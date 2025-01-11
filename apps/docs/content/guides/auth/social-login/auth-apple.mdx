@@ -111,7 +111,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     1. Have an **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple for the App ID you created or already have, in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
     2. Obtain a **Services ID** attached to the App ID that uniquely identifies the website. Use this value as the client ID when initializing Sign in with Apple JS. You can create a new Services ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/serviceId) section in the Apple Developer Console (use the filter menu in the upper right side to see all Services IDs). These usually are a reverse domain name string, for example `com.example.app.website`.
     3. Configure Website URLs for the newly created **Services ID**. The web domain you should use is the domain your website is hosted on. The redirect URL must also point to a page on your website that will receive the callback from Apple.
-    4. Register the Services ID you created to your project's [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
+    4. Register the Services ID you created to your project's [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Client IDs_.
 
     <Admonition type="note">
       If you're using Sign in with Apple JS you do not need to configure the OAuth settings.
@@ -184,12 +184,12 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
 
     <Admonition type="note">
 
-    When testing with Expo Go, the Expo App ID `host.exp.Exponent` will be used. Make sure to add this to the "Authorized Client IDs" list in your [Supabase dashboard Apple provider configuration](https://supabase.com/dashboard/project/_/auth/providers)!
+    When testing with Expo Go, the Expo App ID `host.exp.Exponent` will be used. Make sure to add this to the "Client IDs" list in your [Supabase dashboard Apple provider configuration](https://supabase.com/dashboard/project/_/auth/providers)!
 
     </Admonition>
 
     1. Have an **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple for the App ID you created or already have, in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
-    2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
+    2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Client IDs_.
 
     <Admonition type="note">
 
@@ -243,7 +243,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     ### Configuration [#flutter-configuration-native-app]
 
     1. Have an **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple for the App ID you created or already have, in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
-    2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
+    2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Client IDs_.
 
     ## Apple sign in on Android, Web, Windows and Linux
 
@@ -258,9 +258,11 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     This method of signing in is web based, and will open a browser window to perform the sign in. For non-web platforms, the user is brought back to the app via [deep linking](/docs/guides/auth/native-mobile-deep-linking?platform=flutter).
 
     ```dart
-    supabase.auth.signInWithOAuth(
+    await supabase.auth.signInWithOAuth(
       OAuthProvider.apple,
-      redirectTo: 'my-scheme://login-callback',
+      redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+      authScreenLaunchMode:
+          kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
     );
     ```
 
@@ -298,7 +300,6 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     import SwiftUI
     import AuthenticationServices
     import Supabase
-    import GoTrue
 
     struct SignInView: View {
         let client = SupabaseClient(supabaseURL: URL(string: "your url")!, supabaseKey: "your anon key")
@@ -338,7 +339,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     ### Configuration [#swift-configuration-native-app]
 
     1. Have an **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple for the App ID you created or already have, in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
-    2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
+    2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Client IDs_.
 
     <Admonition type="note">
 

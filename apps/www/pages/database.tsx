@@ -11,7 +11,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Badge, Button, Image, Tabs } from 'ui'
 
 // data
-import Solutions from 'data/Solutions'
+import MainProducts from '~/data/MainProducts'
 import ApiExamplesData from 'data/products/database/api-examples'
 import ExtensionsExamplesData from 'data/products/database/extensions-examples'
 import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
@@ -72,8 +72,8 @@ function Database() {
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.DATABASE} />
         <ProductHeader
-          icon={Solutions['database'].icon}
-          title={Solutions['database'].name}
+          icon={MainProducts['database'].icon}
+          title={MainProducts['database'].name}
           h1={[
             <span key={'database-h1'}>
               Open Source SQL Database
@@ -103,7 +103,7 @@ function Database() {
           <div className="grid grid-cols-12">
             <div className="col-span-12 mb-10 lg:col-span-3 lg:mb-0">
               <div className="p mb-4 flex items-center space-x-2">
-                <ProductIcon icon={Solutions['database'].icon} />
+                <ProductIcon icon={MainProducts['database'].icon} />
                 <X />
                 <div className="flex w-fit items-center">
                   <NextImage
@@ -122,9 +122,9 @@ function Database() {
             </div>
             <div className="col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
               <div className="p mb-4 flex items-center space-x-2">
-                <ProductIcon icon={Solutions['database'].icon} />
+                <ProductIcon icon={MainProducts['database'].icon} />
                 <X />
-                <ProductIcon icon={Solutions['authentication'].icon} />
+                <ProductIcon icon={MainProducts['authentication'].icon} />
               </div>
 
               <h4 className="h4">Built-in Auth</h4>
@@ -136,7 +136,7 @@ function Database() {
             </div>
             <div className="col-span-12 lg:col-span-3 lg:col-start-9">
               <div className="p mb-4 flex items-center space-x-2">
-                <ProductIcon icon={Solutions['database'].icon} />
+                <ProductIcon icon={MainProducts['database'].icon} />
                 <X />
                 <ProductIcon icon={'M13 10V3L4 14h7v7l9-11h-7z'} />
               </div>

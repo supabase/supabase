@@ -432,6 +432,12 @@ export const examples: Registry = [
     files: ['example/dialog-close-button.tsx'],
   },
   {
+    name: 'dialog-centered-off',
+    type: 'components:example',
+    registryDependencies: ['dialog', 'button'],
+    files: ['example/dialog-centered-off.tsx'],
+  },
+  {
     name: 'drawer-demo',
     type: 'components:example',
     registryDependencies: ['drawer'],
@@ -1031,14 +1037,69 @@ export const examples: Registry = [
     files: ['example/info-tooltip-demo.tsx'],
   },
   {
+    name: 'inner-side-menu-demo',
+    type: 'components:example',
+    files: ['example/inner-side-menu-demo.tsx'],
+  },
+  {
+    name: 'inner-side-menu-static-titles',
+    type: 'components:example',
+    files: ['example/inner-side-menu-static-titles.tsx'],
+  },
+  {
+    name: 'inner-side-menu-loading',
+    type: 'components:example',
+    files: ['example/inner-side-menu-loading.tsx'],
+  },
+  {
+    name: 'inner-side-menu-multiple-sections',
+    type: 'components:example',
+    files: ['example/inner-side-menu-multiple-sections.tsx'],
+  },
+  {
+    name: 'inner-side-menu-empty',
+    type: 'components:example',
+    files: ['example/inner-side-menu-empty.tsx'],
+  },
+  {
+    name: 'inner-side-menu-with-search',
+    type: 'components:example',
+    files: ['example/inner-side-menu-with-search.tsx'],
+  },
+  {
     name: 'multi-select-demo',
     type: 'components:example',
     files: ['example/multi-select-demo.tsx'],
   },
   {
-    name: 'multi-select-form',
+    name: 'multi-select-disabled',
     type: 'components:example',
-    files: ['example/multi-select-form.tsx'],
+    files: ['example/multi-select-disabled.tsx'],
+  },
+  {
+    name: 'multi-select-badge-limit-wrap',
+    type: 'components:example',
+    files: ['example/multi-select-badge-limit-wrap.tsx'],
+  },
+  {
+    name: 'multi-select-badge-limit',
+    type: 'components:example',
+    files: ['example/multi-select-badge-limit.tsx'],
+  },
+  {
+    name: 'multi-select-combobox',
+    type: 'components:example',
+    files: ['example/multi-select-combobox.tsx'],
+  },
+  {
+    name: 'multi-select-deletable-badge',
+    type: 'components:example',
+    files: ['example/multi-select-deletable-badge.tsx'],
+  },
+  {
+    name: 'multi-select-inline-search-input',
+    type: 'components:example',
+    files: ['example/multi-select-inline-search-input.tsx'],
   },
   {
     name: 'tree-view-demo',

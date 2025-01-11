@@ -4,7 +4,8 @@
 
 // Basic UI things
 import Link from 'next/link'
-import { Accordion, Admonition, Alert, Button, CodeBlock, Image, markdownComponents } from 'ui'
+import { Accordion, Alert, Button, CodeBlock, Image, markdownComponents } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
@@ -47,6 +48,7 @@ import ProjectSetup from './MDX/project_setup.mdx'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
+import PostgresInstallation from './MDX/postgres_installation.mdx'
 
 // Icons
 import {
@@ -73,7 +75,7 @@ import {
 } from './Navigation/NavigationMenu/MenuIcons'
 
 // Heavy/rare (lazy-loaded)
-import SqlToRest from '@ui-patterns/SqlToRest'
+import SqlToRest from 'ui-patterns/SqlToRest'
 import { AppleSecretGenerator } from './AppleSecretGenerator'
 import { AuthSmsProviderConfig } from './AuthSmsProviderConfig'
 import { Extensions } from './Extensions'
@@ -161,6 +163,7 @@ const components = {
   SharedData,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
+  PostgresInstallation,
   SqlToRest,
   StepHikeCompact,
   table: Table,

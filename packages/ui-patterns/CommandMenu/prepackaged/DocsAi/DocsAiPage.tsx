@@ -1,7 +1,7 @@
 'use client'
 
 import { User } from 'lucide-react'
-import { Fragment, useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -88,7 +88,7 @@ const DocsAiPage = () => {
           />
         )}
       </CommandHeader>
-      <div className={cn('flex-grow min-h-0 overflow-auto p-4')}>
+      <div className={cn('flex-grow min-h-0 overflow-auto')}>
         {!hasError && messages.length > 0 && <AiMessages messages={messages} />}
         {!hasError && messages.length === 0 && <EmptyState handleSubmit={handleSubmit} />}
         {hasError && <ErrorState handleReset={handleReset} />}
@@ -125,12 +125,10 @@ function PromptInput({
   className?: string
 }) {
   const query = useQuery()
-
-  useHistoryKeys({
-    enable: !isResponding,
-    stack: messages.filter(({ role }) => role === MessageRole.User).map(({ content }) => content),
-  })
-
+  const previousQuery = useRef(query)
+  const setQuery = useSetQuery()
+  // If the user has already typed something when they select Supabase AI, we want to
+  // submit it immediately.
   useEffect(() => {
     if (query) {
       submit(query)
@@ -138,8 +136,23 @@ function PromptInput({
     return reset
   }, [])
 
-  // Detect an IME composition (so that we can ignore Enter keypress)
+  const [inputValue, setInputValue] = useState('')
+  // Support CJK IME input
   const [isImeComposing, setIsImeComposing] = useState(false)
+  useEffect(() => {
+    if (query !== previousQuery.current) {
+      setInputValue(query)
+      previousQuery.current = query
+    } else if (!isImeComposing) {
+      setQuery(inputValue)
+      previousQuery.current = inputValue
+    }
+  }, [inputValue, query, isImeComposing])
+
+  useHistoryKeys({
+    enable: !isResponding,
+    stack: messages.filter(({ role }) => role === MessageRole.User).map(({ content }) => content),
+  })
 
   return (
     <CommandInput
@@ -157,7 +170,8 @@ function PromptInput({
       placeholder={
         isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
       }
-      value={query}
+      value={inputValue}
+      onValueChange={setInputValue}
       onCompositionStart={() => setIsImeComposing(true)}
       onCompositionEnd={() => setIsImeComposing(false)}
       onKeyDown={(e) => {
@@ -256,12 +270,10 @@ function EmptyState({ handleSubmit }: { handleSubmit: (message: string) => void 
   const query = useQuery()
 
   return (
-    <CommandList_Shadcn_>
+    <CommandList_Shadcn_ className="max-h-[unset]">
       <CommandGroup_Shadcn_
         heading="Examples"
         className={cn(
-          // Double padding from command group primitive and container, remove the primitive one
-          '!p-0',
           'text-border-strong',
           '[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5',
           '[&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted'

@@ -1,5 +1,6 @@
 import { SVGProps, forwardRef } from 'react'
-import { cn } from 'ui'
+import { cn } from '../lib/utils'
+import { Check } from 'lucide-react'
 
 export interface StatusIconProps {
   hideBackground?: boolean
@@ -16,6 +17,8 @@ export const StatusIcon = forwardRef<
     Icon = WarningIcon
   } else if (variant === 'destructive') {
     Icon = CriticalIcon
+  } else if (variant === 'success') {
+    Icon = CheckIcon
   } else {
     Icon = InfoIcon
   }
@@ -41,9 +44,9 @@ const InfoIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
       )}
     >
       <path
-        fill-rule="evenodd"
+        fillRule="evenodd"
         d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0ZM9 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM6.75 8a.75.75 0 0 0 0 1.5h.75v1.75a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8.25 8h-1.5Z"
-        clip-rule="evenodd"
+        clipRule="evenodd"
       />
     </svg>
   )
@@ -101,4 +104,32 @@ const WarningIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
   )
 }
 
-export { WarningIcon, CriticalIcon, InfoIcon }
+const CheckIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
+  hideBackground = false,
+  ...props
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      {...props}
+      className={cn(
+        !hideBackground
+          ? 'w-4 h-4 p-0.5 bg-foreground text-background rounded'
+          : 'w-3 h-3 text-success-600',
+        props.className
+      )}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={3}
+        d="m4.5 12.75 6 6 9-13.5"
+      />
+    </svg>
+  )
+}
+
+export { CriticalIcon, InfoIcon, WarningIcon, CheckIcon }

@@ -143,7 +143,11 @@ const TextConfirmModal = forwardRef<
             </>
           )}
           <Form_Shadcn_ {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="px-5 flex flex-col gap-2 pt-3">
+            <form
+              autoComplete="off"
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="px-5 flex flex-col gap-2 pt-3"
+            >
               <FormField_Shadcn_
                 control={form.control}
                 name="confirmValue"
@@ -154,7 +158,12 @@ const TextConfirmModal = forwardRef<
                       confirm.
                     </FormLabel_Shadcn_>
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ placeholder={confirmPlaceholder} {...input} {...field} />
+                      <Input_Shadcn_
+                        autoComplete="off"
+                        placeholder={confirmPlaceholder}
+                        {...input}
+                        {...field}
+                      />
                     </FormControl_Shadcn_>
                     <FormDescription_Shadcn_ {...description} />
                     <FormMessage_Shadcn_ {...formMessage} />

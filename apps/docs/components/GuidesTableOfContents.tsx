@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import { proxy, useSnapshot } from 'valtio'
@@ -20,23 +20,32 @@ const formatSlug = (slug: string) => {
   return slug
 }
 
-const formatTOCHeader = (content: string) => {
-  let begin = false
-  const res: Array<string> = []
+function formatTOCHeader(content: string) {
+  let insideInlineCode = false
+  const res: Array<{ type: 'text'; value: string } | { type: 'code'; value: string }> = []
+
   for (const x of content) {
     if (x === '`') {
-      if (!begin) {
-        begin = true
-        res.push(`<code class="text-xs border rounded bg-muted">`)
+      if (!insideInlineCode) {
+        insideInlineCode = true
+        res.push({ type: 'code', value: '' })
       } else {
-        begin = false
-        res.push(`</code>`)
+        insideInlineCode = false
       }
     } else {
-      res.push(x)
+      if (insideInlineCode) {
+        res[res.length - 1].value += x
+      } else {
+        if (res.length === 0 || res[res.length - 1].type === 'code') {
+          res.push({ type: 'text', value: x })
+        } else {
+          res[res.length - 1].value += x
+        }
+      }
     }
   }
-  return res.join('')
+
+  return res
 }
 
 const tocRenderSwitch = proxy({
@@ -121,7 +130,7 @@ const GuidesTableOfContents = ({
 
   if (!displayedList.length) return
 
-  const tocVideoPreview = `http://img.youtube.com/vi/${video}/0.jpg`
+  const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
 
   return (
     <div className={cn('border-l', 'thin-scrollbar overflow-y-auto', 'px-2', className)}>
@@ -140,8 +149,17 @@ const GuidesTableOfContents = ({
             <a
               href={`#${formatSlug(item.link)}`}
               className="text-foreground-lighter hover:text-brand-link transition-colors"
-              dangerouslySetInnerHTML={{ __html: formatTOCHeader(removeAnchor(item.text)) }}
-            />
+            >
+              {formatTOCHeader(removeAnchor(item.text)).map((x, index) => (
+                <Fragment key={index}>
+                  {x.type === 'code' ? (
+                    <code className="text-xs border rounded bg-muted">{x.value}</code>
+                  ) : (
+                    x.value
+                  )}
+                </Fragment>
+              ))}
+            </a>
           </li>
         ))}
       </ul>

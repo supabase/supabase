@@ -4,10 +4,10 @@ node_modules
 package-lock.json
 docker*
 apps/**/out
-apps/docs/spec/**
 # prettier-plugin-sql-cst only supports sqlite syntax
 **/supabase/migrations/*.sql
 apps/www/schema.sql
+apps/www/public/images/*
 apps/docs/**/generated/*
 examples/slack-clone/nextjs-slack-clone/full-schema.sql
 # ignore files with custom js formatting
@@ -17,3 +17,5 @@ apps/studio/public
 apps/**/.turbo
 apps/docs/CONTRIBUTING.md
 apps/design-system/__registry__
+packages/icons/__registry__
+packages/icons/src/icons/*.ts

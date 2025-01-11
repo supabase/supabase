@@ -1,14 +1,7 @@
 REPO_DIR=$(shell pwd)
+GENERATOR_DIR=../../../packages/generator
 
 run: download transform generate format
-
-
-###############################################################################
-# Init - prepare the environment
-###############################################################################
-
-init:
-	cd $(REPO_DIR)/parser && npm install
 
 
 ###############################################################################
@@ -45,7 +38,7 @@ download.storage.v1:
 
 download.tsdoc.v2:
 	curl -sS https://supabase.github.io/supabase-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/supabase.json
-	curl -sS https://supabase.github.io/gotrue-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/gotrue.json
+	curl -sS https://supabase.github.io/auth-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/gotrue.json
 	curl -sS https://supabase.github.io/postgrest-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/postgrest.json
 	curl -sS https://supabase.github.io/realtime-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/realtime.json
 	curl -sS https://supabase.github.io/storage-js/v2/spec.json > $(REPO_DIR)/enrichments/tsdoc_v2/storage.json
@@ -73,20 +66,20 @@ dereference.analytics.v0:
 
 # No longer updated
 # dereference.tsdoc.v1:
-# 	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:functions:v1
-# 	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:gotrue:v1
-# 	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:postgrest:v1
-# 	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:realtime:v1
-# 	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:storage:v1
-# 	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:supabase:v1
+# 	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:functions:v1
+# 	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:gotrue:v1
+# 	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:postgrest:v1
+# 	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:realtime:v1
+# 	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:storage:v1
+# 	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:supabase:v1
 
 dereference.tsdoc.v2:
-	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:functions:v2
-	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:gotrue:v2
-	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:postgrest:v2
-	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:realtime:v2
-	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:storage:v2
-	cd $(REPO_DIR)/parser && npm run tsdoc:dereference:supabase:v2
+	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:functions:v2
+	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:gotrue:v2
+	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:postgrest:v2
+	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:realtime:v2
+	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:storage:v2
+	cd $(GENERATOR_DIR) && npm run tsdoc:dereference:supabase:v2
 
 # No longer updated
 # combine.tsdoc.v1:

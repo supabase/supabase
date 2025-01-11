@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -12,7 +13,7 @@ import {
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { MAX_REPLICAS_BELOW_XL, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
@@ -31,13 +32,11 @@ import {
   AlertTitle_Shadcn_,
   Badge,
   Button,
-  CriticalIcon,
   Modal,
   Radio,
   SidePanel,
   WarningIcon,
 } from 'ui'
-import { ExternalLink, Info } from 'lucide-react'
 
 const ComputeInstanceSidePanel = () => {
   const queryClient = useQueryClient()
@@ -45,17 +44,14 @@ const ComputeInstanceSidePanel = () => {
   const { ref: projectRef } = useParams()
   const { project: selectedProject } = useProjectContext()
   const organization = useSelectedOrganization()
-
   const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
+  const diskAndComputeForm = useFlag('diskAndComputeForm')
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
-
   const canUpdateCompute = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
-
   const isProjectActive = useIsProjectActive()
-
   const { panel, setPanel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'computeInstance'
 
@@ -68,7 +64,7 @@ const ComputeInstanceSidePanel = () => {
         `Successfully updated compute instance to ${selectedCompute?.name}. Your project is currently being restarted to update its instance`,
         { duration: 8000 }
       )
-      setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
+      setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESIZING)
       closePanel()
       router.push(`/project/${projectRef}`)
     },
@@ -82,7 +78,7 @@ const ComputeInstanceSidePanel = () => {
         `Successfully updated compute instance. Your project is currently being restarted to update its instance`,
         { duration: 8000 }
       )
-      setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
+      setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESIZING)
       closePanel()
       router.push(`/project/${projectRef}`)
     },
@@ -163,22 +159,18 @@ const ComputeInstanceSidePanel = () => {
   const selectedCompute = availableOptions.find((option) => option.identifier === selectedOption)
   const hasChanges =
     selectedOption !== (subscriptionCompute?.variant.identifier ?? defaultInstanceSize)
-  const hasReadReplicas = (databases ?? []).length > 1
+  const numReadReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef).length
+  const hasReadReplicas = numReadReplicas > 0
 
-  const blockDowngradeDueToPitr =
-    pitrAddon !== undefined && ['ci_micro', 'ci_nano'].includes(selectedOption) && hasChanges
+  const isDowngradingToBelowSmall = ['ci_micro', 'ci_nano'].includes(selectedOption)
+  const blockDowngradeDueToPitr = pitrAddon !== undefined && isDowngradingToBelowSmall && hasChanges
+  const hasMoreThanTwoReplicasForXLAndAbove =
+    numReadReplicas > MAX_REPLICAS_BELOW_XL &&
+    ['ci_micro', 'ci_small', 'ci_medium', 'ci_large'].includes(selectedOption)
   const blockDowngradeDueToReadReplicas =
-    hasChanges && hasReadReplicas && ['ci_micro', 'ci_nano'].includes(selectedOption)
-
-  useEffect(() => {
-    if (visible) {
-      if (subscriptionCompute !== undefined) {
-        setSelectedOption(subscriptionCompute.variant.identifier)
-      } else {
-        setSelectedOption(defaultInstanceSize)
-      }
-    }
-  }, [visible, isLoading])
+    hasChanges &&
+    hasReadReplicas &&
+    (isDowngradingToBelowSmall || hasMoreThanTwoReplicasForXLAndAbove)
 
   const onConfirmUpdateComputeInstance = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -203,6 +195,22 @@ const ComputeInstanceSidePanel = () => {
       })
     }
   }
+
+  useEffect(() => {
+    if (visible) {
+      if (subscriptionCompute !== undefined) {
+        setSelectedOption(subscriptionCompute.variant.identifier)
+      } else {
+        setSelectedOption(defaultInstanceSize)
+      }
+    }
+  }, [visible, isLoading])
+
+  useEffect(() => {
+    if (visible && diskAndComputeForm) {
+      router.push(`/project/${projectRef}/settings/compute-and-disk`)
+    }
+  }, [visible, diskAndComputeForm, router, projectRef])
 
   return (
     <>
@@ -409,12 +417,14 @@ const ComputeInstanceSidePanel = () => {
               <Alert_Shadcn_>
                 <WarningIcon />
                 <AlertTitle_Shadcn_>
-                  Unable to downgrade as project has active read replicas
+                  {hasMoreThanTwoReplicasForXLAndAbove && selectedOption !== 'ci_micro'
+                    ? `Unable to downgrade as project has more than ${MAX_REPLICAS_BELOW_XL} read replicas`
+                    : 'Unable to downgrade as project has active read replicas'}
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
-                  The minimum compute size for using read replicas is the Small Compute. You need to
-                  remove all read replicas before downgrading Compute as it requires at least a
-                  Small compute instance.
+                  {hasMoreThanTwoReplicasForXLAndAbove && selectedOption !== 'ci_micro'
+                    ? `You can only have up to ${MAX_REPLICAS_BELOW_XL} read replicas for compute sizes below XL, as such you will need to remove at least ${numReadReplicas - MAX_REPLICAS_BELOW_XL} read replica${numReadReplicas - MAX_REPLICAS_BELOW_XL > 1 ? 's' : ''} before downgrading your compute.`
+                    : 'The minimum compute size for using read replicas is the Small Compute. You need to remove all read replicas before downgrading Compute as it requires at least a Small compute instance.'}
                 </AlertDescription_Shadcn_>
                 <AlertDescription_Shadcn_ className="mt-2">
                   <Button asChild type="default">
@@ -446,18 +456,6 @@ const ComputeInstanceSidePanel = () => {
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             ) : null}
-
-            {hasChanges &&
-              subscription?.billing_via_partner &&
-              subscription.scheduled_plan_change?.target_plan !== undefined && (
-                <Alert_Shadcn_ variant={'warning'} className="mb-2">
-                  <CriticalIcon />
-                  <AlertDescription_Shadcn_>
-                    You have a scheduled subscription change that will be canceled if you change
-                    your compute size.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-              )}
           </div>
         </SidePanel.Content>
       </SidePanel>

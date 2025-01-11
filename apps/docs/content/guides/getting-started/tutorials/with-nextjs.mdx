@@ -108,8 +108,8 @@ import { createBrowserClient } from '@supabase/ssr'
 export function createClient() {
   // Create a supabase client on the browser with project's credentials
   return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   )
 }
 ```
@@ -118,14 +118,14 @@ export function createClient() {
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export function createClient() {
-  const cookieStore = cookies()
+export async function createClient() {
+  const cookieStore = await cookies()
 
   // Create a server's supabase client with newly configured cookie,
   // which could be used to maintain user's session
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll() {
@@ -154,53 +154,21 @@ export function createClient() {
 
 <TabPanel id="ts" label="TypeScript">
 
+Create a `client.ts` and a `server.ts` with the following functionalities for client-side Supabase and server-side Supabase, respectively.
+
 <CH.Code className="min-h-[30rem]">
 
-```tsx utils/supabase/client.ts
-import { createBrowserClient } from '@supabase/ssr'
+<$CodeSample
+path="/user-management/nextjs-user-management/utils/supabase/client.ts"
+lines={[[1, -1]]}
+meta="utils/supabase/client.ts"
+/>
 
-export function createClient() {
-  // Create a supabase client on the browser with project's credentials
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-}
-```
-
-```tsx utils/supabase/server.ts
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-
-export function createClient() {
-  const cookieStore = cookies()
-
-  // Create a server's supabase client with newly configured cookie,
-  // which could be used to maintain user's session
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
-          }
-        },
-      },
-    }
-  )
-}
-```
+<$CodeSample
+path="/user-management/nextjs-user-management/utils/supabase/server.ts"
+lines={[[1, -1]]}
+meta="utils/supabase/server.ts"
+/>
 
 </CH.Code>
 
@@ -313,65 +281,17 @@ Create a `middleware.ts` file at the project root and another one within the `ut
 
 <CH.Code className="min-h-[30rem]">
 
-```tsx middleware.ts
-import { type NextRequest } from 'next/server'
-import { updateSession } from '@/utils/supabase/middleware'
+<$CodeSample
+path="/user-management/nextjs-user-management/middleware.ts"
+lines={[[1, -1]]}
+meta="middleware.ts"
+/>
 
-export async function middleware(request: NextRequest) {
-  // update user's auth session
-  return await updateSession(request)
-}
-
-export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
-}
-```
-
-```tsx utils/supabase/middleware.ts
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
-
-export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
-
-  // refreshing the auth token
-  await supabase.auth.getUser()
-
-  return supabaseResponse
-}
-```
+<$CodeSample
+path="/user-management/nextjs-user-management/utils/supabase/middleware.ts"
+lines={[[1, -1]]}
+meta="utils/supabase/middleware.ts"
+/>
 
 </CH.Code>
 
@@ -381,7 +301,7 @@ export async function updateSession(request: NextRequest) {
 
 ## Set up a login page
 
-### Login and Signup form
+### Login and signup form
 
 Create a login/signup page for your application:
 
@@ -420,22 +340,11 @@ export default function LoginPage() {
 
 Create a new folder named `login`, containing a `page.tsx` file with a login/signup form.
 
-```tsx app/login/page.tsx
-import { login, signup } from './actions'
-
-export default function LoginPage() {
-  return (
-    <form>
-      <label htmlFor="email">Email:</label>
-      <input id="email" name="email" type="email" required />
-      <label htmlFor="password">Password:</label>
-      <input id="password" name="password" type="password" required />
-      <button formAction={login}>Log in</button>
-      <button formAction={signup}>Sign up</button>
-    </form>
-  )
-}
-```
+<$CodeSample
+path="/user-management/nextjs-user-management/app/login/page.tsx"
+lines={[[1, -1]]}
+meta="app/login/page.tsx"
+/>
 
 </TabPanel>
 
@@ -476,7 +385,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 
 export async function login(formData) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
@@ -496,7 +405,7 @@ export async function login(formData) {
 }
 
 export async function signup(formData) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const data = {
     email: formData.get('email'),
@@ -528,60 +437,17 @@ export default function ErrorPage() {
 
 <CH.Code className="max-h-[30rem]">
 
-```ts app/login/actions.ts
-'use server'
+<$CodeSample
+path="/user-management/nextjs-user-management/app/login/actions.ts"
+lines={[[1, -1]]}
+meta="app/login/actions.ts"
+/>
 
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-
-import { createClient } from '@/utils/supabase/server'
-
-export async function login(formData: FormData) {
-  const supabase = createClient()
-
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
-
-  const { error } = await supabase.auth.signInWithPassword(data)
-
-  if (error) {
-    redirect('/error')
-  }
-
-  revalidatePath('/', 'layout')
-  redirect('/account')
-}
-
-export async function signup(formData: FormData) {
-  const supabase = createClient()
-
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
-
-  const { error } = await supabase.auth.signUp(data)
-
-  if (error) {
-    redirect('/error')
-  }
-
-  revalidatePath('/', 'layout')
-  redirect('/account')
-}
-```
-
-```tsx app/error/page.tsx
-export default function ErrorPage() {
-  return <p>Sorry, something went wrong</p>
-}
-```
+<$CodeSample
+path="/user-management/nextjs-user-management/app/error/page.tsx"
+lines={[[1, -1]]}
+meta="app/error/page.tsx"
+/>
 
 </CH.Code>
 
@@ -646,7 +512,7 @@ export async function GET(request) {
   redirectTo.searchParams.delete('type')
 
   if (token_hash && type) {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { error } = await supabase.auth.verifyOtp({
       type,
@@ -668,43 +534,11 @@ export async function GET(request) {
 
 <TabPanel id="ts" label="TypeScript">
 
-```ts app/auth/confirm/route.ts
-import { type EmailOtpType } from '@supabase/supabase-js'
-import { type NextRequest, NextResponse } from 'next/server'
-
-import { createClient } from '@/utils/supabase/server'
-
-// Creating a handler to a GET request to route /auth/confirm
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const token_hash = searchParams.get('token_hash')
-  const type = searchParams.get('type') as EmailOtpType | null
-  const next = '/account'
-
-  // Create redirect link without the secret token
-  const redirectTo = request.nextUrl.clone()
-  redirectTo.pathname = next
-  redirectTo.searchParams.delete('token_hash')
-  redirectTo.searchParams.delete('type')
-
-  if (token_hash && type) {
-    const supabase = createClient()
-
-    const { error } = await supabase.auth.verifyOtp({
-      type,
-      token_hash,
-    })
-    if (!error) {
-      redirectTo.searchParams.delete('next')
-      return NextResponse.redirect(redirectTo)
-    }
-  }
-
-  // return the user to an error page with some instructions
-  redirectTo.pathname = '/error'
-  return NextResponse.redirect(redirectTo)
-}
-```
+<$CodeSample
+path="/user-management/nextjs-user-management/app/auth/confirm/route.ts"
+lines={[[1, -1]]}
+meta="app/auth/confirm/route.ts"
+/>
 
 </TabPanel>
 
@@ -857,137 +691,11 @@ export default function AccountForm({ user }) {
 
 <CH.Code className="max-h-[40rem]">
 
-```tsx app/account/account-form.tsx
-'use client'
-import { useCallback, useEffect, useState } from 'react'
-import { createClient } from '@/utils/supabase/client'
-import { type User } from '@supabase/supabase-js'
-
-export default function AccountForm({ user }: { user: User | null }) {
-  const supabase = createClient()
-  const [loading, setLoading] = useState(true)
-  const [fullname, setFullname] = useState<string | null>(null)
-  const [username, setUsername] = useState<string | null>(null)
-  const [website, setWebsite] = useState<string | null>(null)
-  const [avatar_url, setAvatarUrl] = useState<string | null>(null)
-
-  const getProfile = useCallback(async () => {
-    try {
-      setLoading(true)
-
-      const { data, error, status } = await supabase
-        .from('profiles')
-        .select(`full_name, username, website, avatar_url`)
-        .eq('id', user?.id)
-        .single()
-
-      if (error && status !== 406) {
-        console.log(error)
-        throw error
-      }
-
-      if (data) {
-        setFullname(data.full_name)
-        setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
-      }
-    } catch (error) {
-      alert('Error loading user data!')
-    } finally {
-      setLoading(false)
-    }
-  }, [user, supabase])
-
-  useEffect(() => {
-    getProfile()
-  }, [user, getProfile])
-
-  async function updateProfile({
-    username,
-    website,
-    avatar_url,
-  }: {
-    username: string | null
-    fullname: string | null
-    website: string | null
-    avatar_url: string | null
-  }) {
-    try {
-      setLoading(true)
-
-      const { error } = await supabase.from('profiles').upsert({
-        id: user?.id as string,
-        full_name: fullname,
-        username,
-        website,
-        avatar_url,
-        updated_at: new Date().toISOString(),
-      })
-      if (error) throw error
-      alert('Profile updated!')
-    } catch (error) {
-      alert('Error updating the data!')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div className="form-widget">
-      <div>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={user?.email} disabled />
-      </div>
-      <div>
-        <label htmlFor="fullName">Full Name</label>
-        <input
-          id="fullName"
-          type="text"
-          value={fullname || ''}
-          onChange={(e) => setFullname(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="username">Username</label>
-        <input
-          id="username"
-          type="text"
-          value={username || ''}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="website">Website</label>
-        <input
-          id="website"
-          type="url"
-          value={website || ''}
-          onChange={(e) => setWebsite(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <button
-          className="button primary block"
-          onClick={() => updateProfile({ fullname, username, website, avatar_url })}
-          disabled={loading}
-        >
-          {loading ? 'Loading ...' : 'Update'}
-        </button>
-      </div>
-
-      <div>
-        <form action="/auth/signout" method="post">
-          <button className="button block" type="submit">
-            Sign out
-          </button>
-        </form>
-      </div>
-    </div>
-  )
-}
-```
+<$CodeSample
+path="/user-management/nextjs-user-management/app/account/account-form.tsx"
+lines={[[1, 4], [7, 78], [88, -1]]}
+meta="app/account/account-form.tsx"
+/>
 
 </CH.Code>
 
@@ -1012,7 +720,7 @@ import AccountForm from './account-form'
 import { createClient } from '@/utils/supabase/server'
 
 export default async function Account() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const {
     data: { user },
@@ -1026,20 +734,11 @@ export default async function Account() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx app/account/page.tsx
-import AccountForm from './account-form'
-import { createClient } from '@/utils/supabase/server'
-
-export default async function Account() {
-  const supabase = createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  return <AccountForm user={user} />
-}
-```
+<$CodeSample
+path="/user-management/nextjs-user-management/app/account/page.tsx"
+lines={[[1, -1]]}
+meta="app/account/page.tsx"
+/>
 
 </TabPanel>
 </Tabs>
@@ -1064,7 +763,7 @@ import { revalidatePath } from 'next/cache'
 import { NextResponse } from 'next/server'
 
 export async function POST(req) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // Check if a user's logged in
   const {
@@ -1086,29 +785,11 @@ export async function POST(req) {
 
 <TabPanel id="ts" label="TypeScript">
 
-```ts app/auth/signout/route.ts
-import { createClient } from '@/utils/supabase/server'
-import { revalidatePath } from 'next/cache'
-import { type NextRequest, NextResponse } from 'next/server'
-
-export async function POST(req: NextRequest) {
-  const supabase = createClient()
-
-  // Check if a user's logged in
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (user) {
-    await supabase.auth.signOut()
-  }
-
-  revalidatePath('/', 'layout')
-  return NextResponse.redirect(new URL('/login', req.url), {
-    status: 302,
-  })
-}
-```
+<$CodeSample
+path="/user-management/nextjs-user-management/app/auth/signout/route.ts"
+lines={[[1, -1]]}
+meta="app/auth/signout/route.ts"
+/>
 
 </TabPanel>
 
@@ -1237,105 +918,11 @@ export default function Avatar({ uid, url, size, onUpload }) {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx app/account/avatar.tsx
-'use client'
-import React, { useEffect, useState } from 'react'
-import { createClient } from '@/utils/supabase/client'
-import Image from 'next/image'
-
-export default function Avatar({
-  uid,
-  url,
-  size,
-  onUpload,
-}: {
-  uid: string | null
-  url: string | null
-  size: number
-  onUpload: (url: string) => void
-}) {
-  const supabase = createClient()
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(url)
-  const [uploading, setUploading] = useState(false)
-
-  useEffect(() => {
-    async function downloadImage(path: string) {
-      try {
-        const { data, error } = await supabase.storage.from('avatars').download(path)
-        if (error) {
-          throw error
-        }
-
-        const url = URL.createObjectURL(data)
-        setAvatarUrl(url)
-      } catch (error) {
-        console.log('Error downloading image: ', error)
-      }
-    }
-
-    if (url) downloadImage(url)
-  }, [url, supabase])
-
-  const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
-    try {
-      setUploading(true)
-
-      if (!event.target.files || event.target.files.length === 0) {
-        throw new Error('You must select an image to upload.')
-      }
-
-      const file = event.target.files[0]
-      const fileExt = file.name.split('.').pop()
-      const filePath = `${uid}-${Math.random()}.${fileExt}`
-
-      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
-
-      if (uploadError) {
-        throw uploadError
-      }
-
-      onUpload(filePath)
-    } catch (error) {
-      alert('Error uploading avatar!')
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  return (
-    <div>
-      {avatarUrl ? (
-        <Image
-          width={size}
-          height={size}
-          src={avatarUrl}
-          alt="Avatar"
-          className="avatar image"
-          style={{ height: size, width: size }}
-        />
-      ) : (
-        <div className="avatar no-image" style={{ height: size, width: size }} />
-      )}
-      <div style={{ width: size }}>
-        <label className="button primary block" htmlFor="single">
-          {uploading ? 'Uploading ...' : 'Upload'}
-        </label>
-        <input
-          style={{
-            visibility: 'hidden',
-            position: 'absolute',
-          }}
-          type="file"
-          id="single"
-          accept="image/*"
-          onChange={uploadAvatar}
-          disabled={uploading}
-        />
-      </div>
-    </div>
-  )
-}
-```
+<$CodeSample
+path="/user-management/nextjs-user-management/app/account/avatar.tsx"
+lines={[[1, -1]]}
+meta="app/account/avatar.tsx"
+/>
 
 </TabPanel>
 
@@ -1382,28 +969,11 @@ return (
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx app/account/account-form.tsx
-// Import the new component
-import Avatar from './avatar'
-
-// ...
-
-return (
-  <div className="form-widget">
-    {/* Add to the body */}
-    <Avatar
-      uid={user?.id ?? null}
-      url={avatar_url}
-      size={150}
-      onUpload={(url) => {
-        setAvatarUrl(url)
-        updateProfile({ fullname, username, website, avatar_url: url })
-      }}
-    />
-    {/* ... */}
-  </div>
-)
-```
+<$CodeSample
+path="/user-management/nextjs-user-management/app/account/account-form.tsx"
+lines={[[5, 5], [77, 87], [137, -1]]}
+meta="app/account/account-form.tsx"
+/>
 
 </TabPanel>
 

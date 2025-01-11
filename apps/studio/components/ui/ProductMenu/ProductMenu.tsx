@@ -43,7 +43,7 @@ const ProductMenu = ({ page, menu }: ProductMenuProps) => {
                 </div>
               </div>
             </div>
-            {idx !== menu.length - 1 && <div className="h-px w-full bg-border-overlay"></div>}
+            {idx !== menu.length - 1 && <div className="h-px w-full bg-border-overlay" />}
           </div>
         ))}
       </Menu>

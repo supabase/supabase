@@ -85,7 +85,9 @@ const OAuthApps = () => {
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: 'You need additional permissions to create apps',
+                  text: !canCreateOAuthApps
+                    ? 'You need additional permissions to create apps'
+                    : undefined,
                 },
               }}
             >

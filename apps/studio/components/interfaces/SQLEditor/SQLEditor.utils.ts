@@ -1,5 +1,5 @@
-import { SnippetDetail } from 'data/content/sql-folders-query'
 import { removeCommentsFromSql } from 'lib/helpers'
+import type { SnippetWithContent } from 'state/sql-editor-v2'
 import type { SqlSnippets, UserContent } from 'types'
 import {
   NEW_SQL_SNIPPET_SKELETON,
@@ -8,6 +8,9 @@ import {
 } from './SQLEditor.constants'
 import { ContentDiff, DiffType } from './SQLEditor.types'
 
+/**
+ * @deprecated
+ */
 export const createSqlSnippetSkeleton = ({
   id,
   name,
@@ -49,7 +52,7 @@ export const createSqlSnippetSkeletonV2 = ({
   owner_id: number
   project_id: number
   folder_id?: string
-}): SnippetDetail => {
+}): SnippetWithContent => {
   return {
     ...NEW_SQL_SNIPPET_SKELETON,
     id,
@@ -95,7 +98,20 @@ export function getDiffTypeDropdownLabel(diffType: DiffType) {
 }
 
 export function checkDestructiveQuery(sql: string) {
-  return destructiveSqlRegex.some((regex) => regex.test(removeCommentsFromSql(sql)))
+  const cleanedSql = removeCommentsFromSql(sql)
+  return destructiveSqlRegex.some((regex) => regex.test(cleanedSql))
+}
+
+// Function to check for UPDATE queries without WHERE clause
+export function isUpdateWithoutWhere(sql: string): boolean {
+  const updateWithoutWhereRegex =
+    /(?:^|;)\s*update\s+(?:"[\w.]+"\."[\w.]+"|[\w.]+)\s+set\s+[\w\W]+?(?!\s*where\s)/is
+  const updateStatements = sql
+    .split(';')
+    .filter((statement) => statement.trim().toLowerCase().startsWith('update'))
+  return updateStatements.some(
+    (statement) => updateWithoutWhereRegex.test(statement) && !/where\s/i.test(statement)
+  )
 }
 
 export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) =>
@@ -121,18 +137,14 @@ export const compareAsModification = (sqlDiff: ContentDiff) => {
 
   return {
     original: sqlDiff.original,
-    modified: `${sqlAiDisclaimerComment}\n\n${formattedModified}`,
+    modified: `${formattedModified}`,
   }
 }
 
 export const compareAsAddition = (sqlDiff: ContentDiff) => {
   const formattedOriginal = sqlDiff.original.replace(sqlAiDisclaimerComment, '').trim()
   const formattedModified = sqlDiff.modified.replace(sqlAiDisclaimerComment, '').trim()
-  const newModified =
-    sqlAiDisclaimerComment +
-    '\n\n' +
-    (formattedOriginal ? formattedOriginal + '\n\n' : '') +
-    formattedModified
+  const newModified = (formattedOriginal ? formattedOriginal + '\n\n' : '') + formattedModified
 
   return {
     original: sqlDiff.original,

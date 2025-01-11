@@ -21,7 +21,7 @@ const Footer = (props: Props) => {
 
   const isDarkLaunchWeek = useDarkLaunchWeeks()
   const isGAWeek = pathname.includes('/ga-week')
-  const forceDark = isDarkLaunchWeek || pathname === '/'
+  const forceDark = isDarkLaunchWeek
 
   if (props.hideFooter) {
     return null

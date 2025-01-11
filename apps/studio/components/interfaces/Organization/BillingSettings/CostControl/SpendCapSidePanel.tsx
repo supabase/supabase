@@ -266,6 +266,10 @@ const SpendCapSidePanel = () => {
                   ? 'Upon clicking confirm, spend cap will be enabled for your organization and you will no longer be charged any extra for usage.'
                   : 'Upon clicking confirm, spend cap will be disabled for your organization and you will be charged for any usage beyond the included quota.'}
               </p>
+              <p className="text-sm">
+                Toggling spend cap triggers an invoice and there might be prorated charges for any
+                usage beyond the Pro Plans quota during this billing cycle.
+              </p>
             </>
           )}
         </div>

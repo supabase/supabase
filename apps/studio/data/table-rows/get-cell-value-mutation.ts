@@ -51,8 +51,6 @@ export const useGetCellValueMutation = ({
     (vars) => getCellValue(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, table } = variables
-        // await queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name]))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

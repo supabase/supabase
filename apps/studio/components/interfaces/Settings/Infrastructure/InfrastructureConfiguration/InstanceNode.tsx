@@ -207,6 +207,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
         REPLICA_STATUS.COMING_UP,
         REPLICA_STATUS.GOING_DOWN,
         REPLICA_STATUS.RESTORING,
+        REPLICA_STATUS.RESTARTING,
+        REPLICA_STATUS.RESIZING,
         REPLICA_STATUS.INIT_READ_REPLICA,
       ] as string[]
     ).includes(status) || initStatus === ReplicaInitializationStatus.InProgress
@@ -264,8 +266,10 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 </>
               ) : status === REPLICA_STATUS.GOING_DOWN ? (
                 <Badge>Going down</Badge>
-              ) : status === REPLICA_STATUS.RESTORING ? (
+              ) : status === REPLICA_STATUS.RESTARTING ? (
                 <Badge>Restarting</Badge>
+              ) : status === REPLICA_STATUS.RESIZING ? (
+                <Badge>Resizing</Badge>
               ) : initStatus === ReplicaInitializationStatus.Completed &&
                 status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
                 <Badge variant="brand">Healthy</Badge>

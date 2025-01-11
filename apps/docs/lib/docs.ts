@@ -4,18 +4,18 @@ import { serialize } from 'next-mdx-remote/serialize'
 import type { SerializeOptions } from 'next-mdx-remote/dist/types'
 import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
-import { dirname, join, extname, sep, basename } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { basename, extname, join, sep } from 'node:path'
 import remarkGfm from 'remark-gfm'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 
 // MUST be process.cwd() here, not import.meta.url, or files that are added
 // with outputFileTracingIncludes (not auto-traced) will not be found at
 // runtime.
-const DOCS_DIRECTORY = process.cwd()
+export const DOCS_DIRECTORY = process.cwd()
+export const EXAMPLES_DIRECTORY = join(DOCS_DIRECTORY, '..', '..', 'examples')
 export const GUIDES_DIRECTORY = join(DOCS_DIRECTORY, 'content/guides')
 export const REF_DOCS_DIRECTORY = join(DOCS_DIRECTORY, 'docs/ref')
 export const SPEC_DIRECTORY = join(DOCS_DIRECTORY, 'spec')
@@ -26,7 +26,7 @@ export type GuideFrontmatter = {
   description?: string
   canonical?: string
   hideToc?: boolean
-  // @deprecated
+  /** @deprecated */
   hide_table_of_contents?: boolean
   tocVideo?: string
 }

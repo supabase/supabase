@@ -64,7 +64,8 @@ const ProjectUsage = () => {
     ],
     0,
     startDateLocal.toISOString(),
-    endDateLocal.toISOString()
+    endDateLocal.toISOString(),
+    5
   )
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
 

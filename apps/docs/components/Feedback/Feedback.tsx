@@ -1,4 +1,6 @@
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
+'use client'
+
+import { createClient } from '@supabase/supabase-js'
 import { Check, MessageSquareQuote, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import {
@@ -10,13 +12,14 @@ import {
   useState,
 } from 'react'
 
-import { type Database, useIsLoggedIn } from 'common'
+import { type Database, useConstant, useIsLoggedIn } from 'common'
 import { Button, cn } from 'ui'
 
+import { IS_PLATFORM } from '~/lib/constants'
 import { useSendFeedbackMutation } from '~/lib/fetch/feedback'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { FeedbackModal, type FeedbackFields } from './FeedbackModal'
 import { getNotionTeam, getSanitizedTabParams } from './Feedback.utils'
+import { type FeedbackFields, FeedbackModal } from './FeedbackModal'
 
 const FeedbackButton = forwardRef<
   HTMLButtonElement,
@@ -69,7 +72,7 @@ function reducer(state: State, action: Action) {
   }
 }
 
-function Feedback() {
+function Feedback({ className }: { className?: string }) {
   const [state, dispatch] = useReducer(reducer, initialState)
   const [modalOpen, setModalOpen] = useState(false)
   const feedbackButtonRef = useRef<HTMLButtonElement>(null)
@@ -77,7 +80,14 @@ function Feedback() {
   const pathname = usePathname() ?? ''
   const sendTelemetryEvent = useSendTelemetryEvent()
   const { mutate: sendFeedbackComment } = useSendFeedbackMutation()
-  const supabase = useSupabaseClient<Database>()
+  const supabase = useConstant(() =>
+    IS_PLATFORM
+      ? createClient<Database>(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        )
+      : undefined
+  )
 
   const unanswered = state.type === 'unanswered'
   const isYes = 'response' in state && state.response === 'yes'
@@ -132,7 +142,7 @@ function Feedback() {
   }
 
   return (
-    <section className="@container px-5 mb-6" aria-labelledby="feedback-title">
+    <section className={cn('@container px-5 mb-6', className)} aria-labelledby="feedback-title">
       <h3 id="feedback-title" className="block font-mono text-xs uppercase text-foreground mb-4">
         Is this helpful?
       </h3>

@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { RouterComponent } from './router'
-import { expect, suite, vi } from 'vitest'
 import { routerMock } from 'tests/mocks/router'
+import { expect, suite, test } from 'vitest'
+import { RouterComponent } from './router'
 
 suite('Router Mock', () => {
   test('Router mock works as expected', async () => {

@@ -122,6 +122,14 @@ pnpm add dotenv
 </Tabs>
 
 </TabPanel>
+<TabPanel id="hono" label="Hono">
+
+```bash .env
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+</TabPanel>
 </Tabs>
 
 ## Create a client
@@ -150,9 +158,7 @@ The following code samples are for App Router. For help with Pages Router, see t
 >
 <TabPanel id="client" label="Client-side">
 
-```ts utils/supabase/client.tsx
-'use client'
-
+```ts utils/supabase/client.ts
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
@@ -167,12 +173,12 @@ export function createClient() {
 
 <TabPanel id="server" label="Server-side">
 
-```ts utils/supabase/server.tsx
+```ts utils/supabase/server.ts
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export function createClient() {
-  const cookieStore = cookies()
+export async function createClient() {
+  const cookieStore = await cookies()
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -227,7 +233,7 @@ export const config = {
 }
 ```
 
-```ts utils/supabase/middlware.ts
+```ts utils/supabase/middleware.ts
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -482,6 +488,8 @@ const supabase = createServerClient(
 
 ```html index.astro
 <script>
+  import { createBrowserClient } from "@supabase/ssr";
+
   const supabase = createBrowserClient(
     import.meta.env.PUBLIC_SUPABASE_URL,
     import.meta.env.PUBLIC_SUPABASE_ANON_KEY
@@ -516,6 +524,36 @@ export async function GET(context: APIContext) {
 
   return ...
 }
+```
+
+</TabPanel>
+
+<TabPanel id="astro-middleware" label="Middleware">
+
+```ts middleware.ts
+import { createServerClient, parseCookieHeader } from '@supabase/ssr'
+import { defineMiddleware } from 'astro:middleware'
+
+export const onRequest = defineMiddleware(async (context, next) => {
+  const supabase = createServerClient(
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(context.request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            context.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  return next()
+})
 ```
 
 </TabPanel>
@@ -668,6 +706,126 @@ app.post("/hello-world", async function (req, res, next) {
 
   const supabase = createClient({ req, res })
 })
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+
+<TabPanel id="hono" label="Hono">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="server-client"
+  queryGroup="environment"
+>
+<TabPanel id="server-client" label="Server Client">
+
+Create a Hono middleware that creates a Supabase client.
+
+```ts middleware/auth.middleware.ts
+import { createServerClient, parseCookieHeader } from '@supabase/ssr'
+import { SupabaseClient } from '@supabase/supabase-js'
+import type { Context, MiddlewareHandler } from 'hono'
+import { env } from 'hono/adapter'
+import { setCookie } from 'hono/cookie'
+
+declare module 'hono' {
+  interface ContextVariableMap {
+    supabase: SupabaseClient
+  }
+}
+
+export const getSupabase = (c: Context) => {
+  return c.get('supabase')
+}
+
+type SupabaseEnv = {
+  SUPABASE_URL: string
+  SUPABASE_ANON_KEY: string
+}
+
+export const supabaseMiddleware = (): MiddlewareHandler => {
+  return async (c, next) => {
+    const supabaseEnv = env<SupabaseEnv>(c)
+    const supabaseUrl = supabaseEnv.SUPABASE_URL
+    const supabaseAnonKey = supabaseEnv.SUPABASE_ANON_KEY
+
+    if (!supabaseUrl) {
+      throw new Error('SUPABASE_URL missing!')
+    }
+
+    if (!supabaseAnonKey) {
+      throw new Error('SUPABASE_ANON_KEY missing!')
+    }
+
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(c.req.header('Cookie') ?? '')
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => setCookie(c, name, value, options))
+        },
+      },
+    })
+
+    c.set('supabase', supabase)
+
+    await next()
+  }
+}
+```
+
+</TabPanel>
+<TabPanel id="hono-route" label="Route">
+
+You can now use this middleware in your Hono application to create a server Supabase client that can be used to make authenticated requests.
+
+```ts index.tsx
+import { Hono } from 'hono'
+import { getSupabase, supabaseMiddleware } from './middleware/auth.middleware'
+
+const app = new Hono()
+app.use('*', supabaseMiddleware())
+
+app.get('/api/user', async (c) => {
+  const supabase = getSupabase(c)
+  const { data, error } = await supabase.auth.getUser()
+
+  if (error) console.log('error', error)
+
+  if (!data?.user) {
+    return c.json({
+      message: 'You are not logged in.',
+    })
+  }
+
+  return c.json({
+    message: 'You are logged in!',
+    userId: data.user,
+  })
+})
+
+app.get('/signout', async (c) => {
+  const supabase = getSupabase(c)
+  await supabase.auth.signOut()
+  console.log('Signed out server-side!')
+  return c.redirect('/')
+})
+
+// Retrieve data with RLS enabled. The signed in user's auth token is automatically sent.
+app.get('/countries', async (c) => {
+  const supabase = getSupabase(c)
+  const { data, error } = await supabase.from('countries').select('*')
+  if (error) console.log(error)
+  return c.json(data)
+})
+
+export default app
 ```
 
 </TabPanel>

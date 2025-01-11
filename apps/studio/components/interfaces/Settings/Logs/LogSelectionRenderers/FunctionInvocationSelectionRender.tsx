@@ -40,8 +40,8 @@ const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => 
         )}
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
-        <h3 className="text-lg text-foreground mb-4">Request Metadata</h3>
-        <pre className="text-sm syntax-highlight overflow-x-auto">
+        <h3 className="text-foreground-light mb-4 font-mono text-sm uppercase">Request Metadata</h3>
+        <pre className="text-sm syntax-highlight overflow-x-auto mb-4">
           <div
             className="text-wrap"
             dangerouslySetInnerHTML={{
@@ -51,8 +51,10 @@ const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => 
         </pre>
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
-        <h3 className="text-lg text-foreground mb-4">Response Metadata</h3>
-        <pre className="text-sm syntax-highlight overflow-x-auto">
+        <h3 className="text-foreground-light mb-4 font-mono text-sm uppercase">
+          Response Metadata
+        </h3>
+        <pre className="text-sm syntax-highlight overflow-x-auto mb-4">
           <div
             dangerouslySetInnerHTML={{
               __html: response ? jsonSyntaxHighlight(filterFunctionsRequestResponse(response)) : '',

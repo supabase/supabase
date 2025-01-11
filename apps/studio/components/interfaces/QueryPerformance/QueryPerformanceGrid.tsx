@@ -16,7 +16,7 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { QueryPerformanceSort } from '../Reports/Reports.queries'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
@@ -154,6 +154,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               return (
                 <Row
                   {...props}
+                  key={`qp-row-${props.rowIdx}`}
                   onClick={() => {
                     if (typeof idx === 'number' && idx >= 0) {
                       setSelectedRow(idx)

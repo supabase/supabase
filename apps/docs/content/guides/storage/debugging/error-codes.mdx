@@ -6,7 +6,7 @@ subtitle: 'Learn about the Storage error codes and how to resolve them'
 sidebar_label: 'Debugging'
 ---
 
-## Storage Error Codes
+## Storage error codes
 
 <Admonition type="note">
   We are transitioning to a new error code system. For backwards compatibility you'll still be able
@@ -60,7 +60,7 @@ Here is the full list of error codes and their descriptions:
 | MissingPart               | A part of the entity is missing.                                | 400        | Ensure all parts of the entity are included in the request before completing the operation.                                                                                                          |
 | SlowDown                  | The request rate is too high and has been throttled.            | 503        | Reduce the request rate or implement exponential backoff and retry mechanisms to handle throttling.                                                                                                  |
 
-## Legacy Error Codes
+## Legacy error codes
 
 As we are transitioning to a new error code system, you might still see the following error format:
 

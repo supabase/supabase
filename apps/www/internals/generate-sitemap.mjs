@@ -28,6 +28,7 @@ async function generate() {
     '!pages/404.tsx',
     '.next/server/pages/partners/integrations/*.html',
     '.next/server/pages/partners/experts/*.html',
+    '.next/server/pages/features/*.html',
   ])
 
   const blogUrl = 'blog'
@@ -62,6 +63,7 @@ async function generate() {
             if (route === '/case-studies/[slug]') return null
             if (route === '/customers/[slug]') return null
             if (route === '/events/[slug]') return null
+            if (route === '/features/[slug]') return null
             if (route === '/blog/categories/[category]') return null
             if (route === '/partners/experts/[slug]') return null
             if (route === '/partners/integrations/[slug]') return null

@@ -1,6 +1,6 @@
 'use client'
 
-import { type PropsWithChildren, type RefObject, useMemo, useState } from 'react'
+import { type PropsWithChildren, type RefObject, useEffect, useState } from 'react'
 
 import { cn } from 'ui'
 
@@ -24,14 +24,9 @@ const CommandEmpty = ({
   const query = useQuery()
 
   const [render, setRender] = useState(false)
-  useMemo(() => {
-    if (!query) setRender(false)
-    /**
-     * In a timeout so the DOM update happens before we query.
-     */
-    setTimeout(() => {
-      setRender(!listRef?.current?.querySelector('[cmdk-item]'))
-    })
+  useEffect(() => {
+    if (!query) return setRender(false)
+    setRender(!listRef?.current?.querySelector('[cmdk-item]'))
   }, [query])
 
   return (

@@ -5,7 +5,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { BASE_PATH } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 
-const CLSPreview = () => {
+export const CLSPreview = () => {
   const { ref } = useParams()
 
   return (
@@ -53,5 +53,3 @@ const CLSPreview = () => {
     </div>
   )
 }
-
-export default CLSPreview

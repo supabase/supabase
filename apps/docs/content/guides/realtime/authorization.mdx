@@ -167,6 +167,41 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
     ```
 
   </TabPanel>
+  <TabPanel id="swift" label="Swift">
+    ```swift
+    let channel = supabase.channel("room-1") {
+      $0.isPrivate = true
+    }
+
+    Task {
+      for await payload in channel.broadcastStream(event: "test") {
+        print(payload)
+      }
+    }
+
+    await channel.subscribe()
+    print("Connected!")
+    ```
+
+  </TabPanel>
+  <TabPanel id="python" label="Python">
+    ```py
+    channel = realtime.channel(
+      "room-1", {"config": {"private": True}}
+    )
+
+    await channel.on_broadcast(
+      "test", callback=lambda payload: print(payload)
+    ).subscribe(
+      lambda state, err: (
+        print("Connected")
+        if state == RealtimeSubscribeStates.SUBSCRIBED
+        else print(err)
+      )
+    )
+    ```
+
+  </TabPanel>
 </Tabs>
 
 #### Allow a user to send a Broadcast message
@@ -307,7 +342,7 @@ Client access polices are cached for the duration of the connection. Your databa
 Realtime updates the access policy cache for a client based on your RLS polices when:
 
 - A client connects to Realtime and subscribes to a Channel
-- A new JWT is sent to Realtime from a client via the [`access_token` message](docs/guides/realtime/protocol#access-token)
+- A new JWT is sent to Realtime from a client via the [`access_token` message](/docs/guides/realtime/protocol#access-token)
 
 If a new JWT is never received on the Channel, the client will be disconnected when the JWT expires.
 

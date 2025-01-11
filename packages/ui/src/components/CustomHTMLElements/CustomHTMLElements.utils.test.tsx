@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest'
+
 import { getAnchor, removeAnchor } from './CustomHTMLElements.utils'
 
 describe('CustomHTMLElementsUtils', () => {

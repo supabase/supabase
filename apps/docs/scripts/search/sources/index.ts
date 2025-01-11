@@ -93,17 +93,10 @@ export async function fetchSources() {
     'spec/common-cli-sections.json'
   ).load()
 
-  const pagesSources = (await walk('pages'))
-    .filter(({ path }) => /\.mdx?$/.test(path))
-    .filter(({ path }) => !ignoredFiles.includes(path))
-    .map((entry) => new MarkdownLoader('guide', entry.path).load())
-
-  const contentSources = (await walk('content'))
+  const guideSources = (await walk('content'))
     .filter(({ path }) => /\.mdx?$/.test(path))
     .filter(({ path }) => !ignoredFiles.includes(path))
     .map((entry) => new MarkdownLoader('guide', entry.path, { yaml: true }).load())
-
-  const guideSources = [...pagesSources, ...contentSources]
 
   const partnerIntegrationSources = (await fetchPartners()).map((partner) =>
     new IntegrationLoader(partner.slug, partner).load()

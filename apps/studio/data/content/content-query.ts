@@ -1,25 +1,13 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import type { Dashboards, LogSqlSnippets, Owner, SqlSnippets } from 'types'
+import { components } from 'api-types'
+import { get } from 'data/fetchers'
+import type { Dashboards, LogSqlSnippets, SqlSnippets } from 'types'
 import { contentKeys } from './keys'
 
-export type ContentBase = {
-  id?: string
-  name: string
-  description?: string
-  visibility: 'user' | 'project' | 'org' | 'public'
-  owner_id?: number // user id
-  last_updated_by?: number // user id
-  inserted_at?: string // '2021-08-26T08:24:52.040695+00:00'
-  owner?: Owner
-  project_id?: number
-  updated_at?: string // '2021-08-26T08:24:52.040695+00:00'
-  updated_by?: Owner
-}
+export type ContentBase = components['schemas']['GetUserContentObject']
 
-export type Content = ContentBase &
+export type Content = Omit<ContentBase, 'content' | 'type'> &
   (
     | {
         type: 'sql'
@@ -35,28 +23,30 @@ export type Content = ContentBase &
       }
   )
 
-export async function getContent(
-  projectRef: string | undefined,
-  signal?: AbortSignal
-): Promise<{
-  content: Content[]
-}> {
+export type ContentType = Content['type']
+
+interface GetContentVariables {
+  projectRef?: string
+  type: ContentType
+}
+
+export async function getContent({ projectRef, type }: GetContentVariables, signal?: AbortSignal) {
   if (typeof projectRef === 'undefined') {
     throw new Error('projectRef is required for getContent')
   }
 
-  let response = await get(`${API_URL}/projects/${projectRef}/content`, { signal })
+  const { data, error } = await get('/platform/projects/{ref}/content', {
+    params: { path: { ref: projectRef }, query: { type } },
+    signal,
+  })
 
-  if (response.error) {
-    throw response.error
-  }
-
-  if (!response) {
-    throw new Error('Content not found')
+  if (error) {
+    throw error
   }
 
   return {
-    content: response.data,
+    cursor: data.cursor,
+    content: data.data as unknown as Content[],
   }
 }
 
@@ -64,11 +54,11 @@ export type ContentData = Awaited<ReturnType<typeof getContent>>
 export type ContentError = unknown
 
 export const useContentQuery = <TData = ContentData>(
-  projectRef: string | undefined,
+  { projectRef, type }: GetContentVariables,
   { enabled = true, ...options }: UseQueryOptions<ContentData, ContentError, TData> = {}
 ) =>
   useQuery<ContentData, ContentError, TData>(
-    contentKeys.list(projectRef),
-    ({ signal }) => getContent(projectRef, signal),
+    contentKeys.list(projectRef, type),
+    ({ signal }) => getContent({ projectRef, type }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )

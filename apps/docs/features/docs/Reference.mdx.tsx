@@ -2,6 +2,7 @@ import matter from 'gray-matter'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
+import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { components } from '~/features/docs/MdxBase.shared'
 import { RefSubLayout } from '~/features/docs/Reference.ui'
@@ -41,9 +42,9 @@ interface MDXRemoteRefsProps {
 }
 
 function MDXRemoteRefs({ source }: MDXRemoteRefsProps) {
-  const refComponents = { ...components, RefSubLayout }
+  const refComponents = { ...components, RefSubLayout, CliGlobalFlagsHandler }
 
-  return <MDXRemoteBase source={source} components={refComponents} />
+  return <MDXRemoteBase source={source} components={refComponents} customPreprocess={(x) => x} />
 }
 
 export { getRefMarkdown, MDXRemoteRefs }

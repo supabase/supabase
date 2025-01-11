@@ -44,52 +44,49 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   }
 
   return (
-    <div>
-      <Modal
-        closable
-        hideFooter
-        size="small"
-        key="invite-user-modal"
-        visible={visible}
-        header="Invite a new user"
-        onCancel={handleToggle}
+    <Modal
+      hideFooter
+      size="small"
+      key="invite-user-modal"
+      visible={visible}
+      header="Invite a new user"
+      onCancel={handleToggle}
+    >
+      <Form
+        validateOnBlur={false}
+        initialValues={{ email: '' }}
+        validate={validate}
+        onSubmit={onInviteUser}
       >
-        <Form
-          validateOnBlur={false}
-          initialValues={{ email: '' }}
-          validate={validate}
-          onSubmit={onInviteUser}
-        >
-          {() => (
-            <>
-              <Modal.Content>
-                <Input
-                  id="email"
-                  className="w-full"
-                  label="User email"
-                  icon={<Mail />}
-                  type="email"
-                  name="email"
-                  placeholder="User email"
-                />
-              </Modal.Content>
+        {() => (
+          <>
+            <Modal.Content>
+              <Input
+                id="email"
+                className="w-full"
+                label="User email"
+                icon={<Mail />}
+                type="email"
+                name="email"
+                placeholder="User email"
+              />
+            </Modal.Content>
 
-              <Modal.Content>
-                <Button
-                  block
-                  size="small"
-                  htmlType="submit"
-                  loading={isInviting}
-                  disabled={!canInviteUsers || isInviting}
-                >
-                  Invite user
-                </Button>
-              </Modal.Content>
-            </>
-          )}
-        </Form>
-      </Modal>
-    </div>
+            <Modal.Content>
+              <Button
+                block
+                size="small"
+                htmlType="submit"
+                loading={isInviting}
+                disabled={!canInviteUsers || isInviting}
+              >
+                Invite user
+              </Button>
+            </Modal.Content>
+          </>
+        )}
+      </Form>
+    </Modal>
   )
 }
 

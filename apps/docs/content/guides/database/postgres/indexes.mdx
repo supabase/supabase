@@ -69,7 +69,14 @@ Luckily Postgres provides us with `create index concurrently` which prevents blo
 
 Here is a simplified diagram of the index we just created (note that in practice, nodes actually have more than two children).
 
-![B-Tree index example in Postgres](/docs/img/b-tree-example.png)
+<Image
+  alt="B-Tree index example in Postgres"
+  zoomable
+  src={{
+    dark: '/docs/img/database/managing-indexes/creating-indexes.png',
+    light: '/docs/img/database/managing-indexes/creating-indexes--light.png',
+  }}
+/>
 
 You can see that in any large data set, traversing the index to locate a given value can be done in much less operations (O(log n)) than compared to scanning the table one value at a time from top to bottom (O(n)).
 
@@ -114,7 +121,7 @@ For more information on the Index Advisor and its suggestions, see the [`index_a
 
 To use the Dashboard Index Advisor:
 
-1. Go to the [Query Performance](/dashboard/project/_/database/query-performance) page.
+1. Go to the [Query Performance](/dashboard/project/_/advisors/query-performance) page.
 1. Click on a query to bring up the Details side panel.
 1. Select the Indexes tab.
 1. Enable Index Advisor if prompted.

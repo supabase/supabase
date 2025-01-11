@@ -72,7 +72,7 @@ const PricingComputeSection = () => {
                 <h4 className="text-lg">Choose the best compute size for you</h4>
                 <p className="text-[13px] text-foreground-lighter">
                   Every project on the Supabase Platform comes with its own dedicated Postgres
-                  instance. Select the compute compute size that fits your needs.
+                  instance. Select the compute size that fits your needs.
                 </p>
                 <p className="text-[13px] text-foreground-lighter">
                   Compute instances are billed hourly and you can scale up or down at any time. Paid

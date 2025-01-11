@@ -1,5 +1,7 @@
 import { noop } from 'lodash'
-import { ChevronLeft, ExternalLink, FlaskConical } from 'lucide-react'
+import { ChevronLeft, FlaskConical } from 'lucide-react'
+
+import { DocsButton } from 'components/ui/DocsButton'
 import { Button } from 'ui'
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 
@@ -51,22 +53,16 @@ const PolicyEditorModalTitle = ({
       <h4 className="truncate" title={getTitle()}>
         {getTitle()}
       </h4>
-      <div className="flex items-center gap-x-2">
+      <div className="flex items-center gap-x-2 pr-6">
         {showAssistantPreview && view === POLICY_MODAL_VIEWS.EDITOR && (
           <Button type="default" icon={<FlaskConical />} onClick={onToggleFeaturePreviewModal}>
             Try Supabase Assistant
           </Button>
         )}
-        <Button asChild type="default" icon={<ExternalLink />}>
-          <a
-            href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {' '}
-            Documentation
-          </a>
-        </Button>
+        <DocsButton
+          className="mt-[-4px]"
+          href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
+        />
       </div>
     </div>
   )

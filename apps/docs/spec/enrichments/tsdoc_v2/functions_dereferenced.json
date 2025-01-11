@@ -303,23 +303,7 @@
         {
           "title": "Enumeration Members",
           "kind": 16,
-          "children": [
-            64,
-            65,
-            66,
-            67,
-            68,
-            69,
-            70,
-            71,
-            72,
-            73,
-            74,
-            75,
-            76,
-            77,
-            78
-          ]
+          "children": [64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78]
         }
       ],
       "sources": [
@@ -823,21 +807,7 @@
                                   "title": "Enumeration Members",
                                   "kind": 16,
                                   "children": [
-                                    64,
-                                    65,
-                                    66,
-                                    67,
-                                    68,
-                                    69,
-                                    70,
-                                    71,
-                                    72,
-                                    73,
-                                    74,
-                                    75,
-                                    76,
-                                    77,
-                                    78
+                                    64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78
                                   ]
                                 }
                               ],
@@ -856,11 +826,7 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [
-                            8,
-                            7,
-                            13
-                          ]
+                          "children": [8, 7, 13]
                         }
                       ]
                     }
@@ -1314,23 +1280,7 @@
                 {
                   "title": "Enumeration Members",
                   "kind": 16,
-                  "children": [
-                    64,
-                    65,
-                    66,
-                    67,
-                    68,
-                    69,
-                    70,
-                    71,
-                    72,
-                    73,
-                    74,
-                    75,
-                    76,
-                    77,
-                    78
-                  ]
+                  "children": [64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78]
                 }
               ],
               "sources": [
@@ -1954,21 +1904,7 @@
                                       "title": "Enumeration Members",
                                       "kind": 16,
                                       "children": [
-                                        64,
-                                        65,
-                                        66,
-                                        67,
-                                        68,
-                                        69,
-                                        70,
-                                        71,
-                                        72,
-                                        73,
-                                        74,
-                                        75,
-                                        76,
-                                        77,
-                                        78
+                                        64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78
                                       ]
                                     }
                                   ],
@@ -1987,12 +1923,7 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [
-                                38,
-                                32,
-                                36,
-                                37
-                              ]
+                              "children": [38, 32, 36, 37]
                             }
                           ],
                           "sources": [
@@ -2083,27 +2014,17 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            2
-          ]
+          "children": [2]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            17,
-            15,
-            16,
-            14
-          ]
+          "children": [17, 15, 16, 14]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [
-            25,
-            22
-          ]
+          "children": [25, 22]
         }
       ],
       "sources": [
@@ -2218,16 +2139,12 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            40
-          ]
+          "children": [40]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            45
-          ]
+          "children": [45]
         }
       ],
       "sources": [
@@ -2349,16 +2266,12 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            47
-          ]
+          "children": [47]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            50
-          ]
+          "children": [50]
         }
       ],
       "sources": [
@@ -2462,16 +2375,12 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            52
-          ]
+          "children": [52]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            55
-          ]
+          "children": [55]
         }
       ],
       "sources": [
@@ -2575,16 +2484,12 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [
-            57
-          ]
+          "children": [57]
         },
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [
-            60
-          ]
+          "children": [60]
         }
       ],
       "sources": [
@@ -3128,23 +3033,7 @@
                     {
                       "title": "Enumeration Members",
                       "kind": 16,
-                      "children": [
-                        64,
-                        65,
-                        66,
-                        67,
-                        68,
-                        69,
-                        70,
-                        71,
-                        72,
-                        73,
-                        74,
-                        75,
-                        76,
-                        77,
-                        78
-                      ]
+                      "children": [64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78]
                     }
                   ],
                   "sources": [
@@ -3162,12 +3051,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [
-                38,
-                32,
-                36,
-                37
-              ]
+              "children": [38, 32, 36, 37]
             }
           ],
           "sources": [
@@ -3204,10 +3088,7 @@
       ],
       "type": {
         "type": "union",
-        "types": [
-          null,
-          null
-        ]
+        "types": [null, null]
       }
     }
   ],
@@ -3215,28 +3096,17 @@
     {
       "title": "Enumerations",
       "kind": 8,
-      "children": [
-        63
-      ]
+      "children": [63]
     },
     {
       "title": "Classes",
       "kind": 128,
-      "children": [
-        1,
-        39,
-        46,
-        51,
-        56
-      ]
+      "children": [1, 39, 46, 51, 56]
     },
     {
       "title": "Type Aliases",
       "kind": 4194304,
-      "children": [
-        30,
-        61
-      ]
+      "children": [30, 61]
     }
   ],
   "sources": [

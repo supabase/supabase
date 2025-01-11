@@ -1,13 +1,12 @@
-import { useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
+import { X } from 'lucide-react'
 import { useMemo } from 'react'
-import { Button, cn } from 'ui'
 
 import CopyButton from 'components/ui/CopyButton'
-import Telemetry from 'lib/telemetry'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { Button, cn } from 'ui'
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
-import { X } from 'lucide-react'
+import { TelemetryActions } from 'lib/constants/telemetry'
 
 export interface MessageSelectionProps {
   log: LogData | null
@@ -15,12 +14,11 @@ export interface MessageSelectionProps {
 }
 
 const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
-  const telemetryProps = useTelemetryProps()
-  const router = useRouter()
-
   const selectionText = useMemo(() => {
     return JSON.stringify(log, null, 2)
   }, [log])
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   return (
     <div
@@ -76,15 +74,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
                 type="default"
                 title="Copy log to clipboard"
                 onClick={() => {
-                  Telemetry.sendEvent(
-                    {
-                      category: 'realtime_inspector',
-                      action: 'copied_message',
-                      label: 'realtime_inspector_results',
-                    },
-                    telemetryProps,
-                    router
-                  )
+                  sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_COPY_MESSAGE_CLICKED })
                 }}
               />
             </div>

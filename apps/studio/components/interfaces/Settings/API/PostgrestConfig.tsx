@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { indexOf } from 'lodash'
+import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -9,6 +10,7 @@ import { z } from 'zod'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import {
   FormPanelContainer,
@@ -21,9 +23,7 @@ import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-pos
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { ExternalLink, Lock } from 'lucide-react'
 import {
-  Admonition,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -40,11 +40,11 @@ import {
   Switch,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
   MultiSelectorContent,
-  MultiSelectorInput,
   MultiSelectorItem,
   MultiSelectorList,
   MultiSelectorTrigger,
@@ -196,15 +196,7 @@ export const PostgrestConfig = () => {
             <FormPanelHeader className="flex items-center justify-between">
               <span>Data API Settings</span>
               <div className="flex items-center gap-x-2">
-                <Button asChild type="default" icon={<ExternalLink />}>
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://supabase.com/docs/guides/database/connecting-to-postgres#data-apis"
-                  >
-                    Documentation
-                  </a>
-                </Button>
+                <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres#data-apis" />
                 <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
                   Harden Data API
                 </Button>
@@ -304,28 +296,35 @@ export const PostgrestConfig = () => {
                                 <MultiSelector
                                   onValuesChange={field.onChange}
                                   values={field.value}
-                                  size={'small'}
+                                  size="small"
                                   disabled={!canUpdatePostgrestConfig || !isDataApiEnabledInForm}
                                 >
-                                  <MultiSelectorTrigger>
-                                    <MultiSelectorInput placeholder="Select schemas for Data API..." />
-                                  </MultiSelectorTrigger>
+                                  <MultiSelectorTrigger
+                                    mode="inline-combobox"
+                                    label="Select schemas for Data API..."
+                                    badgeLimit="wrap"
+                                    showIcon={false}
+                                    deletableBadge
+                                  />
                                   <MultiSelectorContent>
-                                    {schema.length <= 0 ? (
-                                      <MultiSelectorList>
-                                        <MultiSelectorItem key={'empty'} value={'no'}>
+                                    <MultiSelectorList>
+                                      {schema.length <= 0 ? (
+                                        <MultiSelectorItem key="empty" value="no">
                                           no
                                         </MultiSelectorItem>
-                                      </MultiSelectorList>
-                                    ) : (
-                                      <MultiSelectorList>
-                                        {schema.map((x, i) => (
-                                          <MultiSelectorItem key={x.id + '-' + i} value={x.name}>
-                                            {x.name}
-                                          </MultiSelectorItem>
-                                        ))}
-                                      </MultiSelectorList>
-                                    )}
+                                      ) : (
+                                        <>
+                                          {schema.map((x) => (
+                                            <MultiSelectorItem
+                                              key={x.id + '-' + x.name}
+                                              value={x.name}
+                                            >
+                                              {x.name}
+                                            </MultiSelectorItem>
+                                          ))}
+                                        </>
+                                      )}
+                                    </MultiSelectorList>
                                   </MultiSelectorContent>
                                 </MultiSelector>
                               )}

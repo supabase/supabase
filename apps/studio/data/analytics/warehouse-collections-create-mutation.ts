@@ -7,12 +7,13 @@ import { analyticsKeys } from './keys'
 export type CreateCollectionArgs = {
   projectRef: string
   name: string
+  retention_days: number
 }
 
-export async function createCollection({ projectRef, name }: CreateCollectionArgs) {
+export async function createCollection({ projectRef, name, retention_days }: CreateCollectionArgs) {
   const { data, error } = await post('/platform/projects/{ref}/analytics/warehouse/collections', {
     params: { path: { ref: projectRef } },
-    body: { name },
+    body: { name, retention_days },
   } as any)
 
   if (error) handleError(error)

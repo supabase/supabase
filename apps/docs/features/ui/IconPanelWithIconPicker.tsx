@@ -1,6 +1,6 @@
 import { type ComponentProps } from 'react'
-import { IconPanel } from 'ui-patterns'
 
+import { IconPanel } from 'ui-patterns/IconPanel'
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 
 type IconPanelWithIconPickerProps = Omit<ComponentProps<typeof IconPanel>, 'icon'> & {

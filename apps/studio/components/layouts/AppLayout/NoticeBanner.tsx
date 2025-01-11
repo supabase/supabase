@@ -1,5 +1,3 @@
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { useQuery } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 
@@ -7,105 +5,58 @@ import { useParams } from 'common'
 import { useAppBannerContext } from 'components/interfaces/App/AppBannerWrapperContext'
 import { useProfile } from 'lib/profile'
 import { Button } from 'ui'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { isSmtpEnabled } from 'components/interfaces/Auth/SmtpForm/SmtpForm.utils'
 
-// [Joshen] For this notice specifically, just FYI
-// 1 month after 26th Jan we'll need to add some contextual information about this deprecation
-// in the database settings pooling config section, for projects created before September 27th 2023
+// This file, like AppBannerWrapperContext.tsx, is meant to be dynamic - update this as and when we need to use the NoticeBanner
+
+// [Joshen] As of 19th September 24, this notice is around custom SMTP
+// https://github.com/orgs/supabase/discussions/29370
+// Timelines TLDR:
+// - 20th September 2024: Email template customization no longer possible without setting up custom SMTP provider
+// - 24th September 2024: Projects without custom SMTP will have their custom email templates returned back to default ones
+// - 26th September 2024: If no custom SMTP, emails can only be sent to email addresses in your project's organization
+// We can probably look to disable this banner perhaps a month from 26th Sept 2024 - so maybe end of October 2024
 
 export const NoticeBanner = () => {
   const router = useRouter()
+  const { ref: projectRef } = useParams()
   const { isLoading: isLoadingProfile } = useProfile()
 
   const appBannerContext = useAppBannerContext()
-  const {
-    ipv6BannerAcknowledged,
-    pgbouncerBannerAcknowledged,
-    vercelBannerAcknowledged,
-    onUpdateAcknowledged,
-  } = appBannerContext
+  const { authSmtpBannerAcknowledged, onUpdateAcknowledged } = appBannerContext
 
-  const supabase = useSupabaseClient()
-  const { ref: projectRef } = useParams()
+  const { data: authConfig } = useAuthConfigQuery({ projectRef })
+  const smtpEnabled = isSmtpEnabled(authConfig)
+  const hasAuthEmailHookEnabled = authConfig?.HOOK_SEND_EMAIL_ENABLED
 
-  // [Alaister]: using inline queries here since this is temporary
-  const { data, isLoading: isLoadingIpv6Enabled } = useQuery(
-    ['projects', projectRef, 'pgbouncer-enabled'],
-    async ({ signal }) => {
-      let query = supabase.rpc('ipv6_active_status', { project_ref: projectRef }).returns<
-        {
-          pgbouncer_active: boolean
-          vercel_active: boolean
-        }[]
-      >()
-
-      if (signal) {
-        query = query.abortSignal(signal)
-      }
-
-      const result = await query
-
-      if (result.data === null) {
-        return {
-          pgbouncer_active: false,
-          vercel_active: false,
-        }
-      }
-
-      return result.data[0]
-    },
-    { enabled: Boolean(projectRef) }
-  )
-
-  const pgbouncerEnabled = data?.pgbouncer_active ?? false
-  const vercelWithoutSupavisorEnabled = data?.vercel_active ?? false
-
-  // [Joshen] Pgbouncer list and vercel list are mutually exclusive
-  const pgbouncerProjectAcknowledged = pgbouncerBannerAcknowledged.includes(projectRef ?? '')
-  const vercelProjectAcknowledged = vercelBannerAcknowledged.includes(projectRef ?? '')
-  const allAcknowledged =
-    (!pgbouncerEnabled && !vercelWithoutSupavisorEnabled && ipv6BannerAcknowledged) ||
-    (ipv6BannerAcknowledged && pgbouncerEnabled && pgbouncerProjectAcknowledged) ||
-    (ipv6BannerAcknowledged && vercelWithoutSupavisorEnabled && vercelProjectAcknowledged)
+  const acknowledged = authSmtpBannerAcknowledged.includes(projectRef ?? '')
 
   if (
     isLoadingProfile ||
-    isLoadingIpv6Enabled ||
     router.pathname.includes('sign-in') ||
-    allAcknowledged
+    smtpEnabled ||
+    hasAuthEmailHookEnabled ||
+    acknowledged
   ) {
     return null
   }
 
-  const currentlyViewing =
-    pgbouncerEnabled && !pgbouncerProjectAcknowledged
-      ? ('pgbouncer' as const)
-      : vercelWithoutSupavisorEnabled && !vercelProjectAcknowledged
-        ? ('vercel' as const)
-        : ('ipv6' as const)
-
   return (
     <div
-      className="flex items-center justify-center gap-x-4 bg-surface-100 py-3 transition text-foreground box-border border-b border-default"
       style={{ height: '44px' }}
+      className="flex items-center justify-center gap-x-4 bg-surface-100 py-3 transition text-foreground box-border border-b border-default"
     >
       <p className="text-sm">
-        {currentlyViewing === 'pgbouncer' &&
-          'Our logs on 26th Jan show that you have accessed PgBouncer. Please migrate now. You can ignore this warning if you have already migrated.'}
-        {currentlyViewing === 'vercel' &&
-          "To prepare for the IPv4 migration, please redeploy your Vercel application to detect the updated environment variables if it hasn't been deployed since 27th January."}
-        {currentlyViewing === 'ipv6' &&
-          'We are migrating our infrastructure from IPv4 to IPv6. Please migrate now. You can ignore this warning if you have already migrated.'}
+        Action required: Set up a custom SMTP provider, further restrictions will be imposed for the
+        default email provider
       </p>
       <div className="flex items-center gap-x-1">
         <Button asChild type="link" iconRight={<ExternalLink size={14} />}>
           <a
-            href={
-              currentlyViewing === 'vercel'
-                ? 'https://supabase.com/partners/integrations/vercel'
-                : 'https://github.com/orgs/supabase/discussions/17817'
-            }
             target="_blank"
             rel="noreferrer"
+            href="https://github.com/orgs/supabase/discussions/29370"
           >
             Learn more
           </a>
@@ -113,12 +64,9 @@ export const NoticeBanner = () => {
         <Button
           type="text"
           className="opacity-75"
-          onClick={() =>
-            onUpdateAcknowledged(
-              currentlyViewing,
-              currentlyViewing === 'ipv6' ? true : projectRef ?? ''
-            )
-          }
+          onClick={() => {
+            if (projectRef) onUpdateAcknowledged('auth-smtp', projectRef)
+          }}
         >
           Dismiss
         </Button>

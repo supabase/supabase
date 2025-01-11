@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import { primaryLinks, secondaryLinks } from '~/data/footer'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 
-const Footer = () => (
-  <LayoutMainContent className="pt-0">
+const Footer = ({ className }: { className?: string }) => (
+  <LayoutMainContent className={cn('pt-0', className)}>
     <footer role="contentinfo" aria-label="footer">
       <div className="mt-16">
         <ul className="flex flex-col gap-2">

@@ -45,7 +45,7 @@ VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
 on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```js src/supabaseClient.jsx
+```tsx src/supabaseClient.tsx
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
@@ -354,7 +354,7 @@ const Avatar: Component<Props> = (props) => {
   }
 
   return (
-    <div style={{ width: props.size }} aria-live="polite">
+    <div style={{ width: `${props.size}px` }} aria-live="polite">
       {avatarUrl() ? (
         <img
           src={avatarUrl()!}

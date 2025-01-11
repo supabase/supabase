@@ -17,6 +17,12 @@ date: '2024-08-12'
 toc_depth: 3
 ---
 
+<Admonition type="caution">
+
+Heads up - postgres.new is renaming to database.build. [Why?](/blog/database-build-live-share#new-name-databasebuild)
+
+</Admonition>
+
 Introducing [postgres.new](https://postgres.new), the in-browser Postgres sandbox with AI assistance. With postgres.new, you can instantly spin up an unlimited number of Postgres databases that run directly in your browser (and soon, deploy them to S3).
 
 Each database is paired with a large language model (LLM) which opens the door to some interesting use cases:
@@ -192,7 +198,7 @@ None of this would be possible without [PGlite](https://pglite.dev/), developed 
 - **Local development:** You can use PGlite as an alternative to a full local Postgres for development; simplifying your development environments.
 - **Remote development, or local web containers:** As PGlite is so lightweight it can be easily embedded into remote containerised development environments, or in-browser web containers
 
-### Data persistance
+### Data persistence
 
 PGlite supports multiple backends for data persistence:
 
@@ -241,7 +247,7 @@ We like to ship early and often at Supabase, so there are a number of features i
 
 ## Open Source
 
-As always, the work that we've done is open source and permissively licensed (and is the work by the Electric team. Here are all the open source repos if you want to give them a star, add an issue, or cntribute some code yourself:
+As always, the work that we've done is open source and permissively licensed (as is the work by the Electric team). Here are all the open source repos if you want to give them a star, add an issue, or contribute some code yourself:
 
 - [PGlite](https://github.com/electric-sql/pglite) (Apache 2.0): A WASM build of Postgres.
 - [pg-gateway](https://github.com/supabase-community/pg-gateway) (MIT): Postgres wire protocol for the server-side.

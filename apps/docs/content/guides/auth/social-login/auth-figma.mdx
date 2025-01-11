@@ -72,9 +72,14 @@ async function signInWithFigma() {
 
 When your user signs in, call [signInWithOAuth()](/docs/reference/flutter/auth-signinwithoauth) with `figma` as the `provider`:
 
-```js
+```dart
 Future<void> signInWithFigma() async {
-  await supabase.auth.signInWithOAuth(OAuthProvider.figma);
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.figma,
+    redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+    authScreenLaunchMode:
+        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+  );
 }
 ```
 
