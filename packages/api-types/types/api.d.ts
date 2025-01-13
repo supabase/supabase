@@ -1173,6 +1173,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/credits/top-up': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Tops up the credit balance */
+    post: operations['OrgCreditsController_createTopUp']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/invoices': {
     parameters: {
       query?: never
@@ -3898,7 +3915,7 @@ export interface paths {
     get?: never
     put?: never
     /** Send analytics page leave event */
-    post: operations['TelemetryPageLeaveController_pageLeave']
+    post: operations['TelemetryPageLeaveController_trackPageLeave']
     delete?: never
     options?: never
     head?: never
@@ -7177,6 +7194,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/analytics/endpoints/logs.all': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project's logs */
+    get: operations['V1ProjectLogsController_getLogs']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/api-keys': {
     parameters: {
       query?: never
@@ -8507,13 +8541,26 @@ export interface components {
       result: components['schemas']['CustomHostnameDetails']
       success: boolean
     }
+    CloneBackupsResponse: {
+      backups: components['schemas']['Backup'][]
+      physicalBackupData: {
+        earliestPhysicalBackupDateUnix?: number
+        latestPhysicalBackupDateUnix?: number
+      }
+      pitr_enabled: boolean
+      region: string
+      target_compute_size: string
+      target_volume_size_gb: number
+      tierKey: string
+      walg_enabled: boolean
+    }
     CloneProjectDto: {
       /** @default 0 */
-      cloneBackupId?: number
+      cloneBackupId: number
       newDbPass: string
       newProjectName: string
       /** @default 0 */
-      recoveryTimeTarget?: number
+      recoveryTimeTarget: number
     }
     Column: {
       id: number
@@ -8934,6 +8981,23 @@ export interface components {
       expiry_time: string
       secret_access_key: string
       session_token: string
+    }
+    CreditsTopUpRequestDto: {
+      amount: number
+      hcaptcha_token: string
+      payment_method_id: string
+    }
+    CreditsTopUpResponseDto: {
+      payment_intent_secret?: string
+      /** @enum {string} */
+      status:
+        | 'canceled'
+        | 'processing'
+        | 'requires_action'
+        | 'requires_capture'
+        | 'requires_confirmation'
+        | 'requires_payment_method'
+        | 'succeeded'
     }
     CustomerBillingAddress: {
       city?: string
@@ -9885,7 +9949,8 @@ export interface components {
     LoadBalancerDatabase: {
       identifier: string
       status: string
-      type: Record<string, never>
+      /** @enum {string} */
+      type: 'PRIMARY' | 'READ_REPLICA'
     }
     LoadBalancerDetailResponse: {
       databases: components['schemas']['LoadBalancerDatabase'][]
@@ -9900,7 +9965,7 @@ export interface components {
     Member: {
       gotrue_id: string
       is_sso_user: boolean | null
-      metadata: Record<string, never>
+      metadata: Record<string, never> | null
       mfa_enabled: boolean
       primary_email: string | null
       role_ids: number[]
@@ -10137,13 +10202,13 @@ export interface components {
     }
     OrganizationSlugResponse: {
       billing_email: string | null
-      billing_metadata?: Record<string, never>
+      billing_metadata: Record<string, never> | null
       has_oriole_project: boolean
       id: number
       name: string
       opt_in_tags: string[]
       projects: components['schemas']['OrganizationSlugProject'][]
-      restriction_data: Record<string, never>
+      restriction_data: Record<string, never> | null
       /** @enum {string|null} */
       restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
       slug: string
@@ -10364,7 +10429,7 @@ export interface components {
       /** @enum {string} */
       behavior: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
       complete_statement: string
-      config_params: Record<string, never>
+      config_params: Record<string, never> | null
       definition: string
       id: number
       identity_argument_types: string
@@ -10616,6 +10681,8 @@ export interface components {
     }
     ProjectClonedResponse: {
       source_project_ref: string
+      target_disk_size_gb: number
+      target_instance_size: string
       target_project_ref: string
     }
     ProjectClonedStatusResponse: {
@@ -11305,7 +11372,7 @@ export interface components {
       data: components['schemas']['SnippetMeta'][]
     }
     SnippetMeta: {
-      description?: string
+      description: string | null
       id: string
       inserted_at: string
       name: string
@@ -11325,7 +11392,7 @@ export interface components {
     }
     SnippetResponse: {
       content: components['schemas']['SnippetContent']
-      description?: string
+      description: string | null
       id: string
       inserted_at: string
       name: string
@@ -11512,8 +11579,7 @@ export interface components {
     TargetCloneStatus: {
       inserted_at: string | null
       project_id: number
-      /** @enum {string} */
-      status: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'REMOVED'
+      status: Record<string, never>
       target_project: components['schemas']['TargetClonedProject']
       target_project_id: number
       updated_at: string | null
@@ -11529,21 +11595,22 @@ export interface components {
     TelemetryCallFeatureFlagsResponseDto: {
       [key: string]: unknown
     }
-    TelemetryEventBodyV2: {
+    TelemetryEventBodyV2Dto: {
       action: string
-      custom_properties: Record<string, never>
+      custom_properties: {
+        [key: string]: unknown
+      }
       page_title: string
       page_url: string
       pathname: string
-      ph: components['schemas']['TelemetryEventPostHog']
-    }
-    TelemetryEventPostHog: {
-      language: string
-      referrer: string
-      search: string
-      user_agent: string
-      viewport_height: number
-      viewport_width: number
+      ph: {
+        language: string
+        referrer: string
+        search: string
+        user_agent: string
+        viewport_height: number
+        viewport_width: number
+      }
     }
     TelemetryFeatureFlagBodyDto: {
       feature_flag_name: string
@@ -11562,33 +11629,38 @@ export interface components {
       project_ref?: string
       user_id: string
     }
-    TelemetryPageBodyV2: {
+    TelemetryPageBodyV2Dto: {
+      feature_flags?: {
+        [key: string]: unknown
+      }
       page_title: string
       page_url: string
       pathname: string
-      ph: components['schemas']['TelemetryPagePostHog']
+      ph: {
+        language: string
+        referrer: string
+        search: string
+        user_agent: string
+        viewport_height: number
+        viewport_width: number
+      }
     }
-    TelemetryPageLeaveBody: {
+    TelemetryPageLeaveBodyDto: {
+      feature_flags?: {
+        [key: string]: unknown
+      }
       page_title: string
       page_url: string
       pathname: string
-    }
-    TelemetryPagePostHog: {
-      language: string
-      referrer: string
-      search: string
-      user_agent: string
-      viewport_height: number
-      viewport_width: number
     }
     ThirdPartyAuth: {
-      custom_jwks?: Record<string, never>
+      custom_jwks?: Record<string, never> | null
       id: string
       inserted_at: string
       jwks_url?: string | null
       oidc_issuer_url?: string | null
       resolved_at?: string | null
-      resolved_jwks?: Record<string, never>
+      resolved_jwks?: Record<string, never> | null
       type: string
       updated_at: string
     }
@@ -11894,17 +11966,17 @@ export interface components {
        * @description Growth percentage for disk autoscaling
        * @default 50
        */
-      growth_percent?: number
+      growth_percent: number
       /**
        * @description Maximum limit the disk size will grow to in GB
        * @default 61440
        */
-      max_size_gb?: number
+      max_size_gb: number
       /**
        * @description Minimum increment size for disk autoscaling in GB
        * @default 4
        */
-      min_increment_gb?: number
+      min_increment_gb: number
     }
     UpdateFunctionBody: {
       args?: string[]
@@ -12505,6 +12577,23 @@ export interface components {
       total: number
       users: components['schemas']['UserBody'][]
     }
+    V1AnalyticsResponse: {
+      error?:
+        | {
+            code?: number
+            errors?: {
+              domain?: string
+              location?: string
+              locationType?: string
+              message?: string
+              reason?: string
+            }[]
+            message?: string
+            status?: string
+          }
+        | string
+      result?: Record<string, never>[]
+    }
     V1Backup: {
       inserted_at: string
       is_physical_backup: boolean
@@ -12663,7 +12752,23 @@ export interface components {
        * @example us-east-1
        */
       region: string
-      status: Record<string, never>
+      /** @enum {string} */
+      status:
+        | 'INACTIVE'
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'UNKNOWN'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UPGRADING'
+        | 'PAUSING'
+        | 'RESTORE_FAILED'
+        | 'RESTARTING'
+        | 'PAUSE_FAILED'
+        | 'RESIZING'
     }
     V1ProjectWithDatabaseResponse: {
       /**
@@ -12683,7 +12788,23 @@ export interface components {
        * @example us-east-1
        */
       region: string
-      status: Record<string, never>
+      /** @enum {string} */
+      status:
+        | 'INACTIVE'
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'UNKNOWN'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UPGRADING'
+        | 'PAUSING'
+        | 'RESTORE_FAILED'
+        | 'RESTARTING'
+        | 'PAUSE_FAILED'
+        | 'RESIZING'
     }
     V1RestorePitrBody: {
       /** Format: int64 */
@@ -12778,7 +12899,7 @@ export interface components {
       branch_id: string
       check_run_id: number | null
       created_at: string
-      git_config: Record<string, never>
+      git_config: Record<string, never> | null
       id: string
       /** @enum {string} */
       status:
@@ -14081,7 +14202,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['BackupsResponse']
+          'application/json': components['schemas']['CloneBackupsResponse']
         }
       }
       /** @description Failed to list available valid backups */
@@ -15253,6 +15374,45 @@ export interface operations {
         content?: never
       }
       /** @description Failed to determine available Postgres versions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgCreditsController_createTopUp: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreditsTopUpRequestDto']
+      }
+    }
+    responses: {
+      /** @description Top up has been successfully created. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreditsTopUpResponseDto']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to top up credit balance */
       500: {
         headers: {
           [name: string]: unknown
@@ -19411,17 +19571,13 @@ export interface operations {
   }
   LogsController_getApiPaths: {
     parameters: {
-      query: {
-        iso_timestamp_end: string
-        iso_timestamp_start: string
-        project: string
-        sql: string
-        timestamp_end: string
-        timestamp_start: string
+      query?: {
+        iso_timestamp_end?: string
+        iso_timestamp_start?: string
+        sql?: string
       }
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -23062,7 +23218,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryEventBodyV2']
+        'application/json': components['schemas']['TelemetryEventBodyV2Dto']
       }
     }
     responses: {
@@ -23229,7 +23385,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryPageBodyV2']
+        'application/json': components['schemas']['TelemetryPageBodyV2Dto']
       }
     }
     responses: {
@@ -23248,7 +23404,7 @@ export interface operations {
       }
     }
   }
-  TelemetryPageLeaveController_pageLeave: {
+  TelemetryPageLeaveController_trackPageLeave: {
     parameters: {
       query?: never
       header?: never
@@ -23257,10 +23413,17 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryPageLeaveBody']
+        'application/json': components['schemas']['TelemetryPageLeaveBodyDto']
       }
     }
     responses: {
+      /** @description Page leave event sent */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       201: {
         headers: {
           [name: string]: unknown
@@ -25851,7 +26014,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['BackupsResponse']
+          'application/json': components['schemas']['CloneBackupsResponse']
         }
       }
       /** @description Failed to list available valid backups */
@@ -28831,17 +28994,13 @@ export interface operations {
   }
   LogsController_getApiPaths: {
     parameters: {
-      query: {
-        iso_timestamp_end: string
-        iso_timestamp_start: string
-        project: string
-        sql: string
-        timestamp_end: string
-        timestamp_start: string
+      query?: {
+        iso_timestamp_end?: string
+        iso_timestamp_start?: string
+        sql?: string
       }
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -32338,6 +32497,37 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['V1ProjectRefResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  V1ProjectLogsController_getLogs: {
+    parameters: {
+      query?: {
+        iso_timestamp_end?: string
+        iso_timestamp_start?: string
+        sql?: string
+      }
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1AnalyticsResponse']
         }
       }
       403: {

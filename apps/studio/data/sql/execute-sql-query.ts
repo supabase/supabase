@@ -1,14 +1,14 @@
-import { QueryClient, QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { handleError as handleErrorFetchers, post } from 'data/fetchers'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { MB, PROJECT_STATUS } from 'lib/constants'
 import {
   ROLE_IMPERSONATION_NO_RESULTS,
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
 } from 'lib/role-impersonation'
 import type { ResponseError } from 'types'
 import { sqlKeys } from './keys'
-import { MB, PROJECT_STATUS } from 'lib/constants'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 export type ExecuteSqlVariables = {
   projectRef?: string
@@ -18,6 +18,7 @@ export type ExecuteSqlVariables = {
   handleError?: (error: ResponseError) => { result: any }
   isRoleImpersonationEnabled?: boolean
   autoLimit?: number
+  contextualInvalidation?: boolean
 }
 
 export async function executeSql(

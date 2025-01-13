@@ -1,5 +1,5 @@
 {
-  "name": "playwright-tests",
+  "name": "local-studio-tests",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
