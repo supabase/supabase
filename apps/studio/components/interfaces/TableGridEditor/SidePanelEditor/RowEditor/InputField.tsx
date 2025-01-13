@@ -21,7 +21,6 @@ import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.const
 import { DateTimeInput } from './DateTimeInput'
 import type { EditValue, RowField } from './RowEditor.types'
 import { isValueTruncated } from './RowEditor.utils'
-import { checkDomainOfScale } from 'recharts/types/util/ChartUtils'
 
 export interface InputFieldProps {
   field: RowField
@@ -98,6 +97,7 @@ const InputField = ({
       <Input
         data-testid={`${field.name}-input`}
         layout="horizontal"
+        placeholder="NULL"
         label={field.name}
         value={field.value ?? ''}
         descriptionText={
