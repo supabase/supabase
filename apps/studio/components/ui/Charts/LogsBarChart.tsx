@@ -1,33 +1,11 @@
 import dayjs from 'dayjs'
 import { useState } from 'react'
-import { Bar, Cell, BarChart as RechartBarChart, Tooltip, XAxis, YAxis } from 'recharts'
+import { Bar, Cell, BarChart as RechartBarChart, XAxis, YAxis } from 'recharts'
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import type { CategoricalChartState } from 'recharts/types/chart/types'
 import type { Datum } from './Charts.types'
-import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-import { cn } from 'ui'
-
-const CustomTooltip = ({ active, payload }: any) => {
-  if (!active || !payload?.[0]) return null
-
-  const errorCount = payload[0]?.payload.error_count
-  const okCount = payload[0]?.payload.ok_count
-  const timestamp = payload[0]?.payload.timestamp
-
-  const date = dayjs(timestamp).format(DateTimeFormats.FULL)
-
-  return (
-    <div className="rounded-md bg-alternative p-2 shadow-lg text-[10px] font-mono">
-      <div className="flex flex-col gap-y-0.5">
-        <div className="text-foreground-light">{date}</div>
-        <div className="text-foreground">Success: {numberFormatter(okCount)}</div>
-        <div className="">Errors: {numberFormatter(errorCount)}</div>
-        <div className="text-foreground-light">Total: {numberFormatter(okCount + errorCount)}</div>
-      </div>
-    </div>
-  )
-}
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
 export const LogsBarChart = ({
   data,
@@ -37,7 +15,6 @@ export const LogsBarChart = ({
   onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
 }) => {
   const SIZE = 'tiny'
-  const { Container } = useChartSize(SIZE)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
   if (data.length === 0) {
@@ -55,7 +32,19 @@ export const LogsBarChart = ({
 
   return (
     <div className={cn('flex flex-col gap-y-3')}>
-      <Container>
+      <ChartContainer
+        config={
+          {
+            error_count: {
+              label: 'Errors',
+            },
+            ok_count: {
+              label: 'Success',
+            },
+          } satisfies ChartConfig
+        }
+        className="h-[80px]"
+      >
         <RechartBarChart
           data={data}
           onMouseMove={(e: any) => {
@@ -76,16 +65,19 @@ export const LogsBarChart = ({
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
           <XAxis
+            dataKey="timestamp"
             interval={data.length - 2}
             tick={false}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
-          <Tooltip
-            wrapperStyle={{
-              top: -24,
-            }}
-            content={<CustomTooltip />}
+          <ChartTooltip
+            content={
+              <ChartTooltipContent
+                className="text-foreground-light"
+                labelFormatter={(v) => dayjs(v).format(DateTimeFormats.FULL)}
+              />
+            }
           />
 
           {/* Error bars */}
@@ -118,7 +110,7 @@ export const LogsBarChart = ({
             ))}
           </Bar>
         </RechartBarChart>
-      </Container>
+      </ChartContainer>
       {data && (
         <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">
           <span>{startDate}</span>
