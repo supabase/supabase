@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import type { EnvironmentTargets, UpdateConnectionPayload } from './integrations.types'
+import type { UpdateConnectionPayload } from './integrations.types'
 import { integrationKeys } from './keys'
 
 export async function updateVercelConnection({
