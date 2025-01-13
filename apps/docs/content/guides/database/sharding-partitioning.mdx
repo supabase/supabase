@@ -74,9 +74,9 @@ You can query partitioned tables by querying the parent table or specific partit
 When you query the parent table, Postgres automatically routes the query to the relevant partitions based on the conditions specified in the query.
 
 ```sql
-SELECT *
-FROM sales
-WHERE order_date >= '2000-01-01' AND order_date < '2000-03-01';
+select *
+from sales
+where order_date >= '2000-01-01' and order_date < '2000-03-01';
 ```
 
 ### Querying specific partitions
@@ -84,9 +84,8 @@ WHERE order_date >= '2000-01-01' AND order_date < '2000-03-01';
 If you only need to retrieve data from a specific partition, you can directly query that partition.
 
 ```sql
-SELECT *
-FROM sales_2000_02;
+select *
+from sales_2000_02;
 ```
 
 By following these steps, you can effectively use sharding and partitioning to distribute your data across multiple Supabase project, improving performance and scalability.
-
