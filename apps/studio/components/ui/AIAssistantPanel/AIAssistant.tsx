@@ -85,8 +85,8 @@ export const AIAssistant = ({
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
-  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
-  const { open, initialInput, sqlSnippets, suggestions } = aiAssistantPanel
+  const { aiAssistantPanel, setAiAssistantPanel, saveLatestMessage } = useAppStateSnapshot()
+  const { open, messages: stateMessages, initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
@@ -95,7 +95,6 @@ export const AIAssistant = ({
   const [assistantError, setAssistantError] = useState<string>()
   const [lastSentMessage, setLastSentMessage] = useState<MessageType>()
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
-  const [showFade, setShowFade] = useState(false)
 
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -135,11 +134,7 @@ export const AIAssistant = ({
       schema: currentSchema,
       table: currentTable?.name,
     },
-    onFinish: (message) => {
-      setAiAssistantPanel({
-        messages: [...chatMessages, message],
-      })
-    },
+    onFinish: (message) => saveLatestMessage(message),
   })
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')

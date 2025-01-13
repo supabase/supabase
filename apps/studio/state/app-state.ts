@@ -210,6 +210,14 @@ export const appState = proxy({
       ...value,
     }
   },
+
+  saveLatestMessage: (message: any) => {
+    console.log('SAVE', [...appState.aiAssistantPanel.messages, message])
+    appState.aiAssistantPanel = {
+      ...appState.aiAssistantPanel,
+      messages: [...appState.aiAssistantPanel.messages, message],
+    }
+  },
 })
 
 // Set up localStorage subscription
@@ -220,6 +228,7 @@ if (typeof window !== 'undefined') {
       // limit to 20 messages so as to not overflow the context window
       messages: appState.aiAssistantPanel.messages?.slice(-20),
     }
+    console.log(state.messages)
     localStorage.setItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE, JSON.stringify(state))
   })
 }
