@@ -77,7 +77,7 @@ export type SendEventVariables =
   | AssistantSqlDiffHandlerEvaluatedEvent
   | AssistantEditInSqlEditorClickedEvent
 
-type SendEventPayload = components['schemas']['TelemetryEventBodyV2']
+type SendEventPayload = components['schemas']['TelemetryEventBodyV2Dto']
 
 export async function sendEvent({ body }: { body: SendEventPayload }) {
   const consent =

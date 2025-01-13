@@ -16,6 +16,7 @@ import { render } from '../../helpers'
 vi.mock('common', () => ({
   useParams: vi.fn().mockReturnValue({}),
   useIsLoggedIn: vi.fn(),
+  isBrowser: false,
 }))
 vi.mock('lib/gotrue', () => ({
   auth: { onAuthStateChange: vi.fn() },

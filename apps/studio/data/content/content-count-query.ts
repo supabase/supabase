@@ -28,7 +28,7 @@ export async function getContentCount(
   if (name) query.name = name
 
   const { data, error } = await get('/platform/projects/{ref}/content/count', {
-    params: { path: { ref: projectRef }, query: { type, visibility, favorite, name } },
+    params: { path: { ref: projectRef }, query },
     signal,
   })
 

@@ -1,7 +1,7 @@
 export const databaseKeys = {
   schemas: (projectRef: string | undefined) => ['projects', projectRef, 'schemas'] as const,
-  indexes: (projectRef: string | undefined, schema: string | undefined) =>
-    ['projects', projectRef, 'indexes', schema] as const,
+  indexes: (projectRef: string | undefined, schema?: string) =>
+    ['projects', projectRef, 'indexes', schema].filter(Boolean),
   keywords: (projectRef: string | undefined) => ['projects', projectRef, 'keywords'] as const,
   migrations: (projectRef: string | undefined) => ['projects', projectRef, 'migrations'] as const,
   tableColumns: (
