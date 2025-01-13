@@ -202,12 +202,12 @@ grant usage on schema pgmq to postgres, anon, authenticated, service_role;
 */
 grant usage, select, update
 on all sequences in schema pgmq
-to anon, authenticated;
+to anon, authenticated, service_role;
 
 alter default privileges in schema pgmq
 grant usage, select, update
 on sequences
-to anon, authenticated;
+to anon, authenticated, service_role;
 `)
 
 const HIDE_QUEUES_FROM_POSTGREST_SQL = minify(/* SQL */ `
