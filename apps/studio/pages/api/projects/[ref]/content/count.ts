@@ -19,5 +19,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 type ResponseData = extractResponse<'/platform/projects/{ref}/content/count', 'get'>
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
-  return res.status(200).json({ count: 1 })
+  return res.status(200).json({
+    favorites: 0,
+    private: 0,
+    shared: 0,
+  })
 }
