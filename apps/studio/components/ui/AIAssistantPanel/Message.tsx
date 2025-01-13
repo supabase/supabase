@@ -7,7 +7,6 @@ import remarkGfm from 'remark-gfm'
 import { AiIconAnimation, cn, CodeBlock, markdownComponents, WarningIcon } from 'ui'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
-import { SqlSnippet } from './SqlSnippet'
 
 interface MessageProps {
   role: 'function' | 'system' | 'user' | 'assistant' | 'data' | 'tool'
@@ -95,23 +94,20 @@ export const Message = function Message({
                         hideLineNumbers
                       />
                     ) : (
-                      <div className="flex flex-col gap-y-2">
-                        <QueryBlock
-                          lockColumns
-                          label={title}
-                          sql={sql}
-                          chartConfig={{
-                            type: 'bar',
-                            cumulative: false,
-                            xKey: xAxis ?? '',
-                            yKey: yAxis ?? '',
-                          }}
-                          isChart={isChart}
-                          isLoading={isLoading}
-                          runQuery={runQuery}
-                        />
-                        <SqlSnippet readOnly={readOnly} isLoading={isLoading} sql={rawSql} />
-                      </div>
+                      <QueryBlock
+                        lockColumns
+                        label={title}
+                        sql={sql}
+                        chartConfig={{
+                          type: 'bar',
+                          cumulative: false,
+                          xKey: xAxis ?? '',
+                          yKey: yAxis ?? '',
+                        }}
+                        isChart={isChart}
+                        isLoading={isLoading}
+                        runQuery={runQuery}
+                      />
                     )
                   ) : (
                     <CodeBlock
