@@ -51,7 +51,6 @@ const MemoizedMessage = memo(
     return (
       <Message
         key={message.id}
-        id={message.id}
         role={message.role}
         content={message.content}
         readOnly={message.role === 'user'}
