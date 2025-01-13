@@ -19,6 +19,7 @@ import {
   SQL_ICON,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
@@ -79,12 +80,13 @@ export const QueryBlock = ({
   const [view, setView] = useState<'table' | 'chart'>(isChart ? 'chart' : 'table')
   // [Joshen] Thinking cumulative could just be a UI state here to prevent unnecessary re-rendering
   const [cumulative, setCumulative] = useState(false)
-  const [queryResult, setQueryResult] = useState<any[]>([])
+  const [queryResult, setQueryResult] = useState<any[]>()
   const [parameterValues, setParameterValues] = useState<Record<string, string>>({})
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
 
   const { xKey, yKey } = chartConfig
-  const showChart = isChart && queryResult.length > 0 && !!xKey && !!yKey && view === 'chart'
+  const showChart =
+    isChart && (queryResult ?? []).length > 0 && !!xKey && !!yKey && view === 'chart'
 
   const parameters = useMemo(() => {
     if (!sql) return []
@@ -126,11 +128,11 @@ export const QueryBlock = ({
   }, [sql])
 
   useEffect(() => {
-    if (!!sql && !isLoading && runQuery && isReadOnlySelect(sql)) {
+    if (!!sql && !isLoading && runQuery && isReadOnlySelect(sql) && !!project) {
       handleExecute()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sql, isLoading, runQuery])
+  }, [sql, isLoading, runQuery, project])
 
   return (
     <div className="h-full flex flex-col overflow-hidden bg-surface-100 border-overlay rounded border shadow-sm">
@@ -168,18 +170,20 @@ export const QueryBlock = ({
                   onSubmit={setParameterValues}
                 />
               )}
-              <BlockViewConfiguration
-                view={view}
-                isChart={isChart}
-                lockColumns={lockColumns}
-                chartConfig={{ ...chartConfig, cumulative }}
-                columns={Object.keys(queryResult[0] || {})}
-                changeView={setView}
-                updateChartConfig={(config) => {
-                  if (onUpdateChartConfig) onUpdateChartConfig(config)
-                  setCumulative(config.cumulative)
-                }}
-              />
+              {isChart && (
+                <BlockViewConfiguration
+                  view={view}
+                  isChart={isChart}
+                  lockColumns={lockColumns}
+                  chartConfig={{ ...chartConfig, cumulative }}
+                  columns={Object.keys(queryResult[0] || {})}
+                  changeView={setView}
+                  updateChartConfig={(config) => {
+                    if (onUpdateChartConfig) onUpdateChartConfig(config)
+                    setCumulative(config.cumulative)
+                  }}
+                />
+              )}
             </>
           )}
 
@@ -279,6 +283,12 @@ export const QueryBlock = ({
         </div>
       )}
 
+      {queryResult === undefined && (
+        <div className="border-t p-3">
+          <ShimmeringLoader />
+        </div>
+      )}
+
       {showChart ? (
         <div className={cn('border-t flex-1 shrink-0')}>
           <ChartContainer
@@ -293,7 +303,9 @@ export const QueryBlock = ({
               accessibilityLayer
               margin={{ left: 0, right: 0 }}
               data={
-                cumulative ? getCumulativeResults({ rows: queryResult }, chartConfig) : queryResult
+                cumulative
+                  ? getCumulativeResults({ rows: queryResult ?? [] }, chartConfig)
+                  : queryResult
               }
             >
               <CartesianGrid vertical={false} />
