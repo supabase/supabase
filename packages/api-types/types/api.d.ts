@@ -8556,11 +8556,11 @@ export interface components {
     }
     CloneProjectDto: {
       /** @default 0 */
-      cloneBackupId: number
+      cloneBackupId?: number
       newDbPass: string
       newProjectName: string
       /** @default 0 */
-      recoveryTimeTarget: number
+      recoveryTimeTarget?: number
     }
     Column: {
       id: number
@@ -11579,7 +11579,8 @@ export interface components {
     TargetCloneStatus: {
       inserted_at: string | null
       project_id: number
-      status: Record<string, never>
+      /** @enum {string} */
+      status: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'REMOVED'
       target_project: components['schemas']['TargetClonedProject']
       target_project_id: number
       updated_at: string | null
@@ -11966,17 +11967,17 @@ export interface components {
        * @description Growth percentage for disk autoscaling
        * @default 50
        */
-      growth_percent: number
+      growth_percent?: number
       /**
        * @description Maximum limit the disk size will grow to in GB
        * @default 61440
        */
-      max_size_gb: number
+      max_size_gb?: number
       /**
        * @description Minimum increment size for disk autoscaling in GB
        * @default 4
        */
-      min_increment_gb: number
+      min_increment_gb?: number
     }
     UpdateFunctionBody: {
       args?: string[]

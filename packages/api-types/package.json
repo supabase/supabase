@@ -7,7 +7,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules",
-    "codegen": "openapi-typescript http://localhost:8080/api-json -o types/api.d.ts --alphabetize && prettier --write types/api.d.ts"
+    "codegen": "openapi-typescript http://localhost:8080/api-json -o types/api.d.ts --alphabetize --default-non-nullable=false && prettier --write types/api.d.ts"
   },
   "author": "",
   "license": "MIT",
