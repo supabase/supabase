@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@types/dat.gui": "^0.7.12",
+    "@vercel/flags": "^2.6.0",
+    "api-types": "workspace:*",
     "config": "workspace:*",
     "dat.gui": "^0.7.9",
     "lodash": "^4.17.21",
