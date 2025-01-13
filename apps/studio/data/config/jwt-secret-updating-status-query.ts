@@ -29,15 +29,16 @@ export async function getJwtSecretUpdatingStatus(
 
   if (error) handleError(error)
 
-  // @ts-expect-error `meta` was previously used and I'm not sure if the api has been updated
-  const meta = data.jwtSecretUpdateStatus.meta ?? data.jwtSecretUpdateStatus
+  const meta = data.jwtSecretUpdateStatus
 
-  return {
-    changeTrackingId: meta.change_tracking_id,
-    jwtSecretUpdateError: meta.error,
-    jwtSecretUpdateProgress: meta.progress,
-    jwtSecretUpdateStatus: meta.status,
-  } as JwtSecretUpdatingStatusResponse
+  return meta
+    ? ({
+        changeTrackingId: meta.change_tracking_id,
+        jwtSecretUpdateError: meta.error,
+        jwtSecretUpdateProgress: meta.progress,
+        jwtSecretUpdateStatus: meta.status,
+      } as JwtSecretUpdatingStatusResponse)
+    : null
 }
 
 export type JwtSecretUpdatingStatusData = Awaited<ReturnType<typeof getJwtSecretUpdatingStatus>>
