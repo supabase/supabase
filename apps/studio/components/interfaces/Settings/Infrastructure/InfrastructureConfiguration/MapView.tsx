@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
 import { MoreVertical } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import {
   ComposableMap,
@@ -20,6 +21,7 @@ import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
@@ -50,6 +52,8 @@ const MapView = ({
   onSelectDropReplica,
 }: MapViewProps) => {
   const { ref } = useParams()
+  const dbSelectorState = useDatabaseSelectorStateSnapshot()
+
   const [mount, setMount] = useState(false)
   const [zoom, setZoom] = useState<number>(1.5)
   const [center, setCenter] = useState<[number, number]>([14, 7])
@@ -59,6 +63,7 @@ const MapView = ({
     region: { key: string; country?: string; name?: string }
   }>()
   const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
+  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { data } = useReadReplicasQuery({ projectRef: ref })
   const databases = data ?? []
@@ -293,12 +298,12 @@ const MapView = ({
                             <DropdownMenuItem
                               className="gap-x-2"
                               disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
+                              onClick={() => {
+                                setShowConnect(true)
+                                dbSelectorState.setSelectedDatabaseId(database.identifier)
+                              }}
                             >
-                              <Link
-                                href={`/project/${ref}/settings/database?connectionString=${database.identifier}`}
-                              >
-                                View connection string
-                              </Link>
+                              View connection string
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-x-2"
