@@ -54,14 +54,14 @@ const Globe = ({ markers, currentLocation }: GlobeProps) => {
       mapBrightness: 4,
       baseColor: [255 / 255, 255 / 255, 255 / 255],
       markerColor: [62 / 255, 207 / 255, 142 / 255],
-      glowColor: [100 / 255, 100 / 255, 100 / 255],
+      glowColor: [150 / 255, 150 / 255, 150 / 255],
       markers:
         markers?.map((coords) => ({
           location: coords,
           size:
             currentLocation && coords[0] === currentLocation[0] && coords[1] === currentLocation[1]
               ? 0.1
-              : 0.04,
+              : 0.03,
         })) || [],
       onRender: (state) => {
         if (currentLocation) {

@@ -1,12 +1,12 @@
 import { useChat } from 'ai/react'
 import { ArrowUp } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { BASE_PATH } from 'lib/constants'
 import { TelemetryActions } from 'lib/constants/telemetry'
-import { Button, Label_Shadcn_, Textarea } from 'ui'
+import { AiIconAnimation, Button, Label_Shadcn_, Textarea } from 'ui'
 
 interface SupabaseService {
   name: 'Auth' | 'Storage' | 'Database' | 'Edge Function' | 'Cron' | 'Queues' | 'Vector'
@@ -38,6 +38,7 @@ export const SchemaGenerator = ({
 
   const {
     messages,
+    setMessages,
     handleInputChange,
     append,
     isLoading: isMessagesLoading,
@@ -100,6 +101,13 @@ export const SchemaGenerator = ({
       }
     },
   })
+
+  useEffect(() => {
+    if (isOneOff) {
+      setMessages([])
+      setInput('')
+    }
+  }, [isOneOff, setMessages, setInput])
 
   return (
     <div>
@@ -195,9 +203,11 @@ export const SchemaGenerator = ({
             }}
             disabled={isMessagesLoading}
             loading={isMessagesLoading}
-            icon={<ArrowUp size={16} />}
-            className="rounded-full absolute bottom-2 right-2"
-          />
+            icon={<AiIconAnimation size={16} />}
+            className="absolute bottom-2 right-2"
+          >
+            Generate
+          </Button>
         </div>
       </div>
     </div>

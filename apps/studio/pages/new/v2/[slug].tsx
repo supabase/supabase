@@ -4,7 +4,7 @@ import { components } from 'api-types'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { debounce } from 'lodash'
-import { ExternalLink, Settings } from 'lucide-react'
+import { ChevronRight, ExternalLink, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -90,6 +90,8 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { FeedbackDropdown } from 'components/layouts/ProjectLayout/LayoutHeader/FeedbackDropdown'
+import HelpPopover from 'components/layouts/ProjectLayout/LayoutHeader/HelpPopover'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -407,6 +409,17 @@ const WizardForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultRegionError])
 
+  useEffect(() => {
+    if (step === 1) {
+      handleReset()
+    }
+  }, [step])
+
+  const handleReset = () => {
+    setSqlStatements([])
+    setServices([])
+  }
+
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
 
   const additionalMonthlySpend =
@@ -444,6 +457,13 @@ const WizardForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.getValues('dbRegion')])
 
+  const projectCreateBlocked =
+    projectCreationDisabled ||
+    !isAdmin ||
+    freePlanWithExceedingLimits ||
+    isManagedByVercel ||
+    hasOutstandingInvoices
+
   // set sql fields anytime the sqlStatements array changes
   useEffect(() => {
     form.setValue('sql', sqlStatements.join('\n\n'))
@@ -453,130 +473,118 @@ const WizardForm = () => {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   return (
-    <div
-      ref={scrollRef}
-      className="flex lg:flex-row flex-col w-full overflow-auto h-screen items-start"
-    >
-      <div className="w-full lg:max-w-[600px] relative p-16 lg:p-24 lg:pr-0 min-h-screen lg:flex lg:items-center">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, scale: 1.02 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.3 }}
-          >
-            {step === 1 ? (
-              <InitialStep
-                onSqlGenerated={(sql) => {
-                  setSqlStatements((prev) => [...prev, sql])
+    <div className="flex flex-col h-screen overflow-hidden">
+      <div className="border-b p-3 border-default flex-0">
+        <div className="Breadcrumbs flex justify-between">
+          <div className="flex items-center text-sm">
+            <div className="flex items-center space-x-2">
+              <Link href="/projects">
+                <img
+                  src={`${BASE_PATH}/img/supabase-logo.svg`}
+                  alt="Supabase"
+                  className="rounded border p-1 hover:border-white border-default"
+                  style={{ height: 24 }}
+                />
+              </Link>
+              <ChevronRight size="18" className="text-foreground-light" strokeWidth={1} />
+              <Button
+                type="text"
+                onClick={() => {
+                  handleReset()
+                  setStep(1)
                 }}
-                onServicesUpdated={setServices}
-                onTitleUpdated={(title) => {
-                  if (!form.getValues('projectName')) {
-                    form.setValue('projectName', title)
-                  }
-                }}
-                isLoading={!!(aiDescription && sqlStatements.length === 0)}
-                onSubmit={(value) => {
-                  setAiDescription(value)
-                  setFormTitle('Create a project')
-                  setFormDescription(
-                    'We have generated a starting schema for you based on your description'
-                  )
-                  sendEvent({
-                    action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
-                    properties: { onboardingPath: 'use_prompt' },
-                  })
-                  setStep(2)
-                }}
-                onStartBlank={() => {
-                  setFormTitle('Start from Scratch')
-                  setFormDescription('Configure your new blank project')
-                  sendEvent({
-                    action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
-                    properties: { onboardingPath: 'start_blank' },
-                  })
-                  setStep(2)
-                }}
-                onMigrate={() => {
-                  setFormTitle('Migrate Existing Database')
-                  setFormDescription(
-                    'First we need to create a new project to migrate your database to'
-                  )
-                  sendEvent({
-                    action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
-                    properties: { onboardingPath: 'migrate' },
-                  })
-                  setStep(2)
-                }}
-              />
-            ) : (
-              <Form_Shadcn_ {...form}>
-                <form
-                  id="project-create-form"
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="w-full"
-                >
-                  <section className="relative">
-                    <div>
-                      <div className="mb-2">
-                        <h3>{formTitle}</h3>
-                        <p className="text-sm text-foreground-lighter">{formDescription}</p>
-                      </div>
-                      <>
-                        {projectCreationDisabled ? (
-                          <div className="pb-8">
-                            <DisabledWarningDueToIncident title="Project creation is currently disabled" />
-                          </div>
-                        ) : !isAdmin ? (
-                          <NotOrganizationOwnerWarning />
-                        ) : freePlanWithExceedingLimits ? (
-                          isAdmin &&
-                          slug && (
-                            <div className="py-5">
-                              <FreeProjectLimitWarning
-                                membersExceededLimit={membersExceededLimit || []}
-                                orgSlug={slug}
-                              />
-                            </div>
-                          )
-                        ) : isManagedByVercel ? (
-                          <div className="py-5">
-                            <PartnerManagedResource
-                              partner="vercel-marketplace"
-                              resource="Projects"
-                              cta={{
-                                installationId: currentOrg?.partner_id,
-                                message: 'Visit Vercel to create a project',
-                              }}
-                            />
-                          </div>
-                        ) : hasOutstandingInvoices ? (
-                          <div className="py-5">
-                            <Admonition
-                              type="default"
-                              title="Your organization has overdue invoices"
-                              description={
-                                <div className="space-y-3">
-                                  <p className="text-sm leading-normal">
-                                    Please resolve all outstanding invoices first before creating a
-                                    new project
-                                  </p>
-
-                                  <div>
-                                    <Button asChild type="default">
-                                      <Link href={`/org/${slug}/invoices`}>View invoices</Link>
-                                    </Button>
-                                  </div>
-                                </div>
-                              }
-                            />
-                          </div>
-                        ) : (
+                className={`text-sm ${step === 1 ? 'text-foreground' : 'text-foreground-light'}`}
+              >
+                Create a new project
+              </Button>
+              <ChevronRight size="18" className="text-foreground-light" strokeWidth={1} />
+              <p className={`text-sm ${step !== 2 ? 'text-foreground-light' : ''}`}>
+                Configure your database
+              </p>
+            </div>
+          </div>
+          <div className="flex">{/* The End */}</div>
+          <div className="flex items-center space-x-2">
+            <HelpPopover />
+            <FeedbackDropdown />
+          </div>
+        </div>
+      </div>
+      <div
+        ref={scrollRef}
+        className="flex flex-1 lg:flex-row flex-col items-start w-full overflow-auto"
+      >
+        <div className="w-full min-h-full lg:max-w-[600px] relative p-16 lg:p-24 lg:pr-0 lg:flex lg:items-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, scale: 1.02 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.3 }}
+            >
+              {step === 1 ? (
+                <InitialStep
+                  onSqlGenerated={(sql) => {
+                    setSqlStatements((prev) => [...prev, sql])
+                  }}
+                  onServicesUpdated={setServices}
+                  onTitleUpdated={(title) => {
+                    if (!form.getValues('projectName')) {
+                      form.setValue('projectName', title)
+                    }
+                  }}
+                  isLoading={!!(aiDescription && sqlStatements.length === 0)}
+                  onSubmit={(value) => {
+                    setAiDescription(value)
+                    setFormTitle('Create a project')
+                    setFormDescription(
+                      'We have generated a starting schema for you based on your description'
+                    )
+                    sendEvent({
+                      action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
+                      properties: { onboardingPath: 'use_prompt' },
+                    })
+                    setStep(2)
+                  }}
+                  onStartBlank={() => {
+                    setFormTitle('Start from Scratch')
+                    setFormDescription('Configure your new blank project')
+                    sendEvent({
+                      action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
+                      properties: { onboardingPath: 'start_blank' },
+                    })
+                    setStep(2)
+                  }}
+                  onMigrate={() => {
+                    setFormTitle('Migrate Existing Database')
+                    setFormDescription(
+                      'First we need to create a new project to migrate your database to'
+                    )
+                    sendEvent({
+                      action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
+                      properties: { onboardingPath: 'migrate' },
+                    })
+                    setStep(2)
+                  }}
+                />
+              ) : (
+                <Form_Shadcn_ {...form}>
+                  <form
+                    id="project-create-form"
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="w-full"
+                  >
+                    <section className="relative">
+                      <div>
+                        <div className="mb-2">
+                          <h3>{formTitle}</h3>
+                          <p className="text-sm text-foreground-lighter">{formDescription}</p>
+                        </div>
+                        <>
                           <div className="">
                             <div className="">
-                              <div className="py-5 border-b grid grid-cols-2 gap-2">
+                              <div className="py-5 grid grid-cols-2 gap-2">
                                 <FormField_Shadcn_
                                   control={form.control}
                                   name="organization"
@@ -586,7 +594,7 @@ const WizardForm = () => {
                                         <Select_Shadcn_
                                           onValueChange={(slug) => {
                                             field.onChange(slug)
-                                            router.push(`/new/${slug}`)
+                                            router.push(`/new/v2/${slug}`)
                                           }}
                                           defaultValue={field.value}
                                         >
@@ -630,9 +638,67 @@ const WizardForm = () => {
                                   />
                                 </div>
                               </div>
+                              {projectCreationDisabled ? (
+                                <div className="pb-8">
+                                  <DisabledWarningDueToIncident title="Project creation is currently disabled" />
+                                </div>
+                              ) : !isAdmin ? (
+                                <div className="pb-5 -mt-5">
+                                  <NotOrganizationOwnerWarning />
+                                </div>
+                              ) : freePlanWithExceedingLimits ? (
+                                isAdmin &&
+                                slug && (
+                                  <div className="py-5 -mt-5">
+                                    <FreeProjectLimitWarning
+                                      membersExceededLimit={membersExceededLimit || []}
+                                      orgSlug={slug}
+                                    />
+                                  </div>
+                                )
+                              ) : isManagedByVercel ? (
+                                <div className="py-5 -mt-5">
+                                  <PartnerManagedResource
+                                    partner="vercel-marketplace"
+                                    resource="Projects"
+                                    cta={{
+                                      installationId: currentOrg?.partner_id,
+                                      message: 'Visit Vercel to create a project',
+                                    }}
+                                  />
+                                </div>
+                              ) : (
+                                hasOutstandingInvoices && (
+                                  <div className="py-5 -mt-5">
+                                    <Admonition
+                                      type="default"
+                                      title="Your organization has overdue invoices"
+                                      description={
+                                        <div className="space-y-3">
+                                          <p className="text-sm leading-normal">
+                                            Please resolve all outstanding invoices first before
+                                            creating a new project
+                                          </p>
 
-                              <>
-                                <div className="py-5 border-b">
+                                          <div>
+                                            <Button asChild type="default">
+                                              <Link href={`/org/${slug}/invoices`}>
+                                                View invoices
+                                              </Link>
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      }
+                                    />
+                                  </div>
+                                )
+                              )}
+                              <div
+                                className={
+                                  projectCreateBlocked ? 'opacity-25 pointer-events-none' : ''
+                                }
+                              >
+                                <div className="py-5 border-b border-t">
                                   <FormField_Shadcn_
                                     control={form.control}
                                     name="dbRegion"
@@ -692,10 +758,7 @@ const WizardForm = () => {
                                   <FormItemLayout>
                                     <SchemaGenerator
                                       step="second"
-                                      onReset={() => {
-                                        setSqlStatements([])
-                                        setServices([])
-                                      }}
+                                      onReset={handleReset}
                                       onSqlGenerated={(sql) => {
                                         setSqlStatements((prev) => [...prev, sql])
                                       }}
@@ -1100,63 +1163,65 @@ const WizardForm = () => {
                                     )}
                                   </div>
                                 </div>
-                              </>
+                              </div>
                               <div className="sticky bottom-0 z-20 bg-background-200 pb-6">
                                 <ScrollGradient offset={60} scrollRef={scrollRef} />
                                 <Button
                                   form="project-create-form"
                                   htmlType="submit"
                                   size="large"
+                                  loading={isCreatingNewProject}
+                                  disabled={isCreatingNewProject || projectCreateBlocked}
                                   className="w-full"
                                 >
-                                  Create project
+                                  {isCreatingNewProject ? 'Creating project...' : 'Create project'}
                                 </Button>
                               </div>
                             </div>
                           </div>
-                        )}
-                      </>
-                    </div>
-                  </section>
-                </form>
-              </Form_Shadcn_>
-            )}
-          </motion.div>
-        </AnimatePresence>
+                        </>
+                      </div>
+                    </section>
+                  </form>
+                </Form_Shadcn_>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        <section
+          className={cn(
+            'bg-background-200 lg:bg-transparent lg:z-10 lg:flex-1 flex-0 shrink-0 w-full overflow-hidden h-full',
+            // Mobile styles
+            'lg:sticky lg:top-0', // Always relative on desktop
+            showVisual ? 'fixed inset-0 z-40' : 'hidden lg:block' // Toggle visibility on mobile
+          )}
+        >
+          <ProjectVisual
+            showInfo={step === 2}
+            sqlStatements={sqlStatements}
+            services={services}
+            selectedRegion={selectedRegionObject}
+            projectDetails={{
+              dbRegion: form.getValues('dbRegion'),
+              cloudProvider: form.getValues('cloudProvider'),
+              postgresVersion: form.getValues('postgresVersionSelection'),
+            }}
+            instanceLabel={instanceLabel}
+          />
+
+          {/* Add close button when showing visual on mobile */}
+          {showVisual && (
+            <Button
+              type="default"
+              className="absolute top-4 left-4 lg:hidden"
+              onClick={() => setShowVisual(false)}
+            >
+              Back
+            </Button>
+          )}
+        </section>
       </div>
-
-      <section
-        className={cn(
-          'bg-background-200 lg:bg-transparent lg:z-10 lg:flex-1 flex-0 shrink-0 w-full lg:h-screen overflow-hidden',
-          // Mobile styles
-          'lg:sticky lg:top-0', // Always relative on desktop
-          showVisual ? 'fixed inset-0 z-40' : 'hidden lg:block' // Toggle visibility on mobile
-        )}
-      >
-        <ProjectVisual
-          showInfo={step === 2}
-          sqlStatements={sqlStatements}
-          services={services}
-          selectedRegion={selectedRegionObject}
-          projectDetails={{
-            dbRegion: form.getValues('dbRegion'),
-            cloudProvider: form.getValues('cloudProvider'),
-            postgresVersion: form.getValues('postgresVersionSelection'),
-          }}
-          instanceLabel={instanceLabel}
-        />
-
-        {/* Add close button when showing visual on mobile */}
-        {showVisual && (
-          <Button
-            type="default"
-            className="absolute top-4 left-4 lg:hidden"
-            onClick={() => setShowVisual(false)}
-          >
-            Back
-          </Button>
-        )}
-      </section>
     </div>
   )
 }
@@ -1188,12 +1253,6 @@ const Wizard: NextPageWithLayout = () => {
 
   return (
     <>
-      <Link
-        href="/projects"
-        className="fixed top-4 left-4 rounded border p-2 hover:border-white border-default z-30"
-      >
-        <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" style={{ height: 16 }} />
-      </Link>
       <AnimatePresence mode="wait">
         <motion.div
           initial={{ opacity: 0, scale: 1.02 }}
