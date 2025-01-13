@@ -3,9 +3,10 @@ import { useRouter } from 'next/router'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import gaEvents from '~/lib/gaEvents'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
-
 import { Button } from 'ui'
+
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import AnnouncementBadge from '~/components/Announcement/Badge'
 
 const Hero = () => {
   const router = useRouter()

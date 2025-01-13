@@ -11,12 +11,13 @@ import {
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { BASE_PATH } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { Input } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -25,22 +26,21 @@ import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 const TeamSettings = () => {
-  const { slug } = useParams()
-
   const {
     organizationMembersCreate: organizationMembersCreationEnabled,
     organizationMembersDelete: organizationMembersDeletionEnabled,
   } = useIsFeatureEnabled(['organization_members:create', 'organization_members:delete'])
 
+  const { slug } = useParams()
   const { profile } = useProfile()
   const selectedOrganization = useSelectedOrganization()
   const isOwner = selectedOrganization?.is_owner
 
   const { data: permissions } = usePermissionsQuery()
-  const { data: rolesData } = useOrganizationRolesQuery({ slug })
+  const { data: rolesData } = useOrganizationRolesV2Query({ slug })
   const { data: members } = useOrganizationMembersQuery({ slug })
 
-  const roles = rolesData?.roles ?? []
+  const roles = rolesData?.org_scoped_roles ?? []
 
   const { rolesAddable } = useGetRolesManagementPermissions(
     selectedOrganization?.slug,
@@ -58,7 +58,7 @@ const TeamSettings = () => {
     onSuccess: () => {
       setIsLeaving(false)
       setIsLeaveTeamModalOpen(false)
-      window?.location.replace('/') // Force reload to clear Store
+      window?.location.replace(BASE_PATH) // Force reload to clear Store
     },
     onError: (error) => {
       setIsLeaving(false)
@@ -81,6 +81,7 @@ const TeamSettings = () => {
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="justify-between">
             <Input
+              autoComplete="off"
               icon={<Search size={12} />}
               size="small"
               value={searchString}

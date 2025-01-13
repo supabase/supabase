@@ -76,7 +76,7 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
       return toast.error('Please select at least one reason for deleting your project')
     }
 
-    deleteProject({ projectRef: project.ref })
+    deleteProject({ projectRef: project.ref, organizationSlug: organization?.slug })
   }
 
   return (

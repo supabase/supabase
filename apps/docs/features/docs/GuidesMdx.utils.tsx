@@ -1,7 +1,6 @@
 import matter from 'gray-matter'
 import { fromMarkdown } from 'mdast-util-from-markdown'
-import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
-import { toMarkdown } from 'mdast-util-to-markdown'
+import { gfmFromMarkdown } from 'mdast-util-gfm'
 import { gfm } from 'micromark-extension-gfm'
 import { type Metadata, type ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -26,6 +25,7 @@ const PUBLISHED_SECTIONS = [
   'ai',
   'api',
   'auth',
+  'cron',
   'database',
   'deployment',
   'functions',
@@ -35,6 +35,7 @@ const PUBLISHED_SECTIONS = [
   'local-development',
   'monitoring-troubleshooting',
   'platform',
+  'queues',
   'realtime',
   'resources',
   'self-hosting',

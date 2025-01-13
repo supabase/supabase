@@ -149,10 +149,9 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
   const { project } = useProjectContext()
   const { data, error, isSuccess, isError, isLoading, isRefetching } = useTableRowsQuery(
     {
-      queryKey: [props.table.schema, props.table.name],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table: props.table,
+      tableId: props.table.id,
       sorts,
       filters,
       page: snap.page,
@@ -254,7 +253,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
         table={props.table}
         sorts={sorts}
         filters={filters}
-        onAddRow={editable ? onAddRow : undefined}
+        onAddRow={editable && (props.table.columns ?? []).length > 0 ? onAddRow : undefined}
         onAddColumn={editable ? onAddColumn : undefined}
         onImportData={editable ? onImportData : undefined}
         headerActions={headerActions}

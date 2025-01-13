@@ -220,10 +220,6 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
               />
             </form>
             <div className="flex items-center gap-2">
-              <Button asChild type={'text'}>
-                <Link href={`/project/${projectRef}/settings/warehouse`}>Access tokens</Link>
-              </Button>
-
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button asChild className="px-1.5" type="outline" icon={<Terminal />}>

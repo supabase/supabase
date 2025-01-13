@@ -1,9 +1,10 @@
-import { Code, ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
+import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
 
 import { useParams } from 'common'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
@@ -34,11 +35,13 @@ const TerminalInstructions = forwardRef<
 
   const { anonKey } = getAPIKeys(settings)
   const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
+
+  const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint ?? ''
   const functionsEndpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}/functions/v1`
-      : `https://${endpoint}/functions/v1`
+      : `${protocol}://${endpoint}/functions/v1`
 
   // get the .co or .net TLD from the restUrl
   const restUrl = `https://${endpoint}`
@@ -136,20 +139,12 @@ const TerminalInstructions = forwardRef<
               </p>
             </div>
             <div className="flex gap-2">
+              <DocsButton href="https://supabase.com/docs/guides/functions" />
               <Button asChild type="default" icon={<ExternalLink />}>
                 <a
-                  href="https://supabase.com/docs/guides/functions"
                   target="_blank"
                   rel="noreferrer"
-                >
-                  Documentation
-                </a>
-              </Button>
-              <Button asChild type="default" icon={<Code />}>
-                <a
                   href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
-                  target="_blank"
-                  rel="noreferrer"
                 >
                   Examples
                 </a>

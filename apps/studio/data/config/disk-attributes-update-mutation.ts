@@ -12,7 +12,7 @@ type UpdateIO2Body = components['schemas']['DiskRequestAttributesIO2']
 export const COOLDOWN_DURATION = 60 * 60 * 6
 
 export type UpdateDiskAttributesVariables = {
-  ref: string
+  ref?: string
   storageType: 'gp3' | 'io2'
   provisionedIOPS: number
   throughput?: number
@@ -27,6 +27,8 @@ export async function updateDiskAttributes({
   throughput,
   totalSize,
 }: UpdateDiskAttributesVariables) {
+  if (!ref) throw new Error('ref is required')
+
   const attributes =
     storageType === 'gp3'
       ? ({

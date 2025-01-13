@@ -5,12 +5,13 @@
   "author": "Supabase, Inc.",
   "license": "Apache-2.0",
   "private": true,
-  "workspaces": ["apps/*", "tests", "playwright-tests", "packages/*"],
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "build": "turbo run build",
     "build:studio": "turbo run build --filter=studio",
     "build:design-system": "turbo run build --filter=design-system",
-    "clean": "turbo run clean --parallel && rimraf node_modules",
+    "build:docs": "turbo run build --filter=docs",
+    "clean": "turbo run clean --parallel && rimraf -G node_modules/{*,.bin,.modules.yaml}",
     "dev": "turbo run dev --parallel",
     "dev:reference": "turbo run dev --filter=reference --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
@@ -19,40 +20,39 @@
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
     "lint": "turbo run lint",
     "typecheck": "turbo --continue typecheck",
-    "test:prettier": "prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
-    "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}\" \"packages/pg-meta/**/*.ts\"",
-    "docker:dev": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up --renew-anon-volumes",
-    "docker:up": "cd docker && docker compose up",
-    "docker:down": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down --remove-orphans",
-    "docker:remove": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml rm -vfs",
+    "test:prettier": "prettier -c '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
+    "format": "prettier --write '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "test:docs": "turbo run test --filter=docs",
     "test:ui": "turbo run test --filter=ui",
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
     "test:studio": "turbo run test --filter=studio",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
-    "test:playwright": "npm --prefix playwright-tests run test",
+    "test:local-studio": "pnpm --prefix tests/local-studio-tests run test",
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables",
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
-    "api:codegen": "cd packages/api-types && npm run codegen"
+    "api:codegen": "cd packages/api-types && pnpm run codegen"
   },
   "devDependencies": {
+    "@types/node": "catalog:",
     "eslint": "^8.57.0",
-    "prettier": "^4.0.0-alpha.8",
+    "prettier": "3.2.4",
     "prettier-plugin-sql-cst": "^0.11.0",
     "rimraf": "^6.0.0",
     "sass": "^1.72.0",
     "supabase": "^1.151.1",
-    "turbo": "2.0.4"
+    "supports-color": "^8.0.0",
+    "turbo": "2.3.3",
+    "typescript": "~5.5.0"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/supabase/supabase.git"
   },
   "engines": {
-    "npm": "^10.0.0",
-    "node": "^20.0.0"
+    "pnpm": "^9.0.0",
+    "node": ">= 20"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "npm@10.7.0"
+  "packageManager": "pnpm@9.10.0"
 }

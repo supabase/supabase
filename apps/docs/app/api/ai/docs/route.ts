@@ -6,7 +6,7 @@ import OpenAI from 'openai'
 export const runtime = 'edge'
 /* To avoid OpenAI errors, restrict to the Vercel Edge Function regions that
   overlap with the OpenAI API regions.
-  
+
   Reference for Vercel regions: https://vercel.com/docs/edge-network/regions#region-list
   Reference for OpenAI regions: https://help.openai.com/en/articles/5347006-openai-api-supported-countries-and-territories
   */

@@ -12,6 +12,8 @@ import MessageSelection from './MessageSelection'
 import type { LogData } from './Messages.types'
 import NoChannelEmptyState from './NoChannelEmptyState'
 import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
+import { DocsButton } from 'components/ui/DocsButton'
+import { TelemetryActions } from 'lib/constants/telemetry'
 
 export const isErrorLog = (l: LogData) => {
   return l.message === 'SYSTEM' && l.metadata?.status === 'error'
@@ -83,15 +85,7 @@ const NoResultAlert = ({
                 <p className="text-foreground">Not sure what to do?</p>
                 <p className="text-foreground-lighter text-xs">Browse our documentation</p>
               </div>
-              <Button type="default" iconRight={<ExternalLink />}>
-                <a
-                  href="https://supabase.com/docs/guides/realtime"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Documentation
-                </a>
-              </Button>
+              <DocsButton href="https://supabase.com/docs/guides/realtime" />
             </div>
           </div>
         </>
@@ -184,11 +178,7 @@ const MessagesTable = ({
                       isRowSelected={false}
                       selectedCellIdx={undefined}
                       onClick={() => {
-                        sendEvent({
-                          category: 'realtime_inspector',
-                          action: 'focused-specific-message',
-                          label: 'realtime_inspector_results',
-                        })
+                        sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_MESSAGE_CLICKED })
                         setFocusedLog(row)
                       }}
                     />

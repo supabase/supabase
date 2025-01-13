@@ -228,7 +228,7 @@ export const Grid = memo(
                           className="flex flex-col items-center justify-center col-span-full"
                         >
                           <p className="text-sm text-light">
-                            The filters applied has returned no results from this table
+                            The filters applied have returned no results from this table
                           </p>
                           <div className="flex items-center space-x-2 mt-4">
                             <Button type="default" onClick={() => removeAllFilters()}>

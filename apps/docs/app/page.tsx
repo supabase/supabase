@@ -1,6 +1,6 @@
 import { type Metadata, type ResolvingMetadata } from 'next'
 import Link from 'next/link'
-import { IconBackground, TextLink } from 'ui'
+import { cn, IconBackground, TextLink } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
 
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
@@ -29,6 +29,7 @@ const products = [
     href: '/guides/database/overview',
     description:
       'Supabase provides a full Postgres database for every project with Realtime functionality, database backups, extensions, and more.',
+    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Auth',
@@ -37,6 +38,7 @@ const products = [
     href: '/guides/auth',
     description:
       'Add and manage email and password, passwordless, OAuth, and mobile logins to your project through a suite of identity providers and APIs.',
+    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Storage',
@@ -45,13 +47,6 @@ const products = [
     href: '/guides/storage',
     description:
       'Store, organize, transform, and serve large files—fully integrated with your Postgres database with Row Level Security access policies.',
-  },
-  {
-    title: 'AI & Vectors',
-    icon: 'ai',
-    hasLightIcon: true,
-    href: '/guides/ai',
-    description: 'Use Supabase to store and search embedding vectors.',
   },
   {
     title: 'Realtime',
@@ -68,6 +63,27 @@ const products = [
     href: '/guides/functions',
     description:
       'Globally distributed, server-side functions to execute your code closest to your users for the lowest latency.',
+  },
+]
+
+const postgresIntegrations = [
+  {
+    title: 'AI & Vectors',
+    icon: 'ai',
+    href: '/guides/ai',
+    description: 'AI toolkit to manage embeddings',
+  },
+  {
+    title: 'Cron',
+    icon: 'cron',
+    href: '/guides/cron',
+    description: 'Schedule and monitor recurring Jobs',
+  },
+  {
+    title: 'Queues',
+    icon: 'queues',
+    href: '/guides/queues',
+    description: 'Durable Message Queues with guaranteed delivery',
   },
 ]
 
@@ -161,7 +177,7 @@ const HomePage = () => (
       <ul className="grid grid-cols-12 gap-6 not-prose [&_svg]:text-brand-600">
         {products.map((product) => {
           return (
-            <li key={product.title} className="col-span-12 md:col-span-4">
+            <li key={product.title} className={cn(product.span ?? 'col-span-12 md:col-span-4')}>
               <Link href={product.href} passHref>
                 <GlassPanelWithIconPicker {...product}>
                   {product.description}
@@ -171,6 +187,26 @@ const HomePage = () => (
           )
         })}
       </ul>
+
+      <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
+        <div className="col-span-4">
+          <h2 id="postgres-integrations" className="scroll-mt-24 m-0">
+            Postgres Modules
+          </h2>
+        </div>
+        <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+          {postgresIntegrations.map((integration) => (
+            <Link
+              href={integration.href}
+              key={integration.title}
+              passHref
+              className="col-span-6 md:col-span-4"
+            >
+              <IconPanelWithIconPicker {...integration} />
+            </Link>
+          ))}
+        </div>
+      </div>
 
       <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
         <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
@@ -215,7 +251,7 @@ const HomePage = () => (
         </div>
 
         <ul className="grid col-span-8 grid-cols-12 gap-6 not-prose">
-          {MIGRATION_PAGES.map((guide) => {
+          {MIGRATION_PAGES.sort((a, b) => a.name.localeCompare(b.name)).map((guide) => {
             return (
               <li key={guide.name} className="col-span-6 md:col-span-4">
                 <Link href={guide.url} passHref>

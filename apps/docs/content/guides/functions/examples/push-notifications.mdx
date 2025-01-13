@@ -18,14 +18,14 @@ Push notifications are an important part of any mobile app. They allow you to se
 
     Find the example code on [GitHub](https://github.com/supabase/supabase/blob/master/examples/user-management/expo-push-notifications/).
 
-    ## Supabase Setup
+    ## Supabase setup
 
     - [Create a new Supabase project](https://database.new).
     - Link your project: `supabase link --project-ref your-supabase-project-ref`
     - Start supabase locally: `supabase start`
     - Push up the schema: `supabase db push` (schema is defined in [supabase/migrations](https://github.com/supabase/supabase/blob/master/examples/user-management/expo-push-notifications/supabase/migrations/))
 
-    ## Expo Setup
+    ## Expo setup
 
     To utilize Expo's push notification service, you must configure your app by installing a set of libraries, implementing functions to handle notifications, and setting up credentials for Android and iOS. Follow the official [Expo Push Notifications Setup Guide](https://docs.expo.dev/push-notifications/push-notifications-setup/) to get the credentials for Android and iOS. This project uses [Expo's EAS build](https://docs.expo.dev/build/introduction/) service to simplify this part.
 
@@ -126,7 +126,7 @@ Push notifications are an important part of any mobile app. They allow you to se
  
     This guide will show you how to send push notifications to your app when a new row is inserted into a table using FCM, Supabase Edge Functions, and database web hooks.
 
-    ## Supabase Setup
+    ## Supabase setup
 
     We will create two tables. One to store the user's FCM token and a `notifications` table. The edge function will be triggered when a new row is inserted into the `notifications` table and sends a push notification to the user.
 
@@ -258,7 +258,7 @@ Push notifications are an important part of any mobile app. They allow you to se
     }
     ```
 
-    ## FCM Setup
+    ## FCM setup
 
     1. Follow the official [FCM Setup Guide](https://firebase.google.com/docs/cloud-messaging) to set up FCM for your client side application.
     1. Generate a new service account private key from the Firebase console `Project Settings > Service Accounts > Generate new private key`.

@@ -145,8 +145,8 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: n
       if (IS_PLATFORM === false) {
         return `
 -- local dev edge_logs query
-select id, edge_logs.timestamp, event_message, request.method, request.path, response.status_code 
-from edge_logs 
+select id, edge_logs.timestamp, event_message, request.method, request.path, response.status_code
+from edge_logs
 ${joins}
 ${where}
 ${orderBy}
@@ -211,6 +211,20 @@ limit ${limit}
   ${orderBy}
   limit ${limit}
   `
+
+    case 'pg_cron_logs':
+      const baseWhere = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+
+      const pgCronWhere = where ? `${baseWhere} AND ${where.substring(6)}` : baseWhere
+
+      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.query
+from postgres_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.parsed) as parsed
+${pgCronWhere}
+${orderBy}
+limit ${limit}
+`
   }
 }
 
@@ -444,8 +458,18 @@ export const fillTimeseries = (
   valueKey: string | string[],
   defaultValue: number,
   min?: string,
-  max?: string
+  max?: string,
+  minPointsToFill: number = 20
 ) => {
+  // If we have more points than minPointsToFill, just normalize timestamps and return
+  if (timeseriesData.length > minPointsToFill) {
+    return timeseriesData.map((datum) => {
+      const iso = dayjs.utc(datum[timestampKey]).toISOString()
+      datum[timestampKey] = iso
+      return datum
+    })
+  }
+
   if (timeseriesData.length <= 1 && !(min || max)) return timeseriesData
   const dates: unknown[] = timeseriesData.map((datum) => dayjs.utc(datum[timestampKey]))
 

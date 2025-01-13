@@ -108,9 +108,19 @@ scoop update supabase
 </TabPanel>
 <TabPanel id="linux" label="Linux">
 
+#### Homebrew
+
 ```sh
 brew upgrade supabase
 ```
+
+#### Linux package manager
+
+1. Download the latest package from the [Supabase CLI releases page](https://github.com/supabase/cli/releases/latest)
+2. Install the package using the same commands as the [initial installation](#linux-packages):
+   - `sudo apk add --allow-untrusted <...>.apk`
+   - `sudo dpkg -i <...>.deb`
+   - `sudo rpm -i <...>.rpm`
 
 </TabPanel>
 <TabPanel id="npm" label="npm / Bun">
@@ -131,7 +141,7 @@ If you have any Supabase containers running locally, stop them and delete their 
 Remember to save any local schema and data changes before stopping because the `--no-backup` flag will delete them.
 
 ```sh
-supabase db diff my_schema
+supabase db diff -f my_schema
 supabase db dump --local --data-only > supabase/seed.sql
 supabase stop --no-backup
 ```

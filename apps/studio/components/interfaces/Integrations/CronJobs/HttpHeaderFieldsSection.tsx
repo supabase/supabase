@@ -15,6 +15,7 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
+  FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
   SheetSection,
@@ -38,7 +39,7 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
 
   return (
     <SheetSection>
-      <FormSectionLabel className="lg:!col-span-4">HTTP Headers</FormSectionLabel>
+      <FormLabel_Shadcn_>HTTP Headers</FormLabel_Shadcn_>
       <div className="space-y-3 mt-1">
         {fields.map((field, index) => (
           <div key={field.id} className="flex items-center space-x-2">

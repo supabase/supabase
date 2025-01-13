@@ -121,7 +121,7 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
                 onChange={() => {}}
                 descriptionText={
                   x.tags === 'service_role'
-                    ? 'This key has the ability to bypass Row Level Security. Never share it publicly. ' +
+                    ? 'This key has the ability to bypass Row Level Security. Never share it publicly. If leaked, generate a new JWT secret immediately. ' +
                       (legacy ? 'Prefer using Publishable API keys instead.' : '')
                     : 'This key is safe to use in a browser if you have enabled Row Level Security for your tables and configured policies. ' +
                       (legacy ? 'Prefer using Secret API keys instead.' : '')
@@ -132,7 +132,7 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
         )}
         <Panel.Notice
           className="border-t"
-          title="New API keys coming Q4 2024"
+          title="New API keys coming 2025"
           description={`
 \`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.    
 `}

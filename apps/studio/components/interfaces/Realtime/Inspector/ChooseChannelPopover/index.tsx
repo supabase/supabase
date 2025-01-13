@@ -20,6 +20,8 @@ import {
   Switch,
 } from 'ui'
 import { RealtimeConfig } from '../useRealtimeMessages'
+import { DocsButton } from 'components/ui/DocsButton'
+import { TelemetryActions } from 'lib/constants/telemetry'
 
 interface ChooseChannelPopoverProps {
   config: RealtimeConfig
@@ -50,11 +52,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
 
   const onSubmit = () => {
     setOpen(false)
-    sendEvent({
-      category: 'realtime_inspector',
-      action: 'started_listening_to_channel_in_input_channel_popover',
-      label: 'realtime_inspector_config',
-    })
+    sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED })
     onChangeConfig({
       ...config,
       channelName: form.getValues('channel'),
@@ -154,15 +152,11 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                     )}
                   />
 
-                  <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://supabase.com/docs/guides/realtime/authorization"
-                    >
-                      Documentation
-                    </a>
-                  </Button>
+                  <DocsButton
+                    abbrev={false}
+                    className="w-min"
+                    href="https://supabase.com/docs/guides/realtime/authorization"
+                  />
                 </form>
               </Form_Shadcn_>
             </>

@@ -25,8 +25,8 @@ export const convertToBytes = (size: number, unit: StorageSizeUnits = StorageSiz
   return size * Math.pow(k, i)
 }
 
-export function getConnectionURL(projectRef: string, endpoint?: string) {
-  const projUrl = endpoint ? `https://${endpoint}` : `https://${projectRef}.supabase.co`
+export function getConnectionURL(projectRef: string, protocol: string, endpoint?: string) {
+  const projUrl = endpoint ? `${protocol}://${endpoint}` : `https://${projectRef}.supabase.co`
 
   const url = new URL(projUrl)
   url.pathname = '/storage/v1/s3'

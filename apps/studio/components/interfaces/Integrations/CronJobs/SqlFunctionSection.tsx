@@ -14,7 +14,7 @@ export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
   const schema = form.watch('values.schema')
 
   return (
-    <SheetSection className="flex flex-col gap-3">
+    <SheetSection className="flex flex-col gap-3 2xl:flex-row 2xl:[&>div]:w-full">
       <FormField_Shadcn_
         control={form.control}
         name="values.schema"
@@ -22,6 +22,7 @@ export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
           <FormItemLayout label="Schema" className="gap-1">
             <SchemaSelector
               size="small"
+              className="w-56 2xl:w-full"
               selectedSchemaName={field.value}
               onSelectSchema={(name) => {
                 field.onChange(name)
@@ -40,6 +41,7 @@ export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
           <FormItemLayout label="Function name" className="gap-1">
             <FunctionSelector
               size="small"
+              className="w-56 2xl:w-full"
               schema={schema}
               value={field.value}
               onChange={(name) => field.onChange(name)}

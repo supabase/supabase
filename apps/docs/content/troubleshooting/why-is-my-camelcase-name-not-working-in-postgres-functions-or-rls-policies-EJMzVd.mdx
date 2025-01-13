@@ -1,0 +1,11 @@
+---
+title = "Why is my camelCase name not working in Postgres functions or RLS policies?"
+github_url = "https://github.com/orgs/supabase/discussions/12893"
+date_created = "2023-03-08T16:26:51+00:00"
+topics = [ "database" ]
+database_id = "9dbcf760-7b1f-4cc4-8653-4e884fd02dad"
+---
+
+Avoid camelCase (upper case letters) if possible when naming functions, tables, columns, and variables. You must enclose "camelCase" in double quotes when you define it or use it. YOU WILL FORGET. Use snake_case instead and make your life easier.
+
+Note to Prisma users, you will likely have to deal with it.

@@ -594,7 +594,7 @@ functions:
           - [Steps to obtain Android client ID](https://developers.google.com/identity/sign-in/android/start-integrating#configure_a_project)
           - [Steps to obtain iOS client ID](https://developers.google.com/identity/sign-in/ios/start-integrating#get_an_oauth_client_id)
 
-          Add the web client ID to the `Authentication -> Providers -> Google -> Authorized Client IDs` section in your Supabase dashboard
+          Add the web client ID to the `Authentication -> Providers -> Google -> Client IDs` section in your Supabase dashboard
         code: |
           ```dart
           import 'package:google_sign_in/google_sign_in.dart';

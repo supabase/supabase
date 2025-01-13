@@ -1,11 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { ExternalLink, Info } from 'lucide-react'
 
 import { useParams } from 'common'
 import {
@@ -32,7 +32,6 @@ import {
   AlertTitle_Shadcn_,
   Badge,
   Button,
-  CriticalIcon,
   Modal,
   Radio,
   SidePanel,
@@ -45,17 +44,14 @@ const ComputeInstanceSidePanel = () => {
   const { ref: projectRef } = useParams()
   const { project: selectedProject } = useProjectContext()
   const organization = useSelectedOrganization()
-
   const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
+  const diskAndComputeForm = useFlag('diskAndComputeForm')
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
-
   const canUpdateCompute = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
-
   const isProjectActive = useIsProjectActive()
-
   const { panel, setPanel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'computeInstance'
 
@@ -176,16 +172,6 @@ const ComputeInstanceSidePanel = () => {
     hasReadReplicas &&
     (isDowngradingToBelowSmall || hasMoreThanTwoReplicasForXLAndAbove)
 
-  useEffect(() => {
-    if (visible) {
-      if (subscriptionCompute !== undefined) {
-        setSelectedOption(subscriptionCompute.variant.identifier)
-      } else {
-        setSelectedOption(defaultInstanceSize)
-      }
-    }
-  }, [visible, isLoading])
-
   const onConfirmUpdateComputeInstance = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!projectId) return console.error('Project ID is required')
@@ -209,6 +195,22 @@ const ComputeInstanceSidePanel = () => {
       })
     }
   }
+
+  useEffect(() => {
+    if (visible) {
+      if (subscriptionCompute !== undefined) {
+        setSelectedOption(subscriptionCompute.variant.identifier)
+      } else {
+        setSelectedOption(defaultInstanceSize)
+      }
+    }
+  }, [visible, isLoading])
+
+  useEffect(() => {
+    if (visible && diskAndComputeForm) {
+      router.push(`/project/${projectRef}/settings/compute-and-disk`)
+    }
+  }, [visible, diskAndComputeForm, router, projectRef])
 
   return (
     <>

@@ -10,12 +10,12 @@ import {
   ScrollArea,
 } from 'ui'
 
-interface FilterPopoverProps {
+interface FilterPopoverProps<T> {
   title?: string
-  options: any[]
-  activeOptions: any[]
-  valueKey: string
-  labelKey: string
+  options: T[]
+  activeOptions: string[]
+  valueKey: keyof T
+  labelKey: keyof T
   iconKey?: string
   name: string
   variant?: 'rectangular' | 'rounded'
@@ -27,7 +27,7 @@ interface FilterPopoverProps {
   onSaveFilters: (options: string[]) => void
 }
 
-export const FilterPopover = ({
+export const FilterPopover = <T extends Record<string, any>>({
   title,
   options = [],
   activeOptions = [],
@@ -42,7 +42,7 @@ export const FilterPopover = ({
   maxHeightClass = 'h-[205px]',
   clearButtonText = 'Clear',
   onSaveFilters,
-}: FilterPopoverProps) => {
+}: FilterPopoverProps<T>) => {
   const [open, setOpen] = useState(false)
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
 
@@ -140,7 +140,7 @@ export const FilterPopover = ({
             type="primary"
             onClick={() => {
               // Order the selection based on the options provided
-              const sortingOrder = options.map((option) => option[valueKey])
+              const sortingOrder = options.map((option) => option[valueKey]) as string[]
               const sortedSelection = selectedOptions.sort(
                 (a, b) => sortingOrder.indexOf(a) - sortingOrder.indexOf(b)
               )

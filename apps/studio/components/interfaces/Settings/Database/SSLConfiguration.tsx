@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download, ExternalLink, Loader2 } from 'lucide-react'
+import { Download, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
@@ -81,15 +82,9 @@ const SSLConfiguration = () => {
 
   return (
     <div id="ssl-configuration">
-      <div className="flex items-center justify-between">
-        <FormHeader title="SSL Configuration" description="" />
-        <div className="flex items-center space-x-2 mb-6">
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <Link href="https://supabase.com/docs/guides/platform/ssl-enforcement" target="_blank">
-              Documentation
-            </Link>
-          </Button>
-        </div>
+      <div className="flex items-center justify-between mb-6">
+        <FormHeader className="mb-0" title="SSL Configuration" description="" />
+        <DocsButton href="https://supabase.com/docs/guides/platform/ssl-enforcement" />
       </div>
       <FormPanel>
         <FormSection

@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import {
   EmptyIntegrationConnection,
   IntegrationConnection,
-} from 'components/interfaces/Integrations/IntegrationPanels'
+} from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import type { GitHubConnection } from 'data/integrations/github-connections-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Check, Loader2 } from 'lucide-react'

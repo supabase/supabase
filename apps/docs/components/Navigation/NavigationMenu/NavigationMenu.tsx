@@ -15,6 +15,8 @@ enum MenuId {
   Realtime = 'realtime',
   Storage = 'storage',
   Ai = 'ai',
+  Cron = 'cron',
+  Queues = 'queues',
   Platform = 'platform',
   Deployment = 'deployment',
   MonitoringTroubleshooting = 'monitoring_troubleshooting',
@@ -78,6 +80,10 @@ const menus: Menu[] = [
     type: 'guide',
   },
   {
+    id: MenuId.Queues,
+    type: 'guide',
+  },
+  {
     id: MenuId.Auth,
     type: 'guide',
   },
@@ -101,6 +107,7 @@ const menus: Menu[] = [
     id: MenuId.Ai,
     type: 'guide',
   },
+  { id: MenuId.Cron, type: 'guide' },
   {
     id: MenuId.Platform,
     type: 'guide',
@@ -256,7 +263,7 @@ const NavigationMenu = ({
   additionalNavItems,
 }: {
   menuId: MenuId
-  additionalNavItems?: Partial<NavMenuSection>[]
+  additionalNavItems?: Record<string, Partial<NavMenuSection>[]>
 }) => {
   const level = menuId
   const menu = getMenuById(level)

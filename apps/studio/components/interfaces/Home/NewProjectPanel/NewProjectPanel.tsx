@@ -50,7 +50,7 @@ const NewProjectPanel = () => {
                   <EditorIndexPageLink projectRef={ref}>Table Editor</EditorIndexPageLink>
                 </Button>
                 <Button asChild type="default" icon={<SqlEditor strokeWidth={1.5} />}>
-                  <Link href={`/project/${ref}/sql/new`}>SQL editor</Link>
+                  <Link href={`/project/${ref}/sql/new`}>SQL Editor</Link>
                 </Button>
                 <Button asChild type="default" icon={<ExternalLink />}>
                   <Link

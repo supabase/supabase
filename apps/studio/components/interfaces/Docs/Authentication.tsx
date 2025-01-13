@@ -15,7 +15,9 @@ const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
   const { anonKey, serviceKey } = getAPIKeys(settings)
-  const endpoint = `https://${settings?.app_config?.endpoint ?? ''}`
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const hostEndpoint = settings?.app_config?.endpoint
+  const endpoint = `${protocol}://${hostEndpoint ?? ''}`
 
   // [Joshen] ShowApiKey should really be a boolean, its confusing
   const defaultApiKey =
@@ -46,7 +48,7 @@ const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
       </div>
 
       <h2 className="doc-heading">Client API Keys</h2>
-      <div className="doc-section ">
+      <div className="doc-section">
         <article className="code-column text-foreground">
           <p>
             Client keys allow "anonymous access" to your database, until the user has logged in.
@@ -77,7 +79,7 @@ const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
       </div>
 
       <h2 className="doc-heading">Service Keys</h2>
-      <div className="doc-section ">
+      <div className="doc-section">
         <article className="code-column text-foreground">
           <p>
             Service keys have FULL access to your data, bypassing any security policies. Be VERY

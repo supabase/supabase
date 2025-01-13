@@ -1,11 +1,19 @@
-import { useParams } from 'common'
 import { noop } from 'lodash'
 import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useEffect, useState } from 'react'
+
+import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
+import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
+  ButtonProps,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
@@ -20,29 +28,28 @@ import {
   cn,
 } from 'ui'
 
-import { Markdown } from 'components/interfaces/Markdown'
-import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-
 interface DatabaseSelectorProps {
+  selectedDatabaseId?: string // To override initial state
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   additionalOptions?: { id: string; name: string }[]
+  buttonProps?: ButtonProps
   onSelectId?: (id: string) => void // Optional callback
 }
 
 const DatabaseSelector = ({
+  selectedDatabaseId: _selectedDatabaseId,
   variant = 'regular',
   additionalOptions = [],
   onSelectId = noop,
+  buttonProps,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
+  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const state = useDatabaseSelectorStateSnapshot()
-  const selectedDatabaseId = state.selectedDatabaseId
+  const selectedDatabaseId = _selectedDatabaseId ?? state.selectedDatabaseId
 
   const { data, isLoading, isSuccess } = useReadReplicasQuery({ projectRef })
   const databases = data ?? []
@@ -56,22 +63,31 @@ const DatabaseSelector = ({
 
   const selectedAdditionalOption = additionalOptions.find((x) => x.id === selectedDatabaseId)
 
+  useEffect(() => {
+    if (_selectedDatabaseId) state.setSelectedDatabaseId(_selectedDatabaseId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [_selectedDatabaseId])
+
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <div className="flex items-center space-x-2 cursor-pointer">
+        <div className="flex cursor-pointer">
+          <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
+            Source
+          </span>
           <Button
             type="default"
+            icon={isLoading && <Loader2 className="animate-spin" />}
+            iconRight={<ChevronDown strokeWidth={1.5} size={12} />}
+            {...buttonProps}
             className={cn(
-              'pr-2',
+              'pr-2 rounded-l-none',
               variant === 'connected-on-right' && 'rounded-r-none',
               variant === 'connected-on-left' && 'rounded-l-none border-l-0',
-              variant === 'connected-on-both' && 'rounded-none border-x-0'
+              variant === 'connected-on-both' && 'rounded-none border-x-0',
+              buttonProps?.className
             )}
-            icon={isLoading && <Loader2 className="animate-spin" />}
-            iconRight={<ChevronDown className="text-foreground-light" strokeWidth={2} size={12} />}
           >
-            <span className="text-foreground-muted mr-1">source</span>
             {selectedAdditionalOption ? (
               <span>{selectedAdditionalOption.name}</span>
             ) : (
@@ -193,7 +209,11 @@ const DatabaseSelector = ({
               >
                 <Link
                   href={`/project/${projectRef}/settings/infrastructure`}
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    setOpen(false)
+                    // [Joshen] This is used in the Connect UI which is available across all pages
+                    setShowConnect(null)
+                  }}
                   className="w-full flex items-center gap-2"
                 >
                   <Plus size={14} strokeWidth={1.5} />

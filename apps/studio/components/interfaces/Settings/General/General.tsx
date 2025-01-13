@@ -33,17 +33,6 @@ const General = () => {
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
 
-  // Also doubles up as a feature flag to enable display of the related alert,
-  // another dedicated flag would be redundant.
-  const v2AnnouncementUrl = useFlag('v2AnnouncementUrl') as string
-
-  const v2MaintenanceWindow = project?.v2MaintenanceWindow
-  const v2MaintenanceDate = v2MaintenanceWindow?.start
-    ? new Date(v2MaintenanceWindow.start).toUTCString().slice(0, 16)
-    : undefined
-  const v2MaintenanceStartTime = v2MaintenanceWindow?.start?.substring(11, 16)
-  const v2MaintenanceEndTime = v2MaintenanceWindow?.end?.substring(11, 16)
-
   const parentProject = useProjectByRef(project?.parent_project_ref)
   const isBranch = parentProject !== undefined
 
@@ -123,7 +112,7 @@ const General = () => {
                       label="Project name"
                       disabled={isBranch || !canUpdateProject}
                     />
-                    <Input copy disabled id="ref" size="small" label="Reference ID" />
+                    <Input copy disabled id="ref" size="small" label="Project ID" />
                   </FormSectionContent>
                 </FormSection>
               </FormPanel>
@@ -136,49 +125,6 @@ const General = () => {
           <div className="mt-6" id="restart-project">
             <FormPanel>
               <div className="flex flex-col px-8 py-4">
-                {v2MaintenanceStartTime &&
-                  v2MaintenanceEndTime &&
-                  v2AnnouncementUrl !== 'https://' && (
-                    <Alert_Shadcn_ variant="warning" className="mb-4">
-                      <AlertCircle strokeWidth={2} />
-                      <AlertTitle_Shadcn_>Upcoming project restart scheduled</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                        This project will automatically restart on {v2MaintenanceDate} between{' '}
-                        {v2MaintenanceStartTime} and {v2MaintenanceEndTime} UTC, which will cause up
-                        to a few minutes of downtime.
-                        <Collapsible_Shadcn_>
-                          <CollapsibleTrigger_Shadcn_ className="text-foreground-light transition-all [&[data-state=open]&_svg]:rotate-90 hover:text-foreground data-[state=open]:text-foreground flex items-center gap-x-2 w-full">
-                            <ChevronRight
-                              className="transition-transform"
-                              strokeWidth={1.5}
-                              size={14}
-                            />
-                            Why this time?
-                          </CollapsibleTrigger_Shadcn_>
-                          <CollapsibleContent_Shadcn_>
-                            Your project has historically had the least database queries across the
-                            previous 10 weeks during this 30 minute window.
-                          </CollapsibleContent_Shadcn_>
-                        </Collapsible_Shadcn_>
-                        You may also manually restart this project anytime before{' '}
-                        {v2MaintenanceDate} {v2MaintenanceStartTime} UTC at a time that is
-                        convenient for you.
-                        <br />
-                        <br />
-                        <em>
-                          <a
-                            href={v2AnnouncementUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="underline"
-                          >
-                            Find out more
-                          </a>{' '}
-                          about our v2 platform architecture migration.
-                        </em>
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
                 <div className="flex justify-between">
                   <div>
                     <p className="text-sm">Restart project</p>

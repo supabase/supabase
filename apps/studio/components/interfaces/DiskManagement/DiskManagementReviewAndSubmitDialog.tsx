@@ -1,20 +1,27 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronRight } from 'lucide-react'
+import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
 import {
+  Alert_Shadcn_,
+  AlertTitle_Shadcn_,
   Badge,
   Button,
+  ButtonProps,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogSection,
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
@@ -24,17 +31,22 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  WarningIcon,
 } from 'ui'
-import BillingChangeBadge from './BillingChangeBadge'
-import { DiskType } from './DiskManagement.constants'
+import { DiskStorageSchemaType } from './DiskManagement.schema'
+import { DiskManagementMessage } from './DiskManagement.types'
 import {
+  calculateComputeSizePrice,
   calculateDiskSizePrice,
   calculateIOPSPrice,
   calculateThroughputPrice,
+  getAvailableComputeOptions,
+  mapAddOnVariantIdToComputeSize,
 } from './DiskManagement.utils'
-import { DiskMangementCoolDownSection } from './DiskManagementCoolDownSection'
-import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
+import { BillingChangeBadge } from './ui/BillingChangeBadge'
+import { DiskType } from './ui/DiskManagement.constants'
+import { DiskMangementCoolDownSection } from './ui/DiskManagementCoolDownSection'
 
 const TableHeaderRow = () => (
   <TableRow>
@@ -54,6 +66,7 @@ interface TableDataRowProps {
   afterPrice: number
   hidePrice?: boolean
   priceTooltip?: string
+  upgradeIncluded?: boolean
 }
 
 const TableDataRow = ({
@@ -65,6 +78,7 @@ const TableDataRow = ({
   afterPrice,
   hidePrice = false,
   priceTooltip,
+  upgradeIncluded = false,
 }: TableDataRowProps) => (
   <TableRow>
     <TableCell className="pl-5">
@@ -76,9 +90,11 @@ const TableDataRow = ({
       {defaultValue !== newValue ? (
         <Badge variant="default" className="bg-alternative bg-opacity-100">
           <div className="flex items-center gap-1">
-            <span className="text-xs font-mono text-foreground-muted">{defaultValue}</span>
+            <span className="text-xs font-mono text-foreground-muted">
+              {defaultValue.toString()}
+            </span>
             <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
-            <span className="text-xs font-mono text-foreground">{newValue}</span>
+            <span className="text-xs font-mono text-foreground">{newValue.toString()}</span>
           </div>
         </Badge>
       ) : (
@@ -90,14 +106,15 @@ const TableDataRow = ({
     </TableCell>
     <TableCell className="text-xs font-mono">{unit}</TableCell>
     <TableCell className="text-right pr-5">
-      {hidePrice ? (
+      {!upgradeIncluded && hidePrice ? (
         <span className="text-xs font-mono">-</span>
-      ) : beforePrice !== afterPrice ? (
+      ) : beforePrice !== afterPrice || upgradeIncluded ? (
         <BillingChangeBadge
           show={true}
           beforePrice={beforePrice}
           afterPrice={afterPrice}
           tooltip={priceTooltip}
+          free={upgradeIncluded}
         />
       ) : (
         <span className="text-xs font-mono">{formatCurrency(beforePrice)}</span>
@@ -111,23 +128,29 @@ interface DiskSizeMeterProps {
   form: UseFormReturn<DiskStorageSchemaType>
   numReplicas: number
   isDialogOpen: boolean
-  isWithinCooldown: boolean
+  disabled?: boolean
   setIsDialogOpen: (isOpen: boolean) => void
   onSubmit: (values: DiskStorageSchemaType) => Promise<void>
+
+  buttonSize?: ButtonProps['size']
+  message?: DiskManagementMessage | null
 }
 
 export const DiskManagementReviewAndSubmitDialog = ({
   isDialogOpen,
   setIsDialogOpen,
-  isWithinCooldown,
+  disabled,
   form,
   numReplicas,
   loading,
   onSubmit,
+  message,
+  buttonSize = 'medium',
 }: DiskSizeMeterProps) => {
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+
+  const { formState, getValues } = form
 
   const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
@@ -135,20 +158,43 @@ export const DiskManagementReviewAndSubmitDialog = ({
     },
   })
 
-  const planId = subscription?.plan.id ?? ''
-  const isDirty = Object.keys(form.formState.dirtyFields).length > 0
+  /**
+   * Queries
+   * */
+  const {
+    data: subscription,
+    // request deps in Form handle errors and loading
+  } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const {
+    data: addons,
+    // request deps in Form handle errors and loading
+  } = useProjectAddonsQuery({ projectRef: project?.ref })
 
+  const planId = subscription?.plan.id ?? 'free'
+  const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const replicaTooltipText = `Price change includes primary database and ${numReplicas} replica${numReplicas > 1 ? 's' : ''}`
 
+  const availableAddons = useMemo(() => {
+    return addons?.available_addons ?? []
+  }, [addons])
+  const availableOptions = useMemo(() => {
+    return getAvailableComputeOptions(availableAddons, project?.cloud_provider)
+  }, [availableAddons, project?.cloud_provider])
+
+  const computeSizePrice = calculateComputeSizePrice({
+    availableOptions,
+    oldComputeSize: form.formState.defaultValues?.computeSize || 'ci_micro',
+    newComputeSize: form.getValues('computeSize'),
+    plan: subscription?.plan.id ?? 'free',
+  })
   const diskSizePrice = calculateDiskSizePrice({
-    planId,
-    oldSize: form.formState.defaultValues?.totalSize || 0,
-    oldStorageType: form.formState.defaultValues?.storageType as DiskType,
-    newSize: form.getValues('totalSize'),
-    newStorageType: form.getValues('storageType') as DiskType,
+    planId: planId,
+    oldSize: formState.defaultValues?.totalSize || 0,
+    oldStorageType: formState.defaultValues?.storageType as DiskType,
+    newSize: getValues('totalSize'),
+    newStorageType: getValues('storageType') as DiskType,
     numReplicas,
   })
-
   const iopsPrice = calculateIOPSPrice({
     oldStorageType: form.formState.defaultValues?.storageType as DiskType,
     oldProvisionedIOPS: form.formState.defaultValues?.provisionedIOPS || 0,
@@ -156,7 +202,6 @@ export const DiskManagementReviewAndSubmitDialog = ({
     newProvisionedIOPS: form.getValues('provisionedIOPS'),
     numReplicas,
   })
-
   const throughputPrice = calculateThroughputPrice({
     storageType: form.getValues('storageType') as DiskType,
     newThroughput: form.getValues('throughput') || 0,
@@ -164,10 +209,17 @@ export const DiskManagementReviewAndSubmitDialog = ({
     numReplicas,
   })
 
+  const hasDiskConfigChanges =
+    form.formState.defaultValues?.provisionedIOPS !== form.getValues('provisionedIOPS') ||
+    (form.formState.defaultValues?.throughput !== form.getValues('throughput') &&
+      form.getValues('storageType') === 'gp3') ||
+    form.formState.defaultValues?.totalSize !== form.getValues('totalSize')
+
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <ButtonTooltip
+          size={buttonSize}
           htmlType="submit"
           type="primary"
           onClick={async (e) => {
@@ -175,14 +227,14 @@ export const DiskManagementReviewAndSubmitDialog = ({
             const isValid = await form.trigger()
             if (isValid) setIsDialogOpen(true)
           }}
-          disabled={isWithinCooldown || !isDirty}
+          disabled={disabled || !isDirty}
           tooltip={{
             content: {
               side: 'bottom',
               text: !canUpdateDiskConfiguration
                 ? 'You need additional permissions to update disk configuration'
-                : isWithinCooldown
-                  ? 'Currently within cooldown period from previous disk change'
+                : disabled
+                  ? 'Current form values are invalid'
                   : undefined,
             },
           }}
@@ -190,86 +242,102 @@ export const DiskManagementReviewAndSubmitDialog = ({
           Review changes
         </ButtonTooltip>
       </DialogTrigger>
-      <DialogContent size="large">
+      <DialogContent className="min-w-[620px]">
         <DialogHeader>
           <DialogTitle>Review changes</DialogTitle>
-          <DialogDescription>
-            Disk configuration changes will be applied shortly once confirmed.
-          </DialogDescription>
+          <DialogDescription>Changes will be applied shortly once confirmed.</DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
-
+        <div className="flex flex-col gap-2 p-5">
+          <DiskMangementRestartRequiredSection
+            visible={form.formState.defaultValues?.computeSize !== form.getValues('computeSize')}
+            title="Resizing your Compute will trigger a project restart"
+            description="Project will restart automatically on confirmation."
+          />
+          <DiskMangementCoolDownSection visible={hasDiskConfigChanges} />
+        </div>
+        <DialogSectionSeparator />
         <Table>
           <TableHeader className="font-mono uppercase text-xs [&_th]:h-auto [&_th]:pb-2 [&_th]:pt-4">
             <TableHeaderRow />
           </TableHeader>
           <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
-            <TableDataRow
-              hidePrice
-              attribute="Storage Type"
-              defaultValue={form.formState.defaultValues?.storageType ?? ''}
-              newValue={form.getValues('storageType')}
-              unit="-"
-              beforePrice={0}
-              afterPrice={0}
-            />
-            <TableDataRow
-              attribute="IOPS"
-              defaultValue={form.formState.defaultValues?.provisionedIOPS?.toLocaleString() ?? 0}
-              newValue={form.getValues('provisionedIOPS')?.toLocaleString()}
-              unit="IOPS"
-              beforePrice={Number(iopsPrice.oldPrice)}
-              afterPrice={Number(iopsPrice.newPrice)}
-              priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
-            />
-            {form.getValues('storageType') === 'gp3' ? (
+            {form.formState.defaultValues?.computeSize !== form.getValues('computeSize') && (
               <TableDataRow
-                attribute="Throughput"
-                defaultValue={form.formState.defaultValues?.throughput?.toLocaleString() ?? 0}
-                newValue={form.getValues('throughput')?.toLocaleString() ?? 0}
-                unit="MB/s"
-                beforePrice={Number(throughputPrice.oldPrice)}
-                afterPrice={Number(throughputPrice.newPrice)}
+                attribute="Compute size"
+                defaultValue={mapAddOnVariantIdToComputeSize(
+                  form.formState.defaultValues?.computeSize ?? 'ci_nano'
+                )}
+                newValue={mapAddOnVariantIdToComputeSize(form.getValues('computeSize'))}
+                unit="-"
+                beforePrice={Number(computeSizePrice.oldPrice)}
+                afterPrice={Number(computeSizePrice.newPrice)}
+                upgradeIncluded={
+                  subscription?.plan.id !== 'free' &&
+                  project?.infra_compute_size === 'nano' &&
+                  form.getValues('computeSize') === 'ci_micro'
+                }
+              />
+            )}
+            {form.formState.defaultValues?.storageType !== form.getValues('storageType') && (
+              <TableDataRow
+                hidePrice
+                attribute="Storage Type"
+                defaultValue={form.formState.defaultValues?.storageType ?? ''}
+                newValue={form.getValues('storageType')}
+                unit="-"
+                beforePrice={0}
+                afterPrice={0}
+              />
+            )}
+            {form.formState.defaultValues?.provisionedIOPS !==
+              form.getValues('provisionedIOPS') && (
+              <TableDataRow
+                attribute="IOPS"
+                defaultValue={form.formState.defaultValues?.provisionedIOPS?.toLocaleString() ?? 0}
+                newValue={form.getValues('provisionedIOPS')?.toLocaleString()}
+                unit="IOPS"
+                beforePrice={Number(iopsPrice.oldPrice)}
+                afterPrice={Number(iopsPrice.newPrice)}
                 priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
               />
-            ) : (
-              <TableRow>
-                <TableCell className="pl-5">
-                  <div className="flex flex-row gap-2 items-center">
-                    <span>Throughput</span>
-                  </div>
-                </TableCell>
-                <TableCell colSpan={3}>
-                  <p className="text-foreground-lighter text-xs text-center">
-                    Throughput is not configurable for io2 storage type
-                  </p>
-                </TableCell>
-              </TableRow>
             )}
-            <TableDataRow
-              attribute="Disk size"
-              defaultValue={form.formState.defaultValues?.totalSize?.toLocaleString() ?? 0}
-              newValue={form.getValues('totalSize')?.toLocaleString()}
-              unit="GB"
-              beforePrice={Number(diskSizePrice.oldPrice)}
-              afterPrice={Number(diskSizePrice.newPrice)}
-              priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
-            />
+            {form.formState.defaultValues?.throughput !== form.getValues('throughput') &&
+              form.getValues('storageType') === 'gp3' && (
+                <TableDataRow
+                  attribute="Throughput"
+                  defaultValue={form.formState.defaultValues?.throughput?.toLocaleString() ?? 0}
+                  newValue={form.getValues('throughput')?.toLocaleString() ?? 0}
+                  unit="MiB/s"
+                  beforePrice={Number(throughputPrice.oldPrice)}
+                  afterPrice={Number(throughputPrice.newPrice)}
+                  priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
+                />
+              )}
+            {form.formState.defaultValues?.totalSize !== form.getValues('totalSize') && (
+              <TableDataRow
+                attribute="Disk size"
+                defaultValue={form.formState.defaultValues?.totalSize?.toLocaleString() ?? 0}
+                newValue={form.getValues('totalSize')?.toLocaleString()}
+                unit="GB"
+                beforePrice={Number(diskSizePrice.oldPrice)}
+                afterPrice={Number(diskSizePrice.newPrice)}
+                priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
+              />
+            )}
           </TableBody>
         </Table>
 
-        <DialogSectionSeparator />
-
-        <DiskMangementCoolDownSection />
+        {/* <DialogSectionSeparator /> */}
 
         <DialogFooter>
-          <Button block size="small" type="default" onClick={() => setIsDialogOpen(false)}>
+          <Button block size="large" type="default" onClick={() => setIsDialogOpen(false)}>
             Cancel
           </Button>
-
           <Button
             block
-            size="small"
+            type={'warning'}
+            size="large"
             htmlType="submit"
             loading={loading}
             onClick={async () => {
@@ -279,6 +347,20 @@ export const DiskManagementReviewAndSubmitDialog = ({
             Confirm changes
           </Button>
         </DialogFooter>
+        {message && (
+          <>
+            <DialogSectionSeparator />
+            <DialogSection>
+              <Alert_Shadcn_
+                variant={message.type === 'error' ? 'destructive' : 'default'}
+                className=""
+              >
+                <WarningIcon />
+                <AlertTitle_Shadcn_>{message.message}</AlertTitle_Shadcn_>
+              </Alert_Shadcn_>
+            </DialogSection>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   )
