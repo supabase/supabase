@@ -240,7 +240,7 @@ const TransferProjectButton = () => {
                         </ul>
                         <p className="text-sm text-foreground-light">
                           These members will need to either delete, pause, or upgrade one or more of
-                          their projects before you can downgrade this project.
+                          their projects before you can transfer this project.
                         </p>
                       </div>
                     )}
