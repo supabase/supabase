@@ -332,6 +332,10 @@ export interface paths {
     /** Retrieves a list of available Postgres versions available to the organization */
     post: operations['OrganizationSlugController_getAvailableImageVersions']
   }
+  '/platform/organizations/{slug}/billing/credits/top-up': {
+    /** Tops up the credit balance */
+    post: operations['OrgCreditsController_createTopUp']
+  }
   '/platform/organizations/{slug}/billing/invoices': {
     /** Gets invoices for the given organization */
     get: operations['OrgInvoicesController_getInvoices']
@@ -1140,7 +1144,7 @@ export interface paths {
   }
   '/platform/telemetry/page-leave': {
     /** Send analytics page leave event */
-    post: operations['TelemetryPageLeaveController_pageLeave']
+    post: operations['TelemetryPageLeaveController_trackPageLeave']
   }
   '/platform/telemetry/reset': {
     /** Reset analytics */
@@ -2850,6 +2854,19 @@ export interface components {
       result: components['schemas']['CustomHostnameDetails']
       success: boolean
     }
+    CloneBackupsResponse: {
+      backups: components['schemas']['Backup'][]
+      physicalBackupData: {
+        earliestPhysicalBackupDateUnix?: number
+        latestPhysicalBackupDateUnix?: number
+      }
+      pitr_enabled: boolean
+      region: string
+      target_compute_size: string
+      target_volume_size_gb: number
+      tierKey: string
+      walg_enabled: boolean
+    }
     CloneProjectDto: {
       /** @default 0 */
       cloneBackupId?: number
@@ -3277,6 +3294,23 @@ export interface components {
       expiry_time: string
       secret_access_key: string
       session_token: string
+    }
+    CreditsTopUpRequestDto: {
+      amount: number
+      hcaptcha_token: string
+      payment_method_id: string
+    }
+    CreditsTopUpResponseDto: {
+      payment_intent_secret?: string
+      /** @enum {string} */
+      status:
+        | 'canceled'
+        | 'processing'
+        | 'requires_action'
+        | 'requires_capture'
+        | 'requires_confirmation'
+        | 'requires_payment_method'
+        | 'succeeded'
     }
     CustomerBillingAddress: {
       city?: string
@@ -4481,7 +4515,7 @@ export interface components {
     }
     OrganizationSlugResponse: {
       billing_email: string | null
-      billing_metadata?: Record<string, never>
+      billing_metadata: unknown
       has_oriole_project: boolean
       id: number
       name: string
@@ -4960,6 +4994,8 @@ export interface components {
     }
     ProjectClonedResponse: {
       source_project_ref: string
+      target_disk_size_gb: number
+      target_instance_size: string
       target_project_ref: string
     }
     ProjectClonedStatusResponse: {
@@ -5649,7 +5685,7 @@ export interface components {
       data: components['schemas']['SnippetMeta'][]
     }
     SnippetMeta: {
-      description?: string
+      description: string | null
       id: string
       inserted_at: string
       name: string
@@ -5669,7 +5705,7 @@ export interface components {
     }
     SnippetResponse: {
       content: components['schemas']['SnippetContent']
-      description?: string
+      description: string | null
       id: string
       inserted_at: string
       name: string
@@ -5873,21 +5909,22 @@ export interface components {
     TelemetryCallFeatureFlagsResponseDto: {
       [key: string]: unknown
     }
-    TelemetryEventBodyV2: {
+    TelemetryEventBodyV2Dto: {
       action: string
-      custom_properties: Record<string, never>
+      custom_properties: {
+        [key: string]: unknown
+      }
       page_title: string
       page_url: string
       pathname: string
-      ph: components['schemas']['TelemetryEventPostHog']
-    }
-    TelemetryEventPostHog: {
-      language: string
-      referrer: string
-      search: string
-      user_agent: string
-      viewport_height: number
-      viewport_width: number
+      ph: {
+        language: string
+        referrer: string
+        search: string
+        user_agent: string
+        viewport_height: number
+        viewport_width: number
+      }
     }
     TelemetryFeatureFlagBodyDto: {
       feature_flag_name: string
@@ -5906,24 +5943,29 @@ export interface components {
       project_ref?: string
       user_id: string
     }
-    TelemetryPageBodyV2: {
+    TelemetryPageBodyV2Dto: {
+      feature_flags?: {
+        [key: string]: unknown
+      }
       page_title: string
       page_url: string
       pathname: string
-      ph: components['schemas']['TelemetryPagePostHog']
+      ph: {
+        language: string
+        referrer: string
+        search: string
+        user_agent: string
+        viewport_height: number
+        viewport_width: number
+      }
     }
-    TelemetryPageLeaveBody: {
+    TelemetryPageLeaveBodyDto: {
+      feature_flags?: {
+        [key: string]: unknown
+      }
       page_title: string
       page_url: string
       pathname: string
-    }
-    TelemetryPagePostHog: {
-      language: string
-      referrer: string
-      search: string
-      user_agent: string
-      viewport_height: number
-      viewport_width: number
     }
     ThirdPartyAuth: {
       custom_jwks?: unknown
@@ -8066,7 +8108,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['BackupsResponse']
+          'application/json': components['schemas']['CloneBackupsResponse']
         }
       }
       /** @description Failed to list available valid backups */
@@ -8848,6 +8890,34 @@ export interface operations {
         content: never
       }
       /** @description Failed to determine available Postgres versions */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Tops up the credit balance */
+  OrgCreditsController_createTopUp: {
+    parameters: {
+      path: {
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreditsTopUpRequestDto']
+      }
+    }
+    responses: {
+      /** @description Top up has been successfully created. */
+      201: {
+        content: {
+          'application/json': components['schemas']['CreditsTopUpResponseDto']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to top up credit balance */
       500: {
         content: never
       }
@@ -14384,7 +14454,7 @@ export interface operations {
   TelemetryEventController_sendServerEventV2: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryEventBodyV2']
+        'application/json': components['schemas']['TelemetryEventBodyV2Dto']
       }
     }
     responses: {
@@ -14484,7 +14554,7 @@ export interface operations {
   TelemetryPageController_sendServerPageV2: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryPageBodyV2']
+        'application/json': components['schemas']['TelemetryPageBodyV2Dto']
       }
     }
     responses: {
@@ -14498,13 +14568,17 @@ export interface operations {
     }
   }
   /** Send analytics page leave event */
-  TelemetryPageLeaveController_pageLeave: {
+  TelemetryPageLeaveController_trackPageLeave: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryPageLeaveBody']
+        'application/json': components['schemas']['TelemetryPageLeaveBodyDto']
       }
     }
     responses: {
+      /** @description Page leave event sent */
+      200: {
+        content: never
+      }
       201: {
         content: never
       }
