@@ -196,7 +196,7 @@ grant usage on schema pgmq to postgres, anon, authenticated, service_role;
 
 /*
   Grant access to sequences to API roles by default. Existing table permissions
-  continue to enforce insert restrictions. This is necessary to accomodate the
+  continue to enforce insert restrictions. This is necessary to accommodate the
   on-backup hook that rebuild queue table primary keys to avoid a pg_dump segfault.
   This can be removed once logical backups are completely retired.
 */
