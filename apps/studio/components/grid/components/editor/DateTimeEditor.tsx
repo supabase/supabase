@@ -139,9 +139,14 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
                   <DropdownMenuContent className="w-20" align="end">
                     <DropdownMenuItem
                       onClick={() => {
-                        // [Joshen] The replace here is needed for timestamptz cause dayjs formats "ZZ" with "+" already
-                        const now = dayjs().format(FORMAT_MAP[type]).replace('++', '+')
-                        saveChanges(now)
+                        const formattedNow = dayjs().format(
+                          type === 'date'
+                            ? 'YYYY-MM-DD'
+                            : type === 'datetimetz'
+                              ? 'YYYY-MM-DDTHH:mm:ssZ'
+                              : 'YYYY-MM-DDTHH:mm:ss'
+                        )
+                        saveChanges(formattedNow)
                       }}
                     >
                       Set to NOW
