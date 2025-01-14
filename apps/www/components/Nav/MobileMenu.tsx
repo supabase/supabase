@@ -13,7 +13,7 @@ import { useKey } from 'react-use'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { ChevronRight } from 'lucide-react'
 import ProductModulesData from '~/data/ProductModules'
-import openJobPositions from '~/.contentlayer/generated/CareersCount/_index.json' with { type: 'json' }
+import openJobPositions from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
 const jobsCount = openJobPositions.jobsCount
 
 interface Props {
