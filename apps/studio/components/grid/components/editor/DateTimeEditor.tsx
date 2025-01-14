@@ -50,6 +50,17 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
     onRowChange({ ...row, [column.key]: value }, true)
   }
 
+  const setToNow = () => {
+    const formattedNow = dayjs().format(
+      type === 'date'
+        ? 'YYYY-MM-DD'
+        : type === 'datetimetz'
+          ? 'YYYY-MM-DDTHH:mm:ssZ'
+          : 'YYYY-MM-DDTHH:mm:ss'
+    )
+    saveChanges(formattedNow)
+  }
+
   useEffect(() => {
     try {
       ref.current?.focus({ preventScroll: true })
@@ -123,7 +134,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
             </div>
           </div>
           <div className="flex">
-            {isNullable && (
+            {isNullable ? (
               <>
                 <Button type="default" className="rounded-r-none" onClick={() => saveChanges(null)}>
                   Set NULL
@@ -137,23 +148,14 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-20" align="end">
-                    <DropdownMenuItem
-                      onClick={() => {
-                        const formattedNow = dayjs().format(
-                          type === 'date'
-                            ? 'YYYY-MM-DD'
-                            : type === 'datetimetz'
-                              ? 'YYYY-MM-DDTHH:mm:ssZ'
-                              : 'YYYY-MM-DDTHH:mm:ss'
-                        )
-                        saveChanges(formattedNow)
-                      }}
-                    >
-                      Set to NOW
-                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={setToNow}>Set to NOW</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
+            ) : (
+              <Button type="default" onClick={setToNow}>
+                Set to NOW
+              </Button>
             )}
           </div>
         </div>
