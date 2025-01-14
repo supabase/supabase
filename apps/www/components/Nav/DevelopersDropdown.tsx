@@ -6,7 +6,6 @@ import {
   jobsCount,
   latestBlogPosts,
 } from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
-import { Badge } from 'ui'
 
 type LinkProps = {
   text: string

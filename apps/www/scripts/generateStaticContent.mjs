@@ -29,6 +29,27 @@ const latestBlogPosts = allBlogPosts
   .slice(0, 2)
   .map(({ title, url, description }) => ({ title, url, description }))
 
+let stars = 0
+
+// GitHub Stars
+const fetchOctoData = async () => {
+  const { Octokit } = await import('@octokit/core')
+  const octokit = new Octokit()
+  const res = await octokit.request('GET /repos/{org}/{repo}', {
+    org: 'supabase',
+    repo: 'supabase',
+    type: 'public',
+  })
+
+  return res.data?.stargazers_count
+}
+
+try {
+  stars = await fetchOctoData()
+} catch (error) {
+  throw error
+}
+
 // Careers Jobs count
 const getCareerCount = async () => {
   const job_res = await fetch('https://api.ashbyhq.com/posting-api/job-board/supabase')
@@ -61,6 +82,6 @@ try {
 const filePath = path.join(__dirname, '../.contentlayer/generated/staticContent/_index.json')
 await fs.writeFile(
   filePath,
-  JSON.stringify({ latestBlogPosts: latestBlogPosts, jobsCount: careersCount }),
+  JSON.stringify({ latestBlogPosts: latestBlogPosts, jobsCount: careersCount, githubStars: stars }),
   'utf8'
 )
