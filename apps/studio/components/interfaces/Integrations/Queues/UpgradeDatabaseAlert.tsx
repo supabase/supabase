@@ -11,7 +11,7 @@ export const UpgradeDatabaseAlert = () => {
     <Admonition
       type="warning"
       className="mt-4"
-      title="Database Upgrade Needed"
+      title="Database upgrade needed"
       childProps={{ description: { className: 'flex flex-col gap-y-2' } }}
     >
       <div className="prose text-sm max-w-full">

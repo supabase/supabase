@@ -173,6 +173,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     id: 'vault',
     type: 'postgres_extension' as const,
     requiredExtensions: ['supabase_vault'],
+    missingExtensionsAlert: <UpgradeDatabaseAlert />,
     name: `Vault`,
     status: 'alpha',
     icon: ({ className, ...props } = {}) => (
