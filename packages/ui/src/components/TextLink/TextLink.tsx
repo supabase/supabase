@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { cn } from '../../lib/utils/cn'
 import { ChevronRight } from 'lucide-react'
-import { Badge } from '../../..'
 
 interface Props {
   label: string
