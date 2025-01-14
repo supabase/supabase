@@ -33,7 +33,7 @@ const DevelopersDropdown = () => (
                   {Icon && <Icon size={16} strokeWidth={1.3} />}
                   <span>{link.text}</span>
                   {link.text === 'Careers' && jobsCount > 0 && (
-                    <Badge className="p-1 w-[22px] h-[22px] border-strong text-xs flex items-center justify-center text-foreground-lighter">
+                    <Badge className="p-0 !bg-surface-200 w-[22px] h-[22px] border-none text-xs flex items-center justify-center text-foreground-lighter">
                       {openJobPositions.jobsCount}
                     </Badge>
                   )}
