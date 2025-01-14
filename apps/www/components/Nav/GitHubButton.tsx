@@ -15,7 +15,6 @@ const GitHubButton = () => {
     const showDecimals =
       (!isAlmostNextThousand && hundreds >= 1) || (hundreds === 0 && decimalPart >= 8)
 
-    // Format the output
     return showDecimals
       ? `${kFormat}.${decimalPart >= 8 ? hundreds + 1 : hundreds}K`
       : `${isAlmostNextThousand ? kFormat + 1 : kFormat}K`
