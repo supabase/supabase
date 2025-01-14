@@ -94,7 +94,7 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
               showLegend
               size="normal"
               xAxisIsDate={xKeyDateFormat === 'date'}
-              data={resultToRender as any}
+              data={resultToRender}
               xAxisKey={config.xKey}
               yAxisKey={config.yKey}
               emptyStateMessage="Execute a query and configure the chart options"
@@ -102,6 +102,7 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
               XAxisProps={{
                 angle: 0,
                 interval: 0,
+                interval: 'preserveStart',
                 hide: !config.showLabels,
                 tickFormatter: (idx: string) => {
                   const value = resultToRender[+idx][config.xKey]
@@ -113,8 +114,8 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
               }}
               YAxisProps={{
                 tickFormatter: (value: number) => value.toLocaleString(),
-                label: <></>,
                 hide: !config.showLabels,
+                domain: [0, 'dataMax'],
               }}
             />
           )}
