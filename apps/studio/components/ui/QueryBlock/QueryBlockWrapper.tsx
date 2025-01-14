@@ -21,7 +21,6 @@ interface QueryBlockWrapperProps {
   lockColumns?: boolean
   runQuery?: boolean
   isLoading?: boolean
-  disableUpdate?: boolean
   parameterValues?: Record<string, string>
   onUpdateChartConfig: (config: ChartConfig) => void
   onSetParameter?: (params: Parameter[]) => void
@@ -35,7 +34,6 @@ export const QueryBlockWrapper = ({
   lockColumns = false,
   runQuery = false,
   isLoading = false,
-  disableUpdate = false,
   parameterValues,
   onUpdateChartConfig,
   onSetParameter,
@@ -62,7 +60,6 @@ export const QueryBlockWrapper = ({
       isLoading={isLoading}
       runQuery={runQuery}
       lockColumns={lockColumns}
-      disableUpdate={disableUpdate}
       parameterValues={parameterValues}
       onUpdateChartConfig={onUpdateChartConfig}
       onSetParameter={onSetParameter}
