@@ -141,14 +141,41 @@ npx dotenvx run -f supabase/.env.production -- npx supabase config push
 
 ### How to Use with Preview Branches
 
-We are currently developing a workflow to integrate dotenv secrets with the Supabase branching system. This will allow each new deployed branch to be fully configured, including secrets.
+Dotenvx now supports encrypted secrets with Supabase's branching system. This allows you to securely manage environment-specific configurations across different branches.
 
-However, this feature is not ready yet. While we work on a secure way to share dotenv secrets, you can still use a similar approach to manually configure an existing deployed branch on Supabase.
+Here's how to set up encrypted secrets for your preview branches:
 
-To do this, create a `.env.preview` file containing your secrets. Then, sync the branch configuration with your local values. Note that the branching executor already handles database migrations, so you'll only need to push the configuration:
+1. **Link to Your Production Project:**
 
 ```bash
-npx dotenvx run -f supabase/.env.preview -- npx supabase link --project-ref <branch-ref>
-# Sync branch configuration
-npx dotenvx run -f supabase/.env.preview -- npx supabase config push
+npx supabase link
 ```
+
+2. **Generate Key Pair and Encrypt Your Secrets:**
+
+```bash
+npx dotenvx set SOME_KEY "your-secret-value" -f .env.preview
+```
+
+This creates both the encrypted value in `.env.preview` and the decryption key in `.env.keys`.
+
+3. **Update Project Secrets:**
+
+We store the decryption keys in the project's secret handler, allowing the branching executor to access and decrypt your values when configuring services:
+
+```bash
+npx supabase secrets set --env-file .env.keys
+```
+
+4. **Choose Your Configuration Approach:**
+   - Option A: Copy the encrypted value directly into `config.toml`:
+     ```toml
+     secret_value = "encrypted:<encrypted-value>"
+     ```
+   - Option B: Reference the environment variable in `config.toml`:
+     ```toml
+     secret_value = "env(SOME_KEY)"
+     ```
+     Then commit your `.env.preview` file with the encrypted values. The branching executor will automatically retrieve and use these values from `.env.preview` when deploying your branch.
+
+Now your preview branches will have access to the encrypted secrets while maintaining security. The branching executor will handle both database migrations and configuration updates automatically.
