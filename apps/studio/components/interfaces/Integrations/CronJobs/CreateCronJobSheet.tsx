@@ -345,7 +345,9 @@ export const CreateCronJobSheet = ({
                           name="function_type"
                           value={field.value}
                           disabled={field.disabled}
-                          onValueChange={field.onChange}
+                          onValueChange={(value) => {
+                            field.onChange(value)
+                          }}
                         >
                           {CRONJOB_DEFINITIONS.map((definition) => (
                             <RadioGroupStackedItem
