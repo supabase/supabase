@@ -1,3 +1,4 @@
+'use client'
 import dayjs from 'dayjs'
 import { ReactNode, useState } from 'react'
 import { Bar, Cell, BarChart as RechartBarChart, XAxis, YAxis } from 'recharts'
