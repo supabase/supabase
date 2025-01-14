@@ -155,7 +155,10 @@ const Migrations = () => {
               isReadOnly
               id={selectedMigration?.version ?? ''}
               language="pgsql"
-              defaultValue={selectedMigration?.statements?.join('\n')}
+              defaultValue={
+                selectedMigration?.statements?.join(';\n') +
+                (selectedMigration?.statements?.length ? ';' : '')
+              }
             />
           </div>
         </div>
