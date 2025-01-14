@@ -1,5 +1,5 @@
-import { Code, Play, X } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { Code, Play } from 'lucide-react'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 import { toast } from 'sonner'
 
@@ -43,16 +43,13 @@ interface QueryBlockProps {
   chartConfig?: ChartConfig
   maxHeight?: number
   parameterValues?: Record<string, string>
-
+  actions?: ReactNode // Any other actions specific to the parent to be rendered in the header
   isChart?: boolean
   isLoading?: boolean
-  disableUpdate?: boolean // Do we need this? Or can we rename this to be more obvious?
   runQuery?: boolean
   lockColumns?: boolean
-
   onSetParameter?: (params: Parameter[]) => void
   onUpdateChartConfig?: (config: ChartConfig) => void
-  onRemoveChart?: ({ metric }: { metric: { key: string } }) => void
 }
 
 // [Joshen ReportsV2] JFYI we may adjust this in subsequent PRs when we implement this into Reports V2
@@ -64,14 +61,13 @@ export const QueryBlock = ({
   chartConfig = DEFAULT_CHART_CONFIG,
   maxHeight = 250,
   parameterValues: extParameterValues,
+  actions,
   isChart = false,
   isLoading = false,
-  disableUpdate = false,
   runQuery = false,
   lockColumns = false,
   onSetParameter,
   onUpdateChartConfig,
-  onRemoveChart,
 }: QueryBlockProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
@@ -210,17 +206,7 @@ export const QueryBlock = ({
             }}
           />
 
-          {/* [Joshen ReportsV2] Un-tested as this is intended for Reports V2 */}
-          {!disableUpdate && onRemoveChart && (
-            <ButtonTooltip
-              type="text"
-              size="tiny"
-              icon={<X />}
-              className="w-7 h-7"
-              onClick={() => onRemoveChart({ metric: { key: id ?? '' } })}
-              tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
-            />
-          )}
+          {actions}
         </div>
       </div>
 
@@ -252,12 +238,14 @@ export const QueryBlock = ({
               size="tiny"
               className="w-full flex-1"
               onClick={() => {
+                // [Joshen] This is for when we introduced the concept of parameters into our reports
+                // const processedSql = processParameterizedSql(sql!, combinedParameterValues)
+
                 setShowWarning(undefined)
-                const processedSql = processParameterizedSql(sql!, combinedParameterValues)
                 execute({
                   projectRef: ref,
                   connectionString: project?.connectionString,
-                  sql: processedSql,
+                  sql,
                 })
               }}
             >
@@ -283,7 +271,7 @@ export const QueryBlock = ({
         </div>
       )}
 
-      {queryResult === undefined && (
+      {isExecuting && queryResult === undefined && (
         <div className="border-t p-3">
           <ShimmeringLoader />
         </div>
