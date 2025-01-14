@@ -47,6 +47,7 @@ const ForeignRowSelector = ({
   const tableId = _tableId ? Number(_tableId) : undefined
 
   // [Joshen] Only show Set NULL CTA if its a 1:1 foreign key, and source column is nullable
+  // As this wouldn't be straightforward for composite foreign keys
   const sourceColumn = (selectedTable?.columns ?? []).find((c) => c.name === columns?.[0].source)
   const isNullable = (columns ?? []).length === 1 && sourceColumn?.is_nullable
 
