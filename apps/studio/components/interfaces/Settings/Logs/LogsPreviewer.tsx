@@ -20,7 +20,8 @@ import { ensureNoTimestampConflict, maybeShowUpgradePrompt } from './Logs.utils'
 import UpgradePrompt from './UpgradePrompt'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import useSingleLog from 'hooks/analytics/useSingleLog'
-import { LogsBarChart } from 'components/ui/Charts/LogsBarChart'
+import { LogsBarChart } from 'ui-patterns/LogsBarChart'
+import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 
 /**
  * Acts as a container component for the entire log display
@@ -239,6 +240,13 @@ export const LogsPreviewer = ({
                   from: null,
                 })
               }}
+              EmptyState={
+                <NoDataPlaceholder
+                  message={'No data'}
+                  description="It may take up to 24 hours for data to refresh"
+                  size={'tiny'}
+                />
+              }
             />
           )}
         </div>

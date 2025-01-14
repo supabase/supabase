@@ -1,34 +1,42 @@
 import dayjs from 'dayjs'
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { Bar, Cell, BarChart as RechartBarChart, XAxis, YAxis } from 'recharts'
-import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import type { CategoricalChartState } from 'recharts/types/chart/types'
-import type { Datum } from './Charts.types'
-import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
+const CHART_COLORS = {
+  TICK: 'hsl(var(--background-overlay-hover))',
+  AXIS: 'hsl(var(--background-overlay-hover))',
+  GREEN_1: 'hsl(var(--brand-default))',
+  GREEN_2: 'hsl(var(--brand-500))',
+  RED_1: 'hsl(var(--destructive-default))',
+  RED_2: 'hsl(var(--destructive-500))',
+}
+type LogsBarChartDatum = {
+  timestamp: string
+  error_count: number
+  ok_count: number
+}
 export const LogsBarChart = ({
   data,
   onBarClick,
+  EmptyState,
+  DateTimeFormat = 'MMM D, YYYY, hh:mma',
 }: {
-  data: Datum[]
-  onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
+  data: LogsBarChartDatum[]
+  onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
+  EmptyState?: ReactNode
+  DateTimeFormat?: string
 }) => {
-  const SIZE = 'tiny'
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
   if (data.length === 0) {
-    return (
-      <NoDataPlaceholder
-        message={'No data'}
-        description="It may take up to 24 hours for data to refresh"
-        size={SIZE}
-      />
-    )
+    if (EmptyState) return EmptyState
+    return null
   }
 
-  const startDate = dayjs(data[0]['timestamp']).format(DateTimeFormats.FULL)
-  const endDate = dayjs(data[data?.length - 1]?.['timestamp']).format(DateTimeFormats.FULL)
+  const startDate = dayjs(data[0]['timestamp']).format(DateTimeFormat)
+  const endDate = dayjs(data[data?.length - 1]?.['timestamp']).format(DateTimeFormat)
 
   return (
     <div className={cn('flex flex-col gap-y-3')}>
@@ -39,7 +47,7 @@ export const LogsBarChart = ({
               label: 'Errors',
             },
             ok_count: {
-              label: 'Success',
+              label: 'Ok',
             },
           } satisfies ChartConfig
         }
@@ -75,14 +83,14 @@ export const LogsBarChart = ({
             content={
               <ChartTooltipContent
                 className="text-foreground-light"
-                labelFormatter={(v) => dayjs(v).format(DateTimeFormats.FULL)}
+                labelFormatter={(v) => dayjs(v).format(DateTimeFormat)}
               />
             }
           />
 
           {/* Error bars */}
           <Bar dataKey="error_count" fill={CHART_COLORS.RED_1} maxBarSize={24} stackId="stack">
-            {data?.map((_entry: Datum, index: number) => (
+            {data?.map((_entry: LogsBarChartDatum, index: number) => (
               <Cell
                 className="cursor-pointer transition-colors"
                 key={`error-${index}`}
@@ -97,7 +105,7 @@ export const LogsBarChart = ({
 
           {/* Success bars */}
           <Bar dataKey="ok_count" fill={CHART_COLORS.GREEN_1} maxBarSize={24} stackId="stack">
-            {data?.map((_entry: Datum, index: number) => (
+            {data?.map((_entry: LogsBarChartDatum, index: number) => (
               <Cell
                 className="cursor-pointer transition-colors"
                 key={`success-${index}`}
