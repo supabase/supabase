@@ -11,7 +11,7 @@ type Props = {
 
 function DatabaseBackupsNav({ active }: Props) {
   const isCloneToNewProjectEnabled = useFlag('clonetonewproject')
-  const ref = useProjectContext()?.project?.ref
+  const { ref, cloud_provider } = useProjectContext()?.project || {}
 
   const navMenuItems = [
     {
@@ -27,7 +27,7 @@ function DatabaseBackupsNav({ active }: Props) {
       href: `/project/${ref}/database/backups/pitr`,
     },
     {
-      enabled: isCloneToNewProjectEnabled,
+      enabled: isCloneToNewProjectEnabled && cloud_provider !== 'FLY',
       id: 'rtnp',
       label: (
         <div className="flex items-center gap-1">

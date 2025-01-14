@@ -6,11 +6,9 @@ export enum TelemetryActions {
 
   ASSISTANT_PROMPT_SUBMITTED = 'assistant_prompt_submitted',
   ASSISTANT_DEBUG_SUBMITTED = 'assistant_debug_submitted',
-  ASSISTANT_SUGGESTION_RAN = 'assistant_suggestion_ran',
-  ASSISTANT_SUGGESTION_ACCEPTED = 'assistant_suggestion_accepted',
-  ASSISTANT_SUGGESTION_REJECTED = 'assistant_suggestion_rejected',
-  ASSISTANT_SUGGESTION_COPIED = 'assistant_suggestion_copied',
-  ASSISTANT_EDIT_SQL_CLICKED = 'assistant_edit_sql_clicked',
+  ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED = 'assistant_suggestion_run_query_clicked',
+  ASSISTANT_SQL_DIFF_HANDLER_EVALUATED = 'assistant_sql_diff_handler_evaluated',
+  ASSISTANT_EDIT_IN_SQL_EDITOR_CLICKED = 'assistant_edit_in_sql_editor_clicked',
 
   CONNECTION_STRING_COPIED = 'connection_string_copied',
 
@@ -22,6 +20,7 @@ export enum TelemetryActions {
   CRON_JOB_CREATE_CLICKED = 'cron_job_create_clicked',
   CRON_JOB_HISTORY_CLICKED = 'cron_job_history_clicked',
 
+  FEATURE_PREVIEWS_CLICKED = 'feature_previews_clicked',
   FEATURE_PREVIEW_ENABLED = 'feature_preview_enabled',
   FEATURE_PREVIEW_DISABLED = 'feature_preview_disabled',
 
@@ -37,6 +36,37 @@ export enum TelemetryActions {
   SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED = 'sql_editor_result_download_csv_clicked',
   SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED = 'sql_editor_result_copy_markdown_clicked',
   SQL_EDITOR_RESULT_COPY_JSON_CLICKED = 'sql_editor_result_copy_markdown_clicked',
+}
+
+/**
+ * Triggered when a user signs up. When signing up with Email and Password, this is only triggered once user confirms their email.
+ *
+ * @group Events
+ * @source studio
+ * @page /sign-up
+ */
+export interface SignUpEvent {
+  action: TelemetryActions.SIGN_UP
+  properties: {
+    category: 'conversion'
+  }
+}
+
+/**
+ * Triggered when a user signs in with Github, Email and Password or SSO.
+ *
+ * Some unintuitive behavior:
+ *   - If signing up with GitHub the SignInEvent gets triggered first before the SignUpEvent.
+ *
+ * @group Events
+ * @source studio
+ * @page /sign-in-mfa
+ */
+export interface SignInEvent {
+  action: TelemetryActions.SIGN_IN
+  properties: {
+    category: 'account'
+  }
 }
 
 /**
@@ -76,7 +106,7 @@ export interface CronJobCreatedEvent {
     /**
      * What the cron job executes, e.g. sql_function or sql_snippet
      */
-    type: 'sql_function' | 'sql_snippet'
+    type: 'sql_function' | 'sql_snippet' | 'edge_function' | 'http_request'
     /**
      * Schedule of the cron job in the format of * * * * *
      */
@@ -97,7 +127,7 @@ export interface CronJobUpdatedEvent {
     /**
      * What the cron job executes, e.g. sql_function or sql_snippet
      */
-    type: 'sql_function' | 'sql_snippet'
+    type: 'sql_function' | 'sql_snippet' | 'edge_function' | 'http_request'
     /**
      * Schedule of the cron job in the format of * * * * *
      */
@@ -160,56 +190,254 @@ export interface CronJobHistoryClickedEvent {
   action: TelemetryActions.CRON_JOB_HISTORY_CLICKED
 }
 
-// [Joshen] Just adding these to start consolidating our telemetry configs
-// may change depending on how we choose to standardize across all apps
-// Events define the name of the event and it'll be used as the primary identification
-export enum TELEMETRY_EVENTS {
-  FEATURE_PREVIEWS = 'Dashboard UI Feature Previews',
-  AI_ASSISTANT_V2 = 'AI Assistant V2',
-  CONNECT_UI = 'Connect UI',
-  CRON_JOBS = 'Cron Jobs',
+/**
+ * The FeaturePreviewModal was opened.
+ *
+ * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FeaturePreviewsClickedEvent {
+  action: TelemetryActions.FEATURE_PREVIEWS_CLICKED
 }
 
-// [Joshen] Values refer to the "action" of the "event"
-// e.g prompt submitted (action) through the AI assistant (event)
-// e.g enabled feature x (action) via the feature preview (event)
-export enum TELEMETRY_VALUES {
-  /**
-   * Track whenever a prompt is submitted to the AI (excluding debug prompts)
-   * @context AI Assistant V2
-   * @purpose Indication of engagement with the feature, aid in prioritizing efforts into the assistant itself
-   */
-  PROMPT_SUBMITTED = 'prompt-submitted',
-  /**
-   * Track whenever a debug prompt is submitted to the AI
-   * @context AI Assistant V2
-   * @purpose TBD
-   */
-  DEBUG_SUBMITTED = 'debug-submitted',
-  /**
-   * Track running a SQL suggestion from AI Assistant
-   * @context AI Assistant V2
-   * @purpose Indication of usefulness of AI assistant response, aid in prioritizing tweak of Assistant prompts to adjust output quality
-   * @details Broken down into "select" or "mutation", and for the latter further broken down to the type of query (e.g "functions" or "rls-policies", default to unknown otherwise)
-   * */
-  RAN_SQL_SUGGESTION = 'ran-sql-suggestion',
-  /**
-   * Track editing a SQL suggestion:
-   * @context AI Assistant V2
-   * @purpose Indication of interest for wanting to expand from a SQL suggestion, aid in deciding the priority for an inline editor
-   * */
-  EDIT_IN_SQL_EDITOR = 'edit-in-sql-editor',
-  /**
-   * Track events for cron jobs
-   * @context Cron Jobs
-   * @purpose TBD (Joshen just adding these here as we needed some telemetry, but ideally we think this properly through and come up with purposes)
-   */
-  CRON_JOB_CREATED = 'cron-job-created',
-  CRON_JOB_UPDATED = 'cron-job-updated',
-  CRON_JOB_DELETED = 'cron-job-deleted',
-  CRON_JOB_DELETE_CLICKED = 'cron-job-delete-clicked',
-  CRON_JOB_UPDATE_CLICKED = 'cron-job-update-clicked',
-  CRON_JOB_CREATE_CLICKED = 'cron-job-create-clicked',
-  CRON_JOBS_VIEW_PREVIOUS_RUNS = 'view-previous-runs-clicked',
-  COPY_CONNECTION_STRING = 'copy-connection-string',
+/**
+ * A feature preview was enabled by the user through the FeaturePreviewModal.
+ *
+ * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FeaturePreviewEnabledEvent {
+  action: TelemetryActions.FEATURE_PREVIEW_ENABLED
+  properties: {
+    /**
+     * Feature key of the preview that was enabled. e.g. supabase-ui-api-side-panel
+     */
+    feature: string
+  }
+}
+
+/**
+ * A feature preview was disabled by the user through the FeaturePreviewModal.
+ *
+ * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FeaturePreviewDisabledEvent {
+  action: TelemetryActions.FEATURE_PREVIEW_DISABLED
+  properties: {
+    /**
+     * Feature key of the preview that was disabled. e.g. supabase-ui-api-side-panel
+     */
+    feature: string
+  }
+}
+
+/**
+ * After selecting channel, either "Listening to channel" or "Start listening" button was clicked.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/realtime/inspector
+ */
+export interface RealtimeInspectorListenChannelClickedEvent {
+  action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED
+}
+
+/**
+ * A broadcast message was sent from the SendMessageModal.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/realtime/inspector
+ */
+export interface RealtimeInspectorBroadcastSentEvent {
+  action: TelemetryActions.REALTIME_INSPECTOR_BROADCAST_SENT
+}
+
+/**
+ * A message was clicked in the RealtimeInspector, which opens a sidebar that shows the messsage details including metadata.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/realtime/inspector
+ */
+export interface RealtimeInspectorMessageClickedEvent {
+  action: TelemetryActions.REALTIME_INSPECTOR_MESSAGE_CLICKED
+}
+
+/**
+ * A message was copied from the RealtimeInspector.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/realtime/inspector
+ */
+export interface RealtimeInspectorCopyMessageClickedEvent {
+  action: TelemetryActions.REALTIME_INSPECTOR_COPY_MESSAGE_CLICKED
+}
+
+/**
+ * Filters were applied in the RealtimeInspector.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/realtime/inspector
+ */
+export interface RealtimeInspectorFiltersAppliedEvent {
+  action: TelemetryActions.REALTIME_INSPECTOR_FILTERS_APPLIED
+}
+
+/**
+ * Database role was updated in the RealtimeInspector.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/realtime/inspector
+ */
+export interface RealtimeInspectorDatabaseRoleUpdatedEvent {
+  action: TelemetryActions.REALTIME_INSPECTOR_DATABASE_ROLE_UPDATED
+}
+
+/**
+ * Quickstart card clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorQuickstartClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_QUICKSTART_CLICKED
+  properties: {
+    /**
+     * The title of the quickstart card clicked.
+     */
+    quickstartName: string
+  }
+}
+
+/**
+ * Template card clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorTemplateClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED
+  properties: {
+    /**
+     * The name of the template card clicked.
+     */
+    templateName: string
+  }
+}
+
+/**
+ * Result download CSV button clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorResultDownloadCsvClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED
+}
+
+/**
+ * Result copy markdown button clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorResultCopyMarkdownClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED
+}
+
+/**
+ * Result copy JSON button clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorResultCopyJsonClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_RESULT_COPY_JSON_CLICKED
+}
+
+/**
+ * User submitted a prompt to the assistant sidebar.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantPromptSubmittedEvent {
+  action: TelemetryActions.ASSISTANT_PROMPT_SUBMITTED
+}
+
+/**
+ * User submitted a debug request to the assistant sidebar or prompt submitted has Help me to debug.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantDebugSubmittedEvent {
+  action: TelemetryActions.ASSISTANT_DEBUG_SUBMITTED
+}
+
+/**
+ * User clicked the run query button in the suggestion provided in the assistant sidebar.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantSuggestionRunQueryClickedEvent {
+  action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED
+  properties: {
+    /**
+     * The type of suggestion that was run by the user. Mutate or Select query types only.
+     */
+    queryType: string
+    category?: string
+  }
+}
+
+/**
+ * User accepted or rejected changes in sql ai diff handler. They can accept change by clicking accept button or typing shortcut (CMD+Enter) or reject by clicking reject button or typing shortcut (Esc). Handler only appears after clicking any dropdown option in Edit in Sql Editor in suggestion provided by the assistant. The dropdown options only appear in any page with 'sql' in url.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface AssistantSqlDiffHandlerEvaluatedEvent {
+  action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED
+  properties: {
+    /**
+     * Whether the user accepted or rejected the changes.
+     */
+    handlerAccepted: boolean
+  }
+}
+
+/**
+ * User clicked Edit in SQL Editor button in the assistant sidebar when user is in any page that does not have 'sql' in url or is in a new snippet.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantEditInSqlEditorClickedEvent {
+  action: TelemetryActions.ASSISTANT_EDIT_IN_SQL_EDITOR_CLICKED
+  properties: {
+    /**
+     * Whether the user is in the SQL editor page or in a new snippet.
+     */
+    isInSQLEditor: boolean
+    isInNewSnippet: boolean
+  }
 }

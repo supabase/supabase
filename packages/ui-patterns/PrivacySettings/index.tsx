@@ -31,6 +31,8 @@ export const PrivacySettings = ({
   }
 
   const handleOptOutTelemetry = async () => {
+    // remove telemetry data from cookies
+    document.cookie = `${LOCAL_STORAGE_KEYS.TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
     handleResetTelemetry(process.env.NEXT_PUBLIC_API_URL!)
   }
 

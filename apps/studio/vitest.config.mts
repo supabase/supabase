@@ -1,9 +1,8 @@
-import { defineConfig } from 'vitest/config'
-import tsconfigPaths from 'vite-tsconfig-paths'
-import { fileURLToPath } from 'url'
-import { resolve } from 'path'
-import path from 'path'
 import react from '@vitejs/plugin-react'
+import path, { resolve } from 'path'
+import { fileURLToPath } from 'url'
+import tsconfigPaths from 'vite-tsconfig-paths'
+import { defineConfig } from 'vitest/config'
 
 // Some tools like Vitest VSCode extensions, have trouble with resolving relative paths,
 // as they use the directory of the test file as `cwd`, which makes them believe that
@@ -32,7 +31,6 @@ export default defineConfig({
     restoreMocks: true,
     setupFiles: [
       resolve(dirname, './tests/vitestSetup.ts'),
-      resolve(dirname, './tests/setup/testing-library-matchers.js'),
       resolve(dirname, './tests/setup/polyfills.js'),
       resolve(dirname, './tests/setup/radix.js'),
     ],

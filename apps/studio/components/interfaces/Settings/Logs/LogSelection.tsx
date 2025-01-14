@@ -17,6 +17,7 @@ import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSel
 import type { LogData, QueryType } from './Logs.types'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { WarehouseSelectionRenderer } from './LogSelectionRenderers/WarehouseSelectionRenderer'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -29,28 +30,26 @@ export interface LogSelectionProps {
 }
 
 const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectionProps) => {
+  const useNewLogDetail = useFlag('logsDetailV2')
+
   const LogDetails = () => {
     if (error) return <LogErrorState error={error} />
     if (!log) return <LogDetailEmptyState />
-    // if (!log.metadata) return <DefaultPreviewSelectionRenderer log={log} />
+    if (useNewLogDetail) return <DefaultPreviewSelectionRenderer log={log} />
 
     switch (queryType) {
       case 'warehouse':
         return <WarehouseSelectionRenderer log={log} />
       case 'api':
         return <DatabaseApiSelectionRender log={log} />
-
       case 'database':
         return <DatabasePostgresSelectionRender log={log} />
       case 'pg_cron':
         return <DatabasePostgresSelectionRender log={log} />
-
       case 'fn_edge':
         return <FunctionInvocationSelectionRender log={log} />
-
       case 'functions':
         return <FunctionLogsSelectionRender log={log} />
-
       case 'auth':
         return <AuthSelectionRenderer log={log} />
       default:
