@@ -48,11 +48,14 @@ describe('parseCronJobCommand', () => {
   })
 
   it('should return a HTTP request config with POST method, some headers and empty body', () => {
-    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('headerche', '2'), body:='', timeout_milliseconds:=1000 );`
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('fst', '1', 'snd', '2'), body:='', timeout_milliseconds:=1000 );`
     expect(parseCronJobCommand(command)).toMatchObject({
       endpoint: 'https://example.com/api/endpoint',
       method: 'POST',
-      httpHeaders: [{ name: 'headerche', value: '2' }],
+      httpHeaders: [
+        { name: 'fst', value: '1' },
+        { name: 'snd', value: '2' },
+      ],
       httpBody: '',
       timeoutMs: 1000,
       type: 'http_request',
@@ -77,6 +80,36 @@ describe('parseCronJobCommand', () => {
       endpoint: 'https://example.com/api/endpoint',
       method: 'POST',
       httpHeaders: [],
+      httpBody: '{"key": "value"}',
+      timeoutMs: 5000,
+      type: 'http_request',
+    })
+  })
+
+  it('should return a HTTP request config with POST method, plain JSON headers and plain JSON body', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:='{"fst": "1", "snd": "2"}',body:='{"key": "value"}',timeout_milliseconds:=5000);`
+    expect(parseCronJobCommand(command)).toMatchObject({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [
+        { name: 'fst', value: '1' },
+        { name: 'snd', value: '2' },
+      ],
+      httpBody: '{"key": "value"}',
+      timeoutMs: 5000,
+      type: 'http_request',
+    })
+  })
+
+  it('should return a HTTP request config with POST method, plain JSON headers and plain JSON body with ::jsonb typecasting', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:='{"fst": "1", "snd": "2"}'::jsonb,body:='{"key": "value"}'::jsonb,timeout_milliseconds:=5000);`
+    expect(parseCronJobCommand(command)).toMatchObject({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [
+        { name: 'fst', value: '1' },
+        { name: 'snd', value: '2' },
+      ],
       httpBody: '{"key": "value"}',
       timeoutMs: 5000,
       type: 'http_request',
