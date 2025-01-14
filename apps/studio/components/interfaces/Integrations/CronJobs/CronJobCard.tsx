@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { SQLCodeBlock } from 'components/interfaces/Auth/ThirdPartyAuthForm/SqlCodeBlock'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useCronJobRunQuery } from 'data/database-cron-jobs/database-cron-jobs-run-query'
@@ -15,6 +14,7 @@ import {
   Badge,
   Button,
   cn,
+  CodeBlock,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -184,9 +184,15 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
               <div className="grid grid-cols-10 gap-3">
                 <span className="text-foreground-light col-span-1">Command</span>
                 <div className="col-span-9">
-                  <SQLCodeBlock hideCopy={false} className="py-2">
-                    {[job.command.trim()]}
-                  </SQLCodeBlock>
+                  <CodeBlock
+                    hideLineNumbers
+                    value={job.command.trim()}
+                    language="sql"
+                    className={cn(
+                      'py-0 px-3.5 max-w-full prose dark:prose-dark',
+                      '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
+                    )}
+                  />
                 </div>
               </div>
             </div>
