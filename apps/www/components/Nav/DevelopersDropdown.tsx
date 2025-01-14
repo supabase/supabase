@@ -3,6 +3,9 @@ import Link from 'next/link'
 
 import { data as DevelopersData } from 'data/Developers'
 import blogPosts from '~/.contentlayer/generated/LatestBlogPost/_index.json' with { type: 'json' }
+import openJobPositions from '~/.contentlayer/generated/CareersCount/_index.json' with { type: 'json' }
+import { Badge } from 'ui'
+const jobsCount = openJobPositions.jobsCount
 
 type LinkProps = {
   text: string
@@ -29,6 +32,11 @@ const DevelopersDropdown = () => (
                 >
                   {Icon && <Icon size={16} strokeWidth={1.3} />}
                   <span>{link.text}</span>
+                  {link.text === 'Careers' && jobsCount > 0 && (
+                    <Badge className="p-1 w-[22px] h-[22px] border-strong text-xs flex items-center justify-center text-foreground-lighter">
+                      {openJobPositions.jobsCount}
+                    </Badge>
+                  )}
                   <ChevronRight
                     strokeWidth={2}
                     className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
