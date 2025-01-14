@@ -4,7 +4,11 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
-export const UpgradeDatabaseAlert = () => {
+interface UpgradeDatabaseAlertProps {
+  minimumVersion?: string
+}
+
+export const UpgradeDatabaseAlert = ({ minimumVersion = '15.6' }: UpgradeDatabaseAlertProps) => {
   const project = useSelectedProject()
 
   return (
@@ -17,7 +21,7 @@ export const UpgradeDatabaseAlert = () => {
       <div className="prose text-sm max-w-full">
         <p>
           This integration requires the <code>pgmq</code> extension which is not available on this
-          version of Postgres. The extension is available on version 15.6.1.143 and higher.
+          version of Postgres. The extension is available on version {minimumVersion} and higher.
         </p>
       </div>
       <Button color="primary" className="w-fit">
