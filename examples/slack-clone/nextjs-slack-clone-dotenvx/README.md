@@ -57,6 +57,17 @@ client_id = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID)"
 secret = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET)"
 ```
 
+> **Note:** Alternatively, you can directly store encrypted values in your `config.toml` file:
+>
+> ```toml
+> [auth.external.github]
+> enabled = true
+> client_id = "encrypted:<encrypted-value>"
+> secret = "encrypted:<encrypted-value>"
+> ```
+>
+> This approach eliminates the need for environment variables but still maintains security through encryption.
+
 ---
 
 ## Local Development
