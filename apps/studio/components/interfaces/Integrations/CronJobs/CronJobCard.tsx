@@ -184,7 +184,9 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
               <div className="grid grid-cols-10 gap-3">
                 <span className="text-foreground-light col-span-1">Command</span>
                 <div className="col-span-9">
-                  <SQLCodeBlock className="py-2">{[job.command.trim()]}</SQLCodeBlock>
+                  <SQLCodeBlock hideCopy={false} className="py-2">
+                    {[job.command.trim()]}
+                  </SQLCodeBlock>
                 </div>
               </div>
             </div>

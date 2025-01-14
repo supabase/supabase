@@ -4,9 +4,10 @@ import { CodeBlock, cn } from 'ui'
 interface SQLCodeBlockProps {
   children: string[]
   className?: string
+  hideCopy?: boolean
 }
 
-export const SQLCodeBlock = ({ children, className }: SQLCodeBlockProps) => {
+export const SQLCodeBlock = ({ children, className, hideCopy = true }: SQLCodeBlockProps) => {
   let formatted = (children || [''])[0]
   try {
     formatted = format(formatted, {
@@ -31,7 +32,7 @@ export const SQLCodeBlock = ({ children, className }: SQLCodeBlockProps) => {
           '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap',
           className
         )}
-        hideCopy
+        hideCopy={hideCopy}
         hideLineNumbers
       />
     </pre>
