@@ -30,6 +30,10 @@ import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Button } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
 import Panel from 'components/ui/Panel'
+import { projectSpecToMonthlyPrice } from 'components/interfaces/Database/Backups/RestoreToNewProject/RestoreToNewProject.utils'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { DiskType } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   return (
@@ -82,11 +86,15 @@ const RestoreToNewProject = () => {
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
-  const hasPITREnabled = cloneBackups?.pitr_enabled
-
+  const PITR_ENABLED = cloneBackups?.pitr_enabled
+  const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
   const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
   const IS_PG15_OR_ABOVE = dbVersion >= 15
-  const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
+  const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb
+  const targetComputeSize = cloneBackups?.target_compute_size
+  const planId = subscription?.plan?.id ?? 'free'
+  const { data } = useDiskAttributesQuery({ projectRef: project?.ref })
+  const storageType = data?.attributes?.type ?? 'gp3'
 
   const {
     data: cloneStatus,
@@ -100,9 +108,10 @@ const RestoreToNewProject = () => {
       refetchInterval,
       refetchOnWindowFocus: false,
       onSuccess: (data) => {
-        const hasTransientState = data.clones.some((c) => c.status === 'IN_PROGRESS')
+        const hasTransientState = data?.clones.some((c) => c.status === 'IN_PROGRESS')
         if (!hasTransientState) setRefetchInterval(false)
       },
+      enabled: PHYSICAL_BACKUPS_ENABLED || PITR_ENABLED,
     }
   )
   const IS_CLONED_PROJECT = (cloneStatus?.cloned_from?.source_project as any)?.ref ? true : false
@@ -150,7 +159,7 @@ const RestoreToNewProject = () => {
           <div>
             <TimestampInfo
               className="font-mono text-xs text-foreground-lighter"
-              value={clone.inserted_at ?? ''}
+              utcTimestamp={clone.inserted_at ?? ''}
             />
           </div>
         </div>
@@ -168,7 +177,7 @@ const RestoreToNewProject = () => {
           <div>
             <TimestampInfo
               className="font-mono text-xs text-foreground-lighter"
-              value={clone.inserted_at ?? ''}
+              utcTimestamp={clone.inserted_at ?? ''}
             />
           </div>
           <div className="flex items-center justify-end text-foreground-lighter group-hover:text-foreground">
@@ -177,6 +186,16 @@ const RestoreToNewProject = () => {
         </Link>
       )
     }
+  }
+
+  if (isFreePlan) {
+    return (
+      <UpgradeToPro
+        buttonText="Upgrade"
+        primaryText="Restore to a new project requires a pro plan or above."
+        secondaryText="To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled."
+      />
+    )
   }
 
   if (isOrioleDb) {
@@ -189,10 +208,6 @@ const RestoreToNewProject = () => {
         <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
       </Admonition>
     )
-  }
-
-  if (isLoading) {
-    return <GenericSkeletonLoader />
   }
 
   if (!canReadPhysicalBackups) {
@@ -243,14 +258,8 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (plan === 'free') {
-    return (
-      <UpgradeToPro
-        buttonText="Upgrade"
-        primaryText="Restore to a new project requires a pro plan or above."
-        secondaryText="To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled."
-      />
-    )
+  if (isLoading) {
+    return <GenericSkeletonLoader />
   }
 
   if (IS_CLONED_PROJECT) {
@@ -259,7 +268,7 @@ const RestoreToNewProject = () => {
         <Markdown
           className="max-w-full [&>p]:!leading-normal"
           content={`This is a temporary limitation whereby projects that were originally restored from another project cannot be restored to yet another project. 
-          If you need to restore a project to multiple other projects, please reach out via [support](/support/new?ref=${project?.ref}).`}
+          If you need to restore from a restored project, please reach out via [support](/support/new?ref=${project?.ref}).`}
         />
         <Button asChild type="default">
           <Link href={`/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''}`}>
@@ -286,7 +295,7 @@ const RestoreToNewProject = () => {
 
   if (
     !isLoading &&
-    hasPITREnabled &&
+    PITR_ENABLED &&
     !cloneBackups?.physicalBackupData.earliestPhysicalBackupDateUnix
   ) {
     return (
@@ -298,7 +307,7 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (!isLoading && !hasPITREnabled && cloneBackups?.backups.length === 0) {
+  if (!isLoading && !PITR_ENABLED && cloneBackups?.backups.length === 0) {
     return (
       <>
         <Admonition
@@ -310,6 +319,13 @@ const RestoreToNewProject = () => {
     )
   }
 
+  const additionalMonthlySpend = projectSpecToMonthlyPrice({
+    targetVolumeSizeGb: targetVolumeSizeGb ?? 0,
+    targetComputeSize: targetComputeSize ?? 'nano',
+    planId: planId ?? 'free',
+    storageType: storageType as DiskType,
+  })
+
   return (
     <div className="flex flex-col gap-4">
       <ConfirmRestoreDialog
@@ -319,11 +335,13 @@ const RestoreToNewProject = () => {
           setShowConfirmationDialog(false)
           setShowNewProjectDialog(true)
         }}
+        additionalMonthlySpend={additionalMonthlySpend}
       />
       <CreateNewProjectDialog
         open={showNewProjectDialog}
         selectedBackupId={selectedBackupId}
         recoveryTimeTarget={recoveryTimeTarget}
+        additionalMonthlySpend={additionalMonthlySpend}
         onOpenChange={setShowNewProjectDialog}
         onCloneSuccess={() => {
           refetchCloneStatus()
@@ -354,7 +372,7 @@ const RestoreToNewProject = () => {
           </Panel>
         </div>
       ) : null}
-      {hasPITREnabled ? (
+      {PITR_ENABLED ? (
         <>
           <PITRForm
             disabled={isRestoring}

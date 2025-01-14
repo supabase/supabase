@@ -2,7 +2,7 @@ import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/Billing/Billi
 import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import type { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { Alert } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 export const COLOR_MAP = {
   white: { bar: 'fill-foreground', marker: 'bg-foreground' },
@@ -134,9 +134,8 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
               return (
                 <div>
                   {(isApproachingLimit || isExceededLimit) && isCapped && (
-                    <Alert
-                      withIcon
-                      variant={isExceededLimit ? 'danger' : 'warning'}
+                    <Admonition
+                      type={isExceededLimit ? 'danger' : 'warning'}
                       title={
                         isExceededLimit
                           ? 'Exceeding database size limit'
@@ -152,7 +151,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
                             : "Disable your spend cap to scale seamlessly, and pay for over-usage beyond your Plan's quota."}
                         </div>
                       </div>
-                    </Alert>
+                    </Admonition>
                   )}
                 </div>
               )

@@ -1,6 +1,9 @@
 import { BASE_PATH } from 'lib/constants'
 import { PROVIDER_PHONE, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 
+// [Joshen] Temporary fix as bulk delete will fire n requests since Auth + API do not have a bulk delete endpoint yet
+export const MAX_BULK_DELETE = 20
+
 export const PROVIDER_FILTER_OPTIONS = PROVIDERS_SCHEMAS.map((provider) => ({
   name: provider.title,
   value:

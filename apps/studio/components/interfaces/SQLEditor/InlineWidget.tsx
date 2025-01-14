@@ -40,7 +40,7 @@ const InlineWidget = ({
   editor,
   id,
   beforeLineNumber,
-  afterLineNumber,
+  afterLineNumber = 0,
   heightInLines = 1,
 }: PropsWithChildren<InlineWidgetProps>) => {
   const lineNumber = beforeLineNumber ?? afterLineNumber
