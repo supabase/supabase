@@ -86,7 +86,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
           <Input
             ref={ref}
             value={inputValue ?? ''}
-            placeholder={FORMAT_MAP[type]}
+            placeholder={format}
             onChange={(e) => setInputValue(e.target.value)}
             className="border-0 rounded-none bg-dash-sidebar outline-none !ring-0 !ring-offset-0"
           />
