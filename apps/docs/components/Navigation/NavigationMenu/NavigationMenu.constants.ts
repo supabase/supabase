@@ -260,6 +260,7 @@ export const gettingstarted: NavMenuConstant = {
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
         { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
+        { name: 'Hono', url: '/guides/getting-started/quickstarts/hono' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
         { name: 'iOS SwiftUI', url: '/guides/getting-started/quickstarts/ios-swiftui' },
         {
@@ -771,6 +772,10 @@ const guiQuickstarts: NavMenuSection = {
       name: 'Metabase',
       url: '/guides/database/metabase',
     },
+    {
+      name: 'Beekeeper Studio',
+      url: '/guides/database/beekeeper-studio',
+    },
   ],
 }
 
@@ -1019,6 +1024,10 @@ export const database: NavMenuConstant = {
         {
           name: 'pg_stat_statements: SQL Planning and Execution Statistics',
           url: '/guides/database/extensions/pg_stat_statements',
+        },
+        {
+          name: 'pg_repack: Storage Optimization',
+          url: '/guides/database/extensions/pg_repack',
         },
         {
           name: 'PostGIS: Geo queries',
@@ -1559,6 +1568,10 @@ export const realtime: NavMenuConstant = {
           name: 'Listening to Postgres Changes with Flutter',
           url: '/guides/realtime/realtime-listening-flutter',
         },
+        {
+          name: 'Migrate to Broadcast Changes',
+          url: '/guides/realtime/migrate-from-postgres-changes',
+        },
       ],
     },
     {
@@ -1991,6 +2004,16 @@ export const platform: NavMenuConstant = {
         {
           name: 'Migrating within Supabase',
           url: '/guides/platform/migrating-within-supabase',
+          items: [
+            {
+              name: 'Restore Dashboard backup',
+              url: '/guides/platform/migrating-within-supabase/dashboard-restore',
+            },
+            {
+              name: 'Backup and restore using CLI',
+              url: '/guides/platform/migrating-within-supabase/backup-restore',
+            },
+          ],
         },
         {
           name: 'Migrating to Supabase',

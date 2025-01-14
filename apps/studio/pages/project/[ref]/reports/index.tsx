@@ -19,15 +19,21 @@ export const UserReportPage: NextPageWithLayout = () => {
   const { profile } = useProfile()
   const [showCreateReportModal, setShowCreateReportModal] = useState(false)
 
-  const { isLoading } = useContentQuery(ref, {
-    onSuccess: (data) => {
-      const reports = data.content
-        .filter((x) => x.type === 'report')
-        .sort((a, b) => a.name.localeCompare(b.name))
-      if (reports.length >= 1) router.push(`/project/${ref}/reports/${reports[0].id}`)
-      if (reports.length === 0) router.push(`/project/${ref}/reports/api-overview`)
+  const { isLoading } = useContentQuery(
+    {
+      projectRef: ref,
+      type: 'report',
     },
-  })
+    {
+      onSuccess: (data) => {
+        const reports = data.content
+          .filter((x) => x.type === 'report')
+          .sort((a, b) => a.name.localeCompare(b.name))
+        if (reports.length >= 1) router.push(`/project/${ref}/reports/${reports[0].id}`)
+        if (reports.length === 0) router.push(`/project/${ref}/reports/api-overview`)
+      },
+    }
+  )
 
   const canCreateReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'report', owner_id: profile?.id },

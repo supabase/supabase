@@ -16,9 +16,11 @@ export const LogPage: NextPageWithLayout = () => {
 
   return (
     <LogsPreviewer
+      condensedLayout
       projectRef={ref as string}
       queryType={'functions'}
       filterOverride={{ 'metadata.function_id': selectedFunction.id }}
+      filterPanelClassName="px-0"
     />
   )
 }

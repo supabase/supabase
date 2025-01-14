@@ -1,4 +1,3 @@
-import { toString as CronToString } from 'cronstrue'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -26,7 +25,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateCronJobForm } from './CreateCronJobSheet'
-import { formatScheduleString, getScheduleMessage, secondsPattern } from './CronJobs.utils'
+import { formatScheduleString, getScheduleMessage } from './CronJobs.utils'
 import CronSyntaxChart from './CronSyntaxChart'
 
 interface CronJobScheduleSectionProps {
