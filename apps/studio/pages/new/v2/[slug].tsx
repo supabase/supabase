@@ -28,6 +28,8 @@ import { ProjectVisual } from 'components/interfaces/ProjectCreation/ProjectVisu
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SchemaGenerator } from 'components/interfaces/ProjectCreation/SchemaGenerator'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
+import { FeedbackDropdown } from 'components/layouts/ProjectLayout/LayoutHeader/FeedbackDropdown'
+import HelpPopover from 'components/layouts/ProjectLayout/LayoutHeader/HelpPopover'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
@@ -90,8 +92,6 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { FeedbackDropdown } from 'components/layouts/ProjectLayout/LayoutHeader/FeedbackDropdown'
-import HelpPopover from 'components/layouts/ProjectLayout/LayoutHeader/HelpPopover'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -170,8 +170,7 @@ const WizardForm = () => {
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
   const allowOrioleDB = useFlag('allowOrioleDb')
-  const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
-    useFreeProjectLimitCheckQuery({ slug })
+  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
 
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')

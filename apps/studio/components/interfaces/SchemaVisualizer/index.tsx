@@ -15,6 +15,37 @@ interface SchemaVisualizerProps {
   className?: string
 }
 
+const AUTH_SCHEMA_SQL = `
+CREATE SCHEMA auth;
+CREATE TABLE auth.users (
+    instance_id uuid,
+    id uuid NOT NULL,
+    aud character varying(255),
+    role character varying(255),
+    email character varying(255),
+    encrypted_password character varying(255),
+    confirmed_at timestamp with time zone,
+    invited_at timestamp with time zone,
+    confirmation_token character varying(255),
+    confirmation_sent_at timestamp with time zone,
+    recovery_token character varying(255),
+    recovery_sent_at timestamp with time zone,
+    email_change_token character varying(255),
+    email_change character varying(255),
+    email_change_sent_at timestamp with time zone,
+    last_sign_in_at timestamp with time zone,
+    raw_app_meta_data jsonb,
+    raw_user_meta_data jsonb,
+    is_super_admin boolean,
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone
+);
+ALTER TABLE ONLY auth.users
+ADD CONSTRAINT users_email_key UNIQUE (email);
+ALTER TABLE ONLY auth.users
+ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+`.trim()
+
 export const SchemaVisualizer = ({ sqlStatements, className }: SchemaVisualizerProps) => {
   const [nodes, setNodes] = useState<Node<TableNodeData>[]>([])
   const [edges, setEdges] = useState<Edge[]>([])
@@ -26,36 +57,7 @@ export const SchemaVisualizer = ({ sqlStatements, className }: SchemaVisualizerP
     db.current = new PGlite()
 
     // Execute initial auth schema setup
-    db.current.exec(`
-      CREATE SCHEMA auth;
-      CREATE TABLE auth.users (
-          instance_id uuid,
-          id uuid NOT NULL,
-          aud character varying(255),
-          role character varying(255),
-          email character varying(255),
-          encrypted_password character varying(255),
-          confirmed_at timestamp with time zone,
-          invited_at timestamp with time zone,
-          confirmation_token character varying(255),
-          confirmation_sent_at timestamp with time zone,
-          recovery_token character varying(255),
-          recovery_sent_at timestamp with time zone,
-          email_change_token character varying(255),
-          email_change character varying(255),
-          email_change_sent_at timestamp with time zone,
-          last_sign_in_at timestamp with time zone,
-          raw_app_meta_data jsonb,
-          raw_user_meta_data jsonb,
-          is_super_admin boolean,
-          created_at timestamp with time zone,
-          updated_at timestamp with time zone
-      );
-      ALTER TABLE ONLY auth.users
-      ADD CONSTRAINT users_email_key UNIQUE (email);
-      ALTER TABLE ONLY auth.users
-      ADD CONSTRAINT users_pkey PRIMARY KEY (id);
-    `)
+    db.current.exec(AUTH_SCHEMA_SQL)
   }, [])
 
   // Execute new SQL statements and update schema
@@ -71,36 +73,7 @@ export const SchemaVisualizer = ({ sqlStatements, className }: SchemaVisualizerP
         // Reset database
         db.current = new PGlite()
         // Re-run initial auth schema setup
-        db.current.exec(`
-          CREATE SCHEMA auth;
-          CREATE TABLE auth.users (
-              instance_id uuid,
-              id uuid NOT NULL,
-              aud character varying(255),
-              role character varying(255),
-              email character varying(255),
-              encrypted_password character varying(255),
-              confirmed_at timestamp with time zone,
-              invited_at timestamp with time zone,
-              confirmation_token character varying(255),
-              confirmation_sent_at timestamp with time zone,
-              recovery_token character varying(255),
-              recovery_sent_at timestamp with time zone,
-              email_change_token character varying(255),
-              email_change character varying(255),
-              email_change_sent_at timestamp with time zone,
-              last_sign_in_at timestamp with time zone,
-              raw_app_meta_data jsonb,
-              raw_user_meta_data jsonb,
-              is_super_admin boolean,
-              created_at timestamp with time zone,
-              updated_at timestamp with time zone
-          );
-          ALTER TABLE ONLY auth.users
-          ADD CONSTRAINT users_email_key UNIQUE (email);
-          ALTER TABLE ONLY auth.users
-          ADD CONSTRAINT users_pkey PRIMARY KEY (id);
-        `)
+        db.current.exec(AUTH_SCHEMA_SQL)
         return
       }
 
