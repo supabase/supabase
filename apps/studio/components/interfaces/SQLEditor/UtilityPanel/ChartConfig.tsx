@@ -121,7 +121,7 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={25} minSize={15} className="px-3 py-3 space-y-4">
-          <form className="grid gap-4">
+          <form className="space-y-4">
             <div className="flex justify-between items-center h-5">
               <h2 className="text-sm text-foreground-lighter">Chart options</h2>
               {config.xKey && config.yKey && (
@@ -140,44 +140,47 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
               )}
             </div>
 
-            <Select_Shadcn_
-              value={config.xKey}
-              onValueChange={(value) => {
-                onConfigChange({ ...config, xKey: value })
-              }}
-            >
-              <SelectTrigger_Shadcn_>
-                X Axis {config.xKey && `- ${config.xKey}`}
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectGroup_Shadcn_>
-                  {resultKeys.map((key) => (
-                    <SelectItem_Shadcn_ value={key} key={key}>
-                      {key}
-                    </SelectItem_Shadcn_>
-                  ))}
-                </SelectGroup_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
-            <Select_Shadcn_
-              value={config.yKey}
-              onValueChange={(value) => {
-                onConfigChange({ ...config, yKey: value })
-              }}
-            >
-              <SelectTrigger_Shadcn_>
-                Y Axis {config.yKey && `- ${config.yKey}`}
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectGroup_Shadcn_>
-                  {resultKeys.map((key) => (
-                    <SelectItem_Shadcn_ value={key} key={key}>
-                      {key}
-                    </SelectItem_Shadcn_>
-                  ))}
-                </SelectGroup_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+            <div>
+              <Label_Shadcn_ className="text-xs text-foreground-light">X Axis</Label_Shadcn_>
+              <Select_Shadcn_
+                value={config.xKey}
+                onValueChange={(value) => {
+                  onConfigChange({ ...config, xKey: value })
+                }}
+              >
+                <SelectTrigger_Shadcn_>{config.xKey || 'Select X Axis'}</SelectTrigger_Shadcn_>
+                <SelectContent_Shadcn_>
+                  <SelectGroup_Shadcn_>
+                    {resultKeys.map((key) => (
+                      <SelectItem_Shadcn_ value={key} key={key}>
+                        {key}
+                      </SelectItem_Shadcn_>
+                    ))}
+                  </SelectGroup_Shadcn_>
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
+            </div>
+
+            <div>
+              <Label_Shadcn_ className="text-xs text-foreground-light">Y Axis</Label_Shadcn_>
+              <Select_Shadcn_
+                value={config.yKey}
+                onValueChange={(value) => {
+                  onConfigChange({ ...config, yKey: value })
+                }}
+              >
+                <SelectTrigger_Shadcn_>{config.yKey || 'Select Y Axis'}</SelectTrigger_Shadcn_>
+                <SelectContent_Shadcn_>
+                  <SelectGroup_Shadcn_>
+                    {resultKeys.map((key) => (
+                      <SelectItem_Shadcn_ value={key} key={key}>
+                        {key}
+                      </SelectItem_Shadcn_>
+                    ))}
+                  </SelectGroup_Shadcn_>
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
+            </div>
             <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
               <Label_Shadcn_ className="" htmlFor="cumulative">
                 <Checkbox_Shadcn_
