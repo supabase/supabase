@@ -43,6 +43,17 @@ Follow the conventions used in this project, where environments are split into t
 
 ### Example: Environment-Driven Configuration
 
+> **Important:** The `encrypted:` syntax only works for designated "secret" fields in the configuration (like `secret` in auth providers). Using encrypted values in other fields will not be automatically decrypted and may cause issues. If you need to protect sensitive information in non-secret fields, use environment variables with the `env()` syntax instead.
+>
+> Example of correct usage in secret fields:
+>
+> ```toml
+> [auth.external.github]
+> enabled = true
+> client_id = "encrypted:<value>" # Won't decrypt the value since client_id isn't a secret value
+> secret = "encrypted:<encrypted-value>"  # Works: 'secret' is a designated secret field
+> ```
+
 Using `env()` in `config.toml` simplifies environment-specific values:
 
 ```toml
@@ -62,7 +73,6 @@ secret = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET)"
 > ```toml
 > [auth.external.github]
 > enabled = true
-> client_id = "encrypted:<encrypted-value>"
 > secret = "encrypted:<encrypted-value>"
 > ```
 >
@@ -77,15 +87,14 @@ Set local environment values in `supabase/.env.local`. Sensitive values like Git
 Example `.env.local` file:
 
 ```dotenv
+SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID=<client-id>
 # GitHub Credentials (encrypted)
-SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID=encrypted:<client-id>
 SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET=encrypted:<client-secret>
 ```
 
 Replace placeholders with your own [GitHub OAuth App credentials](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app):
 
 ```bash
-npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID "<your-client-id>" -f supabase/.env.local
 npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env.local
 ```
 
@@ -127,7 +136,6 @@ SUPABASE_AUTH_ADDITIONAL_REDIRECT_URLS=https://<your-app-url>.vercel.app/**
 Add GitHub credentials:
 
 ```bash
-npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID "<your-client-id>" -f supabase/.env.production
 npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env.production
 ```
 
