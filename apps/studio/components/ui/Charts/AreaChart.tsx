@@ -21,7 +21,7 @@ const AreaChart = ({
   yAxisKey,
   xAxisKey,
   format,
-  customDateFormat = 'MMM D, YYYY, hh:mma',
+  customDateFormat = DateTimeFormats.FULL,
   title,
   highlightedValue,
   highlightedLabel,
