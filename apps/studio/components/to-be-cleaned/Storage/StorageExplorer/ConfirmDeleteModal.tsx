@@ -1,7 +1,8 @@
 import { noop } from 'lodash'
 import { useEffect, useState } from 'react'
-import { Alert, Button, Modal } from 'ui'
+import { Button, Modal } from 'ui'
 import { StorageItem } from '../Storage.types'
+import { Admonition } from 'ui-patterns'
 
 interface ConfirmDeleteModalProps {
   visible: boolean
@@ -59,9 +60,9 @@ const ConfirmDeleteModal = ({
       }
     >
       <Modal.Content>
-        <Alert withIcon variant="danger" title={`This action cannot be undone.`}>
+        <Admonition type="danger" title={`This action cannot be undone.`}>
           {description}
-        </Alert>
+        </Admonition>
       </Modal.Content>
     </Modal>
   )
