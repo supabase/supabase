@@ -20,8 +20,8 @@ export async function getContentCount(
     params: {
       path: { ref: projectRef },
       query: {
-        type,
-        name,
+        ...(type && { type }),
+        ...(name && { name }),
       },
     },
     headers: { Version: '2' },
