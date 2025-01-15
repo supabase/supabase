@@ -19,6 +19,7 @@
 .DS_Store
 .env.keys
 !.env.*.example
+!.env.local
 
 # debug
 npm-debug.log*

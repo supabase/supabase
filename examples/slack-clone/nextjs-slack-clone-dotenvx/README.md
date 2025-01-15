@@ -27,7 +27,7 @@ This example demonstrates how to use [dotenvx](https://dotenvx.com/) and `config
 ### Key Features of Dotenvx:
 
 - Secrets are encrypted and stored securely, while private decryption keys are saved in `.env.keys` (excluded from version control).
-- Teams can share private keys to decrypt environment values securely.
+- Teams can share public keys to encrypt environment values securely.
 - Learn more: [Dotenvx secrets and encryption](https://dotenvx.com/encryption).
 
 This example guides you through deploying and managing app environments with dotenvx.
@@ -38,7 +38,7 @@ This example guides you through deploying and managing app environments with dot
 
 Follow the conventions used in this project, where environments are split into three files:
 
-1. `supabase/.env.development` - For local development using `npx supabase start`.
+1. `supabase/.env.local` - For local development using `npx supabase start`.
 2. `supabase/.env.production` - For your main production environment on Supabase.
 3. `supabase/.env.preview` - For the preview branches
 
@@ -83,9 +83,9 @@ secret = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET)"
 
 ## Local Development
 
-Set local environment values in `supabase/.env.development`. Sensitive values like GitHub credentials should be encrypted.
+Set local environment values in `supabase/.env.local`. Sensitive values like GitHub credentials should be encrypted.
 
-Example `.env.development` file:
+Example `.env.local` file:
 
 ```dotenv
 SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID=<client-id>
@@ -96,14 +96,14 @@ SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET=encrypted:<client-secret>
 Replace placeholders with your own [GitHub OAuth App credentials](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app):
 
 ```bash
-npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env.development
+npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env.local
 ```
 
 Run the local stack:
 
 ```bash
-npx dotenvx run -f supabase/.env.development -- npx supabase start
-npx dotenvx run -f supabase/.env.development -- npm run dev
+npx dotenvx run -f supabase/.env.local -- npx supabase start
+npx dotenvx run -f supabase/.env.local -- npm run dev
 ```
 
 Visit `localhost:3000` to test the app with GitHub OAuth integration.

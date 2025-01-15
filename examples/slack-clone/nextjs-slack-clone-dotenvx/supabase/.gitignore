@@ -1,5 +1,5 @@
 # Supabase
 .branches
 .temp
-.env
+# .env
 .env.keys
