@@ -313,12 +313,12 @@ export const AIAssistant = ({
             </div>
           )}
           {hasMessages ? (
-            <motion.div className="w-full p-5">
+            <div className="w-full p-5">
               {renderedMessages}
               {(last(messages)?.role === 'user' || last(messages)?.content?.length === 0) && (
                 <div className="flex gap-4 w-auto overflow-hidden">
                   <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
-                  <motion.div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
+                  <div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
                     <span>Thinking</span>
                     <div className="flex gap-1">
                       <motion.span
@@ -340,11 +340,11 @@ export const AIAssistant = ({
                         .
                       </motion.span>
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
               )}
               <div className="h-1" />
-            </motion.div>
+            </div>
           ) : suggestions ? (
             <div className="w-full h-full px-8 py-0 flex flex-col flex-1 justify-end">
               <h3 className="text-foreground-light font-mono text-sm uppercase mb-3">
