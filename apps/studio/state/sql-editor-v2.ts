@@ -135,6 +135,8 @@ export const sqlEditorState = proxy({
     if (snippet) {
       snippet.name = name
       snippet.description = description
+
+      sqlEditorState.needsSaving.add(id)
     }
   },
 
