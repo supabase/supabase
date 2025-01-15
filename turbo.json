@@ -159,7 +159,7 @@
     },
     "typecheck": {
       "dependsOn": ["^typecheck"],
-      "outputs": ["**/node_modules/.cache/tsbuildinfo.json"]
+      "outputs": []
     }
   }
 }
