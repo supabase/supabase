@@ -1,4 +1,3 @@
-import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
 import BarChart from 'components/ui/Charts/BarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import dayjs from 'dayjs'
@@ -101,7 +100,6 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
               showGrid={config.showGrid}
               XAxisProps={{
                 angle: 0,
-                interval: 0,
                 interval: 'preserveStart',
                 hide: !config.showLabels,
                 tickFormatter: (idx: string) => {
