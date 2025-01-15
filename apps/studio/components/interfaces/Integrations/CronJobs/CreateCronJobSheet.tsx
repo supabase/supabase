@@ -185,7 +185,7 @@ export const CreateCronJobSheet = ({
     'extensions'
   )
 
-  const cronJobValues = parseCronJobCommand(selectedCronJob?.command || '')
+  const cronJobValues = parseCronJobCommand(selectedCronJob?.command || '', project?.ref!)
 
   const form = useForm<CreateCronJobForm>({
     resolver: zodResolver(FormSchema),

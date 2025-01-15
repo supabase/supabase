@@ -39,7 +39,7 @@ const DEFAULT_CRONJOB_COMMAND = {
   httpBody: '',
 } as const
 
-export const parseCronJobCommand = (originalCommand: string): CronJobType => {
+export const parseCronJobCommand = (originalCommand: string, projectRef: string): CronJobType => {
   const command = originalCommand
     .replaceAll('$$', ' ')
     .replaceAll(/\n/g, ' ')
@@ -86,7 +86,7 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
       }
     }
 
-    if (url.includes('.supabase.') && url.includes('/functions/v1/')) {
+    if (url.includes(`${projectRef}.supabase.`) && url.includes('/functions/v1/')) {
       return {
         type: 'edge_function',
         method: method === 'http_get' ? 'GET' : 'POST',
