@@ -1,10 +1,10 @@
-import { Alert } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const AlphaPreview = () => {
   return (
-    <Alert title="Alpha preview" withIcon variant="warning">
+    <Admonition title="Alpha preview" type="warning">
       This is not suitable for production
-    </Alert>
+    </Admonition>
   )
 }
 
