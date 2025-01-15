@@ -1,6 +1,8 @@
 import { promises as fs } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+
+// Latest Blog Posts
 import { allBlogPosts } from '../.contentlayer/generated/index.mjs'
 
 /**
@@ -27,8 +29,46 @@ const latestBlogPosts = allBlogPosts
   .slice(0, 2)
   .map(({ title, url, description }) => ({ title, url, description }))
 
+let stars = 0
+
+// GitHub Stars
+const fetchOctoData = async () => {
+  const { Octokit } = await import('@octokit/core')
+  const octokit = new Octokit()
+  const res = await octokit.request('GET /repos/{org}/{repo}', {
+    org: 'supabase',
+    repo: 'supabase',
+    type: 'public',
+  })
+
+  return res.data?.stargazers_count
+}
+
+try {
+  stars = await fetchOctoData()
+} catch (error) {
+  throw error
+}
+
+// Careers Jobs count
+const getCareerCount = async () => {
+  const job_res = await fetch('https://api.ashbyhq.com/posting-api/job-board/supabase')
+  const job_data = await job_res.json()
+
+  return job_data.jobs.length
+}
+
+let careersCount = 0
+
+try {
+  careersCount = await getCareerCount()
+} catch (error) {
+  throw error
+}
+
+// Create folder for static content
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const folderPath = path.join(__dirname, '../.contentlayer/generated/LatestBlogPost')
+const folderPath = path.join(__dirname, '../.contentlayer/generated/staticContent')
 try {
   await fs.mkdir(folderPath, { recursive: true })
 } catch (error) {
@@ -38,5 +78,10 @@ try {
   // Folder already exists, continue silently
 }
 
-const filePath = path.join(__dirname, '../.contentlayer/generated/LatestBlogPost/_index.json')
-await fs.writeFile(filePath, JSON.stringify(latestBlogPosts), 'utf8')
+// Write static content to file
+const filePath = path.join(__dirname, '../.contentlayer/generated/staticContent/_index.json')
+await fs.writeFile(
+  filePath,
+  JSON.stringify({ latestBlogPosts: latestBlogPosts, jobsCount: careersCount, githubStars: stars }),
+  'utf8'
+)
