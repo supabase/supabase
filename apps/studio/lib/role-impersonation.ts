@@ -13,7 +13,12 @@ type PostgrestImpersonationRole =
   | {
       type: 'postgrest'
       role: 'authenticated'
-      user: User
+      user?: User
+      // Add optional external auth claims
+      externalAuth?: {
+        sub: string
+        additionalClaims?: Record<string, any>
+      }
       aal?: 'aal1' | 'aal2'
     }
 
@@ -36,21 +41,38 @@ function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole
   if (role.role === 'authenticated') {
     const user = role.user
 
-    return {
-      aal: role.aal ?? 'aal1',
-      amr: [{ method: 'password', timestamp: nowTimestamp }],
-      app_metadata: user.raw_app_meta_data,
-      aud: 'authenticated',
-      email: user.email,
-      exp,
-      iat: nowTimestamp,
-      iss: `https://${projectRef}.supabase.co/auth/v1`,
-      phone: user.phone,
-      role: user.role ?? role.role,
-      session_id: uuidv4(),
-      sub: user.id,
-      user_metadata: user.raw_user_meta_data,
-      is_anonymous: user.is_anonymous,
+    // Supabase native auth case
+    if (user) {
+      return {
+        aal: role.aal ?? 'aal1',
+        amr: [{ method: 'password', timestamp: nowTimestamp }],
+        app_metadata: user.raw_app_meta_data,
+        aud: 'authenticated',
+        email: user.email,
+        exp,
+        iat: nowTimestamp,
+        iss: `https://${projectRef}.supabase.co/auth/v1`,
+        phone: user.phone,
+        role: user.role ?? role.role,
+        session_id: uuidv4(),
+        sub: user.id,
+        user_metadata: user.raw_user_meta_data,
+        is_anonymous: user.is_anonymous,
+      }
+    }
+
+    // External auth case
+    if (role.externalAuth) {
+      return {
+        aal: role.aal ?? 'aal1',
+        aud: 'authenticated',
+        exp,
+        iat: nowTimestamp,
+        role: 'authenticated',
+        session_id: uuidv4(),
+        sub: role.externalAuth.sub,
+        ...role.externalAuth.additionalClaims,
+      }
     }
   }
 
