@@ -1,8 +1,16 @@
 import { User } from 'lucide-react'
-import { PropsWithChildren, memo, useMemo, useEffect } from 'react'
+import {
+  PropsWithChildren,
+  memo,
+  useMemo,
+  useEffect,
+  createContext,
+  useContext,
+  ReactNode,
+} from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import type { Components } from 'react-markdown'
+import { Components } from 'react-markdown/lib/ast-to-react'
 
 import { AiIconAnimation, cn, CodeBlock, markdownComponents, WarningIcon } from 'ui'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
@@ -26,20 +34,62 @@ type AssistantSnippetProps = {
   yAxis?: string
 }
 
-const MarkdownPre = ({
-  children,
-  readOnly,
-  isLoading,
-}: {
-  children: any
-  readOnly?: boolean
+interface MessageContextType {
   isLoading: boolean
-}) => {
-  useEffect(() => {
-    return () => {
-      console.log('unmounting')
+  readOnly?: boolean
+}
+
+const MessageContext = createContext<MessageContextType>({ isLoading: false })
+
+const MemoizedQueryBlock = memo(
+  ({
+    sql,
+    title,
+    xAxis,
+    yAxis,
+    isChart,
+    isLoading,
+    runQuery,
+  }: {
+    sql: string
+    title: string
+    xAxis?: string
+    yAxis?: string
+    isChart: boolean
+    isLoading: boolean
+    runQuery: boolean
+  }) => (
+    <DebouncedComponent delay={500} value={sql}>
+      <QueryBlock
+        lockColumns
+        label={title}
+        sql={sql}
+        chartConfig={{
+          type: 'bar',
+          cumulative: false,
+          xKey: xAxis ?? '',
+          yKey: yAxis ?? '',
+        }}
+        isChart={isChart}
+        isLoading={isLoading}
+        runQuery={runQuery}
+      />
+    </DebouncedComponent>
+  )
+)
+MemoizedQueryBlock.displayName = 'MemoizedQueryBlock'
+
+interface PreProps {
+  children: {
+    props: {
+      className?: string
+      children: string | string[]
     }
-  }, [])
+  }[]
+}
+
+const MarkdownPre = ({ children }: PreProps) => {
+  const { isLoading, readOnly } = useContext(MessageContext)
 
   const language = children[0].props.className?.replace('language-', '') || 'sql'
   const rawSql = language === 'sql' ? children[0].props.children : undefined
@@ -63,22 +113,15 @@ const MarkdownPre = ({
             hideLineNumbers
           />
         ) : (
-          <DebouncedComponent delay={500} value={sql}>
-            <QueryBlock
-              lockColumns
-              label={title}
-              sql={sql}
-              chartConfig={{
-                type: 'bar',
-                cumulative: false,
-                xKey: xAxis ?? '',
-                yKey: yAxis ?? '',
-              }}
-              isChart={isChart}
-              isLoading={isLoading}
-              runQuery={runQuery}
-            />
-          </DebouncedComponent>
+          <MemoizedQueryBlock
+            sql={sql}
+            title={title}
+            xAxis={xAxis}
+            yAxis={yAxis}
+            isChart={isChart}
+            isLoading={isLoading}
+            runQuery={runQuery}
+          />
         )
       ) : (
         <CodeBlock
@@ -93,6 +136,47 @@ const MarkdownPre = ({
       )}
     </div>
   )
+}
+
+const OrderedList = memo(({ children }: { children: ReactNode }) => (
+  <ol className="flex flex-col gap-y-4">{children}</ol>
+))
+OrderedList.displayName = 'OrderedList'
+
+const ListItem = memo(({ children }: { children: ReactNode }) => (
+  <li className="[&>pre]:mt-2">{children}</li>
+))
+ListItem.displayName = 'ListItem'
+
+const Heading3 = memo(({ children }: { children: ReactNode }) => (
+  <h3 className="underline">{children}</h3>
+))
+Heading3.displayName = 'Heading3'
+
+const InlineCode = memo(({ className, children }: { className?: string; children: ReactNode }) => (
+  <code className={cn('text-xs', className)}>{children}</code>
+))
+InlineCode.displayName = 'InlineCode'
+
+const Link = memo(({ href, children }: { href?: string; children: ReactNode }) => (
+  <a
+    target="_blank"
+    rel="noopener noreferrer"
+    href={href}
+    className="underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-foreground"
+  >
+    {children}
+  </a>
+))
+Link.displayName = 'Link'
+
+const baseMarkdownComponents: Partial<Components> = {
+  ol: OrderedList,
+  li: ListItem,
+  h3: Heading3,
+  code: InlineCode,
+  a: Link,
+  pre: MarkdownPre,
 }
 
 export const Message = function Message({
@@ -113,79 +197,47 @@ export const Message = function Message({
   const isUser = role === 'user'
 
   const allMarkdownComponents = useMemo(
-    (): Components => ({
+    () => ({
       ...markdownComponents,
-      pre: (props: any) => {
-        const PreComponent = useMemo(
-          () => (preProps: any) => (
-            <MarkdownPre readOnly={readOnly} isLoading={isLoading}>
-              {preProps.children}
-            </MarkdownPre>
-          ),
-          [readOnly, isLoading]
-        )
-        return <PreComponent {...props} />
-      },
-      ol: (props: any) => {
-        return <ol className="flex flex-col gap-y-4">{props.children}</ol>
-      },
-      li: (props: any) => {
-        return <li className="[&>pre]:mt-2">{props.children}</li>
-      },
-      h3: (props: any) => {
-        return <h3 className="underline">{props.children}</h3>
-      },
-      code: (props: any) => {
-        return <code className={cn('text-xs', props.className)}>{props.children}</code>
-      },
-      a: (props: any) => {
-        return (
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href={props.href}
-            className="underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-foreground"
-          >
-            {props.children}
-          </a>
-        )
-      },
+      ...baseMarkdownComponents,
     }),
-    [readOnly]
+    []
   )
 
   if (!content) return null
 
   return (
-    <div
-      className={cn(
-        'mb-5 text-foreground-light text-sm',
-        isUser && 'text-foreground',
-        variant === 'warning' && 'bg-warning-200'
-      )}
-    >
-      {children}
-
-      {variant === 'warning' && <WarningIcon className="w-6 h-6" />}
-
-      {action}
-
-      <div className="flex gap-4 w-auto overflow-hidden">
-        {isUser ? (
-          <figure className="w-5 h-5 shrink-0 bg-foreground rounded-full flex items-center justify-center">
-            <User size={16} strokeWidth={1.5} className="text-background" />
-          </figure>
-        ) : (
-          <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
+    <MessageContext.Provider value={{ isLoading, readOnly }}>
+      <div
+        className={cn(
+          'mb-5 text-foreground-light text-sm',
+          isUser && 'text-foreground',
+          variant === 'warning' && 'bg-warning-200'
         )}
-        <ReactMarkdown
-          className="space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
-          remarkPlugins={[remarkGfm]}
-          components={allMarkdownComponents}
-        >
-          {content}
-        </ReactMarkdown>
+      >
+        {children}
+
+        {variant === 'warning' && <WarningIcon className="w-6 h-6" />}
+
+        {action}
+
+        <div className="flex gap-4 w-auto overflow-hidden">
+          {isUser ? (
+            <figure className="w-5 h-5 shrink-0 bg-foreground rounded-full flex items-center justify-center">
+              <User size={16} strokeWidth={1.5} className="text-background" />
+            </figure>
+          ) : (
+            <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
+          )}
+          <ReactMarkdown
+            className="space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
+            remarkPlugins={[remarkGfm]}
+            components={allMarkdownComponents}
+          >
+            {content}
+          </ReactMarkdown>
+        </div>
       </div>
-    </div>
+    </MessageContext.Provider>
   )
 }
