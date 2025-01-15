@@ -82,24 +82,36 @@ const ServiceStatus = () => {
     data: status,
     isLoading,
     refetch: refetchServiceStatus,
-  } = useProjectServiceStatusQuery({
-    projectRef: ref,
-    refetchInterval: !status || status.some((service) => !service.healthy) ? 5000 : false,
-  })
-  const { data: edgeFunctionsStatus, refetch: refetchEdgeFunctionServiceStatus } =
-    useEdgeFunctionServiceStatusQuery({
+  } = useProjectServiceStatusQuery(
+    {
       projectRef: ref,
-      refetchInterval: !edgeFunctionsStatus?.healthy ? 5000 : false,
-    })
+    },
+    {
+      refetchInterval: (data) => (data?.some((service) => !service.healthy) ? 5000 : false),
+    }
+  )
+  const { data: edgeFunctionsStatus, refetch: refetchEdgeFunctionServiceStatus } =
+    useEdgeFunctionServiceStatusQuery(
+      {
+        projectRef: ref,
+      },
+      {
+        refetchInterval: (data) => (!data?.healthy ? 5000 : false),
+      }
+    )
   const {
     isLoading: isLoadingPostgres,
     isSuccess: isSuccessPostgres,
     refetch: refetchPostgresServiceStatus,
-  } = usePostgresServiceStatusQuery({
-    projectRef: ref,
-    connectionString: project?.connectionString,
-    refetchInterval: !isSuccessPostgres ? 5000 : false,
-  })
+  } = usePostgresServiceStatusQuery(
+    {
+      projectRef: ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      refetchInterval: (data) => (data === null ? 5000 : false),
+    }
+  )
 
   const authStatus = status?.find((service) => service.name === 'auth')
   const restStatus = status?.find((service) => service.name === 'rest')
