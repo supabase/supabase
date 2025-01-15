@@ -157,7 +157,7 @@ export const ChartConfig = ({
       toast.error('Y-axis must be a number')
       return
     }
-    onConfigChange({ ...config, xKey: newY, yKey: newX })
+    onConfigChange({ ...config, xKey: newX, yKey: newY })
   }
 
   return (
