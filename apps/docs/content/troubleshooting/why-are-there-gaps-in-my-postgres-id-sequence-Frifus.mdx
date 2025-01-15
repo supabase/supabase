@@ -19,7 +19,7 @@ It's also important to understand the distinction that sequences guarantee **uni
 
 If you don't know the name of your sequence, it's often formed based on a standard naming convention: table_name_id_seq, where table_name is the name of your table and id is the name of your serial column.
 
-### Common Reasons for Gaps in Sequences
+### Common reasons for gaps in sequences
 
 1. Rollbacks
    One of the most common reasons for a gap is the rollback of a transaction. If you initiate a transaction that includes an insert operation, the sequence responsible for generating the ID for the new row increments. If, for any reason, the transaction doesn't complete successfully—perhaps due to a constraint violation or a deliberate decision to rollback—the insert operation is undone, but the sequence value used is not returned or reused. The documentation explains that as well:
@@ -35,7 +35,7 @@ If you don't know the name of your sequence, it's often formed based on a standa
 4. Upserts
    When an upsert is executed, it can still increase the sequence even if it is set to do nothing on conflicts
 
-### Checking for Gaps
+### Checking for gaps
 
 To check for gaps in the sequence of IDs in a PostgreSQL table, you can use a SQL query that compares the sequence of IDs to a generated series of numbers that spans the same range:
 
@@ -51,7 +51,7 @@ WHERE
 
 This query should help you pinpoint where gaps exist.
 
-### Encountering Errors and Adjusting Sequences
+### Encountering errors and adjusting sequences
 
 In operations involving sequences, you might encounter an error message such as:
 
