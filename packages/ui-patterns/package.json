@@ -34,6 +34,7 @@
     "react-tooltip": "*",
     "react-use": "^17.5.0",
     "reactflow": "*",
+    "recharts": "^2.8.0",
     "remark-gfm": "^4.0.0",
     "sonner": "^1.5.0",
     "sql-formatter": "^15.3.1",
