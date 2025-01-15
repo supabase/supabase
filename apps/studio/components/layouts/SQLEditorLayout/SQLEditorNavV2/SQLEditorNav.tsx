@@ -166,13 +166,12 @@ export const SQLEditorNav = ({
   )
   const folders = useSnippetFolders(projectRef as string)
 
-  const { data: privateSnippetCountData } = useContentCountQuery({
+  const { data: snippetCountData } = useContentCountQuery({
     projectRef,
     type: 'sql',
-    visibility: 'user',
     name: debouncedSearchText,
   })
-  const numPrivateSnippets = privateSnippetCountData?.count ?? 0
+  const numPrivateSnippets = snippetCountData?.private ?? 0
 
   const privateSnippetsTreeState = useMemo(
     () =>
@@ -237,13 +236,7 @@ export const SQLEditorNav = ({
     )
   }, [favoriteSqlSnippetsData?.pages, snippet, sort])
 
-  const { data: favoritedSnippetCountData } = useContentCountQuery({
-    projectRef,
-    type: 'sql',
-    favorite: true,
-    name: debouncedSearchText,
-  })
-  const numFavoriteSnippets = favoritedSnippetCountData?.count ?? 0
+  const numFavoriteSnippets = snippetCountData?.favorites ?? 0
 
   const favoritesTreeState = useMemo(
     () =>
@@ -306,13 +299,7 @@ export const SQLEditorNav = ({
     )
   }, [sharedSqlSnippetsData?.pages, snippet, sort])
 
-  const { data: sharedSnippetCountData } = useContentCountQuery({
-    projectRef,
-    type: 'sql',
-    visibility: 'project',
-    name: debouncedSearchText,
-  })
-  const numProjectSnippets = sharedSnippetCountData?.count ?? 0
+  const numProjectSnippets = snippetCountData?.shared ?? 0
 
   const projectSnippetsTreeState = useMemo(
     () =>
