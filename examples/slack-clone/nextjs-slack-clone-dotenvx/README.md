@@ -40,6 +40,7 @@ Follow the conventions used in this project, where environments are split into t
 
 1. `supabase/.env.development` - For local development using `npx supabase start`.
 2. `supabase/.env.production` - For your main production environment on Supabase.
+3. `supabase/.env.preview` - For the preview branches
 
 ### Example: Environment-Driven Configuration
 
@@ -173,6 +174,8 @@ We store the decryption keys in the project's secret handler, allowing the branc
 
 ```bash
 npx supabase secrets set --env-file .env.keys
+# or
+npx supabase secrets set DOTENV_PRIVATE_KEY <your-private-key>
 ```
 
 4. **Choose Your Configuration Approach:**
@@ -180,7 +183,7 @@ npx supabase secrets set --env-file .env.keys
      ```toml
      secret_value = "encrypted:<encrypted-value>"
      ```
-   - Option B: Reference the environment variable in `config.toml`:
+   - Option B: Reference the environment variable that contain the secret in `config.toml`:
      ```toml
      secret_value = "env(SOME_KEY)"
      ```
