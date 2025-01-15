@@ -1,13 +1,22 @@
 import { motion } from 'framer-motion'
 import { User } from 'lucide-react'
-import { memo, PropsWithChildren, useEffect, useRef, useState, useMemo } from 'react'
+import { PropsWithChildren, memo, useMemo, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import type { Components } from 'react-markdown'
 
 import { AiIconAnimation, cn, CodeBlock, markdownComponents, WarningIcon } from 'ui'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
-import { DebouncedComponent } from '../DebouncedComponent'
+
+interface MessageProps {
+  role: 'function' | 'system' | 'user' | 'assistant' | 'data' | 'tool'
+  content?: string
+  isLoading: boolean
+  readOnly?: boolean
+  action?: React.ReactNode
+  variant?: 'default' | 'warning'
+}
 
 type AssistantSnippetProps = {
   title: string
@@ -17,47 +26,40 @@ type AssistantSnippetProps = {
   yAxis?: string
 }
 
-const MemoizedPreComponent = memo(
-  function MemoizedPreComponent({
-    props,
-    readOnly,
-    isLoading,
-  }: {
-    props: any
-    readOnly?: boolean
-    isLoading?: boolean
-  }) {
-    const language = props.children[0].props.className?.replace('language-', '') || 'sql'
-    const codeContent = props.children[0].props.children
+const MarkdownPre = memo(function MarkdownPre({
+  children,
+  readOnly,
+  isLoading,
+}: {
+  children: any
+  readOnly?: boolean
+  isLoading: boolean
+}) {
+  const language = children[0].props.className?.replace('language-', '') || 'sql'
+  const rawSql = language === 'sql' ? children[0].props.children : undefined
+  const formatted = (rawSql || [''])[0]
+  const propsMatch = formatted.match(/--\s*props:\s*(\{[^}]+\})/)
 
-    if (language === 'sql') {
-      const rawSql = codeContent
-      const formatted = (rawSql || [''])[0]
-      const propsMatch = formatted.match(/--\s*props:\s*(\{[^}]+\})/)
+  const snippetProps: AssistantSnippetProps = propsMatch ? JSON.parse(propsMatch[1]) : {}
+  const { xAxis, yAxis } = snippetProps
+  const title = snippetProps.title || 'SQL Query'
+  const isChart = snippetProps.isChart === 'true'
+  const runQuery = snippetProps.runQuery === 'true'
+  const sql = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
 
-      const snippetProps: AssistantSnippetProps = propsMatch ? JSON.parse(propsMatch[1]) : {}
-      const { xAxis, yAxis } = snippetProps
-      const title = snippetProps.title || 'SQL Query'
-      const isChart = snippetProps.isChart === 'true'
-      const runQuery = snippetProps.runQuery === 'true'
-      const sql = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
+  // Only show QueryBlock when SQL has finished streaming and loading is complete
+  const showQueryBlock = sql?.endsWith(';')
 
-      return readOnly ? (
-        <CollapsibleCodeBlock
-          value={props.children[0].props.children[0]}
-          language="sql"
-          hideLineNumbers
-        />
-      ) : (
-        <DebouncedComponent
-          value={sql}
-          delay={500}
-          fallback={
-            <div className="overflow-hidden rounded border w-auto bg-surface-100 p-2 px-3">
-              Writing SQL...
-            </div>
-          }
-        >
+  return (
+    <div className="w-auto -ml-[36px] overflow-x-hidden">
+      {language === 'sql' ? (
+        readOnly ? (
+          <CollapsibleCodeBlock
+            value={children[0].props.children[0]}
+            language="sql"
+            hideLineNumbers
+          />
+        ) : showQueryBlock ? (
           <QueryBlock
             lockColumns
             label={title}
@@ -72,55 +74,67 @@ const MemoizedPreComponent = memo(
             isLoading={isLoading}
             runQuery={runQuery}
           />
-        </DebouncedComponent>
-      )
-    }
+        ) : (
+          <div className="bg-surface-100 border-overlay rounded border shadow-sm text-xs px-3 py-2">
+            Writing SQL...
+          </div>
+        )
+      ) : (
+        <CodeBlock
+          hideLineNumbers
+          value={children[0].props.children}
+          language={language}
+          className={cn(
+            'max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',
+            '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
+          )}
+        />
+      )}
+    </div>
+  )
+})
 
-    return (
-      <CodeBlock
-        hideLineNumbers
-        value={props.children[0].props.children}
-        language={language}
-        className={cn(
-          'max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',
-          '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
-        )}
-      />
-    )
-  },
-  (prevProps, nextProps) => {
-    return (
-      prevProps.props === nextProps.props &&
-      prevProps.readOnly === nextProps.readOnly &&
-      prevProps.isLoading === nextProps.isLoading
-    )
-  }
-)
-MemoizedPreComponent.displayName = 'MemoizedPreComponent'
+export const Message = function Message({
+  role,
+  content,
+  isLoading,
+  readOnly,
+  children,
+  action = null,
+  variant = 'default',
+}: PropsWithChildren<MessageProps>) {
+  const isUser = role === 'user'
 
-const MemoizedMarkdown = memo(
-  function MemoizedMarkdown({
-    content,
-    readOnly,
-    isLoading,
-  }: {
-    content: string
-    readOnly?: boolean
-    isLoading?: boolean
-  }) {
-    const components = useMemo(
-      () => ({
-        ...markdownComponents,
-        pre: (props: any) => (
-          <MemoizedPreComponent props={props} readOnly={readOnly} isLoading={isLoading} />
-        ),
-        ol: (props: any) => <ol className="flex flex-col gap-y-4">{props.children}</ol>,
-        li: (props: any) => <li className="[&>pre]:mt-2">{props.children}</li>,
-        h3: (props: any) => <h3 className="underline">{props.children}</h3>,
-        code: (props: any) => (
-          <code className={cn('text-xs', props.className)}>{props.children}</code>
-        ),
-        a: (props: any) => (
+  const preComponent = useMemo(
+    () =>
+      function pre(props: any) {
+        return (
+          <MarkdownPre readOnly={readOnly} isLoading={isLoading}>
+            {props.children}
+          </MarkdownPre>
+        )
+      },
+    [readOnly, isLoading]
+  )
+
+  const allMarkdownComponents = useMemo(
+    (): Components => ({
+      ...markdownComponents,
+      pre: preComponent,
+      ol: (props: any) => {
+        return <ol className="flex flex-col gap-y-4">{props.children}</ol>
+      },
+      li: (props: any) => {
+        return <li className="[&>pre]:mt-2">{props.children}</li>
+      },
+      h3: (props: any) => {
+        return <h3 className="underline">{props.children}</h3>
+      },
+      code: (props: any) => {
+        return <code className={cn('text-xs', props.className)}>{props.children}</code>
+      },
+      a: (props: any) => {
+        return (
           <a
             target="_blank"
             rel="noopener noreferrer"
@@ -129,89 +143,44 @@ const MemoizedMarkdown = memo(
           >
             {props.children}
           </a>
-        ),
-      }),
-      [readOnly, isLoading]
-    )
+        )
+      },
+    }),
+    [preComponent]
+  )
 
-    return (
-      <ReactMarkdown
-        className="space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
-        remarkPlugins={[remarkGfm]}
-        components={components}
-      >
-        {content}
-      </ReactMarkdown>
-    )
-  },
-  (prevProps, nextProps) => {
-    return (
-      prevProps.content === nextProps.content &&
-      prevProps.readOnly === nextProps.readOnly &&
-      prevProps.isLoading === nextProps.isLoading
-    )
-  }
-)
-MemoizedMarkdown.displayName = 'MemoizedMarkdown'
+  if (!content) return null
 
-interface MessageProps {
-  role: 'function' | 'system' | 'user' | 'assistant' | 'data' | 'tool'
-  content?: string
-  isLoading: boolean
-  readOnly?: boolean
-  action?: React.ReactNode
-  variant?: 'default' | 'warning'
-}
+  return (
+    <div
+      className={cn(
+        'mb-5 text-foreground-light text-sm',
+        isUser && 'text-foreground',
+        variant === 'warning' && 'bg-warning-200'
+      )}
+    >
+      {children}
 
-export const Message = memo(
-  function Message({
-    role,
-    content,
-    isLoading,
-    readOnly,
-    children,
-    action = null,
-    variant = 'default',
-  }: PropsWithChildren<MessageProps>) {
-    if (!content) return null
+      {variant === 'warning' && <WarningIcon className="w-6 h-6" />}
 
-    const isUser = role === 'user'
+      {action}
 
-    return (
-      <div
-        className={cn(
-          'mb-5 text-foreground-light text-sm',
-          isUser && 'text-foreground',
-          variant === 'warning' && 'bg-warning-200'
+      <div className="flex gap-4 w-auto overflow-hidden">
+        {isUser ? (
+          <figure className="w-5 h-5 shrink-0 bg-foreground rounded-full flex items-center justify-center">
+            <User size={16} strokeWidth={1.5} className="text-background" />
+          </figure>
+        ) : (
+          <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
         )}
-      >
-        {children}
-        {variant === 'warning' && <WarningIcon className="w-6 h-6" />}
-        {action}
-
-        <div className="flex gap-4 w-auto overflow-hidden">
-          {isUser ? (
-            <figure className="w-5 h-5 shrink-0 bg-foreground rounded-full flex items-center justify-center">
-              <User size={16} strokeWidth={1.5} className="text-background" />
-            </figure>
-          ) : (
-            <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
-          )}
-          <MemoizedMarkdown content={content} readOnly={readOnly} isLoading={isLoading} />
-        </div>
+        <ReactMarkdown
+          className="space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
+          remarkPlugins={[remarkGfm]}
+          components={allMarkdownComponents}
+        >
+          {content}
+        </ReactMarkdown>
       </div>
-    )
-  },
-  (prevProps, nextProps) => {
-    return (
-      prevProps.role === nextProps.role &&
-      prevProps.content === nextProps.content &&
-      prevProps.isLoading === nextProps.isLoading &&
-      prevProps.readOnly === nextProps.readOnly &&
-      prevProps.action === nextProps.action &&
-      prevProps.variant === nextProps.variant &&
-      prevProps.children === nextProps.children
-    )
-  }
-)
-Message.displayName = 'Message'
+    </div>
+  )
+}
