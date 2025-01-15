@@ -48,13 +48,18 @@ const StatusIcon = ({
   isLoading,
   isSuccess,
   isProjectNew,
+  projectStatus,
 }: {
   isLoading: boolean
   isSuccess: boolean
   isProjectNew: boolean
+  projectStatus?: ProjectServiceStatus
 }) => {
   if (isLoading || isProjectNew) return <Loader2 size={14} className="animate-spin" />
   if (isSuccess) return <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
+  if (projectStatus === 'UNHEALTHY')
+    return <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
+  if (projectStatus === 'COMING_UP') return <Loader2 size={14} className="animate-spin" />
   return <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
 }
 
@@ -260,6 +265,7 @@ const ServiceStatus = () => {
                 isLoading={service.isLoading}
                 isSuccess={!!service.isSuccess}
                 isProjectNew={isProjectNew}
+                projectStatus={service.status}
               />
               <div className="flex-1">
                 <p>{service.name}</p>
