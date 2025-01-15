@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { User } from 'lucide-react'
 import { PropsWithChildren, memo, useMemo, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -8,6 +7,7 @@ import type { Components } from 'react-markdown'
 import { AiIconAnimation, cn, CodeBlock, markdownComponents, WarningIcon } from 'ui'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
+import { DebouncedComponent } from '../DebouncedComponent'
 
 interface MessageProps {
   role: 'function' | 'system' | 'user' | 'assistant' | 'data' | 'tool'
@@ -26,7 +26,7 @@ type AssistantSnippetProps = {
   yAxis?: string
 }
 
-const MarkdownPre = memo(function MarkdownPre({
+const MarkdownPre = ({
   children,
   readOnly,
   isLoading,
@@ -34,7 +34,13 @@ const MarkdownPre = memo(function MarkdownPre({
   children: any
   readOnly?: boolean
   isLoading: boolean
-}) {
+}) => {
+  useEffect(() => {
+    return () => {
+      console.log('unmounting')
+    }
+  }, [])
+
   const language = children[0].props.className?.replace('language-', '') || 'sql'
   const rawSql = language === 'sql' ? children[0].props.children : undefined
   const formatted = (rawSql || [''])[0]
@@ -47,9 +53,6 @@ const MarkdownPre = memo(function MarkdownPre({
   const runQuery = snippetProps.runQuery === 'true'
   const sql = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
 
-  // Only show QueryBlock when SQL has finished streaming and loading is complete
-  const showQueryBlock = sql?.endsWith(';')
-
   return (
     <div className="w-auto -ml-[36px] overflow-x-hidden">
       {language === 'sql' ? (
@@ -59,25 +62,23 @@ const MarkdownPre = memo(function MarkdownPre({
             language="sql"
             hideLineNumbers
           />
-        ) : showQueryBlock ? (
-          <QueryBlock
-            lockColumns
-            label={title}
-            sql={sql}
-            chartConfig={{
-              type: 'bar',
-              cumulative: false,
-              xKey: xAxis ?? '',
-              yKey: yAxis ?? '',
-            }}
-            isChart={isChart}
-            isLoading={isLoading}
-            runQuery={runQuery}
-          />
         ) : (
-          <div className="bg-surface-100 border-overlay rounded border shadow-sm text-xs px-3 py-2">
-            Writing SQL...
-          </div>
+          <DebouncedComponent delay={500} value={sql}>
+            <QueryBlock
+              lockColumns
+              label={title}
+              sql={sql}
+              chartConfig={{
+                type: 'bar',
+                cumulative: false,
+                xKey: xAxis ?? '',
+                yKey: yAxis ?? '',
+              }}
+              isChart={isChart}
+              isLoading={isLoading}
+              runQuery={runQuery}
+            />
+          </DebouncedComponent>
         )
       ) : (
         <CodeBlock
@@ -92,7 +93,7 @@ const MarkdownPre = memo(function MarkdownPre({
       )}
     </div>
   )
-})
+}
 
 export const Message = function Message({
   role,
@@ -103,24 +104,28 @@ export const Message = function Message({
   action = null,
   variant = 'default',
 }: PropsWithChildren<MessageProps>) {
-  const isUser = role === 'user'
+  useEffect(() => {
+    return () => {
+      console.log('unmounting parent')
+    }
+  }, [])
 
-  const preComponent = useMemo(
-    () =>
-      function pre(props: any) {
-        return (
-          <MarkdownPre readOnly={readOnly} isLoading={isLoading}>
-            {props.children}
-          </MarkdownPre>
-        )
-      },
-    [readOnly, isLoading]
-  )
+  const isUser = role === 'user'
 
   const allMarkdownComponents = useMemo(
     (): Components => ({
       ...markdownComponents,
-      pre: preComponent,
+      pre: (props: any) => {
+        const PreComponent = useMemo(
+          () => (preProps: any) => (
+            <MarkdownPre readOnly={readOnly} isLoading={isLoading}>
+              {preProps.children}
+            </MarkdownPre>
+          ),
+          [readOnly, isLoading]
+        )
+        return <PreComponent {...props} />
+      },
       ol: (props: any) => {
         return <ol className="flex flex-col gap-y-4">{props.children}</ol>
       },
@@ -146,7 +151,7 @@ export const Message = function Message({
         )
       },
     }),
-    [preComponent]
+    [readOnly]
   )
 
   if (!content) return null
