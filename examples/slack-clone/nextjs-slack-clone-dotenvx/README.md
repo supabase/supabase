@@ -175,7 +175,7 @@ We store the decryption keys in the project's secret handler, allowing the branc
 ```bash
 npx supabase secrets set --env-file .env.keys
 # or
-npx supabase secrets set DOTENV_PRIVATE_KEY <your-private-key>
+npx supabase secrets set DOTENV_PRIVATE_KEY=<your-private-key>
 ```
 
 4. **Choose Your Configuration Approach:**
