@@ -1,0 +1,219 @@
+{
+  "analytics": {
+    "id": "analytics",
+    "title": "Analytics",
+    "description": "Monitor and analyze your database performance, query patterns, and resource utilization.",
+    "items": [
+      {
+        "id": "most-time-consuming-queries",
+        "title": "Most time consuming queries",
+        "description": "View aggregate time spent on a query type",
+        "type": "query",
+        "code": "select\n  auth.rolname,\n  statements.query,\n  statements.calls,\n  statements.total_exec_time + statements.total_plan_time as total_time,\n  statements.min_exec_time + statements.min_plan_time as min_time,\n  statements.max_exec_time + statements.max_plan_time as max_time,\n  statements.mean_exec_time + statements.mean_plan_time as mean_time,\n  statements.rows / statements.calls as avg_rows\nfrom pg_stat_statements as statements\ninner join pg_authid as auth on statements.userid = auth.oid\norder by\n  max_time desc\nlimit 100;"
+      },
+      {
+        "id": "query-execution-stats",
+        "title": "Query execution statistics",
+        "description": "Analyze query performance metrics",
+        "type": "query",
+        "code": "select\n  substring(query, 1, 50) as short_query,\n  round(total_exec_time::numeric, 2) as total_exec_time,\n  calls,\n  round(mean_exec_time::numeric, 2) as mean_exec_time,\n  round((100 * total_exec_time / sum(total_exec_time) over())::numeric, 2) as percentage_cpu\nfrom pg_stat_statements\norder by total_exec_time desc\nlimit 20;"
+      }
+    ]
+  },
+  "authentication": {
+    "id": "authentication",
+    "title": "Authentication",
+    "description": "Manage user authentication, sessions, and security features.",
+    "items": [
+      {
+        "id": "user-session-management",
+        "title": "User session management",
+        "description": "Track and manage user sessions",
+        "type": "query",
+        "code": "select \n  users.email,\n  auth.sessions.created_at,\n  auth.sessions.updated_at,\n  auth.sessions.not_after\nfrom auth.sessions \ninner join auth.users as users \n  on sessions.user_id = users.id\norder by auth.sessions.created_at desc;"
+      },
+      {
+        "id": "failed-login-attempts",
+        "title": "Failed login attempts",
+        "description": "Monitor failed authentication attempts",
+        "type": "query",
+        "code": "select\n  auth.users.email,\n  count(*) as failed_attempts,\n  max(auth.audit_log_entries.created_at) as last_attempt\nfrom auth.audit_log_entries\njoin auth.users on auth.audit_log_entries.actor_id = auth.users.id\nwhere auth.audit_log_entries.action = 'login'\nand auth.audit_log_entries.error is not null\ngroup by auth.users.email\norder by failed_attempts desc;"
+      },
+      {
+        "id": "oauth-callback",
+        "title": "OAuth callback handler",
+        "description": "Handle OAuth provider callbacks and user provisioning",
+        "type": "edge-function",
+        "code": "import { serve } from 'https://deno.fresh.dev/std@0.168.0/http/server.ts'\nimport { createClient } from 'https://esm.sh/@supabase/supabase-js@2'\n\nserve(async (req) => {\n  const { code, state } = Object.fromEntries(new URL(req.url).searchParams)\n  if (!code || !state) {\n    return new Response('Missing code or state', { status: 400 })\n  }\n\n  const supabase = createClient(\n    Deno.env.get('SUPABASE_URL'),\n    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')\n  )\n\n  try {\n    // Exchange code for OAuth tokens\n    const tokens = await exchangeCodeForTokens(code)\n    \n    // Get user info from OAuth provider\n    const userInfo = await getUserInfo(tokens.access_token)\n    \n    // Create or update user in Supabase\n    const { data: user, error } = await supabase.auth.admin.createUser({\n      email: userInfo.email,\n      email_verified: true,\n      user_metadata: {\n        full_name: userInfo.name,\n        avatar_url: userInfo.picture,\n        provider: 'oauth'\n      }\n    })\n\n    if (error) throw error\n\n    // Create session and redirect to app\n    const { data: session } = await supabase.auth.admin.createSession(user.id)\n    \n    return new Response(null, {\n      status: 302,\n      headers: {\n        Location: `${Deno.env.get('APP_URL')}?session=${session.access_token}`,\n      },\n    })\n  } catch (err) {\n    return new Response(`Authentication Error: ${err.message}`, { status: 400 })\n  }\n})"
+      },
+      {
+        "id": "mfa-verification",
+        "title": "MFA verification handler",
+        "description": "Handle multi-factor authentication verification",
+        "type": "edge-function",
+        "code": "import { serve } from 'https://deno.fresh.dev/std@0.168.0/http/server.ts'\nimport { createClient } from 'https://esm.sh/@supabase/supabase-js@2'\nimport { totp } from 'https://deno.land/x/oath@v1.0.0/mod.ts'\n\nserve(async (req) => {\n  const { token, user_id } = await req.json()\n  \n  if (!token || !user_id) {\n    return new Response('Missing token or user_id', { status: 400 })\n  }\n\n  const supabase = createClient(\n    Deno.env.get('SUPABASE_URL'),\n    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')\n  )\n\n  try {\n    // Get user's MFA secret\n    const { data: mfaSecret } = await supabase\n      .from('mfa_secrets')\n      .select('secret')\n      .eq('user_id', user_id)\n      .single()\n\n    if (!mfaSecret) {\n      return new Response('MFA not set up for user', { status: 400 })\n    }\n\n    // Verify TOTP token\n    const isValid = totp.verify({\n      token,\n      secret: mfaSecret.secret\n    })\n\n    if (!isValid) {\n      return new Response('Invalid token', { status: 400 })\n    }\n\n    // Update user's MFA verification status\n    await supabase\n      .from('mfa_verifications')\n      .insert({\n        user_id,\n        verified_at: new Date().toISOString()\n      })\n\n    return new Response(JSON.stringify({ verified: true }), {\n      headers: { 'Content-Type': 'application/json' },\n    })\n  } catch (err) {\n    return new Response(`MFA Error: ${err.message}`, { status: 400 })\n  }\n})"
+      }
+    ]
+  },
+  "storage": {
+    "id": "storage",
+    "title": "Storage",
+    "description": "Monitor and manage your storage buckets and objects.",
+    "items": [
+      {
+        "id": "largest-objects",
+        "title": "Largest storage objects",
+        "description": "Find the largest objects in storage",
+        "type": "query",
+        "code": "select\n  storage.objects.name,\n  storage.buckets.name as bucket,\n  storage.objects.created_at,\n  storage.objects.updated_at,\n  pg_size_pretty(storage.objects.metadata->>'size') as size\nfrom storage.objects\njoin storage.buckets on storage.objects.bucket_id = storage.buckets.id\norder by (storage.objects.metadata->>'size')::bigint desc\nlimit 20;"
+      },
+      {
+        "id": "storage-usage-by-bucket",
+        "title": "Storage usage by bucket",
+        "description": "Calculate total storage usage per bucket",
+        "type": "query",
+        "code": "select\n  storage.buckets.name as bucket,\n  count(*) as total_objects,\n  pg_size_pretty(sum((storage.objects.metadata->>'size')::bigint)) as total_size\nfrom storage.objects\njoin storage.buckets on storage.objects.bucket_id = storage.buckets.id\ngroup by storage.buckets.name\norder by sum((storage.objects.metadata->>'size')::bigint) desc;"
+      },
+      {
+        "id": "recent-uploads",
+        "title": "Recent uploads",
+        "description": "Monitor recent file uploads across all buckets",
+        "type": "query",
+        "code": "select\n  storage.objects.name,\n  storage.buckets.name as bucket,\n  storage.objects.created_at,\n  pg_size_pretty(storage.objects.metadata->>'size') as size,\n  storage.objects.metadata->>'mimetype' as mime_type\nfrom storage.objects\njoin storage.buckets on storage.objects.bucket_id = storage.buckets.id\norder by storage.objects.created_at desc\nlimit 50;"
+      }
+    ]
+  },
+  "media": {
+    "id": "media",
+    "title": "Media Processing",
+    "description": "Handle media processing, optimization, and transformation.",
+    "items": [
+      {
+        "id": "image-optimization",
+        "title": "Image optimization",
+        "description": "Optimize and transform images on upload",
+        "type": "edge-function",
+        "code": "import { serve } from 'https://deno.fresh.dev/std@0.168.0/http/server.ts'\nimport { createClient } from 'https://esm.sh/@supabase/supabase-js@2'\nimport Sharp from 'https://esm.sh/sharp@0.32.6'\n\nserve(async (req) => {\n  const formData = await req.formData()\n  const file = formData.get('file')\n  \n  if (!file || !(file instanceof File)) {\n    return new Response('No file uploaded', { status: 400 })\n  }\n\n  try {\n    const buffer = await file.arrayBuffer()\n    const image = Sharp(buffer)\n\n    // Generate optimized versions\n    const [thumbnail, medium, original] = await Promise.all([\n      image.clone().resize(150, 150, { fit: 'cover' }).webp({ quality: 80 }).toBuffer(),\n      image.clone().resize(800, null, { fit: 'inside' }).webp({ quality: 85 }).toBuffer(),\n      image.clone().webp({ quality: 90 }).toBuffer()\n    ])\n\n    const supabase = createClient(\n      Deno.env.get('SUPABASE_URL'),\n      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')\n    )\n\n    // Upload all versions to storage\n    const fileName = `${crypto.randomUUID()}`\n    const uploads = await Promise.all([\n      supabase.storage.from('images').upload(`thumbnails/${fileName}.webp`, thumbnail),\n      supabase.storage.from('images').upload(`medium/${fileName}.webp`, medium),\n      supabase.storage.from('images').upload(`original/${fileName}.webp`, original)\n    ])\n\n    return new Response(JSON.stringify({\n      id: fileName,\n      urls: {\n        thumbnail: uploads[0].data?.path,\n        medium: uploads[1].data?.path,\n        original: uploads[2].data?.path\n      }\n    }), {\n      headers: { 'Content-Type': 'application/json' },\n    })\n  } catch (err) {\n    return new Response(`Image processing error: ${err.message}`, { status: 400 })\n  }\n})"
+      }
+    ]
+  },
+  "integrations": {
+    "id": "integrations",
+    "title": "Integrations",
+    "description": "Integrate with external services and APIs.",
+    "items": [
+      {
+        "id": "stripe-webhook",
+        "title": "Stripe webhook handler",
+        "description": "Process Stripe webhook events securely",
+        "type": "edge-function",
+        "code": "import { serve } from 'https://deno.fresh.dev/std@0.168.0/http/server.ts'\nimport Stripe from 'https://esm.sh/stripe@12.4.0?target=deno'\n\nserve(async (req) => {\n  const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'))\n  const signature = req.headers.get('stripe-signature')\n  \n  if (!signature) {\n    return new Response('No signature found', { status: 400 })\n  }\n\n  try {\n    const body = await req.text()\n    const event = stripe.webhooks.constructEvent(\n      body,\n      signature,\n      Deno.env.get('STRIPE_WEBHOOK_SECRET')\n    )\n\n    switch (event.type) {\n      case 'payment_intent.succeeded':\n        await handleSuccessfulPayment(event.data.object)\n        break\n      case 'customer.subscription.updated':\n        await handleSubscriptionUpdate(event.data.object)\n        break\n      case 'customer.subscription.deleted':\n        await handleSubscriptionCancellation(event.data.object)\n        break\n    }\n\n    return new Response(JSON.stringify({ received: true }), {\n      headers: { 'Content-Type': 'application/json' },\n    })\n  } catch (err) {\n    return new Response(`Webhook Error: ${err.message}`, { status: 400 })\n  }\n})\n\nasync function handleSuccessfulPayment(paymentIntent) {\n  const supabase = createClient(\n    Deno.env.get('SUPABASE_URL'),\n    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')\n  )\n\n  await supabase.from('payments').insert({\n    user_id: paymentIntent.metadata.user_id,\n    amount: paymentIntent.amount,\n    currency: paymentIntent.currency,\n    status: 'succeeded',\n    stripe_payment_id: paymentIntent.id\n  })\n}\n\nasync function handleSubscriptionUpdate(subscription) {\n  // Handle subscription updates\n}\n\nasync function handleSubscriptionCancellation(subscription) {\n  // Handle subscription cancellations\n}"
+      },
+      {
+        "id": "slack-notifications",
+        "title": "Slack notifications",
+        "description": "Send notifications to Slack for important events",
+        "type": "edge-function",
+        "code": "import { serve } from 'https://deno.fresh.dev/std@0.168.0/http/server.ts'\n\nserve(async (req) => {\n  const { type, data } = await req.json()\n  \n  if (!type || !data) {\n    return new Response('Missing event type or data', { status: 400 })\n  }\n\n  const SLACK_WEBHOOK_URL = Deno.env.get('SLACK_WEBHOOK_URL')\n  \n  try {\n    let message = {\n      blocks: [\n        {\n          type: 'header',\n          text: {\n            type: 'plain_text',\n            text: getEventTitle(type)\n          }\n        },\n        {\n          type: 'section',\n          fields: formatEventData(type, data)\n        }\n      ]\n    }\n\n    const response = await fetch(SLACK_WEBHOOK_URL, {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify(message)\n    })\n\n    if (!response.ok) {\n      throw new Error(`Slack API error: ${response.statusText}`)\n    }\n\n    return new Response('Notification sent', { status: 200 })\n  } catch (err) {\n    return new Response(`Notification error: ${err.message}`, { status: 400 })\n  }\n})\n\nfunction getEventTitle(type) {\n  const titles = {\n    'new_user': '🎉 New User Signup',\n    'payment_received': '💰 Payment Received',\n    'error_alert': '🚨 System Alert'\n  }\n  return titles[type] || 'New Event'\n}\n\nfunction formatEventData(type, data) {\n  switch(type) {\n    case 'new_user':\n      return [\n        { type: 'mrkdwn', text: `*Email:*\\n${data.email}` },\n        { type: 'mrkdwn', text: `*Signed up:*\\n${new Date().toISOString()}` }\n      ]\n    case 'payment_received':\n      return [\n        { type: 'mrkdwn', text: `*Amount:*\\n$${data.amount}` },\n        { type: 'mrkdwn', text: `*Customer:*\\n${data.customer_email}` }\n      ]\n    default:\n      return [{ type: 'mrkdwn', text: `*Data:*\\n${JSON.stringify(data, null, 2)}` }]\n  }\n}"
+      }
+    ]
+  },
+  "security": {
+    "id": "security",
+    "title": "Security",
+    "description": "Implement security features and protections.",
+    "items": [
+      {
+        "id": "rate-limiter",
+        "title": "API rate limiter",
+        "description": "Implement rate limiting for API endpoints",
+        "type": "edge-function",
+        "code": "import { serve } from 'https://deno.fresh.dev/std@0.168.0/http/server.ts'\n\nconst RATE_LIMIT = 100 // requests\nconst WINDOW_SIZE = 60 * 1000 // 1 minute in ms\n\nserve(async (req) => {\n  const ip = req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for')\n  const apiKey = req.headers.get('x-api-key')\n  \n  if (!ip || !apiKey) {\n    return new Response('Missing required headers', { status: 400 })\n  }\n\n  const supabase = createClient(\n    Deno.env.get('SUPABASE_URL'),\n    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')\n  )\n\n  try {\n    // Get current window's requests\n    const windowStart = Date.now() - WINDOW_SIZE\n    const { count } = await supabase\n      .from('rate_limits')\n      .select('id', { count: 'exact' })\n      .eq('api_key', apiKey)\n      .gt('timestamp', new Date(windowStart).toISOString())\n\n    if (count >= RATE_LIMIT) {\n      return new Response('Rate limit exceeded', { status: 429 })\n    }\n\n    // Log request\n    await supabase.from('rate_limits').insert({\n      api_key: apiKey,\n      ip_address: ip,\n      timestamp: new Date().toISOString()\n    })\n\n    // Clean up old entries periodically\n    if (Math.random() < 0.1) { // 10% chance to clean up\n      await supabase\n        .from('rate_limits')\n        .delete()\n        .lt('timestamp', new Date(windowStart).toISOString())\n    }\n\n    // Process the actual request here\n    return new Response('Request processed', { status: 200 })\n  } catch (err) {\n    return new Response(`Rate limiting error: ${err.message}`, { status: 500 })\n  }\n})"
+      }
+    ]
+  },
+  "database-management": {
+    "id": "database-management",
+    "title": "Database Management",
+    "description": "Monitor and manage your database health, size, and maintenance tasks.",
+    "items": [
+      {
+        "id": "table-sizes",
+        "title": "Table sizes and bloat",
+        "description": "View table sizes including indexes and bloat estimation",
+        "type": "query",
+        "code": "select\n  schema_name,\n  relname as table_name,\n  pg_size_pretty(pg_total_relation_size(relid)) as total_size,\n  pg_size_pretty(pg_relation_size(relid)) as data_size,\n  pg_size_pretty(pg_total_relation_size(relid) - pg_relation_size(relid)) as external_size\nfrom pg_catalog.pg_statio_user_tables\norder by pg_total_relation_size(relid) desc\nlimit 20;"
+      },
+      {
+        "id": "unused-indexes",
+        "title": "Unused indexes",
+        "description": "Find indexes that are rarely or never used",
+        "type": "query",
+        "code": "select\n  schemaname || '.' || tablename as table,\n  indexname as index,\n  pg_size_pretty(pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(indexname)::regclass)) as index_size,\n  idx_scan as scans\nfrom pg_stat_user_indexes\nwhere idx_scan < 100\nand pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(indexname)::regclass) > 1024 * 1024\norder by pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(indexname)::regclass) desc;"
+      },
+      {
+        "id": "table-bloat",
+        "title": "Table bloat estimation",
+        "description": "Estimate bloat in tables",
+        "type": "query",
+        "code": "with constants as (\n  select current_setting('block_size')::numeric as bs,\n         23 as hdr,\n         8 as ma\n),\nbloat_info as (\n  select\n    ma,bs,schemaname,tablename,\n    (datawidth + (hdr + ma - (case when hdr%ma=0 then ma else hdr%ma end)))::numeric as datahdr\n  from (\n    select\n      schemaname, tablename, hdr, ma, bs,\n      avg(coalesce(null_frac,0)) * (sum((case when null_frac >= 0.7 then 0 else avg_width end)::numeric))/count(*) as datawidth\n    from pg_stats s\n    cross join constants\n    group by 1,2,3,4,5\n  ) as foo\n)\nselect\n  schemaname || '.' || tablename as table,\n  pg_size_pretty(real_size::numeric) as actual_size,\n  pg_size_pretty(bloat_size::numeric) as bloat_size,\n  round(100 * bloat_size/real_size) as bloat_ratio\nfrom (\n  select bs,\n         schemaname, tablename,\n         reltuples,\n         relpages * bs as real_size,\n         (relpages - est_pages_ff) * bs as bloat_size\n  from pg_class c\n  join pg_namespace n on n.oid = c.relnamespace\n  cross join bloat_info\n  where nspname not in ('pg_catalog','information_schema')\n  and relkind = 'r'\n) as a\norder by bloat_size desc\nlimit 20;"
+      }
+    ]
+  },
+  "realtime": {
+    "id": "realtime",
+    "title": "Realtime",
+    "description": "Monitor and analyze realtime connections and broadcasts.",
+    "items": [
+      {
+        "id": "active-subscriptions",
+        "title": "Active realtime subscriptions",
+        "description": "View current realtime subscriptions",
+        "type": "query",
+        "code": "select\n  realtime.subscription.subscription_id,\n  realtime.subscription.entity,\n  realtime.subscription.created_at,\n  count(realtime.broadcast_id) as broadcast_count\nfrom realtime.subscription\nleft join realtime.broadcast\n  on realtime.subscription.subscription_id = realtime.broadcast.subscription_id\nwhere realtime.subscription.created_at > now() - interval '24 hours'\ngroup by\n  realtime.subscription.subscription_id,\n  realtime.subscription.entity,\n  realtime.subscription.created_at\norder by realtime.subscription.created_at desc;"
+      }
+    ]
+  },
+  "user-management": {
+    "id": "user-management",
+    "title": "User Management",
+    "description": "Manage and analyze user data and activity.",
+    "items": [
+      {
+        "id": "user-activity",
+        "title": "User activity overview",
+        "description": "Track user sign-ups and last activity",
+        "type": "query",
+        "code": "select\n  auth.users.email,\n  auth.users.created_at as signed_up_at,\n  auth.users.last_sign_in_at,\n  auth.users.confirmed_at,\n  count(distinct auth.sessions.id) as session_count\nfrom auth.users\nleft join auth.sessions\n  on auth.users.id = auth.sessions.user_id\ngroup by\n  auth.users.email,\n  auth.users.created_at,\n  auth.users.last_sign_in_at,\n  auth.users.confirmed_at\norder by auth.users.created_at desc;"
+      },
+      {
+        "id": "inactive-users",
+        "title": "Inactive users",
+        "description": "Find users who haven't logged in recently",
+        "type": "query",
+        "code": "select\n  email,\n  created_at,\n  last_sign_in_at,\n  confirmed_at\nfrom auth.users\nwhere\n  last_sign_in_at < now() - interval '30 days'\n  or last_sign_in_at is null\norder by last_sign_in_at desc nulls last;"
+      }
+    ]
+  },
+  "performance": {
+    "id": "performance",
+    "title": "Performance",
+    "description": "Monitor and optimize database performance.",
+    "items": [
+      {
+        "id": "slow-queries",
+        "title": "Slow queries",
+        "description": "Find queries taking longer than 1 second",
+        "type": "query",
+        "code": "select\n  auth.rolname as user,\n  datname as database,\n  pid as process_id,\n  application_name,\n  client_addr as client_address,\n  query_start,\n  state,\n  wait_event_type,\n  wait_event,\n  query\nfrom pg_stat_activity\nwhere\n  state != 'idle'\n  and (now() - query_start) > interval '1 second'\norder by query_start;"
+      },
+      {
+        "id": "cache-hit-ratio",
+        "title": "Cache hit ratios",
+        "description": "Monitor database cache effectiveness",
+        "type": "query",
+        "code": "select\n  relname as table,\n  heap_blks_read as blocks_read,\n  heap_blks_hit as blocks_hit,\n  round(100.0 * heap_blks_hit / nullif(heap_blks_hit + heap_blks_read, 0), 2) as hit_ratio\nfrom pg_statio_user_tables\nwhere (heap_blks_hit + heap_blks_read) > 0\norder by hit_ratio desc;"
+      }
+    ]
+  }
+}
