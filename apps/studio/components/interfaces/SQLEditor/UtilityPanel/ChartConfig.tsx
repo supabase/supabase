@@ -65,6 +65,9 @@ export const ChartConfig = ({
     })
   }, [results])
 
+  const hasResults = results.rows.length > 0
+  const hasConfig = config.xKey && config.yKey
+
   // Compute cumulative results only if necessary
   const cumulativeResults = useMemo(() => getCumulativeResults(results, config), [results, config])
 
@@ -90,38 +93,58 @@ export const ChartConfig = ({
 
   const xKeyDateFormat = getDateFormat(config.xKey)
 
+  const ChartPanel = () => {
+    if (!hasConfig) {
+      return (
+        <ResizablePanel className="p-4 h-full" defaultSize={75}>
+          <NoDataPlaceholder
+            size="normal"
+            description="Select your X and Y axis in the chart options panel"
+          />
+        </ResizablePanel>
+      )
+    }
+
+    if (!hasResults) {
+      return <NoDataPlaceholder size="normal" description="No data" />
+    }
+
+    if (config.type === 'bar') {
+      return (
+        <BarChart
+          showLegend
+          size="normal"
+          xAxisIsDate={xKeyDateFormat === 'date'}
+          data={resultToRender}
+          xAxisKey={config.xKey}
+          yAxisKey={config.yKey}
+          showGrid={config.showGrid}
+          XAxisProps={{
+            angle: 0,
+            interval: 'preserveStart',
+            hide: !config.showLabels,
+            tickFormatter: (idx: string) => {
+              const value = resultToRender[+idx][config.xKey]
+              if (xKeyDateFormat === 'date') {
+                return dayjs(value).format('MMM D YYYY')
+              }
+              return value
+            },
+          }}
+          YAxisProps={{
+            tickFormatter: (value: number) => value.toLocaleString(),
+            hide: !config.showLabels,
+            domain: [0, 'dataMax'],
+          }}
+        />
+      )
+    }
+  }
+
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-grow h-full">
       <ResizablePanel className="p-4 h-full" defaultSize={75}>
-        {config.type === 'bar' && (
-          <BarChart
-            showLegend
-            size="normal"
-            xAxisIsDate={xKeyDateFormat === 'date'}
-            data={resultToRender}
-            xAxisKey={config.xKey}
-            yAxisKey={config.yKey}
-            emptyStateMessage="Execute a query and configure the chart options"
-            showGrid={config.showGrid}
-            XAxisProps={{
-              angle: 0,
-              interval: 'preserveStart',
-              hide: !config.showLabels,
-              tickFormatter: (idx: string) => {
-                const value = resultToRender[+idx][config.xKey]
-                if (xKeyDateFormat === 'date') {
-                  return dayjs(value).format('MMM D YYYY')
-                }
-                return value
-              },
-            }}
-            YAxisProps={{
-              tickFormatter: (value: number) => value.toLocaleString(),
-              hide: !config.showLabels,
-              domain: [0, 'dataMax'],
-            }}
-          />
-        )}
+        <ChartPanel />
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel
