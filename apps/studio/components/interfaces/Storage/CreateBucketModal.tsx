@@ -13,7 +13,8 @@ import {
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { IS_PLATFORM } from 'lib/constants'
-import { Alert, Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
+import { Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 export interface CreateBucketModalProps {
   visible: boolean
@@ -127,7 +128,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                     descriptionText="Anyone can read any object without any authorization"
                   />
                   {values.public && (
-                    <Alert title="Public buckets are not protected" variant="warning" withIcon>
+                    <Admonition title="Public buckets are not protected" type="warning">
                       <p className="mb-2">
                         Users can read objects in public buckets without any authorization.
                       </p>
@@ -135,7 +136,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                         Row level security (RLS) policies are still required for other operations
                         such as object uploads and deletes.
                       </p>
-                    </Alert>
+                    </Admonition>
                   )}
                 </div>
               </Modal.Content>
