@@ -80,24 +80,7 @@ export const ChartConfig = ({
   // Compute cumulative results only if necessary
   const cumulativeResults = useMemo(() => getCumulativeResults(results, config), [results, config])
 
-  const filteredResults = results.rows.filter((row) => {
-    // Filter out rows with invalid Y values
-    const yValue = Number(row[config.yKey])
-    return !isNaN(yValue) && yValue !== null && yValue !== undefined
-  })
-
-  const resultToRender = config.cumulative ? cumulativeResults : filteredResults
-
-  if (!resultKeys.length) {
-    return (
-      <div className="p-2">
-        <NoDataPlaceholder
-          size="normal"
-          description="Execute a query and configure the chart options."
-        />
-      </div>
-    )
-  }
+  const resultToRender = config.cumulative ? cumulativeResults : results.rows
 
   const getDateFormat = (key: any) => {
     const value = resultToRender?.[0]?.[key] || ''
@@ -114,14 +97,11 @@ export const ChartConfig = ({
         <ResizablePanel className="p-4 h-full" defaultSize={75}>
           <NoDataPlaceholder
             size="normal"
+            title="Configure your chart"
             description="Select your X and Y axis in the chart options panel"
           />
         </ResizablePanel>
       )
-    }
-
-    if (!hasResults) {
-      return <NoDataPlaceholder size="normal" description="No data" />
     }
 
     if (config.type === 'bar') {
