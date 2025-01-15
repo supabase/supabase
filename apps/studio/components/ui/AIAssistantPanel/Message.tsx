@@ -33,10 +33,7 @@ export const Message = function Message({
   if (!content) return null
 
   return (
-    <motion.div
-      layout="position"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+    <div
       className={cn(
         'mb-5 text-foreground-light text-sm',
         isUser && 'text-foreground',
@@ -124,6 +121,6 @@ export const Message = function Message({
           {content}
         </ReactMarkdown>
       </div>
-    </motion.div>
+    </div>
   )
 }

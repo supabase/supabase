@@ -147,16 +147,10 @@ export const AIAssistant = ({
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
   const messages = useMemo(() => {
-    const merged = [
+    return [
       ...chatMessages,
       ...(assistantError !== undefined && lastSentMessage !== undefined ? [lastSentMessage] : []),
     ]
-
-    return merged.sort(
-      (a, b) =>
-        (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0) ||
-        a.role.localeCompare(b.role)
-    )
   }, [chatMessages, assistantError, lastSentMessage])
 
   const renderedMessages = useMemo(
@@ -166,7 +160,7 @@ export const AIAssistant = ({
           <MemoizedMessage
             key={message.id}
             message={message}
-            isLoading={isChatLoading && message === messages[messages.length - 1]}
+            isLoading={isChatLoading && message.id === messages[messages.length - 1].id}
           />
         )
       }),
