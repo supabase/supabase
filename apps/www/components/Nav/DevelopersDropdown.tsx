@@ -33,7 +33,7 @@ const DevelopersDropdown = () => (
                   {Icon && <Icon size={16} strokeWidth={1.3} />}
                   <span>{link.text}</span>
                   {link.text === 'Careers' && jobsCount > 0 && (
-                    <span className="text-xs flex items-center justify-center text-foreground-lighter">
+                    <span className="text-xs flex items-center justify-center text-foreground-lighter -ml-1">
                       ({jobsCount})
                     </span>
                   )}
