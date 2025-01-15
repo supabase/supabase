@@ -1,4 +1,3 @@
-import { Alert } from 'ui'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import LogsDivider from '../Logs.Divider'
 import {
@@ -7,6 +6,7 @@ import {
   SelectionDetailedTimestampRow,
   SeverityFormatter,
 } from '../LogsFormatters'
+import { Admonition } from 'ui-patterns'
 
 const DatabasePostgresSelectionRender = ({ log }: any) => {
   const postgresUsername = log?.metadata[0]?.parsed[0]?.user_name
@@ -36,7 +36,7 @@ const DatabasePostgresSelectionRender = ({ log }: any) => {
       </div>
       {hint && (
         <div className={`mt-4 ${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
-          <Alert variant="warning" withIcon title={hint} />
+          <Admonition type="warning" title={hint} />
         </div>
       )}
       <LogsDivider />
