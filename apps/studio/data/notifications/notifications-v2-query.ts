@@ -4,12 +4,11 @@ import { get, handleError } from 'data/fetchers'
 import type { components } from 'data/api'
 import type { ResponseError } from 'types'
 import { notificationKeys } from './keys'
+import { createInfiniteQuery } from 'react-query-kit'
 
 const NOTIFICATIONS_PAGE_LIMIT = 10
 
-export type NotificationVariables = {
-  page: number
-  limit?: number
+export type NotificationsVariables = {
   status?: 'new' | 'seen' | 'archived'
   filters: {
     priority: readonly string[]
@@ -35,14 +34,17 @@ export type NotificationData = {
   actions: { label: string; url?: string; action_type?: string }[]
 }
 
-export async function getNotifications(options: NotificationVariables, signal?: AbortSignal) {
-  const { status, filters, page = 0, limit = NOTIFICATIONS_PAGE_LIMIT } = options
+export async function getNotifications(
+  options: NotificationsVariables,
+  { pageParam, signal }: { pageParam: number; signal: AbortSignal }
+) {
+  const { status, filters } = options
   const { data, error } = await get('/platform/notifications', {
     params: {
       // @ts-expect-error maybe the types from the API aren't quite right?
       query: {
-        offset: String(page * limit),
-        limit: String(limit),
+        offset: String(pageParam * NOTIFICATIONS_PAGE_LIMIT),
+        limit: String(NOTIFICATIONS_PAGE_LIMIT),
         ...(status !== undefined ? { status } : { status: ['new', 'seen'] }),
         ...(filters.priority.length > 0 ? { priority: filters.priority } : {}),
         ...(filters.organizations.length > 0 ? { org_slug: filters.organizations } : {}),
@@ -61,25 +63,17 @@ export async function getNotifications(options: NotificationVariables, signal?: 
 export type NotificationsData = Awaited<ReturnType<typeof getNotifications>>
 export type NotificationsError = ResponseError
 
-export const useNotificationsV2Query = <TData = NotificationsData>(
-  { status, filters, limit = NOTIFICATIONS_PAGE_LIMIT }: Omit<NotificationVariables, 'page'>,
-  {
-    enabled = true,
-    ...options
-  }: UseInfiniteQueryOptions<NotificationsData, NotificationsError, TData> = {}
-) => {
-  return useInfiniteQuery<NotificationsData, NotificationsError, TData>(
-    notificationKeys.listV2({ status, filters, limit }),
-    ({ signal, pageParam }) =>
-      getNotifications({ status, filters, limit, page: pageParam }, signal),
-    {
-      enabled: enabled,
-      getNextPageParam(lastPage, pages) {
-        const page = pages.length
-        if ((lastPage ?? []).length < limit) return undefined
-        return page
-      },
-      ...options,
-    }
-  )
-}
+export const useNotificationsV2Query = createInfiniteQuery<
+  NotificationsData,
+  NotificationsVariables,
+  NotificationsError
+>({
+  queryKey: ['notifications'],
+  fetcher: getNotifications,
+  initialPageParam: 0,
+  getNextPageParam(lastPage, pages, sp) {
+    const page = pages.length
+    if ((lastPage ?? []).length < NOTIFICATIONS_PAGE_LIMIT) return undefined
+    return page
+  },
+})

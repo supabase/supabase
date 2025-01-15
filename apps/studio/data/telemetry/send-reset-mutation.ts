@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { createMutation } from 'react-query-kit'
 
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
@@ -14,22 +14,9 @@ export async function sendReset() {
 
 type SendResetData = Awaited<ReturnType<typeof sendReset>>
 
-export const useSendResetMutation = ({
-  onSuccess,
-  onError,
-  ...options
-}: Omit<UseMutationOptions<SendResetData, ResponseError>, 'mutationFn'> = {}) => {
-  return useMutation<SendResetData, ResponseError>(() => sendReset(), {
-    async onSuccess(data, variables, context) {
-      await onSuccess?.(data, variables, context)
-    },
-    async onError(data, variables, context) {
-      if (onError === undefined) {
-        console.error(`Failed to send Telemetry reset: ${data.message}`)
-      } else {
-        onError(data, variables, context)
-      }
-    },
-    ...options,
-  })
-}
+export const useSendResetMutation = createMutation<SendResetData, void, ResponseError>({
+  mutationFn: sendReset,
+  async onError(data) {
+    console.error(`Failed to send Telemetry reset: ${data.message}`)
+  },
+})

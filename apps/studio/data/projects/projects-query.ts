@@ -1,12 +1,11 @@
-import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useRef } from 'react'
+import { createQuery } from 'react-query-kit'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import { useProfile } from 'lib/profile'
 import type { ResponseError } from 'types'
-import { projectKeys } from './keys'
-import type { Project } from './project-detail-query'
+import { useProjectDetailQuery, type Project } from './project-detail-query'
 
 export type ProjectsVariables = {
   ref?: string
@@ -16,7 +15,7 @@ export type ProjectInfo = components['schemas']['ProjectInfo'] & {
   status: components['schemas']['ResourceWithServicesStatusResponse']['status']
 }
 
-export async function getProjects(signal?: AbortSignal) {
+export async function getProjects(_: void, { signal }: { signal: AbortSignal }) {
   const { data, error } = await get('/platform/projects', { signal })
 
   if (error) handleError(error)
@@ -26,20 +25,25 @@ export async function getProjects(signal?: AbortSignal) {
 export type ProjectsData = Awaited<ReturnType<typeof getProjects>>
 export type ProjectsError = ResponseError
 
-export const useProjectsQuery = <TData = ProjectsData>({
-  enabled = true,
-  ...options
-}: UseQueryOptions<ProjectsData, ProjectsError, TData> = {}) => {
-  const { profile } = useProfile()
-  return useQuery<ProjectsData, ProjectsError, TData>(
-    projectKeys.list(),
-    ({ signal }) => getProjects(signal),
-    { enabled: enabled && profile !== undefined, ...options }
-  )
-}
+export const useProjectsQuery = createQuery<ProjectsData, void, ProjectsError>({
+  queryKey: ['projects'],
+  fetcher: getProjects,
+})
+
+// export const useProjectsQuery2 = <TData = ProjectsData>({
+//   enabled = true,
+//   ...options
+// }: UseQueryOptions<ProjectsData, ProjectsError, TData> = {}) => {
+//   const { profile } = useProfile()
+//   return useQuery<ProjectsData, ProjectsError, TData>(
+//     projectKeys.list(),
+//     ({ signal }) => getProjects(signal),
+//     { enabled: enabled && profile !== undefined, ...options }
+//   )
+// }
 
 export function prefetchProjects(client: QueryClient) {
-  return client.prefetchQuery(projectKeys.list(), ({ signal }) => getProjects(signal))
+  return client.prefetchQuery(useProjectsQuery.getFetchOptions())
 }
 
 export function useProjectsPrefetch() {
@@ -61,7 +65,7 @@ export function useAutoProjectsPrefetch() {
 }
 
 export function invalidateProjectsQuery(client: QueryClient) {
-  return client.invalidateQueries(projectKeys.list())
+  return client.invalidateQueries({ queryKey: useProjectsQuery.getKey() })
 }
 
 export function setProjectStatus(
@@ -70,7 +74,7 @@ export function setProjectStatus(
   status: Project['status']
 ) {
   client.setQueriesData<Project[] | undefined>(
-    projectKeys.list(),
+    { queryKey: useProjectsQuery.getKey() },
     (old) => {
       if (!old) return old
 
@@ -85,7 +89,7 @@ export function setProjectStatus(
   )
 
   client.setQueriesData<Project>(
-    projectKeys.detail(projectRef),
+    { queryKey: useProjectDetailQuery.getKey({ projectRef }) },
     (old) => {
       if (!old) return old
 
@@ -101,7 +105,7 @@ export function setProjectPostgrestStatus(
   status: Project['postgrestStatus']
 ) {
   client.setQueriesData<Project>(
-    projectKeys.detail(projectRef),
+    { queryKey: useProjectDetailQuery.getKey({ projectRef }) },
     (old) => {
       if (!old) return old
 

@@ -1,11 +1,11 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
+import { createQuery } from 'react-query-kit'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { organizationKeys } from './keys'
 
-export type OrganizationVariables = { slug?: string }
+export type OrganizationVariables = { slug: string }
 export type OrganizationDetail = components['schemas']['OrganizationSlugResponse']
 
 function castOrganizationSlugResponseToOrganization(
@@ -19,9 +19,10 @@ function castOrganizationSlugResponseToOrganization(
   }
 }
 
-export async function getOrganization({ slug }: OrganizationVariables, signal?: AbortSignal) {
-  if (!slug) throw new Error('Organization slug is required')
-
+export async function getOrganization(
+  { slug }: OrganizationVariables,
+  { signal }: { signal: AbortSignal }
+) {
   const { data, error } = await get('/platform/organizations/{slug}', {
     params: { path: { slug } },
     signal,
@@ -33,17 +34,16 @@ export async function getOrganization({ slug }: OrganizationVariables, signal?: 
 export type OrganizationsData = Awaited<ReturnType<typeof getOrganization>>
 export type OrganizationsError = ResponseError
 
-export const useOrganizationQuery = <TData = OrganizationsData>(
-  { slug }: OrganizationVariables,
-  { enabled = true, ...options }: UseQueryOptions<OrganizationsData, OrganizationsError, TData> = {}
-) => {
-  return useQuery<OrganizationsData, OrganizationsError, TData>(
-    organizationKeys.detail(slug),
-    ({ signal }) => getOrganization({ slug }, signal),
-    { enabled: enabled && typeof slug !== 'undefined', ...options, staleTime: 30 * 60 * 1000 }
-  )
-}
+export const useOrganizationQuery = createQuery<
+  OrganizationsData,
+  OrganizationVariables,
+  OrganizationsError
+>({
+  queryKey: ['organizations'],
+  fetcher: getOrganization,
+  staleTime: 30 * 60 * 1000,
+})
 
 export function invalidateOrganizationsQuery(client: QueryClient) {
-  return client.invalidateQueries(organizationKeys.list())
+  return client.invalidateQueries({ queryKey: useOrganizationQuery.getKey() })
 }

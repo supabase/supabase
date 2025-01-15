@@ -1,5 +1,6 @@
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -10,6 +11,7 @@ import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
 
 const FeaturePreviewModal = () => {
+  const router = useRouter()
   const snap = useAppStateSnapshot()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
@@ -33,6 +35,7 @@ const FeaturePreviewModal = () => {
         ? TelemetryActions.FEATURE_PREVIEW_DISABLED
         : TelemetryActions.FEATURE_PREVIEW_ENABLED,
       properties: { feature: selectedFeatureKey },
+      pathname: router.pathname,
     })
   }
 
@@ -51,7 +54,7 @@ const FeaturePreviewModal = () => {
 
   useEffect(() => {
     if (snap.showFeaturePreviewModal) {
-      sendEvent({ action: TelemetryActions.FEATURE_PREVIEWS_CLICKED })
+      sendEvent({ action: TelemetryActions.FEATURE_PREVIEWS_CLICKED, pathname: router.pathname })
     }
   }, [snap.showFeaturePreviewModal])
 

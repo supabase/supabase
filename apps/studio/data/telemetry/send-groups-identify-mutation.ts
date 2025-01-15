@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { createMutation } from 'react-query-kit'
 
 import { components } from 'api-types'
 import { LOCAL_STORAGE_KEYS } from 'common'
@@ -8,7 +8,7 @@ import type { ResponseError } from 'types'
 
 export type SendGroupsIdentifyVariables = components['schemas']['TelemetryGroupsIdentityBody']
 
-export async function sendGroupsIdentify({ body }: { body: SendGroupsIdentifyVariables }) {
+export async function sendGroupsIdentify(body: SendGroupsIdentifyVariables) {
   const consent =
     (typeof window !== 'undefined'
       ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
@@ -26,28 +26,13 @@ export async function sendGroupsIdentify({ body }: { body: SendGroupsIdentifyVar
 
 type SendGroupsIdentifyData = Awaited<ReturnType<typeof sendGroupsIdentify>>
 
-export const useSendGroupsIdentifyMutation = ({
-  onSuccess,
-  onError,
-  ...options
-}: Omit<
-  UseMutationOptions<SendGroupsIdentifyData, ResponseError, SendGroupsIdentifyVariables>,
-  'mutationFn'
-> = {}) => {
-  return useMutation<SendGroupsIdentifyData, ResponseError, SendGroupsIdentifyVariables>(
-    (vars) => sendGroupsIdentify({ body: vars }),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          console.error(`Failed to send Telemetry groups identify: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
-}
+export const useSendGroupsIdentifyMutation = createMutation<
+  SendGroupsIdentifyData,
+  SendGroupsIdentifyVariables,
+  ResponseError
+>({
+  mutationFn: sendGroupsIdentify,
+  onError(data) {
+    console.error(`Failed to send Telemetry groups identify: ${data.message}`)
+  },
+})

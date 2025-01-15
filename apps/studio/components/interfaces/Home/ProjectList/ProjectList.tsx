@@ -16,7 +16,7 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import type { Organization, ResponseError } from 'types'
 import { Button, cn } from 'ui'
@@ -192,8 +192,12 @@ const OrganizationProjects = ({
         : filteredProjects.filter((project) => filterStatus.includes(project.status))
       : filteredProjects
 
-  const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
-  const { data: connections } = useGitHubConnectionsQuery({ organizationId: organization?.id })
+  const { data: integrations } = useOrgIntegrationsQuery({
+    variables: { orgSlug: organization.slug },
+  })
+  const { data: connections } = useGitHubConnectionsQuery({
+    variables: { organizationId: organization.id },
+  })
   const githubConnections = connections?.map((connection) => ({
     id: String(connection.id),
     added_by: {

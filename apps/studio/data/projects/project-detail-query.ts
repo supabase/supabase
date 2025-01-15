@@ -1,11 +1,11 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
+import { createQuery } from 'react-query-kit'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { projectKeys } from './keys'
 
-export type ProjectDetailVariables = { ref?: string }
+export type ProjectDetailVariables = { projectRef: string }
 
 export type ProjectMinimal = components['schemas']['ProjectInfo']
 export type ProjectDetail = components['schemas']['ProjectDetailResponse']
@@ -20,11 +20,12 @@ export interface Project extends Omit<ProjectDetail, 'status'> {
   status: components['schemas']['ResourceWithServicesStatusResponse']['status']
 }
 
-export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?: AbortSignal) {
-  if (!ref) throw new Error('Project ref is required')
-
+export async function getProjectDetail(
+  { projectRef }: ProjectDetailVariables,
+  { signal }: { signal: AbortSignal }
+) {
   const { data, error } = await get('/platform/projects/{ref}', {
-    params: { path: { ref } },
+    params: { path: { ref: projectRef } },
     signal,
   })
 
@@ -35,35 +36,29 @@ export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?:
 export type ProjectDetailData = Awaited<ReturnType<typeof getProjectDetail>>
 export type ProjectDetailError = ResponseError
 
-export const useProjectDetailQuery = <TData = ProjectDetailData>(
-  { ref }: ProjectDetailVariables,
-  { enabled = true, ...options }: UseQueryOptions<ProjectDetailData, ProjectDetailError, TData> = {}
-) =>
-  useQuery<ProjectDetailData, ProjectDetailError, TData>(
-    projectKeys.detail(ref),
-    ({ signal }) => getProjectDetail({ ref }, signal),
-    {
-      enabled: enabled && typeof ref !== 'undefined',
-      staleTime: 30 * 1000, // 30 seconds
-      refetchInterval(data) {
-        const status = data && (data as unknown as ProjectDetailData).status
+export const useProjectDetailQuery = createQuery<
+  ProjectDetailData,
+  ProjectDetailVariables,
+  ProjectDetailError
+>({
+  queryKey: ['project', 'detail'],
+  fetcher: getProjectDetail,
+  staleTime: 30 * 1000, // 30 seconds
+  refetchInterval(data) {
+    const status = data && (data as unknown as ProjectDetailData).status
 
-        if (status === 'COMING_UP' || status === 'UNKNOWN') {
-          return 5 * 1000 // 5 seconds
-        }
-
-        return false
-      },
-      ...options,
+    if (status === 'COMING_UP' || status === 'UNKNOWN') {
+      return 5 * 1000 // 5 seconds
     }
-  )
 
-export function invalidateProjectDetailsQuery(client: QueryClient, ref: string) {
-  return client.invalidateQueries(projectKeys.detail(ref))
+    return false
+  },
+})
+
+export function invalidateProjectDetailsQuery(client: QueryClient, projectRef: string) {
+  return client.invalidateQueries({ queryKey: useProjectDetailQuery.getKey({ projectRef }) })
 }
 
-export function prefetchProjectDetail(client: QueryClient, { ref }: ProjectDetailVariables) {
-  return client.fetchQuery(projectKeys.detail(ref), ({ signal }) =>
-    getProjectDetail({ ref }, signal)
-  )
+export function prefetchProjectDetail(client: QueryClient, { projectRef }: ProjectDetailVariables) {
+  return client.fetchQuery(useProjectDetailQuery.getFetchOptions({ projectRef }))
 }

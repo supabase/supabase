@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { toString as CronToString } from 'cronstrue'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -167,6 +168,7 @@ export const CreateCronJobSheet = ({
   setIsClosing,
   onClose,
 }: CreateCronJobSheetProps) => {
+  const router = useRouter()
   const { project } = useProjectContext()
   const isEditing = !!selectedCronJob?.jobname
 
@@ -271,6 +273,7 @@ export const CreateCronJobSheet = ({
                 type: values.type,
                 schedule: schedule,
               },
+              pathname: router.pathname,
             })
           } else {
             sendEvent({
@@ -279,6 +282,7 @@ export const CreateCronJobSheet = ({
                 type: values.type,
                 schedule: schedule,
               },
+              pathname: router.pathname,
             })
           }
 

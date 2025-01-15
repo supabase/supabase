@@ -30,21 +30,28 @@ export function withAuth<T>(
   const WithAuthHOC: ComponentType<T> = (props) => {
     const router = useRouter()
     const { isLoading, session } = useAuth()
-    const { isLoading: isAALLoading, data: aalData } = useAuthenticatorAssuranceLevelQuery({
-      onError(error) {
+    const {
+      isLoading: isAALLoading,
+      data: aalData,
+      isError: isAALError,
+      error: aalError,
+    } = useAuthenticatorAssuranceLevelQuery()
+    useEffect(() => {
+      if (isAALError) {
         toast.error(
-          `Failed to fetch authenticator assurance level: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
+          `Failed to fetch authenticator assurance level: ${aalError.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
         )
-      },
-    })
+      }
+    }, [aalError, isAALError])
 
-    usePermissionsQuery({
-      onError(error: any) {
+    const { isError: isPermissionsError, error: permissionsError } = usePermissionsQuery()
+    useEffect(() => {
+      if (isPermissionsError) {
         toast.error(
-          `Failed to fetch permissions: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
+          `Failed to fetch permissions: ${permissionsError.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
         )
-      },
-    })
+      }
+    }, [isPermissionsError, permissionsError?.message])
 
     const isLoggedIn = Boolean(session)
     const isFinishedLoading = !isLoading && !isAALLoading

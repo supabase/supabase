@@ -1,10 +1,11 @@
-import { useIsLoggedIn, useParams } from 'common'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { skipToken } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
+import { useIsLoggedIn, useParams } from 'common'
+import { useOrganizationQuery } from 'data/organizations/organization-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProjectByRef } from './useSelectedProject'
-import { useOrganizationQuery } from 'data/organizations/organization-query'
 
 // [Joshen] Scaffolding this first - will need to double check if this can replace useSelectedOrganization
 export function useSelectedOrganizationV2({ enabled = true } = {}) {
@@ -19,10 +20,10 @@ export function useSelectedOrganizationV2({ enabled = true } = {}) {
   }, [])
 
   const orgSlug = slug ?? selectedProject?.organization_slug ?? localStorageSlug
-  const { data } = useOrganizationQuery(
-    { slug: orgSlug as string },
-    { enabled: enabled && isLoggedIn && typeof orgSlug === 'string' }
-  )
+  const { data } = useOrganizationQuery({
+    variables: isLoggedIn && typeof orgSlug === 'string' ? { slug: orgSlug } : skipToken,
+    enabled,
+  })
 
   return useMemo(() => {
     return data

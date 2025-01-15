@@ -1,4 +1,5 @@
 import { ChevronDown } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { HTMLAttributes, ReactNode, useState } from 'react'
 
 import { useParams } from 'common'
@@ -51,6 +52,7 @@ const StepLabel = ({
 )
 
 export const DatabaseConnectionString = () => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -103,6 +105,7 @@ export const DatabaseConnectionString = () => {
     sendEvent({
       action: TelemetryActions.CONNECTION_STRING_COPIED,
       properties: { connectionType, lang, connectionMethod },
+      pathname: router.pathname,
     })
   }
 

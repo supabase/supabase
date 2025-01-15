@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { createMutation } from 'react-query-kit'
 import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
+import { getQueryClient } from 'data/query-client'
 import type { ResponseError } from 'types'
-import { notificationKeys } from './keys'
+import { useNotificationsV2Query } from './notifications-v2-query'
 
 export async function archiveAllNotifications() {
   const { data, error } = await patch('/platform/notifications/archive-all', {
@@ -16,24 +17,18 @@ export async function archiveAllNotifications() {
 
 type NotificationsArchiveAllData = Awaited<ReturnType<typeof archiveAllNotifications>>
 
-export const useNotificationsArchiveAllMutation = ({
-  onSuccess,
-  onError,
-  ...options
-}: Omit<UseMutationOptions<NotificationsArchiveAllData, ResponseError>, 'mutationFn'> = {}) => {
-  const queryClient = useQueryClient()
-  return useMutation<NotificationsArchiveAllData, ResponseError>(() => archiveAllNotifications(), {
-    async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries(notificationKeys.list())
-      await onSuccess?.(data, variables, context)
-    },
-    async onError(data, variables, context) {
-      if (onError === undefined) {
-        toast.error(`Failed to archive all notifications: ${data.message}`)
-      } else {
-        onError(data, variables, context)
-      }
-    },
-    ...options,
-  })
-}
+export const useNotificationsArchiveAllMutation = createMutation<
+  NotificationsArchiveAllData,
+  void,
+  ResponseError
+>({
+  mutationFn: archiveAllNotifications,
+  async onSuccess(data, variables, context) {
+    const queryClient = getQueryClient()
+
+    await queryClient.invalidateQueries({ queryKey: useNotificationsV2Query.getKey() })
+  },
+  onError(data) {
+    toast.error(`Failed to archive all notifications: ${data.message}`)
+  },
+})

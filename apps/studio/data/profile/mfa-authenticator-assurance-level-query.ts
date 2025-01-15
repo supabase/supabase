@@ -1,7 +1,7 @@
 import type { AuthMFAGetAuthenticatorAssuranceLevelResponse } from '@supabase/supabase-js'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { createQuery } from 'react-query-kit'
+
 import { auth } from 'lib/gotrue'
-import { profileKeys } from './keys'
 import type { Profile } from './types'
 
 export type ProfileResponse = Profile
@@ -20,22 +20,12 @@ type CustomAuthMFAGetAuthenticatorAssuranceLevelError = NonNullable<
   AuthMFAGetAuthenticatorAssuranceLevelResponse['error']
 >
 
-export const useAuthenticatorAssuranceLevelQuery = <
-  TData = CustomAuthMFAGetAuthenticatorAssuranceLevelData,
->({
-  enabled = true,
-  ...options
-}: UseQueryOptions<
+export const useAuthenticatorAssuranceLevelQuery = createQuery<
   CustomAuthMFAGetAuthenticatorAssuranceLevelData,
-  CustomAuthMFAGetAuthenticatorAssuranceLevelError,
-  TData
-> = {}) => {
-  return useQuery<
-    CustomAuthMFAGetAuthenticatorAssuranceLevelData,
-    CustomAuthMFAGetAuthenticatorAssuranceLevelError,
-    TData
-  >(profileKeys.aaLevel(), () => getMfaAuthenticatorAssuranceLevel(), {
-    staleTime: 1000 * 60 * 30, // default good for 30 mins
-    ...options,
-  })
-}
+  void,
+  CustomAuthMFAGetAuthenticatorAssuranceLevelError
+>({
+  queryKey: ['mfa', 'aaLevel'],
+  fetcher: getMfaAuthenticatorAssuranceLevel,
+  staleTime: 1000 * 60 * 30, // default good for 30 mins
+})

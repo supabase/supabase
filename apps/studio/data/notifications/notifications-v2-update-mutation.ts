@@ -1,8 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { createMutation } from 'react-query-kit'
 import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
+import { getQueryClient } from 'data/query-client'
 import type { ResponseError } from 'types'
+import { useNotificationsV2Query } from './notifications-v2-query'
 
 export type NotificationsUpdateVariables = {
   ids: string[]
@@ -22,30 +24,18 @@ export async function updateNotifications({ ids, status }: NotificationsUpdateVa
 
 type NotificationsUpdateData = Awaited<ReturnType<typeof updateNotifications>>
 
-export const useNotificationsV2UpdateMutation = ({
-  onSuccess,
-  onError,
-  ...options
-}: Omit<
-  UseMutationOptions<NotificationsUpdateData, ResponseError, NotificationsUpdateVariables>,
-  'mutationFn'
-> = {}) => {
-  const queryClient = useQueryClient()
-  return useMutation<NotificationsUpdateData, ResponseError, NotificationsUpdateVariables>(
-    (vars) => updateNotifications(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(['notifications'])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update notifications: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
-}
+export const useNotificationsV2UpdateMutation = createMutation<
+  NotificationsUpdateData,
+  NotificationsUpdateVariables,
+  ResponseError
+>({
+  mutationFn: updateNotifications,
+  async onSuccess(data, variables, context) {
+    const queryClient = getQueryClient()
+
+    await queryClient.invalidateQueries({ queryKey: useNotificationsV2Query.getKey() })
+  },
+  onError(data) {
+    toast.error(`Failed to update notifications: ${data.message}`)
+  },
+})

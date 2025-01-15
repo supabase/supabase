@@ -1,3 +1,4 @@
+import { skipToken } from '@tanstack/react-query'
 import Link from 'next/link'
 import { ReactNode, useMemo } from 'react'
 
@@ -60,14 +61,14 @@ const LayoutHeader = ({
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   const { data: subscription } = useOrgSubscriptionQuery({
-    orgSlug: selectedOrganization?.slug,
+    variables: selectedOrganization ? { orgSlug: selectedOrganization.slug } : skipToken,
   })
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
-  const { data: orgUsage } = useOrgUsageQuery(
-    { orgSlug: selectedOrganization?.slug },
-    { enabled: subscription?.usage_billing_enabled === false }
-  )
+  const { data: orgUsage } = useOrgUsageQuery({
+    variables: selectedOrganization ? { orgSlug: selectedOrganization.slug } : skipToken,
+    enabled: subscription?.usage_billing_enabled === false,
+  })
 
   const exceedingLimits = useMemo(() => {
     if (orgUsage) {

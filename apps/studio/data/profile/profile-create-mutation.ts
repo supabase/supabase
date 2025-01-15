@@ -1,50 +1,36 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { createMutation } from 'react-query-kit'
 import { toast } from 'sonner'
 
-import { organizationKeys } from 'data/organizations/keys'
-import { permissionKeys } from 'data/permissions/keys'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { post } from 'data/fetchers'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { getQueryClient } from 'data/query-client'
 import type { ResponseError } from 'types'
-import { profileKeys } from './keys'
-import type { Profile } from './types'
-
-export type ProfileResponse = Profile
+import { useProfileQuery } from './profile-query'
 
 export async function createProfile() {
-  const response = await post(`${API_URL}/profile`, {})
-  if (response.error) {
-    throw response.error
+  const { data, error } = await post(`/platform/profile`, {})
+  if (error) {
+    throw error
   }
 
-  return response as ProfileResponse
+  return data
 }
 
 type ProfileCreateData = Awaited<ReturnType<typeof createProfile>>
 
-export const useProfileCreateMutation = ({
-  onSuccess,
-  onError,
-  ...options
-}: Omit<UseMutationOptions<ProfileCreateData, ResponseError, void>, 'mutationFn'> = {}) => {
-  const queryClient = useQueryClient()
+export const useProfileCreateMutation = createMutation<ProfileCreateData, void, ResponseError>({
+  mutationFn: createProfile,
+  async onSuccess() {
+    const queryClient = getQueryClient()
 
-  return useMutation<ProfileCreateData, ResponseError, void>(() => createProfile(), {
-    async onSuccess(data, variables, context) {
-      await Promise.all([
-        queryClient.invalidateQueries(profileKeys.profile()),
-        queryClient.invalidateQueries(organizationKeys.list()),
-        queryClient.invalidateQueries(permissionKeys.list()),
-      ])
-      await onSuccess?.(data, variables, context)
-    },
-    async onError(data, variables, context) {
-      if (onError === undefined) {
-        toast.error(`Failed to create profile: ${data.message}`)
-      } else {
-        onError(data, variables, context)
-      }
-    },
-    ...options,
-  })
-}
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: useProfileQuery.getKey() }),
+      queryClient.invalidateQueries({ queryKey: useOrganizationsQuery.getKey() }),
+      queryClient.invalidateQueries({ queryKey: usePermissionsQuery.getKey() }),
+    ])
+  },
+  onError(data) {
+    toast.error(`Failed to create profile: ${data.message}`)
+  },
+})

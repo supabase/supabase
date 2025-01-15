@@ -1,3 +1,4 @@
+import { skipToken } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { MouseEvent, useState } from 'react'
 
@@ -6,12 +7,12 @@ import { getAddons } from 'components/interfaces/Billing/Subscription/Subscripti
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { INSTANCE_MICRO_SPECS } from 'lib/constants'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import ShimmeringLoader from './ShimmeringLoader'
-import { useFlag } from 'hooks/ui/useFlag'
 
 const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {
   return (
@@ -43,12 +44,10 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
   const cpuArchitecture = getCloudProviderArchitecture(project.cloud_provider)
 
   // fetches addons
-  const { data: addons, isLoading: isLoadingAddons } = useProjectAddonsQuery(
-    {
-      projectRef: project.ref,
-    },
-    { enabled: open }
-  )
+  const { data: addons, isLoading: isLoadingAddons } = useProjectAddonsQuery({
+    variables: project.ref ? { projectRef: project.ref } : skipToken,
+    enabled: open,
+  })
   const selectedAddons = addons?.selected_addons ?? []
 
   const { computeInstance } = getAddons(selectedAddons)
@@ -82,10 +81,10 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
   const isHighestCompute =
     project?.infra_compute_size === highestComputeAvailable?.replace('ci_', '')
 
-  const { data, isLoading: isLoadingSubscriptions } = useOrgSubscriptionQuery(
-    { orgSlug: project?.organization_slug },
-    { enabled: open }
-  )
+  const { data, isLoading: isLoadingSubscriptions } = useOrgSubscriptionQuery({
+    variables: project?.organization_slug ? { orgSlug: project.organization_slug } : skipToken,
+    enabled: open,
+  })
 
   const isEligibleForFreeUpgrade =
     data?.plan.id !== 'free' && project?.infra_compute_size === 'nano'

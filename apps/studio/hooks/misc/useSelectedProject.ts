@@ -1,11 +1,16 @@
+import { skipToken } from '@tanstack/react-query'
+import { useMemo } from 'react'
+
 import { useIsLoggedIn, useParams } from 'common'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useMemo } from 'react'
 
 export function useSelectedProject({ enabled = true } = {}) {
-  const { ref } = useParams()
-  const { data } = useProjectDetailQuery({ ref }, { enabled })
+  const { ref: projectRef } = useParams()
+  const { data } = useProjectDetailQuery({
+    variables: projectRef ? { projectRef } : skipToken,
+    enabled,
+  })
 
   return useMemo(
     () => data && { ...data, parentRef: data?.parent_project_ref ?? data?.ref },

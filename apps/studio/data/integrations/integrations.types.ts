@@ -161,7 +161,7 @@ export type IntegrationProjectConnection = {
 }
 
 export type IntegrationsVariables = {
-  orgSlug?: string
+  orgSlug: string
 }
 
 export type IntegrationProjectConnectionPayload = {

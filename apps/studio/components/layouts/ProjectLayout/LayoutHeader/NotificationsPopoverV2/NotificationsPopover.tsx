@@ -53,21 +53,23 @@ const NotificationsPopoverV2 = () => {
     isFetchingNextPage,
     fetchNextPage,
   } = useNotificationsV2Query({
-    status:
-      activeTab === 'archived'
-        ? 'archived'
-        : snap.filterStatuses.includes('unread')
-          ? 'new'
-          : undefined,
-    filters: {
-      priority: snap.filterPriorities,
-      organizations: snap.filterOrganizations,
-      projects: snap.filterProjects,
+    variables: {
+      status:
+        activeTab === 'archived'
+          ? 'archived'
+          : snap.filterStatuses.includes('unread')
+            ? 'new'
+            : undefined,
+      filters: {
+        priority: snap.filterPriorities,
+        organizations: snap.filterOrganizations,
+        projects: snap.filterProjects,
+      },
     },
   })
   const { data: summary } = useNotificationsSummaryQuery()
   const { mutate: updateNotifications } = useNotificationsV2UpdateMutation()
-  const { mutate: archiveAllNotifications, isLoading: isArchiving } =
+  const { mutate: archiveAllNotifications, isPending: isArchiving } =
     useNotificationsArchiveAllMutation({
       onSuccess: () => toast.success('Successfully archived all notifications'),
     })

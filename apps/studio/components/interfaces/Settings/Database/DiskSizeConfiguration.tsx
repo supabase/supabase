@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { skipToken } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
@@ -59,8 +60,12 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   const currentDiskSize = project?.volumeSizeGb ?? 0
 
   const { data } = useDatabaseSizeQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
+    variables: project
+      ? {
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+        }
+      : skipToken,
   })
   const databaseSizeBytesUsed = data ?? 0
 

@@ -1,14 +1,15 @@
-import { useIsLoggedIn } from 'common'
-import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, createContext, useContext, useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 
+import { useIsLoggedIn } from 'common'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
 import type { Profile } from 'data/profile/types'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSendIdentifyMutation } from 'data/telemetry/send-identify-mutation'
 import type { ResponseError } from 'types'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { TelemetryActions } from './constants/telemetry'
 
 export type ProfileContextType = {
@@ -28,13 +29,18 @@ export const ProfileContext = createContext<ProfileContextType>({
 })
 
 export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
+  const router = useRouter()
   const isLoggedIn = useIsLoggedIn()
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: sendIdentify } = useSendIdentifyMutation()
-  const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
+  const { mutate: createProfile, isPending: isCreatingProfile } = useProfileCreateMutation({
     onSuccess: () => {
-      sendEvent({ action: TelemetryActions.SIGN_UP, properties: { category: 'conversion' } })
+      sendEvent({
+        action: TelemetryActions.SIGN_UP,
+        properties: { category: 'conversion' },
+        pathname: router.pathname,
+      })
     },
     onError: () => toast.error('Failed to create your profile. Please refresh to try again.'),
   })
@@ -48,16 +54,20 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     isSuccess,
   } = useProfileQuery({
     enabled: isLoggedIn,
-    onSuccess(profile) {
-      sendIdentify({ user: profile })
-    },
-    onError(err) {
-      // if the user does not yet exist, create a profile for them
-      if (typeof err === 'object' && err !== null && err.message === "User's profile not found") {
-        createProfile()
-      }
-    },
   })
+
+  useEffect(() => {
+    if (isSuccess) {
+      sendIdentify({ user_id: profile.gotrue_id })
+    }
+  }, [isSuccess, profile, sendIdentify])
+
+  useEffect(() => {
+    // if the user does not yet exist, create a profile for them
+    if (isError && error.message === "User's profile not found") {
+      createProfile()
+    }
+  }, [isError, error, createProfile])
 
   const { isInitialLoading: isLoadingPermissions } = usePermissionsQuery({ enabled: isLoggedIn })
 
