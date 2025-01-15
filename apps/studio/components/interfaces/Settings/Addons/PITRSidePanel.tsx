@@ -19,7 +19,6 @@ import { BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -31,6 +30,7 @@ import {
   cn,
 } from 'ui'
 import { ExternalLink, AlertTriangle } from 'lucide-react'
+import { Admonition } from 'ui-patterns'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -272,40 +272,38 @@ const PITRSidePanel = () => {
           {selectedCategory === 'on' && (
             <div className="!mt-8 pb-4">
               {isFreePlan ? (
-                <Alert
-                  withIcon
-                  variant="info"
+                <Admonition
+                  type="default"
                   className="mb-4"
                   title="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
-                  actions={
+                >
+                  Upgrade your plan to change PITR for your project
+                  <div className="mt-2">
                     <Button asChild type="default">
                       <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
                         View available plans
                       </Link>
                     </Button>
-                  }
-                >
-                  Upgrade your plan to change PITR for your project
-                </Alert>
+                  </div>
+                </Admonition>
               ) : subscriptionCompute === undefined ? (
-                <Alert
-                  withIcon
-                  variant="warning"
+                <Admonition
+                  type="default"
                   className="mb-4"
                   title="Your project is required to minimally be on a Small compute size to enable PITR"
-                  actions={[
+                >
+                  This is to ensure that your project has enough resources to execute PITR
+                  successfully
+                  <div className="mt-2">
                     <Button
                       key="change-compute"
                       type="default"
                       onClick={() => setPanel('computeInstance')}
                     >
                       Change compute size
-                    </Button>,
-                  ]}
-                >
-                  This is to ensure that your project has enough resources to execute PITR
-                  successfully
-                </Alert>
+                    </Button>
+                  </div>
+                </Admonition>
               ) : null}
 
               <Radio.Group
