@@ -3,7 +3,7 @@ import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
+import { Button, Checkbox, Input, Listbox } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
@@ -23,6 +23,7 @@ import { generateStrongPassword } from 'lib/project'
 import { AWS_REGIONS } from 'shared-data'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout } from 'types'
+import { Admonition } from 'ui-patterns'
 
 const VercelIntegration: NextPageWithLayout = () => {
   return (
@@ -37,11 +38,11 @@ const VercelIntegration: NextPageWithLayout = () => {
             />
           </header>
           <CreateProject />
-          <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
+          <Admonition type="tip" title="You can uninstall this Integration at any time.">
             <Markdown
               content={`You can remove this integration at any time via Vercel or the Supabase dashboard.`}
             />
-          </Alert>
+          </Admonition>
         </ScaffoldColumn>
       </ScaffoldContainer>
     </>
