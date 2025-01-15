@@ -16,13 +16,13 @@ import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-que
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
-  Alert,
   Button,
   Switch,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const SSLConfiguration = () => {
   const { ref } = useParams()
@@ -97,11 +97,7 @@ const SSLConfiguration = () => {
                     Reject non-SSL connections to your database
                   </p>
                   {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
-                    <Alert
-                      withIcon
-                      variant="warning"
-                      title="SSL enforcement was not updated successfully"
-                    >
+                    <Admonition type="warning" title="SSL enforcement was not updated successfully">
                       Please try updating again, or contact{' '}
                       <Link
                         href="/support/new"
@@ -112,7 +108,7 @@ const SSLConfiguration = () => {
                         support
                       </Link>{' '}
                       if this error persists
-                    </Alert>
+                    </Admonition>
                   )}
                 </div>
               }
