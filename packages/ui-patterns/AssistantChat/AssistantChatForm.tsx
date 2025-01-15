@@ -128,10 +128,4 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
 
 AssistantChatFormComponent.displayName = 'AssistantChatFormComponent'
 
-export const AssistantChatForm = memo(
-  AssistantChatFormComponent,
-  (prevProps, nextProps) =>
-    prevProps.value === nextProps.value &&
-    prevProps.loading === nextProps.loading &&
-    prevProps.placeholder === nextProps.placeholder
-)
+export const AssistantChatForm = memo(AssistantChatFormComponent)
