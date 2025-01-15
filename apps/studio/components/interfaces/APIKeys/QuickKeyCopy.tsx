@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import { Button, EyeIcon, EyeOffIcon, Skeleton, WarningIcon } from 'ui'
 import { ChevronsUpDownIcon } from 'lucide-react'
 import { useParams } from 'common'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { SimpleCodeBlock } from 'ui/src/components/SimpleCodeBlock'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 
 const frameworkOptions = ['React', 'Vue', 'Angular', 'Svelte'] // Add more as needed
 
@@ -45,7 +45,7 @@ const QuickKeyCopyContent = ({ selectedFramework }: { selectedFramework: string 
     data: projectAPI,
     isLoading: isProjectApiLoading,
     error: projectApiError,
-  } = useProjectApiQuery({
+  } = useProjectSettingsV2Query({
     projectRef: projectRef as string,
   })
   const {
@@ -114,7 +114,7 @@ const QuickKeyCopyContent = ({ selectedFramework }: { selectedFramework: string 
 
   const getEnvContent = () => {
     return `
-NEXT_PUBLIC_SUPABASE_URL=${projectAPI?.autoApiService.endpoint || ''}
+NEXT_PUBLIC_SUPABASE_URL=${projectAPI?.app_config?.endpoint || ''}
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_API_KEY=${!canReadAPIKeys ? 'You do not have permission to read the Publishable API key' : publishableApiKey || ''}
 `
   }
