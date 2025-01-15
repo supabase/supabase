@@ -16,18 +16,16 @@ export const buildHttpRequestCommand = (
   body: string | undefined,
   timeout: number
 ) => {
-  return `$$
-    select
-      net.${method === 'GET' ? 'http_get' : 'http_post'}(
-          url:='${url}',
-          headers:=jsonb_build_object(${headers
-            .filter((v) => v.name && v.value)
-            .map((v) => `'${v.name}', '${v.value}'`)
-            .join(', ')}),
-          ${method === 'POST' && body ? `body:='${body}',` : ''}
-          timeout_milliseconds:=${timeout}
-      );
-    $$`
+  return `
+select
+  net.${method === 'GET' ? 'http_get' : 'http_post'}(
+      url:='${url}',
+      headers:=jsonb_build_object(${headers
+        .filter((v) => v.name && v.value)
+        .map((v) => `'${v.name}', '${v.value}'`)
+        .join(', ')}), ${method === 'POST' && body ? `\n      body:='${body}',` : ''}
+      timeout_milliseconds:=${timeout}
+  );`
 }
 
 const DEFAULT_CRONJOB_COMMAND = {
@@ -94,6 +92,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
         httpHeaders: headersObjs,
         httpBody: body,
         timeoutMs: +timeout ?? 1000,
+        snippet: originalCommand,
       }
     }
 
@@ -104,6 +103,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
       httpHeaders: headersObjs,
       httpBody: body,
       timeoutMs: +timeout ?? 1000,
+      snippet: originalCommand,
     }
   }
 
@@ -118,6 +118,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
       type: 'sql_function',
       schema: schemaName,
       functionName: functionName,
+      snippet: originalCommand,
     }
   }
 

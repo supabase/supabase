@@ -26,6 +26,7 @@ describe('parseCronJobCommand', () => {
       type: 'sql_function',
       schema: 'auth',
       functionName: 'jwt',
+      snippet: command,
     })
   })
 
@@ -38,6 +39,7 @@ describe('parseCronJobCommand', () => {
       httpBody: '',
       timeoutMs: 5000,
       type: 'edge_function',
+      snippet: command,
     })
   })
 
@@ -50,6 +52,7 @@ describe('parseCronJobCommand', () => {
       httpBody: '',
       timeoutMs: 5000,
       type: 'http_request',
+      snippet: command,
     })
   })
 
@@ -62,6 +65,7 @@ describe('parseCronJobCommand', () => {
       httpBody: 'hello',
       timeoutMs: 5000,
       type: 'http_request',
+      snippet: command,
     })
   })
 
@@ -77,6 +81,7 @@ describe('parseCronJobCommand', () => {
       httpBody: '',
       timeoutMs: 1000,
       type: 'http_request',
+      snippet: command,
     })
   })
 
@@ -89,6 +94,7 @@ describe('parseCronJobCommand', () => {
       httpBody: '',
       timeoutMs: 5000,
       type: 'http_request',
+      snippet: command,
     })
   })
 
@@ -101,6 +107,7 @@ describe('parseCronJobCommand', () => {
       httpBody: '{"key": "value"}',
       timeoutMs: 5000,
       type: 'http_request',
+      snippet: command,
     })
   })
 
@@ -116,6 +123,7 @@ describe('parseCronJobCommand', () => {
       httpBody: '{"key": "value"}',
       timeoutMs: 5000,
       type: 'http_request',
+      snippet: command,
     })
   })
 
@@ -131,6 +139,7 @@ describe('parseCronJobCommand', () => {
       httpBody: '{"key": "value"}',
       timeoutMs: 5000,
       type: 'http_request',
+      snippet: command,
     })
   })
 
