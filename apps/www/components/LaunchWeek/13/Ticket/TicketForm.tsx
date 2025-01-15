@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { SupabaseClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
-import { SITE_ORIGIN } from '~/lib/constants'
+import { LW_URL } from '~/lib/constants'
 import { Button } from 'ui'
 import { useKey } from 'react-use'
 
@@ -126,9 +126,7 @@ export default function TicketForm() {
     setFormState('loading')
     setTicketState('loading')
 
-    const redirectTo = `${SITE_ORIGIN}/launch-week/${
-      userData.username ? '?referral=' + userData.username : ''
-    }`
+    const redirectTo = `${LW_URL}${userData.username ? '?referral=' + userData.username : ''}`
 
     supabase?.auth.signInWithOAuth({
       provider: 'github',

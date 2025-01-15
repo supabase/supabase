@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Error from 'next/error'
 import { createClient, Session } from '@supabase/supabase-js'
 import { Button } from 'ui'
-import { SITE_URL, LW_URL } from '~/lib/constants'
+import { LW_URL } from '~/lib/constants'
 import supabase from '~/lib/supabase'
 import { Database } from '~/lib/database.types'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
@@ -32,7 +32,6 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
   const DISPLAY_NAME = name || username
   const TITLE = `${DISPLAY_NAME ? DISPLAY_NAME.split(' ')[0] + '’s' : 'Get your'} Launch Week Ticket`
   const DESCRIPTION = `Claim your Supabase Launch Week 13 ticket for a chance to win supa swag.`
-  const PAGE_URL = `${LW_URL}/tickets/${username}`
 
   const [session] = useState<Session | null>(null)
   const [ticketState, setTicketState] = useState<TicketState>('ticket')
@@ -53,7 +52,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: PAGE_URL,
+          url: `${LW_URL}/tickets/${username}`,
           images: [
             {
               url: ogImageUrl,
@@ -99,7 +98,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                       <div>
                         <Button type="primary" asChild size="small">
                           <Link
-                            href={`${SITE_URL}${username ? '?referral=' + username : ''}`}
+                            href={`${LW_URL}${username ? '?referral=' + username : ''}`}
                             className="pointer-events-auto"
                           >
                             Claim your ticket
