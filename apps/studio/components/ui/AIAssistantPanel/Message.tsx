@@ -12,7 +12,14 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Components } from 'react-markdown/lib/ast-to-react'
 
-import { AiIconAnimation, cn, CodeBlock, markdownComponents, WarningIcon } from 'ui'
+import {
+  AiIconAnimation,
+  cn,
+  CodeBlock,
+  markdownComponents,
+  WarningIcon,
+  type CodeBlockLang,
+} from 'ui'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { DebouncedComponent } from '../DebouncedComponent'
@@ -59,7 +66,15 @@ const MemoizedQueryBlock = memo(
     isLoading: boolean
     runQuery: boolean
   }) => (
-    <DebouncedComponent delay={500} value={sql}>
+    <DebouncedComponent
+      delay={500}
+      value={sql}
+      fallback={
+        <div className="bg-surface-100 border-overlay rounded border shadow-sm px-3 py-2 text-xs">
+          Writing SQL...
+        </div>
+      }
+    >
       <QueryBlock
         lockColumns
         label={title}
@@ -79,16 +94,7 @@ const MemoizedQueryBlock = memo(
 )
 MemoizedQueryBlock.displayName = 'MemoizedQueryBlock'
 
-interface PreProps {
-  children: {
-    props: {
-      className?: string
-      children: string | string[]
-    }
-  }[]
-}
-
-const MarkdownPre = ({ children }: PreProps) => {
+const MarkdownPre = ({ children }: any) => {
   const { isLoading, readOnly } = useContext(MessageContext)
 
   const language = children[0].props.className?.replace('language-', '') || 'sql'
@@ -126,8 +132,8 @@ const MarkdownPre = ({ children }: PreProps) => {
       ) : (
         <CodeBlock
           hideLineNumbers
-          value={children[0].props.children}
-          language={language}
+          value={children[0].props.children[0]}
+          language={language as CodeBlockLang}
           className={cn(
             'max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
