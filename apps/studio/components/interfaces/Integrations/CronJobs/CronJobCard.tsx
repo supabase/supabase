@@ -189,8 +189,8 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                     value={job.command.trim()}
                     language="sql"
                     className={cn(
-                      'py-0 px-3.5 max-w-full prose dark:prose-dark',
-                      '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
+                      'py-2 px-3.5 max-w-full prose dark:prose-dark',
+                      '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap min-h-11'
                     )}
                   />
                 </div>
