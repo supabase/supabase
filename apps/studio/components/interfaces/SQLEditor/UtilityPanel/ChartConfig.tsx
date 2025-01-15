@@ -89,12 +89,6 @@ export const ChartConfig = ({
   }
 
   const xKeyDateFormat = getDateFormat(config.xKey)
-  const areAllXValuesNumerical = results.rows
-    .map((x) => x[config.xKey])
-    .some((x) => typeof x !== 'number')
-  const areAllYValuesNumerical = results.rows
-    .map((y) => y[config.yKey])
-    .some((y) => typeof y !== 'number')
 
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-grow h-full">
@@ -137,7 +131,7 @@ export const ChartConfig = ({
       >
         <div className="flex justify-between items-center h-5">
           <h2 className="text-sm text-foreground-lighter">Chart options</h2>
-          {config.xKey && config.yKey && areAllXValuesNumerical && areAllYValuesNumerical && (
+          {config.xKey && config.yKey && (
             <Button
               type="text"
               onClick={() => {
