@@ -1,19 +1,19 @@
 ---
 id: 'function-wasm'
-title: 'Using WASM modules'
+title: 'Using Wasm modules'
 description: 'How to use WebAssembly in Edge Functions.'
 subtitle: 'How to use WebAssembly in Edge Functions.'
 ---
 
 Edge Functions supports running [WebAssembly](https://developer.mozilla.org/en-US/docs/WebAssembly) modules. WebAssembly is useful if you want to optimize code that's slower to run in JavaScript or require low-level manipulation.
 
-It also gives you the option to port existing libraries written in other languages to be used with JavaScript. For example, [MagickWasm](https://supabase.com/docs/guides/functions/examples/image-manipulation), which does image manipulation and transforms, is a port of an existing C library to WebAssembly (WASM).
+It also gives you the option to port existing libraries written in other languages to be used with JavaScript. For example, [MagickWasm](https://supabase.com/docs/guides/functions/examples/image-manipulation), which does image manipulation and transforms, is a port of an existing C library to WebAssembly (Wasm).
 
-### Writing a WASM module
+### Writing a Wasm module
 
-You can use different languages and SDKs to write WASM modules. For this tutorial, we will write a simple WASM module in Rust that adds two numbers.
+You can use different languages and SDKs to write Wasm modules. For this tutorial, we will write a simple Wasm module in Rust that adds two numbers.
 
-Follow this [MDN guide on writing WASM modules in Rust](https://developer.mozilla.org/en-US/docs/WebAssembly/Rust_to_Wasm) to setup your dev environment.
+Follow this [guide on writing Wasm modules in Rust](https://developer.mozilla.org/en-US/docs/WebAssembly/Rust_to_Wasm) to setup your dev environment.
 
 Create a new Edge Function called `wasm-add`.
 
@@ -21,7 +21,7 @@ Create a new Edge Function called `wasm-add`.
 supabase functions new wasm-add
 ```
 
-Create a new Cargo project for the WASM module inside the function's directory:
+Create a new Cargo project for the Wasm module inside the function's directory:
 
 ```bash
 cd supabase/functions/wasm-add
@@ -50,11 +50,11 @@ After that we can build the package, by running:
 wasm-pack build --target deno
 ```
 
-This will produce a WASM binary file inside `add-wasm/pkg` directory.
+This will produce a Wasm binary file inside `add-wasm/pkg` directory.
 
-### Calling the WASM module from the Edge Function
+### Calling the Wasm module from the Edge Function
 
-Now let's update the Edge Function to call `add` from the WASM module.
+Now let's update the Edge Function to call `add` from the Wasm module.
 
 <$CodeSample
 path="edge-functions/supabase/functions/wasm-modules/index.ts"
@@ -63,13 +63,13 @@ meta="index.ts"
 />
 
 <Admonition type="info">
-  Supabase Edge Functions currently use Deno 1.46. From [Deno 2.1, importing WASM
+  Supabase Edge Functions currently use Deno 1.46. From [Deno 2.1, importing Wasm
   modules](https://deno.com/blog/v2.1) will require even less boilerplate code.
 </Admonition>
 
 ### Bundle and deploy the Edge Function
 
-Before deploying the Edge Function, we need to ensure it bundles the WASM module with it. We can do this by defining it in the `static_files` for the function in `superbase/config.toml`.
+Before deploying the Edge Function, we need to ensure it bundles the Wasm module with it. We can do this by defining it in the `static_files` for the function in `superbase/config.toml`.
 
 <Admonition type="info">
   You will need update Supabase CLI to 2.7.0 or higher for the `static_files` support.
