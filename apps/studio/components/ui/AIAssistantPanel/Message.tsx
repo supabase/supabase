@@ -5,9 +5,17 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
 import { AiIconAnimation, cn, CodeBlock, markdownComponents, WarningIcon } from 'ui'
+import { QueryBlock } from '../QueryBlock/QueryBlock'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
-import { SqlSnippet } from './SqlSnippet'
 import { DebouncedComponent } from '../DebouncedComponent'
+
+type AssistantSnippetProps = {
+  title: string
+  runQuery: 'true' | 'false'
+  isChart?: 'true' | 'false'
+  xAxis?: string
+  yAxis?: string
+}
 
 const MemoizedPreComponent = memo(
   function MemoizedPreComponent({
@@ -22,24 +30,18 @@ const MemoizedPreComponent = memo(
     const language = props.children[0].props.className?.replace('language-', '') || 'sql'
     const codeContent = props.children[0].props.children
 
-    const debouncedElement = useMemo(
-      () => (
-        <DebouncedComponent
-          value={codeContent[0]}
-          delay={500}
-          fallback={
-            <div className="overflow-hidden rounded border w-auto bg-surface-100 p-2 px-3">
-              Writing SQL...
-            </div>
-          }
-        >
-          <SqlSnippet sql={codeContent} readOnly={readOnly} isLoading={isLoading} />
-        </DebouncedComponent>
-      ),
-      [codeContent, readOnly, isLoading]
-    )
-
     if (language === 'sql') {
+      const rawSql = codeContent
+      const formatted = (rawSql || [''])[0]
+      const propsMatch = formatted.match(/--\s*props:\s*(\{[^}]+\})/)
+
+      const snippetProps: AssistantSnippetProps = propsMatch ? JSON.parse(propsMatch[1]) : {}
+      const { xAxis, yAxis } = snippetProps
+      const title = snippetProps.title || 'SQL Query'
+      const isChart = snippetProps.isChart === 'true'
+      const runQuery = snippetProps.runQuery === 'true'
+      const sql = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
+
       return readOnly ? (
         <CollapsibleCodeBlock
           value={props.children[0].props.children[0]}
@@ -47,7 +49,30 @@ const MemoizedPreComponent = memo(
           hideLineNumbers
         />
       ) : (
-        debouncedElement
+        <DebouncedComponent
+          value={sql}
+          delay={500}
+          fallback={
+            <div className="overflow-hidden rounded border w-auto bg-surface-100 p-2 px-3">
+              Writing SQL...
+            </div>
+          }
+        >
+          <QueryBlock
+            lockColumns
+            label={title}
+            sql={sql}
+            chartConfig={{
+              type: 'bar',
+              cumulative: false,
+              xKey: xAxis ?? '',
+              yKey: yAxis ?? '',
+            }}
+            isChart={isChart}
+            isLoading={isLoading}
+            runQuery={runQuery}
+          />
+        </DebouncedComponent>
       )
     }
 
@@ -86,7 +111,9 @@ const MemoizedMarkdown = memo(
     const components = useMemo(
       () => ({
         ...markdownComponents,
-        pre: (props: any) => <MemoizedPreComponent props={props} readOnly={readOnly} />,
+        pre: (props: any) => (
+          <MemoizedPreComponent props={props} readOnly={readOnly} isLoading={isLoading} />
+        ),
         ol: (props: any) => <ol className="flex flex-col gap-y-4">{props.children}</ol>,
         li: (props: any) => <li className="[&>pre]:mt-2">{props.children}</li>,
         h3: (props: any) => <h3 className="underline">{props.children}</h3>,
@@ -104,7 +131,7 @@ const MemoizedMarkdown = memo(
           </a>
         ),
       }),
-      []
+      [readOnly, isLoading]
     )
 
     return (
@@ -128,7 +155,6 @@ const MemoizedMarkdown = memo(
 MemoizedMarkdown.displayName = 'MemoizedMarkdown'
 
 interface MessageProps {
-  id: string
   role: 'function' | 'system' | 'user' | 'assistant' | 'data' | 'tool'
   content?: string
   isLoading: boolean
@@ -177,9 +203,7 @@ export const Message = memo(
     )
   },
   (prevProps, nextProps) => {
-    // Custom comparison function for memo
     return (
-      prevProps.id === nextProps.id &&
       prevProps.role === nextProps.role &&
       prevProps.content === nextProps.content &&
       prevProps.isLoading === nextProps.isLoading &&
