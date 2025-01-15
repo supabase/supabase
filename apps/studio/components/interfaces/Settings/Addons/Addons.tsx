@@ -37,7 +37,7 @@ import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
-import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
@@ -45,6 +45,7 @@ import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
 import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Admonition } from 'ui-patterns'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -272,10 +273,9 @@ const Addons = () => {
                     )}
 
                     {Number(mostRecentRemainingIOBudget?.disk_io_budget) === 0 ? (
-                      <Alert
-                        withIcon
+                      <Admonition
                         className="mt-4"
-                        variant="danger"
+                        type="danger"
                         title="Your disk IO budget has run out for today"
                       >
                         <p>
@@ -287,12 +287,11 @@ const Addons = () => {
                           Consider upgrading to a larger compute instance for a higher baseline
                           throughput.
                         </p>
-                      </Alert>
+                      </Admonition>
                     ) : Number(mostRecentRemainingIOBudget?.disk_io_budget) <= 10 ? (
-                      <Alert
-                        withIcon
+                      <Admonition
                         className="mt-4"
-                        variant="warning"
+                        type="warning"
                         title="Your disk IO budget is running out for today"
                       >
                         <p>
@@ -305,7 +304,7 @@ const Addons = () => {
                           Consider upgrading to a larger compute instance for a higher baseline
                           throughput.
                         </p>
-                      </Alert>
+                      </Admonition>
                     ) : null}
                     <div className="mt-2 w-full flex items-center justify-between border-b py-2">
                       <Link href={`/project/${projectRef}/settings/infrastructure#ram`}>
