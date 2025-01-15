@@ -51,7 +51,12 @@ type ChartConfigProps = {
   config: ChartConfig
   onConfigChange: (config: ChartConfig) => void
 }
-export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: ChartConfigProps) {
+
+export const ChartConfig = ({
+  results = { rows: [] },
+  config,
+  onConfigChange,
+}: ChartConfigProps) => {
   // If a result key is not valid, it will be filtered out
   const resultKeys = useMemo(() => {
     return Object.keys(results.rows[0] || {}).filter((key) => {
@@ -84,6 +89,12 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
   }
 
   const xKeyDateFormat = getDateFormat(config.xKey)
+  const areAllXValuesNumerical = results.rows
+    .map((x) => x[config.xKey])
+    .some((x) => typeof x !== 'number')
+  const areAllYValuesNumerical = results.rows
+    .map((y) => y[config.yKey])
+    .some((y) => typeof y !== 'number')
 
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-grow h-full">
@@ -126,7 +137,7 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
       >
         <div className="flex justify-between items-center h-5">
           <h2 className="text-sm text-foreground-lighter">Chart options</h2>
-          {config.xKey && config.yKey && (
+          {config.xKey && config.yKey && areAllXValuesNumerical && areAllYValuesNumerical && (
             <Button
               type="text"
               onClick={() => {
