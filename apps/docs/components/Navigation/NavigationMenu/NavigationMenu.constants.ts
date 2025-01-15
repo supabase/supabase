@@ -1360,7 +1360,7 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/ai-models',
         },
         {
-          name: 'WASM modules',
+          name: 'Wasm modules',
           url: '/guides/functions/wasm',
         },
         {
