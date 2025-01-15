@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Error from 'next/error'
 import { createClient, Session } from '@supabase/supabase-js'
 import { Button } from 'ui'
-import { LW_URL } from '~/lib/constants'
+import { LW_URL, SITE_ORIGIN } from '~/lib/constants'
 import supabase from '~/lib/supabase'
 import { Database } from '~/lib/database.types'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
@@ -136,7 +136,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   // fetch the normal ticket
   // stores the og images in supabase storage
-  fetch(`/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`)
+  fetch(`${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`)
 
   // fetch a specific user
   if (username) {
@@ -153,10 +153,14 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // fetch the platinum ticket
   // stores the og images in supabase storage
   if (user?.secret) {
-    fetch(`/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&secret=true`)
+    fetch(
+      `${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&secret=true`
+    )
   } else if (user?.platinum) {
     // fetch /api-v2/ticket-og
-    fetch(`/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&platinum=true`)
+    fetch(
+      `${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&platinum=true`
+    )
   }
 
   const ticketType = user?.secret ? 'secret' : user?.platinum ? 'platinum' : 'regular'
