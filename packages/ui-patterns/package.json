@@ -34,6 +34,7 @@
     "react-tooltip": "*",
     "react-use": "^17.5.0",
     "reactflow": "*",
+    "recharts": "^2.8.0",
     "remark-gfm": "^4.0.0",
     "sonner": "^1.5.0",
     "sql-formatter": "^15.3.1",
@@ -44,7 +45,6 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@supabase/auth-helpers-react": "^0.4.2",
     "@testing-library/dom": "^10.1.0",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",

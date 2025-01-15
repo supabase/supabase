@@ -4,9 +4,9 @@
 # Can also specify a regex that is compatible with the [Rust regex crate](https://docs.rs/regex/latest/regex/).
 may_uppercase = [
     "[A-Z0-9]{2,5}s?",
+    "APIs",
     "Add-ons?",
     "Amazon RDS",
-    "APIs",
     "Analytics",
     "Android",
     "Angular",
@@ -166,6 +166,7 @@ may_uppercase = [
     "Storage",
     "Studio",
     "Supabase",
+    "Supabase AI Assistant",
     "Supabase Marketplace",
     "Supavisor('s)?",
     "Svelte",
