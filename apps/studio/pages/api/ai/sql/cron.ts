@@ -5,7 +5,6 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import OpenAI from 'openai'
 
 const openAiKey = process.env.OPENAI_API_KEY
-const openai = new OpenAI({ apiKey: openAiKey })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!openAiKey) {
@@ -26,6 +25,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  const openai = new OpenAI({ apiKey: openAiKey })
   const {
     body: { prompt },
   } = req

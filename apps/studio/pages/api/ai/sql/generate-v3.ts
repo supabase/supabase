@@ -4,7 +4,7 @@ import { streamText } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import { getTools } from './tools'
+import { getTools } from 'lib/api/aiTools'
 
 export const maxDuration = 30
 const openAiKey = process.env.OPENAI_API_KEY
