@@ -15,7 +15,6 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -25,6 +24,7 @@ import {
   cn,
 } from 'ui'
 import { ExternalLink, AlertCircle, AlertTriangle } from 'lucide-react'
+import { Admonition } from 'ui-patterns'
 
 const CustomDomainSidePanel = () => {
   const { ref: projectRef } = useParams()
@@ -223,20 +223,16 @@ const CustomDomainSidePanel = () => {
           )}
 
           {isFreePlan && (
-            <Alert
-              withIcon
-              variant="info"
-              title="Custom domains are unavailable on the Free Plan"
-              actions={
+            <Admonition type="default" title="Custom domains are unavailable on the Free Plan">
+              Upgrade your plan to add a custom domain to your project
+              <div className="mt-2">
                 <Button asChild type="default">
                   <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
                     View available plans
                   </Link>
                 </Button>
-              }
-            >
-              Upgrade your plan to add a custom domain to your project
-            </Alert>
+              </div>
+            </Admonition>
           )}
         </div>
       </SidePanel.Content>
