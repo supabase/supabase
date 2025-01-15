@@ -51,9 +51,7 @@ export const useContentCountQuery = <TData = ContentIdData>(
     }),
     ({ signal }) => getContentCount({ projectRef, type, visibility, favorite, name }, signal),
     {
-      // count query is causing an api issue  — disabling temporarily
-      //enabled: enabled && typeof projectRef !== 'undefined',
-      enabled: false,
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
