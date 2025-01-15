@@ -65,13 +65,28 @@ export const ChartConfig = ({
     })
   }, [results])
 
+  // Only allow Y-axis keys that are numbers
+  const yAxisKeys = useMemo(() => {
+    if (!results.rows[0]) return []
+    return Object.keys(results.rows[0]).filter((key) => {
+      const value = results.rows[0][key]
+      return typeof value === 'number' || !isNaN(Number(value))
+    })
+  }, [results])
+
   const hasResults = results.rows.length > 0
   const hasConfig = config.xKey && config.yKey
 
   // Compute cumulative results only if necessary
   const cumulativeResults = useMemo(() => getCumulativeResults(results, config), [results, config])
 
-  const resultToRender = config.cumulative ? cumulativeResults : results.rows
+  const filteredResults = results.rows.filter((row) => {
+    // Filter out rows with invalid Y values
+    const yValue = Number(row[config.yKey])
+    return !isNaN(yValue) && yValue !== null && yValue !== undefined
+  })
+
+  const resultToRender = config.cumulative ? cumulativeResults : filteredResults
 
   if (!resultKeys.length) {
     return (
@@ -85,7 +100,7 @@ export const ChartConfig = ({
   }
 
   const getDateFormat = (key: any) => {
-    const value = resultToRender[0][key]
+    const value = resultToRender?.[0]?.[key] || ''
     if (typeof value === 'number') return 'number'
     if (dayjs(value).isValid()) return 'date'
     return 'string'
@@ -126,7 +141,7 @@ export const ChartConfig = ({
             tickFormatter: (idx: string) => {
               const value = resultToRender[+idx][config.xKey]
               if (xKeyDateFormat === 'date') {
-                return dayjs(value).format('MMM D YYYY')
+                return dayjs(value).format('MMM D YYYY HH:mm')
               }
               return value
             },
@@ -202,7 +217,7 @@ export const ChartConfig = ({
             <SelectTrigger_Shadcn_>{config.yKey || 'Select Y Axis'}</SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_>
               <SelectGroup_Shadcn_>
-                {resultKeys.map((key) => (
+                {yAxisKeys.map((key) => (
                   <SelectItem_Shadcn_ value={key} key={key}>
                     {key}
                   </SelectItem_Shadcn_>
