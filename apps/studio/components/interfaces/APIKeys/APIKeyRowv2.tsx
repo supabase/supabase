@@ -7,6 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   TableCell,
   TableRow,
@@ -25,42 +26,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useAPIKeyIdQuery } from 'data/api-keys/[id]/api-key-query'
+import { useAPIKeyIdQuery } from 'data/api-keys/[id]/api-key-id-query'
 import { QueryClient, useQueryClient } from '@tanstack/react-query'
 import { apiKeysKeys } from 'data/api-keys/keys'
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { toast } from 'sonner'
+import APIKeyDeleteDialog from './APIKeyDeleteDialog'
 
 const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
-  const { ref: projectRef } = useParams()
   const isSecret = apiKey.type === 'secret'
-  const [shown, setShown] = useState(!isSecret)
-  const [deleteDialogOpen, setDeleteDialogOpenState] = useState(false)
-
-  // const hiddenKey = useMemo(
-  //   () =>
-  //     apiKey.prefix +
-  //     Array.from({ length: apiKey.api_key.length - apiKey.prefix.length }, () => '•').join(''),
-  //   [apiKey.api_key, apiKey.prefix]
-  // )
-
-  const canDeleteAPIKeys = true // todo
-
-  const { mutate: deleteAPIKey, isLoading: isDeletingAPIKey } = useAPIKeyDeleteMutation()
-
-  const onDeleteAPIKeySubmit = () => {
-    deleteAPIKey(
-      {
-        projectRef,
-        id: apiKey.id as string,
-      },
-      {
-        onSuccess: () => {
-          setDeleteDialogOpenState(false)
-        },
-      }
-    )
-  }
 
   const MotionTableRow = motion(TableRow)
 
@@ -97,7 +71,7 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="max-w-40" align="end">
-            <Tooltip_Shadcn_>
+            {/* <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
                   className="flex gap-2 !pointer-events-auto"
@@ -120,27 +94,12 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
                   You need additional permissions to delete API keys
                 </TooltipContent>
               )}
-            </Tooltip_Shadcn_>
+            </Tooltip_Shadcn_> */}
+            <APIKeyDeleteDialog apiKey={apiKey} />
+            <DropdownMenuSeparator />
+            <APIKeyDeleteDialog apiKey={apiKey} />
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <ConfirmationModal
-          open={deleteDialogOpen}
-          onCancel={() => setDeleteDialogOpenState(!deleteDialogOpen)}
-          variant={'destructive'}
-          visible={true}
-          title={`Delete ${apiKey.description} API key`}
-          description="Are you sure you want to delete this API key?"
-          confirmLabel="Delete key"
-          onConfirm={() => {
-            onDeleteAPIKeySubmit()
-          }}
-          loading={isDeletingAPIKey}
-          alert={{
-            title: 'API secrets cannot be recovered',
-            // description: 'Make sure you are no longer using this secret API key before deleting.',
-          }}
-        />
       </TableCell>
     </MotionTableRow>
   )
@@ -179,17 +138,23 @@ function Input({ apiKey }: { apiKey: APIKeysData[0] }) {
         queryKey: apiKeysKeys.single(projectRef, apiKey.id as string),
         exact: true,
       })
-    }, 2000) // Destroy query after 2 seconds
+    }, 10000) // Destroy query after 10 seconds
   }
 
   async function onCopy() {
+    // if ID already exists from a reveal action, return that
     // @ts-expect-error / TODO: fix type error
     if (data?.api_key) return data?.api_key
 
     try {
+      // fetch ID and then destroy query immediately
       const result = await refetchApiKey()
-      // @ts-expect-error / TODO: fix type error
-      if (result?.data?.api_key) return result.data.api_key
+      queryClient.removeQueries({
+        queryKey: apiKeysKeys.single(projectRef, apiKey.id as string),
+        exact: true,
+      })
+
+      if (result.isSuccess) return result.data.api_key
 
       if (error) {
         toast.error('Failed to copy secret API key')
@@ -208,23 +173,27 @@ function Input({ apiKey }: { apiKey: APIKeysData[0] }) {
       <div
         className={cn(
           InputVariants({ size: 'tiny' }),
-          'flex-1 grow gap-0 font-mono !rounded-full max-w-60 overflow-hidden'
+          'flex-1 grow gap-0 font-mono rounded-full max-w-60 overflow-hidden',
+          show ? 'ring-1 ring-foreground-lighter ring-opacity-50' : 'ring-0 ring-opacity-0',
+          'transition-all'
         )}
       >
-        <span>sb_secret_</span>
         <AnimatePresence mode="wait" initial={false}>
           <motion.span
             key={show ? 'shown' : 'hidden'}
-            initial={{ opacity: 0, y: show ? 16 : -8 }}
+            initial={{ opacity: 0, y: show ? 16 : -16 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: show ? 16 : -8 }}
-            transition={{ duration: 0.12, easings: 'easeIn' }}
+            exit={{ opacity: 0, y: show ? 16 : -16 }}
+            transition={{
+              duration: 0.12,
+              y: { type: 'spring', stiffness: 2450, damping: 55 },
+            }}
             className="truncate"
           >
             {show
               ? // @ts-expect-error / TODO: fix type error
-                data?.api_key?.replace('sb_secret_', '')
-              : apiKey?.api_key.replace('sb_secret_', '')}
+                data?.api_key
+              : apiKey?.api_key}
           </motion.span>
         </AnimatePresence>
       </div>
