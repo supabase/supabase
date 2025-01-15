@@ -1,16 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { FilePlus, FolderPlus, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { getAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -27,7 +25,6 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { SqlEditorMenuStaticLinks } from './sql-editor-menu-static-links'
 import { SQLEditorNav as SQLEditorNavV2 } from './SQLEditorNavV2/SQLEditorNav'
-import { getAppStateSnapshot } from 'state/app-state'
 
 export const SQLEditorMenu = () => {
   const router = useRouter()
@@ -37,6 +34,8 @@ export const SQLEditorMenu = () => {
 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const [searchText, setSearchText] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
+  const [sort, setSort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
 
   const appState = getAppStateSnapshot()
 
@@ -46,11 +45,8 @@ export const SQLEditorMenu = () => {
   })
 
   const createNewFolder = () => {
-    // [Joshen] LEFT OFF: We need to figure out a good UX for creating folders
-    // - Modal? Directly chuck into the tree view like storage explorer?
     if (!ref) return console.error('Project ref is required')
     snapV2.addNewFolder({ projectRef: ref })
-    // createFolder({ projectRef: ref, name: 'test' })
   }
 
   const handleNewQuery = async () => {
@@ -60,17 +56,8 @@ export const SQLEditorMenu = () => {
     if (!canCreateSQLSnippet) {
       return toast('Your queries will not be saved as you do not have sufficient permissions')
     }
-
     try {
-      const snippet = createSqlSnippetSkeletonV2({
-        id: uuidv4(),
-        name: untitledSnippetTitle,
-        owner_id: profile.id,
-        project_id: project.id,
-        sql: '',
-      })
-      snapV2.addSnippet({ projectRef: ref, snippet })
-      router.push(`/project/${ref}/sql/${snippet.id}`)
+      router.push(`/project/${ref}/sql/new?skip=true`)
       setSearchText('')
     } catch (error: any) {
       toast.error(`Failed to create new query: ${error.message}`)
@@ -90,10 +77,11 @@ export const SQLEditorMenu = () => {
               aria-labelledby="Search queries"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
+              isLoading={isSearching}
             >
               <InnerSideBarFilterSortDropdown
-                value={snapV2.order}
-                onValueChange={(value: any) => snapV2.setOrder(value)}
+                value={sort}
+                onValueChange={(value: any) => setSort(value)}
               >
                 <InnerSideBarFilterSortDropdownItem key="name" value="name">
                   Alphabetical
@@ -127,7 +115,7 @@ export const SQLEditorMenu = () => {
 
         <SqlEditorMenuStaticLinks />
 
-        <SQLEditorNavV2 searchText={searchText} />
+        <SQLEditorNavV2 searchText={searchText} sort={sort} setIsSearching={setIsSearching} />
       </div>
 
       <div className="p-4 border-t sticky bottom-0 bg-studio">

@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { ChevronRight, ExternalLink, Loader2, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
@@ -40,6 +39,7 @@ import {
   Switch,
   TextArea_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import { DocsLinkGroup } from './DocsLink'
@@ -53,7 +53,6 @@ import {
   SEVERITY_OPTIONS,
 } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
-import { Admonition } from 'ui-patterns'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -68,7 +67,6 @@ interface SupportFormV2Props {
 // This is a rewrite of the old SupportForm to use the new form components
 export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFormV2Props) => {
   const { profile } = useProfile()
-  const supabaseClient = useSupabaseClient()
   const {
     ref,
     slug,
@@ -127,11 +125,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
 
   const { organizationSlug, projectRef, category, severity, subject, library } = form.watch()
 
-  const {
-    handleDocsSearchDebounced,
-    searchState,
-    searchState: state,
-  } = useDocsSearch(supabaseClient)
+  const { handleDocsSearchDebounced, searchState, searchState: state } = useDocsSearch()
 
   const {
     data: organizations,

@@ -11,7 +11,8 @@ import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-p
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { Alert, Button, InfoIcon, Listbox, Loading, Modal } from 'ui'
+import { Button, InfoIcon, Listbox, Loading, Modal } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const TransferProjectButton = () => {
   const project = useSelectedProject()
@@ -145,7 +146,7 @@ const TransferProjectButton = () => {
 
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <Wrench size={14} className="flex-shrink-0" />
+                <Wrench size={24} className="flex-shrink-0" />
               </span>
               <div>
                 <p className="font-bold">Features</p>
@@ -206,21 +207,16 @@ const TransferProjectButton = () => {
             <Modal.Content>
               <div className="space-y-2">
                 {transferPreviewData && transferPreviewData.warnings.length > 0 && (
-                  <Alert
-                    withIcon
-                    variant="warning"
-                    title="Warnings for project transfer"
-                    className="mt-3"
-                  >
+                  <Admonition type="warning" title="Warnings for project transfer" className="mt-3">
                     <div className="space-y-1">
                       {transferPreviewData.warnings.map((warning) => (
                         <p key={warning.key}>{warning.message}</p>
                       ))}
                     </div>
-                  </Alert>
+                  </Admonition>
                 )}
                 {transferPreviewData && transferPreviewData.errors.length > 0 && (
-                  <Alert withIcon variant="danger" title="Project cannot be transferred">
+                  <Admonition type="danger" title="Project cannot be transferred">
                     <div className="space-y-1">
                       {transferPreviewData.errors.map((error) => (
                         <p key={error.key}>{error.message}</p>
@@ -244,21 +240,33 @@ const TransferProjectButton = () => {
                         </ul>
                         <p className="text-sm text-foreground-light">
                           These members will need to either delete, pause, or upgrade one or more of
-                          their projects before you can downgrade this project.
+                          their projects before you can transfer this project.
                         </p>
                       </div>
                     )}
-                  </Alert>
+                  </Admonition>
                 )}
                 {transferPreviewError && !transferError && (
-                  <Alert withIcon variant="danger" title="Project cannot be transferred">
-                    <p>{transferPreviewError.message}</p>
-                  </Alert>
+                  <Admonition
+                    type="danger"
+                    title="Project cannot be transferred"
+                    description={
+                      <>
+                        <p>{transferPreviewError.message}</p>
+                      </>
+                    }
+                  />
                 )}
                 {transferError && (
-                  <Alert withIcon variant="danger" title="Project cannot be transferred">
-                    <p>{transferError.message}</p>
-                  </Alert>
+                  <Admonition
+                    type="danger"
+                    title="Project cannot be transferred"
+                    description={
+                      <>
+                        <p>{transferError.message}</p>
+                      </>
+                    }
+                  />
                 )}
               </div>
             </Modal.Content>

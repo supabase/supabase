@@ -122,7 +122,7 @@ export function createClient() {
 ```
 
 ```ts utils/supabase/server.ts
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export async function createClient() {
@@ -380,6 +380,8 @@ export async function signup(formData: FormData) {
 ```
 
 ```ts app/error/page.tsx
+'use client'
+
 export default function ErrorPage() {
   return <p>Sorry, something went wrong</p>
 }

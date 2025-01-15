@@ -8,15 +8,17 @@ import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustio
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
 import { useActionKey } from 'hooks/useActionKey'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import { useSnapshot } from 'valtio'
-import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import { useEditorType } from '../editors/editors-layout.hooks'
 import { sidebarState } from '../tabs/sidebar-state'
@@ -24,7 +26,9 @@ import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
-import NavigationBar from './NavigationBar/NavigationBar'
+import MobileNavigationBar from './NavigationBar/MobileNavigationBar'
+import MobileViewNav from './NavigationBar/MobileViewNav'
+import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
@@ -34,9 +38,7 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import { ProjectPausedState } from './PausedState/ProjectPausedState'
-import { withAuth } from 'hooks/misc/withAuth'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import NavigationBar from './NavigationBar/NavigationBar'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -92,6 +94,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     ref
   ) => {
     const router = useRouter()
+    const [isClient, setIsClient] = useState(false)
+    const [isSheetOpen, setIsSheetOpen] = useState(false)
     const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
@@ -106,6 +110,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const sqlEditorTabsEnabled = editor === 'sql' && !flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
     const forceShowProductMenu = tableEditorTabsEnabled && !sqlEditorTabsEnabled
     // end of tabs preview flag logic
+
     const projectName = selectedProject?.name
     const organizationName = selectedOrganization?.name
 
@@ -120,7 +125,9 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
-    const [isClient, setIsClient] = useState(false)
+    const handleMobileMenu = () => {
+      setIsSheetOpen(true)
+    }
 
     useEffect(() => {
       setIsClient(true)
@@ -128,7 +135,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
 
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
-        if (e.metaKey && e.code === 'KeyI' && !e.altKey && !e.shiftKey) {
+        if (e.metaKey && e.key === 'i' && !e.altKey && !e.shiftKey) {
           setAiAssistantPanel({ open: !open })
           e.preventDefault()
           e.stopPropagation()
@@ -157,30 +164,42 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const sideBarIsOpen = forceShowProductMenu ? true : sidebar.isOpen
 
     return (
-      <ProjectContextProvider projectRef={projectRef}>
-        <Head>
-          <title>
-            {title
-              ? `${title} | Supabase`
-              : selectedTable
-                ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
-                : projectName
-                  ? `${projectName} | ${organizationName} | Supabase`
-                  : organizationName
-                    ? `${organizationName} | Supabase`
-                    : 'Supabase'}
-          </title>
-          <meta name="description" content="Supabase Studio" />
-        </Head>
-        <div className="flex flex-col h-screen w-screen">
-          {!hideHeader && IS_PLATFORM && <LayoutHeader />}
-          <div className="flex h-full flex-row grow overflow-y-auto">
+      <>
+        <ProjectContextProvider projectRef={projectRef}>
+          <Head>
+            <title>
+              {title
+                ? `${title} | Supabase`
+                : selectedTable
+                  ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
+                  : projectName
+                    ? `${projectName} | ${organizationName} | Supabase`
+                    : organizationName
+                      ? `${organizationName} | Supabase`
+                      : 'Supabase'}
+            </title>
+            <meta name="description" content="Supabase Studio" />
+          </Head>
+
+          <div className="flex flex-col h-screen w-screen">
+            {!hideHeader && IS_PLATFORM && <LayoutHeader />}
+            <div className="flex h-full flex-row grow overflow-y-auto"></div>
+
+            {/* Left-most navigation side bar to access products */}
             {!hideIconBar && <NavigationBar />}
+            {/* Top Nav to access products from mobile */}
+            {!hideIconBar && <MobileNavigationBar />}
+            {showProductMenu && productMenu && !(!hideHeader && IS_PLATFORM) && (
+              <MobileViewNav title={product} handleMobileMenu={handleMobileMenu} />
+            )}
+
+            {/* Product menu bar */}
             <ResizablePanelGroup
               className="flex h-full"
               direction="horizontal"
               autoSaveId="project-layout"
             >
+              {/* Existing desktop menu */}
               {showProductMenu && productMenu && (
                 <ResizablePanel
                   order={1}
@@ -219,12 +238,18 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
               )}
               <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col">
+                {!hideHeader && IS_PLATFORM && (
+                  <LayoutHeader
+                    showProductMenu={!!(showProductMenu && productMenu)}
+                    handleMobileMenu={handleMobileMenu}
+                  />
+                )}
                 <ResizablePanelGroup
                   className="h-full w-full overflow-x-hidden flex-1"
                   direction="horizontal"
                   autoSaveId="project-layout-content"
                 >
-                  <ResizablePanel id="panel-content" className="w-full min-w-[600px]">
+                  <ResizablePanel id="panel-content" className="w-full md:min-w-[600px]">
                     <main
                       className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
                       ref={ref}
@@ -237,10 +262,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                         </div>
                       ) : (
                         <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                          <Fragment key={selectedProject?.ref}>
-                            <ResourceExhaustionWarningBanner />
-                            {children}
-                          </Fragment>
+                          <ResourceExhaustionWarningBanner />
+                          {children}
                         </ContentWrapper>
                       )}
                     </main>
@@ -264,11 +287,15 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               </ResizablePanel>
             </ResizablePanelGroup>
           </div>
-        </div>
-        <EnableBranchingModal />
-        <AISettingsModal />
-        <ProjectAPIDocs />
-      </ProjectContextProvider>
+
+          <EnableBranchingModal />
+          <AISettingsModal />
+          <ProjectAPIDocs />
+        </ProjectContextProvider>
+        <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+          {productMenu}
+        </MobileSheetNav>
+      </>
     )
   }
 )
@@ -294,7 +321,6 @@ const MenuBarWrapper = ({
 }: MenuBarWrapperProps) => {
   const router = useRouter()
   const selectedProject = useSelectedProject()
-
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
   if (!isBlocking) {

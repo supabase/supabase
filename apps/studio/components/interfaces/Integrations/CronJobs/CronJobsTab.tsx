@@ -60,7 +60,10 @@ export const CronjobsTab = () => {
       </div>
     )
 
-  const filteredCronJobs = (cronJobs ?? []).filter((cj) => cj?.jobname?.includes(searchQuery || ''))
+  const filteredCronJobs =
+    searchQuery.length > 0
+      ? (cronJobs ?? []).filter((cj) => cj?.jobname?.includes(searchQuery || ''))
+      : cronJobs ?? []
 
   const onOpenCreateJobSheet = () => {
     sendEvent({ action: TelemetryActions.CRON_JOB_CREATE_CLICKED })
