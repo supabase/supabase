@@ -246,8 +246,8 @@ You can read more about using functions in RLS policies in the [RLS guide](/docs
 You can then use the `authorize` method within your RLS policies. For example, to enable the desired delete access, you would add the following policies:
 
 ```sql
-create policy "Allow authorized delete access" on public.channels for delete using ( (SELECT authorize('channels.delete')) );
-create policy "Allow authorized delete access" on public.messages for delete using ( (SELECT authorize('messages.delete')) );
+create policy "Allow authorized delete access" on public.channels for delete to authenticated using ( (SELECT authorize('channels.delete')) );
+create policy "Allow authorized delete access" on public.messages for delete to authenticated using ( (SELECT authorize('messages.delete')) );
 ```
 
 ## Accessing custom claims in your application

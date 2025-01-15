@@ -1,27 +1,21 @@
 import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { PostgresTable } from '@supabase/postgres-meta'
 
+import { useParams } from 'common'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { THRESHOLD_COUNT, useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import useTable from 'hooks/misc/useTable'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import {
-  Button,
-  InputNumber,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useParams } from 'common'
 import { useDispatch, useTrackedState } from '../../../store/Store'
 import { DropdownControl } from '../../common/DropdownControl'
 import { formatEstimatedCount } from './Pagination.utils'
-import { Input } from 'ui-patterns/DataInputs/Input'
 
 const rowsPerPageOptions = [
   { value: 100, label: '100 rows' },
@@ -38,14 +32,18 @@ const Pagination = () => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
-  const { data: selectedTable } = useTable(id)
-  // [Joshen] Only applicable to table entities
-  const rowsCountEstimate = (selectedTable as PostgresTable)?.live_rows_estimate ?? null
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+
+  // rowsCountEstimate is only applicable to table entities
+  const rowsCountEstimate = isTableLike(selectedTable) ? selectedTable.live_rows_estimate : null
 
   const [{ filter }] = useUrlState({ arrayKeys: ['filter'] })
   const filters = formatFilterURLParams(filter as string[])
   const page = snap.page
-  const table = state.table ?? undefined
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
@@ -61,10 +59,9 @@ const Pagination = () => {
 
   const { data, isLoading, isSuccess, isError, isFetching } = useTableRowsCountQuery(
     {
-      queryKey: [table?.schema, table?.name, 'count-estimate'],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table,
+      tableId: id,
       filters,
       enforceExactCount: snap.enforceExactCount,
       impersonatedRole: roleImpersonationState.role,

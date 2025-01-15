@@ -39,7 +39,7 @@ const BillingBreakdown = () => {
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
-        <div className="sticky space-y-2 top-12">
+        <div className="sticky space-y-2 top-12 pr-3">
           <p className="text-foreground text-base m-0">Billing Breakdown</p>
           <p className="text-sm text-foreground-light m-0">
             Current billing cycle: {billingCycleStart.format('MMM DD')} -{' '}
@@ -69,17 +69,12 @@ const BillingBreakdown = () => {
 
             {invoiceFeatureEnabled && (
               <>
-                <p className="text-sm text-foreground-light">
+                <p className="prose text-sm">
                   The table shows your upcoming invoice, excluding credits. This invoice will
                   continue updating until the end of your billing period on{' '}
                   {billingCycleEnd.format('MMMM DD')}. See{' '}
-                  <Link
-                    className="text-green-900 transition hover:text-green-1000"
-                    href={`/org/${orgSlug}/usage`}
-                  >
-                    usage page
-                  </Link>{' '}
-                  for a more detailed usage breakdown.
+                  <Link href={`/org/${orgSlug}/usage`}>usage page</Link> for a more detailed usage
+                  breakdown.
                 </p>
 
                 <UpcomingInvoice slug={orgSlug} />

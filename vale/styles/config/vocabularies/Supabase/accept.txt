@@ -1,6 +1,7 @@
 APIs
 [Aa]uth
 [Bb]aselining
+batch_size
 Berri
 [Cc]hatbots?
 ChatGPT
@@ -9,6 +10,7 @@ Colab
 [Cc]omposable
 [Cc]onfigs?
 CPUs?
+[Cc]ron
 CTEs?
 DBeaver
 [Dd]eclarative(ly)?
@@ -16,12 +18,14 @@ DBeaver
 [Dd]eeplinks?
 [Dd]egit
 [Dd]eserializ(e|ed|es|ing)
+[Ee]nqueu(e|ed|es|ing)
 Deno
 [Dd]ev
 [Dd]otenv
 [Ee]nv
 [Ee]nums?
 event_message
+fetch_size
 Firestore
 Hashicorp
 [Gg]eospatial
@@ -39,6 +43,7 @@ JWTs
 Lua
 Markprompt
 [Mm]iddleware
+misexecution
 [Nn]amespace(d|s)?
 Next.js
 npm
@@ -52,6 +57,7 @@ OpenAI
 pg_plan_filter
 PGAudit
 pgAdmin
+pgmq
 PGroonga
 pgvector
 Pinecone
@@ -90,6 +96,7 @@ Terraform
 unnesting
 unnested
 [Uu]npaus(e|es|ed|ing)
+[Uu]nschedul(e|es|ed|ing)
 [Uu]psert(s|ed|ing)?
 [Uu]pvot(es|ed|ing)
 Vercel

@@ -301,6 +301,8 @@ export async function chatRlsPolicy(
       content: codeBlock`
         Here is my policy definition for reference:
         ${definitionBlock}
+        
+        I'm requesting to update this policy instead so please opt to use "alter policy" instead of "create policy" where appropriate.
       `.trim(),
     })
   }

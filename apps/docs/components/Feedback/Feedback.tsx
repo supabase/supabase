@@ -1,6 +1,6 @@
 'use client'
 
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { createClient } from '@supabase/supabase-js'
 import { Check, MessageSquareQuote, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import {
@@ -12,13 +12,14 @@ import {
   useState,
 } from 'react'
 
-import { type Database, useIsLoggedIn } from 'common'
+import { type Database, useConstant, useIsLoggedIn } from 'common'
 import { Button, cn } from 'ui'
 
+import { IS_PLATFORM } from '~/lib/constants'
 import { useSendFeedbackMutation } from '~/lib/fetch/feedback'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { FeedbackModal, type FeedbackFields } from './FeedbackModal'
 import { getNotionTeam, getSanitizedTabParams } from './Feedback.utils'
+import { type FeedbackFields, FeedbackModal } from './FeedbackModal'
 
 const FeedbackButton = forwardRef<
   HTMLButtonElement,
@@ -79,7 +80,14 @@ function Feedback({ className }: { className?: string }) {
   const pathname = usePathname() ?? ''
   const sendTelemetryEvent = useSendTelemetryEvent()
   const { mutate: sendFeedbackComment } = useSendFeedbackMutation()
-  const supabase = useSupabaseClient<Database>()
+  const supabase = useConstant(() =>
+    IS_PLATFORM
+      ? createClient<Database>(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        )
+      : undefined
+  )
 
   const unanswered = state.type === 'unanswered'
   const isYes = 'response' in state && state.response === 'yes'

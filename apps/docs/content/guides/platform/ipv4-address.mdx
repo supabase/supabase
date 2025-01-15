@@ -1,5 +1,5 @@
 ---
-title: 'Dedicated IPv4 Address'
+title: 'Dedicated IPv4 Address for Ingress'
 description: 'Attach an IPv4 address to your database'
 subtitle: 'Attach an IPv4 address to your database'
 ---
@@ -15,12 +15,23 @@ The Internet Protocol (IP) addresses devices on the internet. There are two main
 
 ## When you need the IPv4 add-on:
 
+<Admonition type="caution">
+
+IPv4 addresses are guaranteed to be static for ingress traffic. If your database is making outbound connections, the outbound IP address is not static and cannot be guaranteed.
+
+</Admonition>
+
 - When using the direct connection string in an IPv6-incompatible network instead of Supavisor or client libraries.
 - When you need a dedicated IP address for your direct connection string
 
 ## Enabling the IPv4 add-on
 
-You can enable the IPv4 add-on in your project's [add-ons settings](/dashboard/project/_/settings/addons). Enabling the add-on may briefly disable your database during reconfiguration.
+You can enable the IPv4 add-on in your project's [add-ons settings](/dashboard/project/_/settings/addons).
+
+<Admonition type="caution">
+  Note that direct database connections can experience a short amount of downtime when toggling the
+  add-on due to DNS reconfiguration and propagation. Generally, this should be less than a minute.
+</Admonition>
 
 ## Read replicas and IPv4 add-on
 

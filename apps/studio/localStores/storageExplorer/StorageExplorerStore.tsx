@@ -42,8 +42,9 @@ import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { IS_PLATFORM } from 'lib/constants'
 import { lookupMime } from 'lib/mime'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import Link from 'next/link'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
@@ -127,12 +128,7 @@ class StorageExplorerStore {
     }
   }
 
-  initStore(
-    projectRef: string,
-    url: string,
-    serviceKey: string,
-    protocol: string = PROJECT_ENDPOINT_PROTOCOL
-  ) {
+  initStore(projectRef: string, url: string, serviceKey: string, protocol: string) {
     this.projectRef = projectRef
     this.resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${url}/storage/v1/upload/resumable`
     this.serviceKey = serviceKey
@@ -265,7 +261,6 @@ class StorageExplorerStore {
   popOpenedFoldersAtIndex = (index: number) => {
     this.openedFolders = this.openedFolders.slice(0, index + 1)
   }
-
   clearOpenedFolders = () => {
     this.openedFolders = []
   }
@@ -566,13 +561,22 @@ class StorageExplorerStore {
           <p className="text-foreground">
             Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
             {numberOfFilesRejected > 1 ? 'their' : 'its'} size
-            {numberOfFilesRejected > 1 ? 's are' : ' is'} beyond the upload limit of {value}
+            {numberOfFilesRejected > 1 ? 's are' : ' is'} beyond the global upload limit of {value}
             {unit}.
           </p>
           <p className="text-foreground-light">
-            You may change the file size upload limit under Storage in Project Settings.
+            You can change the global file size upload limit in{' '}
+            <Link
+              className="underline"
+              href={`/project/${this.projectRef}/settings/storage`}
+              target="_blank"
+            >
+              Storage settings
+            </Link>
+            .
           </p>
-        </div>
+        </div>,
+        { duration: 8000 }
       )
 
       if (numberOfFilesRejected === filesToUpload.length) return
@@ -733,26 +737,31 @@ class StorageExplorerStore {
             chunkSize,
             onShouldRetry(error) {
               const status = error.originalResponse ? error.originalResponse.getStatus() : 0
-              const doNotRetryStatuses = [400, 403, 404, 409, 415, 429]
+              const doNotRetryStatuses = [400, 403, 404, 409, 413, 415, 429]
 
               return !doNotRetryStatuses.includes(status)
             },
             onError: (error) => {
               numberOfFilesUploadedFail += 1
-              if (
-                error instanceof tus.DetailedError &&
-                error.originalResponse?.getStatus() === 415
-              ) {
-                // Unsupported mime type
-                toast.error(
-                  capitalize(
-                    error.originalResponse.getBody() ||
-                      `Failed to upload ${file.name}: ${metadata.mimetype} is not allowed`
-                  ),
-                  {
-                    description: `Allowed MIME types: ${this.selectedBucket.allowed_mime_types?.join(', ')}`,
-                  }
-                )
+              if (error instanceof tus.DetailedError) {
+                const status = error.originalResponse?.getStatus()
+                if (status === 415) {
+                  // Unsupported mime type
+                  toast.error(
+                    capitalize(
+                      error?.originalResponse?.getBody() ||
+                        `Failed to upload ${file.name}: ${metadata.mimetype} is not allowed`
+                    ),
+                    {
+                      description: `Allowed MIME types: ${this.selectedBucket.allowed_mime_types?.join(', ')}`,
+                    }
+                  )
+                } else if (status === 413) {
+                  // Payload too large
+                  toast.error(
+                    `Failed to upload ${file.name}: File size exceeds the bucket upload limit.`
+                  )
+                }
               } else {
                 toast.error(`Failed to upload ${file.name}: ${error.message}`)
               }

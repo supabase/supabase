@@ -16,6 +16,7 @@ const PricingAddons = dynamic(() => import('~/components/Pricing/PricingAddons')
 const PricingComparisonTable = dynamic(() => import('~/components/Pricing/PricingComparisonTable'))
 const PricingFAQs = dynamic(() => import('~/components/Pricing/PricingFAQs'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
+const PricingDiskSection = dynamic(() => import('~/components/Pricing/PricingDiskSection'))
 
 export default function IndexPage() {
   const router = useRouter()
@@ -112,6 +113,13 @@ export default function IndexPage() {
         className="container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-16"
       >
         <PricingComputeSection />
+      </div>
+
+      <div
+        id="disk"
+        className="container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-16"
+      >
+        <PricingDiskSection />
       </div>
 
       <div id="addons" className="sm:py-18 container relative mx-auto px-4 py-16 md:py-24 lg:px-12">

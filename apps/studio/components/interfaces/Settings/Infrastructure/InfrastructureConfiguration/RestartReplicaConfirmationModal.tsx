@@ -32,7 +32,7 @@ export const RestartReplicaConfirmationModal = ({
       queryClient.setQueriesData<any>(replicaKeys.list(ref), (old: Database[]) => {
         const updatedReplicas = old.map((x) => {
           if (x.identifier === selectedReplica?.identifier) {
-            return { ...x, status: REPLICA_STATUS.RESTORING }
+            return { ...x, status: REPLICA_STATUS.RESTARTING }
           } else {
             return x
           }

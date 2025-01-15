@@ -97,7 +97,6 @@ export default function TreeViewDemo() {
                 name={element.name}
                 isEditing={element.metadata?.isEditing === true}
                 onEditSubmit={(value) => {
-                  console.log('value', value)
                   let updatedTreeData = { ...treeData }
                   const findNode = (node: any) => {
                     if (node.id === element.id) {

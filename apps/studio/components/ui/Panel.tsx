@@ -1,6 +1,7 @@
 import { Megaphone } from 'lucide-react'
 import { cloneElement, forwardRef, PropsWithChildren, ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
+import { forwardRef, PropsWithChildren, ReactNode } from 'react'
 import { Badge, Button, Loading, cn } from 'ui'
 
 interface PanelProps {
@@ -128,16 +129,15 @@ const PanelNotice = forwardRef<
             </span>
           )}
         </div>
-
-        {action ? (
-          <div>{action}</div>
-        ) : href ? (
+        {href && (
           <div>
             <Button size="tiny" type="default" className="text-xs" asChild>
-              <a href={href}>{buttonText ?? 'Read the accouncement'}</a>
+              <a href={href} target="_blank" rel="noreferrer noopener">
+                {buttonText ?? 'Read the accouncement'}
+              </a>
             </Button>
           </div>
-        ) : null}
+        )}
       </div>
     )
   }

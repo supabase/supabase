@@ -10,7 +10,7 @@ tocVideo: 'A3uND5sgiO0'
 
 This guide will walk you through an example using Amazon Bedrock SDK with `vecs`. We will create embeddings using the Amazon Titan Embeddings G1 – Text v1.2 (amazon.titan-embed-text-v1) model, insert these embeddings into a PostgreSQL database using vecs, and then query the collection to find the most similar sentences to a given query sentence.
 
-## Create an Environment
+## Create an environment
 
 First, you need to set up your environment. You will need Python 3.7+ with the `vecs` and `boto3` libraries installed.
 
@@ -25,7 +25,7 @@ You'll also need:
 - [Credentials to your AWS account](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html)
 - [A Postgres Database with the pgvector extension](hosting.md)
 
-## Create Embeddings
+## Create embeddings
 
 Next, we will use Amazon’s Titan Embedding G1 - Text v1.2 model to create embeddings for a set of sentences.
 
@@ -67,7 +67,7 @@ for sentence in dataset:
 
 ```
 
-### Store the Embeddings with vecs
+### Store the embeddings with vecs
 
 Now that we have our embeddings, we can insert them into a PostgreSQL database using vecs.
 
@@ -90,7 +90,7 @@ sentences.upsert(records=embeddings)
 sentences.create_index()
 ```
 
-### Querying for Most Similar Sentences
+### Querying for most similar sentences
 
 Now, we query the `sentences` collection to find the most similar sentences to a sample query sentence. First need to create an embedding for the query sentence. Next, we query the collection we created earlier to find the most similar sentences.
 

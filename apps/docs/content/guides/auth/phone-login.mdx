@@ -15,7 +15,7 @@ Phone OTP login can:
 
 <CostWarning />
 
-## Enabling Phone Login
+## Enabling phone login
 
 Enable phone authentication on the [Auth Providers page](/dashboard/project/_/auth/providers) for hosted Supabase projects.
 
@@ -213,6 +213,15 @@ try await supabase.auth.updateUser(
     phone: "123456789"
   )
 )
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.auth.updateUser {
+    phone = "123456789"
+}
 ```
 
 </TabPanel>

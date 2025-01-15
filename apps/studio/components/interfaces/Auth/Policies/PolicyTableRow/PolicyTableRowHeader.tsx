@@ -1,25 +1,29 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { noop } from 'lodash'
 import { Lock, Unlock } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useQueryState } from 'nuqs'
-import {
-  AiIconAnimation,
-  Badge,
-  Button,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAppStateSnapshot } from 'state/app-state'
+import { AiIconAnimation, Badge } from 'ui'
 
 interface PolicyTableRowHeaderProps {
-  table: PostgresTable
+  table: {
+    id: number
+    schema: string
+    name: string
+    rls_enabled: boolean
+  }
   isLocked: boolean
-  onSelectToggleRLS: (table: PostgresTable) => void
+  onSelectToggleRLS: (table: {
+    id: number
+    schema: string
+    name: string
+    rls_enabled: boolean
+  }) => void
   onSelectCreatePolicy: () => void
 }
 
@@ -29,9 +33,10 @@ const PolicyTableRowHeader = ({
   onSelectToggleRLS = noop,
   onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
+  const { setAiAssistantPanel } = useAppStateSnapshot()
 
+  const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const isRealtimeSchema = table.schema === 'realtime'
@@ -42,7 +47,11 @@ const PolicyTableRowHeader = ({
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
       <div className="flex gap-x-4 text-left">
-        <Link href={`/project/${ref}/editor/${table.id}`} className="flex items-center gap-x-2">
+        <EditorTablePageLink
+          projectRef={ref}
+          id={String(table.id)}
+          className="flex items-center gap-x-2"
+        >
           {table.rls_enabled ? (
             <div className="flex items-center gap-x-1 text-xs">
               <Lock size={14} strokeWidth={2} className="text-brand" />
@@ -53,7 +62,7 @@ const PolicyTableRowHeader = ({
             </div>
           )}
           <h4 className="m-0">{table.name}</h4>
-        </Link>
+        </EditorTablePageLink>
         <div className="flex items-center gap-x-2">
           {isTableLocked && (
             <Badge>
@@ -75,7 +84,9 @@ const PolicyTableRowHeader = ({
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: 'You need additional permissions to toggle RLS',
+                    text: !canToggleRLS
+                      ? 'You need additional permissions to toggle RLS'
+                      : undefined,
                   },
                 }}
               >
@@ -84,13 +95,15 @@ const PolicyTableRowHeader = ({
             )}
             <ButtonTooltip
               type="default"
-              disabled={!canToggleRLS}
+              disabled={!canToggleRLS || !canCreatePolicies}
               onClick={() => onSelectCreatePolicy()}
               tooltip={{
                 content: {
                   side: 'bottom',
                   text: !canToggleRLS
-                    ? 'You need additional permissions to create RLS policies'
+                    ? !canToggleRLS || !canCreatePolicies
+                      ? 'You need additional permissions to create RLS policies'
+                      : undefined
                     : undefined,
                 },
               }}
@@ -98,25 +111,27 @@ const PolicyTableRowHeader = ({
               Create policy
             </ButtonTooltip>
 
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <Button
-                  type="default"
-                  className="px-1"
-                  onClick={() => {
-                    onSelectCreatePolicy()
-                    setEditView('conversation')
-                  }}
-                >
-                  <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
-                </Button>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="top">
-                {!canToggleRLS
-                  ? 'You need additional permissions to create RLS policies'
-                  : 'Create with Supabase Assistant'}
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+            <ButtonTooltip
+              type="default"
+              className="px-1"
+              onClick={() => {
+                setAiAssistantPanel({
+                  open: true,
+                  initialInput: `Create a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
+                })
+              }}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text:
+                    !canToggleRLS || !canCreatePolicies
+                      ? 'You need additional permissions to create RLS policies'
+                      : 'Create with Supabase Assistant',
+                },
+              }}
+            >
+              <AiIconAnimation size={16} />
+            </ButtonTooltip>
           </div>
         </div>
       )}

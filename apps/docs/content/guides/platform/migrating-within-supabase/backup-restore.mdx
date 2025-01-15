@@ -1,0 +1,278 @@
+---
+title: 'Backup and Restore using the CLI'
+subtitle: 'Learn how to backup and restore projects using the Supabase CLI'
+breadcrumb: 'Migrations'
+---
+
+## Backup database using the CLI
+
+<StepHikeCompact>
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Install the Supabase CLI" fullWidth>
+    Install the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
+    </StepHikeCompact.Details>
+  </StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={2}>
+  <StepHikeCompact.Details title="Install Docker Desktop" fullWidth>
+    Install [Docker Desktop](https://www.docker.com) for your platform.
+  </StepHikeCompact.Details>
+</StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Get the new database connection string" fullWidth>
+      Go to the [project page](/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
+
+      <Admonition type="info">
+        Use the Session pooler connection string by default. If your ISP supports IPv6, use the direct connection string.
+      </Admonition>
+
+      Session pooler connection string:
+      ```bash
+        postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+      ```
+
+      Direct connection string:
+      ```bash
+        postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.com:5432/postgres
+      ```
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Get the database password" fullWidth>
+      Reset the password in the [Database Settings](/dashboard/project/_/settings/database).
+
+      Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+      <StepHikeCompact.Details title="Backup database" fullWidth>
+       Run these commands after replacing ```[CONNECTION_STRING]``` with your connection string from the previous steps:
+
+        ```bash
+        supabase db dump --db-url [CONNECTION_STRING] -f roles.sql --role-only
+        ```
+
+        ```bash
+        supabase db dump --db-url [CONNECTION_STRING] -f schema.sql
+        ```
+
+        ```bash
+        supabase db dump --db-url [CONNECTION_STRING] -f data.sql --use-copy --data-only
+        ```
+      </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+## Before you begin
+
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem header="Install Postgres and psql" id="install-postgres">
+      <PostgresInstallation />
+    </AccordionItem>
+  </div>
+</Accordion>
+
+## Restore backup using CLI
+
+<StepHikeCompact>
+    <StepHikeCompact.Step step={1}>
+        <StepHikeCompact.Details title="Create project" fullWidth>
+          Create a [new project](https://database.new)
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={2}>
+      <StepHikeCompact.Details title="Configure newly created project" fullWidth>
+        In the new project:
+
+        - If Webhooks were used in the old database, enable [Database Webhooks](/dashboard/project/_/database/hooks).
+        - If any non-default extensions were used in the old database, enable the [Extensions](/dashboard/project/_/database/extensions).
+        - If Replication for Realtime was used in the old database, enable [Publication](/dashboard/project/_/database/publications) on the tables necessary
+      </StepHikeCompact.Details>
+
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={3}>
+      <StepHikeCompact.Details title="Get the new database connection string" fullWidth>
+        Go to the [project page](/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
+
+      <Admonition type="info">
+        Use the Session pooler connection string by default. If your ISP supports IPv6, use the direct connection string.
+      </Admonition>
+
+        Session pooler connection string:
+        ```bash
+          postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+        ```
+
+        Direct connection string:
+        ```bash
+          postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.com:5432/postgres
+        ```
+      </StepHikeCompact.Details>
+
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="Get the database password" fullWidth>
+      Reset the password in the [Database Settings](/dashboard/project/_/settings/database).
+
+      Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
+
+    </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={5}>
+      <StepHikeCompact.Details title="Restore your Project with the CLI" fullWidth>
+        <Tabs
+          scrollable
+          size="small"
+          type="underlined"
+          defaultActiveId="no-column-encryption"
+        >
+          <TabPanel id="no-column-encryption" label="Column encryption disabled">
+
+          Run these commands after replacing ```[CONNECTION_STRING]``` with your connection string from the previous steps:
+
+          ```bash
+          psql \
+            --single-transaction \
+            --variable ON_ERROR_STOP=1 \
+            --file roles.sql \
+            --file schema.sql \
+            --command 'SET session_replication_role = replica' \
+            --file data.sql \
+            --dbname [CONNECTION_STRING]
+          ```
+
+          </TabPanel>
+          <TabPanel id="column-encryption" label="Column encryption enabled">
+          If you use [column encryption](/docs/guides/database/column-encryption), copy the root encryption key to your new project using your [Personal Access Token](/dashboard/account/tokens).
+
+          You can restore the project using both the old and new project ref (the project ref is the value between "https://" and ".supabase.co" in the URL) instead of the URL.
+
+          ```bash
+          export OLD_PROJECT_REF="<old_project_ref>"
+          export NEW_PROJECT_REF="<new_project_ref>"
+          export SUPABASE_ACCESS_TOKEN="<personal_access_token>"
+
+          curl "https://api.supabase.com/v1/projects/$OLD_PROJECT_REF/pgsodium" \
+            -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" |
+          curl "https://api.supabase.com/v1/projects/$NEW_PROJECT_REF/pgsodium" \
+            -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            -X PUT --json @-
+          ```
+          </TabPanel>
+        </Tabs>
+      </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+## Important project restoration notes
+
+### Troubleshooting notes
+
+- Setting the `session_replication_role` to `replica` disables all triggers so that columns are not double encrypted.
+- If you have created any [custom roles](/dashboard/project/_/database/roles) with `login` attribute, you have to manually set their passwords in the new project.
+- If you run into any permission errors related to `supabase_admin` during restore, edit the `schema.sql` file and comment out any lines containing `ALTER ... OWNER TO "supabase_admin"`.
+
+### Preserving migration history
+
+If you were using Supabase CLI for managing migrations on your old database and would like to preserve the migration history in your newly restored project, you need to insert the migration records separately using the following commands.
+
+```bash
+supabase db dump --db-url "$OLD_DB_URL" -f history_schema.sql --schema supabase_migrations
+supabase db dump --db-url "$OLD_DB_URL" -f history_data.sql --use-copy --data-only --schema supabase_migrations
+psql \
+  --single-transaction \
+  --variable ON_ERROR_STOP=1 \
+  --file history_schema.sql \
+  --file history_data.sql \
+  --dbname "$NEW_DB_URL"
+```
+
+### Schema changes to `auth` and `storage`
+
+If you have modified the `auth` and `storage` schemas in your old project, such as adding triggers or Row Level Security(RLS) policies, you have to restore them separately. The Supabase CLI can help you diff the changes to these schemas using the following commands.
+
+```bash
+supabase link --project-ref "$OLD_PROJECT_REF"
+supabase db diff --linked --schema auth,storage > changes.sql
+```
+
+### Migrate storage objects
+
+The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another.
+
+```js
+// npm install @supabase/supabase-js@1
+const { createClient } = require('@supabase/supabase-js')
+
+const OLD_PROJECT_URL = 'https://xxx.supabase.co'
+const OLD_PROJECT_SERVICE_KEY = 'old-project-service-key-xxx'
+
+const NEW_PROJECT_URL = 'https://yyy.supabase.co'
+const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
+
+;(async () => {
+  const oldSupabaseRestClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY, {
+    db: {
+      schema: 'storage',
+    },
+  })
+  const oldSupabaseClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY)
+  const newSupabaseClient = createClient(NEW_PROJECT_URL, NEW_PROJECT_SERVICE_KEY)
+
+  // make sure you update max_rows in postgrest settings if you have a lot of objects
+  // or paginate here
+  const { data: oldObjects, error } = await oldSupabaseRestClient.from('objects').select()
+  if (error) {
+    console.log('error getting objects from old bucket')
+    throw error
+  }
+
+  for (const objectData of oldObjects) {
+    console.log(`moving ${objectData.id}`)
+    try {
+      const { data, error: downloadObjectError } = await oldSupabaseClient.storage
+        .from(objectData.bucket_id)
+        .download(objectData.name)
+      if (downloadObjectError) {
+        throw downloadObjectError
+      }
+
+      const { _, error: uploadObjectError } = await newSupabaseClient.storage
+        .from(objectData.bucket_id)
+        .upload(objectData.name, data, {
+          upsert: true,
+          contentType: objectData.metadata.mimetype,
+          cacheControl: objectData.metadata.cacheControl,
+        })
+      if (uploadObjectError) {
+        throw uploadObjectError
+      }
+    } catch (err) {
+      console.log('error moving ', objectData)
+      console.log(err)
+    }
+  }
+})()
+```

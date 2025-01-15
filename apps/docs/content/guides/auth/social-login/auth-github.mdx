@@ -78,6 +78,20 @@ Future<void> signInWithGithub() async {
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+When your user signs in, call [signInWithWithOAuth](/docs/reference/swift/auth-signinwithoauth) with `.github` as the `Provider`:
+
+```swift
+func signInWithGithub() async throws {
+  try await supabase.auth.signInWithOAuth(
+    provider: .github,
+    redirectTo: URL(string: "my-custom-scheme://my-app-host")
+  )
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Github` as the `Provider`:

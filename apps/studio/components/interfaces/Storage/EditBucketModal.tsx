@@ -204,16 +204,16 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                             </Listbox>
                           </div>
                           {IS_PLATFORM && (
-                            <div className="col-span-12">
+                            <div className="col-span-12 mt-2">
                               <p className="text-foreground-light text-sm">
-                                Note: The{' '}
+                                Note: Individual bucket upload will still be capped at the{' '}
                                 <Link
                                   href={`/project/${ref}/settings/storage`}
-                                  className="text-brand opacity-80 hover:opacity-100 transition"
+                                  className="font-bold underline"
                                 >
                                   global upload limit
                                 </Link>{' '}
-                                takes precedence over this value ({formattedGlobalUploadLimit})
+                                of {formattedGlobalUploadLimit}
                               </p>
                             </div>
                           )}

@@ -9,7 +9,7 @@ import remotePatterns from './lib/remotePatterns.js'
 import rewrites from './lib/rewrites.js'
 
 import { remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 
 import { withContentlayer } from 'next-contentlayer2'
 
@@ -70,6 +70,15 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/.well-known/vercel/flags',
+        headers: [
+          {
+            key: 'content-type',
+            value: 'application/json',
+          },
+        ],
+      },
     ]
   },
   async rewrites() {
@@ -84,7 +93,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel
+    // We are already running linting via GH action, this will skip linting during production build on Vercel.
     ignoreDuringBuilds: true,
   },
 }

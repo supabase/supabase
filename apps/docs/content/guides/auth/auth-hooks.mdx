@@ -46,7 +46,7 @@ A HTTP Hook is an endpoint which takes in a JSON event payload and returns a JSO
 </TabPanel>
 </Tabs>
 
-## Security Model
+## Security model
 
 Sign the payload and grant permissions selectively in order to guard the integrity of the payload.
 
@@ -79,11 +79,11 @@ revoke execute
   from authenticated, anon, public;
 ```
 
-<Admonition type="caution" label="Create postgres functions with security invoker">
+You will need to alter your row-level security (RLS) policies to allow the `supabase_auth_admin` role to access tables that you have RLS policies on. You can read more about RLS policies [here](/docs/guides/database/postgres/row-level-security).
 
-We do not recommend creating postgres functions with the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. Read more about the `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
+Alternatively, you can create your postgres function via the dashboard with the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it.
 
-</Admonition>
+Currently, functions created via the dashboard take on the `postgres` role. Read more about the `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker)
 
 </TabPanel>
 <TabPanel id="http" label="HTTP">
@@ -241,7 +241,7 @@ secrets = "env(SEND_SMS_HOOK_SECRET)"
 Fill in the Hook Secret in `supabase/functions/.env`
 
 ```bash
-SEND_SMS_HOOK_SECRETS='v1,whsec_<base64_standard_secret>'
+SEND_SMS_HOOK_SECRET='v1,whsec_<base64_standard_secret>'
 ```
 
 Start the function locally:
@@ -261,7 +261,7 @@ Note that payloads are sent uncompressed in order to accurately track Content Le
 
 In the dashboard, navigate to [`Authentication > Hooks`](/dashboard/project/_/auth/hooks) and select the appropriate function type (SQL or HTTP) from the dropdown menu.
 
-### Error Handling
+### Error handling
 
 You should return an error when facing a runtime error. Runtime errors are specific to your application and arise from specific business rules rather than programmer errors.
 

@@ -166,6 +166,15 @@ function useBreadcrumbs() {
     return breadcrumbs
   }
 
+  const isAiPromptsPage = pathname.startsWith('/guides/getting-started/ai-prompts')
+  if (isAiPromptsPage) {
+    const breadcrumbs = [
+      { name: 'Getting started', url: '/guides/getting-started' },
+      { name: 'AI Prompts', url: '/guides/getting-started/ai-prompts' },
+    ]
+    return breadcrumbs
+  }
+
   const menuId = getMenuId(pathname)
   const menu = NavItems[menuId]
   return findMenuItemByUrl(menu, pathname, [])

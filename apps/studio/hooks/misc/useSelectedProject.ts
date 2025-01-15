@@ -21,3 +21,9 @@ export function useProjectByRef(ref?: string) {
     return projects?.find((project) => project.ref === ref)
   }, [projects, ref])
 }
+
+export const useIsOrioleDb = () => {
+  const project = useSelectedProject()
+  const isOrioleDb = project?.dbVersion?.endsWith('orioledb')
+  return isOrioleDb
+}

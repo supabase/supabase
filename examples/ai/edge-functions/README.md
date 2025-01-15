@@ -14,7 +14,7 @@ This demo consists of three parts:
 
 - Link your project: `supabase link`
 - Deploy Edge Functions: `supabase functions deploy`
-- Enable Database Webhooks in your [project dashboard](https://supabase.com/dashboard/project/_/database/hooks)
+- Update project config to [enable webhooks](https://supabase.com/docs/guides/local-development/cli/config#experimental.webhooks.enabled): `supabase config push`
 - Navigate to the [database-webhook](./supabase/migrations/20240410041607_database-webhook.sql) migration file and insert your `generate-embedding` function details.
 - Push up the database schema `supabase db push`
 

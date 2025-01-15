@@ -38,6 +38,8 @@ To improve experience for your users, we recommend redirecting users to one spec
 
 This is not necessary. Both the access token and refresh token are designed to be passed around to different components in your application. The browser-based side of your application needs access to the refresh token to properly maintain a browser session anyway.
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ### My server is getting invalid refresh token errors. What's going on?
 
 It is likely that the refresh token sent from the browser to your server is stale. Make sure the `onAuthStateChange` listener callback is free of bugs and is registered relatively early in your application's lifetime

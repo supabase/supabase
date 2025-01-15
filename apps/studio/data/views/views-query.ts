@@ -48,6 +48,8 @@ export const useViewsQuery = <TData = ViewsData>(
     ({ signal }) => getViews({ projectRef, connectionString, schema }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      // We're using a staleTime of 0 here because the only way to create a
+      // view is via SQL, which we don't know about
       staleTime: 0,
       ...options,
     }

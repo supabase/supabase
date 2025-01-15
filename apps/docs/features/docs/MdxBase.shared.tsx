@@ -28,6 +28,7 @@ import {
   QuickstartIntro,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
+  PostgresInstallation,
 } from '~/components/MDX/partials'
 import { NavData } from '~/components/NavData'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
@@ -35,9 +36,10 @@ import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
 import { RegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
-import { CodeSampleWrapper } from '~/features/directives/CodeSample.client'
+import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import * as CH from '~/features/ui/CodeHike'
+import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 
 const components = {
@@ -52,6 +54,7 @@ const components = {
   Button,
   ButtonCard,
   CH,
+  CodeSampleDummy,
   CodeSampleWrapper,
   CostWarning,
   CreateClientSnippet,
@@ -78,8 +81,10 @@ const components = {
   RealtimeLimitsEstimator,
   RegionsList,
   SharedData,
+  ShowUntil,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
+  PostgresInstallation,
   SqlToRest,
   StepHikeCompact,
   Tabs,

@@ -1,9 +1,9 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
+import { useParams } from 'common'
 import {
   formatFilterURLParams,
   formatSortURLParams,
@@ -13,13 +13,12 @@ import RefreshButton from 'components/grid/components/header/RefreshButton'
 import FilterPopover from 'components/grid/components/header/filter/FilterPopover'
 import { SortPopover } from 'components/grid/components/header/sort'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useTableQuery } from 'data/tables/table-query'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { SidePanel } from 'ui'
+import { Button, SidePanel } from 'ui'
 import ActionBar from '../../ActionBar'
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
-import { useEncryptedColumns } from '../../SidePanelEditor.utils'
 import Pagination from './Pagination'
 import SelectorGrid from './SelectorGrid'
 
@@ -36,30 +35,29 @@ const ForeignRowSelector = ({
   onSelect,
   closePanel,
 }: ForeignRowSelectorProps) => {
+  const { id } = useParams()
   const { project } = useProjectContext()
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id: !!id ? Number(id) : undefined,
+  })
 
   const { tableId: _tableId, schema: schemaName, table: tableName, columns } = foreignKey ?? {}
   const tableId = _tableId ? Number(_tableId) : undefined
 
-  const { data: table } = useTableQuery({
+  // [Joshen] Only show Set NULL CTA if its a 1:1 foreign key, and source column is nullable
+  // As this wouldn't be straightforward for composite foreign keys
+  const sourceColumn = (selectedTable?.columns ?? []).find((c) => c.name === columns?.[0].source)
+  const isNullable = (columns ?? []).length === 1 && sourceColumn?.is_nullable
+
+  const { data: table } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id: tableId,
   })
 
-  const encryptedColumns = useEncryptedColumns({ schemaName, tableName })
-
-  const supaTable =
-    table &&
-    parseSupaTable(
-      {
-        table: table as PostgresTable,
-        columns: (table as PostgresTable).columns ?? [],
-        primaryKeys: (table as PostgresTable).primary_keys,
-        relationships: (table as PostgresTable).relationships,
-      },
-      encryptedColumns
-    )
+  const supaTable = table && parseSupaTable(table)
 
   const [params, setParams] = useState<any>({ filter: [], sort: [] })
 
@@ -73,10 +71,9 @@ const ForeignRowSelector = ({
 
   const { data, isLoading, isSuccess, isError, isRefetching } = useTableRowsQuery(
     {
-      queryKey: [schemaName, tableName],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table: supaTable,
+      tableId: table?.id,
       sorts,
       filters,
       page,
@@ -150,13 +147,27 @@ const ForeignRowSelector = ({
                   </DndProvider>
                 </div>
 
-                <Pagination
-                  page={page}
-                  setPage={setPage}
-                  rowsPerPage={rowsPerPage}
-                  currentPageRowsCount={data?.rows.length ?? 0}
-                  isLoading={isRefetching}
-                />
+                <div className="flex items-center gap-x-3 divide-x">
+                  <Pagination
+                    page={page}
+                    setPage={setPage}
+                    rowsPerPage={rowsPerPage}
+                    currentPageRowsCount={data?.rows.length ?? 0}
+                    isLoading={isRefetching}
+                  />
+                  {isNullable && (
+                    <div className="pl-3">
+                      <Button
+                        type="default"
+                        onClick={() => {
+                          if (columns?.length === 1) onSelect({ [columns[0].source]: null })
+                        }}
+                      >
+                        Set NULL
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {data.rows.length > 0 ? (

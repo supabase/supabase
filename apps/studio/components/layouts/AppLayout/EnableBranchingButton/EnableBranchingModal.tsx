@@ -26,6 +26,7 @@ import BranchingPITRNotice from './BranchingPITRNotice'
 import BranchingPlanNotice from './BranchingPlanNotice'
 import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import GithubRepositorySelection from './GithubRepositorySelection'
+import { DocsButton } from 'components/ui/DocsButton'
 
 const EnableBranchingModal = () => {
   const { ref } = useParams()
@@ -152,15 +153,7 @@ const EnableBranchingModal = () => {
                   <p className="text-sm text-foreground-light">Manage environments in Supabase</p>
                 </div>
               </div>
-              <Button type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                <Link
-                  href="https://supabase.com/docs/guides/platform/branching"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Documentation
-                </Link>
-              </Button>
+              <DocsButton href="https://supabase.com/docs/guides/platform/branching" />
             </Modal.Content>
 
             {isLoading && (

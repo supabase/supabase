@@ -5,6 +5,7 @@ import { ChevronDown, Clipboard, Download, Eye, EyeOff, Play } from 'lucide-reac
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { toast } from 'sonner'
+import Papa from 'papaparse'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CSVButton from 'components/ui/CSVButton'
@@ -30,14 +31,16 @@ import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresC
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
-import LogSelection, { LogSelectionProps } from './LogSelection'
+import LogSelection from './LogSelection'
 import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
+import { LogsTableEmptyState } from './LogsTableEmptyState'
+import { ResponseError } from 'types'
 
 interface Props {
-  data?: Array<LogData | Object>
+  data?: LogData[]
   onHistogramToggle?: () => void
   isHistogramShowing?: boolean
   isLoading?: boolean
@@ -45,17 +48,19 @@ interface Props {
   showDownload?: boolean
   queryType?: QueryType
   projectRef: string
-  params: LogSelectionProps['params']
   onRun?: () => void
   onSave?: () => void
   hasEditorValue?: boolean
-  maxHeight?: string
   className?: string
   collectionName?: string // Used for warehouse queries
   warehouseError?: string
-  emptyState?: ReactNode
+  EmptyState?: ReactNode
   showHeader?: boolean
   showHistogramToggle?: boolean
+  selectedLog?: LogData
+  isSelectedLogLoading?: boolean
+  selectedLogError?: LogQueryError | ResponseError
+  onSelectedLogChange?: (log: LogData | null) => void
 }
 type LogMap = { [id: string]: LogData }
 
@@ -72,35 +77,39 @@ const LogTable = ({
   isLoading,
   error,
   projectRef,
-  params,
   onRun,
   onSave,
   hasEditorValue,
-  maxHeight,
   className,
   collectionName,
-  emptyState,
+  EmptyState,
   showHeader = true,
   showHistogramToggle = true,
+  selectedLog,
+  isSelectedLogLoading,
+  selectedLogError,
+  onSelectedLogChange,
 }: Props) => {
   const { profile } = useProfile()
   const { show: showContextMenu } = useContextMenu()
 
+  const downloadCsvRef = useRef<HTMLDivElement>(null)
   const [cellPosition, setCellPosition] = useState<any>()
-  const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
+  const [selectionOpen, setSelectionOpen] = useState(false)
+  const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
 
   const canCreateLogQuery = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'log_sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
 
-  const firstRow: LogData | undefined = data?.[0] as LogData
+  const firstRow = data[0]
 
   // move timestamp to the first column, if it exists
   function getFirstRow() {
     if (!firstRow) return {}
 
-    const { timestamp, ...rest } = firstRow || {}
+    const { timestamp, ...rest } = firstRow
 
     if (!timestamp) return firstRow
 
@@ -135,6 +144,7 @@ const LogTable = ({
   })
 
   let columns = DEFAULT_COLUMNS
+
   if (!queryType) {
     columns
   } else {
@@ -160,6 +170,9 @@ const LogTable = ({
       case 'auth':
         columns = AuthColumnRenderer
         break
+      case 'pg_cron':
+        columns = DatabasePostgresColumnRender
+        break
 
       default:
         if (firstRow && isDefaultLogPreviewFormat(firstRow)) {
@@ -171,30 +184,21 @@ const LogTable = ({
     }
   }
 
-  const stringData = JSON.stringify(data)
+  const stringData = useMemo(() => JSON.stringify(data), [data])
   const [dedupedData, logMap] = useMemo<[LogData[], LogMap]>(() => {
     const deduped = [...new Set(data)] as LogData[]
 
     if (!hasId) {
-      return [deduped, {} as LogMap]
+      return [deduped, {}]
     }
 
     const map = deduped.reduce((acc: LogMap, d: LogData) => {
       acc[d.id] = d
       return acc
-    }, {}) as LogMap
+    }, {})
 
     return [deduped, map]
   }, [data, hasId])
-
-  useEffect(() => {
-    if (!data) return
-    const found = data.find((datum) => isEqual(datum, focusedLog))
-    if (!found) {
-      // close selection panel if not found in dataset
-      setFocusedLog(null)
-    }
-  }, [data, focusedLog, stringData])
 
   const logDataRows = useMemo(() => {
     if (hasId && hasTimestamp) {
@@ -228,21 +232,10 @@ const LogTable = ({
     }
   }
 
-  const copyResultsToClipboard = () => {
-    copyToClipboard(stringData, () => {
-      toast.success('Results copied to clipboard')
-    })
-  }
-
-  const downloadCsvRef = useRef<HTMLDivElement>(null)
-  function downloadCSV() {
-    downloadCsvRef.current?.click()
-  }
-
   const LogsExplorerTableHeader = () => (
     <div
       className={cn(
-        'flex w-full items-center justify-between border-t  bg-surface-100 px-5 py-2',
+        'flex w-full items-center justify-between border-t bg-surface-100 px-5 py-2',
         className,
         { hidden: !showHeader }
       )}
@@ -255,13 +248,37 @@ const LogTable = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={downloadCSV} className="space-x-2">
+            <DropdownMenuItem
+              onClick={() => {
+                downloadCsvRef.current?.click()
+              }}
+              className="space-x-2"
+            >
               <Download size={14} />
               <div>Download CSV</div>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={copyResultsToClipboard} className="space-x-2">
+            <DropdownMenuItem
+              onClick={() => {
+                const csvData = Papa.unparse(data)
+                copyToClipboard(csvData, () => {
+                  toast.success('Results copied to clipboard')
+                })
+              }}
+              className="space-x-2"
+            >
               <Clipboard size={14} />
-              <div>Copy to clipboard</div>
+              <div>Copy as CSV</div>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                copyToClipboard(stringData, () => {
+                  toast.success('Results copied to clipboard')
+                })
+              }}
+              className="space-x-2"
+            >
+              <Clipboard size={14} />
+              <div>Copy as JSON</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -341,55 +358,56 @@ const LogTable = ({
   }
 
   const RenderNoResultAlert = () => {
-    if (emptyState) return emptyState
-    else
-      return (
-        <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100 h-full">
-          <div className="flex flex-col gap-1">
-            <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
-            <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
-          </div>
-          <div className="flex flex-col gap-1 px-5">
-            <h3 className="text-lg text-foreground">No results found</h3>
-            <p className="text-sm text-foreground-lighter">
-              Try another search or adjust the filters
-            </p>
-          </div>
-        </div>
-      )
+    if (EmptyState) return EmptyState
+    else return <LogsTableEmptyState />
   }
+
+  function onRowClick(row: LogData) {
+    setSelectedRow(row)
+    onSelectedLogChange?.(row)
+  }
+
+  useEffect(() => {
+    if (selectedLog || isSelectedLogLoading) {
+      setSelectionOpen(true)
+    }
+    if (!isSelectedLogLoading && !selectedLog) {
+      setSelectedRow(null)
+    }
+  }, [selectedLog, isSelectedLogLoading])
 
   if (!data) return null
 
   return (
-    <section className={'flex w-full flex-col h-screen'} style={{ maxHeight }}>
+    <section className={'h-full flex w-full flex-col flex-1'}>
       {!queryType && <LogsExplorerTableHeader />}
 
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel defaultSize={focusedLog ? 60 : 100}>
+        <ResizablePanel defaultSize={selectedLog ? 60 : 100}>
           <DataGrid
             role="table"
             style={{ height: '100%' }}
-            className={cn('flex-1 flex-grow h-full', {
+            className={cn('flex-1 flex-grow h-full border-0', {
               'data-grid--simple-logs': queryType,
               'data-grid--logs-explorer': !queryType,
             })}
             rowHeight={40}
             headerRowHeight={queryType ? 0 : 28}
             onSelectedCellChange={(row) => {
-              setFocusedLog(row.row as LogData)
               setCellPosition(row)
             }}
-            selectedRows={new Set([])}
+            onCellClick={(row) => {
+              onRowClick(row.row)
+            }}
             columns={columns}
-            rowClass={(row: LogData) =>
-              [
-                'font-mono tracking-tight',
-                isEqual(row, focusedLog)
-                  ? '!bg-surface-300 rdg-row--focused'
-                  : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
-              ].join(' ')
-            }
+            rowClass={(row: LogData) => {
+              return cn(
+                'font-mono tracking-tight !bg-studio hover:!bg-surface-100 cursor-pointer',
+                {
+                  '!bg-surface-200 rdg-row--focused': isEqual(row, selectedRow),
+                }
+              )
+            }}
             rows={logDataRows}
             rowKeyGetter={(r) => {
               if (!hasId) return JSON.stringify(r)
@@ -399,10 +417,10 @@ const LogTable = ({
             renderers={{
               renderRow: RowRenderer,
               noRowsFallback: !isLoading ? (
-                <div className="">
+                <>
                   {logDataRows.length === 0 && !error && <RenderNoResultAlert />}
                   {error && <RenderErrorAlert />}
-                </div>
+                </>
               ) : null,
             }}
           />
@@ -417,15 +435,20 @@ const LogTable = ({
               document.body
             )}
         </ResizablePanel>
-        <ResizableHandle />
-        {focusedLog && (
-          <ResizablePanel defaultSize={40}>
+        <ResizableHandle withHandle />
+
+        {selectionOpen && (
+          <ResizablePanel minSize={40} defaultSize={50}>
             <LogSelection
+              isLoading={isSelectedLogLoading || false}
               projectRef={projectRef}
-              onClose={() => setFocusedLog(null)}
-              log={focusedLog}
+              onClose={() => {
+                onSelectedLogChange?.(null)
+                setSelectionOpen(false)
+              }}
+              log={selectedLog}
+              error={selectedLogError}
               queryType={queryType}
-              params={params}
               collectionName={collectionName}
             />
           </ResizablePanel>

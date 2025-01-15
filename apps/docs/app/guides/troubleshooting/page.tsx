@@ -16,6 +16,9 @@ import { TROUBLESHOOTING_CONTAINER_ID } from '~/features/docs/Troubleshooting.ut
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { PROD_URL } from '~/lib/constants'
 
+// 60 seconds/minute * 60 minutes/hour * 24 hours/day
+// export const revalidate = 86_400
+
 export default async function GlobalTroubleshootingPage() {
   const troubleshootingEntries = await getAllTroubleshootingEntries()
   const keywords = await getAllTroubleshootingKeywords()
@@ -23,7 +26,7 @@ export default async function GlobalTroubleshootingPage() {
   const errors = await getAllTroubleshootingErrors()
 
   return (
-    <SidebarSkeleton className="w-full max-w-screen-lg mx-auto">
+    <SidebarSkeleton hideSideNav className="w-full max-w-screen-lg mx-auto">
       <div className="py-8 px-5">
         <h1 className="text-4xl tracking-tight mb-7">Troubleshooting</h1>
         <p className="text-lg text-foreground-light">
