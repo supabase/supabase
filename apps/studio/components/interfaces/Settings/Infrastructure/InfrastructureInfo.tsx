@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
@@ -12,6 +10,7 @@ import {
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
+import { useProjectServiceVersionsQuery } from 'data/projects/project-service-versions'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import {
@@ -43,16 +42,31 @@ const InfrastructureInfo = () => {
   } = useProjectUpgradeEligibilityQuery({
     projectRef: ref,
   })
+
+  const {
+    data: serviceVersions,
+    error: serviceVersionsError,
+    isLoading: isLoadingServiceVersions,
+    isError: isErrorServiceVersions,
+    isSuccess: isSuccessServiceVersions,
+  } = useProjectServiceVersionsQuery({ projectRef: ref })
+
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
-  const { current_app_version, latest_app_version, requires_manual_intervention } = data || {}
+  const { current_app_version, current_app_version_release_channel, latest_app_version } =
+    data || {}
   const isOnLatestVersion = current_app_version === latest_app_version
-  const currentPgVersion = (current_app_version ?? '').split('supabase-postgres-')[1]
+  const currentPgVersion = (current_app_version ?? '')
+    .split('supabase-postgres-')[1]
+    ?.replace('-orioledb', '')
+  const isOnNonGenerallyAvailableReleaseChannel =
+    current_app_version_release_channel && current_app_version_release_channel !== 'ga'
+      ? current_app_version_release_channel
+      : undefined
+  const isOrioleDb = (current_app_version ?? '').includes('orioledb')
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
-  const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
-  const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`
 
   return (
     <>
@@ -90,40 +104,83 @@ const InfrastructureInfo = () => {
                 )}
                 {isSuccessUpgradeEligibility && (
                   <>
-                    {authEnabled && (
-                      <Input
-                        readOnly
-                        disabled
-                        label="Auth version"
-                        value={project?.serviceVersions?.gotrue ?? ''}
+                    {isLoadingServiceVersions && <GenericSkeletonLoader />}
+                    {isErrorServiceVersions && (
+                      <AlertError
+                        error={serviceVersionsError}
+                        subject="Failed to retrieve versions"
                       />
                     )}
-                    <Input
-                      readOnly
-                      disabled
-                      label="PostgREST version"
-                      value={project?.serviceVersions?.postgrest ?? ''}
-                    />
-                    <Input
-                      readOnly
-                      disabled
-                      value={currentPgVersion}
-                      label="Postgres version"
-                      actions={[
-                        isOnLatestVersion && (
-                          <Tooltip_Shadcn_>
-                            <TooltipTrigger_Shadcn_>
-                              <Badge variant="brand" className="mr-1">
-                                Latest
-                              </Badge>
-                            </TooltipTrigger_Shadcn_>
-                            <TooltipContent_Shadcn_ side="bottom" className="w-52 text-center">
-                              Project is on the latest version of Postgres that Supabase supports
-                            </TooltipContent_Shadcn_>
-                          </Tooltip_Shadcn_>
-                        ),
-                      ]}
-                    />
+                    {isSuccessServiceVersions && (
+                      <>
+                        {authEnabled && (
+                          <Input
+                            readOnly
+                            disabled
+                            label="Auth version"
+                            value={serviceVersions?.gotrue ?? ''}
+                          />
+                        )}
+                        <Input
+                          readOnly
+                          disabled
+                          label="PostgREST version"
+                          value={serviceVersions?.postgrest ?? ''}
+                        />
+                        <Input
+                          readOnly
+                          disabled
+                          value={currentPgVersion || serviceVersions?.['supabase-postgres'] || ''}
+                          label="Postgres version"
+                          actions={[
+                            isOnNonGenerallyAvailableReleaseChannel && (
+                              <Tooltip_Shadcn_>
+                                <TooltipTrigger_Shadcn_>
+                                  <Badge variant="warning" className="mr-1 capitalize">
+                                    {isOnNonGenerallyAvailableReleaseChannel}
+                                  </Badge>
+                                </TooltipTrigger_Shadcn_>
+                                <TooltipContent_Shadcn_ side="bottom" className="w-44 text-center">
+                                  This project uses a {isOnNonGenerallyAvailableReleaseChannel}{' '}
+                                  database version release
+                                </TooltipContent_Shadcn_>
+                              </Tooltip_Shadcn_>
+                            ),
+                            isOrioleDb && (
+                              <>
+                                <Tooltip_Shadcn_>
+                                  <TooltipTrigger_Shadcn_>
+                                    <Badge variant="default" className="mr-1">
+                                      OrioleDB
+                                    </Badge>
+                                  </TooltipTrigger_Shadcn_>
+                                  <TooltipContent_Shadcn_
+                                    side="bottom"
+                                    className="w-44 text-center"
+                                  >
+                                    This project uses OrioleDB
+                                  </TooltipContent_Shadcn_>
+                                </Tooltip_Shadcn_>
+                              </>
+                            ),
+                            isOnLatestVersion && (
+                              <Tooltip_Shadcn_>
+                                <TooltipTrigger_Shadcn_>
+                                  <Badge variant="brand" className="mr-1">
+                                    Latest
+                                  </Badge>
+                                </TooltipTrigger_Shadcn_>
+                                <TooltipContent_Shadcn_ side="bottom" className="w-52 text-center">
+                                  Project is on the latest version of Postgres that Supabase
+                                  supports
+                                </TooltipContent_Shadcn_>
+                              </Tooltip_Shadcn_>
+                            ),
+                          ]}
+                        />
+                      </>
+                    )}
+
                     {data?.eligible && !hasReadReplicas && <ProjectUpgradeAlert />}
                     {data.eligible && hasReadReplicas && (
                       <Alert_Shadcn_>
@@ -131,30 +188,8 @@ const InfrastructureInfo = () => {
                           A new version of Postgres is available for your project
                         </AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_>
-                          You will need to remove all read replicas first prior to upgrading your
-                          Postgrest version to the latest available ({latestPgVersion}).
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    )}
-                    {!data?.eligible && data?.requires_manual_intervention && (
-                      <Alert_Shadcn_ title="A new version of Postgres is available for your project">
-                        <AlertTitle_Shadcn_>
-                          A new version of Postgres is available for your project
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
-                          <p className="mb-3">
-                            Please reach out to us via our support form if you are keen to upgrade
-                            your Postgres version to the latest available ({latestPgVersion}).
-                          </p>
-                          <Button size="tiny" type="default" asChild>
-                            <Link
-                              href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              Contact support
-                            </Link>
-                          </Button>
+                          You will need to remove all read replicas prior to upgrading your Postgres
+                          version to the latest available ({latestPgVersion}).
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
                     )}

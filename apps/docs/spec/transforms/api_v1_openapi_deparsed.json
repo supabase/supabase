@@ -78,6 +78,26 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "INACTIVE",
+                        "ACTIVE_HEALTHY",
+                        "ACTIVE_UNHEALTHY",
+                        "COMING_UP",
+                        "UNKNOWN",
+                        "GOING_DOWN",
+                        "INIT_FAILED",
+                        "REMOVED",
+                        "RESTORING",
+                        "UPGRADING",
+                        "PAUSING",
+                        "RESTORE_FAILED",
+                        "RESTARTING",
+                        "PAUSE_FAILED",
+                        "RESIZING"
+                      ]
+                    },
                     "db_port": {
                       "type": "integer"
                     },
@@ -87,23 +107,10 @@
                     "postgres_version": {
                       "type": "string"
                     },
-                    "status": {
-                      "enum": [
-                        "ACTIVE_HEALTHY",
-                        "ACTIVE_UNHEALTHY",
-                        "COMING_UP",
-                        "GOING_DOWN",
-                        "INACTIVE",
-                        "INIT_FAILED",
-                        "REMOVED",
-                        "RESTARTING",
-                        "UNKNOWN",
-                        "UPGRADING",
-                        "PAUSING",
-                        "RESTORING",
-                        "RESTORE_FAILED",
-                        "PAUSE_FAILED"
-                      ],
+                    "postgres_engine": {
+                      "type": "string"
+                    },
+                    "release_channel": {
                       "type": "string"
                     },
                     "db_host": {
@@ -119,7 +126,15 @@
                       "type": "string"
                     }
                   },
-                  "required": ["db_port", "ref", "postgres_version", "status", "db_host"]
+                  "required": [
+                    "status",
+                    "db_port",
+                    "ref",
+                    "postgres_version",
+                    "postgres_engine",
+                    "release_channel",
+                    "db_host"
+                  ]
                 }
               }
             }
@@ -157,19 +172,22 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "reset_on_push": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "description": "This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead."
+                  },
                   "branch_name": {
                     "type": "string"
                   },
                   "git_branch": {
                     "type": "string"
                   },
-                  "reset_on_push": {
-                    "type": "boolean"
-                  },
                   "persistent": {
                     "type": "boolean"
                   },
                   "status": {
+                    "type": "string",
                     "enum": [
                       "CREATING_PROJECT",
                       "RUNNING_MIGRATIONS",
@@ -177,8 +195,7 @@
                       "MIGRATIONS_FAILED",
                       "FUNCTIONS_DEPLOYED",
                       "FUNCTIONS_FAILED"
-                    ],
-                    "type": "string"
+                    ]
                   }
                 }
               }
@@ -193,6 +210,26 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "pr_number": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "latest_check_run_id": {
+                      "type": "number",
+                      "deprecated": true,
+                      "description": "This field is deprecated and will not be populated."
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "CREATING_PROJECT",
+                        "RUNNING_MIGRATIONS",
+                        "MIGRATIONS_PASSED",
+                        "MIGRATIONS_FAILED",
+                        "FUNCTIONS_DEPLOYED",
+                        "FUNCTIONS_FAILED"
+                      ]
+                    },
                     "id": {
                       "type": "string"
                     },
@@ -211,28 +248,8 @@
                     "git_branch": {
                       "type": "string"
                     },
-                    "pr_number": {
-                      "type": "number"
-                    },
-                    "latest_check_run_id": {
-                      "type": "number"
-                    },
-                    "reset_on_push": {
-                      "type": "boolean"
-                    },
                     "persistent": {
                       "type": "boolean"
-                    },
-                    "status": {
-                      "enum": [
-                        "CREATING_PROJECT",
-                        "RUNNING_MIGRATIONS",
-                        "MIGRATIONS_PASSED",
-                        "MIGRATIONS_FAILED",
-                        "FUNCTIONS_DEPLOYED",
-                        "FUNCTIONS_FAILED"
-                      ],
-                      "type": "string"
                     },
                     "created_at": {
                       "type": "string"
@@ -242,14 +259,13 @@
                     }
                   },
                   "required": [
+                    "status",
                     "id",
                     "name",
                     "project_ref",
                     "parent_project_ref",
                     "is_default",
-                    "reset_on_push",
                     "persistent",
-                    "status",
                     "created_at",
                     "updated_at"
                   ]
@@ -312,6 +328,54 @@
         ]
       }
     },
+    "/v1/branches/{branch_id}/push": {
+      "post": {
+        "operationId": "v1-push-a-branch",
+        "summary": "Pushes a database branch",
+        "description": "Pushes the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "workflow_run_id": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["workflow_run_id", "message"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to push database branch"
+          }
+        },
+        "tags": ["Environments"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/branches/{branch_id}/reset": {
       "post": {
         "operationId": "v1-reset-a-branch",
@@ -336,11 +400,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "workflow_run_id": {
+                      "type": "string"
+                    },
                     "message": {
                       "type": "string"
                     }
                   },
-                  "required": ["message"]
+                  "required": ["workflow_run_id", "message"]
                 }
               }
             }
@@ -395,6 +462,26 @@
                         "description": "Creation timestamp",
                         "example": "2023-03-29T16:32:59Z"
                       },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "INACTIVE",
+                          "ACTIVE_HEALTHY",
+                          "ACTIVE_UNHEALTHY",
+                          "COMING_UP",
+                          "UNKNOWN",
+                          "GOING_DOWN",
+                          "INIT_FAILED",
+                          "REMOVED",
+                          "RESTORING",
+                          "UPGRADING",
+                          "PAUSING",
+                          "RESTORE_FAILED",
+                          "RESTARTING",
+                          "PAUSE_FAILED",
+                          "RESIZING"
+                        ]
+                      },
                       "database": {
                         "type": "object",
                         "properties": {
@@ -405,31 +492,28 @@
                           "version": {
                             "type": "string",
                             "description": "Database version"
+                          },
+                          "postgres_engine": {
+                            "type": "string",
+                            "description": "Database engine"
+                          },
+                          "release_channel": {
+                            "type": "string",
+                            "description": "Release channel"
                           }
                         },
-                        "required": ["host", "version"]
-                      },
-                      "status": {
-                        "enum": [
-                          "ACTIVE_HEALTHY",
-                          "ACTIVE_UNHEALTHY",
-                          "COMING_UP",
-                          "GOING_DOWN",
-                          "INACTIVE",
-                          "INIT_FAILED",
-                          "REMOVED",
-                          "RESTARTING",
-                          "UNKNOWN",
-                          "UPGRADING",
-                          "PAUSING",
-                          "RESTORING",
-                          "RESTORE_FAILED",
-                          "PAUSE_FAILED"
-                        ],
-                        "type": "string"
+                        "required": ["host", "version", "postgres_engine", "release_channel"]
                       }
                     },
-                    "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+                    "required": [
+                      "id",
+                      "organization_id",
+                      "name",
+                      "region",
+                      "created_at",
+                      "status",
+                      "database"
+                    ]
                   }
                 }
               }
@@ -460,7 +544,7 @@
                   },
                   "name": {
                     "type": "string",
-                    "description": "Name of your project, should not contain dots"
+                    "description": "Name of your project"
                   },
                   "organization_id": {
                     "type": "string",
@@ -469,12 +553,12 @@
                   "plan": {
                     "type": "string",
                     "enum": ["free", "pro"],
-                    "description": "Subscription Plan is now set on organization level and is ignored in this request",
-                    "example": "free",
-                    "deprecated": true
+                    "deprecated": true,
+                    "description": "Subscription Plan is now set on organization level and is ignored in this request"
                   },
                   "region": {
                     "type": "string",
+                    "description": "Region you want your server to reside in",
                     "enum": [
                       "us-east-1",
                       "us-east-2",
@@ -494,9 +578,7 @@
                       "ca-central-1",
                       "ap-south-1",
                       "sa-east-1"
-                    ],
-                    "description": "Region you want your server to reside in",
-                    "example": "us-east-1"
+                    ]
                   },
                   "kps_enabled": {
                     "type": "boolean",
@@ -520,11 +602,23 @@
                   },
                   "template_url": {
                     "type": "string",
+                    "format": "uri",
                     "description": "Template URL used to create the project from the CLI.",
                     "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
+                  },
+                  "release_channel": {
+                    "type": "string",
+                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
+                    "description": "Release channel. If not provided, GA will be used."
+                  },
+                  "postgres_engine": {
+                    "type": "string",
+                    "enum": ["15", "17-oriole"],
+                    "description": "Postgres engine version. If not provided, the latest version will be used."
                   }
                 },
-                "required": ["db_pass", "name", "organization_id", "region"]
+                "required": ["db_pass", "name", "organization_id", "region"],
+                "additionalProperties": false
               }
             }
           }
@@ -559,38 +653,25 @@
                       "description": "Creation timestamp",
                       "example": "2023-03-29T16:32:59Z"
                     },
-                    "database": {
-                      "type": "object",
-                      "properties": {
-                        "host": {
-                          "type": "string",
-                          "description": "Database host"
-                        },
-                        "version": {
-                          "type": "string",
-                          "description": "Database version"
-                        }
-                      },
-                      "required": ["host", "version"]
-                    },
                     "status": {
+                      "type": "string",
                       "enum": [
+                        "INACTIVE",
                         "ACTIVE_HEALTHY",
                         "ACTIVE_UNHEALTHY",
                         "COMING_UP",
+                        "UNKNOWN",
                         "GOING_DOWN",
-                        "INACTIVE",
                         "INIT_FAILED",
                         "REMOVED",
-                        "RESTARTING",
-                        "UNKNOWN",
+                        "RESTORING",
                         "UPGRADING",
                         "PAUSING",
-                        "RESTORING",
                         "RESTORE_FAILED",
-                        "PAUSE_FAILED"
-                      ],
-                      "type": "string"
+                        "RESTARTING",
+                        "PAUSE_FAILED",
+                        "RESIZING"
+                      ]
                     }
                   },
                   "required": ["id", "organization_id", "name", "region", "created_at", "status"]
@@ -662,7 +743,8 @@
                     "type": "string"
                   }
                 },
-                "required": ["name"]
+                "required": ["name"],
+                "additionalProperties": false
               }
             }
           }
@@ -832,6 +914,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "expires_in": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
                     "token_type": {
                       "type": "string",
                       "enum": ["Bearer"]
@@ -841,15 +927,54 @@
                     },
                     "refresh_token": {
                       "type": "string"
-                    },
-                    "expires_in": {
-                      "type": "number"
                     }
                   },
-                  "required": ["token_type", "access_token", "refresh_token", "expires_in"]
+                  "required": ["expires_in", "token_type", "access_token", "refresh_token"]
                 }
               }
             }
+          }
+        },
+        "tags": ["OAuth"],
+        "security": [
+          {
+            "oauth2": ["write"]
+          }
+        ]
+      }
+    },
+    "/v1/oauth/revoke": {
+      "post": {
+        "operationId": "v1-revoke-token",
+        "summary": "[Beta] Revoke oauth app authorization and it's corresponding tokens",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "client_secret": {
+                    "type": "string"
+                  },
+                  "refresh_token": {
+                    "type": "string"
+                  }
+                },
+                "required": ["client_id", "client_secret", "refresh_token"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
           }
         },
         "tags": ["OAuth"],
@@ -865,6 +990,42 @@
         "operationId": "v1-list-all-snippets",
         "summary": "Lists SQL snippets for the logged in user",
         "parameters": [
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "sort_by",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": ["name", "inserted_at"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort_order",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": ["asc", "desc"],
+              "type": "string"
+            }
+          },
           {
             "name": "project_ref",
             "required": false,
@@ -908,13 +1069,15 @@
                             "type": "string"
                           },
                           "description": {
-                            "type": "string"
+                            "type": "string",
+                            "nullable": true
                           },
                           "project": {
                             "type": "object",
                             "properties": {
                               "id": {
-                                "type": "number"
+                                "type": "integer",
+                                "format": "int64"
                               },
                               "name": {
                                 "type": "string"
@@ -926,7 +1089,8 @@
                             "type": "object",
                             "properties": {
                               "id": {
-                                "type": "number"
+                                "type": "integer",
+                                "format": "int64"
                               },
                               "username": {
                                 "type": "string"
@@ -938,7 +1102,8 @@
                             "type": "object",
                             "properties": {
                               "id": {
-                                "type": "number"
+                                "type": "integer",
+                                "format": "int64"
                               },
                               "username": {
                                 "type": "string"
@@ -954,11 +1119,15 @@
                           "type",
                           "visibility",
                           "name",
+                          "description",
                           "project",
                           "owner",
                           "updated_by"
                         ]
                       }
+                    },
+                    "cursor": {
+                      "type": "string"
                     }
                   },
                   "required": ["data"]
@@ -988,6 +1157,7 @@
             "required": true,
             "in": "path",
             "schema": {
+              "format": "uuid",
               "type": "string"
             }
           }
@@ -1021,13 +1191,15 @@
                       "type": "string"
                     },
                     "description": {
-                      "type": "string"
+                      "type": "string",
+                      "nullable": true
                     },
                     "project": {
                       "type": "object",
                       "properties": {
                         "id": {
-                          "type": "number"
+                          "type": "integer",
+                          "format": "int64"
                         },
                         "name": {
                           "type": "string"
@@ -1039,7 +1211,8 @@
                       "type": "object",
                       "properties": {
                         "id": {
-                          "type": "number"
+                          "type": "integer",
+                          "format": "int64"
                         },
                         "username": {
                           "type": "string"
@@ -1051,7 +1224,8 @@
                       "type": "object",
                       "properties": {
                         "id": {
-                          "type": "number"
+                          "type": "integer",
+                          "format": "int64"
                         },
                         "username": {
                           "type": "string"
@@ -1082,6 +1256,7 @@
                     "type",
                     "visibility",
                     "name",
+                    "description",
                     "project",
                     "owner",
                     "updated_by",
@@ -1118,6 +1293,14 @@
               "maxLength": 20,
               "type": "string"
             }
+          },
+          {
+            "name": "reveal",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -1130,6 +1313,11 @@
                   "items": {
                     "type": "object",
                     "properties": {
+                      "type": {
+                        "nullable": true,
+                        "type": "string",
+                        "enum": ["publishable", "secret", "legacy"]
+                      },
                       "name": {
                         "type": "string"
                       },
@@ -1139,10 +1327,6 @@
                       "id": {
                         "type": "string",
                         "nullable": true
-                      },
-                      "type": {
-                        "nullable": true,
-                        "type": "object"
                       },
                       "prefix": {
                         "type": "string",
@@ -1207,6 +1391,14 @@
               "maxLength": 20,
               "type": "string"
             }
+          },
+          {
+            "name": "reveal",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "requestBody": {
@@ -1252,6 +1444,11 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "type": {
+                      "nullable": true,
+                      "type": "string",
+                      "enum": ["publishable", "secret", "legacy"]
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -1261,10 +1458,6 @@
                     "id": {
                       "type": "string",
                       "nullable": true
-                    },
-                    "type": {
-                      "nullable": true,
-                      "type": "object"
                     },
                     "prefix": {
                       "type": "string",
@@ -1338,6 +1531,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "reveal",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "requestBody": {
@@ -1378,6 +1579,11 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "type": {
+                      "nullable": true,
+                      "type": "string",
+                      "enum": ["publishable", "secret", "legacy"]
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -1388,9 +1594,108 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "prefix": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "hash": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "secret_jwt_template": {
+                      "nullable": true,
+                      "allOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "role": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["role"]
+                        }
+                      ]
+                    },
+                    "inserted_at": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": ["name", "api_key"]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Secrets"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getApiKey",
+        "summary": "[Alpha] Get API key",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reveal",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
                     "type": {
                       "nullable": true,
-                      "type": "object"
+                      "type": "string",
+                      "enum": ["publishable", "secret", "legacy"]
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "api_key": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string",
+                      "nullable": true
                     },
                     "prefix": {
                       "type": "string",
@@ -1462,6 +1767,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "reveal",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -1472,6 +1785,11 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "type": {
+                      "nullable": true,
+                      "type": "string",
+                      "enum": ["publishable", "secret", "legacy"]
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -1481,10 +1799,6 @@
                     "id": {
                       "type": "string",
                       "nullable": true
-                    },
-                    "type": {
-                      "nullable": true,
-                      "type": "object"
                     },
                     "prefix": {
                       "type": "string",
@@ -1566,6 +1880,26 @@
                   "items": {
                     "type": "object",
                     "properties": {
+                      "pr_number": {
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "latest_check_run_id": {
+                        "type": "number",
+                        "deprecated": true,
+                        "description": "This field is deprecated and will not be populated."
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "CREATING_PROJECT",
+                          "RUNNING_MIGRATIONS",
+                          "MIGRATIONS_PASSED",
+                          "MIGRATIONS_FAILED",
+                          "FUNCTIONS_DEPLOYED",
+                          "FUNCTIONS_FAILED"
+                        ]
+                      },
                       "id": {
                         "type": "string"
                       },
@@ -1584,28 +1918,8 @@
                       "git_branch": {
                         "type": "string"
                       },
-                      "pr_number": {
-                        "type": "number"
-                      },
-                      "latest_check_run_id": {
-                        "type": "number"
-                      },
-                      "reset_on_push": {
-                        "type": "boolean"
-                      },
                       "persistent": {
                         "type": "boolean"
-                      },
-                      "status": {
-                        "enum": [
-                          "CREATING_PROJECT",
-                          "RUNNING_MIGRATIONS",
-                          "MIGRATIONS_PASSED",
-                          "MIGRATIONS_FAILED",
-                          "FUNCTIONS_DEPLOYED",
-                          "FUNCTIONS_FAILED"
-                        ],
-                        "type": "string"
                       },
                       "created_at": {
                         "type": "string"
@@ -1615,14 +1929,13 @@
                       }
                     },
                     "required": [
+                      "status",
                       "id",
                       "name",
                       "project_ref",
                       "parent_project_ref",
                       "is_default",
-                      "reset_on_push",
                       "persistent",
-                      "status",
                       "created_at",
                       "updated_at"
                     ]
@@ -1681,6 +1994,15 @@
                       "16xlarge"
                     ]
                   },
+                  "release_channel": {
+                    "type": "string",
+                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+                  },
+                  "postgres_engine": {
+                    "type": "string",
+                    "description": "Postgres engine version. If not provided, the latest version will be used.",
+                    "enum": ["15", "17-oriole"]
+                  },
                   "branch_name": {
                     "type": "string"
                   },
@@ -1707,6 +2029,26 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "pr_number": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "latest_check_run_id": {
+                      "type": "number",
+                      "deprecated": true,
+                      "description": "This field is deprecated and will not be populated."
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "CREATING_PROJECT",
+                        "RUNNING_MIGRATIONS",
+                        "MIGRATIONS_PASSED",
+                        "MIGRATIONS_FAILED",
+                        "FUNCTIONS_DEPLOYED",
+                        "FUNCTIONS_FAILED"
+                      ]
+                    },
                     "id": {
                       "type": "string"
                     },
@@ -1725,28 +2067,8 @@
                     "git_branch": {
                       "type": "string"
                     },
-                    "pr_number": {
-                      "type": "number"
-                    },
-                    "latest_check_run_id": {
-                      "type": "number"
-                    },
-                    "reset_on_push": {
-                      "type": "boolean"
-                    },
                     "persistent": {
                       "type": "boolean"
-                    },
-                    "status": {
-                      "enum": [
-                        "CREATING_PROJECT",
-                        "RUNNING_MIGRATIONS",
-                        "MIGRATIONS_PASSED",
-                        "MIGRATIONS_FAILED",
-                        "FUNCTIONS_DEPLOYED",
-                        "FUNCTIONS_FAILED"
-                      ],
-                      "type": "string"
                     },
                     "created_at": {
                       "type": "string"
@@ -1756,14 +2078,13 @@
                     }
                   },
                   "required": [
+                    "status",
                     "id",
                     "name",
                     "project_ref",
                     "parent_project_ref",
                     "is_default",
-                    "reset_on_push",
                     "persistent",
-                    "status",
                     "created_at",
                     "updated_at"
                   ]
@@ -3082,6 +3403,119 @@
       }
     },
     "/v1/projects/{ref}": {
+      "get": {
+        "operationId": "v1-get-project",
+        "summary": "Gets a specific project that belongs to the authenticated user",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Id of your project"
+                    },
+                    "organization_id": {
+                      "type": "string",
+                      "description": "Slug of your organization"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Name of your project"
+                    },
+                    "region": {
+                      "type": "string",
+                      "description": "Region of your project",
+                      "example": "us-east-1"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "description": "Creation timestamp",
+                      "example": "2023-03-29T16:32:59Z"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "INACTIVE",
+                        "ACTIVE_HEALTHY",
+                        "ACTIVE_UNHEALTHY",
+                        "COMING_UP",
+                        "UNKNOWN",
+                        "GOING_DOWN",
+                        "INIT_FAILED",
+                        "REMOVED",
+                        "RESTORING",
+                        "UPGRADING",
+                        "PAUSING",
+                        "RESTORE_FAILED",
+                        "RESTARTING",
+                        "PAUSE_FAILED",
+                        "RESIZING"
+                      ]
+                    },
+                    "database": {
+                      "type": "object",
+                      "properties": {
+                        "host": {
+                          "type": "string",
+                          "description": "Database host"
+                        },
+                        "version": {
+                          "type": "string",
+                          "description": "Database version"
+                        },
+                        "postgres_engine": {
+                          "type": "string",
+                          "description": "Database engine"
+                        },
+                        "release_channel": {
+                          "type": "string",
+                          "description": "Release channel"
+                        }
+                      },
+                      "required": ["host", "version", "postgres_engine", "release_channel"]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "organization_id",
+                    "name",
+                    "region",
+                    "created_at",
+                    "status",
+                    "database"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to retrieve project"
+          }
+        },
+        "tags": ["Projects"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
       "delete": {
         "operationId": "v1-delete-a-project",
         "summary": "Deletes the given project",
@@ -3107,7 +3541,8 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "number"
+                      "type": "integer",
+                      "format": "int64"
                     },
                     "ref": {
                       "type": "string"
@@ -3742,11 +4177,15 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "release_channel": {
+                    "type": "string",
+                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+                  },
                   "target_version": {
-                    "type": "number"
+                    "type": "string"
                   }
                 },
-                "required": ["target_version"]
+                "required": ["release_channel", "target_version"]
               }
             }
           }
@@ -3785,7 +4224,7 @@
     },
     "/v1/projects/{ref}/upgrade/eligibility": {
       "get": {
-        "operationId": "v1-get-postgrest-upgrade-eligibility",
+        "operationId": "v1-get-postgres-upgrade-eligibility",
         "summary": "[Beta] Returns the project's eligibility for upgrades",
         "parameters": [
           {
@@ -3808,6 +4247,13 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "current_app_version_release_channel": {
+                      "type": "string",
+                      "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+                    },
+                    "duration_estimate_hours": {
+                      "type": "integer"
+                    },
                     "eligible": {
                       "type": "boolean"
                     },
@@ -3823,13 +4269,19 @@
                         "type": "object",
                         "properties": {
                           "postgres_version": {
-                            "type": "number"
+                            "type": "string",
+                            "description": "Postgres engine version. If not provided, the latest version will be used.",
+                            "enum": ["15", "17-oriole"]
+                          },
+                          "release_channel": {
+                            "type": "string",
+                            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                           },
                           "app_version": {
                             "type": "string"
                           }
                         },
-                        "required": ["postgres_version", "app_version"]
+                        "required": ["postgres_version", "release_channel", "app_version"]
                       }
                     },
                     "potential_breaking_changes": {
@@ -3837,9 +4289,6 @@
                       "items": {
                         "type": "string"
                       }
-                    },
-                    "duration_estimate_hours": {
-                      "type": "number"
                     },
                     "legacy_auth_custom_roles": {
                       "type": "array",
@@ -3855,12 +4304,13 @@
                     }
                   },
                   "required": [
+                    "current_app_version_release_channel",
+                    "duration_estimate_hours",
                     "eligible",
                     "current_app_version",
                     "latest_app_version",
                     "target_upgrade_versions",
                     "potential_breaking_changes",
-                    "duration_estimate_hours",
                     "legacy_auth_custom_roles",
                     "extension_dependent_objects"
                   ]
@@ -3885,7 +4335,7 @@
     },
     "/v1/projects/{ref}/upgrade/status": {
       "get": {
-        "operationId": "v1-get-postgrest-upgrade-status",
+        "operationId": "v1-get-postgres-upgrade-status",
         "summary": "[Beta] Gets the latest status of the project's upgrade",
         "parameters": [
           {
@@ -3896,6 +4346,14 @@
             "schema": {
               "minLength": 20,
               "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "tracking_id",
+            "required": false,
+            "in": "query",
+            "schema": {
               "type": "string"
             }
           }
@@ -3914,14 +4372,18 @@
                         {
                           "type": "object",
                           "properties": {
+                            "target_version": {
+                              "type": "integer"
+                            },
+                            "status": {
+                              "enum": [0, 1, 2],
+                              "type": "integer"
+                            },
                             "initiated_at": {
                               "type": "string"
                             },
                             "latest_status_at": {
                               "type": "string"
-                            },
-                            "target_version": {
-                              "type": "number"
                             },
                             "error": {
                               "type": "string",
@@ -3952,17 +4414,13 @@
                                 "9_completed_upgrade",
                                 "10_completed_post_physical_backup"
                               ]
-                            },
-                            "status": {
-                              "type": "number",
-                              "enum": [0, 1, 2]
                             }
                           },
                           "required": [
-                            "initiated_at",
-                            "latest_status_at",
                             "target_version",
-                            "status"
+                            "status",
+                            "initiated_at",
+                            "latest_status_at"
                           ]
                         }
                       ]
@@ -4254,31 +4712,20 @@
                             "type": "object",
                             "properties": {
                               "name": {
-                                "type": "string"
-                              },
-                              "version": {
-                                "type": "string"
-                              },
-                              "description": {
-                                "type": "string"
+                                "type": "string",
+                                "enum": ["GoTrue"]
                               }
                             },
-                            "required": ["name", "version", "description"]
+                            "required": ["name"]
                           },
                           {
                             "type": "object",
                             "properties": {
-                              "healthy": {
-                                "type": "boolean"
-                              },
-                              "db_connected": {
-                                "type": "boolean"
-                              },
                               "connected_cluster": {
-                                "type": "number"
+                                "type": "integer"
                               }
                             },
-                            "required": ["healthy", "db_connected", "connected_cluster"]
+                            "required": ["connected_cluster"]
                           }
                         ]
                       },
@@ -4303,11 +4750,164 @@
               }
             }
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to retrieve project's service health status"
           }
         },
         "tags": ["Projects"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/storage": {
+      "get": {
+        "operationId": "v1-get-storage-config",
+        "summary": "Gets project's storage config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "fileSizeLimit": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "features": {
+                      "type": "object",
+                      "properties": {
+                        "imageTransformation": {
+                          "type": "object",
+                          "properties": {
+                            "enabled": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": ["enabled"]
+                        },
+                        "s3Protocol": {
+                          "type": "object",
+                          "properties": {
+                            "enabled": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": ["enabled"]
+                        }
+                      },
+                      "required": ["imageTransformation", "s3Protocol"]
+                    }
+                  },
+                  "required": ["fileSizeLimit", "features"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's storage config"
+          }
+        },
+        "tags": ["Storage"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "v1-update-storage-config",
+        "summary": "Updates project's storage config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileSizeLimit": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 53687091200,
+                    "format": "int64"
+                  },
+                  "features": {
+                    "type": "object",
+                    "properties": {
+                      "imageTransformation": {
+                        "type": "object",
+                        "properties": {
+                          "enabled": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": ["enabled"]
+                      },
+                      "s3Protocol": {
+                        "type": "object",
+                        "properties": {
+                          "enabled": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": ["enabled"]
+                      }
+                    },
+                    "required": ["imageTransformation", "s3Protocol"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's storage config"
+          }
+        },
+        "tags": ["Storage"],
         "security": [
           {
             "bearer": []
@@ -4340,10 +4940,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "statement_timeout": {
+                    "effective_cache_size": {
                       "type": "string"
                     },
-                    "effective_cache_size": {
+                    "logical_decoding_work_mem": {
                       "type": "string"
                     },
                     "maintenance_work_mem": {
@@ -4374,6 +4974,9 @@
                       "minimum": 0,
                       "maximum": 1024
                     },
+                    "max_replication_slots": {
+                      "type": "integer"
+                    },
                     "max_slot_wal_keep_size": {
                       "type": "string"
                     },
@@ -4386,6 +4989,9 @@
                     "max_wal_size": {
                       "type": "string"
                     },
+                    "max_wal_senders": {
+                      "type": "integer"
+                    },
                     "max_worker_processes": {
                       "type": "integer",
                       "minimum": 0,
@@ -4394,7 +5000,16 @@
                     "shared_buffers": {
                       "type": "string"
                     },
+                    "statement_timeout": {
+                      "type": "string"
+                    },
+                    "track_commit_timestamp": {
+                      "type": "boolean"
+                    },
                     "wal_keep_size": {
+                      "type": "string"
+                    },
+                    "wal_sender_timeout": {
                       "type": "string"
                     },
                     "work_mem": {
@@ -4443,10 +5058,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "statement_timeout": {
+                  "effective_cache_size": {
                     "type": "string"
                   },
-                  "effective_cache_size": {
+                  "logical_decoding_work_mem": {
                     "type": "string"
                   },
                   "maintenance_work_mem": {
@@ -4477,6 +5092,9 @@
                     "minimum": 0,
                     "maximum": 1024
                   },
+                  "max_replication_slots": {
+                    "type": "integer"
+                  },
                   "max_slot_wal_keep_size": {
                     "type": "string"
                   },
@@ -4489,6 +5107,9 @@
                   "max_wal_size": {
                     "type": "string"
                   },
+                  "max_wal_senders": {
+                    "type": "integer"
+                  },
                   "max_worker_processes": {
                     "type": "integer",
                     "minimum": 0,
@@ -4497,11 +5118,23 @@
                   "shared_buffers": {
                     "type": "string"
                   },
+                  "statement_timeout": {
+                    "type": "string"
+                  },
+                  "track_commit_timestamp": {
+                    "type": "boolean"
+                  },
                   "wal_keep_size": {
+                    "type": "string"
+                  },
+                  "wal_sender_timeout": {
                     "type": "string"
                   },
                   "work_mem": {
                     "type": "string"
+                  },
+                  "restart_database": {
+                    "type": "boolean"
                   },
                   "session_replication_role": {
                     "enum": ["origin", "replica", "local"],
@@ -4520,10 +5153,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "statement_timeout": {
+                    "effective_cache_size": {
                       "type": "string"
                     },
-                    "effective_cache_size": {
+                    "logical_decoding_work_mem": {
                       "type": "string"
                     },
                     "maintenance_work_mem": {
@@ -4554,6 +5187,9 @@
                       "minimum": 0,
                       "maximum": 1024
                     },
+                    "max_replication_slots": {
+                      "type": "integer"
+                    },
                     "max_slot_wal_keep_size": {
                       "type": "string"
                     },
@@ -4566,6 +5202,9 @@
                     "max_wal_size": {
                       "type": "string"
                     },
+                    "max_wal_senders": {
+                      "type": "integer"
+                    },
                     "max_worker_processes": {
                       "type": "integer",
                       "minimum": 0,
@@ -4574,7 +5213,16 @@
                     "shared_buffers": {
                       "type": "string"
                     },
+                    "statement_timeout": {
+                      "type": "string"
+                    },
+                    "track_commit_timestamp": {
+                      "type": "boolean"
+                    },
                     "wal_keep_size": {
+                      "type": "string"
+                    },
+                    "wal_sender_timeout": {
                       "type": "string"
                     },
                     "work_mem": {
@@ -4588,6 +5236,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": ""
           },
           "500": {
             "description": "Failed to update project's Postgres config"
@@ -4681,11 +5332,22 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "identifier": {
-                        "type": "string"
-                      },
                       "database_type": {
-                        "enum": ["PRIMARY", "READ_REPLICA"],
+                        "type": "string",
+                        "enum": ["PRIMARY", "READ_REPLICA"]
+                      },
+                      "db_port": {
+                        "type": "integer"
+                      },
+                      "default_pool_size": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "max_client_conn": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "identifier": {
                         "type": "string"
                       },
                       "is_using_scram_auth": {
@@ -4697,22 +5359,11 @@
                       "db_host": {
                         "type": "string"
                       },
-                      "db_port": {
-                        "type": "number"
-                      },
                       "db_name": {
                         "type": "string"
                       },
                       "connectionString": {
                         "type": "string"
-                      },
-                      "default_pool_size": {
-                        "type": "number",
-                        "nullable": true
-                      },
-                      "max_client_conn": {
-                        "type": "number",
-                        "nullable": true
                       },
                       "pool_mode": {
                         "enum": ["transaction", "session"],
@@ -4720,16 +5371,16 @@
                       }
                     },
                     "required": [
-                      "identifier",
                       "database_type",
+                      "db_port",
+                      "default_pool_size",
+                      "max_client_conn",
+                      "identifier",
                       "is_using_scram_auth",
                       "db_user",
                       "db_host",
-                      "db_port",
                       "db_name",
                       "connectionString",
-                      "default_pool_size",
-                      "max_client_conn",
                       "pool_mode"
                     ]
                   }
@@ -4797,7 +5448,7 @@
                   "type": "object",
                   "properties": {
                     "default_pool_size": {
-                      "type": "number",
+                      "type": "integer",
                       "nullable": true
                     },
                     "pool_mode": {
@@ -4851,11 +5502,88 @@
                   "type": "object",
                   "properties": {
                     "api_max_request_duration": {
-                      "type": "number",
+                      "type": "integer",
                       "nullable": true
                     },
                     "db_max_pool_size": {
-                      "type": "number",
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "jwt_exp": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "mailer_otp_exp": {
+                      "type": "integer"
+                    },
+                    "mailer_otp_length": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "mfa_max_enrolled_factors": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "mfa_phone_otp_length": {
+                      "type": "integer"
+                    },
+                    "mfa_phone_max_frequency": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "password_min_length": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "rate_limit_anonymous_users": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "rate_limit_email_sent": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "rate_limit_sms_sent": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "rate_limit_token_refresh": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "rate_limit_verify": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "rate_limit_otp": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "security_refresh_token_reuse_interval": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "sessions_inactivity_timeout": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "sessions_timebox": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "sms_max_frequency": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "sms_otp_exp": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "sms_otp_length": {
+                      "type": "integer"
+                    },
+                    "smtp_max_frequency": {
+                      "type": "integer",
                       "nullable": true
                     },
                     "disable_signup": {
@@ -5202,23 +5930,12 @@
                       "type": "string",
                       "nullable": true
                     },
-                    "jwt_exp": {
-                      "type": "number",
-                      "nullable": true
-                    },
                     "mailer_allow_unverified_email_sign_ins": {
                       "type": "boolean",
                       "nullable": true
                     },
                     "mailer_autoconfirm": {
                       "type": "boolean",
-                      "nullable": true
-                    },
-                    "mailer_otp_exp": {
-                      "type": "number"
-                    },
-                    "mailer_otp_length": {
-                      "type": "number",
                       "nullable": true
                     },
                     "mailer_secure_email_change_enabled": {
@@ -5273,10 +5990,6 @@
                       "type": "string",
                       "nullable": true
                     },
-                    "mfa_max_enrolled_factors": {
-                      "type": "number",
-                      "nullable": true
-                    },
                     "mfa_totp_enroll_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -5301,51 +6014,16 @@
                       "type": "boolean",
                       "nullable": true
                     },
-                    "mfa_phone_otp_length": {
-                      "type": "number"
-                    },
                     "mfa_phone_template": {
                       "type": "string",
-                      "nullable": true
-                    },
-                    "mfa_phone_max_frequency": {
-                      "type": "number",
                       "nullable": true
                     },
                     "password_hibp_enabled": {
                       "type": "boolean",
                       "nullable": true
                     },
-                    "password_min_length": {
-                      "type": "number",
-                      "nullable": true
-                    },
                     "password_required_characters": {
                       "type": "string",
-                      "nullable": true
-                    },
-                    "rate_limit_anonymous_users": {
-                      "type": "number",
-                      "nullable": true
-                    },
-                    "rate_limit_email_sent": {
-                      "type": "number",
-                      "nullable": true
-                    },
-                    "rate_limit_sms_sent": {
-                      "type": "number",
-                      "nullable": true
-                    },
-                    "rate_limit_token_refresh": {
-                      "type": "number",
-                      "nullable": true
-                    },
-                    "rate_limit_verify": {
-                      "type": "number",
-                      "nullable": true
-                    },
-                    "rate_limit_otp": {
-                      "type": "number",
                       "nullable": true
                     },
                     "refresh_token_rotation_enabled": {
@@ -5380,16 +6058,8 @@
                       "type": "boolean",
                       "nullable": true
                     },
-                    "security_refresh_token_reuse_interval": {
-                      "type": "number",
-                      "nullable": true
-                    },
                     "security_update_password_require_reauthentication": {
                       "type": "boolean",
-                      "nullable": true
-                    },
-                    "sessions_inactivity_timeout": {
-                      "type": "number",
                       "nullable": true
                     },
                     "sessions_single_per_user": {
@@ -5400,20 +6070,12 @@
                       "type": "string",
                       "nullable": true
                     },
-                    "sessions_timebox": {
-                      "type": "number",
-                      "nullable": true
-                    },
                     "site_url": {
                       "type": "string",
                       "nullable": true
                     },
                     "sms_autoconfirm": {
                       "type": "boolean",
-                      "nullable": true
-                    },
-                    "sms_max_frequency": {
-                      "type": "number",
                       "nullable": true
                     },
                     "sms_messagebird_access_key": {
@@ -5423,13 +6085,6 @@
                     "sms_messagebird_originator": {
                       "type": "string",
                       "nullable": true
-                    },
-                    "sms_otp_exp": {
-                      "type": "number",
-                      "nullable": true
-                    },
-                    "sms_otp_length": {
-                      "type": "number"
                     },
                     "sms_provider": {
                       "type": "string",
@@ -5503,10 +6158,6 @@
                       "type": "string",
                       "nullable": true
                     },
-                    "smtp_max_frequency": {
-                      "type": "number",
-                      "nullable": true
-                    },
                     "smtp_pass": {
                       "type": "string",
                       "nullable": true
@@ -5531,6 +6182,26 @@
                   "required": [
                     "api_max_request_duration",
                     "db_max_pool_size",
+                    "jwt_exp",
+                    "mailer_otp_exp",
+                    "mailer_otp_length",
+                    "mfa_max_enrolled_factors",
+                    "mfa_phone_otp_length",
+                    "mfa_phone_max_frequency",
+                    "password_min_length",
+                    "rate_limit_anonymous_users",
+                    "rate_limit_email_sent",
+                    "rate_limit_sms_sent",
+                    "rate_limit_token_refresh",
+                    "rate_limit_verify",
+                    "rate_limit_otp",
+                    "security_refresh_token_reuse_interval",
+                    "sessions_inactivity_timeout",
+                    "sessions_timebox",
+                    "sms_max_frequency",
+                    "sms_otp_exp",
+                    "sms_otp_length",
+                    "smtp_max_frequency",
                     "disable_signup",
                     "external_anonymous_users_enabled",
                     "external_apple_additional_client_ids",
@@ -5617,11 +6288,8 @@
                     "hook_send_email_enabled",
                     "hook_send_email_uri",
                     "hook_send_email_secrets",
-                    "jwt_exp",
                     "mailer_allow_unverified_email_sign_ins",
                     "mailer_autoconfirm",
-                    "mailer_otp_exp",
-                    "mailer_otp_length",
                     "mailer_secure_email_change_enabled",
                     "mailer_subjects_confirmation",
                     "mailer_subjects_email_change",
@@ -5635,25 +6303,15 @@
                     "mailer_templates_magic_link_content",
                     "mailer_templates_reauthentication_content",
                     "mailer_templates_recovery_content",
-                    "mfa_max_enrolled_factors",
                     "mfa_totp_enroll_enabled",
                     "mfa_totp_verify_enabled",
                     "mfa_phone_enroll_enabled",
                     "mfa_phone_verify_enabled",
                     "mfa_web_authn_enroll_enabled",
                     "mfa_web_authn_verify_enabled",
-                    "mfa_phone_otp_length",
                     "mfa_phone_template",
-                    "mfa_phone_max_frequency",
                     "password_hibp_enabled",
-                    "password_min_length",
                     "password_required_characters",
-                    "rate_limit_anonymous_users",
-                    "rate_limit_email_sent",
-                    "rate_limit_sms_sent",
-                    "rate_limit_token_refresh",
-                    "rate_limit_verify",
-                    "rate_limit_otp",
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
                     "saml_external_url",
@@ -5662,19 +6320,13 @@
                     "security_captcha_provider",
                     "security_captcha_secret",
                     "security_manual_linking_enabled",
-                    "security_refresh_token_reuse_interval",
                     "security_update_password_require_reauthentication",
-                    "sessions_inactivity_timeout",
                     "sessions_single_per_user",
                     "sessions_tags",
-                    "sessions_timebox",
                     "site_url",
                     "sms_autoconfirm",
-                    "sms_max_frequency",
                     "sms_messagebird_access_key",
                     "sms_messagebird_originator",
-                    "sms_otp_exp",
-                    "sms_otp_length",
                     "sms_provider",
                     "sms_template",
                     "sms_test_otp",
@@ -5693,7 +6345,6 @@
                     "sms_vonage_from",
                     "smtp_admin_email",
                     "smtp_host",
-                    "smtp_max_frequency",
                     "smtp_pass",
                     "smtp_port",
                     "smtp_sender_name",
@@ -5741,17 +6392,116 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "jwt_exp": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 604800
+                  },
+                  "smtp_max_frequency": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 32767
+                  },
+                  "mfa_max_enrolled_factors": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "sessions_timebox": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "sessions_inactivity_timeout": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "rate_limit_anonymous_users": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2147483647
+                  },
+                  "rate_limit_email_sent": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2147483647
+                  },
+                  "rate_limit_sms_sent": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2147483647
+                  },
+                  "rate_limit_verify": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2147483647
+                  },
+                  "rate_limit_token_refresh": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2147483647
+                  },
+                  "rate_limit_otp": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2147483647
+                  },
+                  "password_min_length": {
+                    "type": "integer",
+                    "minimum": 6,
+                    "maximum": 32767
+                  },
+                  "security_refresh_token_reuse_interval": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "mailer_otp_exp": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "mailer_otp_length": {
+                    "type": "integer",
+                    "minimum": 6,
+                    "maximum": 10
+                  },
+                  "sms_max_frequency": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 32767
+                  },
+                  "sms_otp_exp": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "sms_otp_length": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 32767
+                  },
+                  "db_max_pool_size": {
+                    "type": "integer"
+                  },
+                  "api_max_request_duration": {
+                    "type": "integer"
+                  },
+                  "mfa_phone_max_frequency": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 32767
+                  },
+                  "mfa_phone_otp_length": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 32767
+                  },
                   "site_url": {
                     "type": "string",
                     "pattern": "/^[^,]+$/"
                   },
                   "disable_signup": {
                     "type": "boolean"
-                  },
-                  "jwt_exp": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 604800
                   },
                   "smtp_admin_email": {
                     "type": "string"
@@ -5767,11 +6517,6 @@
                   },
                   "smtp_pass": {
                     "type": "string"
-                  },
-                  "smtp_max_frequency": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 32767
                   },
                   "smtp_sender_name": {
                     "type": "string"
@@ -5818,11 +6563,6 @@
                   "mailer_templates_reauthentication_content": {
                     "type": "string"
                   },
-                  "mfa_max_enrolled_factors": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 2147483647
-                  },
                   "uri_allow_list": {
                     "type": "string"
                   },
@@ -5851,50 +6591,12 @@
                   "security_captcha_secret": {
                     "type": "string"
                   },
-                  "sessions_timebox": {
-                    "type": "number",
-                    "minimum": 0
-                  },
-                  "sessions_inactivity_timeout": {
-                    "type": "number",
-                    "minimum": 0
-                  },
                   "sessions_single_per_user": {
                     "type": "boolean"
                   },
                   "sessions_tags": {
                     "type": "string",
                     "pattern": "/^\\s*([a-z0-9_-]+(\\s*,+\\s*)?)*\\s*$/i"
-                  },
-                  "rate_limit_anonymous_users": {
-                    "type": "number",
-                    "minimum": 1,
-                    "maximum": 2147483647
-                  },
-                  "rate_limit_email_sent": {
-                    "type": "number",
-                    "minimum": 1,
-                    "maximum": 2147483647
-                  },
-                  "rate_limit_sms_sent": {
-                    "type": "number",
-                    "minimum": 1,
-                    "maximum": 2147483647
-                  },
-                  "rate_limit_verify": {
-                    "type": "number",
-                    "minimum": 1,
-                    "maximum": 2147483647
-                  },
-                  "rate_limit_token_refresh": {
-                    "type": "number",
-                    "minimum": 1,
-                    "maximum": 2147483647
-                  },
-                  "rate_limit_otp": {
-                    "type": "number",
-                    "minimum": 1,
-                    "maximum": 2147483647
                   },
                   "mailer_secure_email_change_enabled": {
                     "type": "boolean"
@@ -5904,11 +6606,6 @@
                   },
                   "password_hibp_enabled": {
                     "type": "boolean"
-                  },
-                  "password_min_length": {
-                    "type": "number",
-                    "minimum": 6,
-                    "maximum": 32767
                   },
                   "password_required_characters": {
                     "type": "string",
@@ -5925,38 +6622,8 @@
                   "security_update_password_require_reauthentication": {
                     "type": "boolean"
                   },
-                  "security_refresh_token_reuse_interval": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 2147483647
-                  },
-                  "mailer_otp_exp": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 2147483647
-                  },
-                  "mailer_otp_length": {
-                    "type": "number",
-                    "minimum": 6,
-                    "maximum": 10
-                  },
                   "sms_autoconfirm": {
                     "type": "boolean"
-                  },
-                  "sms_max_frequency": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 32767
-                  },
-                  "sms_otp_exp": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 2147483647
-                  },
-                  "sms_otp_length": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 32767
                   },
                   "sms_provider": {
                     "type": "string"
@@ -6259,12 +6926,6 @@
                   "external_zoom_secret": {
                     "type": "string"
                   },
-                  "db_max_pool_size": {
-                    "type": "number"
-                  },
-                  "api_max_request_duration": {
-                    "type": "number"
-                  },
                   "mfa_totp_enroll_enabled": {
                     "type": "boolean"
                   },
@@ -6283,16 +6944,6 @@
                   "mfa_phone_verify_enabled": {
                     "type": "boolean"
                   },
-                  "mfa_phone_max_frequency": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 32767
-                  },
-                  "mfa_phone_otp_length": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 32767
-                  },
                   "mfa_phone_template": {
                     "type": "string"
                   }
@@ -6310,11 +6961,88 @@
                   "type": "object",
                   "properties": {
                     "api_max_request_duration": {
-                      "type": "number",
+                      "type": "integer",
                       "nullable": true
                     },
                     "db_max_pool_size": {
-                      "type": "number",
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "jwt_exp": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "mailer_otp_exp": {
+                      "type": "integer"
+                    },
+                    "mailer_otp_length": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "mfa_max_enrolled_factors": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "mfa_phone_otp_length": {
+                      "type": "integer"
+                    },
+                    "mfa_phone_max_frequency": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "password_min_length": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "rate_limit_anonymous_users": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "rate_limit_email_sent": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "rate_limit_sms_sent": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "rate_limit_token_refresh": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "rate_limit_verify": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "rate_limit_otp": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "security_refresh_token_reuse_interval": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "sessions_inactivity_timeout": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "sessions_timebox": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "sms_max_frequency": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "sms_otp_exp": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "sms_otp_length": {
+                      "type": "integer"
+                    },
+                    "smtp_max_frequency": {
+                      "type": "integer",
                       "nullable": true
                     },
                     "disable_signup": {
@@ -6661,23 +7389,12 @@
                       "type": "string",
                       "nullable": true
                     },
-                    "jwt_exp": {
-                      "type": "number",
-                      "nullable": true
-                    },
                     "mailer_allow_unverified_email_sign_ins": {
                       "type": "boolean",
                       "nullable": true
                     },
                     "mailer_autoconfirm": {
                       "type": "boolean",
-                      "nullable": true
-                    },
-                    "mailer_otp_exp": {
-                      "type": "number"
-                    },
-                    "mailer_otp_length": {
-                      "type": "number",
                       "nullable": true
                     },
                     "mailer_secure_email_change_enabled": {
@@ -6732,10 +7449,6 @@
                       "type": "string",
                       "nullable": true
                     },
-                    "mfa_max_enrolled_factors": {
-                      "type": "number",
-                      "nullable": true
-                    },
                     "mfa_totp_enroll_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -6760,51 +7473,16 @@
                       "type": "boolean",
                       "nullable": true
                     },
-                    "mfa_phone_otp_length": {
-                      "type": "number"
-                    },
                     "mfa_phone_template": {
                       "type": "string",
-                      "nullable": true
-                    },
-                    "mfa_phone_max_frequency": {
-                      "type": "number",
                       "nullable": true
                     },
                     "password_hibp_enabled": {
                       "type": "boolean",
                       "nullable": true
                     },
-                    "password_min_length": {
-                      "type": "number",
-                      "nullable": true
-                    },
                     "password_required_characters": {
                       "type": "string",
-                      "nullable": true
-                    },
-                    "rate_limit_anonymous_users": {
-                      "type": "number",
-                      "nullable": true
-                    },
-                    "rate_limit_email_sent": {
-                      "type": "number",
-                      "nullable": true
-                    },
-                    "rate_limit_sms_sent": {
-                      "type": "number",
-                      "nullable": true
-                    },
-                    "rate_limit_token_refresh": {
-                      "type": "number",
-                      "nullable": true
-                    },
-                    "rate_limit_verify": {
-                      "type": "number",
-                      "nullable": true
-                    },
-                    "rate_limit_otp": {
-                      "type": "number",
                       "nullable": true
                     },
                     "refresh_token_rotation_enabled": {
@@ -6839,16 +7517,8 @@
                       "type": "boolean",
                       "nullable": true
                     },
-                    "security_refresh_token_reuse_interval": {
-                      "type": "number",
-                      "nullable": true
-                    },
                     "security_update_password_require_reauthentication": {
                       "type": "boolean",
-                      "nullable": true
-                    },
-                    "sessions_inactivity_timeout": {
-                      "type": "number",
                       "nullable": true
                     },
                     "sessions_single_per_user": {
@@ -6859,20 +7529,12 @@
                       "type": "string",
                       "nullable": true
                     },
-                    "sessions_timebox": {
-                      "type": "number",
-                      "nullable": true
-                    },
                     "site_url": {
                       "type": "string",
                       "nullable": true
                     },
                     "sms_autoconfirm": {
                       "type": "boolean",
-                      "nullable": true
-                    },
-                    "sms_max_frequency": {
-                      "type": "number",
                       "nullable": true
                     },
                     "sms_messagebird_access_key": {
@@ -6882,13 +7544,6 @@
                     "sms_messagebird_originator": {
                       "type": "string",
                       "nullable": true
-                    },
-                    "sms_otp_exp": {
-                      "type": "number",
-                      "nullable": true
-                    },
-                    "sms_otp_length": {
-                      "type": "number"
                     },
                     "sms_provider": {
                       "type": "string",
@@ -6962,10 +7617,6 @@
                       "type": "string",
                       "nullable": true
                     },
-                    "smtp_max_frequency": {
-                      "type": "number",
-                      "nullable": true
-                    },
                     "smtp_pass": {
                       "type": "string",
                       "nullable": true
@@ -6990,6 +7641,26 @@
                   "required": [
                     "api_max_request_duration",
                     "db_max_pool_size",
+                    "jwt_exp",
+                    "mailer_otp_exp",
+                    "mailer_otp_length",
+                    "mfa_max_enrolled_factors",
+                    "mfa_phone_otp_length",
+                    "mfa_phone_max_frequency",
+                    "password_min_length",
+                    "rate_limit_anonymous_users",
+                    "rate_limit_email_sent",
+                    "rate_limit_sms_sent",
+                    "rate_limit_token_refresh",
+                    "rate_limit_verify",
+                    "rate_limit_otp",
+                    "security_refresh_token_reuse_interval",
+                    "sessions_inactivity_timeout",
+                    "sessions_timebox",
+                    "sms_max_frequency",
+                    "sms_otp_exp",
+                    "sms_otp_length",
+                    "smtp_max_frequency",
                     "disable_signup",
                     "external_anonymous_users_enabled",
                     "external_apple_additional_client_ids",
@@ -7076,11 +7747,8 @@
                     "hook_send_email_enabled",
                     "hook_send_email_uri",
                     "hook_send_email_secrets",
-                    "jwt_exp",
                     "mailer_allow_unverified_email_sign_ins",
                     "mailer_autoconfirm",
-                    "mailer_otp_exp",
-                    "mailer_otp_length",
                     "mailer_secure_email_change_enabled",
                     "mailer_subjects_confirmation",
                     "mailer_subjects_email_change",
@@ -7094,25 +7762,15 @@
                     "mailer_templates_magic_link_content",
                     "mailer_templates_reauthentication_content",
                     "mailer_templates_recovery_content",
-                    "mfa_max_enrolled_factors",
                     "mfa_totp_enroll_enabled",
                     "mfa_totp_verify_enabled",
                     "mfa_phone_enroll_enabled",
                     "mfa_phone_verify_enabled",
                     "mfa_web_authn_enroll_enabled",
                     "mfa_web_authn_verify_enabled",
-                    "mfa_phone_otp_length",
                     "mfa_phone_template",
-                    "mfa_phone_max_frequency",
                     "password_hibp_enabled",
-                    "password_min_length",
                     "password_required_characters",
-                    "rate_limit_anonymous_users",
-                    "rate_limit_email_sent",
-                    "rate_limit_sms_sent",
-                    "rate_limit_token_refresh",
-                    "rate_limit_verify",
-                    "rate_limit_otp",
                     "refresh_token_rotation_enabled",
                     "saml_enabled",
                     "saml_external_url",
@@ -7121,19 +7779,13 @@
                     "security_captcha_provider",
                     "security_captcha_secret",
                     "security_manual_linking_enabled",
-                    "security_refresh_token_reuse_interval",
                     "security_update_password_require_reauthentication",
-                    "sessions_inactivity_timeout",
                     "sessions_single_per_user",
                     "sessions_tags",
-                    "sessions_timebox",
                     "site_url",
                     "sms_autoconfirm",
-                    "sms_max_frequency",
                     "sms_messagebird_access_key",
                     "sms_messagebird_originator",
-                    "sms_otp_exp",
-                    "sms_otp_length",
                     "sms_provider",
                     "sms_template",
                     "sms_test_otp",
@@ -7152,7 +7804,6 @@
                     "sms_vonage_from",
                     "smtp_admin_email",
                     "smtp_host",
-                    "smtp_max_frequency",
                     "smtp_pass",
                     "smtp_port",
                     "smtp_sender_name",
@@ -7514,6 +8165,290 @@
         ]
       }
     },
+    "/v1/projects/{ref}/pause": {
+      "post": {
+        "operationId": "v1-pause-a-project",
+        "summary": "Pauses the given project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": ["Projects"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/restore": {
+      "get": {
+        "operationId": "v1-list-available-restore-versions",
+        "summary": "Lists available restore versions for the given project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "available_versions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "version": {
+                            "type": "string"
+                          },
+                          "release_channel": {
+                            "type": "string",
+                            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+                          },
+                          "postgres_engine": {
+                            "type": "string",
+                            "enum": ["13", "14", "15", "17-oriole"]
+                          }
+                        },
+                        "required": ["version", "release_channel", "postgres_engine"]
+                      }
+                    }
+                  },
+                  "required": ["available_versions"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": ["Projects"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "v1-restore-a-project",
+        "summary": "Restores the given project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "release_channel": {
+                    "type": "string",
+                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
+                    "description": "Release channel version. If not provided, GeneralAvailability will be used."
+                  },
+                  "postgres_engine": {
+                    "type": "string",
+                    "enum": ["15", "17-oriole"],
+                    "description": "Postgres engine version. If not provided, the latest version from the given release channel will be used."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": ["Projects"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/restore/cancel": {
+      "post": {
+        "operationId": "v1-cancel-a-project-restoration",
+        "summary": "Cancels the given project restoration",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": ["Projects"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/analytics/endpoints/logs.all": {
+      "get": {
+        "operationId": "getLogs",
+        "summary": "Gets project's logs",
+        "parameters": [
+          {
+            "name": "iso_timestamp_end",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "iso_timestamp_start",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sql",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "oneOf": [
+                        {
+                          "properties": {
+                            "code": {
+                              "type": "number"
+                            },
+                            "errors": {
+                              "type": "array",
+                              "items": {
+                                "properties": {
+                                  "domain": {
+                                    "type": "string"
+                                  },
+                                  "location": {
+                                    "type": "string"
+                                  },
+                                  "locationType": {
+                                    "type": "string"
+                                  },
+                                  "message": {
+                                    "type": "string"
+                                  },
+                                  "reason": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            },
+                            "message": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": ["Analytics"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/projects/{ref}/database/query": {
       "post": {
         "operationId": "v1-run-a-query",
@@ -7611,7 +8546,7 @@
     },
     "/v1/projects/{ref}/functions": {
       "post": {
-        "operationId": "createFunction",
+        "operationId": "v1-create-a-function",
         "summary": "Create a function",
         "description": "Creates a function and adds it to the specified project.",
         "parameters": [
@@ -7674,6 +8609,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "compute_multiplier",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 4,
+              "type": "number"
+            }
           }
         ],
         "requestBody": {
@@ -7695,6 +8640,11 @@
                   },
                   "verify_jwt": {
                     "type": "boolean"
+                  },
+                  "compute_multiplier": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4
                   }
                 },
                 "required": ["slug", "name", "body"]
@@ -7716,6 +8666,11 @@
                   },
                   "verify_jwt": {
                     "type": "boolean"
+                  },
+                  "compute_multiplier": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4
                   }
                 },
                 "required": ["slug", "name", "body"]
@@ -7731,6 +8686,17 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "version": {
+                      "type": "integer"
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "updated_at": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
                     "id": {
                       "type": "string"
                     },
@@ -7744,15 +8710,6 @@
                       "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
                       "type": "string"
                     },
-                    "version": {
-                      "type": "number"
-                    },
-                    "created_at": {
-                      "type": "number"
-                    },
-                    "updated_at": {
-                      "type": "number"
-                    },
                     "verify_jwt": {
                       "type": "boolean"
                     },
@@ -7764,16 +8721,19 @@
                     },
                     "import_map_path": {
                       "type": "string"
+                    },
+                    "compute_multiplier": {
+                      "type": "number"
                     }
                   },
                   "required": [
+                    "version",
+                    "created_at",
+                    "updated_at",
                     "id",
                     "slug",
                     "name",
-                    "status",
-                    "version",
-                    "created_at",
-                    "updated_at"
+                    "status"
                   ]
                 }
               }
@@ -7820,6 +8780,17 @@
                   "items": {
                     "type": "object",
                     "properties": {
+                      "version": {
+                        "type": "integer"
+                      },
+                      "created_at": {
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "updated_at": {
+                        "type": "integer",
+                        "format": "int64"
+                      },
                       "id": {
                         "type": "string"
                       },
@@ -7833,15 +8804,6 @@
                         "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
                         "type": "string"
                       },
-                      "version": {
-                        "type": "number"
-                      },
-                      "created_at": {
-                        "type": "number"
-                      },
-                      "updated_at": {
-                        "type": "number"
-                      },
                       "verify_jwt": {
                         "type": "boolean"
                       },
@@ -7853,16 +8815,19 @@
                       },
                       "import_map_path": {
                         "type": "string"
+                      },
+                      "compute_multiplier": {
+                        "type": "number"
                       }
                     },
                     "required": [
+                      "version",
+                      "created_at",
+                      "updated_at",
                       "id",
                       "slug",
                       "name",
-                      "status",
-                      "version",
-                      "created_at",
-                      "updated_at"
+                      "status"
                     ]
                   }
                 }
@@ -7920,6 +8885,17 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "version": {
+                      "type": "integer"
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "updated_at": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
                     "id": {
                       "type": "string"
                     },
@@ -7933,15 +8909,6 @@
                       "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
                       "type": "string"
                     },
-                    "version": {
-                      "type": "number"
-                    },
-                    "created_at": {
-                      "type": "number"
-                    },
-                    "updated_at": {
-                      "type": "number"
-                    },
                     "verify_jwt": {
                       "type": "boolean"
                     },
@@ -7953,16 +8920,19 @@
                     },
                     "import_map_path": {
                       "type": "string"
+                    },
+                    "compute_multiplier": {
+                      "type": "number"
                     }
                   },
                   "required": [
+                    "version",
+                    "created_at",
+                    "updated_at",
                     "id",
                     "slug",
                     "name",
-                    "status",
-                    "version",
-                    "created_at",
-                    "updated_at"
+                    "status"
                   ]
                 }
               }
@@ -8056,6 +9026,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "compute_multiplier",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 4,
+              "type": "number"
+            }
           }
         ],
         "requestBody": {
@@ -8073,6 +9053,11 @@
                   },
                   "verify_jwt": {
                     "type": "boolean"
+                  },
+                  "compute_multiplier": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4
                   }
                 }
               }
@@ -8089,6 +9074,11 @@
                   },
                   "verify_jwt": {
                     "type": "boolean"
+                  },
+                  "compute_multiplier": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4
                   }
                 }
               }
@@ -8103,6 +9093,17 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "version": {
+                      "type": "integer"
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "updated_at": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
                     "id": {
                       "type": "string"
                     },
@@ -8116,15 +9117,6 @@
                       "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
                       "type": "string"
                     },
-                    "version": {
-                      "type": "number"
-                    },
-                    "created_at": {
-                      "type": "number"
-                    },
-                    "updated_at": {
-                      "type": "number"
-                    },
                     "verify_jwt": {
                       "type": "boolean"
                     },
@@ -8136,16 +9128,19 @@
                     },
                     "import_map_path": {
                       "type": "string"
+                    },
+                    "compute_multiplier": {
+                      "type": "number"
                     }
                   },
                   "required": [
+                    "version",
+                    "created_at",
+                    "updated_at",
                     "id",
                     "slug",
                     "name",
-                    "status",
-                    "version",
-                    "created_at",
-                    "updated_at"
+                    "status"
                   ]
                 }
               }
@@ -9234,10 +10229,12 @@
                       "type": "object",
                       "properties": {
                         "earliest_physical_backup_date_unix": {
-                          "type": "number"
+                          "type": "integer",
+                          "format": "int64"
                         },
                         "latest_physical_backup_date_unix": {
-                          "type": "number"
+                          "type": "integer",
+                          "format": "int64"
                         }
                       }
                     }
@@ -9290,7 +10287,9 @@
                 "type": "object",
                 "properties": {
                   "recovery_time_target_unix": {
-                    "type": "number"
+                    "type": "integer",
+                    "minimum": 0,
+                    "format": "int64"
                   }
                 },
                 "required": ["recovery_time_target_unix"]
@@ -9399,6 +10398,13 @@
                         "enum": ["AI_SQL_GENERATOR_OPT_IN"]
                       }
                     },
+                    "allowed_release_channels": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+                      }
+                    },
                     "id": {
                       "type": "string"
                     },
@@ -9406,7 +10412,7 @@
                       "type": "string"
                     }
                   },
-                  "required": ["opt_in_tags", "id", "name"]
+                  "required": ["opt_in_tags", "allowed_release_channels", "id", "name"]
                 }
               }
             }
@@ -9433,6 +10439,26 @@
       "BranchDetailResponse": {
         "type": "object",
         "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "INACTIVE",
+              "ACTIVE_HEALTHY",
+              "ACTIVE_UNHEALTHY",
+              "COMING_UP",
+              "UNKNOWN",
+              "GOING_DOWN",
+              "INIT_FAILED",
+              "REMOVED",
+              "RESTORING",
+              "UPGRADING",
+              "PAUSING",
+              "RESTORE_FAILED",
+              "RESTARTING",
+              "PAUSE_FAILED",
+              "RESIZING"
+            ]
+          },
           "db_port": {
             "type": "integer"
           },
@@ -9442,23 +10468,10 @@
           "postgres_version": {
             "type": "string"
           },
-          "status": {
-            "enum": [
-              "ACTIVE_HEALTHY",
-              "ACTIVE_UNHEALTHY",
-              "COMING_UP",
-              "GOING_DOWN",
-              "INACTIVE",
-              "INIT_FAILED",
-              "REMOVED",
-              "RESTARTING",
-              "UNKNOWN",
-              "UPGRADING",
-              "PAUSING",
-              "RESTORING",
-              "RESTORE_FAILED",
-              "PAUSE_FAILED"
-            ],
+          "postgres_engine": {
+            "type": "string"
+          },
+          "release_channel": {
             "type": "string"
           },
           "db_host": {
@@ -9474,24 +10487,35 @@
             "type": "string"
           }
         },
-        "required": ["db_port", "ref", "postgres_version", "status", "db_host"]
+        "required": [
+          "status",
+          "db_port",
+          "ref",
+          "postgres_version",
+          "postgres_engine",
+          "release_channel",
+          "db_host"
+        ]
       },
       "UpdateBranchBody": {
         "type": "object",
         "properties": {
+          "reset_on_push": {
+            "type": "boolean",
+            "deprecated": true,
+            "description": "This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead."
+          },
           "branch_name": {
             "type": "string"
           },
           "git_branch": {
             "type": "string"
           },
-          "reset_on_push": {
-            "type": "boolean"
-          },
           "persistent": {
             "type": "boolean"
           },
           "status": {
+            "type": "string",
             "enum": [
               "CREATING_PROJECT",
               "RUNNING_MIGRATIONS",
@@ -9499,14 +10523,33 @@
               "MIGRATIONS_FAILED",
               "FUNCTIONS_DEPLOYED",
               "FUNCTIONS_FAILED"
-            ],
-            "type": "string"
+            ]
           }
         }
       },
       "BranchResponse": {
         "type": "object",
         "properties": {
+          "pr_number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "latest_check_run_id": {
+            "type": "number",
+            "deprecated": true,
+            "description": "This field is deprecated and will not be populated."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "CREATING_PROJECT",
+              "RUNNING_MIGRATIONS",
+              "MIGRATIONS_PASSED",
+              "MIGRATIONS_FAILED",
+              "FUNCTIONS_DEPLOYED",
+              "FUNCTIONS_FAILED"
+            ]
+          },
           "id": {
             "type": "string"
           },
@@ -9525,28 +10568,8 @@
           "git_branch": {
             "type": "string"
           },
-          "pr_number": {
-            "type": "number"
-          },
-          "latest_check_run_id": {
-            "type": "number"
-          },
-          "reset_on_push": {
-            "type": "boolean"
-          },
           "persistent": {
             "type": "boolean"
-          },
-          "status": {
-            "enum": [
-              "CREATING_PROJECT",
-              "RUNNING_MIGRATIONS",
-              "MIGRATIONS_PASSED",
-              "MIGRATIONS_FAILED",
-              "FUNCTIONS_DEPLOYED",
-              "FUNCTIONS_FAILED"
-            ],
-            "type": "string"
           },
           "created_at": {
             "type": "string"
@@ -9556,14 +10579,13 @@
           }
         },
         "required": [
+          "status",
           "id",
           "name",
           "project_ref",
           "parent_project_ref",
           "is_default",
-          "reset_on_push",
           "persistent",
-          "status",
           "created_at",
           "updated_at"
         ]
@@ -9577,14 +10599,17 @@
         },
         "required": ["message"]
       },
-      "BranchResetResponse": {
+      "BranchUpdateResponse": {
         "type": "object",
         "properties": {
+          "workflow_run_id": {
+            "type": "string"
+          },
           "message": {
             "type": "string"
           }
         },
-        "required": ["message"]
+        "required": ["workflow_run_id", "message"]
       },
       "V1DatabaseResponse": {
         "type": "object",
@@ -9596,9 +10621,172 @@
           "version": {
             "type": "string",
             "description": "Database version"
+          },
+          "postgres_engine": {
+            "type": "string",
+            "description": "Database engine"
+          },
+          "release_channel": {
+            "type": "string",
+            "description": "Release channel"
           }
         },
-        "required": ["host", "version"]
+        "required": ["host", "version", "postgres_engine", "release_channel"]
+      },
+      "V1ProjectWithDatabaseResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id of your project"
+          },
+          "organization_id": {
+            "type": "string",
+            "description": "Slug of your organization"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of your project"
+          },
+          "region": {
+            "type": "string",
+            "description": "Region of your project",
+            "example": "us-east-1"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp",
+            "example": "2023-03-29T16:32:59Z"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "INACTIVE",
+              "ACTIVE_HEALTHY",
+              "ACTIVE_UNHEALTHY",
+              "COMING_UP",
+              "UNKNOWN",
+              "GOING_DOWN",
+              "INIT_FAILED",
+              "REMOVED",
+              "RESTORING",
+              "UPGRADING",
+              "PAUSING",
+              "RESTORE_FAILED",
+              "RESTARTING",
+              "PAUSE_FAILED",
+              "RESIZING"
+            ]
+          },
+          "database": {
+            "type": "object",
+            "properties": {
+              "host": {
+                "type": "string",
+                "description": "Database host"
+              },
+              "version": {
+                "type": "string",
+                "description": "Database version"
+              },
+              "postgres_engine": {
+                "type": "string",
+                "description": "Database engine"
+              },
+              "release_channel": {
+                "type": "string",
+                "description": "Release channel"
+              }
+            },
+            "required": ["host", "version", "postgres_engine", "release_channel"]
+          }
+        },
+        "required": ["id", "organization_id", "name", "region", "created_at", "status", "database"]
+      },
+      "V1CreateProjectBodyDto": {
+        "type": "object",
+        "properties": {
+          "db_pass": {
+            "type": "string",
+            "description": "Database password"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of your project"
+          },
+          "organization_id": {
+            "type": "string",
+            "description": "Slug of your organization"
+          },
+          "plan": {
+            "type": "string",
+            "enum": ["free", "pro"],
+            "deprecated": true,
+            "description": "Subscription Plan is now set on organization level and is ignored in this request"
+          },
+          "region": {
+            "type": "string",
+            "description": "Region you want your server to reside in",
+            "enum": [
+              "us-east-1",
+              "us-east-2",
+              "us-west-1",
+              "us-west-2",
+              "ap-east-1",
+              "ap-southeast-1",
+              "ap-northeast-1",
+              "ap-northeast-2",
+              "ap-southeast-2",
+              "eu-west-1",
+              "eu-west-2",
+              "eu-west-3",
+              "eu-north-1",
+              "eu-central-1",
+              "eu-central-2",
+              "ca-central-1",
+              "ap-south-1",
+              "sa-east-1"
+            ]
+          },
+          "kps_enabled": {
+            "type": "boolean",
+            "deprecated": true,
+            "description": "This field is deprecated and is ignored in this request"
+          },
+          "desired_instance_size": {
+            "type": "string",
+            "enum": [
+              "micro",
+              "small",
+              "medium",
+              "large",
+              "xlarge",
+              "2xlarge",
+              "4xlarge",
+              "8xlarge",
+              "12xlarge",
+              "16xlarge"
+            ]
+          },
+          "template_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Template URL used to create the project from the CLI.",
+            "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
+          },
+          "release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
+            "description": "Release channel. If not provided, GA will be used."
+          },
+          "postgres_engine": {
+            "type": "string",
+            "enum": ["15", "17-oriole"],
+            "description": "Postgres engine version. If not provided, the latest version will be used."
+          }
+        },
+        "required": ["db_pass", "name", "organization_id", "region"],
+        "additionalProperties": false
       },
       "V1ProjectResponse": {
         "type": "object",
@@ -9625,131 +10813,28 @@
             "description": "Creation timestamp",
             "example": "2023-03-29T16:32:59Z"
           },
-          "database": {
-            "type": "object",
-            "properties": {
-              "host": {
-                "type": "string",
-                "description": "Database host"
-              },
-              "version": {
-                "type": "string",
-                "description": "Database version"
-              }
-            },
-            "required": ["host", "version"]
-          },
           "status": {
+            "type": "string",
             "enum": [
+              "INACTIVE",
               "ACTIVE_HEALTHY",
               "ACTIVE_UNHEALTHY",
               "COMING_UP",
+              "UNKNOWN",
               "GOING_DOWN",
-              "INACTIVE",
               "INIT_FAILED",
               "REMOVED",
-              "RESTARTING",
-              "UNKNOWN",
+              "RESTORING",
               "UPGRADING",
               "PAUSING",
-              "RESTORING",
               "RESTORE_FAILED",
-              "PAUSE_FAILED"
-            ],
-            "type": "string"
+              "RESTARTING",
+              "PAUSE_FAILED",
+              "RESIZING"
+            ]
           }
         },
         "required": ["id", "organization_id", "name", "region", "created_at", "status"]
-      },
-      "DesiredInstanceSize": {
-        "type": "string",
-        "enum": [
-          "micro",
-          "small",
-          "medium",
-          "large",
-          "xlarge",
-          "2xlarge",
-          "4xlarge",
-          "8xlarge",
-          "12xlarge",
-          "16xlarge"
-        ]
-      },
-      "V1CreateProjectBody": {
-        "type": "object",
-        "properties": {
-          "db_pass": {
-            "type": "string",
-            "description": "Database password"
-          },
-          "name": {
-            "type": "string",
-            "description": "Name of your project, should not contain dots"
-          },
-          "organization_id": {
-            "type": "string",
-            "description": "Slug of your organization"
-          },
-          "plan": {
-            "type": "string",
-            "enum": ["free", "pro"],
-            "description": "Subscription Plan is now set on organization level and is ignored in this request",
-            "example": "free",
-            "deprecated": true
-          },
-          "region": {
-            "type": "string",
-            "enum": [
-              "us-east-1",
-              "us-east-2",
-              "us-west-1",
-              "us-west-2",
-              "ap-east-1",
-              "ap-southeast-1",
-              "ap-northeast-1",
-              "ap-northeast-2",
-              "ap-southeast-2",
-              "eu-west-1",
-              "eu-west-2",
-              "eu-west-3",
-              "eu-north-1",
-              "eu-central-1",
-              "eu-central-2",
-              "ca-central-1",
-              "ap-south-1",
-              "sa-east-1"
-            ],
-            "description": "Region you want your server to reside in",
-            "example": "us-east-1"
-          },
-          "kps_enabled": {
-            "type": "boolean",
-            "deprecated": true,
-            "description": "This field is deprecated and is ignored in this request"
-          },
-          "desired_instance_size": {
-            "type": "string",
-            "enum": [
-              "micro",
-              "small",
-              "medium",
-              "large",
-              "xlarge",
-              "2xlarge",
-              "4xlarge",
-              "8xlarge",
-              "12xlarge",
-              "16xlarge"
-            ]
-          },
-          "template_url": {
-            "type": "string",
-            "description": "Template URL used to create the project from the CLI.",
-            "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
-          }
-        },
-        "required": ["db_pass", "name", "organization_id", "region"]
       },
       "OrganizationResponseV1": {
         "type": "object",
@@ -9763,14 +10848,15 @@
         },
         "required": ["id", "name"]
       },
-      "CreateOrganizationBodyV1": {
+      "CreateOrganizationV1Dto": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string"
           }
         },
-        "required": ["name"]
+        "required": ["name"],
+        "additionalProperties": false
       },
       "OAuthTokenBody": {
         "type": "object",
@@ -9803,6 +10889,10 @@
       "OAuthTokenResponse": {
         "type": "object",
         "properties": {
+          "expires_in": {
+            "type": "integer",
+            "format": "int64"
+          },
           "token_type": {
             "type": "string",
             "enum": ["Bearer"]
@@ -9812,18 +10902,33 @@
           },
           "refresh_token": {
             "type": "string"
-          },
-          "expires_in": {
-            "type": "number"
           }
         },
-        "required": ["token_type", "access_token", "refresh_token", "expires_in"]
+        "required": ["expires_in", "token_type", "access_token", "refresh_token"]
+      },
+      "OAuthRevokeTokenBodyDto": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "refresh_token": {
+            "type": "string"
+          }
+        },
+        "required": ["client_id", "client_secret", "refresh_token"],
+        "additionalProperties": false
       },
       "SnippetProject": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "number"
+            "type": "integer",
+            "format": "int64"
           },
           "name": {
             "type": "string"
@@ -9835,7 +10940,8 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "number"
+            "type": "integer",
+            "format": "int64"
           },
           "username": {
             "type": "string"
@@ -9867,13 +10973,15 @@
             "type": "string"
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "project": {
             "type": "object",
             "properties": {
               "id": {
-                "type": "number"
+                "type": "integer",
+                "format": "int64"
               },
               "name": {
                 "type": "string"
@@ -9885,7 +10993,8 @@
             "type": "object",
             "properties": {
               "id": {
-                "type": "number"
+                "type": "integer",
+                "format": "int64"
               },
               "username": {
                 "type": "string"
@@ -9897,7 +11006,8 @@
             "type": "object",
             "properties": {
               "id": {
-                "type": "number"
+                "type": "integer",
+                "format": "int64"
               },
               "username": {
                 "type": "string"
@@ -9913,6 +11023,7 @@
           "type",
           "visibility",
           "name",
+          "description",
           "project",
           "owner",
           "updated_by"
@@ -9947,13 +11058,15 @@
                   "type": "string"
                 },
                 "description": {
-                  "type": "string"
+                  "type": "string",
+                  "nullable": true
                 },
                 "project": {
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "number"
+                      "type": "integer",
+                      "format": "int64"
                     },
                     "name": {
                       "type": "string"
@@ -9965,7 +11078,8 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "number"
+                      "type": "integer",
+                      "format": "int64"
                     },
                     "username": {
                       "type": "string"
@@ -9977,7 +11091,8 @@
                   "type": "object",
                   "properties": {
                     "id": {
-                      "type": "number"
+                      "type": "integer",
+                      "format": "int64"
                     },
                     "username": {
                       "type": "string"
@@ -9993,11 +11108,15 @@
                 "type",
                 "visibility",
                 "name",
+                "description",
                 "project",
                 "owner",
                 "updated_by"
               ]
             }
+          },
+          "cursor": {
+            "type": "string"
           }
         },
         "required": ["data"]
@@ -10041,13 +11160,15 @@
             "type": "string"
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "project": {
             "type": "object",
             "properties": {
               "id": {
-                "type": "number"
+                "type": "integer",
+                "format": "int64"
               },
               "name": {
                 "type": "string"
@@ -10059,7 +11180,8 @@
             "type": "object",
             "properties": {
               "id": {
-                "type": "number"
+                "type": "integer",
+                "format": "int64"
               },
               "username": {
                 "type": "string"
@@ -10071,7 +11193,8 @@
             "type": "object",
             "properties": {
               "id": {
-                "type": "number"
+                "type": "integer",
+                "format": "int64"
               },
               "username": {
                 "type": "string"
@@ -10102,6 +11225,7 @@
           "type",
           "visibility",
           "name",
+          "description",
           "project",
           "owner",
           "updated_by",
@@ -10120,6 +11244,11 @@
       "ApiKeyResponse": {
         "type": "object",
         "properties": {
+          "type": {
+            "nullable": true,
+            "type": "string",
+            "enum": ["publishable", "secret", "legacy"]
+          },
           "name": {
             "type": "string"
           },
@@ -10129,10 +11258,6 @@
           "id": {
             "type": "string",
             "nullable": true
-          },
-          "type": {
-            "nullable": true,
-            "type": "object"
           },
           "prefix": {
             "type": "string",
@@ -10222,6 +11347,30 @@
           }
         }
       },
+      "DesiredInstanceSize": {
+        "type": "string",
+        "enum": [
+          "micro",
+          "small",
+          "medium",
+          "large",
+          "xlarge",
+          "2xlarge",
+          "4xlarge",
+          "8xlarge",
+          "12xlarge",
+          "16xlarge"
+        ]
+      },
+      "ReleaseChannel": {
+        "type": "string",
+        "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+      },
+      "PostgresEngine": {
+        "type": "string",
+        "description": "Postgres engine version. If not provided, the latest version will be used.",
+        "enum": ["15", "17-oriole"]
+      },
       "CreateBranchBody": {
         "type": "object",
         "properties": {
@@ -10239,6 +11388,15 @@
               "12xlarge",
               "16xlarge"
             ]
+          },
+          "release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+          },
+          "postgres_engine": {
+            "type": "string",
+            "description": "Postgres engine version. If not provided, the latest version will be used.",
+            "enum": ["15", "17-oriole"]
           },
           "branch_name": {
             "type": "string"
@@ -10818,7 +11976,8 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "number"
+            "type": "integer",
+            "format": "int64"
           },
           "ref": {
             "type": "string"
@@ -10952,11 +12111,15 @@
       "UpgradeDatabaseBody": {
         "type": "object",
         "properties": {
+          "release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+          },
           "target_version": {
-            "type": "number"
+            "type": "string"
           }
         },
-        "required": ["target_version"]
+        "required": ["release_channel", "target_version"]
       },
       "ProjectUpgradeInitiateResponse": {
         "type": "object",
@@ -10971,17 +12134,30 @@
         "type": "object",
         "properties": {
           "postgres_version": {
-            "type": "number"
+            "type": "string",
+            "description": "Postgres engine version. If not provided, the latest version will be used.",
+            "enum": ["15", "17-oriole"]
+          },
+          "release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           },
           "app_version": {
             "type": "string"
           }
         },
-        "required": ["postgres_version", "app_version"]
+        "required": ["postgres_version", "release_channel", "app_version"]
       },
       "ProjectUpgradeEligibilityResponse": {
         "type": "object",
         "properties": {
+          "current_app_version_release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+          },
+          "duration_estimate_hours": {
+            "type": "integer"
+          },
           "eligible": {
             "type": "boolean"
           },
@@ -10997,13 +12173,19 @@
               "type": "object",
               "properties": {
                 "postgres_version": {
-                  "type": "number"
+                  "type": "string",
+                  "description": "Postgres engine version. If not provided, the latest version will be used.",
+                  "enum": ["15", "17-oriole"]
+                },
+                "release_channel": {
+                  "type": "string",
+                  "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                 },
                 "app_version": {
                   "type": "string"
                 }
               },
-              "required": ["postgres_version", "app_version"]
+              "required": ["postgres_version", "release_channel", "app_version"]
             }
           },
           "potential_breaking_changes": {
@@ -11011,9 +12193,6 @@
             "items": {
               "type": "string"
             }
-          },
-          "duration_estimate_hours": {
-            "type": "number"
           },
           "legacy_auth_custom_roles": {
             "type": "array",
@@ -11029,12 +12208,13 @@
           }
         },
         "required": [
+          "current_app_version_release_channel",
+          "duration_estimate_hours",
           "eligible",
           "current_app_version",
           "latest_app_version",
           "target_upgrade_versions",
           "potential_breaking_changes",
-          "duration_estimate_hours",
           "legacy_auth_custom_roles",
           "extension_dependent_objects"
         ]
@@ -11042,14 +12222,18 @@
       "DatabaseUpgradeStatus": {
         "type": "object",
         "properties": {
+          "target_version": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [0, 1, 2],
+            "type": "integer"
+          },
           "initiated_at": {
             "type": "string"
           },
           "latest_status_at": {
             "type": "string"
-          },
-          "target_version": {
-            "type": "number"
           },
           "error": {
             "type": "string",
@@ -11080,13 +12264,9 @@
               "9_completed_upgrade",
               "10_completed_post_physical_backup"
             ]
-          },
-          "status": {
-            "type": "number",
-            "enum": [0, 1, 2]
           }
         },
-        "required": ["initiated_at", "latest_status_at", "target_version", "status"]
+        "required": ["target_version", "status", "initiated_at", "latest_status_at"]
       },
       "DatabaseUpgradeStatusResponse": {
         "type": "object",
@@ -11097,14 +12277,18 @@
               {
                 "type": "object",
                 "properties": {
+                  "target_version": {
+                    "type": "integer"
+                  },
+                  "status": {
+                    "enum": [0, 1, 2],
+                    "type": "integer"
+                  },
                   "initiated_at": {
                     "type": "string"
                   },
                   "latest_status_at": {
                     "type": "string"
-                  },
-                  "target_version": {
-                    "type": "number"
                   },
                   "error": {
                     "type": "string",
@@ -11135,13 +12319,9 @@
                       "9_completed_upgrade",
                       "10_completed_post_physical_backup"
                     ]
-                  },
-                  "status": {
-                    "type": "number",
-                    "enum": [0, 1, 2]
                   }
                 },
-                "required": ["initiated_at", "latest_status_at", "target_version", "status"]
+                "required": ["target_version", "status", "initiated_at", "latest_status_at"]
               }
             ]
           }
@@ -11207,31 +12387,20 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
-          },
-          "version": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
+            "type": "string",
+            "enum": ["GoTrue"]
           }
         },
-        "required": ["name", "version", "description"]
+        "required": ["name"]
       },
       "RealtimeHealthResponse": {
         "type": "object",
         "properties": {
-          "healthy": {
-            "type": "boolean"
-          },
-          "db_connected": {
-            "type": "boolean"
-          },
           "connected_cluster": {
-            "type": "number"
+            "type": "integer"
           }
         },
-        "required": ["healthy", "db_connected", "connected_cluster"]
+        "required": ["connected_cluster"]
       },
       "V1ServiceHealthResponse": {
         "type": "object",
@@ -11242,31 +12411,20 @@
                 "type": "object",
                 "properties": {
                   "name": {
-                    "type": "string"
-                  },
-                  "version": {
-                    "type": "string"
-                  },
-                  "description": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": ["GoTrue"]
                   }
                 },
-                "required": ["name", "version", "description"]
+                "required": ["name"]
               },
               {
                 "type": "object",
                 "properties": {
-                  "healthy": {
-                    "type": "boolean"
-                  },
-                  "db_connected": {
-                    "type": "boolean"
-                  },
                   "connected_cluster": {
-                    "type": "number"
+                    "type": "integer"
                   }
                 },
-                "required": ["healthy", "db_connected", "connected_cluster"]
+                "required": ["connected_cluster"]
               }
             ]
           },
@@ -11287,13 +12445,124 @@
         },
         "required": ["name", "healthy", "status"]
       },
+      "StorageFeatureImageTransformation": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": ["enabled"]
+      },
+      "StorageFeatureS3Protocol": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": ["enabled"]
+      },
+      "StorageFeatures": {
+        "type": "object",
+        "properties": {
+          "imageTransformation": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["enabled"]
+          },
+          "s3Protocol": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["enabled"]
+          }
+        },
+        "required": ["imageTransformation", "s3Protocol"]
+      },
+      "StorageConfigResponse": {
+        "type": "object",
+        "properties": {
+          "fileSizeLimit": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "features": {
+            "type": "object",
+            "properties": {
+              "imageTransformation": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["enabled"]
+              },
+              "s3Protocol": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["enabled"]
+              }
+            },
+            "required": ["imageTransformation", "s3Protocol"]
+          }
+        },
+        "required": ["fileSizeLimit", "features"]
+      },
+      "UpdateStorageConfigBody": {
+        "type": "object",
+        "properties": {
+          "fileSizeLimit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 53687091200,
+            "format": "int64"
+          },
+          "features": {
+            "type": "object",
+            "properties": {
+              "imageTransformation": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["enabled"]
+              },
+              "s3Protocol": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["enabled"]
+              }
+            },
+            "required": ["imageTransformation", "s3Protocol"]
+          }
+        }
+      },
       "PostgresConfigResponse": {
         "type": "object",
         "properties": {
-          "statement_timeout": {
+          "effective_cache_size": {
             "type": "string"
           },
-          "effective_cache_size": {
+          "logical_decoding_work_mem": {
             "type": "string"
           },
           "maintenance_work_mem": {
@@ -11324,6 +12593,9 @@
             "minimum": 0,
             "maximum": 1024
           },
+          "max_replication_slots": {
+            "type": "integer"
+          },
           "max_slot_wal_keep_size": {
             "type": "string"
           },
@@ -11336,6 +12608,9 @@
           "max_wal_size": {
             "type": "string"
           },
+          "max_wal_senders": {
+            "type": "integer"
+          },
           "max_worker_processes": {
             "type": "integer",
             "minimum": 0,
@@ -11344,7 +12619,16 @@
           "shared_buffers": {
             "type": "string"
           },
+          "statement_timeout": {
+            "type": "string"
+          },
+          "track_commit_timestamp": {
+            "type": "boolean"
+          },
           "wal_keep_size": {
+            "type": "string"
+          },
+          "wal_sender_timeout": {
             "type": "string"
           },
           "work_mem": {
@@ -11359,10 +12643,10 @@
       "UpdatePostgresConfigBody": {
         "type": "object",
         "properties": {
-          "statement_timeout": {
+          "effective_cache_size": {
             "type": "string"
           },
-          "effective_cache_size": {
+          "logical_decoding_work_mem": {
             "type": "string"
           },
           "maintenance_work_mem": {
@@ -11393,6 +12677,9 @@
             "minimum": 0,
             "maximum": 1024
           },
+          "max_replication_slots": {
+            "type": "integer"
+          },
           "max_slot_wal_keep_size": {
             "type": "string"
           },
@@ -11405,6 +12692,9 @@
           "max_wal_size": {
             "type": "string"
           },
+          "max_wal_senders": {
+            "type": "integer"
+          },
           "max_worker_processes": {
             "type": "integer",
             "minimum": 0,
@@ -11413,11 +12703,23 @@
           "shared_buffers": {
             "type": "string"
           },
+          "statement_timeout": {
+            "type": "string"
+          },
+          "track_commit_timestamp": {
+            "type": "boolean"
+          },
           "wal_keep_size": {
+            "type": "string"
+          },
+          "wal_sender_timeout": {
             "type": "string"
           },
           "work_mem": {
             "type": "string"
+          },
+          "restart_database": {
+            "type": "boolean"
           },
           "session_replication_role": {
             "enum": ["origin", "replica", "local"],
@@ -11449,11 +12751,22 @@
       "SupavisorConfigResponse": {
         "type": "object",
         "properties": {
-          "identifier": {
-            "type": "string"
-          },
           "database_type": {
-            "enum": ["PRIMARY", "READ_REPLICA"],
+            "type": "string",
+            "enum": ["PRIMARY", "READ_REPLICA"]
+          },
+          "db_port": {
+            "type": "integer"
+          },
+          "default_pool_size": {
+            "type": "integer",
+            "nullable": true
+          },
+          "max_client_conn": {
+            "type": "integer",
+            "nullable": true
+          },
+          "identifier": {
             "type": "string"
           },
           "is_using_scram_auth": {
@@ -11465,22 +12778,11 @@
           "db_host": {
             "type": "string"
           },
-          "db_port": {
-            "type": "number"
-          },
           "db_name": {
             "type": "string"
           },
           "connectionString": {
             "type": "string"
-          },
-          "default_pool_size": {
-            "type": "number",
-            "nullable": true
-          },
-          "max_client_conn": {
-            "type": "number",
-            "nullable": true
           },
           "pool_mode": {
             "enum": ["transaction", "session"],
@@ -11488,16 +12790,16 @@
           }
         },
         "required": [
-          "identifier",
           "database_type",
+          "db_port",
+          "default_pool_size",
+          "max_client_conn",
+          "identifier",
           "is_using_scram_auth",
           "db_user",
           "db_host",
-          "db_port",
           "db_name",
           "connectionString",
-          "default_pool_size",
-          "max_client_conn",
           "pool_mode"
         ]
       },
@@ -11522,7 +12824,7 @@
         "type": "object",
         "properties": {
           "default_pool_size": {
-            "type": "number",
+            "type": "integer",
             "nullable": true
           },
           "pool_mode": {
@@ -11536,11 +12838,88 @@
         "type": "object",
         "properties": {
           "api_max_request_duration": {
-            "type": "number",
+            "type": "integer",
             "nullable": true
           },
           "db_max_pool_size": {
-            "type": "number",
+            "type": "integer",
+            "nullable": true
+          },
+          "jwt_exp": {
+            "type": "integer",
+            "nullable": true
+          },
+          "mailer_otp_exp": {
+            "type": "integer"
+          },
+          "mailer_otp_length": {
+            "type": "integer",
+            "nullable": true
+          },
+          "mfa_max_enrolled_factors": {
+            "type": "integer",
+            "nullable": true
+          },
+          "mfa_phone_otp_length": {
+            "type": "integer"
+          },
+          "mfa_phone_max_frequency": {
+            "type": "integer",
+            "nullable": true
+          },
+          "password_min_length": {
+            "type": "integer",
+            "nullable": true
+          },
+          "rate_limit_anonymous_users": {
+            "type": "integer",
+            "nullable": true
+          },
+          "rate_limit_email_sent": {
+            "type": "integer",
+            "nullable": true
+          },
+          "rate_limit_sms_sent": {
+            "type": "integer",
+            "nullable": true
+          },
+          "rate_limit_token_refresh": {
+            "type": "integer",
+            "nullable": true
+          },
+          "rate_limit_verify": {
+            "type": "integer",
+            "nullable": true
+          },
+          "rate_limit_otp": {
+            "type": "integer",
+            "nullable": true
+          },
+          "security_refresh_token_reuse_interval": {
+            "type": "integer",
+            "nullable": true
+          },
+          "sessions_inactivity_timeout": {
+            "type": "integer",
+            "nullable": true
+          },
+          "sessions_timebox": {
+            "type": "integer",
+            "nullable": true
+          },
+          "sms_max_frequency": {
+            "type": "integer",
+            "nullable": true
+          },
+          "sms_otp_exp": {
+            "type": "integer",
+            "nullable": true
+          },
+          "sms_otp_length": {
+            "type": "integer"
+          },
+          "smtp_max_frequency": {
+            "type": "integer",
             "nullable": true
           },
           "disable_signup": {
@@ -11887,23 +13266,12 @@
             "type": "string",
             "nullable": true
           },
-          "jwt_exp": {
-            "type": "number",
-            "nullable": true
-          },
           "mailer_allow_unverified_email_sign_ins": {
             "type": "boolean",
             "nullable": true
           },
           "mailer_autoconfirm": {
             "type": "boolean",
-            "nullable": true
-          },
-          "mailer_otp_exp": {
-            "type": "number"
-          },
-          "mailer_otp_length": {
-            "type": "number",
             "nullable": true
           },
           "mailer_secure_email_change_enabled": {
@@ -11958,10 +13326,6 @@
             "type": "string",
             "nullable": true
           },
-          "mfa_max_enrolled_factors": {
-            "type": "number",
-            "nullable": true
-          },
           "mfa_totp_enroll_enabled": {
             "type": "boolean",
             "nullable": true
@@ -11986,51 +13350,16 @@
             "type": "boolean",
             "nullable": true
           },
-          "mfa_phone_otp_length": {
-            "type": "number"
-          },
           "mfa_phone_template": {
             "type": "string",
-            "nullable": true
-          },
-          "mfa_phone_max_frequency": {
-            "type": "number",
             "nullable": true
           },
           "password_hibp_enabled": {
             "type": "boolean",
             "nullable": true
           },
-          "password_min_length": {
-            "type": "number",
-            "nullable": true
-          },
           "password_required_characters": {
             "type": "string",
-            "nullable": true
-          },
-          "rate_limit_anonymous_users": {
-            "type": "number",
-            "nullable": true
-          },
-          "rate_limit_email_sent": {
-            "type": "number",
-            "nullable": true
-          },
-          "rate_limit_sms_sent": {
-            "type": "number",
-            "nullable": true
-          },
-          "rate_limit_token_refresh": {
-            "type": "number",
-            "nullable": true
-          },
-          "rate_limit_verify": {
-            "type": "number",
-            "nullable": true
-          },
-          "rate_limit_otp": {
-            "type": "number",
             "nullable": true
           },
           "refresh_token_rotation_enabled": {
@@ -12065,16 +13394,8 @@
             "type": "boolean",
             "nullable": true
           },
-          "security_refresh_token_reuse_interval": {
-            "type": "number",
-            "nullable": true
-          },
           "security_update_password_require_reauthentication": {
             "type": "boolean",
-            "nullable": true
-          },
-          "sessions_inactivity_timeout": {
-            "type": "number",
             "nullable": true
           },
           "sessions_single_per_user": {
@@ -12085,20 +13406,12 @@
             "type": "string",
             "nullable": true
           },
-          "sessions_timebox": {
-            "type": "number",
-            "nullable": true
-          },
           "site_url": {
             "type": "string",
             "nullable": true
           },
           "sms_autoconfirm": {
             "type": "boolean",
-            "nullable": true
-          },
-          "sms_max_frequency": {
-            "type": "number",
             "nullable": true
           },
           "sms_messagebird_access_key": {
@@ -12108,13 +13421,6 @@
           "sms_messagebird_originator": {
             "type": "string",
             "nullable": true
-          },
-          "sms_otp_exp": {
-            "type": "number",
-            "nullable": true
-          },
-          "sms_otp_length": {
-            "type": "number"
           },
           "sms_provider": {
             "type": "string",
@@ -12188,10 +13494,6 @@
             "type": "string",
             "nullable": true
           },
-          "smtp_max_frequency": {
-            "type": "number",
-            "nullable": true
-          },
           "smtp_pass": {
             "type": "string",
             "nullable": true
@@ -12216,6 +13518,26 @@
         "required": [
           "api_max_request_duration",
           "db_max_pool_size",
+          "jwt_exp",
+          "mailer_otp_exp",
+          "mailer_otp_length",
+          "mfa_max_enrolled_factors",
+          "mfa_phone_otp_length",
+          "mfa_phone_max_frequency",
+          "password_min_length",
+          "rate_limit_anonymous_users",
+          "rate_limit_email_sent",
+          "rate_limit_sms_sent",
+          "rate_limit_token_refresh",
+          "rate_limit_verify",
+          "rate_limit_otp",
+          "security_refresh_token_reuse_interval",
+          "sessions_inactivity_timeout",
+          "sessions_timebox",
+          "sms_max_frequency",
+          "sms_otp_exp",
+          "sms_otp_length",
+          "smtp_max_frequency",
           "disable_signup",
           "external_anonymous_users_enabled",
           "external_apple_additional_client_ids",
@@ -12302,11 +13624,8 @@
           "hook_send_email_enabled",
           "hook_send_email_uri",
           "hook_send_email_secrets",
-          "jwt_exp",
           "mailer_allow_unverified_email_sign_ins",
           "mailer_autoconfirm",
-          "mailer_otp_exp",
-          "mailer_otp_length",
           "mailer_secure_email_change_enabled",
           "mailer_subjects_confirmation",
           "mailer_subjects_email_change",
@@ -12320,25 +13639,15 @@
           "mailer_templates_magic_link_content",
           "mailer_templates_reauthentication_content",
           "mailer_templates_recovery_content",
-          "mfa_max_enrolled_factors",
           "mfa_totp_enroll_enabled",
           "mfa_totp_verify_enabled",
           "mfa_phone_enroll_enabled",
           "mfa_phone_verify_enabled",
           "mfa_web_authn_enroll_enabled",
           "mfa_web_authn_verify_enabled",
-          "mfa_phone_otp_length",
           "mfa_phone_template",
-          "mfa_phone_max_frequency",
           "password_hibp_enabled",
-          "password_min_length",
           "password_required_characters",
-          "rate_limit_anonymous_users",
-          "rate_limit_email_sent",
-          "rate_limit_sms_sent",
-          "rate_limit_token_refresh",
-          "rate_limit_verify",
-          "rate_limit_otp",
           "refresh_token_rotation_enabled",
           "saml_enabled",
           "saml_external_url",
@@ -12347,19 +13656,13 @@
           "security_captcha_provider",
           "security_captcha_secret",
           "security_manual_linking_enabled",
-          "security_refresh_token_reuse_interval",
           "security_update_password_require_reauthentication",
-          "sessions_inactivity_timeout",
           "sessions_single_per_user",
           "sessions_tags",
-          "sessions_timebox",
           "site_url",
           "sms_autoconfirm",
-          "sms_max_frequency",
           "sms_messagebird_access_key",
           "sms_messagebird_originator",
-          "sms_otp_exp",
-          "sms_otp_length",
           "sms_provider",
           "sms_template",
           "sms_test_otp",
@@ -12378,7 +13681,6 @@
           "sms_vonage_from",
           "smtp_admin_email",
           "smtp_host",
-          "smtp_max_frequency",
           "smtp_pass",
           "smtp_port",
           "smtp_sender_name",
@@ -12389,17 +13691,116 @@
       "UpdateAuthConfigBody": {
         "type": "object",
         "properties": {
+          "jwt_exp": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 604800
+          },
+          "smtp_max_frequency": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 32767
+          },
+          "mfa_max_enrolled_factors": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "sessions_timebox": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sessions_inactivity_timeout": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "rate_limit_anonymous_users": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "rate_limit_email_sent": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "rate_limit_sms_sent": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "rate_limit_verify": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "rate_limit_token_refresh": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "rate_limit_otp": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "password_min_length": {
+            "type": "integer",
+            "minimum": 6,
+            "maximum": 32767
+          },
+          "security_refresh_token_reuse_interval": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "mailer_otp_exp": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "mailer_otp_length": {
+            "type": "integer",
+            "minimum": 6,
+            "maximum": 10
+          },
+          "sms_max_frequency": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 32767
+          },
+          "sms_otp_exp": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "sms_otp_length": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 32767
+          },
+          "db_max_pool_size": {
+            "type": "integer"
+          },
+          "api_max_request_duration": {
+            "type": "integer"
+          },
+          "mfa_phone_max_frequency": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 32767
+          },
+          "mfa_phone_otp_length": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 32767
+          },
           "site_url": {
             "type": "string",
             "pattern": "/^[^,]+$/"
           },
           "disable_signup": {
             "type": "boolean"
-          },
-          "jwt_exp": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 604800
           },
           "smtp_admin_email": {
             "type": "string"
@@ -12415,11 +13816,6 @@
           },
           "smtp_pass": {
             "type": "string"
-          },
-          "smtp_max_frequency": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 32767
           },
           "smtp_sender_name": {
             "type": "string"
@@ -12466,11 +13862,6 @@
           "mailer_templates_reauthentication_content": {
             "type": "string"
           },
-          "mfa_max_enrolled_factors": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 2147483647
-          },
           "uri_allow_list": {
             "type": "string"
           },
@@ -12499,50 +13890,12 @@
           "security_captcha_secret": {
             "type": "string"
           },
-          "sessions_timebox": {
-            "type": "number",
-            "minimum": 0
-          },
-          "sessions_inactivity_timeout": {
-            "type": "number",
-            "minimum": 0
-          },
           "sessions_single_per_user": {
             "type": "boolean"
           },
           "sessions_tags": {
             "type": "string",
             "pattern": "/^\\s*([a-z0-9_-]+(\\s*,+\\s*)?)*\\s*$/i"
-          },
-          "rate_limit_anonymous_users": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 2147483647
-          },
-          "rate_limit_email_sent": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 2147483647
-          },
-          "rate_limit_sms_sent": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 2147483647
-          },
-          "rate_limit_verify": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 2147483647
-          },
-          "rate_limit_token_refresh": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 2147483647
-          },
-          "rate_limit_otp": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 2147483647
           },
           "mailer_secure_email_change_enabled": {
             "type": "boolean"
@@ -12552,11 +13905,6 @@
           },
           "password_hibp_enabled": {
             "type": "boolean"
-          },
-          "password_min_length": {
-            "type": "number",
-            "minimum": 6,
-            "maximum": 32767
           },
           "password_required_characters": {
             "type": "string",
@@ -12573,38 +13921,8 @@
           "security_update_password_require_reauthentication": {
             "type": "boolean"
           },
-          "security_refresh_token_reuse_interval": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 2147483647
-          },
-          "mailer_otp_exp": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 2147483647
-          },
-          "mailer_otp_length": {
-            "type": "number",
-            "minimum": 6,
-            "maximum": 10
-          },
           "sms_autoconfirm": {
             "type": "boolean"
-          },
-          "sms_max_frequency": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 32767
-          },
-          "sms_otp_exp": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 2147483647
-          },
-          "sms_otp_length": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 32767
           },
           "sms_provider": {
             "type": "string"
@@ -12907,12 +14225,6 @@
           "external_zoom_secret": {
             "type": "string"
           },
-          "db_max_pool_size": {
-            "type": "number"
-          },
-          "api_max_request_duration": {
-            "type": "number"
-          },
           "mfa_totp_enroll_enabled": {
             "type": "boolean"
           },
@@ -12930,16 +14242,6 @@
           },
           "mfa_phone_verify_enabled": {
             "type": "boolean"
-          },
-          "mfa_phone_max_frequency": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 32767
-          },
-          "mfa_phone_otp_length": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 32767
           },
           "mfa_phone_template": {
             "type": "string"
@@ -12998,6 +14300,117 @@
         },
         "required": ["id", "type", "inserted_at", "updated_at"]
       },
+      "ProjectAvailableRestoreVersion": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+          },
+          "postgres_engine": {
+            "type": "string",
+            "enum": ["13", "14", "15", "17-oriole"]
+          }
+        },
+        "required": ["version", "release_channel", "postgres_engine"]
+      },
+      "GetProjectAvailableRestoreVersionsResponse": {
+        "type": "object",
+        "properties": {
+          "available_versions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "version": {
+                  "type": "string"
+                },
+                "release_channel": {
+                  "type": "string",
+                  "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+                },
+                "postgres_engine": {
+                  "type": "string",
+                  "enum": ["13", "14", "15", "17-oriole"]
+                }
+              },
+              "required": ["version", "release_channel", "postgres_engine"]
+            }
+          }
+        },
+        "required": ["available_versions"]
+      },
+      "RestoreProjectBodyDto": {
+        "type": "object",
+        "properties": {
+          "release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
+            "description": "Release channel version. If not provided, GeneralAvailability will be used."
+          },
+          "postgres_engine": {
+            "type": "string",
+            "enum": ["15", "17-oriole"],
+            "description": "Postgres engine version. If not provided, the latest version from the given release channel will be used."
+          }
+        }
+      },
+      "V1AnalyticsResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "oneOf": [
+              {
+                "properties": {
+                  "code": {
+                    "type": "number"
+                  },
+                  "errors": {
+                    "type": "array",
+                    "items": {
+                      "properties": {
+                        "domain": {
+                          "type": "string"
+                        },
+                        "location": {
+                          "type": "string"
+                        },
+                        "locationType": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "result": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
       "V1RunQueryBody": {
         "type": "object",
         "properties": {
@@ -13022,6 +14435,11 @@
           },
           "verify_jwt": {
             "type": "boolean"
+          },
+          "compute_multiplier": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 4
           }
         },
         "required": ["slug", "name", "body"]
@@ -13029,6 +14447,17 @@
       "FunctionResponse": {
         "type": "object",
         "properties": {
+          "version": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updated_at": {
+            "type": "integer",
+            "format": "int64"
+          },
           "id": {
             "type": "string"
           },
@@ -13042,15 +14471,6 @@
             "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
             "type": "string"
           },
-          "version": {
-            "type": "number"
-          },
-          "created_at": {
-            "type": "number"
-          },
-          "updated_at": {
-            "type": "number"
-          },
           "verify_jwt": {
             "type": "boolean"
           },
@@ -13062,13 +14482,27 @@
           },
           "import_map_path": {
             "type": "string"
+          },
+          "compute_multiplier": {
+            "type": "number"
           }
         },
-        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
+        "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
       },
       "FunctionSlugResponse": {
         "type": "object",
         "properties": {
+          "version": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updated_at": {
+            "type": "integer",
+            "format": "int64"
+          },
           "id": {
             "type": "string"
           },
@@ -13082,15 +14516,6 @@
             "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
             "type": "string"
           },
-          "version": {
-            "type": "number"
-          },
-          "created_at": {
-            "type": "number"
-          },
-          "updated_at": {
-            "type": "number"
-          },
           "verify_jwt": {
             "type": "boolean"
           },
@@ -13102,9 +14527,12 @@
           },
           "import_map_path": {
             "type": "string"
+          },
+          "compute_multiplier": {
+            "type": "number"
           }
         },
-        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
+        "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
       },
       "V1UpdateFunctionBody": {
         "type": "object",
@@ -13117,6 +14545,11 @@
           },
           "verify_jwt": {
             "type": "boolean"
+          },
+          "compute_multiplier": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 4
           }
         }
       },
@@ -14026,10 +15459,12 @@
         "type": "object",
         "properties": {
           "earliest_physical_backup_date_unix": {
-            "type": "number"
+            "type": "integer",
+            "format": "int64"
           },
           "latest_physical_backup_date_unix": {
-            "type": "number"
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -14068,10 +15503,12 @@
             "type": "object",
             "properties": {
               "earliest_physical_backup_date_unix": {
-                "type": "number"
+                "type": "integer",
+                "format": "int64"
               },
               "latest_physical_backup_date_unix": {
-                "type": "number"
+                "type": "integer",
+                "format": "int64"
               }
             }
           }
@@ -14082,7 +15519,9 @@
         "type": "object",
         "properties": {
           "recovery_time_target_unix": {
-            "type": "number"
+            "type": "integer",
+            "minimum": 0,
+            "format": "int64"
           }
         },
         "required": ["recovery_time_target_unix"]
@@ -14126,6 +15565,13 @@
               "enum": ["AI_SQL_GENERATOR_OPT_IN"]
             }
           },
+          "allowed_release_channels": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+            }
+          },
           "id": {
             "type": "string"
           },
@@ -14133,7 +15579,7 @@
             "type": "string"
           }
         },
-        "required": ["opt_in_tags", "id", "name"]
+        "required": ["opt_in_tags", "allowed_release_channels", "id", "name"]
       }
     }
   }

@@ -21,6 +21,7 @@ import { formatCurrency } from 'lib/helpers'
 import { Button } from 'ui'
 import CurrentPaymentMethod from '../BillingSettings/PaymentMethods/CurrentPaymentMethod'
 import { FileText, Download, ChevronLeft, ChevronRight } from 'lucide-react'
+import InvoicePayButton from './InvoicePayButton'
 
 const PAGE_LIMIT = 10
 
@@ -133,7 +134,7 @@ const InvoicesSettings = () => {
                           <p>{dayjs(x.period_end * 1000).format('MMM DD, YYYY')}</p>
                         </Table.td>
                         <Table.td>
-                          <p>{formatCurrency(x.subtotal / 100)}</p>
+                          <p>{formatCurrency(x.amount_due / 100)}</p>
                         </Table.td>
                         <Table.td>
                           <p>{x.number}</p>
@@ -146,21 +147,13 @@ const InvoicesSettings = () => {
                         </Table.td>
                         <Table.td className="align-right">
                           <div className="flex items-center justify-end space-x-2">
-                            {x.subtotal > 0 &&
+                            {x.amount_due > 0 &&
                               [
                                 InvoiceStatus.UNCOLLECTIBLE,
                                 InvoiceStatus.OPEN,
                                 InvoiceStatus.ISSUED,
                               ].includes(x.status as InvoiceStatus) && (
-                                <Button asChild>
-                                  <Link
-                                    href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                  >
-                                    Pay Now
-                                  </Link>
-                                </Button>
+                                <InvoicePayButton slug={slug} invoiceId={x.id} />
                               )}
 
                             <Button

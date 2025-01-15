@@ -1,0 +1,294 @@
+---
+id: 'metrics'
+title: 'Metrics'
+description: 'Observability for your Supabase project'
+---
+
+In addition to the reports and charts built in to the Supabase dashboard, each project hosted on the Supabase platform comes with a [Prometheus](https://prometheus.io/)-compatible metrics endpoint, which can be used to gather insight into the health and status of your project.
+
+You can use this endpoint to ingest data into your own monitoring and alerting infrastructure, as long as it is capable of scraping Prometheus-compatible endpoints, in order to set up custom rules beyond those supported by the Supabase dashboard.
+
+<Admonition type="note">
+
+The endpoint discussed in this article is in beta, and the metrics returned by it might evolve or be changed in the future to increase its utility.
+
+</Admonition>
+
+<Admonition type="note">
+
+The endpoint discussed in this article is not available on self-hosted.
+
+</Admonition>
+
+## Accessing the metrics endpoint
+
+Your project's metrics endpoint is accessible at `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`. Access to the endpoint is secured via HTTP Basic Auth; the username is `service_role`, while the password is the service role JWT available through the Supabase dashboard.
+
+```shell
+> curl https://<project-ref>.supabase.co/customer/v1/privileged/metrics --user 'service_role:<service-role-jwt>'
+```
+
+## Configuring Prometheus
+
+For self-hosted Prometheus, modify your `prometheus.yaml` file to add a Supabase job, and set the `metrics_path`, `scheme`, `basic_auth` and `targets` parameters. For example:
+
+```yaml
+scrape_configs:
+  - job_name: "MyJob"
+    metrics_path: "/customer/v1/privileged/metrics"
+    scheme: https
+    basic_auth:
+      username: "service_role"
+      password: "<your service_role JWT>"
+    static_configs:
+      - targets: [
+        "<your Supabase Project ID>.supabase.co:443"
+          ]
+        labels:
+          group: "MyGroupLabel"
+```
+
+Additionally, we [maintain a repo](https://github.com/supabase/supabase-grafana) for a scraping agent to work with Grafana Cloud.
+
+## Deploying Supabase Grafana
+
+The pre-configured Supabase Grafana Dashboard is an advanced version of the [Dashboard's Database Reports](https://supabase.com/dashboard/project/_/reports/database). It visualizes over 200 database performance and health metrics and is updated every minute.
+
+![Supabase Grafana](/docs/img/guides/platform/supabase-grafana-prometheus.png)
+
+### Deploying locally
+
+Prerequisites:
+
+- Must have [Docker](https://www.docker.com/products/docker-desktop/) or a Docker compatible runtime on your machine
+
+<Admonition type="note">
+
+Supabase Grafana only tracks metrics while it's active. For monitoring historical trends, it's better to use a dedicated server that can record data continuously.
+
+</Admonition>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1} >
+
+    <StepHikeCompact.Details title="Download the project">
+        Download the code from the [Github repo](https://github.com/supabase/supabase-grafana/tree/main)
+
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+        ```sh
+        git clone https://github.com/supabase/supabase-grafana.git
+        ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2} >
+
+    <StepHikeCompact.Details title="Create a .env file">
+        copy the `example.env` into a new `.env`
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+        ```sh
+        cp .env.example .env
+        ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Add your credentials">
+        - To monitor a single project, add your service_role key from the [API Settings](https://supabase.com/dashboard/project/_/settings/api) and Project ID from the [General Settings](https://supabase.com/dashboard/project/_/settings/general).
+        - To monitor multiple projects, create an [account access token](https://supabase.com/dashboard/account/tokens) and add it to your `.env` file.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+    <Tabs
+        scrollable
+        size="small"
+        type="underlined"
+        defaultActiveId="single-project"
+        >
+        <TabPanel id="single-project" label="Monitor a single project">
+
+
+            - Add the values to your `.env` file:
+            ```text .env
+            SUPABASE_PROJECT_REF="your_project_reference"
+            SUPABASE_SERVICE_ROLE_KEY="your_service_role"
+            ```
+        </TabPanel>
+        <TabPanel id="monitor-an-org" label="monitor multiple projects">
+
+
+            ```text .env
+            SUPABASE_ACCESS_TOKEN="your_access_token"
+            ```
+        </TabPanel>
+        </Tabs>
+        </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+    <StepHikeCompact.Step step={4}>
+        <StepHikeCompact.Details title="Add a password to your .env">
+            <Admonition type="note" label="password manager">
+                For security, consider using a [password generator](https://bitwarden.com/password-generator/)
+            </Admonition>
+            
+            
+        </StepHikeCompact.Details>
+        <StepHikeCompact.Code>
+                ```text .env
+                GRAFANA_PASSWORD="your password"
+                ```
+            </StepHikeCompact.Code>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={5}>
+        <StepHikeCompact.Details title="Deploy Grafana with Docker">
+
+
+            Deploy the server. Once it is active, you can go to <a href='http://localhost:8000/login'>localhost:8000/login</a> in the browser
+
+        </StepHikeCompact.Details>
+            <StepHikeCompact.Code>
+                ```text
+                docker compose up
+                ```
+            </StepHikeCompact.Code>
+
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={6}>
+        <StepHikeCompact.Details title="Login" >
+            Login with your username (default is `admin`) and the password you created in step 4.
+        </StepHikeCompact.Details>
+            <StepHikeCompact.Code>
+                ![Grafana login](/docs/img/guides/platform/grafana-login.png)
+            </StepHikeCompact.Code>
+    </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+### Deploying to Grafana cloud
+
+<StepHikeCompact>
+
+    <StepHikeCompact.Step step={1}>
+
+        <StepHikeCompact.Details title="Create a free Grafana Cloud account" >
+        Go to Grafana\'s [registration form](https://grafana.com/auth/sign-up/create-user?pg=login) and create an account
+        </StepHikeCompact.Details>
+            <StepHikeCompact.Code>
+                ![Grafana Registration Page](/docs/img/guides/platform/grafana-registration.png)
+            </StepHikeCompact.Code>
+    </StepHikeCompact.Step>
+
+
+    <StepHikeCompact.Step step={2} >
+
+    <StepHikeCompact.Details title="Give a name to your Grafana project">
+    Grafana will prompt you to create a stack. Give it a name and continue.
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+    ![Create Grafana Stack](/docs/img/guides/platform/create-grafana-stack.png)
+    </StepHikeCompact.Code>
+
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={3} >
+
+    <StepHikeCompact.Details title="Create a new Grafana Dashboard">
+        Create a new Dashboard
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+        ![Select Grafana Dashboard](/docs/img/guides/platform/select-grafana-dashboard.png)
+    </StepHikeCompact.Code>
+
+
+    </StepHikeCompact.Step>
+    <StepHikeCompact.Step step={4} >
+    <StepHikeCompact.Details title="Search for the Supabase template" />
+
+        <StepHikeCompact.Code>
+            ![Select Grafana Dashboard](/docs/img/guides/platform/supabase-grafana-template.png)
+        </StepHikeCompact.Code>
+
+
+    </StepHikeCompact.Step>
+
+        <StepHikeCompact.Step step={5} >
+    <StepHikeCompact.Details title="Add your credentials and deploy">
+        Add your service_role key from the [API Settings](https://supabase.com/dashboard/project/_/settings/api) and Project ID from the [General Settings](https://supabase.com/dashboard/project/_/settings/general) to your Grafana credentials. Then install your dashboard.
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+        ![Add credentials](/docs/img/guides/platform/add-credentials-grafana.png)
+    </StepHikeCompact.Code>
+
+    </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+### Deploying to fly.io
+
+<Admonition type="note">
+  This section explains deploying to Fly.io using the included configuration file, but deployment to
+  other hosts is also possible.
+</Admonition>
+
+<StepHikeCompact>
+
+    <StepHikeCompact.Step step={1} fullWidth>
+
+        <StepHikeCompact.Details title="Initialize project locally" >
+        Follow steps 1 through 4 for [local setups](#deploying-locally)
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={2} >
+
+    <StepHikeCompact.Details title="Create a fly.io account">
+    If you do not already have one, create a [fly.io account](https://fly.io/app/sign-up).
+
+    Go through the [onboarding process](https://fly.io/dashboard/personal/new-launch?onboarding=1), including downloading the [Fly CLI tool](https://fly.io/docs/flyctl/install/)
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+    ![Fly Registration Page](/docs/img/guides/platform/fly-signin.png)
+    </StepHikeCompact.Code>
+
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={3} >
+
+    <StepHikeCompact.Details title="Deploy your project"/>
+    <StepHikeCompact.Code>
+        Log into your Fly account through the CLI:
+        ```sh login
+        fly auth login
+        ```
+
+        Deploy your project with the Fly CLI
+        ```sh deploy_to_fly
+        fly launch --copy-config
+        fly secrets import < .env
+        ```
+    </StepHikeCompact.Code>
+
+
+    </StepHikeCompact.Step>
+    <StepHikeCompact.Step step={4} >
+
+    <StepHikeCompact.Details title="Access your project" fullWidth>
+    - Go to your [Fly.io Dashboard](https://fly.io/dashboard)  and select your project.
+    - It may take a few minutes for the project to spin up. Once it's ready, click on the project's link to view your Grafana Dashboard.
+    - When prompted, enter the username admin and the password you created earlier.
+    </StepHikeCompact.Details>
+
+    </StepHikeCompact.Step>
+
+</StepHikeCompact>

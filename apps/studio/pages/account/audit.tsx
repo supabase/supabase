@@ -20,11 +20,11 @@ const User: NextPageWithLayout = () => {
 
 User.getLayout = (page) => (
   <AccountLayout
-    title="Preferences"
+    title="Audit Logs"
     breadcrumbs={[
       {
         key: `supabase-settings`,
-        label: 'Preferences',
+        label: 'Audit Logs',
       },
     ]}
   >

@@ -44,7 +44,7 @@ interface MDXRemoteRefsProps {
 function MDXRemoteRefs({ source }: MDXRemoteRefsProps) {
   const refComponents = { ...components, RefSubLayout, CliGlobalFlagsHandler }
 
-  return <MDXRemoteBase source={source} components={refComponents} />
+  return <MDXRemoteBase source={source} components={refComponents} customPreprocess={(x) => x} />
 }
 
 export { getRefMarkdown, MDXRemoteRefs }

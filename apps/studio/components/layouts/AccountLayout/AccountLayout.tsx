@@ -4,12 +4,11 @@ import { PropsWithChildren, useEffect } from 'react'
 
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
-import SettingsLayout from '../SettingsLayout/SettingsLayout'
 import type { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
 
@@ -26,10 +25,11 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const { data: organizations } = useOrganizationsQuery()
   const selectedOrganization = useSelectedOrganization()
 
-  const navLayoutV2 = useFlag('navigationLayoutV2')
+  const { mutateAsync: sendReset } = useSendResetMutation()
 
   const signOut = useSignOut()
   const onClickLogout = async () => {
+    await sendReset()
     await signOut()
     await router.push('/sign-in')
   }
@@ -143,10 +143,6 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
       : []),
   ]
 
-  if (navLayoutV2) {
-    return <SettingsLayout>{children}</SettingsLayout>
-  }
-
   return (
     <>
       <Head>
@@ -154,12 +150,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
         <meta name="description" content="Supabase Studio" />
       </Head>
       <div className="h-screen min-h-[0px] basis-0 flex-1">
-        <WithSidebar
-          hideSidebar={navLayoutV2}
-          title={title}
-          breadcrumbs={breadcrumbs}
-          sections={sectionsWithHeaders}
-        >
+        <WithSidebar title={title} breadcrumbs={breadcrumbs} sections={sectionsWithHeaders}>
           {children}
         </WithSidebar>
       </div>

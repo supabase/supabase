@@ -1,10 +1,15 @@
 import Image from 'next/image'
 import React from 'react'
+import { cn } from 'ui'
 
-const AuthVisual = () => {
+interface Props {
+  className?: string
+}
+
+const AuthVisual: React.FC<Props> = ({ className }) => {
   return (
     <figure
-      className="group absolute inset-0 z-0 -top-16 xl:top-0 xl:bottom-0"
+      className={cn('group absolute inset-0 z-0 -top-16 xl:top-0 xl:bottom-0', className)}
       role="img"
       aria-label="Supabase Authentication provides Row Level Security which enables you to define custom Policies to restrict access to your database"
     >

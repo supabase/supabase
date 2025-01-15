@@ -10,7 +10,7 @@ import {
   Slider_Shadcn_,
   cn,
 } from 'ui'
-import { ComputeBadge } from 'ui-patterns'
+import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 
 const plans = [

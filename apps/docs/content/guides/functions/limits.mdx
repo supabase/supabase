@@ -8,19 +8,19 @@ subtitle: "Limits applied Edge Functions in Supabase's hosted platform."
 ## Runtime limits
 
 - Maximum Memory: 256MB
-- Maximum Duration (Wall clock limit): 400s (this is the duration an Edge Function worker will stay active. During this period, a worker can serve multiple requests)
-- Maximum CPU Time: 2s
-- Request idle timeout: 150s (if an Edge Function doesn't send a response before the timeout, 504 Gateway Timeout will be returned)
-- Maximum Function Size (after bundling via CLI): 10MB
+- Maximum Duration (Wall clock limit):
+  This is the duration an Edge Function worker will stay active. During this period, a worker can serve multiple requests or process background tasks.
+  - Free plan: 150s
+  - Paid plans: 400s
+- Maximum CPU Time: 2s (Amount of actual time spent on the CPU per request - does not include async I/O.)
+- Request idle timeout: 150s (If an Edge Function doesn't send a response before the timeout, 504 Gateway Timeout will be returned)
+- Maximum Function Size: 20MB (After bundling using CLI)
 - Maximum log message length: 10,000 characters
 - Log event threshold: 100 events per 10 seconds
-- Max Request: 5GB
-- Max Response: No limit
 
 ## Other limits & restrictions
 
 - Outgoing connections to ports `25` and `587` are not allowed.
 - Serving of HTML content is only supported with [custom domains](/docs/reference/cli/supabase-domains) (Otherwise `GET` requests that return `text/html` will be rewritten to `text/plain`).
-- Deno and Node file system APIs are not available.
 - Web Worker API (or Node `vm` API) are not available.
 - Node Libraries that require multithreading are not supported. Examples: [libvips](https://github.com/libvips/libvips), [sharp](https://github.com/lovell/sharp).

@@ -58,7 +58,7 @@ export const AddRLSPolicyForFirebaseDialog = ({
       </DialogHeader>
       <DialogSectionSeparator />
       <DialogSection padding={'small'}>
-        <SQLCodeBlock projectRef={projectRef!}>{[description]}</SQLCodeBlock>
+        <SQLCodeBlock>{[description]}</SQLCodeBlock>
       </DialogSection>
       <DialogFooter padding={'small'}>
         <Button

@@ -43,7 +43,10 @@ const FunctionsPage: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
-            <FormHeader title="Database Functions" />
+            <FormHeader
+              title="Database Functions"
+              docsUrl="https://supabase.com/docs/guides/database/functions"
+            />
             <FunctionsList
               createFunction={createFunction}
               editFunction={editFunction}

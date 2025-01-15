@@ -96,7 +96,6 @@ const PolicyEditorModal = ({
   const onSelectBackFromTemplates = () => setView(previousView)
 
   const onToggleFeaturePreviewModal = () => {
-    snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
     snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
     onSelectCancel()
   }

@@ -27,7 +27,9 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
         tooltip={{
           content: {
             side: 'bottom',
-            text: 'You need additional permissions to delete this project',
+            text: !canDeleteProject
+              ? 'You need additional permissions to delete this project'
+              : undefined,
           },
         }}
       >

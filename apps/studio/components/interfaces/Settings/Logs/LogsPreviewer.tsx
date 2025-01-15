@@ -19,6 +19,8 @@ import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './L
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
 import { ensureNoTimestampConflict, maybeShowUpgradePrompt } from './Logs.utils'
 import UpgradePrompt from './UpgradePrompt'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
+import useSingleLog from 'hooks/analytics/useSingleLog'
 
 /**
  * Acts as a container component for the entire log display
@@ -36,6 +38,8 @@ interface LogsPreviewerProps {
   filterOverride?: Filters
   condensedLayout?: boolean
   tableName?: LogsTableName
+  EmptyState?: React.ReactNode
+  filterPanelClassName?: string
 }
 export const LogsPreviewer = ({
   projectRef,
@@ -44,6 +48,8 @@ export const LogsPreviewer = ({
   condensedLayout = false,
   tableName,
   children,
+  EmptyState,
+  filterPanelClassName,
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
   const { s, ite, its, db } = useParams()
@@ -69,7 +75,19 @@ export const LogsPreviewer = ({
     setFilters,
     refresh,
     setParams,
-  } = useLogsPreview(projectRef as string, table, filterOverride)
+  } = useLogsPreview({ projectRef, table, filterOverride })
+
+  const [selectedLogId, setSelectedLogId] = useSelectedLog()
+  const {
+    data: selectedLog,
+    isLoading: isSelectedLogLoading,
+    error: selectedLogError,
+  } = useSingleLog({
+    projectRef,
+    id: selectedLogId ?? undefined,
+    queryType,
+    paramsToMerge: params,
+  })
 
   const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
     params.iso_timestamp_start as string
@@ -134,6 +152,7 @@ export const LogsPreviewer = ({
   }
   const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
     if (event === 'search-input-change') {
+      setSelectedLogId(null)
       setFilters((prev) => ({ ...prev, search_query: query }))
       router.push({
         pathname: router.pathname,
@@ -180,15 +199,10 @@ export const LogsPreviewer = ({
     }
   }
 
-  const footerHeight = '48px'
-  const navBarHeight = '48px'
-  const filterPanelHeight = '54px'
-  const chartHeight = showChart ? '114px' : '0px'
-  const maxHeight = `calc(100vh - ${navBarHeight} - ${filterPanelHeight} - ${footerHeight} - ${chartHeight})`
-
   return (
-    <div>
+    <div className="flex-1 flex flex-col h-full">
       <PreviewFilterPanel
+        className={filterPanelClassName}
         csvData={logData}
         isLoading={isLoading}
         newCount={newCount}
@@ -225,10 +239,10 @@ export const LogsPreviewer = ({
       <div
         className={
           'transition-all duration-500 ' +
-          (showChart && logData.length > 0 ? 'mb-4 h-24 pt-4 opacity-100' : 'h-0 opacity-0')
+          (showChart && logData.length > 0 ? 'mb-4 h-28 opacity-100' : 'h-0 opacity-0')
         }
       >
-        <div className={condensedLayout ? 'px-4' : ''}>
+        <div className={condensedLayout ? 'px-3' : ''}>
           {showChart && (
             <LogEventChart
               className={cn({
@@ -246,28 +260,28 @@ export const LogsPreviewer = ({
           )}
         </div>
       </div>
-      <div className="relative flex flex-col flex-grow pt-4">
+      <div className="relative flex flex-col flex-grow flex-1 overflow-auto">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable
-            maxHeight={maxHeight}
             projectRef={projectRef}
             isLoading={isLoading}
             data={logData}
             queryType={queryType}
             isHistogramShowing={showChart}
             onHistogramToggle={() => setShowChart(!showChart)}
-            params={params}
             error={error}
+            EmptyState={EmptyState}
+            onSelectedLogChange={(log) => setSelectedLogId(log?.id ?? null)}
+            selectedLog={selectedLog}
+            isSelectedLogLoading={isSelectedLogLoading}
+            selectedLogError={selectedLogError ?? undefined}
           />
         </LoadingOpacity>
       </div>
       {!error && logData.length > 0 && (
-        <div className="border-t flex flex-row justify-between p-2">
+        <div className="border-t flex flex-row items-center gap-3 p-2">
           <Button
-            className={cn({
-              'opacity-0': isLoadingOlder || isLoading,
-            })}
             onClick={loadOlder}
             icon={<Rewind />}
             type="default"
@@ -276,6 +290,9 @@ export const LogsPreviewer = ({
           >
             Load older
           </Button>
+          <div className="text-sm text-foreground-lighter">
+            Showing <span className="font-mono">{logData.length}</span> results
+          </div>
           <div className="flex flex-row justify-end mt-2">
             <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
           </div>

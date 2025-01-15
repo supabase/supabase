@@ -42,7 +42,11 @@ const TriggersPage: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
-            <FormHeader title="Database Triggers" />
+            <FormHeader
+              title="Database Triggers"
+              description="Execute a set of actions automatically on specified table events"
+              docsUrl="https://supabase.com/docs/guides/database/postgres/triggers"
+            />
             <TriggersList
               createTrigger={createTrigger}
               editTrigger={editTrigger}

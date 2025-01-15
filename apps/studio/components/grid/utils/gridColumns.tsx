@@ -2,8 +2,7 @@ import { CalculatedColumn } from 'react-data-grid'
 
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import { BooleanEditor } from '../components/editor/BooleanEditor'
-import { DateEditor } from '../components/editor/DateEditor'
-import { DateTimeEditor, DateTimeWithTimezoneEditor } from '../components/editor/DateTimeEditor'
+import { DateTimeEditor } from '../components/editor/DateTimeEditor'
 import { JsonEditor } from '../components/editor/JsonEditor'
 import { NumberEditor } from '../components/editor/NumberEditor'
 import { SelectEditor } from '../components/editor/SelectEditor'
@@ -141,10 +140,12 @@ function getCellEditor(
       return (p: any) => <BooleanEditor {...p} isNullable={columnDefinition.isNullable} />
     }
     case 'date': {
-      return DateEditor
+      return DateTimeEditor('date', columnDefinition.isNullable || false)
     }
     case 'datetime': {
-      return columnDefinition.format.endsWith('z') ? DateTimeWithTimezoneEditor : DateTimeEditor
+      return columnDefinition.format.endsWith('z')
+        ? DateTimeEditor('datetimetz', columnDefinition.isNullable || false)
+        : DateTimeEditor('datetime', columnDefinition.isNullable || false)
     }
     case 'time': {
       return columnDefinition.format.endsWith('z') ? TimeWithTimezoneEditor : TimeEditor

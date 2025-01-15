@@ -1,4 +1,7 @@
 import matter from 'gray-matter'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { gfmFromMarkdown } from 'mdast-util-gfm'
+import { gfm } from 'micromark-extension-gfm'
 import { type Metadata, type ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
 import { readFile, readdir } from 'node:fs/promises'
@@ -22,12 +25,17 @@ const PUBLISHED_SECTIONS = [
   'ai',
   'api',
   'auth',
-  'cli',
+  'cron',
   'database',
+  'deployment',
   'functions',
   'getting-started',
   // 'graphql', -- technically published, but completely federated
+  'integrations',
+  'local-development',
+  'monitoring-troubleshooting',
   'platform',
+  'queues',
   'realtime',
   'resources',
   'self-hosting',
@@ -143,4 +151,18 @@ const genGuideMeta =
     }
   }
 
-export { getGuidesMarkdown, genGuidesStaticParams, genGuideMeta }
+function removeRedundantH1(content: string) {
+  const mdxTree = fromMarkdown(content, 'utf-8', {
+    extensions: [gfm()],
+    mdastExtensions: [gfmFromMarkdown()],
+  })
+
+  const maybeH1 = mdxTree.children[0]
+  if (maybeH1 && maybeH1.type === 'heading' && maybeH1.depth === 1) {
+    content = content.slice(maybeH1.position?.end?.offset)
+  }
+
+  return content
+}
+
+export { getGuidesMarkdown, genGuidesStaticParams, genGuideMeta, removeRedundantH1 }

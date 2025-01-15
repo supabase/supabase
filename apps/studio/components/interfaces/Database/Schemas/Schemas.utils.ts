@@ -6,22 +6,7 @@ import 'reactflow/dist/style.css'
 
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
-import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH } from 'ui-patterns/SchemaTableNode'
-
-type TableNodeData = {
-  name: string
-  isForeign: boolean
-  columns: {
-    id: string
-    isPrimary: boolean
-    isNullable: boolean
-    isUnique: boolean
-    isUpdateable: boolean
-    isIdentity: boolean
-    name: string
-    format: string
-  }[]
-}
+import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNodeData } from './SchemaTableNode'
 
 const NODE_SEP = 25
 const RANK_SEP = 50
@@ -56,10 +41,12 @@ export async function getGraphDataFromTables(
       id: `${table.id}`,
       type: 'table',
       data: {
+        ref,
+        id: table.id,
         name: table.name,
         isForeign: false,
         columns,
-      },
+      } as TableNodeData,
       position: { x: 0, y: 0 },
     }
   })
@@ -83,10 +70,11 @@ export async function getGraphDataFromTables(
         id: rel.constraint_name,
         type: 'table',
         data: {
+          ref,
           name: `${rel.target_table_schema}.${rel.target_table_name}.${rel.target_column_name}`,
           isForeign: true,
           columns: [],
-        },
+        } as TableNodeData,
         position: { x: 0, y: 0 },
       })
 

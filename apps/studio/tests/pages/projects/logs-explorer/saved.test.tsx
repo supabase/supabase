@@ -1,7 +1,5 @@
 // mock the fetch function
-import { get } from 'lib/common/fetch'
-import { LogsSavedPage } from 'pages/project/[ref]/logs/explorer/saved'
-import { render } from 'tests/helpers'
+import { test } from 'vitest'
 
 test('on load, refresh user content', async () => {
   // get.mockResolvedValue({})

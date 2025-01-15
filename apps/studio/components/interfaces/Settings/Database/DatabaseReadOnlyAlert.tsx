@@ -1,13 +1,13 @@
 import { useParams } from 'common'
+import { AlertTriangle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useState } from 'react'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ConfirmDisableReadOnlyModeModal from './DatabaseSettings/ConfirmDisableReadOnlyModal'
-import { AlertTriangle, ExternalLink } from 'lucide-react'
 
 export const DatabaseReadOnlyAlert = () => {
   const { ref: projectRef } = useParams()

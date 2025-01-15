@@ -80,7 +80,7 @@ In the `build.gradle` (app) file, add these dependencies then press "Sync now." 
 ```kotlin
 implementation "io.github.jan-tennert.supabase:postgrest-kt:$supabase_version"
 implementation "io.github.jan-tennert.supabase:storage-kt:$supabase_version"
-implementation "io.github.jan-tennert.supabase:gotrue-kt:$supabase_version"
+implementation "io.github.jan-tennert.supabase:auth-kt:$supabase_version"
 implementation "io.ktor:ktor-client-android:$ktor_version"
 implementation "io.ktor:ktor-client-core:$ktor_version"
 implementation "io.ktor:ktor-utils:$ktor_version"
@@ -95,6 +95,8 @@ plugins {
     ...
 }
 ```
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### Set up Hilt for dependency injection
 
@@ -133,6 +135,8 @@ class MainActivity : ComponentActivity() {
     //This will come later
 }
 ```
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### Provide Supabase instances with Hilt
 

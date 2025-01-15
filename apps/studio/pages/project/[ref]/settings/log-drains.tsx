@@ -1,6 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -15,6 +13,7 @@ import {
   ScaffoldHeader,
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useCreateLogDrainMutation } from 'data/log-drains/create-log-drain-mutation'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
 import { useUpdateLogDrainMutation } from 'data/log-drains/update-log-drain-mutation'
@@ -24,7 +23,7 @@ import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, Button } from 'ui'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
-  const canManageLogDrains = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
+  const canManageLogDrains = useCheckPermissions(PermissionAction.ANALYTICS_ADMIN_WRITE, 'logflare')
 
   const [open, setOpen] = useState(false)
   const { ref } = useParams() as { ref: string }
@@ -89,15 +88,8 @@ const LogDrainsSettings: NextPageWithLayout = () => {
             </ScaffoldDescription>
           </div>
           <div className="flex items-center justify-end gap-2">
-            <Button type="default" icon={<ExternalLink strokeWidth={1.5} />} asChild>
-              <Link
-                target="_blank"
-                rel="noreferrer"
-                href="https://supabase.com/docs/guides/platform/log-drains"
-              >
-                Documentation
-              </Link>
-            </Button>
+            <DocsButton href="https://supabase.com/docs/guides/platform/log-drains" />
+
             {!(logDrains?.length === 0) && (
               <Button
                 disabled={!logDrainsEnabled || !canManageLogDrains}

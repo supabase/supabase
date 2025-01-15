@@ -8,10 +8,20 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
 import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import { extensions } from 'shared-data'
-import { Button, cn, Switch } from 'ui'
+import {
+  Button,
+  cn,
+  Switch,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
+import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import EnableExtensionModal from './EnableExtensionModal'
+import { EXTENSION_DISABLE_WARNINGS } from './Extensions.constants'
 
 interface ExtensionCardProps {
   extension: DatabaseExtension
@@ -21,6 +31,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   const { project } = useProjectContext()
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
   const isOn = extension.installed_version !== null
+  const isOrioleDb = useIsOrioleDb()
 
   const [isDisableModalOpen, setIsDisableModalOpen] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
@@ -29,6 +40,8 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )
+  const orioleDbCheck = isOrioleDb && extension.name === 'orioledb'
+  const disabled = !canUpdateExtensions || orioleDbCheck
 
   const X_PADDING = 'px-5'
   const extensionMeta = extensions.find((item: any) => item.name === extension.name)
@@ -74,13 +87,26 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
           {isDisabling ? (
             <Loader2 className="animate-spin" size={16} />
           ) : (
-            <Switch
-              disabled={!canUpdateExtensions}
-              checked={isOn}
-              onCheckedChange={() =>
-                isOn ? setIsDisableModalOpen(true) : setShowConfirmEnableModal(true)
-              }
-            />
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_>
+                <Switch
+                  disabled={disabled}
+                  checked={isOn}
+                  onCheckedChange={() =>
+                    isOn ? setIsDisableModalOpen(true) : setShowConfirmEnableModal(true)
+                  }
+                />
+              </TooltipTrigger_Shadcn_>
+              {disabled && (
+                <TooltipContent_Shadcn_ side="bottom">
+                  {!canUpdateExtensions
+                    ? 'You need additional permissions to toggle extensions'
+                    : orioleDbCheck
+                      ? 'Project is using OrioleDB and cannot be disabled'
+                      : null}
+                </TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
           )}
         </div>
 
@@ -161,13 +187,21 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
         visible={isDisableModalOpen}
         title="Confirm to disable extension"
         confirmLabel="Disable"
+        variant="destructive"
         confirmLabelLoading="Disabling"
         onCancel={() => setIsDisableModalOpen(false)}
         onConfirm={() => onConfirmDisable()}
       >
-        <p className="text-sm text-foreground-light">
-          Are you sure you want to turn OFF the "{extension.name}" extension?
-        </p>
+        <div className="flex flex-col gap-y-3">
+          <p className="text-sm text-foreground-light">
+            Are you sure you want to turn OFF the "{extension.name}" extension?
+          </p>
+          {EXTENSION_DISABLE_WARNINGS[extension.name] && (
+            <Admonition type="warning" className="m-0">
+              {EXTENSION_DISABLE_WARNINGS[extension.name]}
+            </Admonition>
+          )}
+        </div>
       </ConfirmationModal>
     </>
   )

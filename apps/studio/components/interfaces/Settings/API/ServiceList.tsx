@@ -12,7 +12,6 @@ import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { configKeys } from 'data/config/keys'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -29,11 +28,8 @@ const ServiceList = () => {
   const { ref: projectRef, source } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
-  const { data: settings, isError } = useProjectApiQuery({
-    projectRef,
-  })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
-  const { data: databases } = useReadReplicasQuery({ projectRef })
+  const { data: databases, isError } = useReadReplicasQuery({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })

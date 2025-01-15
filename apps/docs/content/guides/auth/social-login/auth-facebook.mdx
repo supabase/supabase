@@ -100,6 +100,26 @@ Future<void> signInWithFacebook() async {
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/swift/auth-signinwithoauth) with `facebook` as the `provider`:
+
+```swift
+func signInWithFacebook() async throws {
+  try await supabase.auth.signInWithOAuth(
+    provider: .facebook,
+    redirectTo: URL(string: "my.scheme://my-host")!, // Optionally set the redirect link to bring back the user via deeplink.
+    launchFlow: { url in
+      // use url to start OAuth flow
+      // and return a result url that contains the OAuth token.
+      // ...
+      return resultURL
+    }
+  )
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Facebook` as the `Provider`:
@@ -140,6 +160,17 @@ When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to
 ```dart
 Future<void> signOut() async {
   await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+When your user signs out, call [signOut()](/docs/reference/swift/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```swift
+func signOut() async throws {
+  try await supabase.auth.signOut()
 }
 ```
 

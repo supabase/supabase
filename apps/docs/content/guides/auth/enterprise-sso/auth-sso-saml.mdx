@@ -80,7 +80,7 @@ Alternatively, you can use the `supabase sso info --project-ref <your-project>` 
 User accounts and identities created via SSO differ from regular (email, phone, password, social login...) accounts in these ways:
 
 - **No automatic linking.**
-  Each user account verified using a SSO identity provider will not be automatically linked to existing user accounts in the system. That is, if a user `jane.doe@company.com` had signed up with a password, and then uses their company SSO login with your project, there will be two `jane.doe@company.com` user accounts in the system.
+  Each user account verified using a SSO identity provider will not be automatically linked to existing user accounts in the system. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO login with your project, there will be two `valid.email@supabase.io` user accounts in the system.
 - **Emails are not necessarily unique.**
   Given the behavior with no automatic linking, email addresses are no longer a unique identifier for a user account. Please always use the user's UUID to correctly reference user accounts.
 - **Sessions may have a maximum duration.**
@@ -288,7 +288,7 @@ Given a SAML 2.0 assertion that includes these attributes:
     NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
     >
     <saml:AttributeValue xsi:type="xs:string">
-      jane.doe@company.com
+      valid.email@supabase.io
     </saml:AttributeValue>
   </saml:Attribute>
 
@@ -308,7 +308,7 @@ Will result in the following claims in the user's identity in the database and J
 
 ```json
 {
-  "email": "jane.doe@company.com",
+  "email": "valid.email@supabase.io",
   "custom_claims": {
     "first_name": "Jane Doe"
   }
@@ -415,3 +415,53 @@ Should you run into this problem, it is most likely a misconfiguration issue **o
 At this time it is not possible to extract the RSA private key used by your project's Supabase Auth server. This is done to keep the private key as secure as possible, given that SAML does not offer an easy way to rotate keys without disrupting service. (Please use a SAML 2.0 Metadata URL whenever possible for this reason!)
 
 If you really need access to the key, please [open a support ticket](https://supabase.com/dashboard/support/new) and we'll try to support you as best as possible.
+
+### Is multi-tenant SSO with SAML supported?
+
+Yes, Supabase supports multi-tenant Single Sign-On (SSO) using SAML 2.0. While the dashboard displays only one SAML field, you can set up multiple SAML connections using the Supabase CLI.
+Each connection is assigned a unique `sso_provider_id`, which is included in the user's JWT and can be used in Row Level Security (RLS) policies. You can configure custom attribute mappings for each connection to include tenant-specific information, such as roles.
+This setup allows you to implement multi-tenant SSO for multiple clients or organizations within a single application. For example, if you have an app with multiple clients using different Azure Active Directories, you can create separate SAML connections for each and use the `sso_provider_id` to manage access and apply appropriate security policies.
+
+### Is multi-subdomain SSO with SAML supported?
+
+Yes, also referred to as [cross-origin authentication within the same site](https://web.dev/articles/same-site-same-origin). To redirect to a URL other than the [Site URL](https://supabase.com/docs/guides/auth/redirect-urls), following the SAML response from the IdP, the `redirectTo` option can be added to [`signInWithSSO`](https://supabase.com/docs/reference/javascript/auth-signinwithsso).
+
+```ts
+  const { data, error } = await supabase.auth.signInWithSSO({
+    domain: 'company.com'
+      options: {
+        redirectTo: `https://app.company.com/callback`,
+      },
+  })
+```
+
+When redirecting to a URL other than the Site URL, a `/callback` endpoint is necessary to process the auth code from the IdP and exchange it for a session. This assumes the [Supabase SSR client](https://supabase.com/docs/guides/auth/server-side/creating-a-client) has already been configured.
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="sveltekit" queryGroup="framework">
+
+<TabPanel id="sveltekit" label="SvelteKit">
+
+```ts
+import { error, redirect } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
+
+export const GET: RequestHandler = async ({ url, locals }) => {
+  const code = url.searchParams.get('code')
+
+  if (!code) {
+    error(400, 'No authorization code provided')
+  }
+
+  const { error: tokenExchangeError } = await locals.supabase.auth.exchangeCodeForSession(code)
+
+  if (tokenExchangeError) {
+    error(400, 'Failed to exchange authorization code for session')
+  }
+
+  redirect(303, '/')
+}
+```
+
+</TabPanel>
+
+</Tabs>

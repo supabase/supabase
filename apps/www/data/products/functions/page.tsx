@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import { PRODUCT_NAMES } from 'shared-data/products'
 import Examples from '~/data/Examples'
-import solutions from '~/data/Solutions'
+import solutions from '~/data/MainProducts'
 
 const FunctionsHero = dynamic(() => import('~/components/Products/Functions/FunctionsHero'))
 const RealtimeLogs = dynamic(() => import('~/components/Products/Functions/RealtimeLogs'))
@@ -44,7 +44,7 @@ export default (isMobile?: boolean) => ({
     image: <FunctionsHero />,
     ctas: [
       {
-        label: 'Launch a free database',
+        label: 'Create a free account',
         href: '/dashboard',
         type: 'primary' as any,
       },

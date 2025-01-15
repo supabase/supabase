@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { Check, Copy, Mail, ShieldOff, Trash, X } from 'lucide-react'
+import { Ban, Check, Copy, Mail, ShieldOff, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -14,15 +14,19 @@ import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
 import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
-import { User } from 'data/auth/users-query'
+import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
+import { User } from 'data/auth/users-infinite-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { timeout } from 'lib/helpers'
-import { Admonition, Button, cn, Separator } from 'ui'
+import { Button, cn, Separator } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
+import { BanUserModal } from './BanUserModal'
+import { UserHeader } from './UserHeader'
 import { PANEL_PADDING } from './UserPanel'
-import { getDisplayName, providerIconMap } from './Users.utils'
+import { providerIconMap } from './Users.utils'
 
 const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
 const CONTAINER_CLASS = cn(
@@ -37,15 +41,13 @@ interface UserOverviewProps {
 
 export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const { ref: projectRef } = useParams()
-  const displayName = getDisplayName(user)
-  const hasDisplayName = displayName !== '-'
   const isEmailAuth = user.email !== null
   const isPhoneAuth = user.phone !== null
-  const isAnonUser = user.is_anonymous
+  const isBanned = user.banned_until !== null
 
-  const providers = (user.raw_app_meta_data?.providers ?? []).map((provider) => {
+  const providers = (user.raw_app_meta_data?.providers ?? []).map((provider: string) => {
     return {
-      name: provider,
+      name: provider.startsWith('sso') ? 'SAML' : provider,
       icon:
         provider === 'email'
           ? `${BASE_PATH}/img/icons/email-icon2.svg`
@@ -55,6 +57,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     }
   })
 
+  const canUpdateUser = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
   const canSendMagicLink = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_magic_link')
   const canSendRecovery = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_recovery')
   const canSendOtp = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_otp')
@@ -67,10 +70,13 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const [successAction, setSuccessAction] = useState<
     'send_magic_link' | 'send_recovery' | 'send_otp'
   >()
+  const [isBanModalOpen, setIsBanModalOpen] = useState(false)
+  const [isUnbanModalOpen, setIsUnbanModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isDeleteFactorsModalOpen, setIsDeleteFactorsModalOpen] = useState(false)
 
   const { data } = useAuthConfigQuery({ projectRef })
+
   const mailerOtpExpiry = data?.MAILER_OTP_EXP ?? 0
   const minutes = Math.floor(mailerOtpExpiry / 60)
   const seconds = Math.floor(mailerOtpExpiry % 60)
@@ -116,17 +122,39 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       setIsDeleteFactorsModalOpen(false)
     },
   })
+  const { mutate: updateUser, isLoading: isUpdatingUser } = useUserUpdateMutation({
+    onSuccess: () => {
+      toast.success('Successfully unbanned user')
+      setIsUnbanModalOpen(false)
+    },
+  })
 
   const handleDelete = async () => {
     await timeout(200)
     if (!projectRef) return console.error('Project ref is required')
-    deleteUser({ projectRef, user })
+    if (user.id === undefined) {
+      return toast.error(`Failed to delete user: User ID not found`)
+    }
+    deleteUser({ projectRef, userId: user.id })
   }
 
   const handleDeleteFactors = async () => {
     await timeout(200)
     if (!projectRef) return console.error('Project ref is required')
     deleteUserMFAFactors({ projectRef, userId: user.id as string })
+  }
+
+  const handleUnban = () => {
+    if (projectRef === undefined) return console.error('Project ref is required')
+    if (user.id === undefined) {
+      return toast.error(`Failed to ban user: User ID not found`)
+    }
+
+    updateUser({
+      projectRef,
+      userId: user.id,
+      banDuration: 'none',
+    })
   }
 
   useEffect(() => {
@@ -139,56 +167,9 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   return (
     <>
       <div>
-        <div className={cn(PANEL_PADDING)}>
-          {isPhoneAuth ? (
-            <div className="flex items-center gap-x-1">
-              <p>{user.phone}</p>
-              <CopyButton
-                iconOnly
-                type="text"
-                icon={<Copy />}
-                className="px-1"
-                text={user?.phone ?? ''}
-              />
-            </div>
-          ) : isAnonUser ? (
-            <>
-              <p>Anonymous user</p>
-              <div className="flex items-center gap-x-1">
-                <p className="text-foreground-light text-sm">{user.id}</p>
-                <CopyButton
-                  iconOnly
-                  type="text"
-                  icon={<Copy />}
-                  className="px-1"
-                  text={user?.id ?? ''}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              {hasDisplayName && <p>{displayName}</p>}
-              <div className="flex items-center gap-x-1">
-                <p
-                  className={cn(
-                    hasDisplayName ? 'text-foreground-light text-sm' : 'text-foreground'
-                  )}
-                >
-                  {user.email}
-                </p>
-                <CopyButton
-                  iconOnly
-                  type="text"
-                  icon={<Copy />}
-                  className="px-1"
-                  text={user?.email ?? ''}
-                />
-              </div>
-            </>
-          )}
-        </div>
+        <UserHeader user={user} />
 
-        {!!user.banned_until ? (
+        {isBanned ? (
           <Admonition
             type="warning"
             label={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
@@ -198,7 +179,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           <Separator />
         )}
 
-        <div className={cn('flex flex-col', PANEL_PADDING)}>
+        <div className={cn('flex flex-col gap-1.5', PANEL_PADDING)}>
           <RowData property="User UID" value={user.id} />
           <RowData
             property="Created at"
@@ -231,13 +212,19 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
           {providers.map((provider) => {
             const providerMeta = PROVIDERS_SCHEMAS.find(
-              (x) => x.title.toLowerCase() === provider.name
+              (x) =>
+                x.title.toLowerCase() ===
+                (provider.name === 'linkedin' ? 'linkedin (oidc)' : provider.name)
             )
             const enabledProperty = Object.keys(providerMeta?.properties ?? {}).find((x) =>
               x.toLowerCase().endsWith('_enabled')
             )
             const providerName =
-              provider.name === 'email' ? 'email' : providerMeta?.title ?? provider.name
+              provider.name === 'email'
+                ? 'email'
+                : provider.name === 'linkedin'
+                  ? 'LinkedIn'
+                  : providerMeta?.title ?? provider.name
             const isActive = data?.[enabledProperty as keyof typeof data] ?? false
 
             return (
@@ -251,12 +238,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                   />
                 )}
                 <div className="flex-grow mt-0.5">
-                  <p className="capitalize">{provider.name}</p>
+                  <p className="capitalize">{providerName}</p>
                   <p className="text-xs text-foreground-light">
-                    Signed in with a {providerName} account via OAuth
+                    Signed in with a {providerName} account via{' '}
+                    {providerName === 'SAML' ? 'SSO' : 'OAuth'}
                   </p>
                   <Button asChild type="default" className="mt-2">
-                    <Link href={`/project/${projectRef}/auth/providers?provider=${provider.name}`}>
+                    <Link
+                      href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
+                    >
                       Configure {providerName} provider
                     </Link>
                   </Button>
@@ -374,6 +364,31 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             className="!bg border-destructive-400"
           />
           <RowAction
+            title={
+              isBanned
+                ? `User is banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`
+                : 'Ban user'
+            }
+            description={
+              isBanned
+                ? 'User has no access to the project until after this date'
+                : 'Revoke access to the project for a set duration'
+            }
+            button={{
+              icon: <Ban />,
+              text: isBanned ? 'Unban user' : 'Ban user',
+              disabled: !canUpdateUser,
+              onClick: () => {
+                if (isBanned) {
+                  setIsUnbanModalOpen(true)
+                } else {
+                  setIsBanModalOpen(true)
+                }
+              },
+            }}
+            className="!bg border-destructive-400"
+          />
+          <RowAction
             title="Delete user"
             description="User will no longer have access to the project"
             button={{
@@ -390,65 +405,101 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
 
       <ConfirmationModal
         visible={isDeleteModalOpen}
-        title="Confirm to delete"
+        variant="destructive"
+        title="Confirm to delete user"
         confirmLabel="Delete"
         onCancel={() => setIsDeleteModalOpen(false)}
         onConfirm={() => handleDelete()}
+        alert={{
+          title: 'Deleting a user is irreversible',
+          description: 'This will remove the user from the project and all associated data.',
+        }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to delete user {user.email}?
+          This is permanent! Are you sure you want to delete the user{' '}
+          <span className="text-foreground">{user.email ?? user.phone ?? 'this user'}</span>?
         </p>
       </ConfirmationModal>
 
       <ConfirmationModal
         visible={isDeleteFactorsModalOpen}
+        variant="warning"
         title="Confirm to remove MFA factors"
         confirmLabel="Remove factors"
         confirmLabelLoading="Removing"
         onCancel={() => setIsDeleteFactorsModalOpen(false)}
         onConfirm={() => handleDeleteFactors()}
+        alert={{
+          base: { variant: 'warning' },
+          title: 'Removing MFA factors is irreversible',
+          description: 'This will log the user out of all active sessions.',
+        }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to remove the user's MFA factors?
+          This is permanent! Are you sure you want to remove the MFA factors for the user{' '}
+          <span className="text-foreground">{user.email ?? user.phone ?? 'this user'}</span>?
+        </p>
+      </ConfirmationModal>
+
+      <BanUserModal visible={isBanModalOpen} user={user} onClose={() => setIsBanModalOpen(false)} />
+
+      <ConfirmationModal
+        variant="warning"
+        visible={isUnbanModalOpen}
+        title="Confirm to unban user"
+        loading={isUpdatingUser}
+        confirmLabel="Unban user"
+        confirmLabelLoading="Unbanning"
+        onCancel={() => setIsUnbanModalOpen(false)}
+        onConfirm={() => handleUnban()}
+      >
+        <p className="text-sm text-foreground-light">
+          The user will have access to your project again once unbanned. Are you sure you want to
+          unban this user?
         </p>
       </ConfirmationModal>
     </>
   )
 }
 
-const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
+export const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
   return (
-    <div className="flex items-center gap-x-2 group">
-      <p className="w-36 text-foreground-light text-sm">{property}</p>
-      {typeof value === 'boolean' ? (
-        <div className="h-[26px] flex items-center justify-center">
-          {value ? (
-            <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
-              <Check size={11} className="text-contrast" strokeWidth={4} />
-            </div>
-          ) : (
-            <X size={13} className="text-foreground-light" />
-          )}
-        </div>
-      ) : (
-        <div className="flex items-center gap-x-2 h-[26px]">
-          <p className="text-sm">{!value ? '-' : value}</p>
-          {!!value && (
-            <CopyButton
-              iconOnly
-              type="text"
-              icon={<Copy />}
-              className="transition opacity-0 group-hover:opacity-100 px-1"
-              text={value}
-            />
-          )}
-        </div>
-      )}
-    </div>
+    <>
+      <div className="flex items-center gap-x-2 group justify-between">
+        <p className=" text-foreground-lighter text-sm">{property}</p>
+        {typeof value === 'boolean' ? (
+          <div className="h-[26px] flex items-center justify-center min-w-[70px]">
+            {value ? (
+              <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
+                <Check size={10} className="text-contrast" strokeWidth={4} />
+              </div>
+            ) : (
+              <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
+                <X size={10} className="text-contrast" strokeWidth={4} />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-x-2 h-[26px] font-mono min-w-[40px]">
+            <p className="text-sm">{!value ? '-' : value}</p>
+            {!!value && (
+              <CopyButton
+                iconOnly
+                type="text"
+                icon={<Copy />}
+                className="transition opacity-0 group-hover:opacity-100 px-1"
+                text={value}
+              />
+            )}
+          </div>
+        )}
+      </div>
+      <Separator />
+    </>
   )
 }
 
-const RowAction = ({
+export const RowAction = ({
   title,
   description,
   button,
@@ -471,6 +522,8 @@ const RowAction = ({
   }
   className?: string
 }) => {
+  const disabled = button?.disabled ?? false
+
   return (
     <div className={cn(CONTAINER_CLASS, className)}>
       <div>
@@ -485,11 +538,13 @@ const RowAction = ({
         icon={success ? <Check className="text-brand" /> : button.icon}
         loading={button.isLoading ?? false}
         onClick={button.onClick}
-        disabled={button?.disabled ?? false}
+        disabled={disabled}
         tooltip={{
           content: {
             side: 'bottom',
-            text: `You need additional permissions to ${button.text.toLowerCase()}`,
+            text: disabled
+              ? `You need additional permissions to ${button.text.toLowerCase()}`
+              : undefined,
           },
         }}
       >

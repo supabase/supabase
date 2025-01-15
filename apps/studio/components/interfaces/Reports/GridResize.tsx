@@ -3,8 +3,8 @@ import RGL, { WidthProvider } from 'react-grid-layout'
 
 import { useParams } from 'common'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 
 const ReactGridLayout = WidthProvider(RGL)
@@ -60,7 +60,7 @@ const GridResize = ({
         containerPadding={[0, 0]}
         compactType="horizontal"
       >
-        {editableReport.layout.map((x: any, i: number) => {
+        {editableReport.layout.map((x: any) => {
           return (
             <div
               key={x.id}
@@ -77,17 +77,13 @@ const GridResize = ({
                 customDateFormat={'MMM D, YYYY'}
               >
                 {!disableUpdate && (
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_ asChild>
-                      <Button
-                        type="text"
-                        icon={<X />}
-                        className="ml-2 px-1"
-                        onClick={() => onRemoveChart({ metric: { key: x.attribute } })}
-                      />
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_ side="bottom">Remove chart</TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
+                  <ButtonTooltip
+                    type="text"
+                    icon={<X />}
+                    className="ml-2 px-1"
+                    onClick={() => onRemoveChart({ metric: { key: x.attribute } })}
+                    tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+                  />
                 )}
               </ChartHandler>
 

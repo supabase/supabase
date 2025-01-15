@@ -1,8 +1,12 @@
-import { beforeAll, vi } from 'vitest'
+/// <reference types="@testing-library/jest-dom" />
+
+import '@testing-library/jest-dom/vitest'
+import { cleanup } from '@testing-library/react'
 import { setupServer } from 'msw/node'
+import { createDynamicRouteParser } from 'next-router-mock/dist/dynamic-routes'
+import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 import { APIMock } from './mocks/api'
 import { routerMock } from './mocks/router'
-import { createDynamicRouteParser } from 'next-router-mock/dist/dynamic-routes'
 
 export const mswServer = setupServer(...APIMock)
 
@@ -33,3 +37,7 @@ beforeAll(() => {
 afterAll(() => mswServer.close())
 
 afterEach(() => mswServer.resetHandlers())
+
+afterEach(() => {
+  cleanup()
+})

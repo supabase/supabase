@@ -326,3 +326,21 @@ with check ( realtime.messages.extension = 'presence' AND realtime.topic() = 'ch
   ] as PolicyTemplate[]
   return results
 }
+
+export const getQueuePolicyTemplates = (): PolicyTemplate[] => {
+  return [
+    {
+      id: 'policy-queues-1',
+      preview: false,
+      templateName: 'Allow access to queue',
+      statement: ``.trim(),
+      name: 'Allow anon and authenticated to access messages from queue',
+      description:
+        'Base policy to ensure that anon and authenticated can only access appropriate rows. USING and CHECK statements will need to be adjusted accordingly',
+      definition: 'true',
+      check: 'true',
+      command: 'ALL',
+      roles: ['anon', 'authenticated'],
+    },
+  ]
+}

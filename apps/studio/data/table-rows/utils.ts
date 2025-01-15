@@ -1,6 +1,6 @@
 import type { Filter, ServiceError, SupaTable } from 'components/grid/types'
 import { isNumericalColumn } from 'components/grid/utils/types'
-import type { Table } from 'data/tables/table-query'
+import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
 
 /**
  * temporary fix until we implement a better filter UI
@@ -17,10 +17,16 @@ export function formatFilterValue(table: SupaTable, filter: Filter) {
   return filter.value
 }
 
-export function getPrimaryKeys({ table }: { table: Table }): {
+export function getPrimaryKeys({ table }: { table: Entity }): {
   primaryKeys?: string[]
   error?: ServiceError
 } {
+  if (!isTableLike(table)) {
+    return {
+      error: { message: 'Only table rows can be updated or deleted' },
+    }
+  }
+
   const pkColumns = table.primary_keys
   if (!pkColumns || pkColumns.length == 0) {
     return {

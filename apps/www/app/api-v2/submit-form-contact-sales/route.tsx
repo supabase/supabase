@@ -3,6 +3,34 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const personalEmailDomains = [
+  '@gmail.com',
+  '@yahoo.com',
+  '@hotmail.',
+  '@outlook.com',
+  '@aol.com',
+  '@icloud.com',
+  '@live.com',
+  '@protonmail.com',
+  '@mail.com',
+  '@example.com',
+]
+
+const isValidEmail = (email: string): boolean => {
+  const emailPattern = /^[\w-\.+]+@([\w-]+\.)+[\w-]{2,8}$/
+  return emailPattern.test(email)
+}
+
+const isCompanyEmail = (email: string): boolean => {
+  for (const domain of personalEmailDomains) {
+    if (email.includes(domain)) {
+      return false
+    }
+  }
+
+  return true
+}
+
 export async function POST(req: Request) {
   const HUBSPOT_PORTAL_ID = process.env.HUBSPOT_PORTAL_ID
   const HUBSPOT_FORM_GUID = process.env.HUBSPOT_ENTERPRISE_FORM_GUID
@@ -13,7 +41,23 @@ export async function POST(req: Request) {
   if (!firstName || !secondName || !companyEmail || !message) {
     return new Response(JSON.stringify({ message: 'All fields are required' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
+      status: 422,
+    })
+  }
+
+  // Validate email
+  if (companyEmail && !isValidEmail(companyEmail)) {
+    return new Response(JSON.stringify({ message: 'Invalid email address' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 422,
+    })
+  }
+
+  // Validate company email
+  if (companyEmail && !isCompanyEmail(companyEmail)) {
+    return new Response(JSON.stringify({ message: 'Please use a company email address' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 422,
     })
   }
 

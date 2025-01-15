@@ -194,6 +194,7 @@ functions:
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/guides/auth/redirect-urls). You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - If you are looking to send your own OTP emails, you can use the [Auth Admin command](https://supabase.com/docs/reference/javascript/auth-admin-generatelink) or the `Send Email` [Auth Hook](https://supabase.com/docs/guides/auth/auth-hooks)
     examples:
       - id: sign-in-with-email.
         name: Sign in with email.
