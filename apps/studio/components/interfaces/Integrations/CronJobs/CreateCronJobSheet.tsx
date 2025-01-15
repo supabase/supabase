@@ -270,7 +270,6 @@ export const CreateCronJobSheet = ({
 
   // update the snippet field when the user changes the any values in the form
   useEffect(() => {
-    console.log('httpHeaders', httpHeaders)
     const command = buildCommand({
       type: cronType,
       method,
@@ -409,9 +408,7 @@ export const CreateCronJobSheet = ({
                           name="function_type"
                           value={field.value}
                           disabled={field.disabled}
-                          onValueChange={(value) => {
-                            field.onChange(value)
-                          }}
+                          onValueChange={(value) => field.onChange(value)}
                         >
                           {CRONJOB_DEFINITIONS.map((definition) => (
                             <RadioGroupStackedItem
