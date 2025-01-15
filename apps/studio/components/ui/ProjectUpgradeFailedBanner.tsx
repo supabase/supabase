@@ -3,11 +3,12 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Alert, Button } from 'ui'
+import { Button } from 'ui'
 
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { X } from 'lucide-react'
+import { Admonition } from 'ui-patterns'
 
 // [Joshen] Think twice about the category though - it doesn't correspond
 
@@ -39,33 +40,30 @@ const ProjectUpgradeFailedBanner = () => {
 
   return (
     <div className="max-w-7xl">
-      <Alert
-        withIcon
-        variant={'warning'}
+      <Admonition
+        type={'warning'}
         title={`Postgres version upgrade was not successful (Initiated at ${initiatedAtUTC} UTC)`}
-        actions={
-          <div className="flex items-center h-full space-x-4">
-            <Button asChild type="default">
-              <Link
-                href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Contact support
-              </Link>
-            </Button>
-            <Button
-              type="text"
-              className="px-1"
-              icon={<X size={16} strokeWidth={1.5} />}
-              onClick={() => acknowledgeMessage()}
-            />
-          </div>
-        }
       >
         Your project and its data are not affected. Please reach out to us via our support form for
         assistance with the upgrade.
-      </Alert>
+        <Button
+          type="text"
+          className="absolute top-4 right-4"
+          icon={<X size={16} strokeWidth={1.5} />}
+          onClick={() => acknowledgeMessage()}
+        />
+        <div className="mt-2">
+          <Button asChild type="default">
+            <Link
+              href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Contact support
+            </Link>
+          </Button>
+        </div>
+      </Admonition>
     </div>
   )
 }
