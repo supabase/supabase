@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "predev": "pnpm run codegen:references",
+    "predev": "pnpm run codegen:references && pnpm run codegen:examples",
     "dev": "next dev --port 3001",
     "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../scripts/getSecrets.js -n local/docs",
-    "prebuild": "pnpm run codegen:references",
+    "prebuild": "pnpm run codegen:references && pnpm run codegen:examples",
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
     "build:sitemap": "tsx ./internals/generate-sitemap.ts",
@@ -16,6 +16,7 @@
     "lint": "next lint",
     "lint:mdx": "supa-mdx-lint content/guides --config ../../supa-mdx-lint.config.toml",
     "typecheck": "tsc --noEmit",
+    "pretest": "pnpm run codegen:examples",
     "test": "vitest --exclude \"**/*.smoke.test.ts\"",
     "test:smoke": "pnpm run codegen:references && vitest -t \"prod smoke test\"",
     "embeddings": "tsx scripts/search/generate-embeddings.ts",
@@ -23,9 +24,10 @@
     "troubleshooting:sync": "node features/docs/Troubleshooting.script.mjs",
     "last-changed": "tsx scripts/last-changed.ts",
     "last-changed:reset": "pnpm run last-changed -- --reset",
+    "codegen:examples": "cp -r ../../examples ./examples",
     "codegen:references": "tsx features/docs/Reference.generated.script.ts",
     "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --write \"content/**/*.mdx\"",
-    "clean": "rimraf node_modules ./docs/features/docs/generated"
+    "clean": "rimraf node_modules ./docs/features/docs/generated ./examples"
   },
   "dependencies": {
     "@code-hike/mdx": "^0.9.0",

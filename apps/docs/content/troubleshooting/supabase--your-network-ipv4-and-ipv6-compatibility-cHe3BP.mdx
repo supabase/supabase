@@ -1,0 +1,83 @@
+---
+title = "Supabase & Your Network: IPv4 and IPv6 compatibility"
+github_url = "https://github.com/orgs/supabase/discussions/27034"
+date_created = "2024-06-05T16:26:47+00:00"
+topics = [ "database", "platform", "supavisor" ]
+keywords = [ "ipv4", "ipv6", "network", "compatibility", "address" ]
+database_id = "f27145c7-0ff5-4621-a364-5d5704bce0ff"
+---
+
+# Network compatibility with your Supabase database
+
+The internet uses a system called the Internet Protocol (IP) to route communication between devices. There are two main versions:
+
+- **IPv4**: Introduced in 1980, it's the original version.
+- **IPv6**: Launched in 1999, it offers a much larger address space and is the preferred future-proof option.
+
+### Supabase and IPv6:
+
+All Supabase databases provide a direct connection string that maps to an IPv6 address.
+
+### Working with IPv6 incompatible hosts:
+
+Here are your options if your server platform doesn't support IPv6:
+
+- Use the Supavisor Connection String (available in the [Dashboard](https://supabase.com/dashboard/project/_/settings/database)).
+- Use the [Supabase Client libraries](https://supabase.com/docs/guides/api/rest/client-libs), which are IPv4 compatible.
+- Enable the [dedicated IPv4 Add-On](https://supabase.com/dashboard/project/_/settings/addons) (available to Pro and above orgs)
+
+> Note: the IPv4 Add-On costs $0.0055 an hour, which equates to ~$4.00 if left on for a full month (~720 hours)
+
+### Checking IPv6 support:
+
+The majority of services are IPv6 compatible. However, there are a few prominent ones that only accept IPv4 connections:
+
+- [Retool](https://retool.com/)
+- [Vercel](https://vercel.com/)
+- [GitHub Actions](https://docs.github.com/en/actions)
+- [Render](https://render.com/)
+
+If you're still unsure if your network supports IPv6, you can run this cURL command on your deployment server:
+
+```sh
+curl -6 https://ifconfig.co/ip
+```
+
+If the command returns an IPv6 address, the network is IPv6 compatible.
+
+### Finding your database's IP address:
+
+To determine your current IP address, you can use an IP address [lookup website](https://whatismyipaddress.com/hostname-ip) or the terminal command:
+
+```sh
+nslookup db.<PROJECT_REF>.supabase.co
+```
+
+This command queries the domain name servers to find the IP address of the given hostname.
+
+Example IPv6 Address: `2a05:d014:1c06:5f0c:d7a9:8616:bee2:30df`
+
+### Identifying your connections:
+
+The pooler and direct connection strings can be found in the [database settings](https://supabase.com/dashboard/project/_/settings/database):
+
+> "Note uses an IPv6 address by default
+
+```sh
+# Example connection string
+postgresql://postgres:[YOUR-PASSWORD]@db.ajrbwkcuthywfihaarmflo.supabase.co:5432/postgres
+```
+
+#### Supavisor in transaction mode (port 6543)
+
+```sh
+# Example transaction string
+postgresql://postgres.ajrbwkcuthywddfihrmflo:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres
+```
+
+#### Supavisor in session mode (port 5432)
+
+```sh
+# Example session string
+postgresql://postgres.ajrbwkcuthywfddihrmflo:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+```
