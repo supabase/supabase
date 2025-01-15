@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { AlertTriangle, CheckCircle2, ChevronRight, Info, Loader2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -8,7 +8,6 @@ import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-func
 import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-service-status-query'
 import {
   ProjectServiceStatus,
-  ProjectServiceStatusData,
   useProjectServiceStatusQuery,
 } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -44,6 +43,14 @@ const StatusMessage = ({
   return 'Unable to connect'
 }
 
+const iconProps = {
+  size: 18,
+  strokeWidth: 1.5,
+}
+const LoaderIcon = () => <Loader2 {...iconProps} className="animate-spin" />
+const AlertIcon = () => <AlertTriangle {...iconProps} />
+const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
+
 const StatusIcon = ({
   isLoading,
   isSuccess,
@@ -55,12 +62,11 @@ const StatusIcon = ({
   isProjectNew: boolean
   projectStatus?: ProjectServiceStatus
 }) => {
-  if (isLoading || isProjectNew) return <Loader2 size={14} className="animate-spin" />
-  if (isSuccess) return <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
-  if (projectStatus === 'UNHEALTHY')
-    return <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
-  if (projectStatus === 'COMING_UP') return <Loader2 size={14} className="animate-spin" />
-  return <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
+  if (isLoading || isProjectNew) return <LoaderIcon />
+  if (isSuccess) return <CheckIcon />
+  if (projectStatus === 'UNHEALTHY') return <AlertIcon />
+  if (projectStatus === 'COMING_UP') return <LoaderIcon />
+  return <AlertIcon />
 }
 
 const ServiceStatus = () => {
@@ -240,7 +246,7 @@ const ServiceStatus = () => {
           type="default"
           icon={
             isLoadingChecks || isProjectNew ? (
-              <Loader2 className="animate-spin" />
+              <LoaderIcon />
             ) : (
               <div
                 className={`w-2 h-2 rounded-full ${
