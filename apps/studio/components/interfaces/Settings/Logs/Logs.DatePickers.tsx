@@ -14,6 +14,7 @@ import {
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD, getDefaultHelper } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
 import { Clock } from 'lucide-react'
+import { Admonition } from 'ui-patterns'
 
 interface Props {
   to: string
@@ -102,9 +103,9 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
             Math.abs(dayjs(from).diff(dayjs(to), 'day')) > LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD
           ) {
             return (
-              <Alert title={''} variant="warning" className="mx-3 pl-2 pr-2 pt-1 pb-2">
+              <Admonition title={''} type="warning" className="mx-3 pl-2 pr-2 pt-1 pb-2">
                 Large ranges may result in memory errors for big projects.
-              </Alert>
+              </Admonition>
             )
           }
         }}
