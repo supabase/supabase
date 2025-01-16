@@ -1,0 +1,63 @@
+---
+id: 'your-subscription'
+title: 'Your subscription'
+---
+
+## How billing is organized
+The Supabase platform consists of "organizations" and "projects", with multiple projects allowed per organization. Each organization has its own subscription, including a unique plan (Free, Pro, Team, or Enterprise), billing cycle, and invoices.
+
+Different plans cannot be mixed within a single organization. For example, you cannot have both a Pro Plan project and a Free Plan project in the same organization. To have projects on different plans, you must create separate organizations. See [Project Transfers](docs/guides/platform/project-transfer) if you need to move a project to a different organization.
+
+<Image
+  alt="Subscription downgrade modal"
+  src={{
+    light: '/docs/img/guides/platform/billing-overview--light.png',
+    dark: '/docs/img/guides/platform/billing-overview.png',
+  }}
+  className="max-w-[577px]"
+  zoomable
+/>
+
+## Costs
+The monthly costs for paid plans consist of a fixed subscription fee, based on the subscription plan, and variable fees for usage. More information on plan prices and usage fees can be found on our [pricing page](https://supabase.com/pricing). For a detailed explanation of your monthly invoice, refer to this [guide](/docs/guides/platform/your-monthly-invoice).
+
+### Free Plan
+Supabase offers a Free Plan to help you get started and explore the platform. You are granted two free projects. The project limit applies across all organizations where you are an Owner or Administrator. This means you could have two Free Plan organizations with one project each, or one Free Plan organization with two projects. Paused projects do not count towards your free project limit.
+
+## Change your subscription
+You can change your subscription at any time by clicking the "Change subscription plan" button on the [organization's billing page](https://supabase.com/dashboard/org/_/billing).
+
+### Upgrade
+Upgrades take effect immediately. During the process, you are informed of the associated costs.
+<Image
+  alt="Subscription upgrade modal"
+  src={{
+    light: '/docs/img/guides/platform/upgrade-to-pro-plan-modal--light.png',
+    dark: '/docs/img/guides/platform/upgrade-to-pro-plan-modal--dark.png',
+  }}
+  className="max-w-[577px]"
+  zoomable
+/>
+
+### Downgrade
+Downgrades take effect immediately. During the process, you are informed of the implications.
+<Image
+  alt="Subscription downgrade modal"
+  src={{
+    light: '/docs/img/guides/platform/downgrade-to-free-plan-modal--light.png',
+    dark: '/docs/img/guides/platform/downgrade-to-free-plan-modal--dark.png',
+  }}
+  className="max-w-[577px]"
+  zoomable
+/>
+
+#### Credits upon downgrade
+Upon subscription downgrade, any prepaid subscription fee will be credited back to your organization for unused time in the billing cycle. These credits do not expire and will be applied to future invoices. You can find your credit balance on the [organization's billing page](https://supabase.com/dashboard/org/_/billing).
+
+**Example:**
+If you start a Pro Plan subscription on January 1 and downgrade to the Free Plan on January 15, your organization will receive approximately $12.50 in credits for the unused time between January 15 and January 31.
+
+As stated in our [Terms of Service](https://supabase.com/terms#1-fees), we do not offer refunds to the payment method on file.
+
+
+

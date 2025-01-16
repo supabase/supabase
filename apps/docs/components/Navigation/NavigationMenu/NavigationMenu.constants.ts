@@ -2087,6 +2087,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/billing-faq',
         },
         {
+          name: 'Your subscription',
+          url: '/guides/platform/your-subscription',
+        },
+        {
           name: 'Your monthly invoice',
           url: '/guides/platform/your-monthly-invoice',
         },
