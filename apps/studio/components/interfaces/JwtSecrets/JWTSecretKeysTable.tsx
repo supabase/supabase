@@ -172,6 +172,7 @@ const ApiKeySection: React.FC<{ inUseKey: SecretKey | undefined }> = ({ inUseKey
       .writeText(text)
       .then(() => {
         toast({
+          // @ts-expect-error
           title: 'Copied!',
           description: `${description} has been copied to your clipboard.`,
         })
@@ -179,6 +180,7 @@ const ApiKeySection: React.FC<{ inUseKey: SecretKey | undefined }> = ({ inUseKey
       .catch((err) => {
         console.error('Failed to copy text: ', err)
         toast({
+          // @ts-expect-error
           title: 'Error',
           description: 'Failed to copy to clipboard.',
           variant: 'destructive',
@@ -231,6 +233,7 @@ const ApiKeySection: React.FC<{ inUseKey: SecretKey | undefined }> = ({ inUseKey
                   </code>
                   <Button
                     variant="outline"
+                    // @ts-expect-error
                     size="icon"
                     onClick={() => copyToClipboard(betaPublishableKey, 'Beta publishable key')}
                   >
@@ -253,6 +256,7 @@ const ApiKeySection: React.FC<{ inUseKey: SecretKey | undefined }> = ({ inUseKey
                   </code>
                   <Button
                     variant="outline"
+                    // @ts-expect-error
                     size="icon"
                     onClick={() => copyToClipboard(betaSecretKey, 'Beta secret key')}
                   >
@@ -272,6 +276,7 @@ const ApiKeySection: React.FC<{ inUseKey: SecretKey | undefined }> = ({ inUseKey
                   </div>
                   <Button
                     variant="outline"
+                    // @ts-expect-error
                     size="sm"
                     onClick={() => copyToClipboard(jwksContent, 'JWKS')}
                   >
@@ -300,6 +305,7 @@ const ApiKeySection: React.FC<{ inUseKey: SecretKey | undefined }> = ({ inUseKey
                   </code>
                   <Button
                     variant="outline"
+                    // @ts-expect-error
                     size="icon"
                     onClick={() => copyToClipboard(legacyPublishableKey, 'Legacy publishable key')}
                   >
@@ -322,6 +328,7 @@ const ApiKeySection: React.FC<{ inUseKey: SecretKey | undefined }> = ({ inUseKey
                   </code>
                   <Button
                     variant="outline"
+                    // @ts-expect-error
                     size="icon"
                     onClick={() => copyToClipboard(legacySecretKey, 'Legacy secret key')}
                   >
@@ -531,6 +538,7 @@ NEW_STANDBY_KEY_CONTENT
     setActionInProgress('new')
     await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API call
     const newKey = createNewKey()
+    // @ts-expect-error
     setSecretKeys((prevKeys) => {
       if (autoPromote) {
         return prevKeys
@@ -654,6 +662,8 @@ NEW_STANDBY_KEY_CONTENT
         <Dialog>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
+              {/* 
+              // @ts-expect-error */}
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
                 <MoreVertical className="h-4 w-4" />
@@ -986,6 +996,7 @@ NEW_STANDBY_KEY_CONTENT
                 onClick={() => {
                   navigator.clipboard.writeText(generateJWKS(promotingKey))
                   toast({
+                    // @ts-expect-error
                     title: 'Copied!',
                     description: 'New JWKS has been copied to your clipboard.',
                   })

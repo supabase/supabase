@@ -68,6 +68,7 @@
     "icons": "workspace:*",
     "immutability-helper": "^3.1.1",
     "ip-num": "^1.5.1",
+    "jotai": "^2.8.0",
     "json-logic-js": "^2.0.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.436.0",

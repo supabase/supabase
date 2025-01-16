@@ -6,9 +6,13 @@ import { apiKeysKeys } from './../keys'
 export interface APIKeyVariables {
   projectRef?: string
   id?: string
+  reveal: boolean
 }
 
-export async function getAPIKeysById({ projectRef, id }: APIKeyVariables, signal?: AbortSignal) {
+export async function getAPIKeysById(
+  { projectRef, id, reveal }: APIKeyVariables,
+  signal?: AbortSignal
+) {
   if (typeof projectRef === 'undefined') throw new Error('projectRef is required')
   if (typeof id === 'undefined') throw new Error('Content ID is required')
 
@@ -16,6 +20,7 @@ export async function getAPIKeysById({ projectRef, id }: APIKeyVariables, signal
   const { data, error } = await get('/v1/projects/{ref}/api-keys/{id}', {
     params: {
       path: { ref: projectRef, id },
+      query: { reveal },
     },
     signal,
   })
@@ -30,12 +35,12 @@ export async function getAPIKeysById({ projectRef, id }: APIKeyVariables, signal
 export type APIKeyIdData = Awaited<ReturnType<typeof getAPIKeysById>>
 
 export const useAPIKeyIdQuery = <TData = APIKeyIdData>(
-  { projectRef, id }: APIKeyVariables,
+  { projectRef, id, reveal }: APIKeyVariables,
   { enabled = true, ...options }: UseQueryOptions<APIKeyIdData, ResponseError, TData> = {}
 ) =>
   useQuery<APIKeyIdData, ResponseError, TData>(
     apiKeysKeys.single(projectRef, id),
-    ({ signal }) => getAPIKeysById({ projectRef, id }, signal),
+    ({ signal }) => getAPIKeysById({ projectRef, id, reveal }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
       ...options,

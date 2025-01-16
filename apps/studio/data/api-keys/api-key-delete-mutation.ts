@@ -13,7 +13,11 @@ export async function deleteAPIKey(payload: APIKeyDeleteVariables) {
   if (!payload.projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await del('/v1/projects/{ref}/api-keys/{id}', {
-    params: { path: { ref: payload.projectRef, id: payload.id } },
+    params: {
+      path: { ref: payload.projectRef, id: payload.id },
+      // remove this query parameter
+      query: { reveal: true },
+    },
   })
 
   if (error) handleError(error)

@@ -33,7 +33,11 @@ import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { toast } from 'sonner'
 import APIKeyDeleteDialog from './APIKeyDeleteDialog'
 
-const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
+const APIKeyRow = ({
+  apiKey,
+}: {
+  apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
+}) => {
   const isSecret = apiKey.type === 'secret'
 
   const MotionTableRow = motion(TableRow)
@@ -105,7 +109,11 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
   )
 }
 
-function Input({ apiKey }: { apiKey: APIKeysData[0] }) {
+function Input({
+  apiKey,
+}: {
+  apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
+}) {
   // const [shown, setShown] = useState(false)
   const [show, setShowState] = useState(false)
   const { ref: projectRef } = useParams()
@@ -121,6 +129,7 @@ function Input({ apiKey }: { apiKey: APIKeysData[0] }) {
     {
       projectRef,
       id: apiKey.id as string,
+      reveal: true,
     },
     {
       enabled: show,
@@ -143,7 +152,6 @@ function Input({ apiKey }: { apiKey: APIKeysData[0] }) {
 
   async function onCopy() {
     // if ID already exists from a reveal action, return that
-    // @ts-expect-error / TODO: fix type error
     if (data?.api_key) return data?.api_key
 
     try {
@@ -190,10 +198,7 @@ function Input({ apiKey }: { apiKey: APIKeysData[0] }) {
             }}
             className="truncate"
           >
-            {show
-              ? // @ts-expect-error / TODO: fix type error
-                data?.api_key
-              : apiKey?.api_key}
+            {show ? data?.api_key : apiKey?.api_key}
           </motion.span>
         </AnimatePresence>
       </div>

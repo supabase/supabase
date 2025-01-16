@@ -344,7 +344,7 @@ importers:
         version: 0.3.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       nuqs:
         specifier: ^1.19.1
-        version: 1.19.1(next@14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))
+        version: 1.19.1(next@14.2.21(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))
       openai:
         specifier: ^4.20.1
         version: 4.71.1(encoding@0.1.13)(zod@3.23.8)
@@ -588,7 +588,7 @@ importers:
         version: 10.3.1(react@18.2.0)
       '@vercel/flags':
         specifier: ^2.6.0
-        version: 2.6.0(next@14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 2.6.0(next@14.2.21(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@vitejs/plugin-react':
         specifier: ^4.2.1
         version: 4.2.1(supports-color@8.1.1)(vite@5.2.14(@types/node@20.12.11)(sass@1.72.0)(terser@5.32.0))
@@ -649,6 +649,9 @@ importers:
       ip-num:
         specifier: ^1.5.1
         version: 1.5.1
+      jotai:
+        specifier: ^2.8.0
+        version: 2.8.1(@types/react@18.3.3)(react@18.2.0)
       json-logic-js:
         specifier: ^2.0.2
         version: 2.0.2
@@ -687,7 +690,7 @@ importers:
         version: 0.3.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       nuqs:
         specifier: ^1.17.8
-        version: 1.19.1(next@14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))
+        version: 1.19.1(next@14.2.21(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))
       openai:
         specifier: ^4.20.1
         version: 4.71.1(encoding@0.1.13)(zod@3.23.8)
@@ -958,7 +961,7 @@ importers:
         version: 2.4.11(typescript@5.5.2)
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
+        version: 0.9.13(next@14.2.21(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
       postcss:
         specifier: ^8.4.31
         version: 8.4.38
@@ -1329,7 +1332,7 @@ importers:
         version: 0.7.12
       '@vercel/flags':
         specifier: ^2.6.0
-        version: 2.6.0(next@14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 2.6.0(next@14.2.21(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       api-types:
         specifier: workspace:*
         version: link:../api-types
@@ -1909,7 +1912,7 @@ importers:
         version: link:../api-types
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
+        version: 0.9.13(next@14.2.21(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
       typescript:
         specifier: ~5.5.0
         version: 5.5.2
@@ -7158,7 +7161,6 @@ packages:
     resolution: {integrity: sha512-t0q23FIpvHDTtnORW+bDJziGsal5uh9RJTJ1fyH8drd4lICOoXhJ5pLMUZ5C0VQei6dNmwTzzoTRgMkO9JgHEQ==}
     peerDependencies:
       eslint: '>= 5'
-    bundledDependencies: []
 
   eslint-plugin-import@2.29.1:
     resolution: {integrity: sha512-BbPC0cuExzhiMo4Ff1BTVwHpjjv28C5R+btTOGaCRC7UEz801up0JadwkeSk5Ued6TG34uaczuVuH6qyy5YUxw==}
@@ -17140,7 +17142,7 @@ snapshots:
       '@use-gesture/core': 10.3.1
       react: 18.2.0
 
-  '@vercel/flags@2.6.0(next@14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
+  '@vercel/flags@2.6.0(next@14.2.21(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       jose: 5.2.1
     optionalDependencies:
@@ -22421,7 +22423,7 @@ snapshots:
     dependencies:
       js-yaml-loader: 1.2.2
 
-  next-router-mock@0.9.13(next@14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0):
+  next-router-mock@0.9.13(next@14.2.21(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0):
     dependencies:
       next: 14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       react: 18.2.0
@@ -22611,7 +22613,7 @@ snapshots:
 
   number-flow@0.3.7: {}
 
-  nuqs@1.19.1(next@14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)):
+  nuqs@1.19.1(next@14.2.21(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)):
     dependencies:
       mitt: 3.0.1
       next: 14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.41.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)

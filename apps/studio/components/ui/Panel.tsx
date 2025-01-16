@@ -1,9 +1,7 @@
 import { Megaphone } from 'lucide-react'
 import { cloneElement, forwardRef, PropsWithChildren, ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { forwardRef, PropsWithChildren, ReactNode } from 'react'
-import { Badge, Button, Loading, cn } from 'ui'
-
+import { Badge, Button, cn, Loading } from 'ui'
 interface PanelProps {
   className?: string
   footer?: JSX.Element | false

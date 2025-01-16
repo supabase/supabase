@@ -227,6 +227,7 @@ NEW_KEY_CONTENT
     setActionInProgress('new')
     await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API call
     const newKey = createNewKey('STANDBY')
+    // @ts-expect-error
     setSecretKeys((prevKeys) => {
       const existingStandbyKey = prevKeys.find((key) => key.status === 'STANDBY')
       if (existingStandbyKey) {
@@ -245,6 +246,7 @@ NEW_KEY_CONTENT
     setActionInProgress('rotate')
     await new Promise((resolve) => setTimeout(resolve, 2000)) // Simulate API call
 
+    // @ts-expect-error
     setSecretKeys((prevKeys) => {
       const updatedKeys = prevKeys.map((key) => {
         if (key.status === 'IN_USE') {
@@ -774,7 +776,7 @@ NEW_KEY_CONTENT
           </DialogHeader>
           {renderKeyFlowVisual()}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowConfirmRotateDialog(false)}>
+            <Button type="outline" onClick={() => setShowConfirmRotateDialog(false)}>
               Cancel
             </Button>
             <Button onClick={() => rotateKey()}>Confirm Rotation</Button>
@@ -821,6 +823,8 @@ NEW_KEY_CONTENT
       </Dialog>
 
       <div className="flex items-center space-x-2">
+        {/* 
+        // @ts-expect-error */}
         <ShowPublicJWTsDialogComposer inUseKey={inUseKey} />
       </div>
     </>

@@ -17,17 +17,22 @@ import { APIKeysData } from 'data/api-keys/api-keys-query'
 import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
 import { useParams } from 'common'
 
-const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
+const APIKeyRow = ({
+  apiKey,
+}: {
+  apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
+}) => {
   const { ref: projectRef } = useParams()
   const isSecret = apiKey.type === 'secret'
   const [shown, setShown] = useState(!isSecret)
 
-  const hiddenKey = useMemo(
-    () =>
+  const hiddenKey = useMemo(() => {
+    if (apiKey.type !== 'secret') return apiKey.api_key
+    return (
       apiKey.prefix +
-      Array.from({ length: apiKey.api_key.length - apiKey.prefix.length }, () => '•').join(''),
-    [apiKey.api_key, apiKey.prefix]
-  )
+      Array.from({ length: apiKey.api_key.length - apiKey.prefix.length }, () => '•').join('')
+    )
+  }, [apiKey.api_key, apiKey.prefix, apiKey.type])
 
   const canDeleteAPIKeys = true // todo
 
@@ -51,7 +56,9 @@ const APIKeyRow = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
     <Table.tr key={apiKey.id}>
       <Table.td>
         <div className="flex flex-row gap-2">
-          <code>{shown ? apiKey.api_key : hiddenKey}</code>
+          <code>
+            {apiKey.type === 'secret' ? (shown ? apiKey.api_key : hiddenKey) : apiKey.api_key}
+          </code>
 
           {isSecret && (
             <Button

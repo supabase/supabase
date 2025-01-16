@@ -14,7 +14,11 @@ import QuickKeyCopyWrapper from './QuickKeyCopy'
 
 const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
-  const { data: apiKeysData, isLoading: isLoadingApiKeys, error } = useAPIKeysQuery({ projectRef })
+  const {
+    data: apiKeysData,
+    isLoading: isLoadingApiKeys,
+    error,
+  } = useAPIKeysQuery({ projectRef, reveal: false })
 
   const publishableApiKeys = useMemo(
     () => apiKeysData?.filter(({ type }) => type === 'publishable') ?? [],
@@ -77,7 +81,11 @@ const PublishableAPIKeys = () => {
 
 function ApiKeyInput() {
   const { ref: projectRef } = useParams()
-  const { data: apiKeysData, isLoading: isApiKeysLoading, error } = useAPIKeysQuery({ projectRef })
+  const {
+    data: apiKeysData,
+    isLoading: isApiKeysLoading,
+    error,
+  } = useAPIKeysQuery({ projectRef, reveal: false })
   const publishableApiKeys = useMemo(
     () => apiKeysData?.filter(({ type }) => type === 'publishable') ?? [],
     [apiKeysData]

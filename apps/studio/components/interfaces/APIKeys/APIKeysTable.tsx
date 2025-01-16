@@ -1,8 +1,13 @@
 import { AnimatePresence } from 'framer-motion'
 import APIKeyRow from './APIKeyRowv2'
+import { APIKeysData } from 'data/api-keys/api-keys-query'
 // ... other imports
 
-const APIKeysTable = ({ apiKeys }: { apiKeys: APIKeysData }) => {
+const APIKeysTable = ({
+  apiKeys,
+}: {
+  apiKeys: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>[]
+}) => {
   return (
     <table>
       <thead>{/* ... table header */}</thead>

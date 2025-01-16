@@ -54,6 +54,7 @@ const QuickKeyCopyContent = ({ selectedFramework }: { selectedFramework: string 
     error: apiKeysError,
   } = useAPIKeysQuery({
     projectRef: projectRef as string,
+    reveal: false,
   })
   const isPermissionsLoading = !usePermissionsLoaded()
   const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')

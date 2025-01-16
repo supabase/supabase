@@ -6,7 +6,11 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
 import { DropdownMenuItem } from 'ui'
 
-const APIKeyDeleteDialog = ({ apiKey }: { apiKey: APIKeysData[0] }) => {
+const APIKeyDeleteDialog = ({
+  apiKey,
+}: {
+  apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
+}) => {
   const { ref: projectRef } = useParams()
   const [isOpen, setIsOpen] = useState(false)
 

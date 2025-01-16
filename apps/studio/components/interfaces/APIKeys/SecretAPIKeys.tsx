@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useMemo } from 'react'
 import { Card, CardContent, EyeOffIcon, Skeleton, WarningIcon, cn } from 'ui'
 import {
@@ -18,13 +18,20 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
-  const { data: apiKeysData, isLoading: isLoadingApiKeys, error } = useAPIKeysQuery({ projectRef })
+  const {
+    data: apiKeysData,
+    isLoading: isLoadingApiKeys,
+    error,
+  } = useAPIKeysQuery({ projectRef, reveal: false })
 
   const isLoadingPermissions = !usePermissionsLoaded()
   const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
 
   const secretApiKeys = useMemo(
-    () => apiKeysData?.filter(({ type }) => type === 'secret') ?? [],
+    () =>
+      apiKeysData?.filter(
+        (key): key is Extract<APIKeysData[number], { type: 'secret' }> => key.type === 'secret'
+      ) ?? [],
     [apiKeysData]
   )
 
