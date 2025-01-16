@@ -17,9 +17,10 @@
 
 # misc
 .DS_Store
-.env.keys
-!.env.*.example
+
+# dotenv
 !.env
+!.env.*
 
 # debug
 npm-debug.log*
