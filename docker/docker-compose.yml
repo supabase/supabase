@@ -81,12 +81,6 @@ services:
     container_name: supabase-auth
     image: supabase/gotrue:v2.167.0
     restart: unless-stopped
-    depends_on:
-      db:
-        # Disable this if you are using an external Postgres database
-        condition: service_healthy
-      analytics:
-        condition: service_healthy
     healthcheck:
       test:
         [
@@ -241,14 +235,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./volumes/storage:/var/lib/storage:z
-    depends_on:
-      db:
-        # Disable this if you are using an external Postgres database
-        condition: service_healthy
-      rest:
-        condition: service_started
-      imgproxy:
-        condition: service_started
     healthcheck:
       test:
         [
@@ -401,20 +387,6 @@ services:
   db:
     container_name: supabase-db
     image: supabase/postgres:15.8.1.020
-    healthcheck:
-      test: pg_isready -U postgres -h localhost
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    depends_on:
-      vector:
-        condition: service_healthy
-    command:
-      - postgres
-      - -c
-      - config_file=/etc/postgresql/postgresql.conf
-      - -c
-      - log_min_messages=fatal # prevents Realtime polling queries from appearing in logs
     restart: unless-stopped
     volumes:
       - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
