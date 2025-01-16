@@ -2095,6 +2095,10 @@ export const platform: NavMenuConstant = {
           name: 'Your monthly invoice',
           url: '/guides/platform/your-monthly-invoice',
         },
+        {
+          name: 'Control your costs',
+          url: '/guides/platform/cost-control',
+        },
       ],
     },
   ],
