@@ -533,7 +533,6 @@ const WizardForm = () => {
                       form.setValue('projectName', title)
                     }
                   }}
-                  isLoading={!!(aiDescription && sqlStatements.length === 0)}
                   onSubmit={(value) => {
                     setAiDescription(value)
                     setFormTitle('Create a project')
@@ -1206,7 +1205,6 @@ const WizardForm = () => {
               cloudProvider: form.getValues('cloudProvider'),
               postgresVersion: form.getValues('postgresVersionSelection'),
             }}
-            instanceLabel={instanceLabel}
           />
 
           {/* Add close button when showing visual on mobile */}
