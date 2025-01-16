@@ -81,6 +81,7 @@ export const SQLEditor = () => {
   const os = detectOS()
   const router = useRouter()
   const { ref, id: urlId } = useParams()
+  const org = useSelectedOrganization()
   const { profile } = useProfile()
   const queryClient = useQueryClient()
   const project = useSelectedProject()
@@ -425,6 +426,7 @@ export const SQLEditor = () => {
       sendEvent({
         action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
         properties: { handlerAccepted: true },
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
 
       setSelectedDiffType(DiffType.Modification)

@@ -12,6 +12,7 @@ import { TelemetryActions } from 'lib/constants/telemetry'
 import { Button, Input, Sheet, SheetContent } from 'ui'
 import { CronJobCard } from './CronJobCard'
 import { DeleteCronJob } from './DeleteCronJob'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const EMPTY_CRON_JOB = {
   jobname: '',
@@ -22,6 +23,7 @@ const EMPTY_CRON_JOB = {
 
 export const CronjobsTab = () => {
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
@@ -66,7 +68,10 @@ export const CronjobsTab = () => {
       : cronJobs ?? []
 
   const onOpenCreateJobSheet = () => {
-    sendEvent({ action: TelemetryActions.CRON_JOB_CREATE_CLICKED })
+    sendEvent({
+      action: TelemetryActions.CRON_JOB_CREATE_CLICKED,
+      groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
     setCreateCronJobSheetShown(true)
   }
 

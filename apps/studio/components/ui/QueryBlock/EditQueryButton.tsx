@@ -22,6 +22,8 @@ export const EditQueryButton = ({ sql, title }: EditQueryButtonProps) => {
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
 
+  const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const handleEditInSQLEditor = () => {
@@ -46,6 +48,7 @@ export const EditQueryButton = ({ sql, title }: EditQueryButtonProps) => {
             isInSQLEditor,
             isInNewSnippet,
           },
+          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
         })
       }}
       tooltip={{ content: { side: 'bottom', text: 'Edit in SQL Editor' } }}

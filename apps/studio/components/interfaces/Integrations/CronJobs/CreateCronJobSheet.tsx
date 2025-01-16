@@ -168,6 +168,7 @@ export const CreateCronJobSheet = ({
   onClose,
 }: CreateCronJobSheetProps) => {
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
   const isEditing = !!selectedCronJob?.jobname
 
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
@@ -271,6 +272,10 @@ export const CreateCronJobSheet = ({
                 type: values.type,
                 schedule: schedule,
               },
+              groups: {
+                project: project?.ref ?? 'Unknown',
+                organization: org?.slug ?? 'Unknown',
+              },
             })
           } else {
             sendEvent({
@@ -278,6 +283,10 @@ export const CreateCronJobSheet = ({
               properties: {
                 type: values.type,
                 schedule: schedule,
+              },
+              groups: {
+                project: project?.ref ?? 'Unknown',
+                organization: org?.slug ?? 'Unknown',
               },
             })
           }

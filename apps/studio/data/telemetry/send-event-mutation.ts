@@ -105,6 +105,7 @@ export const useSendEventMutation = ({
     (vars) => {
       const { action } = vars
       const properties = 'properties' in vars ? vars.properties : {}
+      const groups = 'groups' in vars ? vars.groups : {}
 
       const body: SendEventPayload = {
         action,
@@ -120,6 +121,7 @@ export const useSendEventMutation = ({
           viewport_width: isBrowser ? window.innerWidth : 0,
         },
         custom_properties: properties as any,
+        groups,
       }
 
       return sendEvent({ body })

@@ -36,6 +36,7 @@ import {
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings } from './DatabaseSettings.utils'
 import examples, { Example } from './DirectConnectionExamples'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const StepLabel = ({
   number,
@@ -52,6 +53,7 @@ const StepLabel = ({
 
 export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
@@ -103,6 +105,7 @@ export const DatabaseConnectionString = () => {
     sendEvent({
       action: TelemetryActions.CONNECTION_STRING_COPIED,
       properties: { connectionType, lang, connectionMethod },
+      groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
   }
 
