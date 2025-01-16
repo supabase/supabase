@@ -60,10 +60,12 @@ const NavigationBar = () => {
 
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
-  const [allowNavPanelToExpand] = useLocalStorageQuery(
+  const [storedAllowNavPanel] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
     true
   )
+  // Don't allow the nav panel to expand in playwright tests
+  const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
 
   return (
     <div className="w-14 h-full hidden md:flex flex-col">
@@ -100,10 +102,12 @@ export const NavContent = () => {
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
-  const [allowNavPanelToExpand] = useLocalStorageQuery(
+  const [storedAllowNavPanel] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
     true
   )
+  // Don't allow the nav panel to expand in playwright tests
+  const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
 
   const {
     projectAuthAll: authEnabled,
