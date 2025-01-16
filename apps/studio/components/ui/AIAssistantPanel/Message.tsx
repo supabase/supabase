@@ -5,11 +5,10 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
 import { AiIconAnimation, cn, CodeBlock, markdownComponents, WarningIcon } from 'ui'
+import { QueryBlock } from '../QueryBlock/QueryBlock'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
-import { SqlSnippet } from './SqlSnippet'
 
 interface MessageProps {
-  id: string
   role: 'function' | 'system' | 'user' | 'assistant' | 'data' | 'tool'
   content?: string
   isLoading: boolean
@@ -18,8 +17,15 @@ interface MessageProps {
   variant?: 'default' | 'warning'
 }
 
+type AssistantSnippetProps = {
+  title: string
+  runQuery: 'true' | 'false'
+  isChart?: 'true' | 'false'
+  xAxis?: string
+  yAxis?: string
+}
+
 export const Message = function Message({
-  id,
   role,
   content,
   isLoading,
@@ -65,6 +71,19 @@ export const Message = function Message({
             pre: (props: any) => {
               const language = props.children[0].props.className?.replace('language-', '') || 'sql'
 
+              const rawSql = language === 'sql' ? props.children[0].props.children : undefined
+              const formatted = (rawSql || [''])[0]
+              const propsMatch = formatted.match(/--\s*props:\s*(\{[^}]+\})/)
+
+              const snippetProps: AssistantSnippetProps = propsMatch
+                ? JSON.parse(propsMatch[1])
+                : {}
+              const { xAxis, yAxis } = snippetProps
+              const title = snippetProps.title || 'SQL Query'
+              const isChart = snippetProps.isChart === 'true'
+              const runQuery = snippetProps.runQuery === 'true'
+              const sql = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
+
               return (
                 <div className="w-auto -ml-[36px] overflow-x-hidden">
                   {language === 'sql' ? (
@@ -75,10 +94,19 @@ export const Message = function Message({
                         hideLineNumbers
                       />
                     ) : (
-                      <SqlSnippet
-                        readOnly={readOnly}
+                      <QueryBlock
+                        lockColumns
+                        label={title}
+                        sql={sql}
+                        chartConfig={{
+                          type: 'bar',
+                          cumulative: false,
+                          xKey: xAxis ?? '',
+                          yKey: yAxis ?? '',
+                        }}
+                        isChart={isChart}
                         isLoading={isLoading}
-                        sql={props.children[0].props.children}
+                        runQuery={runQuery}
                       />
                     )
                   ) : (
