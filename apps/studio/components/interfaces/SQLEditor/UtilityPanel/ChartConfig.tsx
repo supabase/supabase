@@ -5,7 +5,6 @@ import { useMemo } from 'react'
 import BarChart from 'components/ui/Charts/BarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import {
-  Button,
   Checkbox_Shadcn_,
   Label_Shadcn_,
   ResizableHandle,
@@ -17,7 +16,7 @@ import {
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
 } from 'ui'
-import { toast } from 'sonner'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 type Results = { rows: readonly any[] }
 
@@ -75,8 +74,14 @@ export const ChartConfig = ({
     })
   }, [results])
 
-  const hasResults = results.rows.length > 0
   const hasConfig = config.xKey && config.yKey
+
+  const canFlip = useMemo(() => {
+    if (!hasConfig) return false
+    const xKeyType = typeof results.rows[0]?.[config.xKey]
+    const yKeyType = typeof results.rows[0]?.[config.yKey]
+    return xKeyType === 'number' && yKeyType === 'string'
+  }, [hasConfig, results.rows, config.xKey, config.yKey])
 
   // Compute cumulative results only if necessary
   const cumulativeResults = useMemo(() => getCumulativeResults(results, config), [results, config])
@@ -151,12 +156,6 @@ export const ChartConfig = ({
   const onFlip = () => {
     const newY = config.xKey
     const newX = config.yKey
-
-    const value = results.rows[0]?.[newY]
-    if (typeof value !== 'number' && isNaN(Number(value))) {
-      toast.error('Y-axis must be a number')
-      return
-    }
     onConfigChange({ ...config, xKey: newX, yKey: newY })
   }
 
@@ -174,14 +173,20 @@ export const ChartConfig = ({
         <div className="flex justify-between items-center h-5">
           <h2 className="text-sm text-foreground-lighter">Chart options</h2>
           {config.xKey && config.yKey && (
-            <Button
+            <ButtonTooltip
               type="text"
+              size="tiny"
               onClick={onFlip}
-              title="Swap X and Y axis"
+              disabled={!canFlip}
               icon={<ArrowUpDown size="15" className="text-foreground-lighter" />}
+              tooltip={{
+                content: {
+                  text: canFlip ? 'Swap X and Y axis' : 'Cannot flip Y and X axis',
+                },
+              }}
             >
               Flip
-            </Button>
+            </ButtonTooltip>
           )}
         </div>
 
