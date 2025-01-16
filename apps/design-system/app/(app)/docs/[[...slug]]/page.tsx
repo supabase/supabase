@@ -14,13 +14,13 @@ import { notFound } from 'next/navigation'
 import Balancer from 'react-wrap-balancer'
 import { ScrollArea, Separator } from 'ui'
 
+type Params = Promise<{ slug: string[] }>
+
 interface DocPageProps {
-  params: {
-    slug: string[]
-  }
+  params: Params
 }
 
-async function getDocFromParams({ params }: DocPageProps) {
+async function getDocFromParams({ params }: { params: { slug: string[] } }) {
   const slug = params.slug?.join('/') || ''
   const doc = allDocs.find((doc) => doc.slugAsParams === slug)
 
@@ -31,7 +31,8 @@ async function getDocFromParams({ params }: DocPageProps) {
   return doc
 }
 
-export async function generateMetadata({ params }: DocPageProps): Promise<Metadata> {
+export async function generateMetadata(props: { params: Params }): Promise<Metadata> {
+  const params = await props.params
   const doc = await getDocFromParams({ params })
 
   if (!doc) {
@@ -65,13 +66,14 @@ export async function generateMetadata({ params }: DocPageProps): Promise<Metada
   }
 }
 
-export async function generateStaticParams(): Promise<DocPageProps['params'][]> {
+export async function generateStaticParams(): Promise<{ slug: string[] }[]> {
   return allDocs.map((doc) => ({
     slug: doc.slugAsParams.split('/'),
   }))
 }
 
-export default async function DocPage({ params }: DocPageProps) {
+export default async function DocPage(props: { params: Params }) {
+  const params = await props.params
   const doc = await getDocFromParams({ params })
 
   if (!doc) {
