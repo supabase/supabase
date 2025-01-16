@@ -288,7 +288,7 @@ export const QueryBlock = ({
         </div>
       )}
 
-      {view === 'chart' && !isExecuting && queryResult !== undefined ? (
+      {view === 'chart' && queryResult !== undefined ? (
         <>
           {(queryResult ?? []).length === 0 ? (
             <div className="flex h-full items-center justify-center">
