@@ -8,7 +8,7 @@ import {
   useRowSelection,
 } from 'react-data-grid'
 
-import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { SELECT_COLUMN_KEY } from '../../constants'
 import { useTrackedState } from '../../store/Store'
 import type { SupaRow } from '../../types'
@@ -138,18 +138,19 @@ function SelectCellFormatter({
         onClick={onClick}
       />
       {onEditRow && row && (
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
-            <Button
-              type="text"
-              size="tiny"
-              className="px-1 rdg-row__select-column__edit-action"
-              icon={<Maximize2 />}
-              onClick={onEditClick}
-            />
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">Expand row</TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+        <ButtonTooltip
+          type="text"
+          size="tiny"
+          className="px-1 rdg-row__select-column__edit-action"
+          icon={<Maximize2 />}
+          onClick={onEditClick}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: 'Expand row',
+            },
+          }}
+        />
       )}
     </div>
   )

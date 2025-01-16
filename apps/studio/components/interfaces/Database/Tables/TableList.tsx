@@ -413,16 +413,7 @@ const TableList = ({
                               <p>{x.name}</p>
                             </TooltipTrigger_Shadcn_>
 
-                            <TooltipContent_Shadcn_ side="bottom">
-                              <div
-                                className={[
-                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                  'border border-scale-200',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">{x.name}</span>
-                              </div>
-                            </TooltipContent_Shadcn_>
+                            <TooltipContent_Shadcn_ side="bottom">{x.name}</TooltipContent_Shadcn_>
                           </Tooltip_Shadcn_>
                         ) : (
                           <p>{x.name}</p>

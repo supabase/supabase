@@ -193,7 +193,7 @@ const AddRestrictionModal = ({
                             <TooltipTrigger_Shadcn_>
                               <HelpCircle size="14" strokeWidth={2} />
                             </TooltipTrigger_Shadcn_>
-                            <TooltipContent_Shadcn_ side="bottom">
+                            <TooltipContent_Shadcn_ side="bottom" className="w-80">
                               Classless inter-domain routing (CIDR) notation is the notation used to
                               identify networks and hosts in the networks. The block size tells us
                               how many bits we need to take for the network prefix, and is a value

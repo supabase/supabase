@@ -7,9 +7,9 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 import type { Timezone } from './PITR.types'
 import { TimezoneSelection } from './TimezoneSelection'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface PITRStatusProps {
   selectedTimezone: Timezone
@@ -58,26 +58,22 @@ const PITRStatus = ({
                 You'll be able to pick the right date and time when you begin
               </span>
             </div>
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <Button
-                  disabled={hasReadReplicas || !canTriggerPhysicalBackup}
-                  onClick={() => onSetConfiguration()}
-                >
-                  Start a restore
-                </Button>
-              </TooltipTrigger_Shadcn_>
-              {hasReadReplicas ||
-                (!canTriggerPhysicalBackup && (
-                  <TooltipContent_Shadcn_ side="left">
-                    {hasReadReplicas
-                      ? 'You will need to remove all read replicas first to trigger a PITR recovery'
-                      : !canTriggerPhysicalBackup
-                        ? 'You need additional permissions to trigger a PITR recovery'
-                        : null}
-                  </TooltipContent_Shadcn_>
-                ))}
-            </Tooltip_Shadcn_>
+            <ButtonTooltip
+              disabled={hasReadReplicas || !canTriggerPhysicalBackup}
+              onClick={() => onSetConfiguration()}
+              tooltip={{
+                content: {
+                  side: 'left',
+                  text: hasReadReplicas
+                    ? 'You will need to remove all read replicas first to trigger a PITR recovery'
+                    : !canTriggerPhysicalBackup
+                      ? 'You need additional permissions to trigger a PITR recovery'
+                      : undefined,
+                },
+              }}
+            >
+              Start a restore
+            </ButtonTooltip>
           </div>
         }
       >

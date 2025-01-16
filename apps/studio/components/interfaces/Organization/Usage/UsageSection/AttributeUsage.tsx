@@ -125,16 +125,14 @@ const AttributeUsage = ({
                               )}
                             </TooltipTrigger_Shadcn_>
                             <TooltipContent_Shadcn_ side="bottom">
-                              <div>
-                                <p>
-                                  Exceeding your plans included usage will lead to restrictions to
-                                  your project.
-                                </p>
-                                <p>
-                                  Upgrade to a usage-based plan or disable the spend cap to avoid
-                                  restrictions.
-                                </p>
-                              </div>
+                              <p>
+                                Exceeding your plans included usage will lead to restrictions to
+                                your project.
+                              </p>
+                              <p>
+                                Upgrade to a usage-based plan or disable the spend cap to avoid
+                                restrictions.
+                              </p>
                             </TooltipContent_Shadcn_>
                           </Tooltip_Shadcn_>
                         )}

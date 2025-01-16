@@ -13,17 +13,7 @@ import { usePgSodiumKeyDeleteMutation } from 'data/pg-sodium-keys/pg-sodium-key-
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Key, Loader, Search, Trash, X } from 'lucide-react'
-import {
-  Button,
-  Form,
-  Input,
-  Listbox,
-  Modal,
-  Separator,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-} from 'ui'
+import { Button, Form, Input, Listbox, Modal, Separator } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 const DEFAULT_KEY_NAME = 'No description provided'
@@ -196,22 +186,21 @@ export const EncryptionKeysManagement = () => {
                         <p className="text-sm text-foreground-light">
                           Added on {dayjs(key.created).format('MMM D, YYYY')}
                         </p>
-                        <Tooltip_Shadcn_>
-                          <TooltipTrigger_Shadcn_ asChild>
-                            <Button
-                              type="default"
-                              className="py-2"
-                              icon={<Trash />}
-                              disabled={!canManageKeys}
-                              onClick={() => setSelectedKeyToRemove(key)}
-                            />
-                          </TooltipTrigger_Shadcn_>
-                          {!canManageKeys && (
-                            <TooltipContent_Shadcn_ side="bottom">
-                              You need additional permissions to delete keys
-                            </TooltipContent_Shadcn_>
-                          )}
-                        </Tooltip_Shadcn_>
+                        <ButtonTooltip
+                          type="default"
+                          className="py-2"
+                          icon={<Trash />}
+                          disabled={!canManageKeys}
+                          onClick={() => setSelectedKeyToRemove(key)}
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text: !canManageKeys
+                                ? 'You need additional permissions to delete keys'
+                                : undefined,
+                            },
+                          }}
+                        />
                       </div>
                     </div>
                     {idx !== keys.length - 1 && <Separator />}

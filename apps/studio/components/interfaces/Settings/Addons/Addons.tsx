@@ -38,16 +38,7 @@ import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
@@ -451,32 +442,27 @@ const Addons = () => {
                         ? 'Dedicated IPv4 address is enabled'
                         : 'Dedicated IPv4 address is not enabled'}
                     </p>
-                    <Tooltip_Shadcn_>
-                      <TooltipTrigger_Shadcn_ asChild>
-                        <div>
-                          <Button
-                            type="default"
-                            className="mt-2 pointer-events-auto"
-                            onClick={() => setPanel('ipv4')}
-                            disabled={
-                              isBranch ||
-                              !isProjectActive ||
-                              projectUpdateDisabled ||
-                              !(canUpdateIPv4 || ipv4)
-                            }
-                          >
-                            Change dedicated IPv4 address
-                          </Button>
-                        </div>
-                      </TooltipTrigger_Shadcn_>
-                      {/* Only show the tooltip if the user can't add the addon and ipv4 is not currently applied */}
-                      {!(canUpdateIPv4 || ipv4) && (
-                        <TooltipContent_Shadcn_ side="bottom">
-                          Temporarily disabled while we are migrating to IPv6, please check back
-                          later.
-                        </TooltipContent_Shadcn_>
-                      )}
-                    </Tooltip_Shadcn_>
+                    <ButtonTooltip
+                      type="default"
+                      className="mt-2 pointer-events-auto"
+                      onClick={() => setPanel('ipv4')}
+                      disabled={
+                        isBranch ||
+                        !isProjectActive ||
+                        projectUpdateDisabled ||
+                        !(canUpdateIPv4 || ipv4)
+                      }
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: !(canUpdateIPv4 || ipv4)
+                            ? 'Temporarily disabled while we are migrating to IPv6, please check back later.'
+                            : undefined,
+                        },
+                      }}
+                    >
+                      Change dedicated IPv4 address
+                    </ButtonTooltip>
                   </div>
                 </div>
               </ScaffoldSectionContent>

@@ -144,15 +144,13 @@ const RolesList = () => {
                 />
               </div>
             </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ align="start" side="bottom">
-              <div className="space-y-1">
-                <p className="text-xs text-foreground-light pr-2">Connections by roles:</p>
-                {rolesWithActiveConnections.map((role) => (
-                  <div key={role.id} className="text-xs text-foreground">
-                    {role.name}: {role.activeConnections}
-                  </div>
-                ))}
-              </div>
+            <TooltipContent_Shadcn_ align="start" side="bottom" className="space-y-1">
+              <p className="text-foreground-light pr-2">Connections by roles:</p>
+              {rolesWithActiveConnections.map((role) => (
+                <div key={role.id}>
+                  {role.name}: {role.activeConnections}
+                </div>
+              ))}
             </TooltipContent_Shadcn_>
           </Tooltip_Shadcn_>
           <ButtonTooltip

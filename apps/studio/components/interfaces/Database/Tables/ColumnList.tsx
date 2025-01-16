@@ -152,39 +152,41 @@ const ColumnList = ({
                             <Button type="default" className="px-1" icon={<MoreVertical />} />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="bottom" align="end" className="w-32">
-                            <DropdownMenuItem
-                              disabled={!canUpdateColumns}
-                              onClick={() => onEditColumn(x)}
-                            >
-                              <Tooltip_Shadcn_>
-                                <TooltipTrigger_Shadcn_ className="flex items-center space-x-2">
+                            <Tooltip_Shadcn_>
+                              <TooltipTrigger_Shadcn_>
+                                <DropdownMenuItem
+                                  disabled={!canUpdateColumns}
+                                  onClick={() => onEditColumn(x)}
+                                  className="space-x-2"
+                                >
                                   <Edit size={12} />
                                   <p>Edit column</p>
-                                </TooltipTrigger_Shadcn_>
-                                {!canUpdateColumns && (
-                                  <TooltipContent_Shadcn_ side="bottom">
-                                    Additional permissions required to edit column
-                                  </TooltipContent_Shadcn_>
-                                )}
-                              </Tooltip_Shadcn_>
-                            </DropdownMenuItem>
+                                </DropdownMenuItem>
+                              </TooltipTrigger_Shadcn_>
+                              {!canUpdateColumns && (
+                                <TooltipContent_Shadcn_ side="bottom">
+                                  Additional permissions required to edit column
+                                </TooltipContent_Shadcn_>
+                              )}
+                            </Tooltip_Shadcn_>
 
-                            <DropdownMenuItem
-                              disabled={!canUpdateColumns || isLocked}
-                              onClick={() => onDeleteColumn(x)}
-                            >
-                              <Tooltip_Shadcn_>
-                                <TooltipTrigger_Shadcn_ className="flex items-center space-x-2">
+                            <Tooltip_Shadcn_>
+                              <TooltipTrigger_Shadcn_>
+                                <DropdownMenuItem
+                                  disabled={!canUpdateColumns || isLocked}
+                                  onClick={() => onDeleteColumn(x)}
+                                  className="space-x-2"
+                                >
                                   <Trash stroke="red" size={12} />
                                   <p>Delete column</p>
-                                </TooltipTrigger_Shadcn_>
-                                {!canUpdateColumns && (
-                                  <TooltipContent_Shadcn_ side="bottom">
-                                    Additional permissions required to edit column
-                                  </TooltipContent_Shadcn_>
-                                )}
-                              </Tooltip_Shadcn_>
-                            </DropdownMenuItem>
+                                </DropdownMenuItem>
+                              </TooltipTrigger_Shadcn_>
+                              {!canUpdateColumns && (
+                                <TooltipContent_Shadcn_ side="bottom">
+                                  Additional permissions required to delete column
+                                </TooltipContent_Shadcn_>
+                              )}
+                            </Tooltip_Shadcn_>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       )}

@@ -1,9 +1,9 @@
 import { PlayCircle, StopCircle } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { TelemetryActions } from 'lib/constants/telemetry'
-import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 import { ChooseChannelPopover } from './ChooseChannelPopover'
 import { RealtimeFilterPopover } from './RealtimeFilterPopover'
 import { RealtimeTokensPopover } from './RealtimeTokensPopover'
@@ -22,31 +22,29 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
       <div className="flex flex-row">
         <ChooseChannelPopover config={config} onChangeConfig={onChangeConfig} />
         <RealtimeTokensPopover config={config} onChangeConfig={onChangeConfig} />
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
-            <Button
-              size="tiny"
-              type={config.enabled ? 'warning' : 'primary'}
-              className="rounded-l-none border-l-0"
-              disabled={config.channelName.length === 0}
-              icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}
-              onClick={() => {
-                onChangeConfig({ ...config, enabled: !config.enabled })
-                if (!config.enabled) {
-                  // the user has clicked to start listening
-                  sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED })
-                }
-              }}
-            >
-              {config.enabled ? `Stop listening` : `Start listening`}
-            </Button>
-          </TooltipTrigger_Shadcn_>
-          {config.channelName.length === 0 && (
-            <TooltipContent_Shadcn_ side="bottom">
-              You'll need to join a channel first
-            </TooltipContent_Shadcn_>
-          )}
-        </Tooltip_Shadcn_>
+        <ButtonTooltip
+          size="tiny"
+          type={config.enabled ? 'warning' : 'primary'}
+          className="rounded-l-none border-l-0"
+          disabled={config.channelName.length === 0}
+          icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}
+          onClick={() => {
+            onChangeConfig({ ...config, enabled: !config.enabled })
+            if (!config.enabled) {
+              // the user has clicked to start listening
+              sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED })
+            }
+          }}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text:
+                config.channelName.length === 0 ? 'You need to join a channel first' : undefined,
+            },
+          }}
+        >
+          {config.enabled ? `Stop listening` : `Start listening`}
+        </ButtonTooltip>
       </div>
       <RealtimeFilterPopover config={config} onChangeConfig={onChangeConfig} />
     </div>

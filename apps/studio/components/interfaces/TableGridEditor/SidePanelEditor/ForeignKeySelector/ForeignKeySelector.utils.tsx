@@ -55,13 +55,9 @@ export const generateCascadeActionDescription = (
             <TooltipTrigger_Shadcn_ className="translate-y-[3px] mx-1">
               <HelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
             </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom">
-              <div className="w-[300px] space-y-2">
-                <p>
-                  This is similar to no action, but the restrict check cannot be deferred till later
-                  in the transaction
-                </p>
-              </div>
+            <TooltipContent_Shadcn_ side="bottom" className="w-80">
+              This is similar to no action, but the restrict check cannot be deferred till later in
+              the transaction
             </TooltipContent_Shadcn_>
           </Tooltip_Shadcn_>
           : {actionVerb} a record from{' '}

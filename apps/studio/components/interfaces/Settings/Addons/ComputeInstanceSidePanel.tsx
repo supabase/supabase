@@ -343,21 +343,15 @@ const ComputeInstanceSidePanel = () => {
                           {option.price_interval === 'hourly' && (
                             <Tooltip_Shadcn_>
                               <TooltipTrigger_Shadcn_>
-                                <div className="flex items-center">
-                                  <Info
-                                    size={14}
-                                    strokeWidth={2}
-                                    className="hover:text-foreground-light"
-                                  />
-                                </div>
+                                <Info
+                                  size={14}
+                                  strokeWidth={2}
+                                  className="hover:text-foreground-light"
+                                />
                               </TooltipTrigger_Shadcn_>
                               <TooltipContent_Shadcn_ side="bottom">
-                                <div className="flex items-center space-x-1">
-                                  <p className="text-foreground text-sm">
-                                    ${Number(option.price * 672).toFixed(0)} - $
-                                    {Number(option.price * 744).toFixed(0)} per month
-                                  </p>
-                                </div>
+                                ${Number(option.price * 672).toFixed(0)} - $
+                                {Number(option.price * 744).toFixed(0)} per month
                               </TooltipContent_Shadcn_>
                             </Tooltip_Shadcn_>
                           )}

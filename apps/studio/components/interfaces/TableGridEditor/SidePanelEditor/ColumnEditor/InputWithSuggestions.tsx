@@ -8,8 +8,9 @@
 import { noop } from 'lodash'
 import { List } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -17,11 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
 } from 'ui'
-
 import type { Suggestion } from './ColumnEditor.types'
 
 const MAX_SUGGESTIONS = 3
@@ -100,27 +97,17 @@ const InputWithSuggestions = ({
         actions={
           showSuggestions && (
             <DropdownMenu>
-              <Tooltip_Shadcn_>
-                <DropdownMenuTrigger asChild>
-                  <TooltipTrigger_Shadcn_ asChild>
-                    <Button type="default" className="!px-1 mr-0.5">
-                      <List strokeWidth={1.5} size={14} />
-                    </Button>
-                  </TooltipTrigger_Shadcn_>
-                </DropdownMenuTrigger>
-                <TooltipContent_Shadcn_ side="bottom">
-                  <div
-                    className={[
-                      'bg-alternative rounded py-1 px-2 leading-none shadow',
-                      'border-background border',
-                    ].join(' ')}
-                  >
-                    <span className="text-foreground text-xs">
-                      {suggestionsTooltip || 'Suggestions'}
-                    </span>
-                  </div>
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+              <DropdownMenuTrigger asChild>
+                <ButtonTooltip
+                  type="default"
+                  className="!px-1 mr-0.5"
+                  tooltip={{
+                    content: { text: suggestionsTooltip || 'Suggestions', side: 'bottom' },
+                  }}
+                >
+                  <List strokeWidth={1.5} size={14} />
+                </ButtonTooltip>
+              </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end" side="bottom">
                 <DropdownMenuLabel>{suggestionsHeader || 'Suggestions'}</DropdownMenuLabel>

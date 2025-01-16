@@ -107,9 +107,9 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           <DropdownMenuTrigger asChild>
             <Button type="text" className="px-1" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom">
+          <DropdownMenuContent side="bottom" align="end" className="w-32">
             <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
+              <TooltipTrigger_Shadcn_>
                 <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}
@@ -127,7 +127,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
             </Tooltip_Shadcn_>
 
             <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
+              <TooltipTrigger_Shadcn_>
                 <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}

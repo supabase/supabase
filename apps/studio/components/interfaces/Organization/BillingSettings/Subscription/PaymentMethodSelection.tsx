@@ -3,19 +3,14 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { AlertCircle, CreditCard, Loader, Plus } from 'lucide-react'
-import {
-  Button,
-  Listbox,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-} from 'ui'
+import { Listbox } from 'ui'
 
 export interface PaymentMethodSelectionProps {
   selectedPaymentMethod?: string
@@ -75,29 +70,28 @@ const PaymentMethodSelection = ({
               <p className="text-sm">No saved payment methods</p>
             </div>
 
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <Button
-                  type="default"
-                  disabled={!canUpdatePaymentMethods}
-                  icon={<CreditCard />}
-                  onClick={() => setShowAddNewPaymentMethodModal(true)}
-                  htmlType="button"
-                >
-                  Add new
-                </Button>
-              </TooltipTrigger_Shadcn_>
-              {!canUpdatePaymentMethods && (
-                <TooltipContent_Shadcn_ side="bottom">
-                  <div className="w-48 text-center">
-                    <span>
-                      You need additional permissions to add new payment methods to this
-                      organization
-                    </span>
-                  </div>
-                </TooltipContent_Shadcn_>
-              )}
-            </Tooltip_Shadcn_>
+            <ButtonTooltip
+              type="default"
+              disabled={!canUpdatePaymentMethods}
+              icon={<CreditCard />}
+              onClick={() => setShowAddNewPaymentMethodModal(true)}
+              htmlType="button"
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canUpdatePaymentMethods ? (
+                    <div className="w-48 text-center">
+                      <span>
+                        You need additional permissions to add new payment methods to this
+                        organization
+                      </span>
+                    </div>
+                  ) : undefined,
+                },
+              }}
+            >
+              Add new
+            </ButtonTooltip>
           </div>
         ) : (
           <Listbox

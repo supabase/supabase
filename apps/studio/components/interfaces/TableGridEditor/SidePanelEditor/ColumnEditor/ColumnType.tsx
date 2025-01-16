@@ -132,7 +132,7 @@ const ColumnType = ({
           />
         </TooltipTrigger_Shadcn_>
         {!showLabel && (
-          <TooltipContent_Shadcn_ side="bottom">
+          <TooltipContent_Shadcn_ side="bottom" className="w-80">
             Custom non-native psql data types currently cannot be changed to a different data type
             via Supabase Studio
           </TooltipContent_Shadcn_>
@@ -157,7 +157,7 @@ const ColumnType = ({
         </TooltipTrigger_Shadcn_>
         {!showLabel && description && (
           <TooltipContent_Shadcn_ side="bottom">
-            <div className="w-[240px]">{description}</div>
+            <div className="w-80">{description}</div>
           </TooltipContent_Shadcn_>
         )}
       </Tooltip_Shadcn_>
