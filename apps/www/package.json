@@ -28,7 +28,6 @@
     "@octokit/plugin-paginate-graphql": "^4.0.0",
     "@octokit/rest": "^20.0.2",
     "@radix-ui/react-dialog": "^1.0.5",
-    "@react-three/fiber": "^7.0.29",
     "@supabase/supabase-js": "^2.44.3",
     "@vercel/og": "^0.6.2",
     "ai-commands": "workspace:*",
