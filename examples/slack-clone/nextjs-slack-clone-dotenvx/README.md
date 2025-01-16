@@ -43,11 +43,12 @@ Following the conventions used in this project, environments are configured usin
 | .env.keys       | All         | Yes              | No        |
 | .env.local      | Local       | Yes              | No        |
 | .env.production | Production  | No               | Yes       |
+| .env.preview    | Branches    | No               | Yes       |
 | .env            | Any         | Maybe            | Yes       |
 
 Since `.env` file is always loaded by default, you can use it for any environment, including preview branches.
 
-If you choose to commit `.env` to git, remember to encrypt secret values as explained in [remote development](#How-to-Use-with-Preview-Branches) section.
+However, if you choose to commit `.env` to git, remember to encrypt secret values as explained in [remote development](#How-to-Use-with-Preview-Branches) section.
 
 ### Example: Environment-Driven Configuration
 
@@ -158,10 +159,10 @@ Here's how to set up encrypted secrets for your preview branches:
 1. **Generate Key Pair and Encrypt Your Secrets:**
 
 ```bash
-npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env
+npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env.preview
 ```
 
-This creates a new encryption key in `supabase/.env` and a new decryption key in `supabase/.env.keys`, specifically for your preview branches.
+This creates a new encryption key in `supabase/.env.preview` and a new decryption key in `supabase/.env.keys`, specifically for your preview branches.
 
 2. **Update Project Secrets:**
 
