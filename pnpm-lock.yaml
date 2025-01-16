@@ -9,6 +9,9 @@ catalogs:
     '@supabase/auth-js':
       specifier: ^2.67.3
       version: 2.67.3
+    '@supabase/realtime-js':
+      specifier: ^2.10.2
+      version: 2.11.2
     '@supabase/supabase-js':
       specifier: ^2.47.14
       version: 2.47.14
@@ -569,7 +572,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/pg-meta
       '@supabase/realtime-js':
-        specifier: ^2.10.2
+        specifier: 'catalog:'
         version: 2.11.2
       '@supabase/shared-types':
         specifier: 0.1.74

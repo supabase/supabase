@@ -7,4 +7,5 @@ catalog:
   '@types/node': ^20.0.0
   '@supabase/auth-js': ^2.67.3
   '@supabase/supabase-js': ^2.47.14
+  '@supabase/realtime-js': ^2.10.2
   next: 14.2.21
