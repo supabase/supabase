@@ -38,7 +38,7 @@ This example guides you through deploying and managing app environments with dot
 
 Follow the conventions used in this project, where environments are split into three files:
 
-1. `supabase/.env.local` - For local development using `npx supabase start`.
+1. `supabase/.env` - For local development using `npx supabase start`.
 2. `supabase/.env.production` - For your main production environment on Supabase.
 3. `supabase/.env.preview` - For the preview branches
 
@@ -83,9 +83,9 @@ secret = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET)"
 
 ## Local Development
 
-Set local environment values in `supabase/.env.local`. Sensitive values like GitHub credentials should be encrypted.
+Set local environment values in `supabase/.env`. Sensitive values like GitHub credentials should be encrypted.
 
-Example `.env.local` file:
+Example `.env` file:
 
 ```dotenv
 SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID=<client-id>
@@ -96,14 +96,14 @@ SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET=encrypted:<client-secret>
 Replace placeholders with your own [GitHub OAuth App credentials](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app):
 
 ```bash
-npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env.local
+npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env
 ```
 
 Run the local stack:
 
 ```bash
-npx dotenvx run -f supabase/.env.local -- npx supabase start
-npx dotenvx run -f supabase/.env.local -- npm run dev
+npx dotenvx run -f supabase/.env -- npx supabase start
+npx dotenvx run -f supabase/.env -- npm run dev
 ```
 
 Visit `localhost:3000` to test the app with GitHub OAuth integration.
