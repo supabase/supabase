@@ -10,8 +10,8 @@ catalogs:
       specifier: ^2.67.3
       version: 2.67.3
     '@supabase/realtime-js':
-      specifier: ^2.10.2
-      version: 2.11.2
+      specifier: ^2.11.3
+      version: 2.11.3
     '@supabase/supabase-js':
       specifier: ^2.47.14
       version: 2.47.14
@@ -573,7 +573,7 @@ importers:
         version: link:../../packages/pg-meta
       '@supabase/realtime-js':
         specifier: 'catalog:'
-        version: 2.11.2
+        version: 2.11.3
       '@supabase/shared-types':
         specifier: 0.1.74
         version: 0.1.74
@@ -4919,6 +4919,9 @@ packages:
 
   '@supabase/realtime-js@2.11.2':
     resolution: {integrity: sha512-u/XeuL2Y0QEhXSoIPZZwR6wMXgB+RQbJzG9VErA3VghVt7uRfSVsjeqd7m5GhX3JR6dM/WRmLbVR8URpDWG4+w==}
+
+  '@supabase/realtime-js@2.11.3':
+    resolution: {integrity: sha512-rMMGtZy2MaSBlNXP5hJZx+ij5JtQGPuBQ7/izE1oKlR1A6SzbN0VWeFTdmDHVa1gcJ72zpQAjbSmByIG6uz/eA==}
 
   '@supabase/shared-types@0.1.74':
     resolution: {integrity: sha512-vYbNA6JtV4PNTSuyRQsRBn6v99WMKCBN5wgS2Ezl3n4EGgCoJCvHyQFbNEwbf1vvZVum/j1bAAK3n3io1jxiqA==}
@@ -16301,6 +16304,16 @@ snapshots:
       '@supabase/node-fetch': 2.6.15
 
   '@supabase/realtime-js@2.11.2':
+    dependencies:
+      '@supabase/node-fetch': 2.6.15
+      '@types/phoenix': 1.6.4
+      '@types/ws': 8.5.10
+      ws: 8.18.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  '@supabase/realtime-js@2.11.3':
     dependencies:
       '@supabase/node-fetch': 2.6.15
       '@types/phoenix': 1.6.4
