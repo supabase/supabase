@@ -28,35 +28,36 @@ export default function RecipeDialog({ recipe, onClose }: RecipeDialogProps) {
 
   return (
     <Dialog open={!!recipe} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent size="xlarge">
-        <DialogHeader padding="small">
-          <DialogTitle>{recipe.title}</DialogTitle>
-          <DialogDescription>{recipe.description}</DialogDescription>
-        </DialogHeader>
-        <DialogSectionSeparator />
-        <DialogSection padding="small">
+      <DialogContent size="xlarge" className="grid grid-cols-2 items-stretch">
+        <div className="flex flex-col justify-center p-12 min-h-64">
+          <div>
+            <h2>{recipe.title}</h2>
+            <p className="text-foreground-light">{recipe.description}</p>
+          </div>
+          <div className="flex gap-2 mt-4">
+            <Button
+              type="default"
+              onClick={() => {
+                navigator.clipboard.writeText(recipe.code)
+              }}
+            >
+              Copy to clipboard
+            </Button>
+            <Button type="primary" onClick={onClose}>
+              Add to project
+            </Button>
+          </div>
+        </div>
+        <div className="border-l bg-surface-100">
           <CodeBlock
             lang={recipe.type === 'edge-function' ? 'ts' : 'sql'}
-            className="!rounded-md"
+            className="!rounded-none !bg-surface-100 h-full max-h-96"
+            showLineNumbers
             size="small"
-            hideCopy
           >
             {recipe.code}
           </CodeBlock>
-        </DialogSection>
-        <DialogFooter padding="small">
-          <Button
-            type="default"
-            onClick={() => {
-              navigator.clipboard.writeText(recipe.code)
-            }}
-          >
-            Copy to clipboard
-          </Button>
-          <Button type="primary" onClick={onClose}>
-            Add to project
-          </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   )
