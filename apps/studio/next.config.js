@@ -49,7 +49,7 @@ const GITHUB_USER_CONTENT_URL = 'https://raw.githubusercontent.com'
 const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com'
 const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
 const VERCEL_LIVE_URL = 'https://vercel.live'
-const SENTRY_URL = 'https://*.ingest.sentry.io'
+const SENTRY_URL = 'https://*.ingest.us.sentry.io'
 
 // used by vercel live preview
 const PUSHER_URL = 'https://*.pusher.com'
@@ -77,7 +77,8 @@ const csp = [
       ]
     : [
         `default-src 'self' ${DEFAULT_SRC_URLS} ${PUSHER_URL_WS} ${SENTRY_URL};`,
-        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
+        `connect-src 'self' ${DEFAULT_SRC_URLS} ${SENTRY_URL};`,
+        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL} ${PUSHER_URL} ${SENTRY_URL};`,
         `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `img-src 'self' blob: data: ${IMG_SRC_URLS} ;`,
         `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
