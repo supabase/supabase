@@ -1497,6 +1497,19 @@ parameters:
       [functions.my_function]
       entrypoint = "path/to/custom/function.ts"
 
+  - id: 'functions.function_name.static_files'
+    title: 'functions.<function_name>.static_files'
+    tags: ['edge-functions']
+    required: false
+    description: |
+      Specify an array of static files to be bundled with the function. Supports glob patterns.
+    links:
+      - name: '`supabase functions` CLI subcommands'
+        link: 'https://supabase.com/docs/reference/cli/supabase-functions'
+    usage: |
+      [functions.my_function]
+      static_files = [ "./functions/MY_FUNCTION_NAME/*.html", "./functions/MY_FUNCTION_NAME/custom.wasm" ]
+
   - id: 'analytics.enabled'
     title: 'analytics.enabled'
     tags: ['analytics']

@@ -10,14 +10,11 @@ import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfigu
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
-  const diskManagementV2 = useFlag('diskManagementV2')
   const project = useSelectedProject()
-
-  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
+  const showNewDiskManagementUI = project?.cloud_provider === 'AWS'
 
   return (
     <>

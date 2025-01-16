@@ -1,13 +1,16 @@
+import MotionNumber from '@number-flow/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Info } from 'lucide-react'
-import MotionNumber from '@number-flow/react'
 import { useTheme } from 'next-themes'
 import { UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common'
+import { useDiskBreakdownQuery } from 'data/config/disk-breakdown-query'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { GB } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
+import { useMemo } from 'react'
 import {
   badgeVariants,
   cn,
@@ -17,9 +20,6 @@ import {
 } from 'ui'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
-import { useDiskBreakdownQuery } from 'data/config/disk-breakdown-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useMemo } from 'react'
 
 interface DiskSpaceBarProps {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -68,15 +68,17 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
   const usedTotalPercentage = Math.min((usedSizeTotal / totalSize) * 100, 100)
 
   const usedSizeDatabase = Math.round(((diskBreakdownBytes?.dbSizeBytes ?? 0) / GB) * 100) / 100
-  const usedPercentageDatabase = Math.min((usedSizeDatabase / totalSize) * 100, 100)
+  const usedPercentageDatabase =
+    totalSize === 0 ? 0 : Math.min((usedSizeDatabase / totalSize) * 100, 100)
   const newUsedPercentageDatabase = Math.min((usedSizeDatabase / newTotalSize) * 100, 100)
 
   const usedSizeWAL = Math.round(((diskBreakdownBytes?.walSizeBytes ?? 0) / GB) * 100) / 100
-  const usedPercentageWAL = Math.min((usedSizeWAL / totalSize) * 100, 100)
+  const usedPercentageWAL = totalSize === 0 ? 0 : Math.min((usedSizeWAL / totalSize) * 100, 100)
   const newUsedPercentageWAL = Math.min((usedSizeWAL / newTotalSize) * 100, 100)
 
   const usedSizeSystem = Math.round(((diskBreakdownBytes?.systemBytes ?? 0) / GB) * 100) / 100
-  const usedPercentageSystem = Math.min((usedSizeSystem / totalSize) * 100, 100)
+  const usedPercentageSystem =
+    totalSize === 0 ? 0 : Math.min((usedSizeSystem / totalSize) * 100, 100)
   const newUsedPercentageSystem = Math.min((usedSizeSystem / newTotalSize) * 100, 100)
 
   const resizePercentage = AUTOSCALING_THRESHOLD * 100

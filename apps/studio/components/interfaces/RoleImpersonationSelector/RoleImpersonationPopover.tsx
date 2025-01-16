@@ -4,8 +4,8 @@ import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_
 import type { User } from 'data/auth/users-infinite-query'
 import { ChevronDown, User as IconUser } from 'lucide-react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import RoleImpersonationSelector from './RoleImpersonationSelector'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
+import RoleImpersonationSelector from './RoleImpersonationSelector'
 
 export interface RoleImpersonationPopoverProps {
   serviceRoleLabel?: string
@@ -38,7 +38,7 @@ const RoleImpersonationPopover = ({
           )}
         >
           <div className="flex items-center gap-1">
-            <span className="text-foreground-muted">role</span>
+            <span className="text-foreground-muted">Role</span>
             <span>{currentRole}</span>
             {state.role?.type === 'postgrest' && state.role.role === 'authenticated' && (
               <>
