@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
@@ -5,7 +6,6 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
@@ -22,7 +22,6 @@ import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mu
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -43,14 +42,11 @@ export default DatabaseReport
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
-  const diskManagementV2 = useFlag('diskManagementV2')
 
   const state = useDatabaseSelectorStateSnapshot()
   const [dateRange, setDateRange] = useState<any>(undefined)
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
-
-  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
 
   const report = useDatabaseReport()
   const { data } = useDatabaseSizeQuery({
@@ -218,7 +214,7 @@ const DatabaseUsage = () => {
                   </div>
 
                   <div className="col-span-8 text-right">
-                    {showNewDiskManagementUI ? (
+                    {project?.cloud_provider === 'AWS' ? (
                       <Button asChild type="default">
                         <Link href={`/project/${ref}/settings/compute-and-disk`}>
                           Increase disk size

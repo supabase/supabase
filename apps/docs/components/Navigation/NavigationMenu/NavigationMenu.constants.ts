@@ -1360,6 +1360,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/ai-models',
         },
         {
+          name: 'Wasm modules',
+          url: '/guides/functions/wasm',
+        },
+        {
           name: 'Deploying with CI / CD pipelines',
           url: '/guides/functions/cicd-workflow',
         },
