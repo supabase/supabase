@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { groupBy, isNull } from 'lodash'
+import { ArrowRight, Plus, Save } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -13,12 +14,12 @@ import NoPermission from 'components/ui/NoPermission'
 import { useContentQuery } from 'data/content/content-query'
 import { useContentUpdateMutation } from 'data/content/content-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
+import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { ArrowRight, Plus, Save, Settings } from 'lucide-react'
+import { Dashboards } from 'types'
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
-import GridResize from './GridResize'
+import { GridResize } from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 
@@ -29,10 +30,10 @@ const Reports = () => {
   const { id, ref } = useParams()
   const { profile } = useProfile()
 
-  const [config, setConfig] = useState<any>(undefined)
-  const [startDate, setStartDate] = useState<any>(null)
-  const [endDate, setEndDate] = useState<any>(null)
-  const [hasEdits, setHasEdits] = useState<any>(false)
+  const [config, setConfig] = useState<Dashboards.Content>()
+  const [startDate, setStartDate] = useState<string | null>(null)
+  const [endDate, setEndDate] = useState<string | null>(null)
+  const [hasEdits, setHasEdits] = useState<boolean>(false)
 
   const { data: userContents, isLoading } = useContentQuery({
     projectRef: ref,
@@ -47,8 +48,9 @@ const Reports = () => {
       toast.error(`Failed to update report: ${error.message}`)
     },
   })
-  const currentReport = userContents?.content.find((report) => report.id === id)
 
+  const currentReport = userContents?.content.find((report) => report.id === id)
+  const currentReportContent = currentReport?.content as Dashboards.Content
   const canReadReport = useCheckPermissions(PermissionAction.READ, 'user_content', {
     resource: {
       type: 'report',
@@ -82,7 +84,7 @@ const Reports = () => {
      * want to compare fixed dates as possible differences from saved and edited versions of report.
      */
     let _config = JSON.parse(JSON.stringify(config))
-    let _original = JSON.parse(JSON.stringify(currentReport?.content))
+    let _original = JSON.parse(JSON.stringify(currentReportContent))
 
     if (!_original || !_config) return
 
@@ -117,12 +119,19 @@ const Reports = () => {
     saveReport({ projectRef: ref, id, type: 'report', content: config })
   }
 
-  function handleChartSelection({ metric, value }: any) {
-    if (value) pushChart({ metric })
+  const handleChartSelection = ({
+    metric,
+    isAddingChart,
+  }: {
+    metric: Metric
+    isAddingChart: boolean
+  }) => {
+    if (isAddingChart) pushChart({ metric })
     else popChart({ metric })
   }
 
-  function pushChart({ metric }: any) {
+  const pushChart = ({ metric }: { metric: Metric }) => {
+    if (!config || !metric.provider) return
     const current = [...config.layout]
 
     let x = 0
@@ -159,9 +168,10 @@ const Reports = () => {
       w: DEFAULT_CHART_COLUMN_COUNT,
       h: DEFAULT_CHART_ROW_COUNT,
       id: uuidv4(),
-      attribute: metric.key,
       label: metric.label,
-      provider: metric.provider,
+      attribute: metric.key as Dashboards.ChartType,
+      provider: metric.provider as any,
+      chart_type: 'bar',
     })
 
     setConfig({
@@ -170,25 +180,22 @@ const Reports = () => {
     })
   }
 
-  function popChart({ metric }: any) {
-    const { key } = metric
+  const popChart = ({ metric }: { metric: Partial<Metric> }) => {
+    if (!config) return
+
+    const { key, id } = metric
     const current = [...config.layout]
 
-    const foundIndex = current.findIndex((x: any, i: number) => {
-      if (x.attribute === key) {
-        return x
-      }
+    const foundIndex = current.findIndex((x) => {
+      if (x.attribute === key || x.id === id) return x
     })
     current.splice(foundIndex, 1)
-    setConfig({
-      ...config,
-      layout: [...current],
-    })
+    setConfig({ ...config, layout: [...current] })
   }
 
   useEffect(() => {
-    if (currentReport !== undefined) setConfig(currentReport?.content)
-  }, [currentReport])
+    if (currentReportContent !== undefined) setConfig(currentReportContent)
+  }, [currentReportContent])
 
   useEffect(() => {
     checkEditState()
@@ -213,7 +220,7 @@ const Reports = () => {
           <div className="flex items-center gap-x-2">
             <Button
               type="default"
-              onClick={() => setConfig(currentReport?.content)}
+              onClick={() => setConfig(currentReportContent)}
               disabled={isSaving}
             >
               Cancel
@@ -257,11 +264,11 @@ const Reports = () => {
           {canUpdateReport ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<Settings size={14} />}>
-                  <span>Add / Remove charts</span>
+                <Button type="default" icon={<Plus />}>
+                  <span>Add block</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="end">
+              <DropdownMenuContent side="bottom" align="center" className="w-44">
                 <MetricOptions config={config} handleChartSelection={handleChartSelection} />
               </DropdownMenuContent>
             </DropdownMenu>
@@ -269,7 +276,7 @@ const Reports = () => {
             <ButtonTooltip
               disabled
               type="default"
-              iconRight={<Settings size={14} />}
+              icon={<Plus />}
               tooltip={{
                 content: {
                   side: 'bottom',
@@ -278,7 +285,7 @@ const Reports = () => {
                 },
               }}
             >
-              Add / Remove charts
+              Add block
             </ButtonTooltip>
           )}
           <DatabaseSelector />

@@ -5,6 +5,7 @@ import { useParams } from 'common'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { Dashboards } from 'types'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 
 const ReactGridLayout = WidthProvider(RGL)
@@ -13,13 +14,13 @@ interface GridResizeProps {
   startDate: string
   endDate: string
   interval: string
-  editableReport: any
+  editableReport: Dashboards.Content
   disableUpdate: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
   setEditableReport: (payload: any) => void
 }
 
-const GridResize = ({
+export const GridResize = ({
   startDate,
   endDate,
   interval,
@@ -31,7 +32,7 @@ const GridResize = ({
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
-  function onLayoutChange(layout: any) {
+  function onLayoutChange(layout: RGL.Layout[]) {
     let updatedLayout = editableReport.layout
     layout.map((item: any) => {
       const index = updatedLayout.findIndex((x: any) => x.id === item.i)
@@ -50,56 +51,55 @@ const GridResize = ({
   if (!editableReport) return null
 
   return (
-    <>
-      <ReactGridLayout
-        autoSize={true}
-        layout={editableReport}
-        onLayoutChange={(layout) => onLayoutChange(layout)}
-        rowHeight={60}
-        cols={LAYOUT_COLUMN_COUNT}
-        containerPadding={[0, 0]}
-        compactType="horizontal"
-      >
-        {editableReport.layout.map((x: any) => {
-          return (
-            <div
-              key={x.id}
-              data-grid={{ ...x, minH: 4, maxH: 4, minW: 8 }}
-              className="react-grid-layout__report-item bg-surface-100 border-overlay group relative rounded border px-6 py-4 shadow-sm hover:border-green-900"
+    <ReactGridLayout
+      autoSize
+      isDraggable
+      isResizable
+      // layout={editableReport as any}
+      rowHeight={60}
+      cols={LAYOUT_COLUMN_COUNT}
+      containerPadding={[0, 0]}
+      compactType="horizontal"
+      onLayoutChange={(layout) => onLayoutChange(layout)}
+    >
+      {editableReport.layout.map((x) => {
+        console.log(x)
+        return (
+          <div
+            key={x.id}
+            data-grid={{ ...x, minH: 4, maxH: 4, minW: 8 }}
+            className="react-grid-layout__report-item bg-surface-100 border-overlay group relative rounded border px-6 py-4 shadow-sm hover:border-green-900"
+          >
+            <ChartHandler
+              startDate={startDate}
+              endDate={endDate}
+              interval={interval}
+              attribute={x.attribute}
+              provider={x.provider}
+              label={`${x.label}${ref !== state.selectedDatabaseId ? (x.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
+              customDateFormat={'MMM D, YYYY'}
             >
-              <ChartHandler
-                startDate={startDate}
-                endDate={endDate}
-                interval={interval}
-                attribute={x.attribute}
-                provider={x.provider}
-                label={`${x.label}${ref !== state.selectedDatabaseId ? (x.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
-                customDateFormat={'MMM D, YYYY'}
-              >
-                {!disableUpdate && (
-                  <ButtonTooltip
-                    type="text"
-                    icon={<X />}
-                    className="ml-2 px-1"
-                    onClick={() => onRemoveChart({ metric: { key: x.attribute } })}
-                    tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
-                  />
-                )}
-              </ChartHandler>
+              {!disableUpdate && (
+                <ButtonTooltip
+                  type="text"
+                  icon={<X />}
+                  className="ml-2 px-1"
+                  onClick={() => onRemoveChart({ metric: { key: x.attribute } })}
+                  tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+                />
+              )}
+            </ChartHandler>
 
-              <div className="absolute inset-x-0 top-3 ">
-                <div className="flex justify-around">
-                  <div className="flex h-3 w-24 cursor-move flex-col space-y-2">
-                    <div className="hidden h-3 w-full border-4 border-dotted border-green-900 opacity-50 transition-all hover:opacity-100 group-hover:block" />
-                  </div>
+            <div className="absolute inset-x-0 top-3 ">
+              <div className="flex justify-around">
+                <div className="flex h-3 w-24 cursor-move flex-col space-y-2">
+                  <div className="hidden h-3 w-full border-4 border-dotted border-green-900 opacity-50 transition-all hover:opacity-100 group-hover:block" />
                 </div>
               </div>
             </div>
-          )
-        })}
-      </ReactGridLayout>
-    </>
+          </div>
+        )
+      })}
+    </ReactGridLayout>
   )
 }
-
-export default GridResize

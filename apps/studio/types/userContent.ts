@@ -104,8 +104,9 @@ export namespace Dashboards {
     y: number
     w: number
     h: number
+    label: string
     attribute: ChartType
-    provider: 'daily-stats' | 'prometheus'
+    provider: 'daily-stats' | 'infra-monitoring'
     chart_type: 'bar' | 'line' | 'area'
     // title: string // Eventually we might need this "per chart" right?
   }
