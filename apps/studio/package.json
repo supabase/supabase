@@ -39,7 +39,7 @@
     "@stripe/stripe-js": "^5.5.0",
     "@supabase/auth-js": "catalog:",
     "@supabase/pg-meta": "workspace:*",
-    "@supabase/realtime-js": "2.10.2",
+    "@supabase/realtime-js": "^2.10.2",
     "@supabase/shared-types": "0.1.74",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
