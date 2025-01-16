@@ -80,7 +80,7 @@ export const ChartConfig = ({
     if (!hasConfig) return false
     const xKeyType = typeof results.rows[0]?.[config.xKey]
     const yKeyType = typeof results.rows[0]?.[config.yKey]
-    return xKeyType === 'number' && yKeyType === 'string'
+    return xKeyType === 'number' && yKeyType === 'number'
   }, [hasConfig, results.rows, config.xKey, config.yKey])
 
   // Compute cumulative results only if necessary
