@@ -8,7 +8,6 @@ export type Metric = {
   provider?: string
   category?: MetricCategory
   id?: string
-  isSnippet?: boolean
 }
 
 type MetricCategory = {

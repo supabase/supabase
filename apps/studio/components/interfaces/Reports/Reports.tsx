@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { groupBy, isNull } from 'lodash'
+import { groupBy, isEqual, isNull } from 'lodash'
 import { ArrowRight, Plus, Save } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -11,6 +11,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { Loading } from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
+import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { useContentQuery } from 'data/content/content-query'
 import { useContentUpdateMutation } from 'data/content/content-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -19,12 +20,13 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { Dashboards } from 'types'
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { GridResize } from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 
-const DEFAULT_CHART_COLUMN_COUNT = 12
-const DEFAULT_CHART_ROW_COUNT = 4
+const DEFAULT_CHART_COLUMN_COUNT = 1
+const DEFAULT_CHART_ROW_COUNT = 1
 
 const Reports = () => {
   const { id, ref } = useParams()
@@ -106,17 +108,11 @@ const Reports = () => {
     }
 
     // Runs comparison
-    if (JSON.stringify(_config) == JSON.stringify(_original)) {
+    if (isEqual(config, _original)) {
       setHasEdits(false)
     } else {
       setHasEdits(true)
     }
-  }
-  // Updates the report and reloads the report again
-  const onSaveReport = async () => {
-    if (ref === undefined) return console.error('Project ref is required')
-    if (id === undefined) return console.error('Report ID is required')
-    saveReport({ projectRef: ref, id, type: 'report', content: config })
   }
 
   const handleChartSelection = ({
@@ -131,7 +127,7 @@ const Reports = () => {
   }
 
   const pushChart = ({ metric }: { metric: Metric }) => {
-    if (!config || !metric.provider) return
+    if (!config) return
     const current = [...config.layout]
 
     let x = 0
@@ -139,6 +135,7 @@ const Reports = () => {
 
     const chartsByY = groupBy(config.layout, 'y')
     const yValues = Object.keys(chartsByY)
+    const isSnippet = metric.key?.startsWith('snippet_')
 
     if (yValues.length === 0) {
       y = 0
@@ -167,11 +164,12 @@ const Reports = () => {
       y,
       w: DEFAULT_CHART_COLUMN_COUNT,
       h: DEFAULT_CHART_ROW_COUNT,
-      id: uuidv4(),
+      id: metric?.id ?? uuidv4(),
       label: metric.label,
       attribute: metric.key as Dashboards.ChartType,
       provider: metric.provider as any,
       chart_type: 'bar',
+      ...(isSnippet ? { chartConfig: DEFAULT_CHART_CONFIG } : {}),
     })
 
     setConfig({
@@ -191,6 +189,30 @@ const Reports = () => {
     })
     current.splice(foundIndex, 1)
     setConfig({ ...config, layout: [...current] })
+  }
+
+  const updateChart = (id: string, chartConfig: Partial<ChartConfig>) => {
+    const currentChart = config?.layout.find((x) => x.id === id)
+    if (currentChart) {
+      const updatedChart: Dashboards.Chart = {
+        ...currentChart,
+        chartConfig: { ...(currentChart?.chartConfig ?? {}), ...chartConfig },
+      }
+
+      const foundIndex = config?.layout.findIndex((x) => x.id === id)
+      if (config && foundIndex !== undefined && foundIndex >= 0) {
+        const updatedLayouts = [...config.layout]
+        updatedLayouts[foundIndex] = updatedChart
+        setConfig({ ...config, layout: updatedLayouts })
+      }
+    }
+  }
+
+  // Updates the report and reloads the report again
+  const onSaveReport = async () => {
+    if (ref === undefined) return console.error('Project ref is required')
+    if (id === undefined) return console.error('Report ID is required')
+    saveReport({ projectRef: ref, id, type: 'report', content: config })
   }
 
   useEffect(() => {
@@ -321,6 +343,7 @@ const Reports = () => {
               editableReport={config}
               disableUpdate={!canUpdateReport}
               onRemoveChart={popChart}
+              onUpdateChart={updateChart}
               setEditableReport={setConfig}
             />
           )}

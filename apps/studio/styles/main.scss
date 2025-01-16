@@ -269,3 +269,16 @@ div[data-radix-portal]:not(.portal--toast) {
 .settings-container {
   @apply mx-auto max-w-4xl xl:max-w-6xl;
 }
+
+.react-grid-item.react-grid-placeholder {
+  @apply bg-surface-100;
+  z-index: 1;
+}
+
+.react-grid-item {
+  z-index: 2;
+}
+
+.react-grid-item.react-draggable-dragging {
+  z-index: 3;
+}

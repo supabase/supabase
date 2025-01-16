@@ -33,7 +33,6 @@ interface ChartHandlerProps {
   isLoading?: boolean
   format?: string
   highlightedValue?: string | number
-  onBarClick?: (v: any) => void
 }
 
 /**
@@ -60,7 +59,6 @@ const ChartHandler = ({
   isLoading,
   format,
   highlightedValue,
-  onBarClick,
 }: PropsWithChildren<ChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query

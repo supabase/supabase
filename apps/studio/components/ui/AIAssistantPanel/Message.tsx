@@ -103,7 +103,9 @@ export const Message = function Message({
                           cumulative: false,
                           xKey: xAxis ?? '',
                           yKey: yAxis ?? '',
+                          view: isChart ? 'chart' : 'table',
                         }}
+                        showSql={!isChart}
                         isChart={isChart}
                         isLoading={isLoading}
                         runQuery={runQuery}

@@ -1,9 +1,9 @@
-import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
-import BarChart from 'components/ui/Charts/BarChart'
-import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import dayjs from 'dayjs'
 import { ArrowUpDown } from 'lucide-react'
 import { useMemo } from 'react'
+
+import BarChart from 'components/ui/Charts/BarChart'
+import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -21,6 +21,7 @@ import {
 type Results = { rows: readonly any[] }
 
 export type ChartConfig = {
+  view?: 'table' | 'chart'
   type: 'bar'
   cumulative: boolean
   xKey: string

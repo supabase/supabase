@@ -1,10 +1,13 @@
+import { useDebounce } from '@uidotdev/usehooks'
 import { Code, Home } from 'lucide-react'
+import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useSQLSnippetFoldersQuery } from 'data/content/sql-folders-query'
+import { useContentQuery } from 'data/content/content-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Metric, METRIC_CATEGORIES, METRICS } from 'lib/constants/metrics'
+import { Dashboards } from 'types'
 import {
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
@@ -18,9 +21,10 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 interface MetricOptionsProps {
-  config: any
+  config?: Dashboards.Content
   handleChartSelection: ({
     metric,
     isAddingChart,
@@ -33,6 +37,7 @@ interface MetricOptionsProps {
 export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsProps) => {
   const { ref: projectRef } = useParams()
   const supportSQLBlocks = useFlag('reportsV2')
+  const [search, setSearch] = useState('')
 
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',
@@ -45,14 +50,13 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
     return true
   })
 
-  // [Joshen] UX for selecting a SQL snippet will be kinda weird as we currently don't have an endpoint
-  // that can return the snippets as a flat list (some snippets could be within folders)
-  const { data, isLoading } = useSQLSnippetFoldersQuery(
-    { projectRef, sort: 'name' },
-    { keepPreviousData: true }
-  )
-  const snippets = data?.pages[0].contents
-  const folders = data?.pages[0].folders
+  const debouncedSearch = useDebounce(search, 300)
+  const { data, isLoading } = useContentQuery({
+    projectRef,
+    type: 'sql',
+    name: debouncedSearch.length === 0 ? undefined : debouncedSearch,
+  })
+  const snippets = data?.content
 
   return (
     <>
@@ -69,7 +73,8 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                   return (
                     <DropdownMenuCheckboxItem
                       key={metric.key}
-                      checked={config.layout?.some((x: any) => x.attribute === metric.key)}
+                      className="cursor-pointer"
+                      checked={config?.layout?.some((x: any) => x.attribute === metric.key)}
                       onCheckedChange={(e) => handleChartSelection({ metric, isAddingChart: e })}
                     >
                       <div className="flex flex-col space-y-0">
@@ -91,25 +96,39 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent className="p-0">
-              <Command_Shadcn_>
-                <CommandInput_Shadcn_ autoFocus placeholder="Search snippets..." />
+              <Command_Shadcn_ shouldFilter={false}>
+                <CommandInput_Shadcn_
+                  autoFocus
+                  placeholder="Search snippets..."
+                  value={search}
+                  onValueChange={setSearch}
+                />
                 <CommandList_Shadcn_>
-                  <CommandEmpty_Shadcn_>No snippets found</CommandEmpty_Shadcn_>
+                  {isLoading ? (
+                    <div className="flex flex-col p-1 gap-y-1">
+                      <ShimmeringLoader />
+                      <ShimmeringLoader className="w-3/4" />
+                    </div>
+                  ) : (
+                    <CommandEmpty_Shadcn_>No snippets found</CommandEmpty_Shadcn_>
+                  )}
                   <CommandGroup_Shadcn_>
                     {snippets?.map((snippet) => (
                       <CommandItem_Shadcn_
                         key={snippet.id}
                         value={snippet.id}
+                        className="cursor-pointer"
                         onSelect={() => {
-                          handleChartSelection({
-                            metric: {
-                              id: snippet.id,
-                              key: `snippet_${snippet.id}`,
-                              label: snippet.name,
-                              isSnippet: true,
-                            },
-                            isAddingChart: true,
-                          })
+                          if (!config?.layout.find((x) => x.id === snippet.id)) {
+                            handleChartSelection({
+                              metric: {
+                                id: snippet.id,
+                                key: `snippet_${snippet.id}`,
+                                label: snippet.name,
+                              },
+                              isAddingChart: true,
+                            })
+                          }
                         }}
                       >
                         {snippet.name}

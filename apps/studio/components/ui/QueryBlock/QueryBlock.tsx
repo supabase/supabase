@@ -27,29 +27,33 @@ import { EditQueryButton } from './EditQueryButton'
 import { ParametersPopover } from './ParametersPopover'
 import { getCumulativeResults } from './QueryBlock.utils'
 
-const DEFAULT_CHART_CONFIG: ChartConfig = {
+export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
   cumulative: false,
   xKey: '',
   yKey: '',
   showLabels: false,
   showGrid: false,
+  view: 'table',
 }
 
 interface QueryBlockProps {
-  id?: string
+  id?: string // If SQL is a snippet that's already saved
   label: string
-  sql: string
+  sql?: string
   chartConfig?: ChartConfig
   maxHeight?: number
   parameterValues?: Record<string, string>
   actions?: ReactNode // Any other actions specific to the parent to be rendered in the header
+  showSql?: boolean // Toggle visiblity of SQL query on render
   isChart?: boolean
   isLoading?: boolean
   runQuery?: boolean
   lockColumns?: boolean
+  disableRunIfMutation?: boolean
+  noResultPlaceholder?: ReactNode
   onSetParameter?: (params: Parameter[]) => void
-  onUpdateChartConfig?: (config: ChartConfig) => void
+  onUpdateChartConfig?: (config: Partial<ChartConfig>) => void
 }
 
 // [Joshen ReportsV2] JFYI we may adjust this in subsequent PRs when we implement this into Reports V2
@@ -62,33 +66,33 @@ export const QueryBlock = ({
   maxHeight = 250,
   parameterValues: extParameterValues,
   actions,
+  showSql: _showSql = false,
   isChart = false,
   isLoading = false,
   runQuery = false,
   lockColumns = false,
+  disableRunIfMutation = false,
+  noResultPlaceholder = null,
   onSetParameter,
   onUpdateChartConfig,
 }: QueryBlockProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
 
-  const [showSql, setShowSql] = useState(!isChart)
-  const [view, setView] = useState<'table' | 'chart'>(isChart ? 'chart' : 'table')
-  // [Joshen] Thinking cumulative could just be a UI state here to prevent unnecessary re-rendering
-  const [cumulative, setCumulative] = useState(false)
+  const [chartSettings, setChartSettings] = useState<ChartConfig>(chartConfig)
+  const { xKey, yKey, view = 'table' } = chartSettings
+
+  const [showSql, setShowSql] = useState(_showSql)
   const [queryResult, setQueryResult] = useState<any[]>()
   const [parameterValues, setParameterValues] = useState<Record<string, string>>({})
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
-
-  const { xKey, yKey } = chartConfig
-  const showChart =
-    isChart && (queryResult ?? []).length > 0 && !!xKey && !!yKey && view === 'chart'
 
   const parameters = useMemo(() => {
     if (!sql) return []
     return parseParameters(sql)
   }, [sql])
   const combinedParameterValues = { ...extParameterValues, ...parameterValues }
+  const isReadOnlySelectSQL = isReadOnlySelect(sql ?? '')
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: (data) => setQueryResult(data.result),
@@ -97,7 +101,7 @@ export const QueryBlock = ({
   const handleExecute = () => {
     if (!sql || isLoading) return
 
-    if (!isReadOnlySelect(sql)) {
+    if (!isReadOnlySelectSQL) {
       const hasUnknownFunctions = containsUnknownFunction(sql)
       return setShowWarning(hasUnknownFunctions ? 'hasUnknownFunctions' : 'hasWriteOperation')
     }
@@ -171,40 +175,45 @@ export const QueryBlock = ({
                   view={view}
                   isChart={isChart}
                   lockColumns={lockColumns}
-                  chartConfig={{ ...chartConfig, cumulative }}
+                  chartConfig={chartSettings}
                   columns={Object.keys(queryResult[0] || {})}
-                  changeView={setView}
+                  changeView={(view) => {
+                    if (onUpdateChartConfig) onUpdateChartConfig({ view })
+                    setChartSettings({ ...chartSettings, view })
+                  }}
                   updateChartConfig={(config) => {
                     if (onUpdateChartConfig) onUpdateChartConfig(config)
-                    setCumulative(config.cumulative)
+                    setChartSettings(config)
                   }}
                 />
               )}
             </>
           )}
 
-          <EditQueryButton title={label} sql={sql} />
+          <EditQueryButton id={id} title={label} sql={sql} />
 
-          <ButtonTooltip
-            type="text"
-            size="tiny"
-            className="w-7 h-7"
-            icon={<Play size={14} />}
-            loading={isExecuting || isLoading}
-            disabled={isLoading}
-            onClick={handleExecute}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                className: 'max-w-56 text-center',
-                text: isExecuting ? (
-                  <p>{`Query is running. You may cancel ongoing queries via the [SQL Editor](/project/${ref}/sql?viewOngoingQueries=true).`}</p>
-                ) : (
-                  'Run query'
-                ),
-              },
-            }}
-          />
+          {(isReadOnlySelectSQL || (!isReadOnlySelectSQL && !disableRunIfMutation)) && (
+            <ButtonTooltip
+              type="text"
+              size="tiny"
+              className="w-7 h-7"
+              icon={<Play size={14} />}
+              loading={isExecuting || isLoading}
+              disabled={isLoading}
+              onClick={handleExecute}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  className: 'max-w-56 text-center',
+                  text: isExecuting ? (
+                    <p>{`Query is running. You may cancel ongoing queries via the [SQL Editor](/project/${ref}/sql?viewOngoingQueries=true).`}</p>
+                  ) : (
+                    'Run query'
+                  ),
+                },
+              }}
+            />
+          )}
 
           {actions}
         </div>
@@ -236,17 +245,19 @@ export const QueryBlock = ({
             <Button
               type="danger"
               size="tiny"
+              disabled={!sql}
               className="w-full flex-1"
               onClick={() => {
                 // [Joshen] This is for when we introduced the concept of parameters into our reports
                 // const processedSql = processParameterizedSql(sql!, combinedParameterValues)
-
-                setShowWarning(undefined)
-                execute({
-                  projectRef: ref,
-                  connectionString: project?.connectionString,
-                  sql,
-                })
+                if (sql) {
+                  setShowWarning(undefined)
+                  execute({
+                    projectRef: ref,
+                    connectionString: project?.connectionString,
+                    sql,
+                  })
+                }
               }}
             >
               Run
@@ -277,47 +288,61 @@ export const QueryBlock = ({
         </div>
       )}
 
-      {showChart ? (
-        <div className={cn('border-t flex-1 shrink-0')}>
-          <ChartContainer
-            className="aspect-auto p-3"
-            config={{}}
-            style={{
-              height: maxHeight ? `${maxHeight}px` : undefined,
-              minHeight: maxHeight ? `${maxHeight}px` : undefined,
-            }}
-          >
-            <BarChart
-              accessibilityLayer
-              margin={{ left: 0, right: 0 }}
-              data={
-                cumulative
-                  ? getCumulativeResults({ rows: queryResult ?? [] }, chartConfig)
-                  : queryResult
-              }
-            >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey={xKey}
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                minTickGap={32}
-              />
-              <ChartTooltip content={<ChartTooltipContent className="w-[150px]" />} />
-              <Bar dataKey={yKey} fill="var(--chart-1)" radius={4} />
-            </BarChart>
-          </ChartContainer>
-        </div>
+      {view === 'chart' && !isExecuting && queryResult !== undefined ? (
+        <>
+          {(queryResult ?? []).length === 0 ? (
+            <div className="flex h-full items-center justify-center">
+              <p className="text-foreground-light text-xs">No results returned from query</p>
+            </div>
+          ) : !xKey || !yKey ? (
+            <div className="flex h-full items-center justify-center">
+              <p className="text-foreground-light text-xs">Select columns for the X and Y axes</p>
+            </div>
+          ) : (
+            <div className={cn('flex-1 border-t')}>
+              <ChartContainer
+                className="aspect-auto px-3 pb-2"
+                config={{}}
+                style={{
+                  height: maxHeight ? `${maxHeight}px` : undefined,
+                  minHeight: maxHeight ? `${maxHeight}px` : undefined,
+                }}
+              >
+                <BarChart
+                  accessibilityLayer
+                  margin={{ left: 0, right: 0 }}
+                  data={
+                    chartSettings.cumulative
+                      ? getCumulativeResults({ rows: queryResult ?? [] }, chartSettings)
+                      : queryResult
+                  }
+                >
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey={xKey}
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    minTickGap={32}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent className="w-[150px]" />} />
+                  <Bar dataKey={yKey} fill="var(--chart-1)" radius={4} />
+                </BarChart>
+              </ChartContainer>
+            </div>
+          )}
+        </>
       ) : (
         <>
-          {queryResult && (
+          {queryResult ? (
             <div
               className={cn('flex-1 overflow-auto relative border-t')}
               style={{ maxHeight: maxHeight ? `${maxHeight}px` : undefined }}
             >
               <Results rows={queryResult} />
             </div>
+          ) : (
+            noResultPlaceholder
           )}
         </>
       )}
