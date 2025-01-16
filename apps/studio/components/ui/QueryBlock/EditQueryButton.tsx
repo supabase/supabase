@@ -8,6 +8,8 @@ import { TelemetryActions } from 'lib/constants/telemetry'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
+import { useParams } from 'common'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface EditQueryButtonProps {
   title: string
