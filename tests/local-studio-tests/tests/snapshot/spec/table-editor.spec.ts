@@ -8,9 +8,9 @@ const dismissToast = async (page: Page) => {
 
 test.describe('Table Editor page', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.setItem('supabase-expand-navigation-panel', 'false')
-    })
+    // await page.addInitScript(() => {
+    //   localStorage.setItem('supabase-expand-navigation-panel', 'false')
+    // })
     const tableResponsePromise = page.waitForResponse(
       'http://localhost:8082/api/pg-meta/default/query?key=entity-types-public-0',
       { timeout: 0 }
