@@ -37,7 +37,11 @@ const Reports = () => {
   const [endDate, setEndDate] = useState<string | null>(null)
   const [hasEdits, setHasEdits] = useState<boolean>(false)
 
-  const { data: userContents, isLoading } = useContentQuery({
+  const {
+    data: userContents,
+    isLoading,
+    isSuccess,
+  } = useContentQuery({
     projectRef: ref,
     type: 'report',
   })
@@ -98,8 +102,8 @@ const Reports = () => {
      * the below would not need to be run
      */
     if (
-      _config.period_start.time_period != 'custom' ||
-      _config.period_end.time_period != 'custom'
+      _config.period_start.time_period !== 'custom' ||
+      _config.period_end.time_period !== 'custom'
     ) {
       _original.period_start.date = ''
       _config.period_start.date = ''
@@ -108,7 +112,7 @@ const Reports = () => {
     }
 
     // Runs comparison
-    if (isEqual(config, _original)) {
+    if (isEqual(_config, _original)) {
       setHasEdits(false)
     } else {
       setHasEdits(true)
@@ -216,8 +220,8 @@ const Reports = () => {
   }
 
   useEffect(() => {
-    if (currentReportContent !== undefined) setConfig(currentReportContent)
-  }, [currentReportContent])
+    if (isSuccess && currentReportContent !== undefined) setConfig(currentReportContent)
+  }, [isSuccess])
 
   useEffect(() => {
     checkEditState()

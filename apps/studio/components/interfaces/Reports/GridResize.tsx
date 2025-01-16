@@ -28,20 +28,24 @@ export const GridResize = ({
   onUpdateChart,
   setEditableReport,
 }: GridResizeProps) => {
-  function onLayoutChange(layout: RGL.Layout[]) {
-    let updatedLayout = editableReport.layout
-    layout.map((item: any) => {
-      const index = updatedLayout.findIndex((x: any) => x.id === item.i)
-      updatedLayout[index].w = layout[index].w
-      updatedLayout[index].h = layout[index].h
-      updatedLayout[index].x = layout[index].x
-      updatedLayout[index].y = layout[index].y
+  const onDragStop = (layout: RGL.Layout[]) => {
+    const updatedLayout = [...editableReport.layout]
+
+    layout.forEach((chart) => {
+      const chartIdx = updatedLayout.findIndex((y) => chart.i === y.id)
+      if (chartIdx !== undefined && chartIdx >= 0) {
+        console.log(chart.i, { w: chart.w, h: chart.h, x: chart.x, y: chart.y })
+        updatedLayout[chartIdx] = {
+          ...updatedLayout[chartIdx],
+          w: chart.w,
+          h: chart.h,
+          x: chart.x,
+          y: chart.y,
+        }
+      }
     })
-    const payload = {
-      ...editableReport,
-      layout: updatedLayout,
-    }
-    setEditableReport(payload)
+
+    setEditableReport({ ...editableReport, layout: updatedLayout })
   }
 
   if (!editableReport) return null
@@ -56,7 +60,7 @@ export const GridResize = ({
       containerPadding={[0, 0]}
       resizeHandles={['sw', 'se']}
       compactType="horizontal"
-      onLayoutChange={(layout) => onLayoutChange(layout)}
+      onDragStop={onDragStop}
     >
       {editableReport.layout.map((item) => {
         return (
