@@ -23,8 +23,10 @@
   "dependencies": {
     "@ai-sdk/openai": "^0.0.72",
     "@dagrejs/dagre": "^1.0.4",
+    "@electric-sql/pglite": "^0.2.15",
     "@graphiql/react": "^0.19.4",
     "@graphiql/toolkit": "^0.9.1",
+    "@gregnr/postgres-meta": "^0.82.0-dev.2",
     "@hcaptcha/react-hcaptcha": "^1.11.1",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.1.3",
@@ -53,6 +55,7 @@
     "ai": "^3.4.33",
     "ai-commands": "workspace:*",
     "awesome-debounce-promise": "^2.1.0",
+    "cobe": "^0.6.3",
     "common": "workspace:*",
     "common-tags": "^1.8.2",
     "config": "workspace:*",
