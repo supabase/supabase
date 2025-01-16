@@ -15,7 +15,6 @@ export const InitialStep = ({
   onSqlGenerated,
   onServicesUpdated,
   onTitleUpdated,
-  isLoading,
 }: {
   onSubmit: (value: string) => void
   onStartBlank: () => void
@@ -23,7 +22,6 @@ export const InitialStep = ({
   onSqlGenerated: (sql: string) => void
   onServicesUpdated: (services: SupabaseService[]) => void
   onTitleUpdated: (title: string) => void
-  isLoading: boolean
 }) => {
   return (
     <div className="w-full">

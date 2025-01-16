@@ -33,7 +33,6 @@ interface ProjectVisualProps {
     cloudProvider: string
     postgresVersion: string
   }
-  instanceLabel: (size: string) => string
 }
 
 const arePropsEqual = (prevProps: ProjectVisualProps, nextProps: ProjectVisualProps) => {
@@ -55,7 +54,6 @@ export const ProjectVisual = memo(
     services,
     selectedRegion,
     projectDetails,
-    instanceLabel,
   }: ProjectVisualProps) => {
     const variants = {
       center: {

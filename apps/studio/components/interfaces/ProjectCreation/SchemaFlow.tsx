@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import {
   applyNodeChanges,
   Background,
@@ -83,20 +83,4 @@ export const SchemaFlow = ({ nodes: initialNodes, edges: initialEdges }: SchemaF
       </ReactFlow>
     </div>
   )
-}
-
-export function useDebounce<T>(value: T, delay: number) {
-  const [debouncedValue, setDebouncedValue] = useState(value)
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
-
-    return () => {
-      clearTimeout(handler)
-    }
-  }, [value, delay])
-
-  return debouncedValue
 }
