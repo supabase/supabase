@@ -1,8 +1,23 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
-import { atom, useAtom } from 'jotai'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useAtom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
+import {
+  ArrowRight,
+  Book,
+  Edit,
+  Eye,
+  FileKey,
+  Key,
+  Loader2,
+  MoreVertical,
+  RotateCw,
+  Timer,
+  Trash2,
+} from 'lucide-react'
+import React, { useMemo, useState } from 'react'
+import { Badge, Button, cn } from 'ui'
 import {
   Card,
   CardContent,
@@ -11,32 +26,23 @@ import {
   CardTitle,
 } from 'ui/src/components/shadcn/ui/card'
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui/src/components/shadcn/ui/table'
-import { Badge } from 'ui/src/components/shadcn/ui/badge'
-import { Button } from 'ui/src/components/button'
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+} from 'ui/src/components/shadcn/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui/src/components/shadcn/ui/dropdown-menu'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogDescription,
-  DialogSectionSeparator,
-  DialogSection,
-} from 'ui/src/components/shadcn/ui/dialog'
+import { Input } from 'ui/src/components/shadcn/ui/input'
+import { Label } from 'ui/src/components/shadcn/ui/label'
 import {
   Select,
   SelectContent,
@@ -44,32 +50,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui/src/components/shadcn/ui/select'
-import { Input } from 'ui/src/components/shadcn/ui/input'
-import { Textarea } from 'ui/src/components/shadcn/ui/textarea'
-import { Label } from 'ui/src/components/shadcn/ui/label'
 import { Separator } from 'ui/src/components/shadcn/ui/separator'
 import {
-  MoreVertical,
-  Loader2,
-  Key,
-  RotateCw,
-  Trash2,
-  Eye,
-  Edit,
-  ArrowRight,
-  CirclePower,
-  Timer,
-  Book,
-  FileKey,
-} from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui/src/components/shadcn/ui/table'
+import { Textarea } from 'ui/src/components/shadcn/ui/textarea'
 import { AlgorithmHoverCard } from './AlgorithmHoverCard'
-import { cn } from 'ui'
-import {
-  StandbyKeyIllustration,
-  WhyRotateKeysIllustration,
-  WhyUseStandbyKeysIllustration,
-} from './illustrations'
+import { WhyRotateKeysIllustration, WhyUseStandbyKeysIllustration } from './illustrations'
 import ShowPublicJWTsDialogComposer from './ShowPublicJWTsDialogComposer'
 
 type KeyStatus = 'IN_USE' | 'STANDBY' | 'PREVIOUSLY_USED' | 'REVOKED'
