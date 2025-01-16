@@ -2,11 +2,12 @@
 title = "Why are there gaps in my Postgres id sequence?"
 github_url = "https://github.com/orgs/supabase/discussions/22299"
 date_created = "2024-03-27T18:04:39+00:00"
-topics = ["database"]
-keywords = ["sequence", "id", "rollback", "deletions", "upserts"]
+topics = [ "database" ]
+keywords = [ "sequence", "id", "rollback", "deletions", "upserts" ]
+database_id = "0c0369db-2968-4ea7-9f99-c5f5ce55acad"
 
 [[errors]]
-message = 'Failed to run sql query: duplicate key value violates unique constraint "{table}_pkey"'
+message = "Failed to run sql query: duplicate key value violates unique constraint \"{table}_pkey\""
 ---
 
 Most database tables have a primary key that is a made-up number, and that number is usually made by a sequence.
