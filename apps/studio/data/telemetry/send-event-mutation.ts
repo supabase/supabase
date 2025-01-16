@@ -21,7 +21,6 @@ import {
   SqlEditorResultDownloadCsvClickedEvent,
   SqlEditorResultCopyMarkdownClickedEvent,
   SqlEditorResultCopyJsonClickedEvent,
-  TelemetryActions,
   SignUpEvent,
   SignInEvent,
   RealtimeInspectorListenChannelClickedEvent,
@@ -70,13 +69,7 @@ export type SendEventVariables =
   | AssistantSqlDiffHandlerEvaluatedEvent
   | AssistantEditInSqlEditorClickedEvent
 
-  // TODO remove this once all events are documented
-  | {
-      action: TelemetryActions
-      properties?: Record<string, any> // Is arbitrary, but always aim to be self-explanatory with custom properties
-    }
-
-type SendEventPayload = components['schemas']['TelemetryEventBodyV2']
+type SendEventPayload = components['schemas']['TelemetryEventBodyV2Dto']
 
 export async function sendEvent({ body }: { body: SendEventPayload }) {
   const consent =

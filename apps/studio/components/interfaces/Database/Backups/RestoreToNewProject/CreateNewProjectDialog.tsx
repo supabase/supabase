@@ -30,6 +30,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { AdditionalMonthlySpend } from './AdditionalMonthlySpend'
+import { NewProjectPrice } from './RestoreToNewProject.utils'
 
 interface CreateNewProjectDialogProps {
   open: boolean
@@ -37,6 +38,7 @@ interface CreateNewProjectDialogProps {
   recoveryTimeTarget: number | null
   onOpenChange: (value: boolean) => void
   onCloneSuccess: () => void
+  additionalMonthlySpend: NewProjectPrice
 }
 
 export const CreateNewProjectDialog = ({
@@ -45,6 +47,7 @@ export const CreateNewProjectDialog = ({
   recoveryTimeTarget,
   onOpenChange,
   onCloneSuccess,
+  additionalMonthlySpend,
 }: CreateNewProjectDialogProps) => {
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
@@ -188,7 +191,7 @@ export const CreateNewProjectDialog = ({
                 )}
               />
             </DialogSection>
-            <AdditionalMonthlySpend />
+            <AdditionalMonthlySpend additionalMonthlySpend={additionalMonthlySpend} />
             <DialogFooter>
               <Button htmlType="reset" type="outline" onClick={() => onOpenChange(false)}>
                 Cancel

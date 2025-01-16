@@ -15,7 +15,7 @@ import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 // with outputFileTracingIncludes (not auto-traced) will not be found at
 // runtime.
 export const DOCS_DIRECTORY = process.cwd()
-export const EXAMPLES_DIRECTORY = join(DOCS_DIRECTORY, '..', '..', 'examples')
+export const EXAMPLES_DIRECTORY = join(DOCS_DIRECTORY, 'examples')
 export const GUIDES_DIRECTORY = join(DOCS_DIRECTORY, 'content/guides')
 export const REF_DOCS_DIRECTORY = join(DOCS_DIRECTORY, 'docs/ref')
 export const SPEC_DIRECTORY = join(DOCS_DIRECTORY, 'spec')
@@ -26,7 +26,7 @@ export type GuideFrontmatter = {
   description?: string
   canonical?: string
   hideToc?: boolean
-  // @deprecated
+  /** @deprecated */
   hide_table_of_contents?: boolean
   tocVideo?: string
 }

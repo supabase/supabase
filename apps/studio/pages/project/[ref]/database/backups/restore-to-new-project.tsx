@@ -30,6 +30,10 @@ import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Button } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
 import Panel from 'components/ui/Panel'
+import { projectSpecToMonthlyPrice } from 'components/interfaces/Database/Backups/RestoreToNewProject/RestoreToNewProject.utils'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { DiskType } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   return (
@@ -83,10 +87,14 @@ const RestoreToNewProject = () => {
     'queue_job.restore.prepare'
   )
   const PITR_ENABLED = cloneBackups?.pitr_enabled
-
+  const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
   const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
   const IS_PG15_OR_ABOVE = dbVersion >= 15
-  const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
+  const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb
+  const targetComputeSize = cloneBackups?.target_compute_size
+  const planId = subscription?.plan?.id ?? 'free'
+  const { data } = useDiskAttributesQuery({ projectRef: project?.ref })
+  const storageType = data?.attributes?.type ?? 'gp3'
 
   const {
     data: cloneStatus,
@@ -260,7 +268,7 @@ const RestoreToNewProject = () => {
         <Markdown
           className="max-w-full [&>p]:!leading-normal"
           content={`This is a temporary limitation whereby projects that were originally restored from another project cannot be restored to yet another project. 
-          If you need to restore a project to multiple other projects, please reach out via [support](/support/new?ref=${project?.ref}).`}
+          If you need to restore from a restored project, please reach out via [support](/support/new?ref=${project?.ref}).`}
         />
         <Button asChild type="default">
           <Link href={`/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''}`}>
@@ -311,6 +319,13 @@ const RestoreToNewProject = () => {
     )
   }
 
+  const additionalMonthlySpend = projectSpecToMonthlyPrice({
+    targetVolumeSizeGb: targetVolumeSizeGb ?? 0,
+    targetComputeSize: targetComputeSize ?? 'nano',
+    planId: planId ?? 'free',
+    storageType: storageType as DiskType,
+  })
+
   return (
     <div className="flex flex-col gap-4">
       <ConfirmRestoreDialog
@@ -320,11 +335,13 @@ const RestoreToNewProject = () => {
           setShowConfirmationDialog(false)
           setShowNewProjectDialog(true)
         }}
+        additionalMonthlySpend={additionalMonthlySpend}
       />
       <CreateNewProjectDialog
         open={showNewProjectDialog}
         selectedBackupId={selectedBackupId}
         recoveryTimeTarget={recoveryTimeTarget}
+        additionalMonthlySpend={additionalMonthlySpend}
         onOpenChange={setShowNewProjectDialog}
         onCloneSuccess={() => {
           refetchCloneStatus()
