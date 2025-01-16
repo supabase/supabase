@@ -9,7 +9,7 @@ Edge Functions supports running [WebAssembly (Wasm)](https://developer.mozilla.o
 
 It also gives you the option to port existing libraries written in other languages to be used with JavaScript. For example, [MagickWasm](https://supabase.com/docs/guides/functions/examples/image-manipulation), which does image manipulation and transforms, is a port of an existing C library to WebAssembly.
 
-### Writing a Wasm module
+### Writing a wasm module
 
 You can use different languages and SDKs to write Wasm modules. For this tutorial, we will write a simple Wasm module in Rust that adds two numbers.
 
@@ -52,7 +52,7 @@ wasm-pack build --target deno
 
 This will produce a Wasm binary file inside `add-wasm/pkg` directory.
 
-### Calling the Wasm module from the Edge Function
+### Calling the wasm module from the Edge Function
 
 Now let's update the Edge Function to call `add` from the Wasm module.
 
