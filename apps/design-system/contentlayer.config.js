@@ -9,7 +9,6 @@ import remarkGfm from 'remark-gfm'
 import { visit } from 'unist-util-visit'
 
 import { rehypeComponent } from './lib/rehype-component'
-import { rehypeNpmCommand } from './lib/rehype-npm-command'
 
 /** @type {import('contentlayer2/source-files').ComputedFields} */
 const computedFields = {

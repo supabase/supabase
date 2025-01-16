@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
-    "contentlayer2": "0.4.6",
+    "class-variance-authority": "^0.6.0",
+    "contentlayer2": "0.5.3",
     "eslint-config-supabase": "workspace:*",
     "icons": "workspace:*",
     "jotai": "^2.8.0",
@@ -24,7 +25,7 @@
     "lucide-react": "*",
     "markdown-wasm": "^1.2.0",
     "next": "catalog:",
-    "next-contentlayer2": "0.4.6",
+    "next-contentlayer2": "0.5.3",
     "next-themes": "^0.3.0",
     "react": "^18.2.0",
     "react-docgen": "^7.0.3",
