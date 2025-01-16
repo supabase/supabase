@@ -36,11 +36,18 @@ This example guides you through deploying and managing app environments with dot
 
 ## Structuring Environment Files
 
-Follow the conventions used in this project, where environments are split into three files:
+Following the conventions used in this project, environments are configured using dotenv files in `supabase` directory:
 
-1. `supabase/.env` - For local development using `npx supabase start`.
-2. `supabase/.env.production` - For your main production environment on Supabase.
-3. `supabase/.env.preview` - For the preview branches
+| File            | Environment | `.gitignore` it? | Encrypted |
+| --------------- | ----------- | ---------------- | --------- |
+| .env.keys       | All         | Yes              | No        |
+| .env.local      | Local       | Yes              | No        |
+| .env.production | Production  | No               | Yes       |
+| .env            | Any         | Maybe            | Yes       |
+
+Since `.env` file is always loaded by default, you can use it for any environment, including preview branches.
+
+If you choose to commit `.env` to git, remember to encrypt secret values as explained in [remote development](#How-to-Use-with-Preview-Branches) section.
 
 ### Example: Environment-Driven Configuration
 
@@ -83,27 +90,18 @@ secret = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET)"
 
 ## Local Development
 
-Set local environment values in `supabase/.env`. Sensitive values like GitHub credentials should be encrypted.
-
-Example `.env` file:
+Create `supabase/.env.local` with your own [GitHub OAuth App credentials](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app). This file should NOT be committed to git as it can contain plaintext values for secret fields.
 
 ```dotenv
 SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID=<client-id>
-# GitHub Credentials (encrypted)
-SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET=encrypted:<client-secret>
-```
-
-Replace placeholders with your own [GitHub OAuth App credentials](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app):
-
-```bash
-npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env
+SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET=<client-secret>
 ```
 
 Run the local stack:
 
 ```bash
-npx dotenvx run -f supabase/.env -- npx supabase start
-npx dotenvx run -f supabase/.env -- npm run dev
+npx supabase start
+npm run dev
 ```
 
 Visit `localhost:3000` to test the app with GitHub OAuth integration.
@@ -118,11 +116,12 @@ Visit `localhost:3000` to test the app with GitHub OAuth integration.
 - **Supabase Account**
 
 1. **Create a Supabase Project:**
-   Sign up at [Supabase Dashboard](https://supabase.com/dashboard) and create a new project. After the database initializes, configure `.env.production`:
+
+Sign up at [Supabase Dashboard](https://supabase.com/dashboard) and create a new project. After the database initializes, create `supabase/.env.production` file with your project specific values.
 
 ```dotenv
 NEXT_PUBLIC_SUPABASE_URL=https://<your-project>.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-api-key>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-project-apikey>
 ```
 
 2. **Configure Production Variables:**
@@ -134,16 +133,18 @@ SUPABASE_AUTH_SITE_URL=https://<your-app-url>.vercel.app/
 SUPABASE_AUTH_ADDITIONAL_REDIRECT_URLS=https://<your-app-url>.vercel.app/**
 ```
 
-Add GitHub credentials:
+Encrypt GitHub credentials in dotenv file:
 
 ```bash
 npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env.production
 ```
 
+This also creates the encryption key in `supabase/.env.production` and the decryption key in `supabase/.env.keys`.
+
 3. **Deploy to Supabase Remote:**
 
 ```bash
-npx dotenvx run -f supabase/.env.production -- npx supabase link --project-ref <project-ref>
+npx dotenvx run -f supabase/.env.production -- npx supabase link
 npx dotenvx run -f supabase/.env.production -- npx supabase db push
 npx dotenvx run -f supabase/.env.production -- npx supabase config push
 ```
@@ -154,28 +155,20 @@ Dotenvx now supports encrypted secrets with Supabase's branching system. This al
 
 Here's how to set up encrypted secrets for your preview branches:
 
-1. **Link to Your Production Project:**
+1. **Generate Key Pair and Encrypt Your Secrets:**
 
 ```bash
-npx supabase link
+npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env
 ```
 
-2. **Generate Key Pair and Encrypt Your Secrets:**
+This creates a new encryption key in `supabase/.env` and a new decryption key in `supabase/.env.keys`, specifically for your preview branches.
+
+2. **Update Project Secrets:**
+
+We store both the production and preview decryption keys in the project's secret handler, allowing the branching executor to access and decrypt your values when configuring services:
 
 ```bash
-npx dotenvx set SOME_KEY "your-secret-value" -f .env.preview
-```
-
-This creates both the encrypted value in `.env.preview` and the decryption key in `.env.keys`.
-
-3. **Update Project Secrets:**
-
-We store the decryption keys in the project's secret handler, allowing the branching executor to access and decrypt your values when configuring services:
-
-```bash
-npx supabase secrets set --env-file .env.keys
-# or
-npx supabase secrets set DOTENV_PRIVATE_KEY=<your-private-key>
+npx supabase secrets set --env-file supabase/.env.keys
 ```
 
 4. **Choose Your Configuration Approach:**
