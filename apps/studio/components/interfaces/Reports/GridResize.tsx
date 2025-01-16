@@ -34,7 +34,6 @@ export const GridResize = ({
     layout.forEach((chart) => {
       const chartIdx = updatedLayout.findIndex((y) => chart.i === y.id)
       if (chartIdx !== undefined && chartIdx >= 0) {
-        console.log(chart.i, { w: chart.w, h: chart.h, x: chart.x, y: chart.y })
         updatedLayout[chartIdx] = {
           ...updatedLayout[chartIdx],
           w: chart.w,
