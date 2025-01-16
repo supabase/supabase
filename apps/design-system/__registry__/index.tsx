@@ -2161,6 +2161,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "logs-bar-chart": {
+      name: "logs-bar-chart",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/logs-bar-chart")),
+      source: "",
+      files: ["registry/default/example/logs-bar-chart.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "chart-area-axes": {
       name: "chart-area-axes",
       type: "components:block",

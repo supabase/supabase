@@ -48,7 +48,8 @@ const CreditBalance = () => {
             <p className="text-foreground text-base m-0">Credit Balance</p>
           </div>
           <p className="text-sm text-foreground-light m-0">
-            Credits will be applied to future invoices, before charging your payment method.
+            Credits will be applied to future invoices, before charging your payment method. If your
+            credit balance runs out, your default payment method will be charged.
           </p>
         </div>
       </ScaffoldSectionDetail>
