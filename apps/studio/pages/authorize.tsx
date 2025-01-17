@@ -17,13 +17,13 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import type { NextPageWithLayout } from 'types'
 import {
-  Alert,
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
   Listbox,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 // Need to handle if no organizations in account
 // Need to handle if not logged in yet state
@@ -103,9 +103,9 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     return (
       <FormPanel header={<p>Authorization for API access</p>}>
         <div className="px-8 py-6">
-          <Alert withIcon variant="warning" title="Missing authorization ID">
+          <Admonition type="warning" title="Missing authorization ID">
             Please provide a valid authorization ID in the URL
-          </Alert>
+          </Admonition>
         </div>
       </FormPanel>
     )
@@ -115,14 +115,10 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     return (
       <FormPanel header={<p>Authorize API access</p>}>
         <div className="px-8 py-6">
-          <Alert
-            withIcon
-            variant="warning"
-            title="Failed to fetch details for API authorization request"
-          >
+          <Admonition type="warning" title="Failed to fetch details for API authorization request">
             <p>Please retry your authorization request from the requesting app</p>
             {error !== undefined && <p className="mt-2">Error: {error?.message}</p>}
-          </Alert>
+          </Admonition>
         </div>
       </FormPanel>
     )
@@ -136,7 +132,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     return (
       <FormPanel header={<p>Authorize API access for {requester?.name}</p>}>
         <div className="w-full px-8 py-6 space-y-8">
-          <Alert withIcon variant="success" title="This authorization request has been approved">
+          <Admonition type="default" title="This authorization request has been approved">
             <p>
               {requester.name} has read and write access to the organization "
               {approvedOrganization?.name ?? 'Unknown'}" and all of its projects
@@ -144,7 +140,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
             <p className="mt-2">
               Approved on: {dayjs(requester.approved_at).format('DD MMM YYYY HH:mm:ss (ZZ)')}
             </p>
-          </Alert>
+          </Admonition>
         </div>
       </FormPanel>
     )
@@ -203,9 +199,9 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
         {/* Expiry warning */}
         {isExpired && (
-          <Alert withIcon variant="warning" title="This authorization request is expired">
+          <Admonition type="warning" title="This authorization request is expired">
             Please retry your authorization request from the requesting app
-          </Alert>
+          </Admonition>
         )}
 
         {/* Organization selection */}
