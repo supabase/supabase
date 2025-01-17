@@ -508,7 +508,7 @@ export const AIAssistant = ({
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
-              'z-20 [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
+              'z-20 [&>textarea]:text-base [&>textarea]:md:text-sm [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
             )}
             loading={isChatLoading}
             disabled={!isApiKeySet || disablePrompts || isChatLoading}

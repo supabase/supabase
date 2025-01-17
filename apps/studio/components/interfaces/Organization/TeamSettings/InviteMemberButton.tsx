@@ -192,7 +192,7 @@ export const InviteMemberButton = () => {
           <TooltipTrigger_Shadcn_ asChild>
             <Button
               disabled={!canInviteMembers}
-              className="pointer-events-auto"
+              className="pointer-events-auto flex-grow md:flex-grow-0"
               onClick={() => setIsOpen(true)}
             >
               Invite
