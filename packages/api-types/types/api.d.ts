@@ -712,7 +712,7 @@ export interface paths {
     get?: never
     put?: never
     /** Send feedback on docs */
-    post: operations['SendDocsFeedbackController_sendDocsFeedback']
+    post: operations['SendFeedbackController_sendDocsFeedback']
     delete?: never
     options?: never
     head?: never
@@ -729,7 +729,7 @@ export interface paths {
     get?: never
     put?: never
     /** Send exit survey to HubSpot */
-    post: operations['SendExitSurveyController_sendExitSurvey']
+    post: operations['SendFeedbackController_sendExitSurvey']
     delete?: never
     options?: never
     head?: never
@@ -763,7 +763,7 @@ export interface paths {
     get?: never
     put?: never
     /** Send upgrade survey to survey_responses table */
-    post: operations['SendUpgradeSurveyController_sendUpgradeSurvey']
+    post: operations['SendFeedbackController_sendUpgradeSurvey']
     delete?: never
     options?: never
     head?: never
@@ -8984,7 +8984,7 @@ export interface components {
     }
     CreditsTopUpRequestDto: {
       amount: number
-      hcaptcha_token: string
+      hcaptcha_token?: string
       payment_method_id: string
     }
     CreditsTopUpResponseDto: {
@@ -10403,6 +10403,7 @@ export interface components {
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
       statement_timeout?: string
+      track_activity_query_size?: string
       track_commit_timestamp?: boolean
       wal_keep_size?: string
       wal_sender_timeout?: string
@@ -12273,6 +12274,7 @@ export interface components {
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
       statement_timeout?: string
+      track_activity_query_size?: string
       track_commit_timestamp?: boolean
       wal_keep_size?: string
       wal_sender_timeout?: string
@@ -14351,7 +14353,7 @@ export interface operations {
       }
     }
   }
-  SendDocsFeedbackController_sendDocsFeedback: {
+  SendFeedbackController_sendDocsFeedback: {
     parameters: {
       query?: never
       header?: never
@@ -14381,7 +14383,7 @@ export interface operations {
       }
     }
   }
-  SendExitSurveyController_sendExitSurvey: {
+  SendFeedbackController_sendExitSurvey: {
     parameters: {
       query?: never
       header?: never
@@ -14441,7 +14443,7 @@ export interface operations {
       }
     }
   }
-  SendUpgradeSurveyController_sendUpgradeSurvey: {
+  SendFeedbackController_sendUpgradeSurvey: {
     parameters: {
       query?: never
       header?: never
