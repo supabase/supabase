@@ -29,6 +29,10 @@ import {
   RealtimeInspectorCopyMessageClickedEvent,
   RealtimeInspectorFiltersAppliedEvent,
   RealtimeInspectorDatabaseRoleUpdatedEvent,
+  ProjectCreationInitialStepPromptIntendedEvent,
+  ProjectCreationInitialStepSubmittedEvent,
+  ProjectCreationSecondStepPromptIntendedEvent,
+  ProjectCreationSecondStepSubmittedEvent,
   AssistantPromptSubmittedEvent,
   AssistantDebugSubmittedEvent,
   AssistantSuggestionRunQueryClickedEvent,
@@ -52,6 +56,10 @@ export type SendEventVariables =
   | FeaturePreviewsClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
+  | ProjectCreationInitialStepPromptIntendedEvent
+  | ProjectCreationInitialStepSubmittedEvent
+  | ProjectCreationSecondStepPromptIntendedEvent
+  | ProjectCreationSecondStepSubmittedEvent
   | RealtimeInspectorListenChannelClickedEvent
   | RealtimeInspectorBroadcastSentEvent
   | RealtimeInspectorMessageClickedEvent
@@ -69,7 +77,7 @@ export type SendEventVariables =
   | AssistantSqlDiffHandlerEvaluatedEvent
   | AssistantEditInSqlEditorClickedEvent
 
-type SendEventPayload = components['schemas']['TelemetryEventBodyV2']
+type SendEventPayload = components['schemas']['TelemetryEventBodyV2Dto']
 
 export async function sendEvent({ body }: { body: SendEventPayload }) {
   const consent =

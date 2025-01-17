@@ -10,7 +10,7 @@ name: supabase
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20241202-71e5240
+    image: supabase/studio:20250113-83c9420
     restart: unless-stopped
     healthcheck:
       test:
@@ -78,7 +78,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.164.0
+    image: supabase/gotrue:v2.167.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -227,7 +227,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.11.13
+    image: supabase/storage-api:v1.14.5
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -304,7 +304,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.65.3
+    image: supabase/edge-runtime:v1.66.4
     restart: unless-stopped
     depends_on:
       analytics:
@@ -369,7 +369,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.6.1.146
+    image: supabase/postgres:15.8.1.020
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
