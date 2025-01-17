@@ -221,7 +221,7 @@ const Reports = () => {
 
   useEffect(() => {
     if (isSuccess && currentReportContent !== undefined) setConfig(currentReportContent)
-  }, [isSuccess])
+  }, [isSuccess, currentReportContent])
 
   useEffect(() => {
     checkEditState()
