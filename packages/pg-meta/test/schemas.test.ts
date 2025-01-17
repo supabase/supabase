@@ -59,66 +59,73 @@ withTestDatabase('list without system schemas', async ({ executeQuery }) => {
   )
 })
 
-// test('retrieve, create, update, delete', async () => {
-//   // Create
-//   let { sql } = await pgMeta.schemas.create({ name: 's' })
-//   let res = await executeQuery(sql)
-//   expect(res).toMatchInlineSnapshot(
-//     { id: expect.any(Number) },
-//     `
-//     {
-//       "id": Any<Number>,
-//       "name": "s",
-//       "owner": "postgres",
-//     }
-//     `
-//   )
+withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) => {
+  // Create schema
+  const { sql: createSql } = await pgMeta.schemas.create({ name: 's' })
+  await executeQuery(createSql)
 
-//   // Retrieve
-//   const schemaId = res.id
-//   ;({ sql } = await pgMeta.schemas.retrieve({ id: schemaId }))
-//   res = await executeQuery(sql)
-//   expect(res).toMatchInlineSnapshot(
-//     { id: expect.any(Number) },
-//     `
-//     {
-//       "id": Any<Number>,
-//       "name": "s",
-//       "owner": "postgres",
-//     }
-//     `
-//   )
+  // Get the created schema
+  const { sql: retrieveSql, zod } = await pgMeta.schemas.retrieve({ name: 's' })
+  const createRes = zod.parse((await executeQuery(retrieveSql))[0])
+  expect(createRes).toMatchInlineSnapshot(
+    { id: expect.any(Number) },
+    `
+    {
+      "id": Any<Number>,
+      "name": "s",
+      "owner": "postgres",
+    }
+    `
+  )
 
-//   // Update
-//   ;({ sql } = await pgMeta.schemas.update(schemaId, { name: 'ss', owner: 'postgres' }))
-//   res = await executeQuery(sql)
-//   expect(res).toMatchInlineSnapshot(
-//     { id: expect.any(Number) },
-//     `
-//     {
-//       "id": Any<Number>,
-//       "name": "ss",
-//       "owner": "postgres",
-//     }
-//     `
-//   )
+  // Retrieve schema again to verify
+  const { sql: retrieveSql2, zod: retrieveZod } = await pgMeta.schemas.retrieve({
+    id: createRes!.id,
+  })
+  const retrieveRes = retrieveZod.parse((await executeQuery(retrieveSql2))[0])
+  expect(retrieveRes).toMatchInlineSnapshot(
+    { id: expect.any(Number) },
+    `
+    {
+      "id": Any<Number>,
+      "name": "s",
+      "owner": "postgres",
+    }
+    `
+  )
 
-//   // Remove
-//   ;({ sql } = await pgMeta.schemas.remove(schemaId))
-//   res = await executeQuery(sql)
-//   expect(res).toMatchInlineSnapshot(
-//     { id: expect.any(Number) },
-//     `
-//     {
-//       "id": Any<Number>,
-//       "name": "ss",
-//       "owner": "postgres",
-//     }
-//     `
-//   )
+  // Update schema
+  const { sql: updateSql } = await pgMeta.schemas.update(
+    { id: createRes!.id },
+    {
+      name: 'ss',
+      owner: 'postgres',
+    }
+  )
+  await executeQuery(updateSql)
 
-//   // Verify deletion
-//   ;({ sql } = await pgMeta.schemas.retrieve({ id: schemaId }))
-//   res = await executeQuery(sql)
-//   expect(res).toBeNull()
-// })
+  // Get the updated schema
+  const { sql: retrieveUpdatedSql, zod: retrieveUpdatedZod } = await pgMeta.schemas.retrieve({
+    name: 'ss',
+  })
+  const updateRes = retrieveUpdatedZod.parse((await executeQuery(retrieveUpdatedSql))[0])
+  expect(updateRes).toMatchInlineSnapshot(
+    { id: expect.any(Number) },
+    `
+    {
+      "id": Any<Number>,
+      "name": "ss",
+      "owner": "postgres",
+    }
+    `
+  )
+
+  // Delete schema
+  const { sql: deleteSql } = await pgMeta.schemas.remove({ id: updateRes!.id })
+  await executeQuery(deleteSql)
+
+  // Verify deletion
+  const { sql: finalRetrieveSql } = await pgMeta.schemas.retrieve({ id: updateRes!.id })
+  const finalRes = await executeQuery(finalRetrieveSql)
+  expect(finalRes).toMatchInlineSnapshot(`[]`)
+})
