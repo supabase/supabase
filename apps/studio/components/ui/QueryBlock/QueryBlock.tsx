@@ -65,7 +65,7 @@ interface QueryBlockProps {
   /** Not implemented yet: Will be the next part of ReportsV2 */
   onSetParameter?: (params: Parameter[]) => void
   /** Optional callback the SQL query is run */
-  onRunQuery?: () => void
+  onRunQuery?: (queryType: 'select' | 'mutation') => void
 
   // [Joshen] Params below are currently only used by ReportsV2 (Might revisit to see how to improve these)
   /** Optional height set to render the SQL query (Used in Reports) */
@@ -142,8 +142,6 @@ export const QueryBlock = ({
     } catch (error: any) {
       toast.error(`Failed to execute query: ${error.message}`)
     }
-
-    onRunQuery?.()
   }
 
   // Run once on mount to parse parameters and notify parent
@@ -228,7 +226,10 @@ export const QueryBlock = ({
               icon={<Play size={14} />}
               loading={isExecuting || isLoading}
               disabled={isLoading}
-              onClick={handleExecute}
+              onClick={() => {
+                handleExecute()
+                if (!!sql && isReadOnlySelect(sql)) onRunQuery?.('select')
+              }}
               tooltip={{
                 content: {
                   side: 'bottom',
@@ -285,7 +286,7 @@ export const QueryBlock = ({
                     connectionString: project?.connectionString,
                     sql,
                   })
-                  onRunQuery?.()
+                  onRunQuery?.('mutation')
                 }
               }}
             >

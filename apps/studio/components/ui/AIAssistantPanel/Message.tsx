@@ -88,6 +88,18 @@ export const Message = function Message({
               const runQuery = snippetProps.runQuery === 'true'
               const sql = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
 
+              const onRunQuery = async (queryType: 'select' | 'mutation') => {
+                sendEvent({
+                  action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED,
+                  properties: {
+                    queryType,
+                    ...(queryType === 'mutation'
+                      ? { category: identifyQueryType(sql) ?? 'unknown' }
+                      : {}),
+                  },
+                })
+              }
+
               return (
                 <div className="w-auto -ml-[36px] overflow-x-hidden">
                   {language === 'sql' ? (
@@ -113,15 +125,7 @@ export const Message = function Message({
                         isChart={isChart}
                         isLoading={isLoading}
                         runQuery={runQuery}
-                        onRunQuery={() => {
-                          sendEvent({
-                            action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED,
-                            properties: {
-                              queryType: 'mutation',
-                              category: identifyQueryType(sql) ?? 'unknown',
-                            },
-                          })
-                        }}
+                        onRunQuery={onRunQuery}
                       />
                     )
                   ) : (
