@@ -1,4 +1,6 @@
 import RGL, { WidthProvider } from 'react-grid-layout'
+import 'react-grid-layout/css/styles.css'
+import 'react-resizable/css/styles.css'
 
 import { Dashboards } from 'types'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
