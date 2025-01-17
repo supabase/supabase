@@ -1,8 +1,8 @@
-import { fireEvent, getByText, screen, render as originalRender } from '@testing-library/react'
-import React, { useState } from 'react'
-import { TooltipProvider } from '@radix-ui/react-tooltip'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { fireEvent, getByText, render as originalRender, screen } from '@testing-library/react'
+import React, { useState } from 'react'
 
+import { TooltipProvider_Shadcn_ } from 'ui'
 interface SelectorOptions {
   container?: HTMLElement
 }
@@ -63,9 +63,9 @@ const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) =
   )
 
   return (
-    <TooltipProvider>
+    <TooltipProvider_Shadcn_>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </TooltipProvider>
+    </TooltipProvider_Shadcn_>
   )
 }
 type renderParams = Parameters<typeof originalRender>

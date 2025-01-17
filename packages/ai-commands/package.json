@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@serafin/schema-builder": "^0.18.5",
-    "@supabase/supabase-js": "*",
+    "@supabase/supabase-js": "catalog:",
     "ai": "^3.4.33",
     "common-tags": "^1.8.2",
     "config": "workspace:*",
@@ -24,6 +24,7 @@
   "devDependencies": {
     "@ai-sdk/openai": "^0.0.72",
     "@types/common-tags": "^1.8.4",
+    "@types/node": "catalog:",
     "api-types": "workspace:*",
     "chalk": "^5.3.0",
     "dotenv": "^16.3.1",

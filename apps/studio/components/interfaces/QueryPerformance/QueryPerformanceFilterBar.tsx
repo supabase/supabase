@@ -73,7 +73,7 @@ export const QueryPerformanceFilterBar = ({
   }
 
   function getSortButtonLabel() {
-    if (defaultSortByValue?.order === 'desc') {
+    if (sortByValue?.order === 'desc') {
       return 'Sorted by latency - high to low'
     } else {
       return 'Sorted by latency - low to high'

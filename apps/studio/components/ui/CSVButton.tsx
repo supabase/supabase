@@ -52,7 +52,7 @@ const CSVButton = ({
         filename={`supabase_logs.csv`}
         title={title}
       />
-      <Tooltip_Shadcn_ delayDuration={100}>
+      <Tooltip_Shadcn_>
         <TooltipTrigger_Shadcn_ asChild>
           <Button
             type={buttonType}

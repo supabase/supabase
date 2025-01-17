@@ -27,4 +27,5 @@ yarn-error.log*
 # Sitemap
 public/sitemap.xml
 
+# Copied examples folder
 /examples/

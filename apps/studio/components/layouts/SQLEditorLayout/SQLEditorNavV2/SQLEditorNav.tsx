@@ -13,6 +13,7 @@ import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLE
 import { useContentCountQuery } from 'data/content/content-count-query'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { getContentById } from 'data/content/content-id-query'
+import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
 import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from 'data/content/sql-folders-query'
 import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
@@ -24,6 +25,7 @@ import {
   useSnippetFolders,
   useSqlEditorV2StateSnapshot,
 } from 'state/sql-editor-v2'
+import { SqlSnippets } from 'types'
 import { cn, Separator, TreeView } from 'ui'
 import {
   InnerSideBarEmptyPanel,
@@ -34,10 +36,8 @@ import {
 } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import SQLEditorLoadingSnippets from './SQLEditorLoadingSnippets'
-import { ROOT_NODE, formatFolderResponseForTreeView, getLastItemIds } from './SQLEditorNav.utils'
+import { formatFolderResponseForTreeView, getLastItemIds, ROOT_NODE } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
-import { useContentUpsertV2Mutation } from 'data/content/content-upsert-v2-mutation'
-import { SqlSnippets } from 'types'
 
 interface SQLEditorNavProps {
   searchText: string
@@ -166,13 +166,12 @@ export const SQLEditorNav = ({
   )
   const folders = useSnippetFolders(projectRef as string)
 
-  const { data: privateSnippetCountData } = useContentCountQuery({
+  const { data: snippetCountData } = useContentCountQuery({
     projectRef,
     type: 'sql',
-    visibility: 'user',
     name: debouncedSearchText,
   })
-  const numPrivateSnippets = privateSnippets.length
+  const numPrivateSnippets = snippetCountData?.private ?? 0
 
   const privateSnippetsTreeState = useMemo(
     () =>
@@ -237,13 +236,7 @@ export const SQLEditorNav = ({
     )
   }, [favoriteSqlSnippetsData?.pages, snippet, sort])
 
-  const { data: favoritedSnippetCountData } = useContentCountQuery({
-    projectRef,
-    type: 'sql',
-    favorite: true,
-    name: debouncedSearchText,
-  })
-  const numFavoriteSnippets = favoriteSnippets.length
+  const numFavoriteSnippets = snippetCountData?.favorites ?? 0
 
   const favoritesTreeState = useMemo(
     () =>
@@ -306,13 +299,7 @@ export const SQLEditorNav = ({
     )
   }, [sharedSqlSnippetsData?.pages, snippet, sort])
 
-  const { data: sharedSnippetCountData } = useContentCountQuery({
-    projectRef,
-    type: 'sql',
-    visibility: 'project',
-    name: debouncedSearchText,
-  })
-  const numProjectSnippets = sharedSnippets.length
+  const numProjectSnippets = snippetCountData?.shared ?? 0
 
   const projectSnippetsTreeState = useMemo(
     () =>
@@ -331,7 +318,7 @@ export const SQLEditorNav = ({
   // Snippet mutations from  RQ
   // ==========================
 
-  const { mutate: upsertContent, isLoading: isUpserting } = useContentUpsertV2Mutation({
+  const { mutate: upsertContent, isLoading: isUpserting } = useContentUpsertMutation({
     onError: (error) => {
       toast.error(`Failed to update query: ${error.message}`)
     },
@@ -557,7 +544,9 @@ export const SQLEditorNav = ({
         onOpenChange={setShowSharedSnippets}
         className="px-0"
       >
-        <InnerSideMenuCollapsibleTrigger title={`Shared`} />
+        <InnerSideMenuCollapsibleTrigger
+          title={`Shared ${numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
+        />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoadingSharedSqlSnippets ? (
             <SQLEditorLoadingSnippets />
@@ -613,7 +602,9 @@ export const SQLEditorNav = ({
         open={showFavoriteSnippets}
         onOpenChange={setShowFavoriteSnippets}
       >
-        <InnerSideMenuCollapsibleTrigger title={`Favorites`} />
+        <InnerSideMenuCollapsibleTrigger
+          title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
+        />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoadingFavoriteSqlSnippets ? (
             <SQLEditorLoadingSnippets />
@@ -674,7 +665,10 @@ export const SQLEditorNav = ({
         onOpenChange={setShowPrivateSnippets}
         className="px-0"
       >
-        <InnerSideMenuCollapsibleTrigger title={`PRIVATE`} />
+        <InnerSideMenuCollapsibleTrigger
+          title={`PRIVATE
+            ${numPrivateSnippets > 0 ? ` (${numPrivateSnippets})` : ''}`}
+        />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoading ? (
             <SQLEditorLoadingSnippets />

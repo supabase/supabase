@@ -27,6 +27,8 @@ export const SAFE_FUNCTIONS = [
   'to_char(',
   'to_date(',
   'extract(',
+  'date(',
   'date_trunc(',
   'string_agg(',
+  'in (',
 ]

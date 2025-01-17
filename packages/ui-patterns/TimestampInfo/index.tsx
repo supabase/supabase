@@ -95,6 +95,12 @@ export const TimestampInfo = ({
 
     return (
       <span
+        onPointerDown={(e) => {
+          e.stopPropagation()
+        }}
+        onMouseDown={(e) => {
+          e.stopPropagation()
+        }}
         onClick={(e) => {
           e.stopPropagation()
           e.preventDefault()
