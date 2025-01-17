@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Alert, Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
+import { Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
 
 import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
 import {
@@ -14,6 +14,7 @@ import { useProjectStorageConfigQuery } from 'data/config/project-storage-config
 import { useBucketUpdateMutation } from 'data/storage/bucket-update-mutation'
 import { IS_PLATFORM } from 'lib/constants'
 import type { StorageBucket } from './Storage.types'
+import { Admonition } from 'ui-patterns'
 
 export interface EditBucketModalProps {
   visible: boolean
@@ -123,7 +124,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                     descriptionText="Anyone can read any object without any authorization"
                   />
                   {bucket?.public !== values.public && (
-                    <Alert
+                    <Admonition
                       title={
                         !bucket?.public && values.public
                           ? 'Warning: Making bucket public'
@@ -131,8 +132,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                             ? 'Warning: Making bucket private'
                             : ''
                       }
-                      variant="warning"
-                      withIcon
+                      type="warning"
                     >
                       <p className="mb-2">
                         {!bucket?.public && values.public
@@ -141,7 +141,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                             ? `All objects in "${bucket?.name}" will be made private and will only be accessible via signed URLs or downloaded with the right authorisation headers`
                             : ''}
                       </p>
-                    </Alert>
+                    </Admonition>
                   )}
                 </div>
               </Modal.Content>
