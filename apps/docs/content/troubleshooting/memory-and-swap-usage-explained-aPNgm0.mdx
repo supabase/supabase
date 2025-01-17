@@ -6,7 +6,7 @@ topics = ["database", "platform"]
 keywords = ["memory", "swap", "ram", "disk", "IO"]
 ---
 
-## Understanding Swap and Memory Usage
+## Understanding swap and memory usage
 
 - Swap is part of Linux's tiered memory system
 - Serves as a backup memory space when RAM is limited.
@@ -15,7 +15,7 @@ keywords = ["memory", "swap", "ram", "disk", "IO"]
 - Swap is used for less frequently accessed or non-critical data
 - Default swapiness value of 60 indicates the system's preference to fill up swap for performance benefits
 
-## Compute Instance Configuration
+## Compute instance configuration
 
 - Default swapiness: 60 (out of 100)
   - Determines how aggressively the system moves data from RAM to swap
@@ -23,7 +23,7 @@ keywords = ["memory", "swap", "ram", "disk", "IO"]
   - Changing the swapiness value significantly impacts system behavior, as it is a non-linear value. A small adjustment of 10 can result in a very different system behavior
 - Swap provision: 1024MB on every compute instance
 
-## Issues with High Swap Usage
+## Issues with high swap usage
 
 - When swap reaches its limits, the system faces decisions:
   1. Evict cached memory from swap, which affects disk performance
@@ -31,7 +31,7 @@ keywords = ["memory", "swap", "ram", "disk", "IO"]
   3. Access the disk directly without caching, resulting in more frequent disk reads
 - Swap usage reaching limits indicates running out of free memory
 
-## Disk Balance and AWS Limits
+## Disk balance and AWS limits
 
 - Each project has a baseline 'balance replenishment rate'
 - The replenishment rate is higher on greater AWS instances
@@ -40,7 +40,7 @@ keywords = ["memory", "swap", "ram", "disk", "IO"]
 - Balance increases when IO usage is below replenishment rate
 - AWS does not export relevant metrics for tracking IO usage
 
-## Monitoring Recommendations
+## Monitoring recommendations
 
 - Monitor memory usage:
   - If usage is over 85% and swap usage is over 90% for an extended period, optimize database access or add more resources
