@@ -9,7 +9,7 @@ database_id = "46bab0a2-9780-4e4f-99f5-fcc9fa51c496"
 
 We want to clarify and provide reassurance on this topic.
 
-### Security Overview:
+### Security overview:
 
 Enabling anonymous sign-ins on your project does not reduce its security. Here's why:
 
@@ -17,7 +17,7 @@ Enabling anonymous sign-ins on your project does not reduce its security. Here's
 - Security Policies: All role-based security policies (RLS) applicable to regular users also apply to anonymous users.
 - Identity Verification Measures: Even though anonymous users do not initially provide an email or phone number, the security of your project remains robust. But to prevent misuse, we recommend implementing additional security measure such as [CAPTCHA](https://supabase.com/docs/guides/auth/auth-captcha): to ensure that interactions are genuinely human.
 
-### Practical Use Cases:
+### Practical use cases:
 
 - Demo Mode: You can enable users to try out your product in a demo mode without full account creation.
 - Feature Restrictions: You can limit certain actions (like posting public content) to users who sign up with more identifiable information (e.g., Google or Apple sign-ins), while still allowing anonymous users to explore your app.
