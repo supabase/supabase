@@ -5,6 +5,7 @@ import { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
 import { toast } from 'sonner'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { copyToClipboard } from 'lib/helpers'
@@ -16,7 +17,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 export type ResultsDropdownProps = {
   id: string

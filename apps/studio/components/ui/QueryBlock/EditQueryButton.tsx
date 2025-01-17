@@ -1,10 +1,10 @@
 import { Edit } from 'lucide-react'
 import { useRouter } from 'next/router'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import useNewQuery from 'components/interfaces/SQLEditor/hooks'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'

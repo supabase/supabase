@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
 
 import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
+import { DocsButton } from 'components/ui/DocsButton'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { Button, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
@@ -12,8 +14,6 @@ import MessageSelection from './MessageSelection'
 import type { LogData } from './Messages.types'
 import NoChannelEmptyState from './NoChannelEmptyState'
 import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
-import { DocsButton } from 'components/ui/DocsButton'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 export const isErrorLog = (l: LogData) => {
   return l.message === 'SYSTEM' && l.metadata?.status === 'error'

@@ -1,12 +1,12 @@
 import { X } from 'lucide-react'
 import { useMemo } from 'react'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import CopyButton from 'components/ui/CopyButton'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { Button, cn } from 'ui'
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 export interface MessageSelectionProps {
   log: LogData | null

@@ -13,6 +13,7 @@ import {
 } from 'react'
 
 import { type Database, useConstant, useIsLoggedIn } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { Button, cn } from 'ui'
 
 import { IS_PLATFORM } from '~/lib/constants'
@@ -20,7 +21,6 @@ import { useSendFeedbackMutation } from '~/lib/fetch/feedback'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { getNotionTeam, getSanitizedTabParams } from './Feedback.utils'
 import { type FeedbackFields, FeedbackModal } from './FeedbackModal'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 const FeedbackButton = forwardRef<
   HTMLButtonElement,

@@ -1,8 +1,8 @@
 import { useParams } from 'common'
 import { useState } from 'react'
 
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { TelemetryActions } from 'common/telemetry-constants'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'

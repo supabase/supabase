@@ -1,9 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronDown, ExternalLink } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
+import { TelemetryActions } from 'common/telemetry-constants'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import {
   Button,
@@ -20,8 +22,6 @@ import {
   Switch,
 } from 'ui'
 import { RealtimeConfig } from '../useRealtimeMessages'
-import { DocsButton } from 'components/ui/DocsButton'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 interface ChooseChannelPopoverProps {
   config: RealtimeConfig
