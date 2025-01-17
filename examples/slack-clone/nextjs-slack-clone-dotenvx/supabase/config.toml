@@ -24,10 +24,15 @@ shadow_port = 54320
 # server_version;` on the remote database to check.
 major_version = 15
 
+[db.seed]
+# If enabled, seeds the database after migrations during a db reset.
+enabled = false
+# Specifies an ordered list of seed files to load during db reset.
+# Supports glob patterns relative to supabase directory. For example:
+# sql_paths = ['./seeds/*.sql', '../project-src/seeds/*-load-testing.sql']
+
 [realtime]
 enabled = true
-# Bind realtime via either IPv4 or IPv6. (default: IPv6)
-# ip_version = "IPv6"
 
 [auth]
 enabled = true
@@ -72,11 +77,6 @@ otp_expiry = 86400
 enabled = true
 # Port to use for the email testing server web interface.
 port = 54324
-# Uncomment to expose additional ports for testing user applications that send emails.
-# smtp_port = 54325
-# pop3_port = 54326
-# admin_email = "admin@email.com"
-# sender_name = "Admin"
 
 # Enable auth hooks
 # https://supabase.com/docs/guides/auth/auth-hooks#local-development
