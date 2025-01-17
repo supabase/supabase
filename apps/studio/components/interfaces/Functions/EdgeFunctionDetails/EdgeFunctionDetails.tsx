@@ -101,7 +101,7 @@ const EdgeFunctionDetails = () => {
 
   return (
     <>
-      <div className="space-y-4 pb-16">
+      <div className="space-y-4 pb-16 pt-3">
         <Form id={formId} initialValues={{}} onSubmit={onUpdateFunction}>
           {({ handleReset, values, initialValues, resetForm }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)

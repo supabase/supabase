@@ -5,7 +5,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
 import { AIAssistant } from './AIAssistant'
 
-export const AiAssistantPanel = () => {
+export const AIAssistantPanel = () => {
   const { aiAssistantPanel, resetAiAssistantPanel } = useAppStateSnapshot()
   const [initialMessages, setInitialMessages] = useState<MessageType[] | undefined>(
     aiAssistantPanel.messages?.length > 0 ? (aiAssistantPanel.messages as any) : undefined

@@ -86,6 +86,7 @@ We recommend reviewing and applying the recommendations offered in our [Producti
 You can use Supabase to store and process Protected Health Information (PHI). You are responsible for the following
 
 - Signing a Business Associate Agreement (BAA) with Supabase. Submit a [HIPAA add-on request](https://forms.supabase.com/hipaa2) to get started. You will need to be at least on the [Team Plan](https://supabase.com/pricing) to sign a BAA with us.
+- [Marking specific projects as HIPAA projects](/docs/guides/platform/hipaa-projects) and addressing security issues raised by the advisor.
 - Ensuring [MFA is enabled](/docs/guides/platform/multi-factor-authentication) on all Supabase accounts.
 - Enabling [Point in Time Recovery](/docs/guides/platform/backups#point-in-time-recovery) which requires at least a [small compute add-on](/docs/guides/platform/compute-add-ons).
 - Turning on [SSL Enforcement](/docs/guides/platform/ssl-enforcement).
@@ -93,7 +94,6 @@ You can use Supabase to store and process Protected Health Information (PHI). Yo
 - Disabling data sharing for [Supabase AI editor](https://supabase.com/dashboard/org/_/general) in our dashboard.
   - Specifically, "_Opt-in to sending anonymous data to OpenAI_" should be disabled (Opt-out).
 - Complying with encryption requirements in the HIPAA Security Rule. Data is encrypted at rest and in transit by Supabase. You can consider encrypting the data at your application layer.
-- Not using [Edge functions](/docs/guides/functions) or [Fly Postgres](/docs/guides/platform/fly-postgres) to process PHI.
-- Not using [branching](/docs/guides/platform/branching) to process PHI.
+- Not using [Edge functions](/docs/guides/functions) to process PHI.
 - Not storing PHI in [public Storage buckets](/docs/guides/storage/buckets/fundamentals#public-buckets).
 - Not [transferring projects](/docs/guides/platform/project-transfer) to a non-HIPAA organization.

@@ -69,6 +69,19 @@ export const pricing: Pricing = {
         usage_based: true,
       },
       {
+        title: 'Advanced disk config',
+        tooltips: {
+          main: 'Supabase databases are backed by high performance SSD disks. The disk can be scaled up to 60 TB, 80,000 IOPS and 4,000 Mbps throughput.',
+        },
+        plans: {
+          free: false,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
         title: 'Automatic backups',
         tooltips: {
           main: 'Backups are entire copies of your database that can be restored in the future.',

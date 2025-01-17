@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react'
 
 import { useParams } from 'common'
 import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
-import Connect from 'components/interfaces/Home/Connect/Connect'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import { SecurityStatus } from 'components/interfaces/Home/SecurityStatus'
@@ -10,6 +9,7 @@ import ServiceStatus from 'components/interfaces/Home/ServiceStatus'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
+import { InlineLink } from 'components/ui/InlineLink'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -30,7 +30,6 @@ import {
 const Home: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
   const project = useSelectedProject()
-
   const isOrioleDb = useIsOrioleDb()
   const snap = useAppStateSnapshot()
   const { enableBranching } = useParams()
@@ -62,15 +61,9 @@ const Home: NextPageWithLayout = () => {
               <TooltipContent_Shadcn_ side="bottom" align="start" className="max-w-80 text-center">
                 This project is using Postgres with OrioleDB which is currently in preview and not
                 suitable for production workloads. View our{' '}
-                {/* [Refactor] Make this into a reusable component to use links inline */}
-                <a
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground"
-                  href="https://supabase.com/docs/guides/database/orioledb"
-                >
+                <InlineLink href="https://supabase.com/docs/guides/database/orioledb">
                   documentation
-                </a>{' '}
+                </InlineLink>{' '}
                 for all limitations.
               </TooltipContent_Shadcn_>
             </Tooltip_Shadcn_>
@@ -87,7 +80,6 @@ const Home: NextPageWithLayout = () => {
         <div className="flex items-center gap-x-3">
           {project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <SecurityStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <ServiceStatus />}
-          {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <Connect />}
         </div>
       </div>
 

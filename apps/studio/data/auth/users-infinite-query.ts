@@ -44,8 +44,10 @@ export const getUsersSQL = ({
   const baseQueryUsers = `select * from auth.users`
 
   if (hasValidKeywords) {
+    // [Joshen] Escape single quotes properly
+    const formattedKeywords = keywords.replaceAll("'", "''")
     conditions.push(
-      `id::text ilike '%${keywords}%' or email ilike '%${keywords}%' or phone ilike '%${keywords}%'`
+      `id::text like '%${formattedKeywords}%' or email like '%${formattedKeywords}%' or phone like '%${formattedKeywords}%'`
     )
   }
 

@@ -80,7 +80,7 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 
     ```ts
     const { data, error } = await supabase.auth.admin.createUser({
-      email: 'foo@example.com',
+      email: 'valid.email@supabase.io',
       password_hash: '$2y$10$a9pghn27d7m0ltXvlX8LiOowy7XfFw0hW0G80OjKYQ1jaoejaA7NC',
       email_confirm: true,
     })
@@ -96,7 +96,7 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 
     ```ts
     const { data, error } = await supabase.auth.admin.createUser({
-      email: 'foo@example.com',
+      email: 'valid.email@supabase.io',
       password: 'supersecurepassword123!',
     })
     ```
@@ -115,7 +115,7 @@ For passwordless signin via email or phone, check for users with verified email 
 
 ```ts
 const { data, error } = await supabase.auth.admin.createUser({
-  email: 'foo@example.com',
+  email: 'valid.email@supabase.io',
   email_confirm: true,
 })
 ```
@@ -151,7 +151,7 @@ Both columns are accessible from the admin user methods. To create a user with c
 
 ```ts
 const { data, error } = await supabase.auth.admin.createUser({
-  email: 'foo@example.com',
+  email: 'valid.email@supabase.io',
   user_metadata: {
     full_name: 'Foo Bar',
   },
@@ -207,7 +207,7 @@ New users in Supabase Auth will always be created with a UUID V4 ID by default.
 // specify a custom id
 const { data, error } = await supabase.auth.admin.createUser({
   id: 'e7f5ae65-376e-4d05-a18c-10a91295727a',
-  email: 'foo@example.com',
+  email: 'valid.email@supabase.io',
 })
 ```
 

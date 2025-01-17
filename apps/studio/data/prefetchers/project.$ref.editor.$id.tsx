@@ -12,7 +12,6 @@ import { Filter, Sort } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { prefetchTableRows } from 'data/table-rows/table-rows-query'
-import { useFlag } from 'hooks/ui/useFlag'
 import { ImpersonationRole } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE } from 'state/table-editor'
@@ -67,12 +66,9 @@ export function usePrefetchEditorTablePage() {
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
-  const tableEditorPrefetchingEnabled = useFlag('tableEditorPrefetching')
 
   return useCallback(
     ({ id: _id, filters, sorts }: { id?: string; filters?: Filter[]; sorts?: Sort[] }) => {
-      if (!tableEditorPrefetchingEnabled) return
-
       const id = _id ? Number(_id) : undefined
       if (!project || !id || isNaN(id)) return
 
@@ -92,7 +88,7 @@ export function usePrefetchEditorTablePage() {
         // eat prefetching errors as they are not critical
       })
     },
-    [project, queryClient, roleImpersonationState.role, router, tableEditorPrefetchingEnabled]
+    [project, queryClient, roleImpersonationState.role, router]
   )
 }
 

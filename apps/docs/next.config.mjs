@@ -1,14 +1,13 @@
 // @ts-check
 import { remarkCodeHike } from '@code-hike/mdx'
 import nextMdx from '@next/mdx'
-import os from 'node:os'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
 import configureBundleAnalyzer from '@next/bundle-analyzer'
 import withYaml from 'next-plugin-yaml'
 
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import remotePatterns from './lib/remotePatterns.js'
 
 const withBundleAnalyzer = configureBundleAnalyzer({
@@ -58,33 +57,14 @@ const nextConfig = {
   experimental: {
     outputFileTracingIncludes: {
       '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
-      '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*'],
+      '/guides/**/*': [
+        './content/guides/**/*',
+        './content/troubleshooting/**/*',
+        './examples/**/*',
+      ],
       '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
     },
-  },
-  webpack: (config, options) => {
-    /**
-     * The SQL to REST API translator relies on libpg-query, which packages a
-     * native Node.js module that wraps the Postgres query parser.
-     *
-     * The default webpack config can't load native modules, so we need a custom
-     * loader for it, which calls process.dlopen to load C++ Addons.
-     *
-     * See https://github.com/eisberg-labs/nextjs-node-loader
-     */
-    config.module.rules.push({
-      test: /\.node$/,
-      use: [
-        {
-          loader: 'nextjs-node-loader',
-          options: {
-            flags: os.constants.dlopen.RTLD_NOW,
-            outputPath: config.output.path,
-          },
-        },
-      ],
-    })
-    return config
+    serverComponentsExternalPackages: ['libpg-query'],
   },
   async headers() {
     return [

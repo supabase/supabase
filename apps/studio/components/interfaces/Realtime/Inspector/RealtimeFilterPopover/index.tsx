@@ -20,6 +20,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
+import { TelemetryActions } from 'lib/constants/telemetry'
 
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig
@@ -200,11 +201,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
         visible={applyConfigOpen}
         onCancel={() => setApplyConfigOpen(false)}
         onConfirm={() => {
-          sendEvent({
-            category: 'realtime_inspector',
-            action: 'applied_filters',
-            label: 'realtime_inspector_config',
-          })
+          sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_FILTERS_APPLIED })
           onChangeConfig(tempConfig)
           setApplyConfigOpen(false)
           setOpen(false)

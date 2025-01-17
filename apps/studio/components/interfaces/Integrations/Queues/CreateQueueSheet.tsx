@@ -56,7 +56,8 @@ const FormSchema = z.object({
     .string()
     .trim()
     .min(1, 'Please provide a name for your queue')
-    .max(47, "The name can't be longer than 47 characters"),
+    .max(47, "The name can't be longer than 47 characters")
+    .regex(/^[a-z_-]+$/, 'Name must contain only lowercase letters, hyphens, and underscores'),
   enableRls: z.boolean(),
   values: z.discriminatedUnion('type', [
     normalQueueSchema,
@@ -164,10 +165,13 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
                   control={form.control}
                   name="name"
                   render={({ field }) => (
-                    <FormItemLayout label="Name" layout="vertical" className="gap-1">
+                    <FormItemLayout label="Name" layout="vertical" className="gap-1 relative">
                       <FormControl_Shadcn_>
                         <Input_Shadcn_ {...field} />
                       </FormControl_Shadcn_>
+                      <span className="text-foreground-lighter text-xs absolute top-0 right-0">
+                        Must be all lowercase letters
+                      </span>
                     </FormItemLayout>
                   )}
                 />

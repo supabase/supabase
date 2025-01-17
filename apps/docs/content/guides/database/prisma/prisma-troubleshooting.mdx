@@ -27,6 +27,8 @@ connection_string.../postgres?KEY1=VALUE&KEY2=VALUE&KEY3=VALUE
 
 # Errors
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ## ... prepared statement already exists
 
 Supavisor in transaction mode (port 6543) does not support [prepared statements](https://www.postgresql.org/docs/current/sql-prepare.html), which Prisma will try to create in the background.
@@ -162,7 +164,7 @@ An alternative strategy to reference these tables is to duplicate values into Pr
 
 <details>
 	<summary>Show/Hide Details</summary>
-  
+
     ```sql table_in_public
     -- Create the 'profiles' table in the 'public' schema
     create table public.profiles (

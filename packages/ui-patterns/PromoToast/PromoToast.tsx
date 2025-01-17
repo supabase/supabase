@@ -39,15 +39,18 @@ const PromoToast = () => {
   return (
     <div
       className={cn(
-        'opacity-0 translate-y-3 transition-all grid gap-4 fixed z-50 bottom-4 right-4 sm:bottom-8 sm:right-8 w-[calc(100vw-2rem)] sm:w-[320px] bg-alternative hover:bg-alternative border border-default rounded p-6 shadow-lg overflow-hidden',
+        'opacity-0 translate-y-3 transition-all grid gap-2 fixed z-50 bottom-4 right-4 sm:bottom-8 sm:right-8 w-[calc(100vw-2rem)] sm:w-[320px] bg-alternative hover:bg-alternative border border-default rounded p-6 shadow-lg overflow-hidden',
         visible && 'opacity-100 translate-y-0'
       )}
     >
       <div className="relative z-10 text-foreground-lighter leading-3 flex flex-col font-mono uppercase tracking-wide w-full text-xs">
-        {announcement.text}
+        <div className="text-foreground uppercase tracking-wider text-lg -mb-1">Launch Week 13</div>
+        <p className="text-foreground-lighter uppercase tracking-wider text-xl md:text-lg leading-snug">
+          2—6 Dec
+        </p>
       </div>
-      <div className="relative z-10 text-foreground flex flex-col text-xl w-full -mt-1">
-        Supabase Functions — Background Tasks and WebSockets
+      <div className="relative z-10 text-foreground-lighter flex flex-col text-sm uppercase font-mono tracking-widest w-full -mt-1">
+        A week of new features
       </div>
 
       <div className="relative z-10 flex items-center space-x-2 mt-2">

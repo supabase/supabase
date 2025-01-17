@@ -2,7 +2,7 @@ import Param from '~/components/Params'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
-import specRealtimeV0 from '~/spec/realtime_v0_config.yaml' assert { type: 'yml' }
+import specRealtimeV0 from '~/spec/realtime_v0_config.yaml' with { type: 'yml' }
 
 const meta = {
   title: 'Realtime Self-hosting Config',

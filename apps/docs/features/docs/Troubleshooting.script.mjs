@@ -1,3 +1,5 @@
+// @ts-check
+
 /* eslint-disable turbo/no-undeclared-env-vars */
 
 /**
@@ -42,7 +44,7 @@ const REPOSITORY_NAME = 'supabase'
  */
 let octokitInstance
 /**
- * @type {SupabaseClient<import('../../../../packages/common').Database>}
+ * @type {import('@supabase/supabase-js').SupabaseClient<import('../../../../packages/common').Database>}
  */
 let supabaseAdminClient
 
@@ -64,8 +66,8 @@ function octokit() {
 export function supabaseAdmin() {
   if (!supabaseAdminClient) {
     supabaseAdminClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SECRET_KEY
+      /** @type {string} */ (process.env.NEXT_PUBLIC_SUPABASE_URL),
+      /** @type {string} */ (process.env.SUPABASE_SECRET_KEY)
     )
   }
 
@@ -123,7 +125,7 @@ async function syncTroubleshootingEntries() {
     if (result.status === 'rejected') {
       console.error(
         `[ERROR] Failed to insert and/or update for ${troubleshootingEntries[index].filePath}:\n%O`,
-        result.reason
+        result.reason?.errors ?? result.reason
       )
       hasErrors = true
     }
@@ -167,7 +169,14 @@ function calculateChecksum(content) {
     extensions: [gfm(), mdxjs()],
     mdastExtensions: [gfmFromMarkdown(), mdxFromMarkdown()],
   })
-  const normalized = toMarkdown(mdast, { extensions: [gfmToMarkdown(), mdxToMarkdown()] })
+  const bodyNormalized = toMarkdown(mdast, { extensions: [gfmToMarkdown(), mdxToMarkdown()] })
+
+  const { data, content: body } = matter(bodyNormalized, {
+    language: 'toml',
+    engines: { toml: toml.parse.bind(toml) },
+  })
+  const newFrontmatter = stringify(data)
+  const normalized = `---\n${newFrontmatter}\n---\n${body}`
 
   return createHash('sha256').update(normalized).digest('base64')
 }
@@ -252,7 +261,7 @@ async function updateChecksumIfNeeded(entry) {
  * @param {TroubleshootingEntry} entry
  */
 function addCanonicalUrl(entry) {
-  const docsUrl = 'https://supabase.com/docs/guides/troubleshooting/' + getArticleSlug(entry.data)
+  const docsUrl = 'https://supabase.com/docs/guides/troubleshooting/' + getArticleSlug(entry)
   const content =
     `_This is a copy of a troubleshooting article on Supabase's docs site. It may be missing some details from the original. View the [original article](${docsUrl})._\n\n` +
     entry.contentWithoutJsx
@@ -260,11 +269,18 @@ function addCanonicalUrl(entry) {
 }
 
 /**
+ * @param {string} str
+ */
+function escapeGraphQlString(str) {
+  return str.replace(/"/g, '\\"')
+}
+
+/**
  * @param {TroubleshootingEntry} entry
  */
 async function createGithubDiscussion(entry) {
   console.log(`[INFO] Creating GitHub discussion for ${entry.data.title}`)
-  const content = addCanonicalUrl(entry)
+  const content = escapeGraphQlString(addCanonicalUrl(entry))
 
   const mutation = `
     mutation {
@@ -362,7 +378,7 @@ async function updateGithubDiscussion(entry) {
     throw error
   }
 
-  const content = addCanonicalUrl(entry)
+  const content = escapeGraphQlString(addCanonicalUrl(entry))
   const mutation = `
     mutation {
       updateDiscussion(input: {

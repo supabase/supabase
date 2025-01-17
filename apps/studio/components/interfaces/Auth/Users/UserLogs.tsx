@@ -112,7 +112,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                     className="flex items-center transition font-mono px-2 py-1.5 bg-surface-100 divide-x"
                   >
                     <p className="text-xs text-foreground-light min-w-[125px] w-[125px] px-1">
-                      <TimestampInfo value={log.timestamp / 1000} />
+                      <TimestampInfo utcTimestamp={log.timestamp / 1000} />
                     </p>
                     <div className="flex items-center text-xs text-foreground-light h-[22px] min-w-[70px] w-[70px] px-2">
                       <div

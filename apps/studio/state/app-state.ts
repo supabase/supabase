@@ -1,8 +1,8 @@
-import { proxy, subscribe, snapshot, useSnapshot } from 'valtio'
 import type { Message as MessageType } from 'ai/react'
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
 import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
+import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 export type CommonDatabaseEntity = {
   id: number
@@ -210,15 +210,24 @@ export const appState = proxy({
       ...value,
     }
   },
+
+  saveLatestMessage: (message: any) => {
+    appState.aiAssistantPanel = {
+      ...appState.aiAssistantPanel,
+      messages: [...appState.aiAssistantPanel.messages, message],
+    }
+  },
 })
 
 // Set up localStorage subscription
 if (typeof window !== 'undefined') {
   subscribe(appState, () => {
-    localStorage.setItem(
-      LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE,
-      JSON.stringify(appState.aiAssistantPanel)
-    )
+    const state = {
+      ...appState.aiAssistantPanel,
+      // limit to 20 messages so as to not overflow the context window
+      messages: appState.aiAssistantPanel.messages?.slice(-20),
+    }
+    localStorage.setItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE, JSON.stringify(state))
   })
 }
 

@@ -39,12 +39,14 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 const TableEditorMenu = () => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const isMobile = useBreakpoint()
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
@@ -169,7 +171,7 @@ const TableEditorMenu = () => {
         <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
           <InnerSideBarFilters>
             <InnerSideBarFilterSearchInput
-              autoFocus
+              autoFocus={!isMobile}
               name="search-tables"
               aria-labelledby="Search tables"
               onChange={(e) => {
@@ -201,7 +203,7 @@ const TableEditorMenu = () => {
               <PopoverTrigger_Shadcn_ asChild>
                 <Button
                   type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-                  className="h-[28px] px-1.5"
+                  className="h-[32px] md:h-[28px] px-1.5"
                   icon={<Filter />}
                 />
               </PopoverTrigger_Shadcn_>
@@ -267,7 +269,7 @@ const TableEditorMenu = () => {
                 />
               )}
               {(entityTypes?.length ?? 0) > 0 && (
-                <div className="flex flex-1" data-testid="tables-list">
+                <div className="flex flex-1 -mx-2" data-testid="tables-list">
                   <InfiniteList
                     items={entityTypes}
                     ItemComponent={EntityListItem}

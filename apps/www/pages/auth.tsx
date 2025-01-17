@@ -15,7 +15,7 @@ import ProductsNav from '~/components/Products/ProductsNav'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import EventCallout from '~/components/EventCallout'
 
-import Solutions from 'data/Solutions'
+import MainProducts from '~/data/MainProducts'
 import { PRODUCT_NAMES } from 'shared-data/products'
 import AuthProviders from '~/data/auth.json'
 
@@ -60,8 +60,8 @@ function AuthPage() {
               className="mb-4 lg:mb-8 -mt-8 lg:-mt-10"
             />
           }
-          icon={Solutions['authentication'].icon}
-          title={Solutions['authentication'].name}
+          icon={MainProducts['authentication'].icon}
+          title={MainProducts['authentication'].name}
           h1={[
             <span key={'authentication-h1'}>
               Open Source Auth

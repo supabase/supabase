@@ -1,4 +1,3 @@
-import { toString as CronToString } from 'cronstrue'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -26,7 +25,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateCronJobForm } from './CreateCronJobSheet'
-import { getScheduleMessage, secondsPattern } from './CronJobs.utils'
+import { formatScheduleString, getScheduleMessage } from './CronJobs.utils'
 import CronSyntaxChart from './CronSyntaxChart'
 
 interface CronJobScheduleSectionProps {
@@ -36,14 +35,10 @@ interface CronJobScheduleSectionProps {
 
 export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobScheduleSectionProps) => {
   const { project } = useProjectContext()
-  const initialValue = form.getValues('schedule')
-  const schedule = form.watch('schedule')
 
-  const [presetValue, setPresetValue] = useState<string>(initialValue)
-  const [inputValue, setInputValue] = useState(initialValue)
+  const [inputValue, setInputValue] = useState('')
   const [debouncedValue] = useDebounce(inputValue, 750)
   const [useNaturalLanguage, setUseNaturalLanguage] = useState(false)
-  const [scheduleString, setScheduleString] = useState('')
 
   const PRESETS = [
     ...(supportsSeconds ? [{ name: 'Every 30 seconds', expression: '30 seconds' }] : []),
@@ -54,15 +49,21 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
     { name: 'Every Monday at 2 AM', expression: '0 2 * * 1' },
   ] as const
 
-  const { complete: generateCronSyntax, isLoading: isGeneratingCron } = useCompletion({
+  const {
+    complete: generateCronSyntax,
+    isLoading: isGeneratingCron,
+    stop,
+  } = useCompletion({
     api: `${BASE_PATH}/api/ai/sql/cron`,
     onResponse: async (response) => {
       if (response.ok) {
         // remove quotes from the cron expression
         const expression = (await response.text()).trim().replace(/^"|"$/g, '')
-        form.setValue('schedule', expression)
-        setPresetValue(expression)
-        setScheduleString(CronToString(expression))
+        form.setValue('schedule', expression, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true,
+        })
       }
     },
     onError: (error) => {
@@ -76,47 +77,15 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
   })
 
   useEffect(() => {
-    if (!useNaturalLanguage || !debouncedValue) return
-    generateCronSyntax(debouncedValue)
+    if (useNaturalLanguage && debouncedValue) {
+      generateCronSyntax(debouncedValue)
+      return () => stop()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue, useNaturalLanguage])
 
-  useEffect(() => {
-    if (!inputValue || inputValue.length < 5) return // set a min length before showing invalid message
-
-    // update the cronstrue string when the input value changes
-    try {
-      setScheduleString(CronToString(inputValue))
-      form.setValue('schedule', inputValue)
-    } catch (error) {
-      console.error('Error converting cron expression to string:', error)
-    }
-  }, [form, inputValue])
-
-  useEffect(() => {
-    if (useNaturalLanguage) return
-
-    setPresetValue(schedule)
-
-    if (!schedule) {
-      setScheduleString('')
-      return
-    }
-
-    try {
-      // Don't allow seconds-based schedules if seconds aren't supported
-      if (!supportsSeconds && secondsPattern.test(schedule)) {
-        setScheduleString('Invalid cron expression')
-        return
-      }
-
-      setScheduleString(CronToString(schedule))
-    } catch (error) {
-      setScheduleString('Invalid cron expression')
-      console.error('Error converting cron expression to string:', error)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [schedule])
+  const schedule = form.watch('schedule')
+  const scheduleString = formatScheduleString(schedule)
 
   return (
     <SheetSection>
@@ -136,108 +105,99 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
               </div>
 
               <FormControl_Shadcn_>
-                <div className="flex flex-col gap-y-2">
-                  {useNaturalLanguage ? (
-                    <Input
-                      value={inputValue}
-                      placeholder="E.g. every 5 minutes"
-                      className={cn(!useNaturalLanguage && 'hidden')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault()
-                        }
-                      }}
-                      onChange={(e) => setInputValue(e.target.value)}
-                    />
-                  ) : (
-                    <Input_Shadcn_
-                      {...field}
-                      autoComplete="off"
-                      placeholder="* * * * *"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault()
-                        }
-                      }}
-                    />
-                  )}
-                  <FormMessage_Shadcn_ />
-
-                  <div className="flex items-center gap-2 mt-2">
-                    <Switch
-                      checked={useNaturalLanguage}
-                      onCheckedChange={() => {
-                        setUseNaturalLanguage(!useNaturalLanguage)
-                        setInputValue('')
-                        setPresetValue('')
-                        setScheduleString('')
-                        form.setValue('schedule', '')
-                      }}
-                    />
-                    <p className="text-sm text-foreground-light">Use natural language</p>
-                  </div>
-
-                  <div className="mt-2">
-                    <ul className="flex gap-2 flex-wrap mt-2">
-                      {PRESETS.map((preset) => (
-                        <li key={preset.name}>
-                          <Button
-                            type="outline"
-                            onClick={() => {
-                              setUseNaturalLanguage(false)
-                              form.setValue('schedule', preset.expression)
-                              form.trigger('schedule')
-                              setPresetValue(preset.expression)
-                            }}
-                          >
-                            {preset.name}
-                          </Button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <Accordion_Shadcn_ type="single" collapsible className="mt-2 pb-2">
-                    <AccordionItem_Shadcn_ value="item-1" className="border-none">
-                      <AccordionTrigger_Shadcn_ className="text-xs text-foreground-light font-normal gap-2 justify-start py-1 ">
-                        View syntax chart
-                      </AccordionTrigger_Shadcn_>
-                      <AccordionContent_Shadcn_ asChild className="!pb-0">
-                        <CronSyntaxChart />
-                      </AccordionContent_Shadcn_>
-                    </AccordionItem_Shadcn_>
-                  </Accordion_Shadcn_>
-                </div>
+                {useNaturalLanguage ? (
+                  <Input
+                    value={inputValue}
+                    placeholder="E.g. every 5 minutes"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                      }
+                    }}
+                    onChange={(e) => setInputValue(e.target.value)}
+                  />
+                ) : (
+                  <Input_Shadcn_
+                    {...field}
+                    autoComplete="off"
+                    placeholder="* * * * *"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                      }
+                    }}
+                  />
+                )}
               </FormControl_Shadcn_>
+              <FormMessage_Shadcn_ />
+              <div className="flex flex-col gap-y-4 mt-3 mb-2">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={useNaturalLanguage}
+                    onCheckedChange={() => {
+                      setUseNaturalLanguage(!useNaturalLanguage)
+                      setInputValue('')
+                    }}
+                  />
+                  <p className="text-sm text-foreground-light">Use natural language</p>
+                </div>
 
+                <ul className="flex gap-2 flex-wrap mt-2">
+                  {PRESETS.map((preset) => (
+                    <li key={preset.name}>
+                      <Button
+                        type="outline"
+                        onClick={() => {
+                          if (useNaturalLanguage) {
+                            setUseNaturalLanguage(false)
+                          }
+                          form.setValue('schedule', preset.expression, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                            shouldTouch: true,
+                          })
+                        }}
+                      >
+                        {preset.name}
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+                <Accordion_Shadcn_ type="single" collapsible>
+                  <AccordionItem_Shadcn_ value="item-1" className="border-none">
+                    <AccordionTrigger_Shadcn_ className="text-xs text-foreground-light font-normal gap-2 justify-start py-1 ">
+                      View syntax chart
+                    </AccordionTrigger_Shadcn_>
+                    <AccordionContent_Shadcn_ asChild className="!pb-0">
+                      <CronSyntaxChart />
+                    </AccordionContent_Shadcn_>
+                  </AccordionItem_Shadcn_>
+                </Accordion_Shadcn_>
+              </div>
               <div className="bg-surface-100 p-4 rounded grid gap-y-4 border">
                 <h4 className="text-sm text-foreground">
                   Schedule {timezone ? `(${timezone})` : ''}
                 </h4>
-                {scheduleString ? (
-                  <span
-                    className={cn(
-                      'text-xl font-mono',
-                      isGeneratingCron ? 'animate-pulse text-foreground-lighter' : 'text-foreground'
-                    )}
-                  >
-                    {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * *'}
-                  </span>
-                ) : (
-                  <span className="text-xl font-mono text-foreground-lighter">
-                    {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * *'}
-                  </span>
-                )}
+                <span
+                  className={cn(
+                    'text-xl font-mono',
+                    scheduleString
+                      ? isGeneratingCron
+                        ? 'animate-pulse text-foreground-lighter'
+                        : 'text-foreground'
+                      : 'text-foreground-lighter'
+                  )}
+                >
+                  {isGeneratingCron ? <CronSyntaxLoader /> : schedule || '* * * * * *'}
+                </span>
+
                 {!inputValue && !isGeneratingCron && !scheduleString ? (
                   <span className="text-sm text-foreground-light">
                     Describe your schedule above
                   </span>
                 ) : (
                   <span className="text-sm text-foreground-light flex items-center gap-2">
-                    {isGeneratingCron ? (
-                      <LoadingDots />
-                    ) : (
-                      getScheduleMessage(scheduleString, schedule)
-                    )}
+                    {isGeneratingCron ? <LoadingDots /> : getScheduleMessage(scheduleString)}
                   </span>
                 )}
               </div>

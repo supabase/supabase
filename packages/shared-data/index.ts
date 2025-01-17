@@ -3,7 +3,7 @@ import extensions from './extensions.json'
 import logConstants from './logConstants'
 import { plans, PricingInformation } from './plans'
 import { pricing } from './pricing'
-import { products } from './products'
+import { products, PRODUCT_MODULES } from './products'
 import questions from './questions'
 import type { AWS_REGIONS_KEYS, CloudProvider, Region } from './regions'
 import { AWS_REGIONS, FLY_REGIONS } from './regions'
@@ -19,6 +19,7 @@ export {
   plans,
   pricing,
   products,
+  PRODUCT_MODULES,
   questions,
   tweets,
 }

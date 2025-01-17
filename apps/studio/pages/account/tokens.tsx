@@ -16,7 +16,8 @@ import {
 } from 'components/layouts/Scaffold'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 import type { NextPageWithLayout } from 'types'
-import { Alert, Button } from 'ui'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const UserAccessTokens: NextPageWithLayout = () => {
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
@@ -56,11 +57,10 @@ const UserAccessTokens: NextPageWithLayout = () => {
       </ScaffoldHeader>
       <div className="flex flex-col">
         <div className="flex items-center justify-between">
-          <Alert
-            withIcon
-            className="mb-6 w-full"
-            variant="warning"
+          <Admonition
+            type="warning"
             title="Personal access tokens can be used to control your whole account and use features added in the future. Be careful when sharing them!"
+            className="mb-6 w-full"
           />
         </div>
         <div className="space-y-4">

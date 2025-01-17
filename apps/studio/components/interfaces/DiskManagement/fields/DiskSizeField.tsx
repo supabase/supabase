@@ -19,6 +19,9 @@ import { DiskTypeRecommendationSection } from '../ui/DiskTypeRecommendationSecti
 import FormMessage from '../ui/FormMessage'
 import { InputPostTab } from '../ui/InputPostTab'
 import { InputResetButton } from '../ui/InputResetButton'
+import { Admonition } from 'ui-patterns'
+import Markdown from 'markdown-to-jsx'
+import { DocsButton } from 'components/ui/DocsButton'
 
 type DiskSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -148,6 +151,13 @@ export function DiskSizeField({
             {includedDiskGB > 0 &&
               subscription?.plan.id &&
               `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
+
+            <div className="mt-3">
+              <DocsButton
+                abbrev={false}
+                href="https://supabase.com/docs/guides/platform/database-size"
+              />
+            </div>
           </span>
           <DiskTypeRecommendationSection
             form={form}

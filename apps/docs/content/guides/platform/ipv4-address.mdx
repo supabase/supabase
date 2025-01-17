@@ -26,7 +26,12 @@ IPv4 addresses are guaranteed to be static for ingress traffic. If your database
 
 ## Enabling the IPv4 add-on
 
-You can enable the IPv4 add-on in your project's [add-ons settings](/dashboard/project/_/settings/addons). Enabling the add-on may briefly disable your database during reconfiguration.
+You can enable the IPv4 add-on in your project's [add-ons settings](/dashboard/project/_/settings/addons).
+
+<Admonition type="caution">
+  Note that direct database connections can experience a short amount of downtime when toggling the
+  add-on due to DNS reconfiguration and propagation. Generally, this should be less than a minute.
+</Admonition>
 
 ## Read replicas and IPv4 add-on
 

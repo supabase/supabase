@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 01 Oct 2024 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Mon, 09 Dec 2024 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/e2b</guid>
+  <title>E2B: Accelerating AI-Driven Development with Supabase</title>
+  <link>https://supabase.com/customers/e2b</link>
+  <description>Discover how E2B leveraged Supabase to streamline its platform, allowing secure, scalable execution of AI-generated code in the cloud.</description>
+  <pubDate>Mon, 09 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/humata</guid>
   <title>Humata Scales with Supabase: Achieving 4X Cost Savings and Enhanced Performance</title>
   <link>https://supabase.com/customers/humata</link>

@@ -94,7 +94,7 @@ Smaller compute instances like Nano, Micro, and Small have baseline performance 
 
 If you need consistent disk performance, choose the 4XL or larger compute instance. If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://supabase.com/dashboard/project/_/reports). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has exceeded the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk IO budget. Projects that use any disk IO budget are good candidates for upgrading to a larger compute instance with higher throughput.
 
-### Provisioned Disk throughput and IOPS
+### Provisioned disk throughput and IOPS
 
 The default disk type is gp3, which comes with a baseline throughput of 125 MiB/s and a default IOPS of 3,000. You can provision additional IOPS and throughput from the [Database Settings](/dashboard/project/_/settings/database) page, but keep in mind that the effective IOPS and throughput will be limited by the compute instance size.
 
@@ -108,13 +108,14 @@ Be aware that increasing IOPS or throughput incurs additional charges.
 
 When selecting your disk, it's essential to focus on the performance needs of your workload. Here's a comparison of our available disk types:
 
-|                   | General Purpose SSD (gp3)                                              | High Performance SSD (io2)                                                   |
-| ----------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| **Use Case**      | General workloads, development environments, small to medium databases | High-performance needs, large-scale databases, mission-critical applications |
-| **Max Disk Size** | 16 TB                                                                  | 60 TB                                                                        |
-| **Max IOPS**      | 16,000 IOPS (at 32 GB disk size)                                       | 80,000 IOPS (at 80 GB disk size)                                             |
-| **Throughput**    | 125 MiB/s (default) to 1,000 MiB/s (maximum)                           | Automatically scales with IOPS                                               |
-| **Best For**      | Great value for most use cases                                         | Low latency and very high IOPS requirements                                  |
+|                   | General Purpose SSD (gp3)                                                                                                                     | High Performance SSD (io2)                                                                           |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Use Case**      | General workloads, development environments, small to medium databases                                                                        | High-performance needs, large-scale databases, mission-critical applications                         |
+| **Max Disk Size** | 16 TB                                                                                                                                         | 60 TB                                                                                                |
+| **Max IOPS**      | 16,000 IOPS (at 32 GB disk size)                                                                                                              | 80,000 IOPS (at 80 GB disk size)                                                                     |
+| **Throughput**    | 125 MiB/s (default) to 1,000 MiB/s (maximum)                                                                                                  | Automatically scales with IOPS                                                                       |
+| **Best For**      | Great value for most use cases                                                                                                                | Low latency and very high IOPS requirements                                                          |
+| **Pricing**       | Disk: 8 GB included, then $0.125 per GB<br/>IOPS: 3,000 included, then $0.024 per IOPS<br/>Throughput: 125 Mbps included, then $0.95 per Mbps | Disk: $0.195 per GB<br/>IOPS: $0.119 per IOPS<br/>Throughput: Scales with IOPS at no additional cost |
 
 For general, day-to-day operations, gp3 should be more than enough. If you need high throughput and IOPS for critical systems, io2 will provide the performance required.
 
@@ -129,7 +130,7 @@ Compute instance size changes will not change your selected disk type or disk si
 - General Purpose (gp3) disks come with a baseline of 3,000 IOPS and 125 MiB/s. You can provision additional 500 IOPS for every GB of disk size and additional 0.25 MiB/s throughput per provisioned IOPS.
 - High Performance (io2) disks can be provisioned with 1,000 IOPS per GB of disk size.
 
-## Limits and Constraints
+## Limits and constraints
 
 ### Postgres replication slots, WAL senders, and connections
 

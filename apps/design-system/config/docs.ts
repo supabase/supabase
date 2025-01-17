@@ -117,6 +117,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/multi-select',
           items: [],
         },
+        {
+          title: 'Logs Bar Chart',
+          href: '/docs/fragments/logs-bar-chart',
+          items: [],
+        },
       ],
     },
     {

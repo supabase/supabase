@@ -60,6 +60,8 @@ A Read Replica is deployed by using a physical backup as a starting point, and a
 
 Along with the progress of the deployment, the dashboard displays rough estimates for each component.
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ### What does it mean when "Init failed" is observed?
 
 The status `Init failed` indicates that the Read Replica has failed to deploy. Some possible scenarios as to why a Read Replica may have failed to be deployed:
@@ -142,7 +144,7 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 async function createUser() {
   // Make the Auth call to create a user
   const { data, error } = await supabase.auth.signUp({
-    email: 'my-new-user@example.com',
+    email: 'valid.email@supabase.io',
     password: 'my--really-strong-password',
   })
 

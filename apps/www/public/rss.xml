@@ -5,9 +5,100 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 03 Dec 2024 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Fri, 20 Dec 2024 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/ai-hackathon-at-y-combinator</guid>
+  <title>AI Hackathon at Y Combinator</title>
+  <link>https://supabase.com/blog/ai-hackathon-at-y-combinator</link>
+  <description>Announcing the winners of the Supabase AI Hackathon.</description>
+  <pubDate>Fri, 20 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/calendars-in-postgres-using-foreign-data-wrappers</guid>
+  <title>Calendars in Postgres using Foreign Data Wrappers</title>
+  <link>https://supabase.com/blog/calendars-in-postgres-using-foreign-data-wrappers</link>
+  <description>Calendar data integration with Cal.com using Wasm foreign data wrapper on Supabase</description>
+  <pubDate>Fri, 20 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/lw13-hackathon-winners</guid>
+  <title>Supabase Launch Week 13 Hackathon Winners</title>
+  <link>https://supabase.com/blog/lw13-hackathon-winners</link>
+  <description>Announcing the winners of the Supabase Launch Week 13 Hackathon.</description>
+  <pubDate>Fri, 20 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/how-to-hack-the-base</guid>
+  <title>How to Hack the Base!</title>
+  <link>https://supabase.com/blog/how-to-hack-the-base</link>
+  <description>Played cool games, won cool prizes.</description>
+  <pubDate>Thu, 19 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/durable-workflows-in-postgres-dbos</guid>
+  <title>Running Durable Workflows in Postgres using DBOS</title>
+  <link>https://supabase.com/blog/durable-workflows-in-postgres-dbos</link>
+  <description>Technical deep dive into the new DBOS integration for Supabase</description>
+  <pubDate>Tue, 10 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/hack-the-base</guid>
+  <title>Hack the Base! with Supabase</title>
+  <link>https://supabase.com/blog/hack-the-base</link>
+  <description>Play cool games, win cool prizes.</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-13-top-10</guid>
+  <title>Top 10 Launches of Launch Week 13</title>
+  <link>https://supabase.com/blog/launch-week-13-top-10</link>
+  <description>Highlights from Launch Week 13</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/database-build-v2</guid>
+  <title>database.build v2: Bring-your-own-LLM</title>
+  <link>https://supabase.com/blog/database-build-v2</link>
+  <description>Use any OpenAI API compatible LLMs in database.build</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/restore-to-a-new-project</guid>
+  <title>Restore to a New Project</title>
+  <link>https://supabase.com/blog/restore-to-a-new-project</link>
+  <description>Effortlessly Clone Data into a New Supabase Project</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-queues</guid>
+  <title>Supabase Queues</title>
+  <link>https://supabase.com/blog/supabase-queues</link>
+  <description>Durable Message Queues with Guaranteed Delivery in Postgres</description>
+  <pubDate>Thu, 05 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/high-performance-disks</guid>
+  <title>High Performance Disk</title>
+  <link>https://supabase.com/blog/high-performance-disks</link>
+  <description>Store up to 60 TB of data with 100x improved durability and 5x more IOPS</description>
+  <pubDate>Thu, 05 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-cron</guid>
+  <title>Supabase Cron</title>
+  <link>https://supabase.com/blog/supabase-cron</link>
+  <description>Schedule Recurring Jobs in Postgres</description>
+  <pubDate>Wed, 04 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/cli-v2-config-as-code</guid>
+  <title>Supabase CLI v2: Config as Code</title>
+  <link>https://supabase.com/blog/cli-v2-config-as-code</link>
+  <description>Commit the configuration for all of your Projects and Branches into version control.</description>
+  <pubDate>Wed, 04 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/edge-functions-background-tasks-websockets</guid>
   <title>Supabase Edge Functions: Introducing Background Tasks, Ephemeral Storage, and WebSockets</title>
   <link>https://supabase.com/blog/edge-functions-background-tasks-websockets</link>
@@ -65,7 +156,7 @@
 </item>
 <item>
   <guid>https://supabase.com/blog/lw12-hackathon-winners</guid>
-  <title>Supabase Launch Week 12 Hackathon</title>
+  <title>Supabase Launch Week 12 Hackathon Winners</title>
   <link>https://supabase.com/blog/lw12-hackathon-winners</link>
   <description>Announcing the winners of the Supabase Launch Week 12 Hackathon.</description>
   <pubDate>Mon, 30 Sep 2024 00:00:00 -0700</pubDate>

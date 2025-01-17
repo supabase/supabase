@@ -8,6 +8,7 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
@@ -16,7 +17,6 @@ import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   FormControl_Shadcn_,
@@ -35,7 +35,6 @@ import {
 } from 'ui'
 import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
-import { Markdown } from 'components/interfaces/Markdown'
 
 interface StorageSettingsState {
   fileSizeLimit: number
@@ -54,7 +53,7 @@ const StorageSettings = () => {
     isLoading,
     isSuccess,
     isError,
-  } = useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
+  } = useProjectStorageConfigQuery({ projectRef })
 
   const organization = useSelectedOrganization()
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
@@ -116,7 +115,7 @@ const StorageSettings = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: initialValues,
   })
-  const { fileSizeLimit: limit, unit: storageUnit, imageTransformationEnabled } = form.watch()
+  const { fileSizeLimit: limit, unit: storageUnit } = form.watch()
 
   const { mutate: updateStorageConfig, isLoading: isUpdating } =
     useProjectStorageConfigUpdateUpdateMutation({
@@ -127,13 +126,14 @@ const StorageSettings = () => {
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!projectRef) return console.error('Project ref is required')
+    if (!config) return console.error('Storage config is required')
+
     updateStorageConfig({
       projectRef,
       fileSizeLimit: convertToBytes(data.fileSizeLimit, data.unit),
       features: {
-        imageTransformation: {
-          enabled: data.imageTransformationEnabled,
-        },
+        imageTransformation: { enabled: data.imageTransformationEnabled },
+        s3Protocol: { enabled: config.features.s3Protocol.enabled },
       },
     })
   }
@@ -153,7 +153,7 @@ const StorageSettings = () => {
       {isSuccess && (
         <form id={formId} className="" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="bg-surface-100  overflow-hidden border-muted rounded-md border shadow">
-            <div className="flex flex-col gap-0 divide-y divide-border-muted">
+            <div className="flex flex-col gap-0 divide-y divide-border">
               <div className="grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
                 <div className="relative flex flex-col col-span-12 gap-6 lg:col-span-4">
                   <p className="text-sm">Upload file size limit</p>
@@ -251,7 +251,13 @@ const StorageSettings = () => {
                       )}
                     />
                   </div>
-                  <Markdown content="Optimize and resize images on the fly. [Learn more](https://supabase.com/docs/guides/storage/serving/image-transformations)." />
+                  <p className="text-sm text-foreground-light">
+                    Optimize and resize images on the fly.{' '}
+                    <InlineLink href="https://supabase.com/docs/guides/storage/serving/image-transformations">
+                      Learn more
+                    </InlineLink>
+                    .
+                  </p>
                 </div>
               </div>
             </div>

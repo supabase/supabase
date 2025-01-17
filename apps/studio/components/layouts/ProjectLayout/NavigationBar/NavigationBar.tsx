@@ -15,7 +15,6 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -57,7 +56,39 @@ export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
 const NavigationBar = () => {
-  const os = detectOS()
+  const snap = useAppStateSnapshot()
+
+  const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
+
+  const [storedAllowNavPanel] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
+    true
+  )
+  // Don't allow the nav panel to expand in playwright tests
+  const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
+
+  return (
+    <div className="w-14 h-full hidden md:flex flex-col">
+      <nav
+        data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
+        className={cn(
+          'group py-2 z-10 h-full w-[13rem] md:w-14 md:data-[state=expanded]:w-[13rem]',
+          'border-r bg-dash-sidebar border-default data-[state=expanded]:shadow-xl',
+          'transition-width duration-200',
+          'hide-scrollbar flex flex-col justify-between overflow-y-auto'
+        )}
+        onMouseEnter={() => allowNavPanelToExpand && snap.setNavigationPanelOpen(true)}
+        onMouseLeave={() => {
+          if (!userDropdownOpen && allowNavPanelToExpand) snap.setNavigationPanelOpen(false)
+        }}
+      >
+        <NavContent />
+      </nav>
+    </div>
+  )
+}
+
+export const NavContent = () => {
   const router = useRouter()
   const { profile } = useProfile()
   const { project } = useProjectContext()
@@ -68,14 +99,15 @@ const NavigationBar = () => {
 
   const signOut = useSignOut()
 
-  const navLayoutV2 = useFlag('navigationLayoutV2')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
-  const [allowNavPanelToExpand] = useLocalStorageQuery(
+  const [storedAllowNavPanel] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
     true
   )
+  // Don't allow the nav panel to expand in playwright tests
+  const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
 
   const {
     projectAuthAll: authEnabled,
@@ -170,9 +202,9 @@ const NavigationBar = () => {
         </figure>
         <span
           className={cn(
-            'w-[8rem] flex flex-col items-start text-sm truncate',
-            'absolute left-7 group-data-[state=expanded]:left-10',
-            'group-data-[state=collapsed]:opacity-0 group-data-[state=expanded]:opacity-100',
+            'w-full md:w-[8rem] flex flex-col items-start text-sm truncate',
+            'absolute left-10 md:left-7 group-data-[state=expanded]:left-10',
+            'opacity-100 md:group-data-[state=collapsed]:opacity-0 md:group-data-[state=expanded]:opacity-100',
             'transition-all'
           )}
         >
@@ -197,249 +229,229 @@ const NavigationBar = () => {
   )
 
   return (
-    <div className="w-14 h-full flex flex-col">
-      <nav
-        data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
-        className={cn(
-          'group py-2 z-10 h-full w-14 data-[state=expanded]:w-[13rem]',
-          'border-r bg-dash-sidebar border-default data-[state=expanded]:shadow-xl',
-          'transition-width duration-200',
-          'hide-scrollbar flex flex-col justify-between overflow-y-auto'
-        )}
-        onMouseEnter={() => allowNavPanelToExpand && snap.setNavigationPanelOpen(true)}
-        onMouseLeave={() => {
-          if (!userDropdownOpen && allowNavPanelToExpand) snap.setNavigationPanelOpen(false)
-        }}
-      >
-        <ul className="flex flex-col gap-y-1 justify-start px-2 relative">
-          {(!navLayoutV2 || !IS_PLATFORM) && (
-            <Link
-              href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
-              className="mx-2 flex items-center h-[40px]"
-              onClick={onCloseNavigationIconLink}
-            >
-              <img
-                alt="Supabase"
-                src={`${router.basePath}/img/supabase-logo.svg`}
-                className="absolute h-[40px] w-6 cursor-pointer rounded"
-              />
-            </Link>
-          )}
+    <>
+      <ul className="flex flex-col gap-y-1 justify-start px-2 relative">
+        <Link
+          href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
+          className="mx-2 hidden md:flex items-center w-[40px] h-[40px]"
+          onClick={onCloseNavigationIconLink}
+        >
+          <img
+            alt="Supabase"
+            src={`${router.basePath}/img/supabase-logo.svg`}
+            className="absolute h-[40px] w-6 cursor-pointer rounded"
+          />
+        </Link>
+        <NavigationIconLink
+          isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
+          route={{
+            key: 'HOME',
+            label: 'Home',
+            icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: `/project/${projectRef}`,
+            linkElement: <ProjectIndexPageLink projectRef={projectRef} />,
+          }}
+          onClick={onCloseNavigationIconLink}
+        />
+        <Separator className="my-1 bg-border-muted" />
+        {toolRoutes.map((route) => (
           <NavigationIconLink
-            isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
-            route={{
-              key: 'HOME',
-              label: 'Home',
-              icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-              link: `/project/${projectRef}`,
-              linkElement: <ProjectIndexPageLink projectRef={projectRef} />,
-            }}
+            key={route.key}
+            route={route}
+            isActive={activeRoute === route.key}
             onClick={onCloseNavigationIconLink}
           />
-          <Separator className="my-1 bg-border-muted" />
-          {toolRoutes.map((route) => (
-            <NavigationIconLink
-              key={route.key}
-              route={route}
-              isActive={activeRoute === route.key}
-              onClick={onCloseNavigationIconLink}
-            />
-          ))}
-          <Separator className="my-1 bg-border-muted" />
-          {productRoutes.map((route) => (
-            <NavigationIconLink
-              key={route.key}
-              route={route}
-              isActive={activeRoute === route.key}
-              onClick={onCloseNavigationIconLink}
-            />
-          ))}
+        ))}
+        <Separator className="my-1 bg-border-muted" />
+        {productRoutes.map((route) => (
+          <NavigationIconLink
+            key={route.key}
+            route={route}
+            isActive={activeRoute === route.key}
+            onClick={onCloseNavigationIconLink}
+          />
+        ))}
 
-          <Separator className="my-1 bg-border-muted" />
-          {otherRoutes.map((route) => {
-            if (route.key === 'api' && isNewAPIDocsEnabled) {
-              return (
-                <NavigationIconButton
-                  key={route.key}
-                  onClick={() => {
-                    snap.setShowProjectApiDocs(true)
-                    snap.setNavigationPanelOpen(false)
-                  }}
-                  icon={<FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
-                >
-                  Project API
-                </NavigationIconButton>
-              )
-            } else if (route.key === 'advisors') {
-              return (
-                <div className="relative" key={route.key}>
-                  {securityLints.length > 0 && (
-                    <div
-                      className={cn(
-                        'absolute flex h-2 w-2 left-6 top-2 z-10 rounded-full',
-                        errorLints.length > 0 ? 'bg-destructive-600' : 'bg-warning-600'
-                      )}
-                    />
-                  )}
-
-                  <NavigationIconLink
-                    route={route}
-                    isActive={activeRoute === route.key}
-                    onClick={onCloseNavigationIconLink}
+        <Separator className="my-1 bg-border-muted" />
+        {otherRoutes.map((route) => {
+          if (route.key === 'api' && isNewAPIDocsEnabled) {
+            return (
+              <NavigationIconButton
+                key={route.key}
+                onClick={() => {
+                  snap.setShowProjectApiDocs(true)
+                  snap.setNavigationPanelOpen(false)
+                }}
+                icon={<FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+              >
+                Project API
+              </NavigationIconButton>
+            )
+          } else if (route.key === 'advisors') {
+            return (
+              <div className="relative" key={route.key}>
+                {securityLints.length > 0 && (
+                  <div
+                    className={cn(
+                      'absolute flex h-2 w-2 left-6 top-2 z-10 rounded-full',
+                      errorLints.length > 0 ? 'bg-destructive-600' : 'bg-warning-600'
+                    )}
                   />
-                </div>
-              )
-            } else if (route.key === 'logs') {
-              // TODO: Undo this when warehouse flag is removed
-              const label = showWarehouse ? 'Logs & Analytics' : route.label
-              const newRoute = { ...route, label }
-              return (
+                )}
+
                 <NavigationIconLink
-                  key={newRoute.key}
-                  route={newRoute}
-                  isActive={activeRoute === newRoute.key}
-                  onClick={onCloseNavigationIconLink}
-                />
-              )
-            } else {
-              return (
-                <NavigationIconLink
-                  key={route.key}
                   route={route}
                   isActive={activeRoute === route.key}
                   onClick={onCloseNavigationIconLink}
                 />
-              )
-            }
-          })}
-        </ul>
+              </div>
+            )
+          } else if (route.key === 'logs') {
+            // TODO: Undo this when warehouse flag is removed
+            const label = showWarehouse ? 'Logs & Analytics' : route.label
+            const newRoute = { ...route, label }
+            return (
+              <NavigationIconLink
+                key={newRoute.key}
+                route={newRoute}
+                isActive={activeRoute === newRoute.key}
+                onClick={onCloseNavigationIconLink}
+              />
+            )
+          } else {
+            return (
+              <NavigationIconLink
+                key={route.key}
+                route={route}
+                isActive={activeRoute === route.key}
+                onClick={onCloseNavigationIconLink}
+              />
+            )
+          }
+        })}
+      </ul>
 
-        <ul className="flex flex-col px-2 gap-y-1">
-          {settingsRoutes.map((route) => (
-            <NavigationIconLink
-              key={route.key}
-              route={route}
-              isActive={activeRoute === route.key}
-              onClick={onCloseNavigationIconLink}
-            />
-          ))}
+      <ul className="flex flex-col px-2 pb-4 md:pb-0 gap-y-1">
+        {settingsRoutes.map((route) => (
+          <NavigationIconLink
+            key={route.key}
+            route={route}
+            isActive={activeRoute === route.key}
+            onClick={onCloseNavigationIconLink}
+          />
+        ))}
 
-          {IS_PLATFORM && (
-            <>
-              {!allowNavPanelToExpand && (
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>{CommandButton}</TooltipTrigger_Shadcn_>
-                  <TooltipContent_Shadcn_ side="right">
-                    <span>Commands</span>
-                  </TooltipContent_Shadcn_>
-                </Tooltip_Shadcn_>
-              )}
-              {allowNavPanelToExpand && CommandButton}
-            </>
-          )}
-
-          <DropdownMenu
-            open={userDropdownOpen}
-            onOpenChange={(open: boolean) => {
-              setUserDropdownOpenState(open)
-              if (open === false) snap.setNavigationPanelOpen(false)
-            }}
-          >
-            {allowNavPanelToExpand ? (
-              <DropdownMenuTrigger asChild>{UserAccountButton}</DropdownMenuTrigger>
-            ) : (
+        {IS_PLATFORM && (
+          <>
+            {!allowNavPanelToExpand && (
               <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
-                  <DropdownMenuTrigger asChild>{UserAccountButton}</DropdownMenuTrigger>
-                </TooltipTrigger_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>{CommandButton}</TooltipTrigger_Shadcn_>
                 <TooltipContent_Shadcn_ side="right">
-                  <span>Account settings</span>
+                  <span>Commands</span>
                 </TooltipContent_Shadcn_>
               </Tooltip_Shadcn_>
             )}
+            {allowNavPanelToExpand && CommandButton}
+          </>
+        )}
 
-            <DropdownMenuContent side="top" align="start">
-              {IS_PLATFORM && (
-                <>
-                  <div className="px-2 py-1 flex flex-col gap-0 text-sm">
-                    {profile && (
-                      <>
+        <DropdownMenu
+          open={userDropdownOpen}
+          onOpenChange={(open: boolean) => {
+            setUserDropdownOpenState(open)
+            if (open === false) snap.setNavigationPanelOpen(false)
+          }}
+        >
+          {allowNavPanelToExpand ? (
+            <DropdownMenuTrigger asChild>{UserAccountButton}</DropdownMenuTrigger>
+          ) : (
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <DropdownMenuTrigger asChild>{UserAccountButton}</DropdownMenuTrigger>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="right">
+                <span>Account settings</span>
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
+          )}
+
+          <DropdownMenuContent side="top" align="start">
+            {IS_PLATFORM && (
+              <>
+                <div className="px-2 py-1 flex flex-col gap-0 text-sm">
+                  {profile && (
+                    <>
+                      <span
+                        title={profile.username}
+                        className="w-full text-left text-foreground truncate"
+                      >
+                        {profile.username}
+                      </span>
+                      {profile.primary_email !== profile.username && (
                         <span
-                          title={profile.username}
-                          className="w-full text-left text-foreground truncate"
+                          title={profile.primary_email}
+                          className="w-full text-left text-foreground-light text-xs truncate"
                         >
-                          {profile.username}
+                          {profile.primary_email}
                         </span>
-                        {profile.primary_email !== profile.username && (
-                          <span
-                            title={profile.primary_email}
-                            className="w-full text-left text-foreground-light text-xs truncate"
-                          >
-                            {profile.primary_email}
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </div>
+                      )}
+                    </>
+                  )}
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem className="flex gap-2" asChild>
+                    <Link href="/account/me">
+                      <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                      Account preferences
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="flex gap-2"
+                    onClick={() => snap.setShowFeaturePreviewModal(true)}
+                    onSelect={() => snap.setShowFeaturePreviewModal(true)}
+                  >
+                    <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                    Feature previews
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem className="flex gap-2" asChild>
-                      <Link href="/account/me">
-                        <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                        Account preferences
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="flex gap-2"
-                      onClick={() => snap.setShowFeaturePreviewModal(true)}
-                      onSelect={() => snap.setShowFeaturePreviewModal(true)}
-                    >
-                      <FlaskConical
-                        size={14}
-                        strokeWidth={1.5}
-                        className="text-foreground-lighter"
-                      />
-                      Feature previews
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </DropdownMenuGroup>
-                </>
-              )}
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>Theme</DropdownMenuLabel>
-                <DropdownMenuRadioGroup
-                  value={theme}
-                  onValueChange={(value) => {
-                    setTheme(value)
-                  }}
-                >
-                  {singleThemes.map((theme: Theme) => (
-                    <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                      {theme.name}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuGroup>
-              {IS_PLATFORM && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem
-                      onSelect={async () => {
-                        await signOut()
-                        await router.push('/sign-in')
-                      }}
-                    >
-                      Log out
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </ul>
-      </nav>
-    </div>
+                </DropdownMenuGroup>
+              </>
+            )}
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Theme</DropdownMenuLabel>
+              <DropdownMenuRadioGroup
+                value={theme}
+                onValueChange={(value) => {
+                  setTheme(value)
+                }}
+              >
+                {singleThemes.map((theme: Theme) => (
+                  <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                    {theme.name}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuGroup>
+            {IS_PLATFORM && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    onSelect={async () => {
+                      await signOut()
+                      await router.push('/sign-in')
+                    }}
+                  >
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </ul>
+    </>
   )
 }
 

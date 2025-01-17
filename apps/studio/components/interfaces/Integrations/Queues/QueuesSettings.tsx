@@ -12,11 +12,15 @@ import {
   FormPanelContent,
   FormPanelFooter,
 } from 'components/ui/Forms/FormPanel'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
 import {
   QUEUES_SCHEMA,
   useDatabaseQueueToggleExposeMutation,
 } from 'data/database-queues/database-queues-toggle-postgrest-mutation'
+import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
@@ -28,12 +32,8 @@ import {
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useTablesQuery } from 'data/tables/tables-query'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 // [Joshen] Not convinced with the UI and layout but getting the functionality out first
 
@@ -179,7 +179,7 @@ export const QueuesSettings = () => {
         <FormHeader
           className="mb-0"
           title="Settings"
-          description="Manage your queues via any client library or PostgREST endpoints"
+          description="Manage your queues via any client library or Data APIs endpoints"
         />
         <Form_Shadcn_ {...form}>
           <form id="pgmq-postgrest" onSubmit={form.handleSubmit(onSubmit)}>
@@ -206,7 +206,7 @@ export const QueuesSettings = () => {
                               <code className="text-xs">send_batch</code>,{' '}
                               <code className="text-xs">read</code>,{' '}
                               <code className="text-xs">pop</code>,
-                              <code className="text-xs">archive</code>, and
+                              <code className="text-xs">archive</code>, and{' '}
                               <code className="text-xs">delete</code>
                             </p>
                           </>

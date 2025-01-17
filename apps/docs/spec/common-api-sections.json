@@ -298,6 +298,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-push-a-branch",
+        "title": "Push a branch",
+        "slug": "v1-push-a-branch",
+        "type": "operation"
+      },
+      {
         "id": "v1-reset-a-branch",
         "title": "Reset a branch",
         "slug": "v1-reset-a-branch",
@@ -325,6 +331,12 @@
         "id": "v1-exchange-oauth-token",
         "title": "Exchange oauth token",
         "slug": "v1-exchange-oauth-token",
+        "type": "operation"
+      },
+      {
+        "id": "v1-revoke-token",
+        "title": "Revoke token",
+        "slug": "v1-revoke-token",
         "type": "operation"
       }
     ]
@@ -363,6 +375,12 @@
     "type": "category",
     "title": "Projects",
     "items": [
+      {
+        "id": "v1-cancel-a-project-restoration",
+        "title": "Cancel a project restoration",
+        "slug": "v1-cancel-a-project-restoration",
+        "type": "operation"
+      },
       {
         "id": "v1-create-a-project",
         "title": "Create a project",
@@ -421,6 +439,24 @@
         "id": "v1-list-all-projects",
         "title": "List all projects",
         "slug": "v1-list-all-projects",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-available-restore-versions",
+        "title": "List available restore versions",
+        "slug": "v1-list-available-restore-versions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-pause-a-project",
+        "title": "Pause a project",
+        "slug": "v1-pause-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-restore-a-project",
+        "title": "Restore a project",
+        "slug": "v1-restore-a-project",
         "type": "operation"
       },
       {

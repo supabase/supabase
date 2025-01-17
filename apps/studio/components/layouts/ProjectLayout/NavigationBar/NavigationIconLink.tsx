@@ -23,10 +23,13 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
   ({ route, isActive = false, onClick = noop, ...props }, ref) => {
     const snap = useAppStateSnapshot()
 
-    const [allowNavPanelToExpand] = useLocalStorageQuery(
+    const [storedAllowNavPanel] = useLocalStorageQuery(
       LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
       true
     )
+    // Don't allow the nav panel to expand in playwright tests
+    const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
+
     const iconClasses = [
       'absolute left-0 top-0 flex rounded items-center h-10 w-10 items-center justify-center text-foreground-lighter', // Layout
       'group-hover/item:text-foreground-light',
@@ -36,7 +39,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
 
     const classes = [
       'relative',
-      'h-10 w-10 group-data-[state=expanded]:w-full',
+      'h-10 w-full md:w-10 md:group-data-[state=expanded]:w-full',
       'transition-all duration-200',
       'flex items-center rounded',
       'group-data-[state=collapsed]:justify-center',
@@ -80,8 +83,8 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
             'min-w-[128px] text-sm text-foreground-light',
             'group-hover/item:text-foreground',
             'group-aria-current/item:text-foreground',
-            'absolute left-7 group-data-[state=expanded]:left-12',
-            'opacity-0 group-data-[state=expanded]:opacity-100',
+            'absolute left-10 md:left-7 md:group-data-[state=expanded]:left-12',
+            'opacity-100 md:opacity-0 md:group-data-[state=expanded]:opacity-100',
             `${isActive && 'text-foreground hover:text-foreground'}`,
             'transition-all'
           )}

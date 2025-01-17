@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
-import { FileText, Info } from 'lucide-react'
+import { ArrowDown, FileText, Info, X } from 'lucide-react'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -24,7 +24,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
-import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import uuidv4 from 'lib/uuid'
 import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -44,13 +44,13 @@ import DotGrid from '../DotGrid'
 import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
+import { useAutoScroll } from './hooks'
 
 const MemoizedMessage = memo(
   ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
     return (
       <Message
         key={message.id}
-        id={message.id}
         role={message.role}
         content={message.content}
         readOnly={message.role === 'user'}
@@ -85,18 +85,16 @@ export const AIAssistant = ({
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
-  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { aiAssistantPanel, setAiAssistantPanel, saveLatestMessage } = useAppStateSnapshot()
   const { open, initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const bottomRef = useRef<HTMLDivElement>(null)
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
 
   const [value, setValue] = useState<string>(initialInput)
   const [assistantError, setAssistantError] = useState<string>()
   const [lastSentMessage, setLastSentMessage] = useState<MessageType>()
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
-  const [showFade, setShowFade] = useState(false)
 
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -118,13 +116,6 @@ export const AIAssistant = ({
   const currentSchema = searchParams?.get('schema') ?? 'public'
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const sendTelemetryEvent = (value: string) => {
-    sendEvent({
-      value,
-      action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
-      ...((sqlSnippets ?? []).length > 0 ? { label: 'context-added' } : {}),
-    })
-  }
 
   const {
     messages: chatMessages,
@@ -143,11 +134,7 @@ export const AIAssistant = ({
       schema: currentSchema,
       table: currentTable?.name,
     },
-    onFinish: (message) => {
-      setAiAssistantPanel({
-        messages: [...chatMessages, message],
-      })
-    },
+    onFinish: (message) => saveLatestMessage(message),
   })
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
@@ -195,10 +182,18 @@ export const AIAssistant = ({
     setLastSentMessage(payload)
 
     if (content.includes('Help me to debug')) {
-      sendTelemetryEvent(TELEMETRY_VALUES.DEBUG_SUBMITTED)
+      sendEvent({
+        action: TelemetryActions.ASSISTANT_DEBUG_SUBMITTED,
+      })
     } else {
-      sendTelemetryEvent(TELEMETRY_VALUES.PROMPT_SUBMITTED)
+      sendEvent({
+        action: TelemetryActions.ASSISTANT_PROMPT_SUBMITTED,
+      })
     }
+  }
+
+  const closeAssistant = () => {
+    setAiAssistantPanel({ open: false })
   }
 
   const confirmOptInToShareSchemaData = async () => {
@@ -225,37 +220,16 @@ export const AIAssistant = ({
     )
   }
 
-  const handleScroll = () => {
-    const container = scrollContainerRef.current
-    if (container) {
-      const scrollPercentage =
-        (container.scrollTop / (container.scrollHeight - container.clientHeight)) * 100
-      const isScrollable = container.scrollHeight > container.clientHeight
-      const isAtBottom = scrollPercentage >= 100
-
-      setShowFade(isScrollable && !isAtBottom)
-    }
-  }
-
-  // Add useEffect to set up scroll listener
+  // Update scroll behavior for new messages
   useEffect(() => {
-    // Use a small delay to ensure container is mounted and has content
-    const timeoutId = setTimeout(() => {
-      const container = scrollContainerRef.current
-      if (container) {
-        container.addEventListener('scroll', handleScroll)
-        handleScroll()
-      }
-    }, 100)
-
-    return () => {
-      clearTimeout(timeoutId)
-      const container = scrollContainerRef.current
-      if (container) {
-        container.removeEventListener('scroll', handleScroll)
-      }
+    if (!isChatLoading) {
+      if (inputRef.current) inputRef.current.focus()
     }
-  }, [])
+
+    if (isSticky) {
+      setTimeout(scrollToEnd, 0)
+    }
+  }, [isChatLoading, isSticky, scrollToEnd, messages])
 
   useEffect(() => {
     setValue(initialInput)
@@ -264,30 +238,6 @@ export const AIAssistant = ({
       inputRef.current.setSelectionRange(initialInput.length, initialInput.length)
     }
   }, [initialInput])
-
-  useEffect(() => {
-    if (!isChatLoading) {
-      if (inputRef.current) inputRef.current.focus()
-    }
-
-    setTimeout(
-      () => {
-        if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
-      },
-      isChatLoading ? 100 : 500
-    )
-  }, [isChatLoading])
-
-  useEffect(() => {
-    if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
-    handleScroll()
-    // Load messages into state
-    if (!isChatLoading) {
-      setAiAssistantPanel({
-        messages,
-      })
-    }
-  }, [messages, isChatLoading, setAiAssistantPanel])
 
   // Remove suggestions if sqlSnippets were removed
   useEffect(() => {
@@ -306,11 +256,7 @@ export const AIAssistant = ({
   return (
     <>
       <div className={cn('flex flex-col h-full', className)}>
-        <div
-          ref={scrollContainerRef}
-          className={cn('flex-grow overflow-auto flex flex-col')}
-          onScroll={handleScroll}
-        >
+        <div ref={scrollContainerRef} className={cn('flex-grow overflow-auto flex flex-col')}>
           <div className="z-30 sticky top-0">
             <div className="border-b flex items-center bg gap-x-3 px-5 h-[46px]">
               <AiIconAnimation allowHoverEffect />
@@ -328,15 +274,17 @@ export const AIAssistant = ({
                       : 'Project metadata is not being shared. Opt in to improve Assistant responses.'}
                   </TooltipContent_Shadcn_>
                 </Tooltip_Shadcn_>
-
-                {(hasMessages || suggestions || sqlSnippets) && (
-                  <Button type="default" disabled={isChatLoading} onClick={onResetConversation}>
-                    Reset
-                  </Button>
-                )}
+                <div className="flex gap-2">
+                  {(hasMessages || suggestions || sqlSnippets) && (
+                    <Button type="default" disabled={isChatLoading} onClick={onResetConversation}>
+                      Reset
+                    </Button>
+                  )}
+                  <Button type="default" className="w-7" onClick={closeAssistant} icon={<X />} />
+                </div>
               </div>
             </div>
-            {!includeSchemaMetadata && (
+            {!includeSchemaMetadata && selectedOrganization && (
               <Admonition
                 type="default"
                 title="Project metadata is not shared"
@@ -345,7 +293,7 @@ export const AIAssistant = ({
                     ? 'Your organization has the HIPAA addon and will not send any project metadata with your prompts.'
                     : 'The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions.'
                 }
-                className="border-0 border-b rounded-none"
+                className="border-0 border-b rounded-none bg-background"
               >
                 {!hasHipaaAddon && (
                   <Button
@@ -395,7 +343,7 @@ export const AIAssistant = ({
                   </motion.div>
                 </div>
               )}
-              <div ref={bottomRef} className="h-1" />
+              <div className="h-1" />
             </motion.div>
           ) : suggestions ? (
             <div className="w-full h-full px-8 py-0 flex flex-col flex-1 justify-end">
@@ -484,16 +432,41 @@ export const AIAssistant = ({
             </div>
           )}
         </div>
+
         <AnimatePresence>
-          {showFade && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="pointer-events-none z-10 -mt-24"
-            >
-              <div className="h-24 w-full bg-gradient-to-t from-background muted to-transparent" />
-            </motion.div>
+          {!isSticky && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="pointer-events-none z-10 -mt-24"
+              >
+                <div className="h-24 w-full bg-gradient-to-t from-background to-transparent" />
+              </motion.div>
+              <motion.div
+                className="absolute bottom-20 left-1/2 -translate-x-1/2"
+                variants={{
+                  hidden: { y: 5, opacity: 0 },
+                  show: { y: 0, opacity: 1 },
+                }}
+                transition={{ duration: 0.1 }}
+                initial="hidden"
+                animate="show"
+                exit="hidden"
+              >
+                <Button
+                  type="default"
+                  className="rounded-full w-8 h-8 p-1.5"
+                  onClick={() => {
+                    scrollToEnd()
+                    if (inputRef.current) inputRef.current.focus()
+                  }}
+                >
+                  <ArrowDown size={16} />
+                </Button>
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
 
@@ -530,7 +503,9 @@ export const AIAssistant = ({
               title="OpenAI API key not set"
               description={
                 <Markdown
-                  content={'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'}
+                  content={
+                    'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
+                  }
                 />
               }
             />
@@ -561,6 +536,7 @@ export const AIAssistant = ({
                     .join('\n') || ''
                 const valueWithSnippets = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
                 sendMessageToAssistant(valueWithSnippets)
+                scrollToEnd()
               } else {
                 sendMessageToAssistant(value)
               }

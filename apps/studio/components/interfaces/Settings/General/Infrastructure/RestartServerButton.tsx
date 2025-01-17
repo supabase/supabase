@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -13,7 +14,6 @@ import { useProjectRestartServicesMutation } from 'data/projects/project-restart
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
-import { ChevronDown } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -23,6 +23,7 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
+  cn,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
@@ -92,7 +93,10 @@ const RestartServerButton = () => {
           <div className="flex items-center">
             <Button
               type="default"
-              className={`px-3 ${canRestartProject && isProjectActive ? 'rounded-r-none' : ''}`}
+              className={cn(
+                'px-3 hover:z-10',
+                canRestartProject && isProjectActive ? 'rounded-r-none' : ''
+              )}
               disabled={
                 project === undefined ||
                 !canRestartProject ||
@@ -108,7 +112,7 @@ const RestartServerButton = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     type="default"
-                    className="rounded-l-none px-[4px] py-[5px]"
+                    className="rounded-l-none px-[4px] py-[5px] -ml-[1px]"
                     icon={<ChevronDown />}
                     disabled={!canRestartProject}
                   />

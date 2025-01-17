@@ -5,7 +5,7 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { Tabs, Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import TemplateEditor from './TemplateEditor'
@@ -39,7 +39,11 @@ const EmailTemplates = () => {
       {isError && (
         <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
       )}
-      {isLoading && <GenericSkeletonLoader />}
+      {isLoading && (
+        <div className="w-[854px]">
+          <GenericSkeletonLoader />
+        </div>
+      )}
       {isSuccess && (
         <FormPanel>
           <Tabs_Shadcn_ defaultValue={TEMPLATES_SCHEMAS[0].title.trim().replace(/\s+/g, '-')}>
