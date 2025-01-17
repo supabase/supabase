@@ -8,6 +8,7 @@ import { RestrictionBanner } from 'components/layouts/AppLayout/RestrictionBanne
 import { getTheme } from 'components/ui/CodeEditor/CodeEditor.utils'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
+import { ClockSkewBanner } from 'components/layouts/AppLayout/ClockSkewBanner'
 
 const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const monaco = useMonaco()
@@ -32,6 +33,7 @@ const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
         {ongoingIncident && <IncidentBanner />}
         {showNoticeBanner && <NoticeBanner />}
         {profile !== undefined && <RestrictionBanner />}
+        <ClockSkewBanner />
       </div>
       {children}
     </div>
