@@ -60,7 +60,7 @@ export const GridResize = ({
       cols={LAYOUT_COLUMN_COUNT}
       containerPadding={[0, 0]}
       resizeHandles={['sw', 'se']}
-      compactType="horizontal"
+      compactType="vertical"
       onDragStop={onUpdateLayout}
       onResizeStop={onUpdateLayout}
     >
