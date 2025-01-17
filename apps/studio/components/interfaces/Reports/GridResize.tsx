@@ -30,7 +30,7 @@ export const GridResize = ({
   onUpdateChart,
   setEditableReport,
 }: GridResizeProps) => {
-  const onDragStop = (layout: RGL.Layout[]) => {
+  const onUpdateLayout = (layout: RGL.Layout[]) => {
     const updatedLayout = [...editableReport.layout]
 
     layout.forEach((chart) => {
@@ -61,11 +61,15 @@ export const GridResize = ({
       containerPadding={[0, 0]}
       resizeHandles={['sw', 'se']}
       compactType="horizontal"
-      onDragStop={onDragStop}
+      onDragStop={onUpdateLayout}
+      onResizeStop={onUpdateLayout}
     >
       {editableReport.layout.map((item) => {
         return (
-          <div key={item.id} data-grid={{ ...item, minH: 4, maxH: 4, minW: 8 }}>
+          <div
+            key={item.id}
+            data-grid={{ ...item, minH: 1, maxH: 1, minW: 1, maxW: LAYOUT_COLUMN_COUNT }}
+          >
             <ReportChartBlock
               key={item.id}
               item={item}
