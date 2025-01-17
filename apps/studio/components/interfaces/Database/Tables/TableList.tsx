@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
@@ -406,27 +405,16 @@ const TableList = ({
                       <Table.td>
                         {/* only show tooltips if required, to reduce noise */}
                         {x.name.length > 20 ? (
-                          <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-                            <Tooltip.Trigger
+                          <Tooltip_Shadcn_ disableHoverableContent={true}>
+                            <TooltipTrigger_Shadcn_
                               asChild
                               className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
                             >
                               <p>{x.name}</p>
-                            </Tooltip.Trigger>
-                            <Tooltip.Portal>
-                              <Tooltip.Content side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs text-foreground">{x.name}</span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
-                          </Tooltip.Root>
+                            </TooltipTrigger_Shadcn_>
+
+                            <TooltipContent_Shadcn_ side="bottom">{x.name}</TooltipContent_Shadcn_>
+                          </Tooltip_Shadcn_>
                         ) : (
                           <p>{x.name}</p>
                         )}
