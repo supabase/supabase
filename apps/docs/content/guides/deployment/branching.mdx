@@ -26,6 +26,13 @@ If you understand Git, you already understand Supabase Branching.
 
 You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials.
 
+Preview Environments pause automatically after <SharedData data="config">branching.inactivity_period_in_minutes</SharedData> minutes of inactivity. Upon receiving a new request to your database or REST API, the paused branch will automatically resume to serve the request. The implications of this architecture means
+
+- Larger variance in request latency due to database cold starts.
+- `pg_cron` jobs will not execute in an auto-paused database.
+
+If you need higher performance guarantees on your Preview Environment, you can switch individual branches to [persistent](/docs/guides/deployment/branching#persistent-branches).
+
 <Image
   zoomable
   className="max-w-[700px] !mx-auto"
