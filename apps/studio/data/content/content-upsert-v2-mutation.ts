@@ -8,7 +8,7 @@ import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
 export type UpsertContentPayloadV2 = Omit<
-  components['schemas']['UpsertContentBodyV2'],
+  components['schemas']['UpsertContentBodyDto'],
   'content'
 > & {
   content: Content['content']
@@ -24,7 +24,6 @@ export async function upsertContent(
   signal?: AbortSignal
 ) {
   const { data, error } = await put('/platform/projects/{ref}/content', {
-    // @ts-ignore API codegen is wrong, any is also cause of API codegen being unable to handle versioning
     params: { path: { ref: projectRef } },
     body: payload as any,
     headers: { Version: '2' },
@@ -56,13 +55,13 @@ export const useContentUpsertV2Mutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         if (invalidateQueriesOnSuccess) {
-          await queryClient.invalidateQueries(contentKeys.list(projectRef))
+          await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
         }
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to insert content: ${data.message}`)
+          toast.error(`Failed to upsert content: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
