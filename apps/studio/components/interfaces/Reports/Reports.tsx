@@ -19,7 +19,7 @@ import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { Dashboards } from 'types'
-import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { GridResize } from './GridResize'
 import { MetricOptions } from './MetricOptions'
@@ -57,6 +57,10 @@ const Reports = () => {
 
   const currentReport = userContents?.content.find((report) => report.id === id)
   const currentReportContent = currentReport?.content as Dashboards.Content
+  const showDatePicker = !!config?.layout.some(
+    (x) => x.provider === 'daily-stats' || x.provider === 'infra-monitoring'
+  )
+
   const canReadReport = useCheckPermissions(PermissionAction.READ, 'user_content', {
     resource: {
       type: 'report',
@@ -262,29 +266,36 @@ const Reports = () => {
           </div>
         )}
       </div>
-      <div className="mb-4 flex items-center justify-between space-x-3">
-        <div className="flex items-center space-x-3">
-          <DateRangePicker
-            onChange={handleDateRangePicker}
-            value="7d"
-            options={TIME_PERIODS_REPORTS}
-            loading={isLoading}
-          />
+      <div
+        className={cn(
+          'mb-4 flex items-center gap-x-3',
+          showDatePicker ? 'justify-between' : 'justify-end'
+        )}
+      >
+        {showDatePicker && (
+          <div className="flex items-center gap-x-3">
+            <DateRangePicker
+              onChange={handleDateRangePicker}
+              value="7d"
+              options={TIME_PERIODS_REPORTS}
+              loading={isLoading}
+            />
 
-          {startDate && endDate && (
-            <div className="hidden items-center space-x-1 lg:flex ">
-              <span className="text-sm text-foreground-light">
-                {dayjs(startDate).format('MMM D, YYYY')}
-              </span>
-              <span className="text-foreground-lighter">
-                <ArrowRight size={12} />
-              </span>
-              <span className="text-sm text-foreground-light">
-                {dayjs(endDate).format('MMM D, YYYY')}
-              </span>
-            </div>
-          )}
-        </div>
+            {startDate && endDate && (
+              <div className="hidden items-center space-x-1 lg:flex ">
+                <span className="text-sm text-foreground-light">
+                  {dayjs(startDate).format('MMM D, YYYY')}
+                </span>
+                <span className="text-foreground-lighter">
+                  <ArrowRight size={12} />
+                </span>
+                <span className="text-sm text-foreground-light">
+                  {dayjs(endDate).format('MMM D, YYYY')}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="flex items-center gap-x-2">
           {canUpdateReport ? (
