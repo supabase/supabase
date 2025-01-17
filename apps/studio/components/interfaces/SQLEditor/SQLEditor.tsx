@@ -26,8 +26,8 @@ import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { detectOS, uuidv4 } from 'lib/helpers'
 import { TelemetryActions } from 'lib/constants/telemetry'
+import { detectOS, uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { format } from 'sql-formatter'
@@ -227,7 +227,7 @@ export const SQLEditor = () => {
       const selection = editor.getSelection()
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
       const sql = snippet
-        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
         : selectedValue || editorRef.current?.getValue()
       formatQuery(
         {
@@ -267,7 +267,7 @@ export const SQLEditor = () => {
         const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
         const sql = snippet
-          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
           : selectedValue || editorRef.current?.getValue()
 
         let queryHasIssues = false
@@ -320,6 +320,7 @@ export const SQLEditor = () => {
           }),
           autoLimit: appendAutoLimit ? limit : undefined,
           isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+          contextualInvalidation: true,
           handleError: (error) => {
             throw error
           },
@@ -373,7 +374,9 @@ export const SQLEditor = () => {
       const result = snapV2.results[id]?.[0]
       appSnap.setAiAssistantPanel({
         open: true,
-        sqlSnippets: [snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim()],
+        sqlSnippets: [
+          (snippet.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),
+        ],
         initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
       })
     } catch (error: unknown) {
@@ -419,7 +422,10 @@ export const SQLEditor = () => {
         }
       }
 
-      sendEvent({ action: TelemetryActions.ASSISTANT_SUGGESTION_ACCEPTED })
+      sendEvent({
+        action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
+        properties: { handlerAccepted: true },
+      })
 
       setSelectedDiffType(DiffType.Modification)
       resetPrompt()
@@ -440,7 +446,10 @@ export const SQLEditor = () => {
   ])
 
   const discardAiHandler = useCallback(() => {
-    sendEvent({ action: TelemetryActions.ASSISTANT_SUGGESTION_REJECTED })
+    sendEvent({
+      action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
+      properties: { handlerAccepted: false },
+    })
     resetPrompt()
     closeDiff()
   }, [closeDiff, resetPrompt, sendEvent])

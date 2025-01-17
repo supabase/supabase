@@ -113,7 +113,7 @@ const Usage = () => {
   return (
     <>
       <ScaffoldContainer className="sticky top-0 border-b bg-studio z-10 overflow-hidden">
-        <div className="py-4 flex items-center space-x-4">
+        <div className="py-4 flex flex-col md:flex-row md:items-center gap-4">
           {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
 
           {isErrorSubscription && (
@@ -138,7 +138,7 @@ const Usage = () => {
               <Listbox
                 size="tiny"
                 name="schema"
-                className="w-[180px]"
+                className="w-full md:w-[180px]"
                 value={selectedProjectRef}
                 onChange={(value: any) => {
                   if (value === 'all-projects') setSelectedProjectRef(undefined)

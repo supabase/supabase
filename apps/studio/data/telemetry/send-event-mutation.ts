@@ -13,12 +13,38 @@ import {
   CronJobHistoryClickedEvent,
   CronJobUpdateClickedEvent,
   CronJobUpdatedEvent,
-  TelemetryActions,
+  FeaturePreviewsClickedEvent,
+  FeaturePreviewEnabledEvent,
+  FeaturePreviewDisabledEvent,
+  SqlEditorQuickstartClickedEvent,
+  SqlEditorTemplateClickedEvent,
+  SqlEditorResultDownloadCsvClickedEvent,
+  SqlEditorResultCopyMarkdownClickedEvent,
+  SqlEditorResultCopyJsonClickedEvent,
+  SignUpEvent,
+  SignInEvent,
+  RealtimeInspectorListenChannelClickedEvent,
+  RealtimeInspectorBroadcastSentEvent,
+  RealtimeInspectorMessageClickedEvent,
+  RealtimeInspectorCopyMessageClickedEvent,
+  RealtimeInspectorFiltersAppliedEvent,
+  RealtimeInspectorDatabaseRoleUpdatedEvent,
+  ProjectCreationInitialStepPromptIntendedEvent,
+  ProjectCreationInitialStepSubmittedEvent,
+  ProjectCreationSecondStepPromptIntendedEvent,
+  ProjectCreationSecondStepSubmittedEvent,
+  AssistantPromptSubmittedEvent,
+  AssistantDebugSubmittedEvent,
+  AssistantSuggestionRunQueryClickedEvent,
+  AssistantSqlDiffHandlerEvaluatedEvent,
+  AssistantEditInSqlEditorClickedEvent,
 } from 'lib/constants/telemetry'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
 export type SendEventVariables =
+  | SignUpEvent
+  | SignInEvent
   | ConnectionStringCopiedEvent
   | CronJobCreatedEvent
   | CronJobUpdatedEvent
@@ -27,14 +53,31 @@ export type SendEventVariables =
   | CronJobUpdateClickedEvent
   | CronJobDeleteClickedEvent
   | CronJobHistoryClickedEvent
+  | FeaturePreviewsClickedEvent
+  | FeaturePreviewEnabledEvent
+  | FeaturePreviewDisabledEvent
+  | ProjectCreationInitialStepPromptIntendedEvent
+  | ProjectCreationInitialStepSubmittedEvent
+  | ProjectCreationSecondStepPromptIntendedEvent
+  | ProjectCreationSecondStepSubmittedEvent
+  | RealtimeInspectorListenChannelClickedEvent
+  | RealtimeInspectorBroadcastSentEvent
+  | RealtimeInspectorMessageClickedEvent
+  | RealtimeInspectorCopyMessageClickedEvent
+  | RealtimeInspectorFiltersAppliedEvent
+  | RealtimeInspectorDatabaseRoleUpdatedEvent
+  | SqlEditorQuickstartClickedEvent
+  | SqlEditorTemplateClickedEvent
+  | SqlEditorResultDownloadCsvClickedEvent
+  | SqlEditorResultCopyMarkdownClickedEvent
+  | SqlEditorResultCopyJsonClickedEvent
+  | AssistantPromptSubmittedEvent
+  | AssistantDebugSubmittedEvent
+  | AssistantSuggestionRunQueryClickedEvent
+  | AssistantSqlDiffHandlerEvaluatedEvent
+  | AssistantEditInSqlEditorClickedEvent
 
-  // TODO remove this once all events are documented
-  | {
-      action: TelemetryActions
-      properties?: Record<string, any> // Is arbitrary, but always aim to be self-explanatory with custom properties
-    }
-
-type SendEventPayload = components['schemas']['TelemetryEventBodyV2']
+type SendEventPayload = components['schemas']['TelemetryEventBodyV2Dto']
 
 export async function sendEvent({ body }: { body: SendEventPayload }) {
   const consent =

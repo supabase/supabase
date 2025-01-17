@@ -13,7 +13,6 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Button, cn } from 'ui'
-import LogEventChart from './LogEventChart'
 import LogTable from './LogTable'
 import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
@@ -21,6 +20,8 @@ import { ensureNoTimestampConflict, maybeShowUpgradePrompt } from './Logs.utils'
 import UpgradePrompt from './UpgradePrompt'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import useSingleLog from 'hooks/analytics/useSingleLog'
+import { LogsBarChart } from 'ui-patterns/LogsBarChart'
+import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 
 /**
  * Acts as a container component for the entire log display
@@ -39,6 +40,7 @@ interface LogsPreviewerProps {
   condensedLayout?: boolean
   tableName?: LogsTableName
   EmptyState?: React.ReactNode
+  filterPanelClassName?: string
 }
 export const LogsPreviewer = ({
   projectRef,
@@ -48,6 +50,7 @@ export const LogsPreviewer = ({
   tableName,
   children,
   EmptyState,
+  filterPanelClassName,
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
   const { s, ite, its, db } = useParams()
@@ -90,21 +93,6 @@ export const LogsPreviewer = ({
   const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
     params.iso_timestamp_start as string
   )
-
-  useEffect(() => {
-    setFilters((prev) => ({
-      ...prev,
-      search_query: s,
-      database: db,
-    }))
-    if (ite || its) {
-      setParams((prev) => ({
-        ...prev,
-        iso_timestamp_start: its || '',
-        iso_timestamp_end: ite || '',
-      }))
-    }
-  }, [db, s, ite, its])
 
   // Show the prompt on page load based on query params
   useEffect(() => {
@@ -150,6 +138,7 @@ export const LogsPreviewer = ({
   }
   const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
     if (event === 'search-input-change') {
+      setSelectedLogId(null)
       setFilters((prev) => ({ ...prev, search_query: query }))
       router.push({
         pathname: router.pathname,
@@ -199,6 +188,7 @@ export const LogsPreviewer = ({
   return (
     <div className="flex-1 flex flex-col h-full">
       <PreviewFilterPanel
+        className={filterPanelClassName}
         csvData={logData}
         isLoading={isLoading}
         newCount={newCount}
@@ -235,23 +225,28 @@ export const LogsPreviewer = ({
       <div
         className={
           'transition-all duration-500 ' +
-          (showChart && logData.length > 0 ? 'mb-4 h-28 opacity-100' : 'h-0 opacity-0')
+          (showChart && logData.length > 0 ? 'mb-2 mt-1 opacity-100' : 'h-0 opacity-0')
         }
       >
         <div className={condensedLayout ? 'px-3' : ''}>
           {showChart && (
-            <LogEventChart
-              className={cn({
-                'opacity-40': isLoading,
-              })}
+            <LogsBarChart
               data={eventChartData}
-              onBarClick={(isoTimestamp) => {
+              onBarClick={(datum) => {
+                if (!datum?.timestamp) return
                 handleSearch('event-chart-bar-click', {
                   query: filters.search_query as string,
-                  to: isoTimestamp as string,
+                  to: datum.timestamp.toString(),
                   from: null,
                 })
               }}
+              EmptyState={
+                <NoDataPlaceholder
+                  message={'No data'}
+                  description="It may take up to 24 hours for data to refresh"
+                  size={'tiny'}
+                />
+              }
             />
           )}
         </div>

@@ -2,7 +2,8 @@ import { noop } from 'lodash'
 import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -26,17 +27,17 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import { useAppStateSnapshot } from 'state/app-state'
 
 interface DatabaseSelectorProps {
+  selectedDatabaseId?: string // To override initial state
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   additionalOptions?: { id: string; name: string }[]
-  onSelectId?: (id: string) => void // Optional callback
-
   buttonProps?: ButtonProps
+  onSelectId?: (id: string) => void // Optional callback
 }
 
 const DatabaseSelector = ({
+  selectedDatabaseId: _selectedDatabaseId,
   variant = 'regular',
   additionalOptions = [],
   onSelectId = noop,
@@ -45,10 +46,10 @@ const DatabaseSelector = ({
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
+  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
-  const appState = useAppStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
-  const selectedDatabaseId = state.selectedDatabaseId
+  const selectedDatabaseId = _selectedDatabaseId ?? state.selectedDatabaseId
 
   const { data, isLoading, isSuccess } = useReadReplicasQuery({ projectRef })
   const databases = data ?? []
@@ -61,6 +62,11 @@ const DatabaseSelector = ({
   const formattedDatabaseId = formatDatabaseID(selectedDatabaseId ?? '')
 
   const selectedAdditionalOption = additionalOptions.find((x) => x.id === selectedDatabaseId)
+
+  useEffect(() => {
+    if (_selectedDatabaseId) state.setSelectedDatabaseId(_selectedDatabaseId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [_selectedDatabaseId])
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -206,7 +212,7 @@ const DatabaseSelector = ({
                   onClick={() => {
                     setOpen(false)
                     // [Joshen] This is used in the Connect UI which is available across all pages
-                    appState.setShowConnectDialog(false)
+                    setShowConnect(null)
                   }}
                   className="w-full flex items-center gap-2"
                 >

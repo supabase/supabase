@@ -4,9 +4,9 @@
 # Can also specify a regex that is compatible with the [Rust regex crate](https://docs.rs/regex/latest/regex/).
 may_uppercase = [
     "[A-Z0-9]{2,5}s?",
+    "APIs",
     "Add-ons?",
     "Amazon RDS",
-    "APIs",
     "Analytics",
     "Android",
     "Angular",
@@ -41,6 +41,7 @@ may_uppercase = [
     "Dart",
     "Dashboard",
     "Database Functions?",
+    "Deadpool",
     "Deno",
     "DigitalOcean",
     "Discord",
@@ -133,6 +134,7 @@ may_uppercase = [
     "PostgreSQL",
     "PostgREST",
     "Presence",
+    "Prisma",
     "Prometheus",
     "Python",
     "Queues?",
@@ -166,6 +168,7 @@ may_uppercase = [
     "Storage",
     "Studio",
     "Supabase",
+    "Supabase AI Assistant",
     "Supabase Marketplace",
     "Supavisor('s)?",
     "Svelte",
@@ -195,6 +198,7 @@ may_uppercase = [
     "Vercel Marketplace",
     "Visual Studio Code",
     "Vue",
+    "Wasm",
     "Web",
     "WebAssembly",
     "WebP",
@@ -210,4 +214,4 @@ may_uppercase = [
 
 # Words that may be lowercased even if they are the first word in the sentence.
 # Can also specify a regex that is compatible with the [Rust regex crate](https://docs.rs/regex/latest/regex/).
-may_lowercase = ["iOS"]
+may_lowercase = ["asyncpg", "iOS"]

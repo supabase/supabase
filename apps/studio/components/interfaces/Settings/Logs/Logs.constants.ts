@@ -350,6 +350,9 @@ export const SQL_FILTER_TEMPLATES: any = {
     ..._SQL_FILTER_COMMON,
     database: (value: string) => `m.project like '${value}%'`,
   },
+  pg_cron_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
 }
 
 export enum LogsTableName {
@@ -670,6 +673,16 @@ export const LOGS_TAILWIND_CLASSES = {
 }
 
 export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
+  {
+    text: 'Last 15 minutes',
+    calcFrom: () => dayjs().subtract(15, 'minute').startOf('minute').toISOString(),
+    calcTo: () => '',
+  },
+  {
+    text: 'Last 30 minutes',
+    calcFrom: () => dayjs().subtract(30, 'minute').startOf('minute').toISOString(),
+    calcTo: () => '',
+  },
   {
     text: 'Last hour',
     calcFrom: () => dayjs().subtract(1, 'hour').startOf('hour').toISOString(),

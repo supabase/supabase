@@ -15,7 +15,6 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import {
-  Alert,
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -29,6 +28,7 @@ import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
 import { Markdown } from 'components/interfaces/Markdown'
+import { Admonition } from 'ui-patterns'
 
 export interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
@@ -205,7 +205,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
         <button
           ref={ref}
           type="button"
-          className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
+          className="group flex w-full items-center justify-between rounded py-3 px-4 text-foreground"
         >
           <div className="flex items-center gap-3">
             <ChevronUp
@@ -246,8 +246,8 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
           return (
             <Collapsible.Content>
-              <div className="group border-t border-strong bg-surface-100 py-6 px-6 text-foreground">
-                <div className="mx-auto my-6 max-w-lg space-y-6">
+              <div className="group border-t border-strong bg-surface-100 py-6 px-4 md:px-6 text-foreground">
+                <div className="mx-auto my-2 md:my-6 max-w-lg space-y-6">
                   {showAlert(provider.title)}
                   {Object.keys(provider.properties).map((x: string) => (
                     <FormField
@@ -264,9 +264,15 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                   ))}
 
                   {provider?.misc?.alert && (
-                    <Alert title={provider.misc.alert.title} variant="warning" withIcon>
-                      <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
-                    </Alert>
+                    <Admonition
+                      type="warning"
+                      title={provider.misc.alert.title}
+                      description={
+                        <>
+                          <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
+                        </>
+                      }
+                    />
                   )}
 
                   {provider.misc.requiresRedirect && (

@@ -1,13 +1,21 @@
-import { Eye, EyeOff, RefreshCw, Search, Terminal } from 'lucide-react'
+import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, Input, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
+import {
+  Button,
+  Input,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+} from 'ui'
 import DatePickers from './Logs.DatePickers'
 import {
   FILTER_OPTIONS,
@@ -38,6 +46,7 @@ interface PreviewFilterPanelProps {
   onFiltersChange: (filters: Filters) => void
   filters: Filters
   onSelectedDatabaseChange: (id: string) => void
+  className?: string
 }
 
 /**
@@ -61,6 +70,7 @@ const PreviewFilterPanel = ({
   filters,
   table,
   onSelectedDatabaseChange,
+  className,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -81,7 +91,7 @@ const PreviewFilterPanel = ({
   }, [defaultSearchValue])
 
   const RefreshButton = () => (
-    <Tooltip_Shadcn_ delayDuration={100}>
+    <Tooltip_Shadcn_>
       <TooltipTrigger_Shadcn_ asChild>
         <Button
           title="refresh"
@@ -121,7 +131,13 @@ const PreviewFilterPanel = ({
   const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
 
   return (
-    <div className={'flex w-full items-center justify-between' + (condensedLayout ? ' p-3' : '')}>
+    <div
+      className={cn(
+        'flex w-full items-center justify-between',
+        condensedLayout ? ' p-3' : '',
+        className
+      )}
+    >
       <div className="flex flex-row items-center gap-x-2">
         <form
           id="log-panel-search"
@@ -147,14 +163,27 @@ const PreviewFilterPanel = ({
             }
             value={search}
             actions={
-              hasEdits && (
-                <button
-                  onClick={() => handleInputSearch(search)}
-                  className="mx-2 text-foreground-light hover:text-foreground"
-                >
-                  {'↲'}
-                </button>
-              )
+              <div className="flex items-center gap-x-1 mr-0.5">
+                {hasEdits && (
+                  <ButtonTooltip
+                    icon={<span>↲</span>}
+                    type="text"
+                    className="px-1 h-[20px]"
+                    onClick={() => handleInputSearch(search)}
+                    tooltip={{ content: { side: 'bottom', text: 'Search for events' } }}
+                  />
+                )}
+
+                {search.length > 0 && (
+                  <ButtonTooltip
+                    icon={<X />}
+                    type="text"
+                    className="p-[1px] h-[20px]"
+                    onClick={() => handleInputSearch('')}
+                    tooltip={{ content: { side: 'bottom', text: 'Clear search' } }}
+                  />
+                )}
+              </div>
             }
           />
         </form>
@@ -210,7 +239,7 @@ const PreviewFilterPanel = ({
 
       {showDatabaseSelector ? (
         <div className="flex items-center justify-center gap-x-2">
-          <Tooltip_Shadcn_ delayDuration={100}>
+          <Tooltip_Shadcn_>
             <TooltipTrigger_Shadcn_ asChild>
               <Button asChild className="px-1.5" type="default" icon={<Terminal />}>
                 <Link href={queryUrl} />

@@ -332,6 +332,10 @@ export interface paths {
     /** Retrieves a list of available Postgres versions available to the organization */
     post: operations['OrganizationSlugController_getAvailableImageVersions']
   }
+  '/platform/organizations/{slug}/billing/credits/top-up': {
+    /** Tops up the credit balance */
+    post: operations['OrgCreditsController_createTopUp']
+  }
   '/platform/organizations/{slug}/billing/invoices': {
     /** Gets invoices for the given organization */
     get: operations['OrgInvoicesController_getInvoices']
@@ -619,14 +623,6 @@ export interface paths {
     /** Searches project pg.tables. Return maximum 50 results. */
     post: operations['SearchController_searchTables']
   }
-  '/platform/pg-meta/{ref}/table-privileges': {
-    /** Retrieve table privileges */
-    get: operations['TablePrivilegesController_getTablePrivileges']
-    /** Grant table privileges */
-    post: operations['TablePrivilegesController_grantTablePrivileges']
-    /** Revoke table privileges */
-    delete: operations['TablePrivilegesController_revokeTablePrivileges']
-  }
   '/platform/pg-meta/{ref}/tables': {
     /** Gets project pg.tables or pg.table with the given ID */
     get: operations['TablesController_getTables']
@@ -692,10 +688,6 @@ export interface paths {
   '/platform/profile/search': {
     /** Search profiles by username, email with the given keywords */
     post: operations['SearchProfileController_searchProfile']
-  }
-  '/platform/profile/subscriptions': {
-    /** Gets the user's subscription statistics */
-    get: operations['SubscriptionsController_getSubscriptionsStatistics']
   }
   '/platform/projects': {
     /**
@@ -866,15 +858,12 @@ export interface paths {
     patch: operations['v1-update-supavisor-config']
   }
   '/platform/projects/{ref}/content': {
-    /**
-     * Gets project's content
-     * @deprecated
-     */
+    /** Gets project's content */
     get: operations['ContentController_getContent']
     /** Updates project's content */
-    put: operations['ContentController_updateWholeContentV2']
+    put: operations['ContentController_updateWholeContent']
     /** Creates project's content */
-    post: operations['ContentController_createContentV2']
+    post: operations['ContentController_createContent']
     /** Deletes project's contents */
     delete: operations['ContentController_deleteContents']
     /**
@@ -884,8 +873,8 @@ export interface paths {
     patch: operations['ContentController_updateContent']
   }
   '/platform/projects/{ref}/content/count': {
-    /** Gets the count of a user's content by type */
-    get: operations['ContentController_getContentCount']
+    /** Gets the user's content counts */
+    get: operations['ContentController_getContentCountV2']
   }
   '/platform/projects/{ref}/content/folders': {
     /** Gets project's content root folder */
@@ -1155,7 +1144,7 @@ export interface paths {
   }
   '/platform/telemetry/page-leave': {
     /** Send analytics page leave event */
-    post: operations['TelemetryPageLeaveController_pageLeave']
+    post: operations['TelemetryPageLeaveController_trackPageLeave']
   }
   '/platform/telemetry/reset': {
     /** Reset analytics */
@@ -1685,14 +1674,6 @@ export interface paths {
     /** Searches project pg.tables. Return maximum 50 results. */
     post: operations['SearchController_searchTables']
   }
-  '/v0/pg-meta/{ref}/table-privileges': {
-    /** Retrieve table privileges */
-    get: operations['TablePrivilegesController_getTablePrivileges']
-    /** Grant table privileges */
-    post: operations['TablePrivilegesController_grantTablePrivileges']
-    /** Revoke table privileges */
-    delete: operations['TablePrivilegesController_revokeTablePrivileges']
-  }
   '/v0/pg-meta/{ref}/tables': {
     /** Gets project pg.tables or pg.table with the given ID */
     get: operations['TablesController_getTables']
@@ -1883,15 +1864,12 @@ export interface paths {
     patch: operations['v1-update-supavisor-config']
   }
   '/v0/projects/{ref}/content': {
-    /**
-     * Gets project's content
-     * @deprecated
-     */
+    /** Gets project's content */
     get: operations['ContentController_getContent']
     /** Updates project's content */
-    put: operations['ContentController_updateWholeContentV2']
+    put: operations['ContentController_updateWholeContent']
     /** Creates project's content */
-    post: operations['ContentController_createContentV2']
+    post: operations['ContentController_createContent']
     /** Deletes project's contents */
     delete: operations['ContentController_deleteContents']
     /**
@@ -1901,8 +1879,8 @@ export interface paths {
     patch: operations['ContentController_updateContent']
   }
   '/v0/projects/{ref}/content/count': {
-    /** Gets the count of a user's content by type */
-    get: operations['ContentController_getContentCount']
+    /** Gets the user's content counts */
+    get: operations['ContentController_getContentCountV2']
   }
   '/v0/projects/{ref}/content/item/{id}': {
     /** Gets project's content by the given id */
@@ -2149,6 +2127,10 @@ export interface paths {
     /** Deletes the given project */
     delete: operations['v1-delete-a-project']
   }
+  '/v1/projects/{ref}/analytics/endpoints/logs.all': {
+    /** Gets project's logs */
+    get: operations['V1ProjectLogsController_getLogs']
+  }
   '/v1/projects/{ref}/api-keys': {
     /** Get project api keys */
     get: operations['v1-get-project-api-keys']
@@ -2355,6 +2337,16 @@ export interface paths {
   '/v1/projects/{ref}/readonly/temporary-disable': {
     /** Disables project's readonly mode for the next 15 minutes */
     post: operations['v1-disable-readonly-mode-temporarily']
+  }
+  '/v1/projects/{ref}/restore': {
+    /** Lists available restore versions for the given project */
+    get: operations['v1-list-available-restore-versions']
+    /** Restores the given project */
+    post: operations['v1-restore-a-project']
+  }
+  '/v1/projects/{ref}/restore/cancel': {
+    /** Cancels the given project restoration */
+    post: operations['v1-cancel-a-project-restoration']
   }
   '/v1/projects/{ref}/secrets': {
     /**
@@ -2806,19 +2798,19 @@ export interface components {
       release_channel: string
       /** @enum {string} */
       status:
+        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
+        | 'UNKNOWN'
         | 'GOING_DOWN'
-        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTARTING'
-        | 'UNKNOWN'
+        | 'RESTORING'
         | 'UPGRADING'
         | 'PAUSING'
-        | 'RESTORING'
         | 'RESTORE_FAILED'
+        | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
     }
@@ -2861,6 +2853,19 @@ export interface components {
       messages: Record<string, never>[]
       result: components['schemas']['CustomHostnameDetails']
       success: boolean
+    }
+    CloneBackupsResponse: {
+      backups: components['schemas']['Backup'][]
+      physicalBackupData: {
+        earliestPhysicalBackupDateUnix?: number
+        latestPhysicalBackupDateUnix?: number
+      }
+      pitr_enabled: boolean
+      region: string
+      target_compute_size: string
+      target_volume_size_gb: number
+      tierKey: string
+      walg_enabled: boolean
     }
     CloneProjectDto: {
       /** @default 0 */
@@ -2956,9 +2961,13 @@ export interface components {
       tableId: number
       type: string
     }
-    CreateContentBody: {
-      content?: Record<string, never>
+    CreateContentBodyDto: {
+      content?: {
+        [key: string]: unknown
+      }
       description?: string
+      /** Format: uuid */
+      folder_id?: null | string
       id?: string
       name: string
       owner_id?: number
@@ -2967,20 +2976,9 @@ export interface components {
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
     }
-    CreateContentBodyV2: {
-      content?: Record<string, never>
-      description?: string
-      folder_id?: string
-      id?: string
+    CreateContentFolderBodyDto: {
       name: string
-      owner_id?: number
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    CreateContentFolderBody: {
-      name: string
+      /** Format: uuid */
       parent_id?: string
     }
     CreateExtensionBody: {
@@ -3297,6 +3295,23 @@ export interface components {
       secret_access_key: string
       session_token: string
     }
+    CreditsTopUpRequestDto: {
+      amount: number
+      hcaptcha_token: string
+      payment_method_id: string
+    }
+    CreditsTopUpResponseDto: {
+      payment_intent_secret?: string
+      /** @enum {string} */
+      status:
+        | 'canceled'
+        | 'processing'
+        | 'requires_action'
+        | 'requires_capture'
+        | 'requires_confirmation'
+        | 'requires_payment_method'
+        | 'succeeded'
+    }
     CustomerBillingAddress: {
       city?: string
       country: string
@@ -3323,6 +3338,22 @@ export interface components {
     CustomSupabaseInternalRequests: {
       ami: components['schemas']['AmiSearchOptions']
     }
+    /** @enum {string} */
+    database_status:
+      | 'ACTIVE_HEALTHY'
+      | 'ACTIVE_UNHEALTHY'
+      | 'COMING_UP'
+      | 'GOING_DOWN'
+      | 'INIT_FAILED'
+      | 'REMOVED'
+      | 'RESTORING'
+      | 'UNKNOWN'
+      | 'INIT_READ_REPLICA'
+      | 'INIT_READ_REPLICA_FAILED'
+      | 'RESTARTING'
+      | 'RESIZING'
+    /** @enum {string} */
+    database_type: 'PRIMARY' | 'READ_REPLICA'
     DatabaseDetailResponse: {
       /** @enum {string} */
       cloud_provider: 'AWS' | 'FLY'
@@ -3346,27 +3377,11 @@ export interface components {
         | 'REMOVED'
         | 'RESTORING'
         | 'UNKNOWN'
-        | 'UPGRADING'
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
         | 'RESTARTING'
         | 'RESIZING'
     }
-    /** @enum {string} */
-    DatabaseStatus:
-      | 'ACTIVE_HEALTHY'
-      | 'ACTIVE_UNHEALTHY'
-      | 'COMING_UP'
-      | 'GOING_DOWN'
-      | 'INIT_FAILED'
-      | 'REMOVED'
-      | 'RESTORING'
-      | 'UNKNOWN'
-      | 'UPGRADING'
-      | 'INIT_READ_REPLICA'
-      | 'INIT_READ_REPLICA_FAILED'
-      | 'RESTARTING'
-      | 'RESIZING'
     DatabaseStatusResponse: {
       identifier: string
       replicaInitializationStatus?: Record<string, never>
@@ -3380,14 +3395,11 @@ export interface components {
         | 'REMOVED'
         | 'RESTORING'
         | 'UNKNOWN'
-        | 'UPGRADING'
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
         | 'RESTARTING'
         | 'RESIZING'
     }
-    /** @enum {string} */
-    DatabaseType: 'PRIMARY' | 'READ_REPLICA'
     DatabaseUpgradeStatus: {
       /** @enum {string} */
       error?:
@@ -3673,6 +3685,11 @@ export interface components {
     GetContentCountResponse: {
       count: number
     }
+    GetContentCountV2Response: {
+      favorites: number
+      private: number
+      shared: number
+    }
     GetMetricsBody: {
       /** @enum {string} */
       interval: '1d' | '3d' | '7d'
@@ -3741,6 +3758,9 @@ export interface components {
       }
       updated_at: string
     }
+    GetProjectAvailableRestoreVersionsResponse: {
+      available_versions: components['schemas']['ProjectAvailableRestoreVersion'][]
+    }
     GetProjectByFlyExtensionIdResponse: {
       ref: string
     }
@@ -3794,7 +3814,7 @@ export interface components {
       content: Record<string, never>
       description?: string
       favorite: boolean | null
-      folder_id?: string
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -3808,6 +3828,7 @@ export interface components {
       visibility: 'user' | 'project' | 'org' | 'public'
     }
     GetUserContentFolderResponse: {
+      cursor?: string
       data: {
         contents?: components['schemas']['UserContentObjectMeta'][]
         folders?: components['schemas']['UserContentFolder'][]
@@ -3816,6 +3837,8 @@ export interface components {
     GetUserContentObject: {
       content: Record<string, never>
       description?: string
+      favorite?: boolean | null
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -3837,6 +3860,7 @@ export interface components {
       visibility: 'user' | 'project' | 'org' | 'public'
     }
     GetUserContentResponse: {
+      cursor?: string
       data: components['schemas']['GetUserContentObject'][]
     }
     GetUserOrganizationIntegrationResponse: {
@@ -4055,21 +4079,6 @@ export interface components {
       is_grantable?: boolean
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
-    }
-    GrantTablePrivilegesBody: {
-      grantee: string
-      is_grantable?: boolean
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-      relation_id: number
     }
     HCaptchaBody: {
       hcaptchaToken: string
@@ -4410,19 +4419,19 @@ export interface components {
        * @enum {string}
        */
       status:
+        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
+        | 'UNKNOWN'
         | 'GOING_DOWN'
-        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTARTING'
-        | 'UNKNOWN'
+        | 'RESTORING'
         | 'UPGRADING'
         | 'PAUSING'
-        | 'RESTORING'
         | 'RESTORE_FAILED'
+        | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
       /**
@@ -4506,7 +4515,7 @@ export interface components {
     }
     OrganizationSlugResponse: {
       billing_email: string | null
-      billing_metadata?: Record<string, never>
+      billing_metadata: unknown
       has_oriole_project: boolean
       id: number
       name: string
@@ -4813,12 +4822,6 @@ export interface components {
       schema: string
       size: string
     }
-    PostgresTablePrivileges: {
-      kind: string
-      name: string
-      privileges: components['schemas']['TablePrivilege'][]
-      schema: string
-    }
     PostgrestConfigResponse: {
       db_anon_role: string
       db_extra_search_path: string
@@ -4929,6 +4932,23 @@ export interface components {
       username: string
     }
     /** @enum {string} */
+    project_status:
+      | 'INACTIVE'
+      | 'ACTIVE_HEALTHY'
+      | 'ACTIVE_UNHEALTHY'
+      | 'COMING_UP'
+      | 'UNKNOWN'
+      | 'GOING_DOWN'
+      | 'INIT_FAILED'
+      | 'REMOVED'
+      | 'RESTORING'
+      | 'UPGRADING'
+      | 'PAUSING'
+      | 'RESTORE_FAILED'
+      | 'RESTARTING'
+      | 'PAUSE_FAILED'
+      | 'RESIZING'
+    /** @enum {string} */
     ProjectAddonPricingInterval: 'monthly' | 'hourly'
     ProjectAddonsResponse: {
       available_addons: components['schemas']['AvailableAddonResponse'][]
@@ -4965,8 +4985,17 @@ export interface components {
       db_schema: string
       endpoint: string
     }
+    ProjectAvailableRestoreVersion: {
+      /** @enum {string} */
+      postgres_engine: '13' | '14' | '15' | '17-oriole'
+      /** @enum {string} */
+      release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+      version: string
+    }
     ProjectClonedResponse: {
       source_project_ref: string
+      target_disk_size_gb: number
+      target_instance_size: string
       target_project_ref: string
     }
     ProjectClonedStatusResponse: {
@@ -4990,8 +5019,8 @@ export interface components {
       identifier: string
       infra_compute_size?: components['schemas']['DbInstanceSize']
       region: string
-      status: components['schemas']['DatabaseStatus']
-      type: components['schemas']['DatabaseType']
+      status: components['schemas']['database_status']
+      type: components['schemas']['database_type']
     }
     ProjectDetailResponse: {
       cloud_provider: string
@@ -5013,19 +5042,19 @@ export interface components {
       restUrl: string
       /** @enum {string} */
       status:
+        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
+        | 'UNKNOWN'
         | 'GOING_DOWN'
-        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTARTING'
-        | 'UNKNOWN'
+        | 'RESTORING'
         | 'UPGRADING'
         | 'PAUSING'
-        | 'RESTORING'
         | 'RESTORE_FAILED'
+        | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
       subscription_id: string
@@ -5177,32 +5206,13 @@ export interface components {
       region: string
       service_api_keys?: components['schemas']['ProjectServiceApiKeyResponse'][]
       ssl_enforced: boolean
-      is_sensitive?: boolean
       status: string
     }
-    ProjectSensitivitySettingResponse: {
-      is_sensitive: boolean
-    }
-    /** @enum {string} */
-    ProjectStatus:
-      | 'ACTIVE_HEALTHY'
-      | 'ACTIVE_UNHEALTHY'
-      | 'COMING_UP'
-      | 'GOING_DOWN'
-      | 'INACTIVE'
-      | 'INIT_FAILED'
-      | 'REMOVED'
-      | 'RESTARTING'
-      | 'UNKNOWN'
-      | 'UPGRADING'
-      | 'PAUSING'
-      | 'RESTORING'
-      | 'RESTORE_FAILED'
-      | 'PAUSE_FAILED'
-      | 'RESIZING'
     ProjectUnpauseVersionInfo: {
-      postgres_engine: components['schemas']['PostgresEngine']
-      release_channel: components['schemas']['ReleaseChannel']
+      /** @enum {string} */
+      postgres_engine: '13' | '14' | '15' | '17-oriole'
+      /** @enum {string} */
+      release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       version: string
     }
     ProjectUpgradeEligibilityResponse: {
@@ -5230,7 +5240,7 @@ export interface components {
       name: string
       ref: string
       region: string
-      status: components['schemas']['ProjectStatus']
+      status: components['schemas']['project_status']
     }
     Provider: {
       created_at?: string
@@ -5296,7 +5306,6 @@ export interface components {
         | 'REMOVED'
         | 'RESTORING'
         | 'UNKNOWN'
-        | 'UPGRADING'
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
         | 'RESTARTING'
@@ -5370,19 +5379,19 @@ export interface components {
        * @enum {string}
        */
       status:
+        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
+        | 'UNKNOWN'
         | 'GOING_DOWN'
-        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTARTING'
-        | 'UNKNOWN'
+        | 'RESTORING'
         | 'UPGRADING'
         | 'PAUSING'
-        | 'RESTORING'
         | 'RESTORE_FAILED'
+        | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
       /**
@@ -5426,6 +5435,18 @@ export interface components {
       id: number
       recovery_time_target: string
     }
+    RestoreProjectBodyDto: {
+      /**
+       * @description Postgres engine version. If not provided, the latest version from the given release channel will be used.
+       * @enum {string}
+       */
+      postgres_engine?: '15' | '17-oriole'
+      /**
+       * @description Release channel version. If not provided, GeneralAvailability will be used.
+       * @enum {string}
+       */
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+    }
     RestrictionData: {
       grace_period_end?: string
       report_date?: string
@@ -5457,20 +5478,6 @@ export interface components {
       grantee: string
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
-    }
-    RevokeTablePrivilegesBody: {
-      grantee: string
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-      relation_id: number
     }
     RunQueryBody: {
       query: string
@@ -5674,10 +5681,11 @@ export interface components {
       sql: string
     }
     SnippetList: {
+      cursor?: string
       data: components['schemas']['SnippetMeta'][]
     }
     SnippetMeta: {
-      description?: string
+      description: string | null
       id: string
       inserted_at: string
       name: string
@@ -5697,7 +5705,7 @@ export interface components {
     }
     SnippetResponse: {
       content: components['schemas']['SnippetContent']
-      description?: string
+      description: string | null
       id: string
       inserted_at: string
       name: string
@@ -5748,6 +5756,10 @@ export interface components {
     }
     StorageFeatures: {
       imageTransformation: components['schemas']['StorageFeatureImageTransformation']
+      s3Protocol: components['schemas']['StorageFeatureS3Protocol']
+    }
+    StorageFeatureS3Protocol: {
+      enabled: boolean
     }
     StorageObject: {
       bucket_id: string
@@ -5781,16 +5793,6 @@ export interface components {
     }
     SubdomainAvailabilityResponse: {
       available: boolean
-    }
-    SubscriptionStatisticsResponse: {
-      total_active_free_projects: number
-      total_enterprise_projects: number
-      total_free_projects: number
-      total_paid_projects: number
-      total_paused_free_projects: number
-      total_payg_projects: number
-      total_pro_projects: number
-      total_team_projects: number
     }
     SupavisorConfigResponse: {
       connectionString: string
@@ -5883,22 +5885,8 @@ export interface components {
       name: string
       schema: string
     }
-    TablePrivilege: {
-      grantee: string
-      grantor: string
-      is_grantable: boolean
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-    }
     TargetClonedProject: {
+      name: string
       ref: string
     }
     TargetCloneStatus: {
@@ -5921,21 +5909,22 @@ export interface components {
     TelemetryCallFeatureFlagsResponseDto: {
       [key: string]: unknown
     }
-    TelemetryEventBodyV2: {
+    TelemetryEventBodyV2Dto: {
       action: string
-      custom_properties: Record<string, never>
+      custom_properties: {
+        [key: string]: unknown
+      }
       page_title: string
       page_url: string
       pathname: string
-      ph: components['schemas']['TelemetryEventPostHog']
-    }
-    TelemetryEventPostHog: {
-      language: string
-      referrer: string
-      search: string
-      user_agent: string
-      viewport_height: number
-      viewport_width: number
+      ph: {
+        language: string
+        referrer: string
+        search: string
+        user_agent: string
+        viewport_height: number
+        viewport_width: number
+      }
     }
     TelemetryFeatureFlagBodyDto: {
       feature_flag_name: string
@@ -5954,24 +5943,29 @@ export interface components {
       project_ref?: string
       user_id: string
     }
-    TelemetryPageBodyV2: {
+    TelemetryPageBodyV2Dto: {
+      feature_flags?: {
+        [key: string]: unknown
+      }
       page_title: string
       page_url: string
       pathname: string
-      ph: components['schemas']['TelemetryPagePostHog']
+      ph: {
+        language: string
+        referrer: string
+        search: string
+        user_agent: string
+        viewport_height: number
+        viewport_width: number
+      }
     }
-    TelemetryPageLeaveBody: {
+    TelemetryPageLeaveBodyDto: {
+      feature_flags?: {
+        [key: string]: unknown
+      }
       page_title: string
       page_url: string
       pathname: string
-    }
-    TelemetryPagePostHog: {
-      language: string
-      referrer: string
-      search: string
-      user_agent: string
-      viewport_height: number
-      viewport_width: number
     }
     ThirdPartyAuth: {
       custom_jwks?: unknown
@@ -5998,11 +5992,19 @@ export interface components {
     UnpauseProjectAvailableVersionsResponse: {
       available_versions: components['schemas']['ProjectUnpauseVersionInfo'][]
     }
-    UnpauseProjectBody: {
-      postgres_engine?: components['schemas']['PostgresEngine']
-      release_channel?: components['schemas']['ReleaseChannel']
+    UnpauseProjectBodyDto: {
+      /**
+       * @description Postgres engine version. If not provided, the latest version from the given release channel will be used.
+       * @enum {string}
+       */
+      postgres_engine?: '15' | '17-oriole'
+      /**
+       * @description Release channel version. If not provided, GeneralAvailability will be used.
+       * @enum {string}
+       */
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
     }
-    UnpauseProjectInfo: {
+    UnpauseProjectResponse: {
       back_ups: components['schemas']['BackupId'][]
       cloud_provider: string
       id: number
@@ -6241,9 +6243,13 @@ export interface components {
       name?: string
       type?: string
     }
-    UpdateContentBody: {
-      content?: Record<string, never>
+    UpdateContentBodyDto: {
+      content?: {
+        [key: string]: unknown
+      }
       description?: string
+      /** Format: uuid */
+      folder_id?: null | string
       id?: string
       name?: string
       owner_id?: number
@@ -6252,7 +6258,7 @@ export interface components {
       /** @enum {string} */
       visibility?: 'user' | 'project' | 'org' | 'public'
     }
-    UpdateContentFolderBody: {
+    UpdateContentFolderBodyDto: {
       name: string
     }
     UpdateCustomHostnameBody: {
@@ -6598,9 +6604,6 @@ export interface components {
     UpdateProjectBody: {
       name: string
     }
-    UpdateProjectSensitivityBody: {
-      is_sensitive: boolean
-    }
     UpdateProviderBody: {
       attribute_mapping?: components['schemas']['AttributeMapping']
       domains?: string[]
@@ -6775,32 +6778,24 @@ export interface components {
       updated_at?: string
     }
     UpdateVercelConnectionsBody: {
-      env_sync_targets?: ('production' | 'preview' | 'development')[]
+      /** @enum {array} */
+      env_sync_targets?: production | preview | development
       public_env_var_prefix?: string
     }
     UpgradeDatabaseBody: {
       release_channel: components['schemas']['ReleaseChannel']
       target_version: string
     }
-    UpsertContentBody: {
-      content?: Record<string, never>
+    UpsertContentBodyDto: {
+      content?: {
+        [key: string]: unknown
+      }
       description?: string
-      id?: string
+      /** Format: uuid */
+      folder_id?: null | string
+      id: string
       name: string
-      owner_id?: number
-      project_id?: number
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    UpsertContentBodyV2: {
-      content?: Record<string, never>
-      description?: string
-      folder_id?: string
-      id?: string
-      name: string
-      owner_id?: number
+      owner_id: number
       project_id?: number
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
@@ -6862,6 +6857,8 @@ export interface components {
     UserContentObject: {
       content: Record<string, never>
       description?: string
+      favorite?: boolean | null
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -6876,25 +6873,8 @@ export interface components {
     }
     UserContentObjectMeta: {
       description?: string
-      favorite: boolean | null
-      folder_id?: string
-      id: string
-      inserted_at: string
-      last_updated_by?: number
-      name: string
-      owner_id: number
-      project_id: number
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      updated_at: string
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    UserContentObjectV2: {
-      content: Record<string, never>
-      description?: string
-      favorite: boolean | null
-      folder_id?: string
+      favorite?: boolean | null
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -6910,6 +6890,26 @@ export interface components {
     UsersResponse: {
       total: number
       users: components['schemas']['UserBody'][]
+    }
+    V1AnalyticsResponse: {
+      error?: OneOf<
+        [
+          {
+            code?: number
+            errors?: {
+              domain?: string
+              location?: string
+              locationType?: string
+              message?: string
+              reason?: string
+            }[]
+            message?: string
+            status?: string
+          },
+          string,
+        ]
+      >
+      result?: Record<string, never>[]
     }
     V1Backup: {
       inserted_at: string
@@ -7071,19 +7071,19 @@ export interface components {
       region: string
       /** @enum {string} */
       status:
+        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
+        | 'UNKNOWN'
         | 'GOING_DOWN'
-        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTARTING'
-        | 'UNKNOWN'
+        | 'RESTORING'
         | 'UPGRADING'
         | 'PAUSING'
-        | 'RESTORING'
         | 'RESTORE_FAILED'
+        | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
     }
@@ -7107,19 +7107,19 @@ export interface components {
       region: string
       /** @enum {string} */
       status:
+        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
+        | 'UNKNOWN'
         | 'GOING_DOWN'
-        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTARTING'
-        | 'UNKNOWN'
+        | 'RESTORING'
         | 'UPGRADING'
         | 'PAUSING'
-        | 'RESTORING'
         | 'RESTORE_FAILED'
+        | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
     }
@@ -8108,7 +8108,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['BackupsResponse']
+          'application/json': components['schemas']['CloneBackupsResponse']
         }
       }
       /** @description Failed to list available valid backups */
@@ -8650,13 +8650,13 @@ export interface operations {
   /** Get notifications */
   NotificationsController_getNotificationsV2: {
     parameters: {
-      query: {
-        status: 'new' | 'seen' | 'archived'
-        priority: 'Critical' | 'Warning' | 'Info'
-        org_slug?: string[]
-        project_ref?: string[]
-        offset: number
-        limit: number
+      query?: {
+        limit?: string
+        offset?: string
+        priority?: 'Critical' | 'Warning' | 'Info'
+        status?: 'new' | 'seen' | 'archived'
+        org_slug?: string
+        project_ref?: string
       }
     }
     responses: {
@@ -8890,6 +8890,34 @@ export interface operations {
         content: never
       }
       /** @description Failed to determine available Postgres versions */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Tops up the credit balance */
+  OrgCreditsController_createTopUp: {
+    parameters: {
+      path: {
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreditsTopUpRequestDto']
+      }
+    }
+    responses: {
+      /** @description Top up has been successfully created. */
+      201: {
+        content: {
+          'application/json': components['schemas']['CreditsTopUpResponseDto']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to top up credit balance */
       500: {
         content: never
       }
@@ -11189,94 +11217,6 @@ export interface operations {
       }
     }
   }
-  /** Retrieve table privileges */
-  TablePrivilegesController_getTablePrivileges: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to retrieve table privileges */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Grant table privileges */
-  TablePrivilegesController_grantTablePrivileges: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GrantTablePrivilegesBody'][]
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to grant table privileges */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Revoke table privileges */
-  TablePrivilegesController_revokeTablePrivileges: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RevokeTablePrivilegesBody'][]
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to revoke table privileges */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets project pg.tables or pg.table with the given ID */
   TablesController_getTables: {
     parameters: {
@@ -11811,20 +11751,6 @@ export interface operations {
       }
     }
   }
-  /** Gets the user's subscription statistics */
-  SubscriptionsController_getSubscriptionsStatistics: {
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['SubscriptionStatisticsResponse']
-        }
-      }
-      /** @description Failed to retrieve user's subscription statistics */
-      500: {
-        content: never
-      }
-    }
-  }
   /**
    * Gets all projects that belong to the authenticated user
    * @description Only returns the minimal project info
@@ -12013,16 +11939,12 @@ export interface operations {
   /** Gets project's logs */
   LogsController_getApiPaths: {
     parameters: {
-      query: {
-        sql: string
-        project: string
-        iso_timestamp_start: string
-        iso_timestamp_end: string
-        timestamp_start: string
-        timestamp_end: string
+      query?: {
+        iso_timestamp_end?: string
+        iso_timestamp_start?: string
+        sql?: string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
@@ -12910,14 +12832,20 @@ export interface operations {
       }
     }
   }
-  /**
-   * Gets project's content
-   * @deprecated
-   */
+  /** Gets project's content */
   ContentController_getContent: {
     parameters: {
+      query?: {
+        cursor?: string
+        limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
+        visibility?: string
+        type?: 'sql' | 'report' | 'log_sql'
+        name?: string
+        favorite?: boolean
+      }
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
@@ -12934,16 +12862,15 @@ export interface operations {
     }
   }
   /** Updates project's content */
-  ContentController_updateWholeContentV2: {
+  ContentController_updateWholeContent: {
     parameters: {
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpsertContentBodyV2']
+        'application/json': components['schemas']['UpsertContentBodyDto']
       }
     }
     responses: {
@@ -12957,22 +12884,21 @@ export interface operations {
     }
   }
   /** Creates project's content */
-  ContentController_createContentV2: {
+  ContentController_createContent: {
     parameters: {
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateContentBodyV2']
+        'application/json': components['schemas']['CreateContentBodyDto']
       }
     }
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['UserContentObjectV2']
+          'application/json': components['schemas']['UserContentObject']
         }
       }
       /** @description Failed to create project's content */
@@ -12988,7 +12914,6 @@ export interface operations {
         ids: string[]
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
@@ -13013,10 +12938,13 @@ export interface operations {
       query: {
         id: string
       }
+      path: {
+        ref: string
+      }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateContentBody']
+        'application/json': components['schemas']['UpdateContentBodyDto']
       }
     }
     responses: {
@@ -13031,24 +12959,24 @@ export interface operations {
       }
     }
   }
-  /** Gets the count of a user's content by type */
-  ContentController_getContentCount: {
+  /** Gets the user's content counts */
+  ContentController_getContentCountV2: {
     parameters: {
       query?: {
-        type?: string
+        type?: 'sql' | 'report' | 'log_sql'
+        name?: string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['GetContentCountResponse']
+          'application/json': components['schemas']['GetContentCountV2Response']
         }
       }
-      /** @description Failed to retrieve user's content count */
+      /** @description Failed to retrieve user's content counts */
       500: {
         content: never
       }
@@ -13058,10 +12986,15 @@ export interface operations {
   ContentFoldersController_getRootFolder: {
     parameters: {
       query?: {
+        cursor?: string
+        limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
+        visibility?: string
         type?: 'sql' | 'report' | 'log_sql'
+        name?: string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
@@ -13081,13 +13014,12 @@ export interface operations {
   ContentFoldersController_createFolder: {
     parameters: {
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateContentFolderBody']
+        'application/json': components['schemas']['CreateContentFolderBodyDto']
       }
     }
     responses: {
@@ -13108,6 +13040,9 @@ export interface operations {
       query: {
         ids: string[]
       }
+      path: {
+        ref: string
+      }
     }
     responses: {
       200: {
@@ -13122,11 +13057,17 @@ export interface operations {
   /** Gets project's content folder */
   ContentFoldersController_getFolder: {
     parameters: {
+      query?: {
+        cursor?: string
+        limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
+        name?: string
+      }
       path: {
-        /** @description Project ref */
-        ref: string
         /** @description Content folder id */
         id: string
+        ref: string
       }
     }
     responses: {
@@ -13145,15 +13086,14 @@ export interface operations {
   ContentFoldersController_updateFolder: {
     parameters: {
       path: {
-        /** @description Project ref */
-        ref: string
         /** @description Content folder id */
         id: string
+        ref: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateContentFolderBody']
+        'application/json': components['schemas']['UpdateContentFolderBodyDto']
       }
     }
     responses: {
@@ -13170,10 +13110,8 @@ export interface operations {
   ContentController_getContentById: {
     parameters: {
       path: {
-        /** @description Project ref */
-        ref: string
-        /** @description Content id */
         id: string
+        ref: string
       }
     }
     responses: {
@@ -13624,19 +13562,18 @@ export interface operations {
   UnpauseController_unpauseProject: {
     parameters: {
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UnpauseProjectBody']
+        'application/json': components['schemas']['UnpauseProjectBodyDto']
       }
     }
     responses: {
-      201: {
+      200: {
         content: {
-          'application/json': components['schemas']['UnpauseProjectInfo']
+          'application/json': components['schemas']['UnpauseProjectResponse']
         }
       }
       403: {
@@ -13652,12 +13589,11 @@ export interface operations {
   UnpauseController_cancelProjectRestoration: {
     parameters: {
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
     responses: {
-      201: {
+      200: {
         content: {
           'application/json': components['schemas']['RestoreCancellation']
         }
@@ -13675,7 +13611,6 @@ export interface operations {
   UnpauseController_getAvailableImageVersions: {
     parameters: {
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
@@ -13749,30 +13684,29 @@ export interface operations {
       }
     }
   }
-  /** Update project's sensitivity settings */
-  SettingsController_patchProjectSensitivity: {
+  /** Updates the given project sensitivity */
+  SensitivityController_updateProjectSensitivity: {
     parameters: {
       path: {
         /** @description Project ref */
         ref: string
-      } 
+      }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateProjectSensitivityBody']
+        'application/json': components['schemas']['MarkSensitiveBody']
       }
     }
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['ProjectSensitivitySettingResponse']
+          'application/json': components['schemas']['ProjectSensitivityResponse']
         }
       }
-      /** @description Failed to update project's sensitivity setting */
-      404: {
+      403: {
         content: never
       }
-      /** @description Failed to update project's sensitivity setting */
+      /** @description Failed to update project */
       500: {
         content: never
       }
@@ -14520,7 +14454,7 @@ export interface operations {
   TelemetryEventController_sendServerEventV2: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryEventBodyV2']
+        'application/json': components['schemas']['TelemetryEventBodyV2Dto']
       }
     }
     responses: {
@@ -14620,7 +14554,7 @@ export interface operations {
   TelemetryPageController_sendServerPageV2: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryPageBodyV2']
+        'application/json': components['schemas']['TelemetryPageBodyV2Dto']
       }
     }
     responses: {
@@ -14634,13 +14568,17 @@ export interface operations {
     }
   }
   /** Send analytics page leave event */
-  TelemetryPageLeaveController_pageLeave: {
+  TelemetryPageLeaveController_trackPageLeave: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryPageLeaveBody']
+        'application/json': components['schemas']['TelemetryPageLeaveBodyDto']
       }
     }
     responses: {
+      /** @description Page leave event sent */
+      200: {
+        content: never
+      }
       201: {
         content: never
       }
@@ -16225,6 +16163,29 @@ export interface operations {
       }
     }
   }
+  /** Gets project's logs */
+  V1ProjectLogsController_getLogs: {
+    parameters: {
+      query?: {
+        iso_timestamp_end?: string
+        iso_timestamp_start?: string
+        sql?: string
+      }
+      path: {
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['V1AnalyticsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
   /** Get project api keys */
   'v1-get-project-api-keys': {
     parameters: {
@@ -17335,6 +17296,61 @@ export interface operations {
       }
     }
   }
+  /** Lists available restore versions for the given project */
+  'v1-list-available-restore-versions': {
+    parameters: {
+      path: {
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetProjectAvailableRestoreVersionsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Restores the given project */
+  'v1-restore-a-project': {
+    parameters: {
+      path: {
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RestoreProjectBodyDto']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Cancels the given project restoration */
+  'v1-cancel-a-project-restoration': {
+    parameters: {
+      path: {
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+    }
+  }
   /** [Beta] Get project's SSL enforcement configuration. */
   'v1-get-ssl-enforcement-config': {
     parameters: {
@@ -17619,6 +17635,10 @@ export interface operations {
   'v1-list-all-snippets': {
     parameters: {
       query?: {
+        cursor?: string
+        limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
         project_ref?: string
       }
     }

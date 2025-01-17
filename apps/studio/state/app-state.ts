@@ -68,7 +68,6 @@ const getInitialState = () => {
       showGenerateSqlModal: false,
       navigationPanelOpen: false,
       navigationPanelJustClosed: false,
-      showConnectDialog: false,
     }
   }
 
@@ -112,7 +111,6 @@ const getInitialState = () => {
     showGenerateSqlModal: false,
     navigationPanelOpen: false,
     navigationPanelJustClosed: false,
-    showConnectDialog: false,
   }
 }
 
@@ -213,9 +211,11 @@ export const appState = proxy({
     }
   },
 
-  showConnectDialog: false,
-  setShowConnectDialog: (value: boolean) => {
-    appState.showConnectDialog = value
+  saveLatestMessage: (message: any) => {
+    appState.aiAssistantPanel = {
+      ...appState.aiAssistantPanel,
+      messages: [...appState.aiAssistantPanel.messages, message],
+    }
   },
 })
 

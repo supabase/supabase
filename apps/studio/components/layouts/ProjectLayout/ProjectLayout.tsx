@@ -1,14 +1,6 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import {
-  forwardRef,
-  Fragment,
-  PropsWithChildren,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
@@ -22,16 +14,17 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup, Sheet, SheetContent } from 'ui'
+import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
-import NavigationBar from './NavigationBar/NavigationBar'
 import MobileNavigationBar from './NavigationBar/MobileNavigationBar'
 import MobileViewNav from './NavigationBar/MobileViewNav'
+import NavigationBar from './NavigationBar/NavigationBar'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
@@ -42,7 +35,6 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -98,6 +90,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     ref
   ) => {
     const router = useRouter()
+    const [isClient, setIsClient] = useState(false)
     const [isSheetOpen, setIsSheetOpen] = useState(false)
     const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
@@ -119,7 +112,9 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
-    const [isClient, setIsClient] = useState(false)
+    const handleMobileMenu = () => {
+      setIsSheetOpen(true)
+    }
 
     useEffect(() => {
       setIsClient(true)
@@ -137,10 +132,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       return () => window.removeEventListener('keydown', handler)
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
-
-    const handleMobileMenu = () => {
-      setIsSheetOpen(true)
-    }
 
     return (
       <AppLayout>
@@ -211,13 +202,13 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                   direction="horizontal"
                   autoSaveId="project-layout-content"
                 >
-                  <ResizablePanel id="panel-content" className="w-full md:min-w-[600px]">
+                  <ResizablePanel id="panel-content" className="w-full lg:min-w-[600px]">
                     <main
                       className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
                       ref={ref}
                     >
                       {showPausedState ? (
-                        <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                        <div className="mx-auto my-8 md:my-16 w-full h-full max-w-7xl flex items-center">
                           <div className="w-full">
                             <ProjectPausedState product={product} />
                           </div>
@@ -236,8 +227,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                       <ResizablePanel
                         id="panel-assistant"
                         className={cn(
-                          'bg absolute right-0 top-[48px] bottom-0 xl:relative xl:top-0',
-                          'min-w-[400px] max-w-[500px]',
+                          'bg fixed z-40 md:absolute right-0 top-0 md:top-[48px] bottom-0 xl:relative xl:top-0',
+                          'w-screen h-[100dvh] md:h-auto md:w-auto md:min-w-[400px] max-w-[500px]',
                           '2xl:min-w-[500px] 2xl:max-w-[600px]'
                         )}
                       >

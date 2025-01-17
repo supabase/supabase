@@ -150,7 +150,7 @@ const AuditLogs = () => {
                 title="Organization Audit Logs are not available on Free or Pro plans"
               >
                 <WarningIcon />
-                <div className="flex flex-row pt-1">
+                <div className="flex flex-col md:flex-row pt-1 gap-4">
                   <div className="grow">
                     <AlertTitle_Shadcn_>
                       Organization Audit Logs are not available on Free or Pro plans

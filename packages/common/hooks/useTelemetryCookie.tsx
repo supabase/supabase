@@ -1,7 +1,8 @@
 // hooks/useTelemetryCookie.ts
-import { IS_PROD, LOCAL_STORAGE_KEYS, useTelemetryProps } from 'common'
 import { useRouter } from 'next/compat/router'
 import { useEffect } from 'react'
+import { LOCAL_STORAGE_KEYS, IS_PROD } from '../constants'
+import { useTelemetryProps } from './useTelemetryProps'
 
 interface UseTelemetryCookieProps {
   hasAcceptedConsent: boolean
