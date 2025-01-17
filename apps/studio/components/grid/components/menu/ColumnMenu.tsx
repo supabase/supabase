@@ -8,9 +8,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Separator,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { useDispatch, useTrackedState } from '../../store/Store'
 
@@ -46,19 +46,17 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
     return (
       <>
         {state.editable && onEditColumn !== undefined && (
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
+          <Tooltip>
+            <TooltipTrigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
               <DropdownMenuItem className="space-x-2" onClick={onEditColumn} disabled={isEncrypted}>
                 <Edit size={14} />
                 <p>Edit column</p>
               </DropdownMenuItem>
-            </TooltipTrigger_Shadcn_>
+            </TooltipTrigger>
             {isEncrypted && (
-              <TooltipContent_Shadcn_ side="bottom">
-                Encrypted columns cannot be edited
-              </TooltipContent_Shadcn_>
+              <TooltipContent side="bottom">Encrypted columns cannot be edited</TooltipContent>
             )}
-          </Tooltip_Shadcn_>
+          </Tooltip>
         )}
         <DropdownMenuItem
           className="space-x-2"

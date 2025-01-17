@@ -10,14 +10,7 @@ import { DatabaseExtension } from 'data/database-extensions/database-extensions-
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import { extensions } from 'shared-data'
-import {
-  Button,
-  cn,
-  Switch,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-} from 'ui'
+import { Button, cn, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import EnableExtensionModal from './EnableExtensionModal'
@@ -84,8 +77,8 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
           {isDisabling ? (
             <Loader2 className="animate-spin" size={16} />
           ) : (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_>
+            <Tooltip>
+              <TooltipTrigger>
                 <Switch
                   disabled={disabled}
                   checked={isOn}
@@ -93,17 +86,17 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                     isOn ? setIsDisableModalOpen(true) : setShowConfirmEnableModal(true)
                   }
                 />
-              </TooltipTrigger_Shadcn_>
+              </TooltipTrigger>
               {disabled && (
-                <TooltipContent_Shadcn_ side="bottom">
+                <TooltipContent side="bottom">
                   {!canUpdateExtensions
                     ? 'You need additional permissions to toggle extensions'
                     : orioleDbCheck
                       ? 'Project is using OrioleDB and cannot be disabled'
                       : null}
-                </TooltipContent_Shadcn_>
+                </TooltipContent>
               )}
-            </Tooltip_Shadcn_>
+            </Tooltip>
           )}
         </div>
 

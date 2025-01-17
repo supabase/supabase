@@ -10,7 +10,7 @@ import type { OrgSubscription } from 'data/subscriptions/types'
 import type { OrgMetricsUsage, OrgUsageResponse } from 'data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import type { ResponseError } from 'types'
-import { Button, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import SectionContent from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
 import {
@@ -100,8 +100,8 @@ const AttributeUsage = ({
                       <div className="flex items-center space-x-4">
                         <p className="text-sm">{attribute.name} usage</p>
                         {showUsageWarning && (
-                          <Tooltip_Shadcn_>
-                            <TooltipTrigger_Shadcn_ asChild>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
                               {usageRatio >= 1 ? (
                                 <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
                                   <AlertTriangle
@@ -123,8 +123,8 @@ const AttributeUsage = ({
                                   </div>
                                 )
                               )}
-                            </TooltipTrigger_Shadcn_>
-                            <TooltipContent_Shadcn_ side="bottom">
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
                               <p>
                                 Exceeding your plans included usage will lead to restrictions to
                                 your project.
@@ -133,8 +133,8 @@ const AttributeUsage = ({
                                 Upgrade to a usage-based plan or disable the spend cap to avoid
                                 restrictions.
                               </p>
-                            </TooltipContent_Shadcn_>
-                          </Tooltip_Shadcn_>
+                            </TooltipContent>
+                          </Tooltip>
                         )}
                       </div>
                     </div>

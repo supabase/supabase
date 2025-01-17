@@ -7,7 +7,7 @@ import {
   forwardRef,
   isValidElement,
 } from 'react'
-import { cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import type { Route } from 'components/ui/ui.types'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -96,12 +96,12 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
 
     if (!allowNavPanelToExpand) {
       return (
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>{linkContent}</TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="right">
+        <Tooltip>
+          <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
+          <TooltipContent side="right">
             <span>{route.label}</span>
-          </TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipContent>
+        </Tooltip>
       )
     }
 
