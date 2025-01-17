@@ -768,6 +768,10 @@ const guiQuickstarts: NavMenuSection = {
       name: 'DBeaver',
       url: '/guides/database/dbeaver',
     },
+    {
+      name: 'Metabase',
+      url: '/guides/database/metabase',
+    },
   ],
 }
 
@@ -1555,6 +1559,10 @@ export const realtime: NavMenuConstant = {
         {
           name: 'Listening to Postgres Changes with Flutter',
           url: '/guides/realtime/realtime-listening-flutter',
+        },
+        {
+          name: 'Migrate to Broadcast Changes',
+          url: '/guides/realtime/migrate-from-postgres-changes',
         },
       ],
     },

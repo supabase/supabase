@@ -78,7 +78,7 @@ const SQLQuickstarts = () => {
                 handleNewQuery(sql, title)
                 sendEvent({
                   action: TelemetryActions.SQL_EDITOR_QUICKSTART_CLICKED,
-                  properties: { title },
+                  properties: { quickstartName: title },
                 })
               }}
             />
