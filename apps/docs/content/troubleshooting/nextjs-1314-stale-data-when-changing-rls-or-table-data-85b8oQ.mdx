@@ -2,8 +2,9 @@
 title = "Next.js 13/14 stale data when changing RLS or table data."
 github_url = "https://github.com/orgs/supabase/discussions/19084"
 date_created = "2023-11-19T19:33:06+00:00"
-topics = ["auth", "platform"]
-keywords = ["cache", "rls", "next.js"]
+topics = [ "auth", "platform" ]
+keywords = [ "cache", "rls", "next.js" ]
+database_id = "9be3727b-c3ea-4dda-b30c-55f3c8aa8f35"
 ---
 
 Next.js caches urls in certain cases. This is causing users to lose lots of time debugging early on with RLS changes. Changing the table data in the UI will also not be returned in these cases.
