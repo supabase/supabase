@@ -19,6 +19,12 @@ const client = createClient<paths>({
   referrerPolicy: 'no-referrer-when-downgrade',
   headers: DEFAULT_HEADERS,
   credentials: 'include',
+  querySerializer: {
+    array: {
+      style: 'form',
+      explode: false,
+    },
+  },
 })
 
 export async function constructHeaders(headersInit?: HeadersInit | undefined) {
