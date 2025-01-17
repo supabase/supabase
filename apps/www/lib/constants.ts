@@ -25,21 +25,18 @@ export enum PRODUCT_SHORTNAMES {
   VECTOR = 'vector',
 }
 
-// Launch Weeek
+// Launch Week
 export const SAMPLE_TICKET_NUMBER = 1234
-export const SITE_URL =
+
+export const SITE_ORIGIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-    ? 'https://supabase.com/launch-week'
-    : process.env.NEXT_PUBLIC_VERCEL_URL
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/launch-week`
-      : 'http://localhost:3000/launch-week'
-export const LW_URL =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-    ? 'https://supabase.com/launch-week'
-    : process.env.NEXT_PUBLIC_VERCEL_URL
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/launch-week`
-      : 'http://localhost:3000/launch-week'
-export const SITE_ORIGIN = new URL(SITE_URL).origin
+    ? 'https://supabase.com'
+    : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
+      : 'http://localhost:3000'
+
+export const LW_URL = `${SITE_ORIGIN}/launch-week`
+
 export const TWITTER_USER_NAME = 'supabase'
 export const LW7_DATE = 'April 10th 2023'
 export const LW8_DATE = 'August 7-11'
