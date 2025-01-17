@@ -38,21 +38,41 @@ export const DEFAULT_CHART_CONFIG: ChartConfig = {
 }
 
 interface QueryBlockProps {
-  id?: string // If SQL is a snippet that's already saved
+  /** Applicable if SQL is a snippet that's already saved (Used in Reports) */
+  id?: string
+  /** Title of the QueryBlock */
   label: string
+  /** SQL query to render/run in the QueryBlock */
   sql?: string
+  /** Configuration of the output chart based on the query result */
   chartConfig?: ChartConfig
-  maxHeight?: number
+  /** Not implemented yet: Will be the next part of ReportsV2 */
   parameterValues?: Record<string, string>
-  actions?: ReactNode // Any other actions specific to the parent to be rendered in the header
-  showSql?: boolean // Toggle visiblity of SQL query on render
+  /** Any other actions specific to the parent to be rendered in the header */
+  actions?: ReactNode
+  /** Toggle visiblity of SQL query on render */
+  showSql?: boolean
+  /** Indicate if SQL query can be rendered as a chart */
   isChart?: boolean
+  /** For Assistant as QueryBlock is rendered while streaming response */
   isLoading?: boolean
+  /** Override to prevent running the SQL query provided */
   runQuery?: boolean
+  /** Prevent updating of columns for X and Y axes in the chart view */
   lockColumns?: boolean
-  disableRunIfMutation?: boolean
-  noResultPlaceholder?: ReactNode
+  /** Max height set to render results / charts (Defaults to 250) */
+  maxHeight?: number
+  /** Not implemented yet: Will be the next part of ReportsV2 */
   onSetParameter?: (params: Parameter[]) => void
+
+  // [Joshen] Params below are currently only used by ReportsV2 (Might revisit to see how to improve these)
+  /** Optional height set to render the SQL query (Used in Reports) */
+  queryHeight?: number
+  /** Override hiding Run Query button if SQL query is NOT readonly (Used in Reports) */
+  disableRunIfMutation?: boolean
+  /** UI to render if there's no query results (Used in Reports) */
+  noResultPlaceholder?: ReactNode
+  /** Optional callback whenever a chart configuration is updated (Used in Reports) */
   onUpdateChartConfig?: (config: Partial<ChartConfig>) => void
 }
 
@@ -64,6 +84,7 @@ export const QueryBlock = ({
   sql,
   chartConfig = DEFAULT_CHART_CONFIG,
   maxHeight = 250,
+  queryHeight,
   parameterValues: extParameterValues,
   actions,
   showSql: _showSql = false,
@@ -268,7 +289,10 @@ export const QueryBlock = ({
 
       {/* QueryBlock output */}
       {showSql && (
-        <div className="shrink-0 max-h-96 overflow-y-auto border-t">
+        <div
+          className="shrink-0 max-h-96 overflow-y-auto border-t"
+          style={{ height: !!queryHeight ? `${queryHeight}px` : undefined }}
+        >
           <CodeBlock
             hideLineNumbers
             wrapLines={false}

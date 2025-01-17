@@ -62,6 +62,7 @@ export const ReportChartBlock = ({
           chartConfig={chartConfig}
           sql={sql}
           maxHeight={232}
+          queryHeight={232}
           actions={
             <ButtonTooltip
               type="text"
