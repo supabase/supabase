@@ -16,7 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 
 export type ResultsDropdownProps = {
   id: string

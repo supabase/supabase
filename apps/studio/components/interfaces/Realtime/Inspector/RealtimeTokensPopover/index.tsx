@@ -6,7 +6,7 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { IS_PLATFORM } from 'lib/constants'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { RealtimeConfig } from '../useRealtimeMessages'

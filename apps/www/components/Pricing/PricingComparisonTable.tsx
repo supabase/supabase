@@ -1,16 +1,14 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import { plans } from 'shared-data/plans'
 import { pricing } from 'shared-data/pricing'
 import { Button, Select, cn } from 'ui'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
-import { Organization } from '~/data/organizations'
 import Solutions from '~/data/MainProducts'
+import { Organization } from '~/data/organizations'
 import gaEvents from '~/lib/gaEvents'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import UpgradePlan from './UpgradePlan'
 
 const MobileHeader = ({
@@ -32,11 +30,7 @@ const MobileHeader = ({
   organizations?: Organization[]
   hasExistingOrganizations?: boolean
 }) => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   const selectedPlan = plans.find((p) => p.name === plan)!
   const isUpgradablePlan = selectedPlan.name === 'Pro' || selectedPlan.name === 'Team'
@@ -93,13 +87,9 @@ const PricingComparisonTable = ({
   organizations,
   hasExistingOrganizations,
 }: PricingComparisonTableProps) => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
 
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <div

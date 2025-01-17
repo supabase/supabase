@@ -20,7 +20,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig

@@ -1,19 +1,12 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
-import gaEvents from '~/lib/gaEvents'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
-import { Button } from 'ui'
 
+import { Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import AnnouncementBadge from '~/components/Announcement/Badge'
+import gaEvents from '~/lib/gaEvents'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 const Hero = () => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <div className="relative -mt-[65px]">

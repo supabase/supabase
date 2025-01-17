@@ -6,7 +6,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { Button, cn } from 'ui'
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 
 export interface MessageSelectionProps {
   log: LogData | null

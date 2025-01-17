@@ -2,14 +2,14 @@ import { useIsLoggedIn } from 'common'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import { toast } from 'sonner'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
 import type { Profile } from 'data/profile/types'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSendIdentifyMutation } from 'data/telemetry/send-identify-mutation'
 import type { ResponseError } from 'types'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from './constants/telemetry'
 
 export type ProfileContextType = {
   profile: Profile | undefined

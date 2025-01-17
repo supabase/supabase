@@ -13,7 +13,7 @@ import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 
 const SQLTemplates = () => {
   const router = useRouter()

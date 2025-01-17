@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useFlag } from 'hooks/ui/useFlag'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'

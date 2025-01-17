@@ -13,7 +13,7 @@ import type { LogData } from './Messages.types'
 import NoChannelEmptyState from './NoChannelEmptyState'
 import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
 import { DocsButton } from 'components/ui/DocsButton'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 
 export const isErrorLog = (l: LogData) => {
   return l.message === 'SYSTEM' && l.metadata?.status === 'error'

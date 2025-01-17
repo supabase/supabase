@@ -10,7 +10,7 @@ import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useCronJobRunQuery } from 'data/database-cron-jobs/database-cron-jobs-run-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 import {
   Badge,
   Button,

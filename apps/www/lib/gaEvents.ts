@@ -1,7 +1,5 @@
-import { TelemetryEvent } from './telemetry'
-
 interface TelemetryEventType {
-  [key: string]: TelemetryEvent
+  [key: string]: any
 }
 
 const TelemetryEvents: TelemetryEventType = {

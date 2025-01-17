@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { BASE_PATH } from 'lib/constants'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { AiIconAnimation, Button, Label_Shadcn_, Textarea } from 'ui'
 
 interface SupabaseService {

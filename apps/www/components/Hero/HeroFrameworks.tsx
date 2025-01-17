@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useBreakpoint, useTelemetryProps } from 'common'
+import Link from 'next/link'
+import { useState } from 'react'
 import { cn } from 'ui'
-import Telemetry from '~/lib/telemetry'
 import { EASE_IN, EASE_OUT } from '~/lib/animations'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import SectionContainer from '../Layouts/SectionContainer'
 
 type Framework = {
@@ -106,21 +105,9 @@ const textVariants = {
 
 const HeroFrameworks = ({ className }: { className?: string }) => {
   const [activeFramework, setActiveFramework] = useState<Framework>(null!)
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps() as any
   const isXs = useBreakpoint(640)
 
-  const sendTelemetryEvent = async (gaEvent: string) => {
-    return await Telemetry.sendEvent(
-      {
-        action: gaEvent,
-        category: 'link',
-        label: '',
-      },
-      telemetryProps,
-      router
-    )
-  }
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <SectionContainer className={cn(className)} id="frameworks">

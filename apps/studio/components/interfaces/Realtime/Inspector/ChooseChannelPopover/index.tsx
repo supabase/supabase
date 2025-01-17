@@ -21,7 +21,7 @@ import {
 } from 'ui'
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { DocsButton } from 'components/ui/DocsButton'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 
 interface ChooseChannelPopoverProps {
   config: RealtimeConfig

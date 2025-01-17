@@ -8,7 +8,7 @@ import { object, string } from 'yup'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { BASE_PATH } from 'lib/constants'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
 

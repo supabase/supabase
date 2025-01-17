@@ -41,6 +41,8 @@ export enum TelemetryActions {
   SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED = 'sql_editor_result_download_csv_clicked',
   SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED = 'sql_editor_result_copy_markdown_clicked',
   SQL_EDITOR_RESULT_COPY_JSON_CLICKED = 'sql_editor_result_copy_markdown_clicked',
+
+  DOCS_FEEDBACK_CLICKED = 'docs_feedback_clicked',
 }
 
 /**
@@ -512,3 +514,55 @@ export interface AssistantEditInSqlEditorClickedEvent {
     isInNewSnippet: boolean
   }
 }
+
+/**
+ * User voted on the feedback button on a docs page. The feedback button is located at the sidebar of every docs page.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsFeedbackClickedEvent {
+  action: TelemetryActions.DOCS_FEEDBACK_CLICKED
+  properties: {
+    /**
+     * 'yes' means clicking on the tick button, 'no' means clicking on the cross button.
+     */
+    response: 'yes' | 'no'
+  }
+}
+
+export type TelemetryEvent =
+  | SignUpEvent
+  | SignInEvent
+  | ConnectionStringCopiedEvent
+  | CronJobCreatedEvent
+  | CronJobUpdatedEvent
+  | CronJobDeletedEvent
+  | CronJobCreateClickedEvent
+  | CronJobUpdateClickedEvent
+  | CronJobDeleteClickedEvent
+  | CronJobHistoryClickedEvent
+  | FeaturePreviewsClickedEvent
+  | FeaturePreviewEnabledEvent
+  | FeaturePreviewDisabledEvent
+  | ProjectCreationInitialStepPromptIntendedEvent
+  | ProjectCreationInitialStepSubmittedEvent
+  | ProjectCreationSecondStepPromptIntendedEvent
+  | ProjectCreationSecondStepSubmittedEvent
+  | RealtimeInspectorListenChannelClickedEvent
+  | RealtimeInspectorBroadcastSentEvent
+  | RealtimeInspectorMessageClickedEvent
+  | RealtimeInspectorCopyMessageClickedEvent
+  | RealtimeInspectorFiltersAppliedEvent
+  | RealtimeInspectorDatabaseRoleUpdatedEvent
+  | SqlEditorQuickstartClickedEvent
+  | SqlEditorTemplateClickedEvent
+  | SqlEditorResultDownloadCsvClickedEvent
+  | SqlEditorResultCopyMarkdownClickedEvent
+  | SqlEditorResultCopyJsonClickedEvent
+  | AssistantPromptSubmittedEvent
+  | AssistantDebugSubmittedEvent
+  | AssistantSuggestionRunQueryClickedEvent
+  | AssistantSqlDiffHandlerEvaluatedEvent
+  | AssistantEditInSqlEditorClickedEvent
+  | DocsFeedbackClickedEvent
