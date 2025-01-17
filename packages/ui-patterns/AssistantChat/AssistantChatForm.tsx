@@ -1,5 +1,6 @@
 'use client'
 
+import { useBreakpoint } from 'common'
 import { Loader2 } from 'lucide-react'
 import React, { ChangeEvent, memo, useRef } from 'react'
 import { ExpandingTextArea } from 'ui'
@@ -47,6 +48,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
   ) => {
     const formRef = useRef<HTMLFormElement>(null)
     const submitRef = useRef<HTMLButtonElement>(null)
+    const isMobile = useBreakpoint('md')
 
     /**
      * This function is used to handle the "Enter" key press
@@ -81,7 +83,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
         )}
         <ExpandingTextArea
           ref={textAreaRef}
-          autoFocus
+          autoFocus={isMobile}
           disabled={disabled}
           className={cn(icon ? 'pl-12' : '', 'text-sm pr-10 rounded-[18px]')}
           placeholder={placeholder}

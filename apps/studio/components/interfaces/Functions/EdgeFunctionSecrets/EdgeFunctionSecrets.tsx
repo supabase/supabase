@@ -57,10 +57,10 @@ const EdgeFunctionSecrets = () => {
             <NoPermission resourceText="view this project's edge function secrets" />
           ) : (
             <>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <Input
                   size="small"
-                  className="w-80"
+                  className="w-full md:w-80"
                   placeholder="Search for a secret"
                   value={searchString}
                   onChange={(e: any) => setSearchString(e.target.value)}

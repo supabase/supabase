@@ -20,14 +20,14 @@ function Panel(props: PropsWithChildren<PanelProps>) {
         'bg-surface-100',
         'rounded-md border shadow-sm',
         props.noHideOverflow ? '' : 'overflow-hidden',
-        props.noMargin ? '' : 'mb-8',
+        props.noMargin ? '' : 'mb-4 md:mb-8',
         props.className
       )}
     >
       {props.title && (
         <div
           className={cn(
-            'bg-surface-100 border-b border-default flex items-center px-6 py-4',
+            'bg-surface-100 border-b border-default flex items-center px-4 md:px-6 py-4',
             props.titleClasses
           )}
         >
@@ -37,7 +37,7 @@ function Panel(props: PropsWithChildren<PanelProps>) {
       {props.children}
       {props.footer && (
         <div className="bg-surface-100 border-t border-default">
-          <div className="flex h-12 items-center px-6">{props.footer}</div>
+          <div className="flex h-12 items-center px-4 md:px-6">{props.footer}</div>
         </div>
       )}
     </div>
@@ -51,7 +51,7 @@ function Panel(props: PropsWithChildren<PanelProps>) {
 }
 
 function Content({ children, className }: { children: ReactNode; className?: string | false }) {
-  return <div className={cn('px-6 py-4', className)}>{children}</div>
+  return <div className={cn('px-4 md:px-6 py-4', className)}>{children}</div>
 }
 
 const PanelNotice = forwardRef<
@@ -69,7 +69,7 @@ const PanelNotice = forwardRef<
       ref={ref}
       {...props}
       className={cn(
-        'relative px-6 py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center',
+        'relative mx-4 md:px-4 md:px-6 py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center',
         className
       )}
     >
