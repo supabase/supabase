@@ -123,7 +123,7 @@ Show RLS and before after for above examples.
 | ---- | --------------------------------- | -------------------------------------------------- | ------- | ------ |
 | 1    | auth.uid()=user_id                | user_id indexed                                    | 171ms   | &lt;.1 |
 | 2a   | auth.uid()=user_id                | (select auth.uid()) = user_id                      | 179     | 9      |
-| 2b   | is_admin() _table join_           | (select is_admin()) _table join_                   | 11,000  | 7      |
+| 2b   | is*admin() \_table join*          | (select is*admin()) \_table join*                  | 11,000  | 7      |
 | 2c   | is_admin() OR auth.uid()=user_id  | (select is_admin()) OR (select auth.uid()=user_id) | 11,000  | 10     |
 | 2d   | has_role()=role                   | (select has_role())=role                           | 178,000 | 12     |
 | 2e   | team_id=any(user_teams())         | team_id=any(array(select user_teams()))            | 173000  | 16     |
