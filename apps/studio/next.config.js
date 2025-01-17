@@ -64,7 +64,7 @@ const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
 const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
 
 const csp = [
-  ...(process.env.VERCEL_ENV === 'preview' ||
+  ...(process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
     ? [
@@ -109,8 +109,7 @@ const nextConfig = {
     return [
       {
         source: `/.well-known/vercel/flags`,
-        // TODO: Replace this with supabase.com/.well-known/vercel/flags once this PR is merged.
-        destination: `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.NEXT_PUBLIC_SITE_URL}${process.env.NEXT_PUBLIC_BASE_PATH}/.well-known/vercel/flags`,
+        destination: `https://supabase.com/.well-known/vercel/flags`,
         basePath: false,
       },
     ]
