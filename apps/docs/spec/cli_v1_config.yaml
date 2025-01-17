@@ -1503,6 +1503,8 @@ parameters:
     required: false
     description: |
       Specify an array of static files to be bundled with the function. Supports glob patterns.
+
+      NOTE: only file paths within `functions` directory are supported at the moment.
     links:
       - name: '`supabase functions` CLI subcommands'
         link: 'https://supabase.com/docs/reference/cli/supabase-functions'

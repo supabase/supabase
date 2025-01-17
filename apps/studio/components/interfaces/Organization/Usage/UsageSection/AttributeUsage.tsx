@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { AlertTriangle, BarChart2 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
@@ -11,7 +10,7 @@ import type { OrgSubscription } from 'data/subscriptions/types'
 import type { OrgMetricsUsage, OrgUsageResponse } from 'data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import type { ResponseError } from 'types'
-import { Button, cn } from 'ui'
+import { Button, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 import SectionContent from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
 import {
@@ -101,8 +100,8 @@ const AttributeUsage = ({
                       <div className="flex items-center space-x-4">
                         <p className="text-sm">{attribute.name} usage</p>
                         {showUsageWarning && (
-                          <Tooltip.Root delayDuration={0}>
-                            <Tooltip.Trigger asChild>
+                          <Tooltip_Shadcn_>
+                            <TooltipTrigger_Shadcn_ asChild>
                               {usageRatio >= 1 ? (
                                 <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
                                   <AlertTriangle
@@ -124,28 +123,18 @@ const AttributeUsage = ({
                                   </div>
                                 )
                               )}
-                            </Tooltip.Trigger>
-                            <Tooltip.Portal>
-                              <Tooltip.Content side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                    'border border-background',
-                                  ].join(' ')}
-                                >
-                                  <p className="text-xs text-foreground">
-                                    Exceeding your plans included usage will lead to restrictions to
-                                    your project.
-                                  </p>
-                                  <p className="text-xs text-foreground">
-                                    Upgrade to a usage-based plan or disable the spend cap to avoid
-                                    restrictions.
-                                  </p>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
-                          </Tooltip.Root>
+                            </TooltipTrigger_Shadcn_>
+                            <TooltipContent_Shadcn_ side="bottom">
+                              <p>
+                                Exceeding your plans included usage will lead to restrictions to
+                                your project.
+                              </p>
+                              <p>
+                                Upgrade to a usage-based plan or disable the spend cap to avoid
+                                restrictions.
+                              </p>
+                            </TooltipContent_Shadcn_>
+                          </Tooltip_Shadcn_>
                         )}
                       </div>
                     </div>

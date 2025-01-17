@@ -32,6 +32,7 @@ interface PostgresVersionSelectorProps {
   organizationSlug: string | undefined
   field: ControllerRenderProps<any, 'postgresVersionSelection'>
   form: UseFormReturn<any>
+  layout?: 'vertical' | 'horizontal'
 }
 
 const formatValue = ({ postgres_engine, release_channel }: ProjectCreationPostgresVersion) => {
@@ -53,6 +54,7 @@ export const PostgresVersionSelector = ({
   organizationSlug,
   field,
   form,
+  layout = 'horizontal',
 }: PostgresVersionSelectorProps) => {
   const {
     data,
@@ -73,7 +75,7 @@ export const PostgresVersionSelector = ({
   }, [isSuccess, form])
 
   return (
-    <FormItemLayout layout="horizontal" label="Postgres Version">
+    <FormItemLayout label="Postgres Version" layout={layout}>
       <Select_Shadcn_
         value={field.value}
         onValueChange={field.onChange}

@@ -49,7 +49,8 @@ const GITHUB_USER_CONTENT_URL = 'https://raw.githubusercontent.com'
 const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com'
 const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
 const VERCEL_LIVE_URL = 'https://vercel.live'
-const SENTRY_URL = 'https://*.ingest.sentry.io'
+const SENTRY_URL =
+  'https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io'
 
 // used by vercel live preview
 const PUSHER_URL = 'https://*.pusher.com'

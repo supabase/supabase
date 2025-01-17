@@ -2,12 +2,13 @@
 title = "Resolving 42P01: relation does not exist error"
 github_url = "https://github.com/orgs/supabase/discussions/29577"
 date_created = "2024-09-29T15:52:41+00:00"
-topics = ["database"]
-keywords = ["relation", "schema", "capitalization"]
+topics = [ "database" ]
+keywords = [ "relation", "schema", "capitalization" ]
+database_id = "72e93bc8-597d-4c72-8d86-4997679196fd"
 
 [[errors]]
 code = "42P01"
-message = 'relation "<some table name>" does not exist'
+message = "relation \"<some table name>\" does not exist"
 
 [[errors]]
 code = "42501"
@@ -47,7 +48,7 @@ rename to table_name;
 
 ---
 
-### Cause 3: table or function actually does not exist
+### Cause 3: Table or function actually does not exist
 
 One may have never made the table or dropped it deliberately or accidentally. This can be quickly checked with the following query:
 
