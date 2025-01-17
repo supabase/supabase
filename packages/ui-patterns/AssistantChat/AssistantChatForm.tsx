@@ -1,7 +1,7 @@
 'use client'
 
 import { Loader2 } from 'lucide-react'
-import React, { ChangeEvent, useRef } from 'react'
+import React, { ChangeEvent, memo, useRef } from 'react'
 import { ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
 
@@ -28,7 +28,7 @@ export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   placeholder?: string
 }
 
-const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
+const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
   (
     {
       loading = false,
@@ -126,6 +126,6 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
   }
 )
 
-AssistantChatForm.displayName = 'AssistantChatForm'
+AssistantChatFormComponent.displayName = 'AssistantChatFormComponent'
 
-export { AssistantChatForm }
+export const AssistantChatForm = memo(AssistantChatFormComponent)
