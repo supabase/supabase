@@ -11,17 +11,20 @@ import {
   DialogTitle,
 } from 'ui'
 import { AdditionalMonthlySpend } from './AdditionalMonthlySpend'
+import { NewProjectPrice } from './RestoreToNewProject.utils'
 
 interface ConfirmRestoreDialogProps {
   open: boolean
   onOpenChange: (value: boolean) => void
   onSelectContinue: () => void
+  additionalMonthlySpend: NewProjectPrice
 }
 
 export const ConfirmRestoreDialog = ({
   open,
   onOpenChange,
   onSelectContinue,
+  additionalMonthlySpend,
 }: ConfirmRestoreDialogProps) => {
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
@@ -64,7 +67,7 @@ export const ConfirmRestoreDialog = ({
             </ul>
           </ul>
         </DialogSection>
-        <AdditionalMonthlySpend />
+        <AdditionalMonthlySpend additionalMonthlySpend={additionalMonthlySpend} />
         <DialogFooter>
           <Button type="outline" onClick={() => onOpenChange(false)}>
             Cancel

@@ -13,6 +13,7 @@ import { useKey } from 'react-use'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { ChevronRight } from 'lucide-react'
 import ProductModulesData from '~/data/ProductModules'
+import { jobsCount } from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
 
 interface Props {
   open: boolean
@@ -105,6 +106,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                   key={link.text}
                   url={link.url}
                   label={link.text}
+                  counter={link.text === 'Careers' && jobsCount > 0 ? jobsCount : undefined}
                   className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay !mt-0"
                 />
               ))}

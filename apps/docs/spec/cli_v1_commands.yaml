@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.2.1
+  version: 2.6.8
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -2901,9 +2901,13 @@ commands:
     summary: Starts local Postgres database
     tags: []
     links: []
-    usage: supabase db start
+    usage: supabase db start [flags]
     subcommands: []
-    flags: []
+    flags:
+      - id: from-backup
+        name: --from-backup <string>
+        description: Path to a logical backup file.
+        default_value: ''
   - id: supabase-db-reset
     title: supabase db reset
     summary: Resets the local database to current migrations
@@ -3599,9 +3603,26 @@ commands:
     description: Retrieve details of the specified preview branch.
     tags: []
     links: []
-    usage: supabase branches get [branch-id]
+    usage: supabase branches get [branch-id] [flags]
     subcommands: []
     flags:
+      - id: output
+        name: -o, --output <[ pretty | json | toml | yaml ]>
+        description: Output format of branch details.
+        default_value: pretty
+        accepted_values:
+          - id: pretty
+            name: pretty
+            type: '[ pretty | json | toml | yaml ]'
+          - id: json
+            name: json
+            type: '[ pretty | json | toml | yaml ]'
+          - id: toml
+            name: toml
+            type: '[ pretty | json | toml | yaml ]'
+          - id: yaml
+            name: yaml
+            type: '[ pretty | json | toml | yaml ]'
       - id: experimental
         name: --experimental
         description: enable experimental features

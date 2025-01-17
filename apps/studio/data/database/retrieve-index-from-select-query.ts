@@ -102,19 +102,28 @@ export const useGetIndexesFromSelectQuery = <TData = GetInvolvedIndexesFromSelec
     GetInvolvedIndexesFromSelectQueryError,
     TData
   > = {}
-) =>
-  useQuery<GetInvolvedIndexesFromSelectQueryData, GetInvolvedIndexesFromSelectQueryError, TData>(
+) => {
+  // [Joshen] Only get indexes for queries starting with these
+  const isValidQueryForIndexing =
+    query !== undefined &&
+    (query.trim().toLowerCase().startsWith('select') ||
+      query.trim().toLowerCase().startsWith('with pgrst_source'))
+
+  return useQuery<
+    GetInvolvedIndexesFromSelectQueryData,
+    GetInvolvedIndexesFromSelectQueryError,
+    TData
+  >(
     databaseKeys.indexesFromQuery(projectRef, query),
     () => getInvolvedIndexesInSelectQuery({ projectRef, connectionString, query }),
     {
       retry: false,
       enabled:
-        (enabled &&
-          typeof projectRef !== 'undefined' &&
-          typeof query !== 'undefined' &&
-          query !== undefined &&
-          (query.startsWith('select') || query.startsWith('SELECT'))) ||
-        query.trim().toLowerCase().startsWith('with pgrst_source'),
+        enabled &&
+        typeof projectRef !== 'undefined' &&
+        typeof query !== 'undefined' &&
+        isValidQueryForIndexing,
       ...options,
     }
   )
+}
