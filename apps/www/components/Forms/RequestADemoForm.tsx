@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { CircleAlert } from 'lucide-react'
 import { Button, cn, Input_Shadcn_, Label_Shadcn_, Separator, TextArea_Shadcn_ } from 'ui'
-import { Alert } from 'ui/src/components/shadcn/ui/alert'
+import { Admonition } from 'ui-patterns'
 
 interface FormData {
   firstName: string
@@ -273,9 +273,12 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
               .
             </p>
             {errors.general && (
-              <Alert className="flex gap-2 text-foreground text-sm col-span-full">
+              <Admonition
+                type="warning"
+                className="flex gap-2 text-foreground text-sm col-span-full"
+              >
                 <CircleAlert className="w-3 h-3" /> <span>{errors.general}</span>
-              </Alert>
+              </Admonition>
             )}
           </form>
         )}
