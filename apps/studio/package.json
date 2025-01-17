@@ -34,8 +34,6 @@
     "@monaco-editor/react": "^4.6.0",
     "@next/bundle-analyzer": "^14.2.3",
     "@number-flow/react": "^0.3.2",
-    "@radix-ui/react-popover": "^1.0.7",
-    "@radix-ui/react-tooltip": "^1.0.7",
     "@sentry/nextjs": "^8.34.0",
     "@stripe/react-stripe-js": "^3.1.1",
     "@stripe/stripe-js": "^5.5.0",

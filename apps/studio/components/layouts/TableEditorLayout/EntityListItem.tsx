@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import saveAs from 'file-saver'
 import {
   Clipboard,
@@ -35,6 +34,7 @@ import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { copyToClipboard } from 'lib/helpers'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   cn,
@@ -46,9 +46,11 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { copyToClipboard } from 'lib/helpers'
 
 export interface EntityListItemProps {
   id: number
@@ -238,28 +240,16 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
 
     if (tooltipContent) {
       return (
-        <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-          <Tooltip.Trigger className="min-w-4" asChild>
+        <Tooltip_Shadcn_ disableHoverableContent={true}>
+          <TooltipTrigger_Shadcn_ className="min-w-4" asChild>
             <Unlock
               size={14}
               strokeWidth={2}
               className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
             />
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="bottom"
-              className={[
-                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                'border border-background',
-                'text-xs text-foreground',
-              ].join(' ')}
-            >
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              {tooltipContent}
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom">{tooltipContent}</TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
       )
     }
 
@@ -285,8 +275,8 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           'transition'
         )}
       >
-        <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-          <Tooltip.Trigger className="min-w-4" asChild>
+        <Tooltip_Shadcn_ disableHoverableContent={true}>
+          <TooltipTrigger_Shadcn_ className="min-w-4" asChild>
             {entity.type === ENTITY_TYPE.TABLE ? (
               <Table2
                 size={15}
@@ -322,21 +312,11 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                   ?.toUpperCase()}
               </div>
             )}
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="bottom"
-              className={[
-                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                'border border-background',
-                'text-xs text-foreground capitalize',
-              ].join(' ')}
-            >
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              {formatTooltipText(entity.type)}
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom">
+            {formatTooltipText(entity.type)}
+          </TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
         <div
           className={cn(
             'truncate',

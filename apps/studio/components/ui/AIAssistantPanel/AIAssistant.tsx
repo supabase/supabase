@@ -257,7 +257,7 @@ export const AIAssistant = ({
 
               <div className="text-sm flex-1">Assistant</div>
               <div className="flex gap-4 items-center">
-                <Tooltip_Shadcn_ delayDuration={100}>
+                <Tooltip_Shadcn_>
                   <TooltipTrigger_Shadcn_ asChild>
                     <Info size={14} className="text-foreground-light" />
                   </TooltipTrigger_Shadcn_>
