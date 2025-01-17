@@ -2,6 +2,7 @@ import { X } from 'lucide-react'
 
 import { useParams } from 'common'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
+import { isReadOnlySelect } from 'components/ui/AIAssistantPanel/AIAssistant.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from 'components/ui/QueryBlock/QueryBlock'
 import { useContentIdQuery } from 'data/content/content-id-query'
@@ -49,6 +50,7 @@ export const ReportChartBlock = ({
   )
   const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.sql : undefined
   const chartConfig = { ...DEFAULT_CHART_CONFIG, ...(item.chartConfig ?? {}) }
+  const isReadOnlySQL = isReadOnlySelect(sql ?? '')
 
   return (
     <>
@@ -74,12 +76,21 @@ export const ReportChartBlock = ({
           }
           onUpdateChartConfig={onUpdateChart}
           noResultPlaceholder={
-            <div className="border-t flex flex-col gap-y-1 items-center justify-center h-full">
-              <p className="text-xs text-foreground-light">SQL query is not readonly</p>
-              <p className="text-xs text-foreground-lighter">
-                Queries that involve any mutation will not be run or rendered in reports
-              </p>
-            </div>
+            isReadOnlySQL ? (
+              <div className="border-t flex flex-col gap-y-1 items-center justify-center h-full">
+                <p className="text-xs text-foreground-light">SQL query is not readonly</p>
+                <p className="text-xs text-foreground-lighter">
+                  Queries that involve any mutation will not be run or rendered in reports
+                </p>
+              </div>
+            ) : (
+              <div className="border-t flex flex-col gap-y-1 items-center justify-center h-full">
+                <p className="text-xs text-foreground-light">No results returned from query</p>
+                <p className="text-xs text-foreground-lighter">
+                  Results from the SQL query can be viewed as a table or chart here
+                </p>
+              </div>
+            )
           }
         />
       ) : (

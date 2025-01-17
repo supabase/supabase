@@ -297,6 +297,12 @@ export const QueryBlock = ({
       )}
 
       {/* QueryBlock output */}
+      {isExecuting && queryResult === undefined && (
+        <div className="border-t p-3">
+          <ShimmeringLoader />
+        </div>
+      )}
+
       {showSql && (
         <div
           className="shrink-0 max-h-96 overflow-y-auto border-t"
@@ -312,12 +318,6 @@ export const QueryBlock = ({
               '[&>code]:m-0 [&>code>span]:text-foreground'
             )}
           />
-        </div>
-      )}
-
-      {isExecuting && queryResult === undefined && (
-        <div className="border-t p-3">
-          <ShimmeringLoader />
         </div>
       )}
 
@@ -374,9 +374,9 @@ export const QueryBlock = ({
             >
               <Results rows={queryResult} />
             </div>
-          ) : (
+          ) : !isExecuting ? (
             noResultPlaceholder
-          )}
+          ) : null}
         </>
       )}
     </div>
