@@ -13,7 +13,7 @@ Here are the steps for you to migrate your application from the `auth-helpers` p
 
 Depending on your implementation, you may ignore some parts of this documentation and use your own implementation (i.e. using API routes vs. Server Actions). What’s important is you replace the clients provided by `auth-helpers` with the utility functions created using clients provided by `@supabase/ssr`.
 
-### 1. Uninstall Supabase Auth Helpers and install the Supabase SSR package
+### 1. Uninstall Supabase Auth helpers and install the Supabase SSR package
 
 It’s important that you don’t use both `auth-helpers-nextjs` and `@supabase/ssr` packages in the same application to avoid running into authentication issues.
 
@@ -159,7 +159,7 @@ export const config = {
 };
 ```
 
-### 4. Create your Server Actions to handle Login and Sign up.
+### 4. Create your server actions to handle login and sign up.
 
 ```
 // app/login/actions.ts
@@ -212,7 +212,7 @@ export async function signup(formData: FormData) {
 }
 ```
 
-### 5. Utilize the server actions in your Login page UI.
+### 5. Utilize the server actions in your login page UI.
 
 ```
 // app/login/page.tsx
@@ -233,7 +233,7 @@ export default function LoginPage() {
 }
 ```
 
-### 6. Client Components
+### 6. Client components
 
 ```
 'use client';
@@ -255,7 +255,7 @@ export default async function Page() {
 }
 ```
 
-### 7. Server Components
+### 7. Server components
 
 ```
 // replace
@@ -279,7 +279,7 @@ export default async function Page() {
 }
 ```
 
-### 8. Route Handlers
+### 8. Route handlers
 
 ```
 // replace
