@@ -166,13 +166,12 @@ export const SQLEditorNav = ({
   )
   const folders = useSnippetFolders(projectRef as string)
 
-  const { data: privateSnippetCountData } = useContentCountQuery({
+  const { data: snippetCountData } = useContentCountQuery({
     projectRef,
     type: 'sql',
-    visibility: 'user',
     name: debouncedSearchText,
   })
-  const numPrivateSnippets = privateSnippets.length
+  const numPrivateSnippets = snippetCountData?.private ?? 0
 
   const privateSnippetsTreeState = useMemo(
     () =>
@@ -237,13 +236,7 @@ export const SQLEditorNav = ({
     )
   }, [favoriteSqlSnippetsData?.pages, snippet, sort])
 
-  const { data: favoritedSnippetCountData } = useContentCountQuery({
-    projectRef,
-    type: 'sql',
-    favorite: true,
-    name: debouncedSearchText,
-  })
-  const numFavoriteSnippets = favoriteSnippets.length
+  const numFavoriteSnippets = snippetCountData?.favorites ?? 0
 
   const favoritesTreeState = useMemo(
     () =>
@@ -306,13 +299,7 @@ export const SQLEditorNav = ({
     )
   }, [sharedSqlSnippetsData?.pages, snippet, sort])
 
-  const { data: sharedSnippetCountData } = useContentCountQuery({
-    projectRef,
-    type: 'sql',
-    visibility: 'project',
-    name: debouncedSearchText,
-  })
-  const numProjectSnippets = sharedSnippets.length
+  const numProjectSnippets = snippetCountData?.shared ?? 0
 
   const projectSnippetsTreeState = useMemo(
     () =>
@@ -557,7 +544,9 @@ export const SQLEditorNav = ({
         onOpenChange={setShowSharedSnippets}
         className="px-0"
       >
-        <InnerSideMenuCollapsibleTrigger title={`Shared`} />
+        <InnerSideMenuCollapsibleTrigger
+          title={`Shared ${numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
+        />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoadingSharedSqlSnippets ? (
             <SQLEditorLoadingSnippets />
@@ -613,7 +602,9 @@ export const SQLEditorNav = ({
         open={showFavoriteSnippets}
         onOpenChange={setShowFavoriteSnippets}
       >
-        <InnerSideMenuCollapsibleTrigger title={`Favorites`} />
+        <InnerSideMenuCollapsibleTrigger
+          title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
+        />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoadingFavoriteSqlSnippets ? (
             <SQLEditorLoadingSnippets />
@@ -674,7 +665,10 @@ export const SQLEditorNav = ({
         onOpenChange={setShowPrivateSnippets}
         className="px-0"
       >
-        <InnerSideMenuCollapsibleTrigger title={`PRIVATE`} />
+        <InnerSideMenuCollapsibleTrigger
+          title={`PRIVATE
+            ${numPrivateSnippets > 0 ? ` (${numPrivateSnippets})` : ''}`}
+        />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoading ? (
             <SQLEditorLoadingSnippets />
