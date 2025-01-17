@@ -3,12 +3,14 @@ title = "Auth error: {401: invalid claim: missing sub}"
 github_url = "https://github.com/orgs/supabase/discussions/21347"
 date_created = "2024-02-18T13:47:37+00:00"
 topics = ["auth"]
-keywords = ["claim", "jwt", "token"]
+keywords = ["JWT", "Server-Side Rendering"]
+
+[api]
+sdk = ["auth-getuser"]
 
 [[errors]]
 http_status_code = 401
-code = "invalid_claim"
-message = "missing sub"
+message = "invalid claim: missing sub"
 ---
 
 The missing sub claim error is returned when supabase.auth.getUser() is called with an invalid JWT in the session or when the user attempts to register/sign in but hasn't completed the sign in when the getUser call is made.
