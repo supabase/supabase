@@ -8,7 +8,7 @@ import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartC
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { Parameter, parseParameters, processParameterizedSql } from 'lib/sql-parameters'
+import { Parameter, parseParameters } from 'lib/sql-parameters'
 import {
   Button,
   ChartContainer,
@@ -64,6 +64,8 @@ interface QueryBlockProps {
   maxHeight?: number
   /** Not implemented yet: Will be the next part of ReportsV2 */
   onSetParameter?: (params: Parameter[]) => void
+  /** Optional callback the SQL query is run */
+  onRunQuery?: () => void
 
   // [Joshen] Params below are currently only used by ReportsV2 (Might revisit to see how to improve these)
   /** Optional height set to render the SQL query (Used in Reports) */
@@ -94,6 +96,7 @@ export const QueryBlock = ({
   lockColumns = false,
   disableRunIfMutation = false,
   noResultPlaceholder = null,
+  onRunQuery,
   onSetParameter,
   onUpdateChartConfig,
 }: QueryBlockProps) => {
@@ -112,7 +115,8 @@ export const QueryBlock = ({
     if (!sql) return []
     return parseParameters(sql)
   }, [sql])
-  const combinedParameterValues = { ...extParameterValues, ...parameterValues }
+  // [Joshen] This is for when we introduced the concept of parameters into our reports
+  // const combinedParameterValues = { ...extParameterValues, ...parameterValues }
   const isReadOnlySelectSQL = isReadOnlySelect(sql ?? '')
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
@@ -128,15 +132,18 @@ export const QueryBlock = ({
     }
 
     try {
-      const processedSql = processParameterizedSql(sql, combinedParameterValues)
+      // [Joshen] This is for when we introduced the concept of parameters into our reports
+      // const processedSql = processParameterizedSql(sql, combinedParameterValues)
       execute({
         projectRef: ref,
         connectionString: project?.connectionString,
-        sql: processedSql,
+        sql,
       })
     } catch (error: any) {
       toast.error(`Failed to execute query: ${error.message}`)
     }
+
+    onRunQuery?.()
   }
 
   // Run once on mount to parse parameters and notify parent
@@ -278,6 +285,7 @@ export const QueryBlock = ({
                     connectionString: project?.connectionString,
                     sql,
                   })
+                  onRunQuery?.()
                 }
               }}
             >

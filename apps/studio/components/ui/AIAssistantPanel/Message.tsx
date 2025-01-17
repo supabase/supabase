@@ -4,8 +4,11 @@ import { PropsWithChildren } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { AiIconAnimation, cn, CodeBlock, markdownComponents, WarningIcon } from 'ui'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
+import { identifyQueryType } from './AIAssistant.utils'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 
 interface MessageProps {
@@ -35,6 +38,7 @@ export const Message = function Message({
   variant = 'default',
 }: PropsWithChildren<MessageProps>) {
   const isUser = role === 'user'
+  const { mutate: sendEvent } = useSendEventMutation()
 
   if (!content) return null
 
@@ -109,6 +113,15 @@ export const Message = function Message({
                         isChart={isChart}
                         isLoading={isLoading}
                         runQuery={runQuery}
+                        onRunQuery={() => {
+                          sendEvent({
+                            action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED,
+                            properties: {
+                              queryType: 'mutation',
+                              category: identifyQueryType(sql) ?? 'unknown',
+                            },
+                          })
+                        }}
                       />
                     )
                   ) : (
