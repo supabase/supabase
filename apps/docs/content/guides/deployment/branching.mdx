@@ -24,7 +24,14 @@ If you understand Git, you already understand Supabase Branching.
 - **Supabase Project**: You need an existing Supabase project.
 - **GitHub Repository**: Your project must be connected to a GitHub repository containing your Supabase directory.
 
-You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Preview Environments pause automatically after <SharedData data="config">branching.inactivity_period_in_minutes</SharedData> minutes of inactivity. Note that `pg_cron` executions will be impacted by inactivity related pausing.
+You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials.
+
+Preview Environments auto-pause after <SharedData data="config">branching.inactivity_period_in_minutes</SharedData> minutes of inactivity. Upon receiving a new request to your database or REST API, the paused branch will automatically resume to serve the request. The implications of this architecture means
+
+- `pg_cron` jobs will not execute in an auto-paused database.
+- Larger variance in request latency due to database cold starts.
+
+If you need higher performance guarantees on your Preview Environment, you can switch individual branches to [persistent](/docs/guides/deployment/branching#persistent-branches) so they are not auto-paused.
 
 <Image
   zoomable
