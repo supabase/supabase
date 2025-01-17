@@ -13,7 +13,7 @@ This page covers long-running queries via the Dashboard or external interfaces. 
 </Admonition>
 
 Certain queries, like indexing a table or changing a column's data type, are inherently time-consuming. The [Dashboard's SQL Editor](https://supabase.com/dashboard/project/_/sql/) has a 1-minute timeout limit.
- 
+
 To execute long-running queries, follow the below steps.
 
 ### Install an external SQL client
@@ -21,6 +21,7 @@ To execute long-running queries, follow the below steps.
 The guide focuses on [psql](https://supabase.com/docs/guides/database/psql) but you can use any Postgres client.
 
 Some other options include:
+
 - [pgadmin](https://supabase.com/docs/guides/database/pgadmin)
 - [DBeaver](https://supabase.com/docs/guides/database/dbeaver)
 
@@ -44,11 +45,13 @@ If you are working in an [IPv6 environment](https://github.com/orgs/supabase/dis
 Then you can increase the query timeout solely for your session:
 
 Long timeout
+
 ```sql
 set statement_timeout = '120min';
 ```
 
 Disable timeout
+
 ```sql
 set statement_timeout = '0';
 ```

@@ -26,3 +26,5 @@ yarn-error.log*
 
 # Sitemap
 public/sitemap.xml
+
+/examples/
