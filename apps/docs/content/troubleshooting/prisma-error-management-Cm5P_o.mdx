@@ -76,7 +76,7 @@ Some users have discussed how they managed this problem in a [GitHub Discussion.
 
 # Management suggestions
 
-## Make a custom role for prisma to increase observability
+## Make a custom role for Prisma to increase observability
 
 **Imagine your database as a house, and users as the people with keys.**
 
@@ -84,7 +84,7 @@ Some users have discussed how they managed this problem in a [GitHub Discussion.
 - it's usually safer to give Prisma its own key! This way, it can only access the rooms (tables) it needs.
 - Plus, with separate keys, it's easier to see what Prisma is doing in your house with monitoring tools, such as [PGAudit](https://supabase.com/docs/guides/database/extensions/pgaudit?queryGroups=database-method&database-method=sql) and [pg_stat_activity](https://supabase.com/docs/guides/platform/performance).
 
-### Creating the prisma user:
+### Creating the Prisma user:
 
 ```sql
 create user "prisma" with password 'secret_password' bypassrls createdb;
@@ -110,7 +110,7 @@ If you need to change it later, you can use the below SQL:
 alter user "prisma" with password 'new_password';
 ```
 
-### Grant prisma access
+### Grant Prisma access
 
 The below example gives Prisma full authority over all database objects in the public schema:
 
@@ -128,7 +128,7 @@ The below example gives Prisma full authority over all database objects in the p
 
 > For more guidance on specifying access, check out this [article](https://supabase.com/blog/postgres-roles-and-privileges#creating-objects-and-assigning-privileges) on privileges
 
-## Optimize prisma queries:
+## Optimize Prisma queries:
 
 In the [Query Performance Advisor](https://supabase.com/dashboard/project/_/database/query-performance), you can view long-running or frequently accessed queries by role:
 

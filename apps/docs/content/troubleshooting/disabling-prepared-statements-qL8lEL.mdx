@@ -44,12 +44,12 @@ const query = {
 
 set the [prepare_threshold](https://www.psycopg.org/psycopg3/docs/api/connections.html#psycopg.Connection.prepare_threshold) to `None`.
 
-# Asyncpg
+# asyncpg
 
 Follow the recommendation in the [asyncpg docs](https://magicstack.github.io/asyncpg/current/faq.html#why-am-i-getting-prepared-statement-errors)
 
 > disable automatic use of prepared statements by passing `statement_cache_size=0` to [asyncpg.connect()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.connection.connect) and [asyncpg.create_pool()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.pool.create_pool) (and, obviously, avoid the use of [Connection.prepare()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.connection.Connection.prepare));
 
-# Rust's deadpool or tokio-postgres:
+# Rust's Deadpool or tokio-postgres:
 
 - Check [Github Discussion](https://github.com/bikeshedder/deadpool/issues/340#event-13642472475)
