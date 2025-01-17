@@ -15,13 +15,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
-  Button,
-  Switch,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Button, Switch, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 const SSLConfiguration = () => {
