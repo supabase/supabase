@@ -1,5 +1,6 @@
 import { config } from 'dotenv'
 import { statSync } from 'fs'
+import './test/extensions'
 
 if (!process.env.CI) {
   // Use keys from studio .env.local for local tests
