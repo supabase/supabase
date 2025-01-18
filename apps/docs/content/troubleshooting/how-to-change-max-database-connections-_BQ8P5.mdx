@@ -12,7 +12,7 @@ cli = [ "supabase-postgres-config-update" ]
 
 > WARNING: Manually configuring the connection count hard codes it. This means if you upgrade or downgrade your database, the connection count will not auto-resize. You will have to make sure to manually update it.
 
-# Changing Max Database Connections:
+# Changing max database connections:
 
 Each compute instance has a default direct connection and pooler connection settings. You can find the most recent settings in the [compute docs](https://supabase.com/docs/guides/platform/compute-add-ons#disk-io):
 
@@ -30,7 +30,7 @@ Each compute instance has a default direct connection and pooler connection sett
 | 12XL         | 500                | 9,000              |
 | 16XL         | 500                | 12,000             |
 
-## Configuring Direct Connections Limits
+## Configuring direct connections limits
 
 > Note: the Supavisor connection limits are hard-coded and cannot be changed without upgrading the compute size:
 
@@ -54,7 +54,7 @@ SHOW max_connections;
 
 **Three** factors must be taken into consideration when adjusting the direct connection limit:
 
-### Process Schedulers and Postgres Internals:
+### Process schedulers and Postgres internals:
 
 Allowing too many direct connections in your database can overburden Postgres schedulers and other internal modules. This will result in a noticeable decrease in query throughput, despite having more connections available. EnterpriseDB wrote a wonderful [article](https://www.enterprisedb.com/postgres-tutorials/why-you-should-use-connection-pooling-when-setting-maxconnections-postgres) that outlines some of the considerations.
 
