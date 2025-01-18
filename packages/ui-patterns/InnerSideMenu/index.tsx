@@ -1,4 +1,4 @@
-import { ChevronRight, ChevronsDown, Search } from 'lucide-react'
+import { ChevronRight, ChevronsDown, Loader2, Search } from 'lucide-react'
 import Link from 'next/link'
 import { ElementRef, forwardRef } from 'react'
 import {
@@ -136,8 +136,12 @@ const InnerSideBarFilters = forwardRef<HTMLDivElement, React.ComponentPropsWitho
 
 const InnerSideBarFilterSearchInput = forwardRef<
   HTMLInputElement,
-  React.ComponentPropsWithoutRef<typeof Input_Shadcn_> & { 'aria-labelledby': string; name: string }
->(({ children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof Input_Shadcn_> & {
+    'aria-labelledby': string
+    name: string
+    isLoading?: boolean
+  }
+>(({ children, isLoading = false, ...props }, ref) => {
   return (
     <label htmlFor={props.name} className="relative w-full">
       <span className="sr-only">{props['aria-labelledby']}</span>
@@ -159,7 +163,20 @@ const InnerSideBarFilterSearchInput = forwardRef<
         {...props}
       />
       {children}
-      <Search className="absolute left-2 top-2 text-foreground-muted" size={14} strokeWidth={1.5} />
+      {isLoading ? (
+        <Loader2
+          className="animate-spin absolute left-2 text-foreground-muted"
+          style={{ top: 7 }}
+          size={14}
+          strokeWidth={1.5}
+        />
+      ) : (
+        <Search
+          className="absolute left-2 top-2 text-foreground-muted"
+          size={14}
+          strokeWidth={1.5}
+        />
+      )}
     </label>
   )
 })
@@ -251,10 +268,10 @@ const InnerSideBarEmptyPanel = forwardRef<
 
 export {
   InnerSideBarEmptyPanel,
-  InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
+  InnerSideBarFilters,
   InnerSideBarShimmeringLoaders,
   InnerSideBarTitle,
   InnerSideMenuCollapsible,

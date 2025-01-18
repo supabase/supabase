@@ -1,4 +1,4 @@
-import { toString as CronToString } from 'cronstrue'
+import dayjs from 'dayjs'
 import { Clock, History, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -7,21 +7,26 @@ import { useParams } from 'common'
 import { SQLCodeBlock } from 'components/interfaces/Auth/ThirdPartyAuthForm/SqlCodeBlock'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { useCronJobRunQuery } from 'data/database-cron-jobs/database-cron-jobs-run-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { TelemetryActions } from 'lib/constants/telemetry'
 import {
+  Badge,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
   Label_Shadcn_,
   Switch,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { convertCronToString, getNextRun } from './CronJobs.utils'
 
 interface CronJobCardProps {
   job: CronJob
@@ -35,16 +40,17 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
 
   const [toggleConfirmationModalShown, showToggleConfirmationModal] = useState(false)
 
+  const { data } = useCronJobRunQuery({
+    projectRef: ref,
+    connectionString: selectedProject?.connectionString,
+    jobId: job.jobid,
+  })
+  const lastRun = data?.start_time ? dayjs(data.start_time).valueOf() : undefined
+  const nextRun = getNextRun(job.schedule, data?.start_time)
+  const schedule = convertCronToString(job.schedule)
+
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: toggleDatabaseCronJob, isLoading } = useDatabaseCronJobToggleMutation()
-
-  // pg_cron can also use "30 seconds" format for schedule. Cronstrue doesn't understand that format so just use the
-  // original schedule when cronstrue throws
-  let schedule = job.schedule
-  try {
-    const scheduleString = CronToString(job.schedule)
-    schedule = scheduleString
-  } catch {}
 
   return (
     <>
@@ -120,12 +126,56 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
               <div className="grid grid-cols-10 gap-3 items-center">
                 <span className="text-foreground-light col-span-1">Schedule</span>
                 <div className="col-span-9">
-                  <Input
-                    title={schedule}
-                    readOnly
-                    className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
-                    value={schedule}
-                  />
+                  <Input readOnly title={schedule} value={schedule} className="w-96" />
+                </div>
+              </div>
+              <div className="grid grid-cols-10 gap-3 items-center">
+                <span className="text-foreground-light col-span-1">Last run</span>
+                <div className="col-span-9">
+                  <div
+                    className={cn(
+                      'border border-control bg-foreground/[0.026] rounded-md px-3 py-1.5 w-96',
+                      !lastRun && 'text-foreground-lighter'
+                    )}
+                  >
+                    {lastRun ? (
+                      <>
+                        <TimestampInfo
+                          utcTimestamp={lastRun}
+                          labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+                          className="font-sans text-sm"
+                        />
+                        {data?.status && (
+                          <Badge variant="success" className="capitalize ml-2">
+                            {data.status}
+                          </Badge>
+                        )}
+                      </>
+                    ) : (
+                      'Job has not been run yet'
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-10 gap-3 items-center">
+                <span className="text-foreground-light col-span-1">Next run</span>
+                <div className="col-span-9">
+                  <div
+                    className={cn(
+                      'border border-control bg-foreground/[0.026] rounded-md px-3 py-1.5 w-96',
+                      !nextRun && 'text-foreground-lighter'
+                    )}
+                  >
+                    {nextRun ? (
+                      <TimestampInfo
+                        utcTimestamp={nextRun}
+                        labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+                        className="font-sans text-sm"
+                      />
+                    ) : (
+                      'Unable to parse next run for job'
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-10 gap-3">
