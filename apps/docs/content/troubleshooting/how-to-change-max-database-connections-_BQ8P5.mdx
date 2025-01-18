@@ -2,11 +2,12 @@
 title = "How to change max database connections"
 github_url = "https://github.com/orgs/supabase/discussions/27197"
 date_created = "2024-06-12T02:49:15+00:00"
-topics = ["database", "supavisor", "cli"]
-keywords = ["connections", "postgres", "memory", "cpu"]
+topics = [ "database", "supavisor", "cli" ]
+keywords = [ "connections", "postgres", "memory", "cpu" ]
+database_id = "78f06ca5-6a69-4536-89fc-ed2e6ff334e5"
 
 [api]
-cli = ["supabase-postgres-config-update"]
+cli = [ "supabase-postgres-config-update" ]
 ---
 
 > WARNING: Manually configuring the connection count hard codes it. This means if you upgrade or downgrade your database, the connection count will not auto-resize. You will have to make sure to manually update it.

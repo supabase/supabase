@@ -1,18 +1,19 @@
 ---
-title = 'Error: "Connection refused" when trying to connect to Supabase database'
+title = "Error: \"Connection refused\" when trying to connect to Supabase database"
 github_url = "https://github.com/orgs/supabase/discussions/14929"
 date_created = "2023-06-09T10:38:06+00:00"
-topics = ["database", "cli"]
-keywords = ["connection", "fail2ban", "econnrefused"]
+topics = [ "database", "cli" ]
+keywords = [ "connection", "fail2ban", "econnrefused" ]
+database_id = "9d8b179c-ff4d-4072-b9e6-2d16e63b2aaa"
 
 [api]
-cli = ["supabase-network-bans-get", "supabase-network-bans-remove"]
+cli = [ "supabase-network-bans-get", "supabase-network-bans-remove" ]
 
 [[errors]]
 message = "connect ECONNREFUSED 1.2.3.4:5432"
 
 [[errors]]
-message = 'psql: error: connection to server at "db.xxxxxxxxxxxxxxxxxxxx.supabase.co" (1.2.3.4), port 5432 failed: Connection refused Is the server running on that host and accepting TCP/IP connections?'
+message = "psql: error: connection to server at \"db.xxxxxxxxxxxxxxxxxxxx.supabase.co\" (1.2.3.4), port 5432 failed: Connection refused Is the server running on that host and accepting TCP/IP connections?"
 ---
 
 If you're not able to connect to the Supabase database and see the error `connect ECONNREFUSED 1.2.3.4:5432` or `psql: error: connection to server at "db.xxxxxxxxxxxxxxxxxxxx.supabase.co" (1.2.3.4), port 5432 failed: Connection refused
