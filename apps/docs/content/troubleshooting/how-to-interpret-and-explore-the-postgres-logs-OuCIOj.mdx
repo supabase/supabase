@@ -8,11 +8,11 @@ database_id = "8b000bb4-180b-4a6c-b280-ba02965060f6"
 
 > A complimentary guide was made for the [API logs](https://github.com/orgs/supabase/discussions/22849)
 
-# Debugging and Monitoring Postgres with Logs
+# Debugging and monitoring Postgres with logs
 
 Logs provide insights into Postgres operations. They help meet compliance requirements, detect suspicious activity, and troubleshoot problems.
 
-## Table of Contents
+## Table of contents
 
 - Querying Logs
   - `postgres_logs` Table Structure
@@ -33,7 +33,7 @@ Logs provide insights into Postgres operations. They help meet compliance requir
 - Frequently Asked Questions
 - Other resources
 
-## Querying Logs
+## Querying logs
 
 The most practical way to explore and filter logs is through the [Logs Explorer](https://supabase.com/dashboard/project/_/logs/explorer).
 
@@ -47,7 +47,7 @@ Although there are many strategies to filter logs, such as `like` and `in` state
 
 The `postgres_logs` table contains Postgres events.
 
-### `postgres_logs` Table Structure
+### `postgres_logs` table structure
 
 The table contains 3 fundamental columns:
 
@@ -73,9 +73,9 @@ cross join unnest(metadata) AS metadata
 cross join unnest(parsed) AS parsed;
 ```
 
-### Parsed Metadata Fields
+### Parsed metadata fields
 
-#### Query Information
+#### Query information
 
 | Field                 | Description                                                                                            | Example                         |
 | --------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------- |
@@ -88,7 +88,7 @@ cross join unnest(parsed) AS parsed;
 - Identifying slow queries
 - Identifying failing queries
 
-#### Error/Warning Information
+#### Error/Warning information
 
 | Field                 | Description                                            | Example                                                                                             |
 | --------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
@@ -103,7 +103,7 @@ cross join unnest(parsed) AS parsed;
 - Filter by error severity or sql code
 - Get hints, details, and context about error events
 
-#### Connection/Identification Information
+#### Connection/Identification information
 
 | Field                     | Description                                                                                                                                                    | Example              |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
@@ -124,9 +124,9 @@ cross join unnest(parsed) AS parsed;
 - Filter connections by sessions for debugging
 - identify extension events
 
-## Filtering Logs
+## Filtering logs
 
-### Excluding Routine Events
+### Excluding routine events
 
 Most Postgres logs during normal periods are routine events, such as connection authorizations and checkpoints. To see the default types of events that are logged, you can check this [guide](https://gist.github.com/TheOtherBrian1/991d32c2b00dbc75d29b80d4cdf41aa7).
 
@@ -139,7 +139,7 @@ where
   not regexp_contains(event_message, '^cron|PgBouncer|checkpoint|connection received|authenticated|authorized';
 ```
 
-### By Timeframe
+### By timeframe
 
 To investigate issues around a specific period:
 
@@ -150,7 +150,7 @@ where
   timestamp between '2024-05-06 04:44:00' and '2024-05-06 04:45:00'
 ```
 
-### By Error Severity
+### By error severity
 
 This filter finds all errors, fatals, and panics:
 
@@ -169,7 +169,7 @@ where
 
 Failure events include an sql_state_code that can be referenced in the [Postgres Docs](https://www.postgresql.org/docs/current/errcodes-appendix.html)
 
-### By Query
+### By query
 
 > NOTE: Unless pg_audit is configured, only failed queries are logged
 
@@ -191,7 +191,7 @@ Queries can use complex syntax, so it is often helpful to isolate by referenced 
 
 All failed queries, including those from PostgREST, Auth, and external libraries (e.g., Prisma) are logged with helpful error messages for debugging.
 
-#### Server/Role Mapping
+#### Server/Role mapping
 
 API servers have assigned database roles for connecting to the database:
 
@@ -217,7 +217,7 @@ where
 ...
 ```
 
-## By Dashboard Queries
+## By Dashboard queries
 
 Queries from the Supabase Dashboard are executed under the postgres role and include the comment `-- source: dashboard`. To isolate or exclude Dashboard requests during debugging, you can filter by this comment.
 
@@ -228,7 +228,7 @@ where
   regexp_contains(parsed.query, '-- source: dashboard')
 ```
 
-## Full Example For Finding Errors
+## Full example for finding errors
 
 ```sql
 select
@@ -255,9 +255,9 @@ order by timestamp desc
 limit 100;
 ```
 
-# Logging for Compliance and Security
+# Logging for compliance and security
 
-### Customized Object and Role Activity Logging
+### Customized object and role activity logging
 
 > ⚠️ NOTE: This is specifically designated for those using the `postgres` role or [custom roles](https://supabase.com/docs/guides/database/postgres/roles) to interact with their database. Those utilizing the Database REST API should reference the [Database API Logging Guide](https://github.com/orgs/supabase/discussions/22849) instead.
 
@@ -279,7 +279,7 @@ where
  parsed.user_name = 'API_role'
 ```
 
-### Filtering By IP
+### Filtering by IP
 
 > If you are connecting from a known, limited range of IP addresses, you should enable [network restrictions](https://supabase.com/docs/guides/platform/network-restrictions).
 
@@ -306,7 +306,7 @@ order by ip_count desc
 limit 100;
 ```
 
-# Reviewing Log Settings
+# Reviewing log settings
 
 The `pg_settings` table describes system and logging configurations.
 
@@ -337,7 +337,7 @@ where
   and name like '%log%';
 ```
 
-## Changing Log Settings
+## Changing log settings
 
 > WARNING: lenient settings can lead to overlogging, impacting database performance while creating noise in the logs.
 
