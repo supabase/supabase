@@ -67,7 +67,7 @@ The default connection values are set based on a solid understanding of Postgres
 
 This is a Grafana Chart of unhealthy memory usage:
 
-![image](/img/troubleshooting/47685206-7914-440e-a010-da62f5c38186.png)
+![image](/docs/img/troubleshooting/47685206-7914-440e-a010-da62f5c38186.png)
 
 - Yellow: represents active memory
 - Red: represents SWAP, which is disk storage that the system treats as if it were actually memory
@@ -95,7 +95,7 @@ select
 
 The below chart is an example of what can occur to the CPU if 100s of connections are inappropriately opened/closed every second or many CPU intensive queries are run in parallel
 
-![image](/img/troubleshooting/0e7f6842-78fd-44f9-b463-425507815fb6.png)
+![image](/docs/img/troubleshooting/0e7f6842-78fd-44f9-b463-425507815fb6.png)
 
 If you plan on increasing your direct connection numbers, your database should have relatively predictable or low CPU usage, such as what the example displays below:
 
