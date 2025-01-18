@@ -71,7 +71,7 @@ const { data, error } = await supabase
 
 **Execution Time: 0.069 ms:** measures how long it took to actually execute the query, including retrieving the data, performing any sorts, joins, or other operations defined in the execution plan, and returning the final results. This time is measured in milliseconds.
 
-![image](/img/troubleshooting/10950be3-264b-4a41-bc71-3d431c2756b2.png)
+![image](/docs/img/troubleshooting/10950be3-264b-4a41-bc71-3d431c2756b2.png)
 
 ### Detailed Components in EXPLAIN ANALYZE
 
@@ -192,7 +192,7 @@ So, the acceptable performance threshold can vary by application. For real-time 
 ### Tools to interpret EXPLAIN ANALYZE output
 
 Since reading a longer execution plan is quite cumbersome, you can use the website https://explain.depesz.com/ to better visualize the query. If you paste the execution plan in the text area and hit “Submit”, you will get output like this:
-![image](/img/troubleshooting/830b81aa-ae52-44a4-aa49-32c2a6296af7.png)
+![image](/docs/img/troubleshooting/830b81aa-ae52-44a4-aa49-32c2a6296af7.png)
 
 ### Tips for Optimizing Queries
 
