@@ -298,10 +298,8 @@ from
   cross join unnest(parsed) as parsed
 where
   regexp_contains(user_name, '<ROLE>')
-  and -- only search for connections from outside the database (excludes cron jobs)
-  regexp_contains(backend_type, 'client backend')
-  and -- only view successful authentication events
-  regexp_contains(event_message, '^connection authenticated')
+  and regexp_contains(backend_type, 'client backend') -- only search for connections from outside the database (excludes cron jobs)
+  and regexp_contains(event_message, '^connection authenticated') -- only view successful authentication events
 group by connection_from, event_message
 order by ip_count desc
 limit 100;

@@ -269,8 +269,7 @@ from
 where
   -- find all errors
   status_code >= 400
-  and -- only look at DB API
-  regexp_contains(path, '^/rest/v1/');
+  and regexp_contains(path, '^/rest/v1/'); -- only look at DB API
 ```
 
 **Group errors by path and code:**
@@ -288,8 +287,7 @@ from
 where
   -- find all errors
   status_code >= 400
-  and -- only look at DB API
-  regexp_contains(path, '^/rest/v1/')
+  and regexp_contains(path, '^/rest/v1/') -- only look at DB API
 group by path, status_code
 order by reoccurrence_per_path;
 ```
