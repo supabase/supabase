@@ -14,11 +14,11 @@ sdk = [ "explain" ]
 
 This guide is designed to help you understand how to use the PostgreSQL [EXPLAIN and EXPLAIN ANALYZE](https://www.postgresql.org/docs/current/sql-explain.html) commands to optimize and debug SQL queries. Understanding the output of these commands can help you improve the performance of your applications by optimizing database interactions.
 
-### What is EXPLAIN?
+### What is explain?
 
 The PostgreSQL EXPLAIN command shows the execution plan of a SQL query. This plan describes how the PostgreSQL database will execute the query, including how tables will be scanned—by using sequential scans, index scans, etc.—and how rows will be joined.
 
-### How to Use EXPLAIN in Supabase
+### How to use explain in Supabase
 
 **Using EXPLAIN through the SQL Editor**
 
@@ -39,9 +39,9 @@ const { data, error } = await supabase
   .explain({analyze:true,verbose:true})
 ```
 
-### Detailed Breakdown of EXPLAIN Output Components
+### Detailed breakdown of explain output components
 
-### 1. Plan Type
+### 1. Plan type
 
 **- Seq Scan:** A sequential scan that reads all rows from a table. This is often seen in the absence of indexes that can be used for the query.
 
@@ -68,13 +68,13 @@ const { data, error } = await supabase
 
 **Filter: (user_id = 1):** This shows any filters applied post-scan. Filters are conditions that are checked after retrieving the rows. A high number of rows being filtered out could indicate a need for better indexing.
 
-### 6. Execution Time
+### 6. Execution time
 
 **Execution Time: 0.069 ms:** measures how long it took to actually execute the query, including retrieving the data, performing any sorts, joins, or other operations defined in the execution plan, and returning the final results. This time is measured in milliseconds.
 
 ![image](/docs/img/troubleshooting/10950be3-264b-4a41-bc71-3d431c2756b2.png)
 
-### Detailed Components in EXPLAIN ANALYZE
+### Detailed components in explain analyze
 
 When running EXPLAIN ANALYZE, additional information is provided, including:
 
@@ -109,7 +109,7 @@ To answer you, one is for the estimated cost and performance, and another for th
 
 **Identifying Bottlenecks**: If the actual time is significantly higher than expected, or if loops are more frequent than anticipated, these could be indicators of performance bottlenecks in the query.
 
-### How to read a Complex EXPLAIN Output
+### How to read a complex explain output
 
 First, you have to understand that a PostgreSQL execution plan is a tree structure consisting of several nodes. The top node (the Aggregate above) is at the top, and lower nodes are indented and start with an arrow (->). Nodes with the same indentation are on the same level (for example, the two relations combined with a join).
 
@@ -133,7 +133,7 @@ PostgreSQL executes a plan top down, that is, it starts with producing the first
 
 On top of that, you have to multiply the cost and the time with the number of “loops” to get the total time spent in a node.
 
-### Common Nodes in PostgreSQL EXPLAIN Output
+### Common nodes in PostgreSQL explain output
 
 | Node Type             | Description                                                                  |
 | --------------------- | ---------------------------------------------------------------------------- |
@@ -155,7 +155,7 @@ On top of that, you have to multiply the cost and the time with the number of �
 | **Foreign Scan**      | Fetches data from foreign data sources outside the local database.           |
 | **Function Scan**     | Retrieves results from a set-returning function.                             |
 
-### What to focus on in EXPLAIN ANALYZE output
+### What to focus on in explain analyze output
 
 - Find the nodes where most of the execution time was spent.
   `Hash Join  (cost=100.00..200.00 rows=1000 width=50) (actual time=50.012..150.023 rows=1000 loops=1)`
@@ -176,7 +176,7 @@ Seq Scan on products  (cost=0.00..100.00 rows=300 width=50) (actual time=50.000.
 Explanation:
 This sequential scan took 50 to 100 milliseconds and filtered out 2997 of 3000 rows, indicating that only a few rows met the condition. This scenario is ideal for an index on the price column to optimize the performance by reducing the need for a full table scan.
 
-### Understanding the Significance of Milliseconds in Query Performance
+### Understanding the significance of milliseconds in Query Performance
 
 Determining whether 100 milliseconds for e.g is noteworthy in the context of identifying performance bottlenecks depends on various factors:
 
@@ -190,12 +190,12 @@ For complex queries that involve multiple joins, subqueries, or aggregation func
 
 So, the acceptable performance threshold can vary by application. For real-time systems or high-frequency trading platforms, even a few milliseconds can be critical, whereas for batch processing or data warehousing, longer execution times might be acceptable.
 
-### Tools to interpret EXPLAIN ANALYZE output
+### Tools to interpret explain analyze output
 
 Since reading a longer execution plan is quite cumbersome, you can use the website https://explain.depesz.com/ to better visualize the query. If you paste the execution plan in the text area and hit “Submit”, you will get output like this:
 ![image](/docs/img/troubleshooting/830b81aa-ae52-44a4-aa49-32c2a6296af7.png)
 
-### Tips for Optimizing Queries
+### Tips for optimizing queries
 
 - **Add Indexes:** Improve performance by adding indexes on columns that are frequently used in WHERE clauses or JOIN conditions.
 

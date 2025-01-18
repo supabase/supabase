@@ -9,7 +9,7 @@ database_id = "10186830-8cce-4f10-8cb9-7cbf39310763"
 
 Since each Supabase project uses PostgreSQL as its underlying database engine, it’s common to adjust logging settings for various reasons—whether for debugging issues, monitoring database performance, or auditing actions. However, modifying logging levels improperly can lead to an excessive amount of log data being generated, which can quickly fill up your disk space and cause significant performance degradation or even system failure.
 
-### 1. Overview of PostgreSQL Logging Levels
+### 1. Overview of PostgreSQL logging levels
 
 PostgreSQL provides multiple logging levels that allow you to control how much information gets logged. These include:
 
@@ -39,7 +39,7 @@ PANIC: database system shutdown requested
 
 The default log level is set to **WARNING** through the log_min_messages setting, and we recommend keeping it that way.
 
-### 2. How High Log Levels Can Affect Your Database
+### 2. How high log levels can affect your database
 
 When users alter a high level of log settings, the database can start generating an overwhelming number of log entries. This can quickly escalate to issues such as:
 
@@ -49,7 +49,7 @@ When users alter a high level of log settings, the database can start generating
 
 - Database Lockups: In extreme cases, if the disk is filled to capacity with logs, your database could lock up, leading to downtime or severe performance degradation.
 
-### 3. Common Scenarios That Cause Log Overload
+### 3. Common scenarios that cause log overload
 
 Here are a few common scenarios where excessive logging can become a problem:
 
@@ -59,7 +59,7 @@ Here are a few common scenarios where excessive logging can become a problem:
 
 - Frequent Write Operations: If your database processes a lot of write operations (such as inserts, updates, or deletes), even low-level logs (like NOTICE or INFO) can lead to significant log accumulation.
 
-### 4. How to Manage PostgreSQL Log Levels Effectively
+### 4. How to manage PostgreSQL log levels effectively
 
 **a. Choose the Right Log Level**
 For most users, setting PostgreSQL logs to WARNING or ERROR is sufficient for regular operations. Here’s a general guideline:
