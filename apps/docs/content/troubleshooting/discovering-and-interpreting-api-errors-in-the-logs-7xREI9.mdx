@@ -269,7 +269,8 @@ from
 where
   -- find all errors
   status_code >= 400
-  and regexp_contains(path, '^/rest/v1/'); -- only look at DB API
+  and regexp_contains(path, '^/rest/v1/');
+-- only look at DB API
 ```
 
 **Group errors by path and code:**
