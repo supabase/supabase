@@ -6,7 +6,7 @@ topics = ["auth", "database"]
 keywords = ["performance", "security", "queries", "indexes", "roles"]
 ---
 
-## RLS Performance and Best Practices
+## RLS performance and best practices
 
 Although most of the time spent on thinking about RLS is to get it to handle security needs, the impact of it on performance
 of your queries can be massive.
@@ -23,7 +23,7 @@ For very slow queries, or if using the tools at end of article, run a query with
 
 The following tips are very broad and each may or may not help the specific case involved. Some changes, like adding indexes, should be backed out if they do not make a difference in RLS performance and you are not using them for filtering performance.
 
-#### (1) The first thing to try is put an index on columns used in the RLS that are not primary keys or unique already.
+#### 1. The first thing to try is put an index on columns used in the RLS that are not primary keys or unique already.
 
 For RLS like:
 `auth.uid() = user_id`
@@ -31,7 +31,7 @@ Add an index like:
 `create index userid on test_table using btree (user_id) tablespace pg_default;`
 Improvement seen over 100x on large tables.
 
-#### (2) Another method to improve performance is to wrap your RLS queries and functions in select statements.
+#### 2. Another method to improve performance is to wrap your RLS queries and functions in select statements.
 
 This method works well for jwt functions like auth.uid() and auth.jwt() as well as any other functions including security definer type.
 Wrapping the function in some SQL causes an initPlan to be run by the optimizer which allows it to "cache" the results versus calling the function
@@ -57,7 +57,7 @@ $$ language plpgsql security definer;
 
 </details>
 
-#### (3) Do not rely on RLS for filtering but only for security.
+#### 3. Do not rely on RLS for filtering but only for security.
 
 Instead of doing this (JS client example):
 `.from('table').select()`
@@ -66,7 +66,7 @@ With an RLS policy of:
 Add a filter in addition to the RLS:
 `.from('table').select().eq('user_id',userId)`
 
-#### (4) Use security definer functions to do queries on other tables to bypass their RLS when possible.
+#### 4. Use security definer functions to do queries on other tables to bypass their RLS when possible.
 
 Instead of having this RLS where the roles_table has an RLS select policy of `auth.uid() = user_id`:
 `exists (select 1 from roles_table where auth.uid() = user_id and role = 'good_role')`
@@ -92,7 +92,7 @@ $$ language plpgsql security definer;
 
 </details>
 
-#### (5) Always optimize join queries to compare row columns to fixed join data.
+#### 5. Always optimize join queries to compare row columns to fixed join data.
 
 Instead of querying on a row column in a join table WHERE, organize your query to get all
 the column values that meet your query into an array or set.
@@ -105,7 +105,7 @@ Also consider moving the join query to a security definer function to avoid RLS 
 `team_id in (select user_teams())`
 Note that if the `in` list gets to be over 10K items, then extra analysis is likely needed. See this follow up testing: https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/Supabase-Docs-Test .
 
-#### (6) Use role in TO option or roles dropdown in the dashboard.
+#### 6. Use role in TO option or roles dropdown in the dashboard.
 
 Never just use RLS involving auth.uid() or auth.jwt() as your way to rule out 'anon' role.
 Always add 'authenticated' to the approved roles instead of nothing or public.
