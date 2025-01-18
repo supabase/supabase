@@ -7,7 +7,7 @@ keywords = [ "usage", "metrics", "projects" ]
 database_id = "f379a628-6821-40b0-9793-4bf819b8c085"
 ---
 
-## Organization Usage Metrics
+## Organization usage metrics
 
 This discussion explains your organization's usage metrics, which can be found here: [https://supabase.com/dashboard/org/\_/usage](https://supabase.com/dashboard/org/_/usage).
 
@@ -20,7 +20,7 @@ These metrics are calculated based on all the projects under the organization th
 
 This may be confusing for users looking at only what metrics are being used for currently active projects.
 
-## Database Size Example
+## Database size example
 
 Using the database size as an example, suppose we have the following projects under the organization:
 
@@ -32,7 +32,7 @@ If the user decides to delete Projects A and B during the current billing cycle,
 
 As of now, even if your project was just active for a few days, we take the average database size for those active days, which may lead to high usage when creating and deleting many projects within a billing cycle. We're working on a better billing model to cover these cases.
 
-## Edge Functions Example
+## Edge Functions example
 
 Consider another example with edge functions. Suppose we have these projects under the organization:
 
@@ -41,7 +41,7 @@ Consider another example with edge functions. Suppose we have these projects und
 
 If Project E with its 7 functions is deleted during the current billing cycle, the average Edge Function count for this billing cycle on the dashboard will still be 12 functions.
 
-## Other Metrics
+## Other metrics
 
 It is a little more tricky to understand metrics like realtime and egress due to being more complex to track usage compared to Database size or Function count. However, they will account for usage from all projects that are active or were active during your current billing cycle as well.
 
