@@ -187,7 +187,7 @@ const Connect = () => {
         </DialogHeader>
 
         <Tabs_Shadcn_ defaultValue="direct" onValueChange={(value) => handleConnectionType(value)}>
-          <TabsList_Shadcn_ className={cn('flex gap-x-4', DIALOG_PADDING_X)}>
+          <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
             {CONNECTION_TYPES.map((type) => (
               <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
                 {type.label}
@@ -224,8 +224,8 @@ const Connect = () => {
                 value={type.key}
                 className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
               >
-                <div className="flex justify-between">
-                  <div className="flex items-center gap-3">
+                <div className="flex flex-col md:flex-row gap-2 justify-between">
+                  <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3">
                     <ConnectDropdown
                       state={selectedParent}
                       updateState={handleParentChange}

@@ -49,9 +49,9 @@ const Home: NextPageWithLayout = () => {
       : 'Welcome to your project'
 
   return (
-    <div className="w-full mx-auto my-16 space-y-16 max-w-7xl">
-      <div className="flex items-center justify-between mx-6 space-x-6">
-        <div className="flex flex-row items-center gap-3">
+    <div className="w-full mx-auto my-12 md:my-16 space-y-12 md:space-y-16 max-w-7xl">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mx-6 gap-6">
+        <div className="flex flex-col md:flex-row md:items-center gap-3">
           <h1 className="text-3xl">{projectName}</h1>
           {isOrioleDb && (
             <Tooltip_Shadcn_>
@@ -97,7 +97,7 @@ const Home: NextPageWithLayout = () => {
             <div className="mx-6">
               <h4 className="text-lg">Client libraries</h4>
             </div>
-            <div className="grid gap-12 mx-6 mb-12 md:grid-cols-3">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:gap-12 mx-6 mb-12 md:grid-cols-3">
               {CLIENT_LIBRARIES.map((library) => (
                 <ClientLibrary key={library.language} {...library} />
               ))}
@@ -114,7 +114,7 @@ const Home: NextPageWithLayout = () => {
                   <TabsTrigger_Shadcn_ value="mobile">Mobile Framework</TabsTrigger_Shadcn_>
                 </TabsList_Shadcn_>
                 <TabsContent_Shadcn_ value="app">
-                  <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
                     {EXAMPLE_PROJECTS.filter((project) => project.type === 'app')
                       .sort((a, b) => a.title.localeCompare(b.title))
                       .map((project) => (
@@ -123,7 +123,7 @@ const Home: NextPageWithLayout = () => {
                   </div>
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_ value="mobile">
-                  <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
                     {EXAMPLE_PROJECTS.filter((project) => project.type === 'mobile')
                       .sort((a, b) => a.title.localeCompare(b.title))
                       .map((project) => (

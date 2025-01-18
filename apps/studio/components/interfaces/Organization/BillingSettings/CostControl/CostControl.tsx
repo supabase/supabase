@@ -127,7 +127,7 @@ const CostControl = ({}: CostControlProps) => {
                     </p>
                   )}
 
-                  <div className="flex space-x-6">
+                  <div className="flex flex-col md:flex-row gap-6">
                     <div>
                       <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
                         <Image

@@ -24,17 +24,19 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
   const [showReference, setShowReference] = useState(false)
 
   return (
-    <div className={['flex items-center gap-8 transition-all pb-6 justify-between'].join(' ')}>
-      <div className="flex items-center gap-3">
-        <div
-          className="flex h-6 w-6 items-center justify-center rounded border
-            border-brand-600 bg-brand-300 text-brand
-          "
-        >
-          <List size={14} strokeWidth={3} />
-        </div>
+    <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 transition-all pb-6 justify-between">
+      <div className="flex flex-col md:flex-row md:items-center gap-3">
+        <div className="flex flex-row items-center gap-3">
+          <div
+            className="flex h-6 w-6 items-center justify-center rounded border
+              border-brand-600 bg-brand-300 text-brand
+            "
+          >
+            <List size={14} strokeWidth={3} />
+          </div>
 
-        <h1 className="text-2xl text-foreground">Logs Explorer</h1>
+          <h1 className="text-2xl text-foreground">Logs Explorer</h1>
+        </div>
         {subtitle && <span className="text-2xl text-foreground-light">{subtitle}</span>}
       </div>
       <div className="flex flex-row gap-2">

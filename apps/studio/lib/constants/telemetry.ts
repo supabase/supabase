@@ -24,6 +24,11 @@ export enum TelemetryActions {
   FEATURE_PREVIEW_ENABLED = 'feature_preview_enabled',
   FEATURE_PREVIEW_DISABLED = 'feature_preview_disabled',
 
+  PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED = 'project_creation_initial_step_prompt_intended',
+  PROJECT_CREATION_INITIAL_STEP_SUBMITTED = 'project_creation_initial_step_submitted',
+  PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED = 'project_creation_second_step_prompt_intended',
+  PROJECT_CREATION_SECOND_STEP_SUBMITTED = 'project_creation_second_step_submitted',
+
   REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED = 'realtime_inspector_listen_channel_clicked',
   REALTIME_INSPECTOR_BROADCAST_SENT = 'realtime_inspector_broadcast_sent',
   REALTIME_INSPECTOR_MESSAGE_CLICKED = 'realtime_inspector_message_clicked',
@@ -236,6 +241,72 @@ export interface FeaturePreviewDisabledEvent {
      */
     feature: string
   }
+}
+
+/**
+ * On the InitialStep.tsx screen, where user can chose to prompt, start blank or migrate, at least 5 characters were typed
+ * in the prompt textarea indicating an intention to use the prompt.
+ *
+ * @group Events
+ * @source studio
+ * @page new/v2/{slug}
+ */
+export interface ProjectCreationInitialStepPromptIntendedEvent {
+  action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED
+  /**
+   * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
+   * words, was this not just an edit. In this case, it should always be true.
+   */
+  properties: {
+    isNewPrompt: boolean
+  }
+}
+
+/**
+ * First step of project creation was submitted, where the user writes a prompt or select to start blank or to migrate.
+ *
+ * @group Events
+ * @source studio
+ * @page new/v2/{slug}
+ */
+export interface ProjectCreationInitialStepSubmittedEvent {
+  action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED
+  properties: {
+    /**
+     * Records what the user selected in the first step of project creation.
+     */
+    onboardingPath: 'use_prompt' | 'start_blank' | 'migrate'
+  }
+}
+
+/**
+ * After the InitialStep screen, at least 5 characters were typed in the prompt textarea indicating an intention to use the prompt.
+ *
+ * @group Events
+ * @source studio
+ * @page new/v2/{slug}
+ */
+export interface ProjectCreationSecondStepPromptIntendedEvent {
+  action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED
+  properties: {
+    /**
+     * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
+     * words, was this not just an edit.
+     */
+    isNewPrompt: boolean
+  }
+}
+
+/**
+ * Second and final step of project creation was submitted. More precisely, right after the user clicks on "Create Project". To check,
+ * if the project creation was successful, please refer to project_created event.
+ *
+ * @group Events
+ * @source studio
+ * @page new/v2/{slug}
+ */
+export interface ProjectCreationSecondStepSubmittedEvent {
+  action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_SUBMITTED
 }
 
 /**
