@@ -60,7 +60,14 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
         </div>
         <div className="flex flex-col flex-0 overflow-y-auto w-full">
           <div className="flex flex-row justify-between items-center">
-            <span className="text-base text-foreground">{job.jobname}</span>
+            <span
+              className={cn(
+                'text-base',
+                job.jobname === null ? 'text-foreground-lighter' : 'text-foreground'
+              )}
+            >
+              {job.jobname ?? 'No name provided'}
+            </span>
             <div className="flex items-center gap-x-2">
               {isLoading ? (
                 <Loader2 size={18} strokeWidth={2} className="animate-spin text-foreground-muted" />

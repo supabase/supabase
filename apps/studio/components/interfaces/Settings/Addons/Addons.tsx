@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import { AlertCircle, ChevronRight, ExternalLink, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -11,6 +10,7 @@ import {
   getAddons,
   subscriptionHasHipaaAddon,
 } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
   useIsProjectActive,
@@ -24,6 +24,7 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -43,8 +44,6 @@ import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
-import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -443,44 +442,27 @@ const Addons = () => {
                         ? 'Dedicated IPv4 address is enabled'
                         : 'Dedicated IPv4 address is not enabled'}
                     </p>
-                    <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger asChild>
-                        <div>
-                          <Button
-                            type="default"
-                            className="mt-2 pointer-events-auto"
-                            onClick={() => setPanel('ipv4')}
-                            disabled={
-                              isBranch ||
-                              !isProjectActive ||
-                              projectUpdateDisabled ||
-                              !(canUpdateIPv4 || ipv4)
-                            }
-                          >
-                            Change dedicated IPv4 address
-                          </Button>
-                        </div>
-                      </Tooltip.Trigger>
-                      <Tooltip.Portal>
-                        {/* Only show the tooltip if the user can't add the addon and ipv4 is not currently applied */}
-                        {!(canUpdateIPv4 || ipv4) && (
-                          <Tooltip.Content side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                'border border-background',
-                              ].join(' ')}
-                            >
-                              <span className="text-xs text-foreground">
-                                Temporarily disabled while we are migrating to IPv6, please check
-                                back later.
-                              </span>
-                            </div>
-                          </Tooltip.Content>
-                        )}
-                      </Tooltip.Portal>
-                    </Tooltip.Root>
+                    <ButtonTooltip
+                      type="default"
+                      className="mt-2 pointer-events-auto"
+                      onClick={() => setPanel('ipv4')}
+                      disabled={
+                        isBranch ||
+                        !isProjectActive ||
+                        projectUpdateDisabled ||
+                        !(canUpdateIPv4 || ipv4)
+                      }
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: !(canUpdateIPv4 || ipv4)
+                            ? 'Temporarily disabled while we are migrating to IPv6, please check back later.'
+                            : undefined,
+                        },
+                      }}
+                    >
+                      Change dedicated IPv4 address
+                    </ButtonTooltip>
                   </div>
                 </div>
               </ScaffoldSectionContent>

@@ -51,7 +51,6 @@ const MemoizedMessage = memo(
     return (
       <Message
         key={message.id}
-        id={message.id}
         role={message.role}
         content={message.content}
         readOnly={message.role === 'user'}
@@ -86,7 +85,7 @@ export const AIAssistant = ({
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
-  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { aiAssistantPanel, setAiAssistantPanel, saveLatestMessage } = useAppStateSnapshot()
   const { open, initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -96,7 +95,6 @@ export const AIAssistant = ({
   const [assistantError, setAssistantError] = useState<string>()
   const [lastSentMessage, setLastSentMessage] = useState<MessageType>()
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
-  const [showFade, setShowFade] = useState(false)
 
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -136,27 +134,17 @@ export const AIAssistant = ({
       schema: currentSchema,
       table: currentTable?.name,
     },
-    onFinish: (message) => {
-      setAiAssistantPanel({
-        messages: [...chatMessages, message],
-      })
-    },
+    onFinish: (message) => saveLatestMessage(message),
   })
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
   const messages = useMemo(() => {
-    const merged = [
+    return [
       ...chatMessages,
       ...(assistantError !== undefined && lastSentMessage !== undefined ? [lastSentMessage] : []),
     ]
-
-    return merged.sort(
-      (a, b) =>
-        (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0) ||
-        a.role.localeCompare(b.role)
-    )
   }, [chatMessages, assistantError, lastSentMessage])
 
   const renderedMessages = useMemo(
@@ -166,7 +154,7 @@ export const AIAssistant = ({
           <MemoizedMessage
             key={message.id}
             message={message}
-            isLoading={isChatLoading && message === messages[messages.length - 1]}
+            isLoading={isChatLoading && message.id === messages[messages.length - 1].id}
           />
         )
       }),
@@ -269,7 +257,7 @@ export const AIAssistant = ({
 
               <div className="text-sm flex-1">Assistant</div>
               <div className="flex gap-4 items-center">
-                <Tooltip_Shadcn_ delayDuration={100}>
+                <Tooltip_Shadcn_>
                   <TooltipTrigger_Shadcn_ asChild>
                     <Info size={14} className="text-foreground-light" />
                   </TooltipTrigger_Shadcn_>
@@ -319,12 +307,12 @@ export const AIAssistant = ({
             </div>
           )}
           {hasMessages ? (
-            <motion.div className="w-full p-5">
+            <div className="w-full p-5">
               {renderedMessages}
               {(last(messages)?.role === 'user' || last(messages)?.content?.length === 0) && (
                 <div className="flex gap-4 w-auto overflow-hidden">
                   <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
-                  <motion.div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
+                  <div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
                     <span>Thinking</span>
                     <div className="flex gap-1">
                       <motion.span
@@ -346,11 +334,11 @@ export const AIAssistant = ({
                         .
                       </motion.span>
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
               )}
               <div className="h-1" />
-            </motion.div>
+            </div>
           ) : suggestions ? (
             <div className="w-full h-full px-8 py-0 flex flex-col flex-1 justify-end">
               <h3 className="text-foreground-light font-mono text-sm uppercase mb-3">
@@ -520,7 +508,7 @@ export const AIAssistant = ({
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
-              'z-20 [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
+              'z-20 [&>textarea]:text-base [&>textarea]:md:text-sm [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
             )}
             loading={isChatLoading}
             disabled={!isApiKeySet || disablePrompts || isChatLoading}
