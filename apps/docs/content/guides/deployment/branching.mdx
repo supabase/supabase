@@ -583,8 +583,10 @@ For branching to work with Vercel, you also need the [Vercel GitHub integration]
 
 </Admonition>
 
-Supabase automatically updates your Vercel project with the correct environment variables for the corresponding preview branches.
-The synchronization happens at the time of Pull Request being opened, not at the time of branch creation.
+And make sure you have [connected](/dashboard/org/_/integrations) your Supabase project to your Vercel project.
+
+Supabase automatically updates your Vercel project with the correct environment variables for the corresponding preview branches. The synchronization happens at the time of Pull Request being opened, not at the time of branch creation.
+
 As branching integration is tied to the Preview Deployments feature in Vercel, there are possible race conditions between Supabase setting correct variables, and Vercel running a deployment process. Because of that, Supabase is always automatically re-deploying the most recent deployment of the given pull request.
 
 ## Other Git providers
