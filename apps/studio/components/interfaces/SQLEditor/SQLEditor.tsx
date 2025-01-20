@@ -451,6 +451,7 @@ export const SQLEditor = () => {
     sendEvent({
       action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
       properties: { handlerAccepted: false },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
     resetPrompt()
     closeDiff()

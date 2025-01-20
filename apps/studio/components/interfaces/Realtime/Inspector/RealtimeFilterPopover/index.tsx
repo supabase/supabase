@@ -21,7 +21,8 @@ import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
 import { TelemetryActions } from 'lib/constants/telemetry'
-import { orgSettingsPageState } from 'state/organization-settings'
+import { useParams } from 'common'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig

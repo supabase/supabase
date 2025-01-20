@@ -17,6 +17,8 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { TelemetryActions } from 'lib/constants/telemetry'
+import { useParams } from 'common'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export type ResultsDropdownProps = {
   id: string
