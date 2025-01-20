@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 import { Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import gaEvents from '~/lib/gaEvents'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 const Hero = () => {
@@ -32,7 +32,11 @@ const Hero = () => {
                     <Link
                       href="https://supabase.com/dashboard"
                       as="https://supabase.com/dashboard"
-                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}
+                      onClick={() =>
+                        sendTelemetryEvent({
+                          action: TelemetryActions.HOMEPAGE_HERO_START_PROJECT_CLICKED,
+                        })
+                      }
                     >
                       Start your project
                     </Link>
@@ -41,7 +45,11 @@ const Hero = () => {
                     <Link
                       href="/contact/sales"
                       as="/contact/sales"
-                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_requestDemo'])}
+                      onClick={() =>
+                        sendTelemetryEvent({
+                          action: TelemetryActions.HOMEPAGE_HERO_REQUEST_DEMO_CLICKED,
+                        })
+                      }
                     >
                       Request a demo
                     </Link>

@@ -11,7 +11,7 @@ import StorageVisual from './StorageVisual'
 import VectorVisual from './VectorVisual'
 
 import { PRODUCT_MODULES_SHORTNAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
-import gaEvents from '~/lib/gaEvents'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 import type { ProductType } from '~/data/MainProducts'
@@ -26,22 +26,10 @@ const Products: React.FC<Props> = (props) => {
   const sendTelemetryEvent = async (
     product: PRODUCT_SHORTNAMES | PRODUCT_MODULES_SHORTNAMES | 'data-api'
   ) => {
-    switch (product) {
-      case PRODUCT_SHORTNAMES.DATABASE:
-        return await _sendTelemetryEvent(gaEvents['www_hp_subhero_products_database'])
-      case PRODUCT_SHORTNAMES.AUTHENTICATION:
-        return await _sendTelemetryEvent(gaEvents['www_hp_subhero_products_auth'])
-      case PRODUCT_SHORTNAMES.STORAGE:
-        return await _sendTelemetryEvent(gaEvents['www_hp_subhero_products_storage'])
-      case PRODUCT_SHORTNAMES.FUNCTIONS:
-        return await _sendTelemetryEvent(gaEvents['www_hp_subhero_products_edgeFunctions'])
-      case PRODUCT_SHORTNAMES.REALTIME:
-        return await _sendTelemetryEvent(gaEvents['www_hp_subhero_products_realtime'])
-      case PRODUCT_MODULES_SHORTNAMES.VECTOR:
-        return await _sendTelemetryEvent(gaEvents['www_hp_subhero_products_vector'])
-      case 'data-api':
-        return await _sendTelemetryEvent(gaEvents['www_hp_subhero_products_data-api'])
-    }
+    return await _sendTelemetryEvent({
+      action: TelemetryActions.HOMEPAGE_PRODUCT_CARD_CLICKED,
+      properties: { product },
+    })
   }
 
   return (

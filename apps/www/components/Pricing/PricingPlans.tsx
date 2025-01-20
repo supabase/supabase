@@ -4,9 +4,9 @@ import { Check } from 'lucide-react'
 import { pickFeatures, pickFooter, plans } from 'shared-data/plans'
 import { Button, cn } from 'ui'
 import { Organization } from '~/data/organizations'
-import gaEvents from '~/lib/gaEvents'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import UpgradePlan from './UpgradePlan'
+import { TelemetryActions } from 'common/telemetry-constants'
 
 interface PricingPlansProps {
   organizations?: Organization[]
@@ -28,7 +28,14 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
             const footer = pickFooter(plan)
 
             const sendPricingEvent = () => {
-              sendTelemetryEvent(gaEvents[`www_pricing_hero_plan_${plan.name.toLowerCase()}`])
+              sendTelemetryEvent({
+                action: TelemetryActions.PRICING_PLAN_CTA_CLICKED,
+                properties: {
+                  plan: plan.name,
+                  showUpgradeText: isUpgradablePlan && hasExistingOrganizations ? true : false,
+                  section: 'main',
+                },
+              })
             }
 
             return (

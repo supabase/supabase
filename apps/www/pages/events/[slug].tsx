@@ -14,7 +14,7 @@ import NextImage from 'next/image'
 import Link from 'next/link'
 
 import authors from 'lib/authors.json'
-import gaEvents from '~/lib/gaEvents'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { isNotNullOrUndefined } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
@@ -285,7 +285,12 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     <Link
                       href={event.main_cta?.url ?? '#'}
                       target={event.main_cta?.target ? event.main_cta?.target : undefined}
-                      onClick={() => sendTelemetryEvent(gaEvents['www_event'])}
+                      onClick={() =>
+                        sendTelemetryEvent({
+                          action: TelemetryActions.EVENT_PAGE_CTA_CLICKED,
+                          properties: { eventTitle: event.title },
+                        })
+                      }
                     >
                       {IS_REGISTRATION_OPEN
                         ? event.main_cta?.label
