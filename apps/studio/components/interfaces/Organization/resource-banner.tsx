@@ -5,6 +5,22 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import Link from 'next/link'
 import { Button, cn, CriticalIcon, WarningIcon } from 'ui'
 import dayjs from 'dayjs'
+import { motion, AnimatePresence } from 'framer-motion'
+
+const bannerMotionProps = {
+  initial: { height: 0, opacity: 0 },
+  animate: { height: 'auto', opacity: 1 },
+  exit: { height: 0, opacity: 0 },
+  transition: { duration: 0.2, delay: 0.5 },
+} as const
+
+const containerMotionProps = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+} as const
 
 export function OrganizationResourceBanner() {
   const { data: resourceWarnings } = useResourceWarningsQuery()
@@ -12,44 +28,54 @@ export function OrganizationResourceBanner() {
   const org = useSelectedOrganization()
 
   return (
-    <>
-      {!!overdueInvoices?.length && (
-        <WarningBanner
-          type="danger"
-          title="Outstanding Invoices"
-          message="Please pay invoices to avoid service disruption."
-          link={`/org/${org?.slug}/settings/invoices`}
-          org={org}
-        />
-      )}
-      {org?.restriction_status === 'grace_period' && (
-        <WarningBanner
-          type="warning"
-          title="Your organization has exceeded its quota"
-          message={`You are given a grace period until ${dayjs(org?.restriction_data?.['grace_period_end']).format('DD MMM, YYYY')}`}
-          link={`/org/${org?.slug}/settings/billing`}
-          org={org}
-        />
-      )}
-      {org?.restriction_status === 'grace_period_over' && (
-        <WarningBanner
-          type="warning"
-          title="Grace period is over"
-          message="Your project will not be able to serve requests when you used up your quota."
-          link={`/org/${org?.slug}/settings/billing`}
-          org={org}
-        />
-      )}
-      {org?.restriction_status === 'restricted' && (
-        <WarningBanner
-          type="danger"
-          title="Services Restricted"
-          message="Your project is unable to serve any requests as your organization has used up its quota."
-          link={`/org/${org?.slug}/settings/billing`}
-          org={org}
-        />
-      )}
-    </>
+    <AnimatePresence>
+      <motion.div {...containerMotionProps}>
+        {!!overdueInvoices?.length && (
+          <motion.div {...bannerMotionProps}>
+            <WarningBanner
+              type="danger"
+              title="Outstanding Invoices"
+              message="Please pay invoices to avoid service disruption."
+              link={`/org/${org?.slug}/settings/invoices`}
+              org={org}
+            />
+          </motion.div>
+        )}
+        {org?.restriction_status === 'grace_period' && (
+          <motion.div {...bannerMotionProps}>
+            <WarningBanner
+              type="warning"
+              title="Your organization has exceeded its quota"
+              message={`You are given a grace period until ${dayjs(org?.restriction_data?.['grace_period_end']).format('DD MMM, YYYY')}`}
+              link={`/org/${org?.slug}/settings/billing`}
+              org={org}
+            />
+          </motion.div>
+        )}
+        {org?.restriction_status === 'grace_period_over' && (
+          <motion.div {...bannerMotionProps}>
+            <WarningBanner
+              type="warning"
+              title="Grace period is over"
+              message="Your project will not be able to serve requests when you used up your quota."
+              link={`/org/${org?.slug}/settings/billing`}
+              org={org}
+            />
+          </motion.div>
+        )}
+        {org?.restriction_status === 'restricted' && (
+          <motion.div {...bannerMotionProps}>
+            <WarningBanner
+              type="danger"
+              title="Services Restricted"
+              message="Your project is unable to serve any requests as your organization has used up its quota."
+              link={`/org/${org?.slug}/settings/billing`}
+              org={org}
+            />
+          </motion.div>
+        )}
+      </motion.div>
+    </AnimatePresence>
   )
 }
 

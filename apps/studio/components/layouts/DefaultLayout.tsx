@@ -23,7 +23,7 @@ const DefaultLayout = ({ children }: PropsWithChildren<DefaultLayoutProps>) => {
               <SidebarOpenTopBanner />
             </div>
             {/* Main Content Area */}
-            <div className="flex flex-1 w-full overflow-hidden">
+            <div className="flex flex-1 w-full overflow-y-hidden">
               {/* Sidebar */}
               <AppDefaultNavigation />
               {/* Main Content */}
