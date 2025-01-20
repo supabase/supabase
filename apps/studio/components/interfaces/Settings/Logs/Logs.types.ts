@@ -51,7 +51,8 @@ export interface CountData {
 }
 
 export interface EventChartData extends Datum {
-  count: number
+  error_count: number
+  ok_count: number
   timestamp: string
 }
 

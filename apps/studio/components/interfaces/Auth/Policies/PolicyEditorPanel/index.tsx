@@ -291,7 +291,7 @@ export const PolicyEditorPanel = memo(function ({
               size={showTools ? 'lg' : 'default'}
               className={cn(
                 'bg-surface-200 p-0 flex flex-row gap-0',
-                showTools ? '!min-w-[1000px]' : '!min-w-[600px]'
+                showTools ? '!min-w-[100vw] lg:!min-w-[1000px]' : '!min-w-[100vw] lg:!min-w-[600px]'
               )}
             >
               <div className={cn('flex flex-col grow w-full', showTools && 'w-[60%]')}>

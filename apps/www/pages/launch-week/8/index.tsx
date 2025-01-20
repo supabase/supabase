@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
-import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
+import { SITE_ORIGIN, LW_URL } from '~/lib/constants'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
@@ -105,7 +105,7 @@ export default function TicketHome({ users, meetups }: Props) {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: SITE_URL,
+          url: LW_URL,
           images: [
             {
               url: OG_IMAGE,

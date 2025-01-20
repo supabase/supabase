@@ -45,7 +45,7 @@ export const QueuesTab = () => {
 
   return (
     <>
-      <div className="w-full space-y-4 p-10">
+      <div className="w-full space-y-4 p-4 md:p-10">
         {queues.length === 0 ? (
           <div
             className={

@@ -49,7 +49,8 @@ const GITHUB_USER_CONTENT_URL = 'https://raw.githubusercontent.com'
 const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com'
 const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
 const VERCEL_LIVE_URL = 'https://vercel.live'
-const SENTRY_URL = 'https://*.ingest.sentry.io'
+const SENTRY_URL =
+  'https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io'
 
 // used by vercel live preview
 const PUSHER_URL = 'https://*.pusher.com'
@@ -63,7 +64,7 @@ const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
 const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
 
 const csp = [
-  ...(process.env.VERCEL_ENV === 'preview' ||
+  ...(process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
     ? [
@@ -108,8 +109,7 @@ const nextConfig = {
     return [
       {
         source: `/.well-known/vercel/flags`,
-        // TODO: Replace this with supabase.com/.well-known/vercel/flags once this PR is merged.
-        destination: `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.NEXT_PUBLIC_SITE_URL}${process.env.NEXT_PUBLIC_BASE_PATH}/.well-known/vercel/flags`,
+        destination: `https://supabase.com/.well-known/vercel/flags`,
         basePath: false,
       },
     ]
