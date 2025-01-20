@@ -3,8 +3,10 @@ import type { SqlSnippet } from './sql-snippets-query'
 
 export const contentKeys = {
   allContentLists: (projectRef: string | undefined) => ['projects', projectRef, 'content'] as const,
-  list: (projectRef: string | undefined, type: ContentType | undefined) =>
-    ['projects', projectRef, 'content', type] as const,
+  list: (
+    projectRef: string | undefined,
+    options: { type: ContentType | undefined; name: string | undefined }
+  ) => ['projects', projectRef, 'content', options] as const,
   sqlSnippets: (
     projectRef: string | undefined,
     options?: {
