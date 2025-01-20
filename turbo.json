@@ -54,7 +54,7 @@
         "SUPABASE_SECRET_KEY",
         "OPENAI_API_KEY"
       ],
-      "inputs": ["$TURBO_DEFAULT$", "../../examples/**"],
+      "inputs": ["$TURBO_DEFAULT$", "../../examples"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "studio#build": {
