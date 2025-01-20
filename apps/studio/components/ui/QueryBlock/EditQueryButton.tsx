@@ -37,7 +37,6 @@ export const EditQueryButton = ({ id, sql, title }: EditQueryButtonProps) => {
     content: { side: 'bottom', text: 'Edit in SQL Editor' },
   }
 
-  const { ref } = useParams()
   const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
