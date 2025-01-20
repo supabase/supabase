@@ -12,44 +12,44 @@ export type Metric = {
 
 type MetricCategory = {
   label: string
-  icon: ReactNode
+  icon: (className?: string) => ReactNode
   key: string
 }
 
 export const METRIC_CATEGORIES = {
   API: {
     label: 'All API usage',
-    icon: <ActivityIcon size={16} />,
+    icon: (className?: string) => <ActivityIcon size={16} className={className} />,
     key: 'api',
   },
   API_DATABASE: {
     label: 'Database API',
-    icon: <DatabaseIcon size={16} />,
+    icon: (className?: string) => <DatabaseIcon size={16} className={className} />,
     key: 'api_database',
   },
   API_AUTH: {
     label: 'Auth API',
-    icon: <Auth size={16} />,
+    icon: (className?: string) => <Auth size={16} className={className} />,
     key: 'api_auth',
   },
   API_STORAGE: {
     label: 'Storage API',
-    icon: <Storage size={16} />,
+    icon: (className?: string) => <Storage size={16} className={className} />,
     key: 'api_storage',
   },
   API_REALTIME: {
     label: 'Realtime API',
-    icon: <Realtime size={16} />,
+    icon: (className?: string) => <Realtime size={16} className={className} />,
     key: 'api_realtime',
   },
   INSTANCE: {
     label: 'Instance health',
-    icon: <HeartIcon size={16} />,
+    icon: (className?: string) => <HeartIcon size={16} className={className} />,
     key: 'instance',
   },
   SUPAVISOR: {
     label: 'Supavisor',
-    icon: <ServerIcon size={16} />,
+    icon: (className?: string) => <ServerIcon size={16} className={className} />,
     key: 'supavisor',
   },
 }

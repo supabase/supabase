@@ -4,7 +4,7 @@ import 'react-resizable/css/styles.css'
 
 import { Dashboards } from 'types'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
-import { ReportChartBlock } from './ReportChartBlock'
+import { ReportBlock } from './ReportBlock/ReportBlock'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 
 const ReactGridLayout = WidthProvider(RGL)
@@ -70,7 +70,7 @@ export const GridResize = ({
             key={item.id}
             data-grid={{ ...item, minH: 1, maxH: 1, minW: 1, maxW: LAYOUT_COLUMN_COUNT }}
           >
-            <ReportChartBlock
+            <ReportBlock
               key={item.id}
               item={item}
               startDate={startDate}
