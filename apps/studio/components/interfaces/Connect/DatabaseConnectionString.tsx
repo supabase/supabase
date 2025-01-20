@@ -173,7 +173,12 @@ export const DatabaseConnectionString = () => {
 
   return (
     <div className="flex flex-col">
-      <div className={cn('flex items-center gap-3', DIALOG_PADDING_X)}>
+      <div
+        className={cn(
+          'flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3',
+          DIALOG_PADDING_X
+        )}
+      >
         <div className="flex">
           <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
             Type
@@ -215,7 +220,7 @@ export const DatabaseConnectionString = () => {
         <div className="flex flex-col divide-y divide-border">
           {/* // handle non terminal examples */}
           {hasCodeExamples && (
-            <div className="grid grid-cols-2 gap-x-20 w-full px-7 py-8">
+            <div className="grid grid-cols-2 gap-x-20 w-full px-4 md:px-7 py-8">
               <div>
                 <StepLabel number={++stepNumber} className="mb-4">
                   Install the following
@@ -256,11 +261,11 @@ export const DatabaseConnectionString = () => {
 
           <div>
             {hasCodeExamples && (
-              <div className="px-7 pt-8">
+              <div className="px-4 md:px-7 pt-8">
                 <StepLabel number={++stepNumber}>Choose type of connection</StepLabel>
               </div>
             )}
-            <div className="divide-y divide-border-muted [&>div]:px-7 [&>div]:py-8">
+            <div className="divide-y divide-border-muted [&>div]:px-4 [&>div]:md:px-7 [&>div]:py-8">
               <ConnectionPanel
                 contentType={contentType}
                 lang={lang}
@@ -354,7 +359,7 @@ export const DatabaseConnectionString = () => {
             </div>
           </div>
           {examplePostInstallCommands && (
-            <div className="grid grid-cols-2 gap-20 w-full px-7 py-10">
+            <div className="grid grid-cols-2 gap-20 w-full px-4 md:px-7 py-10">
               <div>
                 <StepLabel number={++stepNumber} className="mb-4">
                   Add the configuration package to read the settings

@@ -7,7 +7,7 @@ keywords = [ "prepared", "statements", "transaction", "mode", "disable" ]
 database_id = "04801b69-e7eb-4f40-8d41-81110397bbc2"
 ---
 
-### It is important to note that although the direct connections and Supavisor in Session mode support prepared statements, Supavisor in transaction mode does not.
+### It is important to note that although the direct connections and Supavisor in session mode support prepared statements, Supavisor in transaction mode does not.
 
 ## How to disable prepared statements for Supavisor in transaction mode
 
@@ -29,7 +29,7 @@ Add a prepared false flag to the client:
 export const client = postgres(connectionString, { prepare: false })
 ```
 
-# node postgres
+# Node postgres
 
 [Just omit the "name" value in a query definition](https://node-postgres.com/features/queries#prepared-statements):
 
@@ -41,7 +41,7 @@ const query = {
 }
 ```
 
-# psycopg
+# Psycopg
 
 set the [prepare_threshold](https://www.psycopg.org/psycopg3/docs/api/connections.html#psycopg.Connection.prepare_threshold) to `None`.
 

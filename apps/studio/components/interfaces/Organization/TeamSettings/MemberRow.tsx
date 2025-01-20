@@ -72,9 +72,9 @@ export const MemberRow = ({ member }: MemberRowProps) => {
     <Table.tr>
       <Table.td>
         <div className="flex items-center space-x-4">
-          <div>
+          <div className="w-[32px] h-[32px] md:w-[40px] md:h-[40px]">
             {isInvitedUser || isEmailUser || isFlyUser || hasInvalidImg ? (
-              <div className="w-[40px] h-[40px] bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center">
+              <div className="w-[32px] h-[32px] md:w-[40px] md:h-[40px] bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center">
                 <User size={20} strokeWidth={1.5} />
               </div>
             ) : (
@@ -83,7 +83,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                 src={`https://github.com/${member.username}.png?size=80`}
                 width="40"
                 height="40"
-                className="border rounded-full"
+                className="border rounded-full w-[32px] h-[32px] md:w-[40px] md:h-[40px]"
                 onError={() => {
                   setHasInvalidImg(true)
                 }}

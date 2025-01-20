@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { AlertTriangle, CheckCircle2, ChevronRight, Info, Loader2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -8,7 +8,6 @@ import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-func
 import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-service-status-query'
 import {
   ProjectServiceStatus,
-  ProjectServiceStatusData,
   useProjectServiceStatusQuery,
 } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -44,18 +43,30 @@ const StatusMessage = ({
   return 'Unable to connect'
 }
 
+const iconProps = {
+  size: 18,
+  strokeWidth: 1.5,
+}
+const LoaderIcon = () => <Loader2 {...iconProps} className="animate-spin" />
+const AlertIcon = () => <AlertTriangle {...iconProps} />
+const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
+
 const StatusIcon = ({
   isLoading,
   isSuccess,
   isProjectNew,
+  projectStatus,
 }: {
   isLoading: boolean
   isSuccess: boolean
   isProjectNew: boolean
+  projectStatus?: ProjectServiceStatus
 }) => {
-  if (isLoading || isProjectNew) return <Loader2 size={14} className="animate-spin" />
-  if (isSuccess) return <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
-  return <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
+  if (isLoading || isProjectNew) return <LoaderIcon />
+  if (isSuccess) return <CheckIcon />
+  if (projectStatus === 'UNHEALTHY') return <AlertIcon />
+  if (projectStatus === 'COMING_UP') return <LoaderIcon />
+  return <AlertIcon />
 }
 
 const ServiceStatus = () => {
@@ -82,17 +93,36 @@ const ServiceStatus = () => {
     data: status,
     isLoading,
     refetch: refetchServiceStatus,
-  } = useProjectServiceStatusQuery({ projectRef: ref })
+  } = useProjectServiceStatusQuery(
+    {
+      projectRef: ref,
+    },
+    {
+      refetchInterval: (data) => (data?.some((service) => !service.healthy) ? 5000 : false),
+    }
+  )
   const { data: edgeFunctionsStatus, refetch: refetchEdgeFunctionServiceStatus } =
-    useEdgeFunctionServiceStatusQuery({ projectRef: ref })
+    useEdgeFunctionServiceStatusQuery(
+      {
+        projectRef: ref,
+      },
+      {
+        refetchInterval: (data) => (!data?.healthy ? 5000 : false),
+      }
+    )
   const {
     isLoading: isLoadingPostgres,
     isSuccess: isSuccessPostgres,
     refetch: refetchPostgresServiceStatus,
-  } = usePostgresServiceStatusQuery({
-    projectRef: ref,
-    connectionString: project?.connectionString,
-  })
+  } = usePostgresServiceStatusQuery(
+    {
+      projectRef: ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      refetchInterval: (data) => (data === null ? 5000 : false),
+    }
+  )
 
   const authStatus = status?.find((service) => service.name === 'auth')
   const restStatus = status?.find((service) => service.name === 'rest')
@@ -216,7 +246,7 @@ const ServiceStatus = () => {
           type="default"
           icon={
             isLoadingChecks || isProjectNew ? (
-              <Loader2 className="animate-spin" />
+              <LoaderIcon />
             ) : (
               <div
                 className={`w-2 h-2 rounded-full ${
@@ -241,6 +271,7 @@ const ServiceStatus = () => {
                 isLoading={service.isLoading}
                 isSuccess={!!service.isSuccess}
                 isProjectNew={isProjectNew}
+                projectStatus={service.status}
               />
               <div className="flex-1">
                 <p>{service.name}</p>
