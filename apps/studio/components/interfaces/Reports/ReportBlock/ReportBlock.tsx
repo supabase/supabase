@@ -4,6 +4,7 @@ import { useParams } from 'common'
 import { isReadOnlySelect } from 'components/ui/AIAssistantPanel/AIAssistant.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from 'components/ui/QueryBlock/QueryBlock'
+import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentIdQuery } from 'data/content/content-id-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Dashboards, SqlSnippets } from 'types'
@@ -14,7 +15,7 @@ interface ReportBlockProps {
   item: Dashboards.Chart
   startDate: string
   endDate: string
-  interval: string
+  interval: AnalyticsInterval
   disableUpdate: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
   onUpdateChart: (config: Partial<ChartConfig>) => void
@@ -92,7 +93,6 @@ export const ReportBlock = ({
           provider={item.provider}
           maxHeight={232}
           label={`${item.label}${projectRef !== state.selectedDatabaseId ? (item.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
-          customDateFormat={'MMM D, YYYY'}
           actions={
             !disableUpdate ? (
               <ButtonTooltip

@@ -2,6 +2,7 @@ import RGL, { WidthProvider } from 'react-grid-layout'
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 
+import { AnalyticsInterval } from 'data/analytics/constants'
 import { Dashboards } from 'types'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { ReportBlock } from './ReportBlock/ReportBlock'
@@ -12,7 +13,7 @@ const ReactGridLayout = WidthProvider(RGL)
 interface GridResizeProps {
   startDate: string
   endDate: string
-  interval: string
+  interval: AnalyticsInterval
   editableReport: Dashboards.Content
   disableUpdate: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
