@@ -42,7 +42,7 @@ const ContainerVariants = cva('relative grid gap-10', {
       false: '',
     },
     layout: {
-      horizontal: 'grid grid-cols-12',
+      horizontal: 'flex flex-col gap-2 md:gap-0 md:grid md:grid-cols-12',
       vertical: 'flex flex-col gap-3',
       flex: 'flex flex-row gap-3',
       'flex-row-reverse': 'flex flex-row gap-3 flex-row-reverse justify-between',

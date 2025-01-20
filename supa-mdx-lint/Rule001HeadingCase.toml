@@ -41,6 +41,7 @@ may_uppercase = [
     "Dart",
     "Dashboard",
     "Database Functions?",
+    "Deadpool",
     "Deno",
     "DigitalOcean",
     "Discord",
@@ -133,6 +134,7 @@ may_uppercase = [
     "PostgreSQL",
     "PostgREST",
     "Presence",
+    "Prisma",
     "Prometheus",
     "Python",
     "Queues?",
@@ -212,4 +214,4 @@ may_uppercase = [
 
 # Words that may be lowercased even if they are the first word in the sentence.
 # Can also specify a regex that is compatible with the [Rust regex crate](https://docs.rs/regex/latest/regex/).
-may_lowercase = ["iOS"]
+may_lowercase = ["asyncpg", "iOS"]

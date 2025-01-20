@@ -174,7 +174,7 @@ const RolesList = () => {
 
       <div className="space-y-4">
         <div>
-          <div className="bg-surface-100 border border-default px-6 py-3 rounded-t flex items-center space-x-4">
+          <div className="bg-surface-100 border border-default px-4 md:px-6 py-3 rounded-t flex items-center space-x-4">
             <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
             <Badge variant="brand">Protected</Badge>
           </div>
@@ -192,7 +192,7 @@ const RolesList = () => {
         </div>
 
         <div>
-          <div className="bg-surface-100 border border-default px-6 py-3 rounded-t">
+          <div className="bg-surface-100 border border-default px-4 md:px-6 py-3 rounded-t">
             <p className="text-sm text-foreground-light">Other database roles</p>
           </div>
 
