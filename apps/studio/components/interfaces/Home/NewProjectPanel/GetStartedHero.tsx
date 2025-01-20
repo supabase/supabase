@@ -1,6 +1,6 @@
 const GetStartedHero = () => {
   return (
-    <div className="w-full h-full relative pointer-events-none">
+    <div className="w-full max-w-[500px] h-full pb-10 lg:pb-0 relative pointer-events-none">
       <div
         className={[
           'w-[290px] lg:w-[400px] h-[180px] bg-alternative border border-default',

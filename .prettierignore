@@ -9,10 +9,9 @@ apps/**/out
 apps/www/schema.sql
 apps/www/public/images/*
 apps/docs/**/generated/*
+apps/docs/examples
 examples/slack-clone/nextjs-slack-clone/full-schema.sql
 # ignore files with custom js formatting
-apps/docs/pages/guides/auth/*.mdx
-apps/docs/pages/guides/integrations/*.mdx
 apps/studio/public
 apps/**/.turbo
 apps/docs/CONTRIBUTING.md
