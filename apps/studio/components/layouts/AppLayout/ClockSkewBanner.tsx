@@ -2,7 +2,8 @@ import { BASE_PATH } from 'lib/constants'
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from 'ui'
 
-const CLOCK_SKEW_THRESHOLD = 5000
+// Show the banner if the clock skew is greater than 2 minutes
+const CLOCK_SKEW_THRESHOLD = 2 * 60 * 1000
 // check every 5 minutes
 const CLOCK_SKEW_CHECK_INTERVAL = 30 * 60 * 1000
 
