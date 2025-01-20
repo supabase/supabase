@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import { ArrowUpDown } from 'lucide-react'
 import { useMemo } from 'react'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import BarChart from 'components/ui/Charts/BarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import {
@@ -16,7 +17,6 @@ import {
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
 } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 type Results = { rows: readonly any[] }
 
@@ -182,7 +182,11 @@ export const ChartConfig = ({
               icon={<ArrowUpDown size="15" className="text-foreground-lighter" />}
               tooltip={{
                 content: {
-                  text: canFlip ? 'Swap X and Y axis' : 'Cannot flip Y and X axis',
+                  side: 'bottom',
+                  className: 'w-64 text-center',
+                  text: canFlip
+                    ? 'Swap X and Y axis'
+                    : 'Unable to swap X and Y axis - both axes need to numerical values',
                 },
               }}
             >
