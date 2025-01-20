@@ -21,7 +21,6 @@ import {
   SqlEditorResultDownloadCsvClickedEvent,
   SqlEditorResultCopyMarkdownClickedEvent,
   SqlEditorResultCopyJsonClickedEvent,
-  TelemetryActions,
   SignUpEvent,
   SignInEvent,
   RealtimeInspectorListenChannelClickedEvent,
@@ -30,6 +29,15 @@ import {
   RealtimeInspectorCopyMessageClickedEvent,
   RealtimeInspectorFiltersAppliedEvent,
   RealtimeInspectorDatabaseRoleUpdatedEvent,
+  ProjectCreationInitialStepPromptIntendedEvent,
+  ProjectCreationInitialStepSubmittedEvent,
+  ProjectCreationSecondStepPromptIntendedEvent,
+  ProjectCreationSecondStepSubmittedEvent,
+  AssistantPromptSubmittedEvent,
+  AssistantDebugSubmittedEvent,
+  AssistantSuggestionRunQueryClickedEvent,
+  AssistantSqlDiffHandlerEvaluatedEvent,
+  AssistantEditInSqlEditorClickedEvent,
 } from 'lib/constants/telemetry'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
@@ -48,6 +56,10 @@ export type SendEventVariables =
   | FeaturePreviewsClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
+  | ProjectCreationInitialStepPromptIntendedEvent
+  | ProjectCreationInitialStepSubmittedEvent
+  | ProjectCreationSecondStepPromptIntendedEvent
+  | ProjectCreationSecondStepSubmittedEvent
   | RealtimeInspectorListenChannelClickedEvent
   | RealtimeInspectorBroadcastSentEvent
   | RealtimeInspectorMessageClickedEvent
@@ -59,14 +71,13 @@ export type SendEventVariables =
   | SqlEditorResultDownloadCsvClickedEvent
   | SqlEditorResultCopyMarkdownClickedEvent
   | SqlEditorResultCopyJsonClickedEvent
+  | AssistantPromptSubmittedEvent
+  | AssistantDebugSubmittedEvent
+  | AssistantSuggestionRunQueryClickedEvent
+  | AssistantSqlDiffHandlerEvaluatedEvent
+  | AssistantEditInSqlEditorClickedEvent
 
-  // TODO remove this once all events are documented
-  | {
-      action: TelemetryActions
-      properties?: Record<string, any> // Is arbitrary, but always aim to be self-explanatory with custom properties
-    }
-
-type SendEventPayload = components['schemas']['TelemetryEventBodyV2']
+type SendEventPayload = components['schemas']['TelemetryEventBodyV2Dto']
 
 export async function sendEvent({ body }: { body: SendEventPayload }) {
   const consent =

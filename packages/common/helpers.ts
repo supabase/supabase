@@ -33,3 +33,7 @@ export const useReducedMotion = (): boolean => {
     () => false
   )
 }
+
+export function ensurePlatformSuffix(apiUrl: string) {
+  return apiUrl.endsWith('/platform') ? apiUrl : `${apiUrl}/platform`
+}

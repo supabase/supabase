@@ -56,7 +56,7 @@ export const ForeignKeyFormatter = (props: Props) => {
         {value === null ? <NullValue /> : value}
       </span>
       {relationship !== undefined && targetTable !== undefined && value !== null && (
-        <Tooltip_Shadcn_ delayDuration={0}>
+        <Tooltip_Shadcn_>
           <TooltipTrigger_Shadcn_ asChild>
             <Button
               asChild

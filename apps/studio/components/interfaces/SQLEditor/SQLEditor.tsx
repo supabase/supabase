@@ -10,7 +10,6 @@ import { toast } from 'sonner'
 import { useCompletion } from 'ai/react'
 import { useParams } from 'common'
 import { GridFooter } from 'components/ui/GridFooter'
-import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { constructHeaders } from 'data/fetchers'
@@ -26,8 +25,8 @@ import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { detectOS, uuidv4 } from 'lib/helpers'
 import { TelemetryActions } from 'lib/constants/telemetry'
+import { detectOS, uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { format } from 'sql-formatter'
@@ -153,7 +152,6 @@ export const SQLEditor = () => {
   /* React query mutations */
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
-  const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
@@ -320,6 +318,7 @@ export const SQLEditor = () => {
           }),
           autoLimit: appendAutoLimit ? limit : undefined,
           isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+          contextualInvalidation: true,
           handleError: (error) => {
             throw error
           },
@@ -389,7 +388,7 @@ export const SQLEditor = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debugSql, entityDefinitions, id, snapV2.results, snapV2.snippets])
+  }, [entityDefinitions, id, snapV2.results, snapV2.snippets])
 
   const acceptAiHandler = useCallback(async () => {
     try {
@@ -421,7 +420,10 @@ export const SQLEditor = () => {
         }
       }
 
-      sendEvent({ action: TelemetryActions.ASSISTANT_SUGGESTION_ACCEPTED })
+      sendEvent({
+        action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
+        properties: { handlerAccepted: true },
+      })
 
       setSelectedDiffType(DiffType.Modification)
       resetPrompt()
@@ -442,7 +444,10 @@ export const SQLEditor = () => {
   ])
 
   const discardAiHandler = useCallback(() => {
-    sendEvent({ action: TelemetryActions.ASSISTANT_SUGGESTION_REJECTED })
+    sendEvent({
+      action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
+      properties: { handlerAccepted: false },
+    })
     resetPrompt()
     closeDiff()
   }, [closeDiff, resetPrompt, sendEvent])
@@ -799,7 +804,6 @@ export const SQLEditor = () => {
                   id={id}
                   isExecuting={isExecuting}
                   isDisabled={isDiffOpen}
-                  isDebugging={isDebugSqlLoading}
                   hasSelection={hasSelection}
                   prettifyQuery={prettifyQuery}
                   executeQuery={executeQuery}

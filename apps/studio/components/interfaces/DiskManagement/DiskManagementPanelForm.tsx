@@ -74,6 +74,7 @@ import {
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 
+// [Joshen] Only used for non AWS projects
 export function DiskManagementPanelForm() {
   const { project } = useProjectContext()
   const org = useSelectedOrganization()

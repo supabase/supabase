@@ -1,28 +1,27 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { DatabaseUpgradeProgress, DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
-import dayjs from 'dayjs'
-import Link from 'next/link'
-import { useState } from 'react'
-import { Button } from 'ui'
-
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common/hooks'
+import dayjs from 'dayjs'
+import {
+  AlertCircle,
+  Check,
+  CheckCircle,
+  Circle,
+  Loader,
+  Maximize2,
+  Minimize2,
+  Settings,
+} from 'lucide-react'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
+
+import { useParams } from 'common'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
+import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 import { useProjectContext } from '../ProjectContext'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
-import {
-  CheckCircle,
-  AlertCircle,
-  Settings,
-  Circle,
-  Minimize2,
-  Maximize2,
-  Loader,
-  Check,
-} from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
 
 const UpgradingState = () => {
   const { ref } = useParams()
@@ -101,7 +100,7 @@ const UpgradingState = () => {
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">We ran into an issue while upgrading your project</p>
-                  <p className="mt-4 text-center text-sm text-foreground-light w-[450px] mx-auto">
+                  <p className="mt-4 text-center text-sm text-foreground-light w-full md:w-[450px] mx-auto">
                     Your project is back online and its data is not affected. Please reach out to us
                     via our support form for assistance with the upgrade.
                   </p>
@@ -226,26 +225,14 @@ const UpgradingState = () => {
                   </div>
 
                   {initiated_at !== undefined && (
-                    <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger className="w-full">
+                    <Tooltip_Shadcn_>
+                      <TooltipTrigger_Shadcn_>
                         <p className="text-sm text-center text-foreground-light">
                           Started on: {initiatedAtUTC} (UTC)
                         </p>
-                      </Tooltip.Trigger>
-                      <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                              'border border-background', //border
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-foreground">{initiatedAt}</span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
-                    </Tooltip.Root>
+                      </TooltipTrigger_Shadcn_>
+                      <TooltipContent_Shadcn_ side="bottom">{initiatedAt}</TooltipContent_Shadcn_>
+                    </Tooltip_Shadcn_>
                   )}
                 </div>
               </div>

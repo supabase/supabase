@@ -1,11 +1,9 @@
 'use client'
 
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { type SupabaseClient } from '@supabase/supabase-js'
 import { usePathname } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect } from 'react'
 
-import { type DocsSearchResult } from 'common'
+import { useDocsSearch, type DocsSearchResult } from 'common'
 import { Button, cn } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -22,48 +20,25 @@ function SearchButton() {
   )
 }
 
-async function getRecommendations(page: string, supabase: SupabaseClient) {
-  try {
-    const query = decodeURIComponent(page.replace(/^\/(?:guides|reference)\//, '')).replace(
-      /[_\/-]/g,
-      ' '
-    )
-    if (!query) return []
-
-    const { data, error } = await supabase.rpc('docs_search_fts', { query })
-    if (error || !data?.length) return []
-    return data as Array<Omit<DocsSearchResult, 'sections'>>
-  } catch (err) {
-    console.error(err)
-    return []
-  }
-}
-
 function Recommendations() {
   const pathname = usePathname()
-  const supabase = useSupabaseClient()
 
-  const [loading, setLoading] = useState(true)
-  const [recommendations, setRecommendations] = useState(
-    [] as Array<Omit<DocsSearchResult, 'sections'>>
-  )
+  const { searchState: state, handleDocsSearch: handleSearch } = useDocsSearch()
+
+  const loading = state.status === 'initial' || state.status === 'loading'
+  const recommendations =
+    state.status === 'partialResults' || state.status === 'fullResults' ? state.results : []
 
   useEffect(() => {
     if (!pathname) return
 
-    let stale = false
+    const query = decodeURIComponent(pathname.replace(/^\/(?:guides|reference)\//, '')).replace(
+      /[_\/-]/g,
+      ' '
+    )
 
-    getRecommendations(pathname, supabase).then((data) => {
-      if (!stale) {
-        setRecommendations(data)
-        setLoading(false)
-      }
-    })
-
-    return () => {
-      stale = true
-    }
-  }, [pathname, supabase])
+    handleSearch(query)
+  }, [handleSearch, pathname])
 
   return (
     <section aria-labelledby="empty-page-recommendations" className="min-h-96 mt-20">

@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { ChevronDown, Edit, Lock, Trash, Unlock } from 'lucide-react'
 import type { CalculatedColumn } from 'react-data-grid'
 
@@ -9,6 +8,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Separator,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
 import { useDispatch, useTrackedState } from '../../store/Store'
 
@@ -44,31 +46,19 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
     return (
       <>
         {state.editable && onEditColumn !== undefined && (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
               <DropdownMenuItem className="space-x-2" onClick={onEditColumn} disabled={isEncrypted}>
                 <Edit size={14} />
                 <p>Edit column</p>
               </DropdownMenuItem>
-            </Tooltip.Trigger>
+            </TooltipTrigger_Shadcn_>
             {isEncrypted && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      Encrypted columns cannot be edited
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
+              <TooltipContent_Shadcn_ side="bottom">
+                Encrypted columns cannot be edited
+              </TooltipContent_Shadcn_>
             )}
-          </Tooltip.Root>
+          </Tooltip_Shadcn_>
         )}
         <DropdownMenuItem
           className="space-x-2"

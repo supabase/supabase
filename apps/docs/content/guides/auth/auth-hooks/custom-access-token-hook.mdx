@@ -10,8 +10,8 @@ Claims returned must conform to our specification. Supabase Auth will check for 
 
 These are the fields currently available on an access token:
 
-Required Claims: `aud`, `exp`, `iat`, `sub`, `email`, `phone`, `role`, `aal`, `session_id`
-Optional Claims: `jti`, `iss`, `nbf`, `app_metadata`, `user_metadata`, `amr`
+Required Claims: `iss`, `aud`, `exp`, `iat`, `sub`, `role`, `aal`, `session_id`
+Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`, `email`, `phone`
 
 **Inputs**
 
@@ -205,8 +205,57 @@ Return these only if your hook processed the input without errors.
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="add-admin-role"
+  defaultActiveId="minimal-jwt"
 >
+<TabPanel id="minimal-jwt" label="Minimal JWT">
+
+Sometimes the size of the JWT can be a problem especially if you're using a [Server-Side Rendering framework](/docs/guides/auth/server-side). Common situations where the JWT can get too large include:
+
+- The user has a particularly large name, email address or phone number
+- The default JWT has too many claims coming from OAuth providers
+- A large avatar URL is included
+
+To lower the size of the JWT you can define a Custom Access Token hook like the one below which will instruct the Auth server to issue a JWT with only the listed claims. Check the documentation above on what JWT claims must be present and cannot be removed.
+
+Refer to the [Postgres JSON functions](https://www.postgresql.org/docs/current/functions-json.html) on how to manipulate `jsonb` objects.
+
+```sql
+create or replace function public.custom_access_token_hook(event jsonb)
+returns jsonb
+language plpgsql
+as $$
+  declare
+    original_claims jsonb;
+    new_claims jsonb;
+    claim text;
+  begin
+    original_claims = event->'claims';
+    new_claims = '{}'::jsonb;
+
+    foreach claim in array array[
+      -- add claims you want to keep here
+      'iss',
+      'aud',
+      'exp',
+      'iat',
+      'sub',
+      'role',
+      'aal',
+      'session_id'
+   ] loop
+      if original_claims ? claim then
+        -- original_claims contains one of the listed claims, set it on new_claims
+        new_claims = jsonb_set(new_claims, array[claim], original_claims->claim);
+      end if;
+    end loop;
+
+    return jsonb_build_object('claims', new_claims);
+  end
+$$;
+```
+
+</TabPanel>
+
 <TabPanel id="add-admin-role" label="Add admin role">
 
 You can allow registered admin users to perform restricted actions by granting an `admin` claim to their token.

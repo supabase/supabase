@@ -6,11 +6,9 @@ export enum TelemetryActions {
 
   ASSISTANT_PROMPT_SUBMITTED = 'assistant_prompt_submitted',
   ASSISTANT_DEBUG_SUBMITTED = 'assistant_debug_submitted',
-  ASSISTANT_SUGGESTION_RAN = 'assistant_suggestion_ran',
-  ASSISTANT_SUGGESTION_ACCEPTED = 'assistant_suggestion_accepted',
-  ASSISTANT_SUGGESTION_REJECTED = 'assistant_suggestion_rejected',
-  ASSISTANT_SUGGESTION_COPIED = 'assistant_suggestion_copied',
-  ASSISTANT_EDIT_SQL_CLICKED = 'assistant_edit_sql_clicked',
+  ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED = 'assistant_suggestion_run_query_clicked',
+  ASSISTANT_SQL_DIFF_HANDLER_EVALUATED = 'assistant_sql_diff_handler_evaluated',
+  ASSISTANT_EDIT_IN_SQL_EDITOR_CLICKED = 'assistant_edit_in_sql_editor_clicked',
 
   CONNECTION_STRING_COPIED = 'connection_string_copied',
 
@@ -25,6 +23,11 @@ export enum TelemetryActions {
   FEATURE_PREVIEWS_CLICKED = 'feature_previews_clicked',
   FEATURE_PREVIEW_ENABLED = 'feature_preview_enabled',
   FEATURE_PREVIEW_DISABLED = 'feature_preview_disabled',
+
+  PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED = 'project_creation_initial_step_prompt_intended',
+  PROJECT_CREATION_INITIAL_STEP_SUBMITTED = 'project_creation_initial_step_submitted',
+  PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED = 'project_creation_second_step_prompt_intended',
+  PROJECT_CREATION_SECOND_STEP_SUBMITTED = 'project_creation_second_step_submitted',
 
   REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED = 'realtime_inspector_listen_channel_clicked',
   REALTIME_INSPECTOR_BROADCAST_SENT = 'realtime_inspector_broadcast_sent',
@@ -108,7 +111,7 @@ export interface CronJobCreatedEvent {
     /**
      * What the cron job executes, e.g. sql_function or sql_snippet
      */
-    type: 'sql_function' | 'sql_snippet'
+    type: 'sql_function' | 'sql_snippet' | 'edge_function' | 'http_request'
     /**
      * Schedule of the cron job in the format of * * * * *
      */
@@ -129,7 +132,7 @@ export interface CronJobUpdatedEvent {
     /**
      * What the cron job executes, e.g. sql_function or sql_snippet
      */
-    type: 'sql_function' | 'sql_snippet'
+    type: 'sql_function' | 'sql_snippet' | 'edge_function' | 'http_request'
     /**
      * Schedule of the cron job in the format of * * * * *
      */
@@ -238,6 +241,72 @@ export interface FeaturePreviewDisabledEvent {
      */
     feature: string
   }
+}
+
+/**
+ * On the InitialStep.tsx screen, where user can chose to prompt, start blank or migrate, at least 5 characters were typed
+ * in the prompt textarea indicating an intention to use the prompt.
+ *
+ * @group Events
+ * @source studio
+ * @page new/v2/{slug}
+ */
+export interface ProjectCreationInitialStepPromptIntendedEvent {
+  action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED
+  /**
+   * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
+   * words, was this not just an edit. In this case, it should always be true.
+   */
+  properties: {
+    isNewPrompt: boolean
+  }
+}
+
+/**
+ * First step of project creation was submitted, where the user writes a prompt or select to start blank or to migrate.
+ *
+ * @group Events
+ * @source studio
+ * @page new/v2/{slug}
+ */
+export interface ProjectCreationInitialStepSubmittedEvent {
+  action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED
+  properties: {
+    /**
+     * Records what the user selected in the first step of project creation.
+     */
+    onboardingPath: 'use_prompt' | 'start_blank' | 'migrate'
+  }
+}
+
+/**
+ * After the InitialStep screen, at least 5 characters were typed in the prompt textarea indicating an intention to use the prompt.
+ *
+ * @group Events
+ * @source studio
+ * @page new/v2/{slug}
+ */
+export interface ProjectCreationSecondStepPromptIntendedEvent {
+  action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED
+  properties: {
+    /**
+     * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
+     * words, was this not just an edit.
+     */
+    isNewPrompt: boolean
+  }
+}
+
+/**
+ * Second and final step of project creation was submitted. More precisely, right after the user clicks on "Create Project". To check,
+ * if the project creation was successful, please refer to project_created event.
+ *
+ * @group Events
+ * @source studio
+ * @page new/v2/{slug}
+ */
+export interface ProjectCreationSecondStepSubmittedEvent {
+  action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_SUBMITTED
 }
 
 /**
@@ -371,4 +440,75 @@ export interface SqlEditorResultCopyMarkdownClickedEvent {
  */
 export interface SqlEditorResultCopyJsonClickedEvent {
   action: TelemetryActions.SQL_EDITOR_RESULT_COPY_JSON_CLICKED
+}
+
+/**
+ * User submitted a prompt to the assistant sidebar.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantPromptSubmittedEvent {
+  action: TelemetryActions.ASSISTANT_PROMPT_SUBMITTED
+}
+
+/**
+ * User submitted a debug request to the assistant sidebar or prompt submitted has Help me to debug.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantDebugSubmittedEvent {
+  action: TelemetryActions.ASSISTANT_DEBUG_SUBMITTED
+}
+
+/**
+ * User clicked the run query button in the suggestion provided in the assistant sidebar.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantSuggestionRunQueryClickedEvent {
+  action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED
+  properties: {
+    /**
+     * The type of suggestion that was run by the user. Mutate or Select query types only.
+     */
+    queryType: string
+    category?: string
+  }
+}
+
+/**
+ * User accepted or rejected changes in sql ai diff handler. They can accept change by clicking accept button or typing shortcut (CMD+Enter) or reject by clicking reject button or typing shortcut (Esc). Handler only appears after clicking any dropdown option in Edit in Sql Editor in suggestion provided by the assistant. The dropdown options only appear in any page with 'sql' in url.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface AssistantSqlDiffHandlerEvaluatedEvent {
+  action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED
+  properties: {
+    /**
+     * Whether the user accepted or rejected the changes.
+     */
+    handlerAccepted: boolean
+  }
+}
+
+/**
+ * User clicked Edit in SQL Editor button in the assistant sidebar when user is in any page that does not have 'sql' in url or is in a new snippet.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantEditInSqlEditorClickedEvent {
+  action: TelemetryActions.ASSISTANT_EDIT_IN_SQL_EDITOR_CLICKED
+  properties: {
+    /**
+     * Whether the user is in the SQL editor page or in a new snippet.
+     */
+    isInSQLEditor: boolean
+    isInNewSnippet: boolean
+  }
 }

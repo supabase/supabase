@@ -1,12 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import type { Message as MessageType } from 'ai/react'
+import { useChat } from 'ai/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
 import { ArrowDown, FileText, Info, X } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import type { Message as MessageType } from 'ai/react'
-import { useChat } from 'ai/react'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -26,7 +27,6 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { TelemetryActions } from 'lib/constants/telemetry'
 import uuidv4 from 'lib/uuid'
-import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -51,7 +51,6 @@ const MemoizedMessage = memo(
     return (
       <Message
         key={message.id}
-        id={message.id}
         role={message.role}
         content={message.content}
         readOnly={message.role === 'user'}
@@ -86,7 +85,7 @@ export const AIAssistant = ({
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
-  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { aiAssistantPanel, setAiAssistantPanel, saveLatestMessage } = useAppStateSnapshot()
   const { open, initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -96,7 +95,6 @@ export const AIAssistant = ({
   const [assistantError, setAssistantError] = useState<string>()
   const [lastSentMessage, setLastSentMessage] = useState<MessageType>()
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
-  const [showFade, setShowFade] = useState(false)
 
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -118,12 +116,6 @@ export const AIAssistant = ({
   const currentSchema = searchParams?.get('schema') ?? 'public'
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const sendTelemetryEvent = (action: TelemetryActions) => {
-    sendEvent({
-      action,
-      properties: { contextAdded: (sqlSnippets ?? []).length > 0 },
-    })
-  }
 
   const {
     messages: chatMessages,
@@ -142,27 +134,17 @@ export const AIAssistant = ({
       schema: currentSchema,
       table: currentTable?.name,
     },
-    onFinish: (message) => {
-      setAiAssistantPanel({
-        messages: [...chatMessages, message],
-      })
-    },
+    onFinish: (message) => saveLatestMessage(message),
   })
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
   const messages = useMemo(() => {
-    const merged = [
+    return [
       ...chatMessages,
       ...(assistantError !== undefined && lastSentMessage !== undefined ? [lastSentMessage] : []),
     ]
-
-    return merged.sort(
-      (a, b) =>
-        (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0) ||
-        a.role.localeCompare(b.role)
-    )
   }, [chatMessages, assistantError, lastSentMessage])
 
   const renderedMessages = useMemo(
@@ -172,7 +154,7 @@ export const AIAssistant = ({
           <MemoizedMessage
             key={message.id}
             message={message}
-            isLoading={isChatLoading && message === messages[messages.length - 1]}
+            isLoading={isChatLoading && message.id === messages[messages.length - 1].id}
           />
         )
       }),
@@ -194,9 +176,13 @@ export const AIAssistant = ({
     setLastSentMessage(payload)
 
     if (content.includes('Help me to debug')) {
-      sendTelemetryEvent(TelemetryActions.ASSISTANT_DEBUG_SUBMITTED)
+      sendEvent({
+        action: TelemetryActions.ASSISTANT_DEBUG_SUBMITTED,
+      })
     } else {
-      sendTelemetryEvent(TelemetryActions.ASSISTANT_PROMPT_SUBMITTED)
+      sendEvent({
+        action: TelemetryActions.ASSISTANT_PROMPT_SUBMITTED,
+      })
     }
   }
 
@@ -271,7 +257,7 @@ export const AIAssistant = ({
 
               <div className="text-sm flex-1">Assistant</div>
               <div className="flex gap-4 items-center">
-                <Tooltip_Shadcn_ delayDuration={100}>
+                <Tooltip_Shadcn_>
                   <TooltipTrigger_Shadcn_ asChild>
                     <Info size={14} className="text-foreground-light" />
                   </TooltipTrigger_Shadcn_>
@@ -321,12 +307,12 @@ export const AIAssistant = ({
             </div>
           )}
           {hasMessages ? (
-            <motion.div className="w-full p-5">
+            <div className="w-full p-5">
               {renderedMessages}
               {(last(messages)?.role === 'user' || last(messages)?.content?.length === 0) && (
                 <div className="flex gap-4 w-auto overflow-hidden">
                   <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
-                  <motion.div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
+                  <div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
                     <span>Thinking</span>
                     <div className="flex gap-1">
                       <motion.span
@@ -348,11 +334,11 @@ export const AIAssistant = ({
                         .
                       </motion.span>
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
               )}
               <div className="h-1" />
-            </motion.div>
+            </div>
           ) : suggestions ? (
             <div className="w-full h-full px-8 py-0 flex flex-col flex-1 justify-end">
               <h3 className="text-foreground-light font-mono text-sm uppercase mb-3">
@@ -511,7 +497,9 @@ export const AIAssistant = ({
               title="OpenAI API key not set"
               description={
                 <Markdown
-                  content={'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'}
+                  content={
+                    'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
+                  }
                 />
               }
             />
@@ -520,7 +508,7 @@ export const AIAssistant = ({
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
-              'z-20 [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
+              'z-20 [&>textarea]:text-base [&>textarea]:md:text-sm [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
             )}
             loading={isChatLoading}
             disabled={!isApiKeySet || disablePrompts || isChatLoading}
