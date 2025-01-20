@@ -17,7 +17,6 @@ import {
   TooltipContent_Shadcn_,
 } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { useParams } from 'common'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface EditQueryButtonProps {
