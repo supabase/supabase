@@ -7,7 +7,6 @@
     "predev": "pnpm run codegen:references && pnpm run codegen:examples",
     "dev": "next dev --port 3001",
     "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../scripts/getSecrets.js -n local/docs",
-    "prebuild": "pnpm run codegen:references && pnpm run codegen:examples",
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
     "build:sitemap": "tsx ./internals/generate-sitemap.ts",
@@ -27,7 +26,7 @@
     "codegen:examples": "cp -r ../../examples ./examples",
     "codegen:references": "tsx features/docs/Reference.generated.script.ts",
     "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --write \"content/**/*.mdx\"",
-    "clean": "rimraf node_modules ./docs/features/docs/generated ./examples"
+    "clean": "rimraf node_modules features/docs/generated examples"
   },
   "dependencies": {
     "@code-hike/mdx": "^0.9.0",
