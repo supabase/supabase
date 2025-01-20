@@ -101,10 +101,10 @@ const FunctionsList = ({
         </div>
       ) : (
         <div className="w-full space-y-4">
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex items-center gap-x-2">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2">
               <SchemaSelector
-                className="w-[180px]"
+                className="w-full lg:w-[180px]"
                 size="tiny"
                 showError={false}
                 selectedSchemaName={selectedSchema}
@@ -120,7 +120,7 @@ const FunctionsList = ({
                 size="tiny"
                 icon={<Search size={14} />}
                 value={filterString}
-                className="w-52"
+                className="w-full lg:w-52"
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>
@@ -131,6 +131,7 @@ const FunctionsList = ({
                   <ButtonTooltip
                     disabled={!canCreateFunctions}
                     onClick={() => createFunction()}
+                    className="flex-grow"
                     tooltip={{
                       content: {
                         side: 'bottom',

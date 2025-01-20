@@ -91,7 +91,7 @@ const PreviewFilterPanel = ({
   }, [defaultSearchValue])
 
   const RefreshButton = () => (
-    <Tooltip_Shadcn_ delayDuration={100}>
+    <Tooltip_Shadcn_>
       <TooltipTrigger_Shadcn_ asChild>
         <Button
           title="refresh"
@@ -239,7 +239,7 @@ const PreviewFilterPanel = ({
 
       {showDatabaseSelector ? (
         <div className="flex items-center justify-center gap-x-2">
-          <Tooltip_Shadcn_ delayDuration={100}>
+          <Tooltip_Shadcn_>
             <TooltipTrigger_Shadcn_ asChild>
               <Button asChild className="px-1.5" type="default" icon={<Terminal />}>
                 <Link href={queryUrl} />

@@ -7,7 +7,7 @@ keywords = [ "pooler", "connections", "supavisor", "database" ]
 database_id = "f252ba39-e540-462b-868f-42eb31a5d40c"
 ---
 
-### What Problems Do Poolers Solve?
+### What problems do poolers solve?
 
 PostgreSQL stands out from other databases by opting to create a new process, not a new thread, for each direct connection. While this design choice brings [numerous benefits](https://www.postgresql.org/message-id/1098894087.31930.62.camel@localhost.localdomain), it introduces a startup penalty for new connections. Moreover, connections are more memory-intensive and can strain Postgres's internal schedulers, limiting the sustainable number that can be formed. Resultingly, developers must be mindful of how they allocate the resource.
 
@@ -15,11 +15,11 @@ When a client (backend server) connects to PostgreSQL, the connection is statefu
 
 PostgreSQL's shortcomings are particularly evident when handling transient servers, like edge functions. They not only hoard connections for brief queries but also aggressively open and close connections, straining the database.
 
-### How Do Poolers Solve the Problem?
+### How do poolers solve the problem?
 
 A pooler is ultimately a load balancer for database connections. It maintains several hot connections that it triages to clients. This reduces the startup cost of creating a new process on Postgres. The pooler can also more efficiently manage a database's finite connections by only allowing clients to access them when they need to execute a query (A.K.A. transaction mode).
 
-### Are Poolers Necessary?
+### Are poolers necessary?
 
 All database connection libraries, such as Prisma, SQLAlchemy, and Postgres.js have built-in poolers. These are known as application-side poolers and they are fundamental for sustainable connection management. Most libraries have default pool sizes that may need to be changed for specific workloads. As an example, most edge/serverless functions are called to service a single user's request. They usually require significantly fewer connections (often 1 is optimal) than a dedicated application server.
 
@@ -64,7 +64,7 @@ postgresql://postgres.ajrbwkcuthywddfihrmflo:[YOUR-PASSWORD]@aws-0-us-east-1.poo
 postgresql://postgres.ajrbwkcuthywfddihrmflo:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
 ```
 
-### Supavisor: Transaction Mode vs. Session Mode?
+### Supavisor: Transaction mode vs. Session mode?
 
 When a client forms a direct connection with PostgreSQL, it usually will make a few queries, but may not utilize the connection the entire time. In transaction mode, a client is allowed to make a single query before being sent back to the figurative "waiting room". This prevents greedy or sedentary clients from hoarding connections. In most cases, this increases query throughput and is optimal.
 
@@ -74,11 +74,11 @@ This behavior mirrors a direct connection, allowing greedy clients to monopolize
 
 Depending on your application's configurations, having the pooler manage a queue of patient clients is preferable to the alternative of constantly polling the database to check for an available connection. Session mode can queue clients for up to a minute. If this isn't particularly relevant to your application design, then the primary benefit is that it is [IPv4 compatible](https://github.com/orgs/supabase/discussions/27034). Also, unlike transaction mode, it supports prepared statements.
 
-### What Happens when a Client Library, such as Prisma, Connects through Supavisor?
+### What happens when a client library, such as prisma, connects through Supavisor?
 
 When clients connect to either PostgreSQL or Supavisor, they do so with the PostgreSQL Wire Protocol. Because of this, clients treat connections with pooler as if they were directly connected to PostgreSQL. The pooler then smoothly acts as a messenger between the database and the client.
 
-### What are "Client Connections"?
+### What are "client connections"?
 
 TL;DR: They have nothing to do with front-end clients. They are the amount of backend-server connections that can connect to a serverside pooler.
 
@@ -88,11 +88,11 @@ But when the tournament fills up and all the boards are taken, new players are t
 
 Now, imagine the tournament organizers decide to expand the venue to house 200 people without adding more tables. Even when all boards are occupied, players don't have to leave. They can wait in the wings, and the moment a board opens up, someone from the waiting area can take their place. Likewise, if someone ends their game, but wants to play again, they can just go back to the waiting area. The waiting area represents the "Max Client Connections". Ultimately, the additional capacity provided by the pooler ensures fewer people are turned away from the "tournament".
 
-### In the Context of Supavisor, what Does "pool size" Mean?
+### In the context of Supavisor, what does "pool size" mean?
 
 "Pool size" refers to the maximum number of direct connections the pooler can maintain per unique user, database, and mode combination. You can adjust it in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database) to strike a balance between efficient resource utilization and accommodating peak traffic.
 
-### What is the "user+db+mode" Combination?
+### What is the "user+db+mode" combination?
 
 PostgreSQL is not actually a database. It is a Relational Database Management System (RDMS). Within it, you can spawn PostgreSQL databases. In Supabase, it is a common pattern to just use the default database called postgres, but you could create more:
 
@@ -118,7 +118,7 @@ postgres://[USER].shfmmplnqscentnakbkl:[password]@aws-0-ca-central-1.pooler.supa
 
 When a distinct combination connects to your database, a new direct connection pool will be created. That means if you have two combinations connecting and the "Pool Size" is set to 120, each combination will have permission to form 120 connections. This can become problematic if collectively they exhaust all available direct connections.
 
-### **Does Supavisor Immediately Establish the Max Pool Size?**
+### **Does Supavisor immediately establish the max pool size?**
 
 No, it doesn't. Let's break it down:
 
@@ -128,7 +128,7 @@ No, it doesn't. Let's break it down:
 - In transaction mode, once a direct connection is established, the pooler will keep it available for reuse for another client. However, if the connection remains unused for 5 minutes, the pooler will close it to free up database resources. In session mode, the connection will be immediately closed.
 - If a client is connected to the pooler, then at least 1 hot connection will be sustained, even if no client needs it.
 
-### **Where Can I Change My Pool Size?**
+### **Where can I change my pool size?**
 
 In the [Dashboard's Database Settings](https://supabase.com/dashboard/project/_/settings/database), you can configure Supavisor's "Pool Size":
 
@@ -146,7 +146,7 @@ Supabase Storage uses Supavisor internally. The other servers that communicate w
 
 Supavisor is primarily intended for users who do not want to rely on the Supase Client libraries and instead prefer to work with external ORMs, such as Prisma, Drizzle, and Psycopg.
 
-### **Should I Change Supavisor's Pool Size?**
+### **Should I change Supavisor's pool size?**
 
 In an ideal scenario, PostgreSQL would support an unlimited number of direct connections, but there's a limit to how many it can handle. If Supavisor uses most of the available connections, you risk depriving other servers, such as Auth, from accessing your database. Still, as much as possible, you want to give your pooler freedom to grow its pool as needed to service demand.
 
@@ -154,7 +154,7 @@ It's important to note that the Storage server also uses Supavisor as a unique "
 
 As a rule of thumb, if you're using the DB REST API or multiple app-based "user+db+mode" combinations, try to keep the pooler's usage under 40% of available connections. Otherwise, you can cautiously increase usage to around 80%. These percentages are flexible and depend on your application's usage and setup. Monitor connection usage to determine the optimal allocation without depriving other servers of necessary connections.
 
-### **How can I Monitor Connections?**
+### **How can I monitor connections?**
 
 > EDIT: a more in-depth [troubleshooting guide](https://github.com/orgs/supabase/discussions/27141) for connection monitoring was published
 
@@ -162,7 +162,7 @@ Connection usage can be monitored with a Supabase Grafana Dashboard. It provides
 
 You can check our [GitHub repo](https://github.com/supabase/supabase-grafana) for setup instructions for local deployments or free cloud deployments on [Fly.io](http://fly.io/). I recommend referring to our concise [documentation](https://supabase.com/docs/guides/platform/metrics) to learn more about the metrics endpoint.
 
-### **Can Supavisor really Support a Million Connections?**
+### **Can Supavisor really support a million connections?**
 
 It depends.
 

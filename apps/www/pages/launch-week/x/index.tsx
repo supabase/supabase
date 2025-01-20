@@ -4,7 +4,7 @@ import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Session } from '@supabase/supabase-js'
-import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
+import { LW_URL, SITE_ORIGIN } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
 
 import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
@@ -91,7 +91,7 @@ export default function LaunchWeekIndex({ meetups }: Props) {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: SITE_URL,
+          url: LW_URL,
           images: [
             {
               url: OG_IMAGE,

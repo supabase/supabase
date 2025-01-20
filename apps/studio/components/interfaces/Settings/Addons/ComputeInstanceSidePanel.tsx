@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { ExternalLink, Info } from 'lucide-react'
@@ -35,6 +34,9 @@ import {
   Modal,
   Radio,
   SidePanel,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
   WarningIcon,
 } from 'ui'
 
@@ -339,35 +341,19 @@ const ComputeInstanceSidePanel = () => {
                             </span>
                           </div>
                           {option.price_interval === 'hourly' && (
-                            <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger>
-                                <div className="flex items-center">
-                                  <Info
-                                    size={14}
-                                    strokeWidth={2}
-                                    className="hover:text-foreground-light"
-                                  />
-                                </div>
-                              </Tooltip.Trigger>
-                              <Tooltip.Portal>
-                                <Tooltip.Content side="bottom">
-                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                  <div
-                                    className={[
-                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                      'border border-background',
-                                    ].join(' ')}
-                                  >
-                                    <div className="flex items-center space-x-1">
-                                      <p className="text-foreground text-sm">
-                                        ${Number(option.price * 672).toFixed(0)} - $
-                                        {Number(option.price * 744).toFixed(0)} per month
-                                      </p>
-                                    </div>
-                                  </div>
-                                </Tooltip.Content>
-                              </Tooltip.Portal>
-                            </Tooltip.Root>
+                            <Tooltip_Shadcn_>
+                              <TooltipTrigger_Shadcn_>
+                                <Info
+                                  size={14}
+                                  strokeWidth={2}
+                                  className="hover:text-foreground-light"
+                                />
+                              </TooltipTrigger_Shadcn_>
+                              <TooltipContent_Shadcn_ side="bottom">
+                                ${Number(option.price * 672).toFixed(0)} - $
+                                {Number(option.price * 744).toFixed(0)} per month
+                              </TooltipContent_Shadcn_>
+                            </Tooltip_Shadcn_>
                           )}
                         </div>
                       </div>

@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import type { SupaRow, SupaTable } from 'components/grid/types'
 import {
@@ -7,6 +6,7 @@ import {
 } from 'components/grid/utils/gridColumns'
 import { Key } from 'lucide-react'
 import DataGrid, { Column } from 'react-data-grid'
+import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
 export interface SelectorGridProps {
   table: SupaTable
@@ -18,21 +18,14 @@ const columnRender = (name: string, isPrimaryKey = false) => {
   return (
     <div className="flex h-full items-center justify-center gap-2">
       {isPrimaryKey && (
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_>
             <div className="text-brand">
               <Key size={14} strokeWidth={2} />
             </div>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div className="rounded bg-alternative py-1 px-2 leading-none shadow border border-background">
-                <span className="text-xs text-foreground">Primary key</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom">Primary key</TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
       )}
 
       <span className="sb-grid-column-header__inner__name">{name}</span>
