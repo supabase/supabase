@@ -57,13 +57,13 @@ export const METRIC_CATEGORIES = {
 export const METRICS: Metric[] = [
   {
     key: 'avg_cpu_usage',
-    label: 'Average CPU % usage',
+    label: 'Average CPU % Usage',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
   {
     key: 'max_cpu_usage',
-    label: 'Max CPU % usage',
+    label: 'Max CPU % Usage',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
@@ -81,7 +81,7 @@ export const METRICS: Metric[] = [
   },
   {
     key: 'ram_usage',
-    label: 'Memory % usage',
+    label: 'Memory % Usage',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
@@ -204,13 +204,13 @@ export const METRICS: Metric[] = [
   },
   {
     key: 'total_auth_patch_requests',
-    label: 'Auth PATCH requests',
+    label: 'Auth PATCH Requests',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_AUTH,
   },
   {
     key: 'total_auth_options_requests',
-    label: 'Auth OPTIONS requests',
+    label: 'Auth OPTIONS Requests',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_AUTH,
   },

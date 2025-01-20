@@ -334,7 +334,7 @@ export const QueryBlock = ({
           ) : (
             <div className={cn('flex-1 border-t')}>
               <ChartContainer
-                className="aspect-auto px-3 pb-2"
+                className="aspect-auto px-3 py-2"
                 config={{}}
                 style={{
                   height: maxHeight ? `${maxHeight}px` : undefined,

@@ -18,6 +18,7 @@ import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { WarningIcon } from 'ui'
+import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 
 interface ChartBlockProps {
   label: string
@@ -95,13 +96,34 @@ export const ChartBlock = ({
   const metric = METRICS.find((x) => x.key === attribute)
   const metricLabel = metric?.label ?? attribute
 
+  const getCellColor = (attribute: string, value: number) => {
+    const threshold = METRIC_THRESHOLDS[attribute as keyof typeof METRIC_THRESHOLDS]
+    if (!threshold) return 'var(--chart-1)'
+    if (threshold.check === 'gt') {
+      return value >= threshold.danger
+        ? 'var(--chart-destructive)'
+        : value >= threshold.warning
+          ? 'var(--chart-warning)'
+          : 'var(--chart-1)'
+    } else {
+      return value <= threshold.danger
+        ? 'var(--chart-destructive)'
+        : value <= threshold.warning
+          ? 'var(--chart-warning)'
+          : 'var(--chart-1)'
+    }
+  }
+
   const data = (chartData?.data ?? []).map((x: any) => {
     const value = chartData?.format === '%' ? x[attribute].toFixed(1) : x[attribute].toFixed(2)
+    const color = getCellColor(attribute, x[attribute])
     return {
       ...x,
       period_start: dayjs(x.period_start).utc().format('YYYY-MM-DD'),
       [attribute]: value,
       [metricLabel]: value,
+      fill: color,
+      stroke: color,
     }
   })
 
@@ -144,7 +166,7 @@ export const ChartBlock = ({
         </div>
       ) : (
         <ChartContainer
-          className="flex-1 border-t aspect-auto px-3 pb-2"
+          className="flex-1 border-t aspect-auto px-3 py-2"
           config={{}}
           style={{
             height: maxHeight ? `${maxHeight}px` : undefined,
@@ -171,7 +193,7 @@ export const ChartBlock = ({
                   />
                 }
               />
-              <Bar dataKey={metricLabel} fill="var(--chart-1)" radius={4} />
+              <Bar dataKey={metricLabel} radius={4} />
             </BarChart>
           ) : (
             <LineChart accessibilityLayer margin={{ left: 0, right: 0 }} data={data}>
@@ -193,7 +215,7 @@ export const ChartBlock = ({
                   />
                 }
               />
-              <Line dataKey={metricLabel} stroke="var(--chart-1)" radius={4} />
+              <Line dataKey={metricLabel} radius={4} />
             </LineChart>
           )}
         </ChartContainer>
