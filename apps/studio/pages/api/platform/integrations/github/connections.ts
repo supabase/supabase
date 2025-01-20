@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
+import { paths } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
-import { DEFAULT_PROJECT } from '../constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -10,15 +10,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case 'GET':
-      return handleGetAll(req, res)
+      return handleGet(req, res)
     default:
       res.setHeader('Allow', ['GET'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
 
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
-  const response = [DEFAULT_PROJECT]
-  return res.status(200).json(response)
+type ResponseData =
+  paths['/platform/integrations/github/connections']['get']['responses']['200']['content']['application/json']
+
+const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
+  return res.status(200).json({ connections: [] })
 }

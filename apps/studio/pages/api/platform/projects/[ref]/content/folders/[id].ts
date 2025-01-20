@@ -1,7 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { paths } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
-import type { UserContent } from 'types'
-import { extractResponse } from 'pages/api/constants'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -19,13 +18,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-type GetResponseData = extractResponse<'/platform/projects/{ref}/content/folders/{id}', 'get'>
+type GetResponseData =
+  paths['/platform/projects/{ref}/content/folders/{id}']['get']['responses']['200']['content']['application/json']
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
   return res.status(200).json({ data: { folders: [] } })
 }
 
-type PatchResponseData = extractResponse<'/platform/projects/{ref}/content/folders/{id}', 'patch'>
+type PatchResponseData =
+  paths['/platform/projects/{ref}/content/folders/{id}']['patch']['responses']['200']['content']
 
 const handlePatch = async (req: NextApiRequest, res: NextApiResponse<PatchResponseData>) => {
   // Platform specific endpoint
