@@ -186,7 +186,7 @@ const buildCommand = (values: CronJobType) => {
       values.timeoutMs
     )
   } else if (values.type === 'sql_function') {
-    command = `CALL ${values.schema}.${values.functionName}()`
+    command = `SELECT ${values.schema}.${values.functionName}()`
   }
   return command
 }

@@ -91,7 +91,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
         edgeFunctionName: url,
         httpHeaders: headersObjs,
         httpBody: body,
-        timeoutMs: +timeout ?? 1000,
+        timeoutMs: Number(timeout ?? 1000),
         snippet: originalCommand,
       }
     }
@@ -102,15 +102,16 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
       endpoint: url,
       httpHeaders: headersObjs,
       httpBody: body,
-      timeoutMs: +timeout ?? 1000,
+      timeoutMs: Number(timeout ?? 1000),
       snippet: originalCommand,
     }
   }
 
-  if (command.toLocaleLowerCase().startsWith('call ')) {
+  const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*\(.+/g
+  if (command.toLocaleLowerCase().match(regexDBFunction)) {
     const [schemaName, functionName] = command
-      .replace('CALL ', '')
-      .replace('()', '')
+      .replace('SELECT ', '')
+      .replace(/\(.*\)/, '')
       .trim()
       .split('.')
 
