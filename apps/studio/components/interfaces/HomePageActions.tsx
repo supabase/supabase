@@ -21,6 +21,7 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
+import { useFlag } from 'hooks/ui/useFlag'
 
 interface HomePageActionsProps {
   organizations: { name: string; slug: string }[]
@@ -42,6 +43,9 @@ const HomePageActions = ({
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
   const { isSuccess: orgsLoaded } = useOrganizationsQuery()
 
+  const projectCreationExperimentGroup = useFlag<string>('projectCreationExperimentGroup')
+  const newProjectPath = projectCreationExperimentGroup === 'group-b' ? '/new/v2' : '/new'
+
   return (
     <div className="flex flex-col gap-2 md:gap-3 md:flex-row">
       <DropdownMenu>
@@ -56,7 +60,10 @@ const HomePageActions = ({
             {organizations
               .sort((a, b) => a.name.localeCompare(b.name))
               .map((x) => (
-                <DropdownMenuItem key={x.slug} onClick={() => router.push(`/new/${x.slug}`)}>
+                <DropdownMenuItem
+                  key={x.slug}
+                  onClick={() => router.push(`${newProjectPath}/${x.slug}`)}
+                >
                   {x.name}
                 </DropdownMenuItem>
               ))}

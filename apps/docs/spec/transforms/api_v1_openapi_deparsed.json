@@ -8545,6 +8545,101 @@
       }
     },
     "/v1/projects/{ref}/functions": {
+      "get": {
+        "operationId": "v1-list-all-functions",
+        "summary": "List all functions",
+        "description": "Returns all functions you've previously added to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "version": {
+                        "type": "integer"
+                      },
+                      "created_at": {
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "updated_at": {
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "slug": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                        "type": "string"
+                      },
+                      "verify_jwt": {
+                        "type": "boolean"
+                      },
+                      "import_map": {
+                        "type": "boolean"
+                      },
+                      "entrypoint_path": {
+                        "type": "string"
+                      },
+                      "import_map_path": {
+                        "type": "string"
+                      },
+                      "compute_multiplier": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "version",
+                      "created_at",
+                      "updated_at",
+                      "id",
+                      "slug",
+                      "name",
+                      "status"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's functions"
+          }
+        },
+        "tags": ["Edge Functions"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
       "post": {
         "operationId": "v1-create-a-function",
         "summary": "Create a function",
@@ -8744,101 +8839,6 @@
           },
           "500": {
             "description": "Failed to create project's function"
-          }
-        },
-        "tags": ["Edge Functions"],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "get": {
-        "operationId": "v1-list-all-functions",
-        "summary": "List all functions",
-        "description": "Returns all functions you've previously added to the specified project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "version": {
-                        "type": "integer"
-                      },
-                      "created_at": {
-                        "type": "integer",
-                        "format": "int64"
-                      },
-                      "updated_at": {
-                        "type": "integer",
-                        "format": "int64"
-                      },
-                      "id": {
-                        "type": "string"
-                      },
-                      "slug": {
-                        "type": "string"
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "status": {
-                        "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                        "type": "string"
-                      },
-                      "verify_jwt": {
-                        "type": "boolean"
-                      },
-                      "import_map": {
-                        "type": "boolean"
-                      },
-                      "entrypoint_path": {
-                        "type": "string"
-                      },
-                      "import_map_path": {
-                        "type": "string"
-                      },
-                      "compute_multiplier": {
-                        "type": "number"
-                      }
-                    },
-                    "required": [
-                      "version",
-                      "created_at",
-                      "updated_at",
-                      "id",
-                      "slug",
-                      "name",
-                      "status"
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to retrieve project's functions"
           }
         },
         "tags": ["Edge Functions"],
@@ -14420,30 +14420,6 @@
         },
         "required": ["query"]
       },
-      "V1CreateFunctionBody": {
-        "type": "object",
-        "properties": {
-          "slug": {
-            "type": "string",
-            "pattern": "/^[A-Za-z0-9_-]+$/"
-          },
-          "name": {
-            "type": "string"
-          },
-          "body": {
-            "type": "string"
-          },
-          "verify_jwt": {
-            "type": "boolean"
-          },
-          "compute_multiplier": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 4
-          }
-        },
-        "required": ["slug", "name", "body"]
-      },
       "FunctionResponse": {
         "type": "object",
         "properties": {
@@ -14488,6 +14464,30 @@
           }
         },
         "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
+      },
+      "V1CreateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "pattern": "/^[A-Za-z0-9_-]+$/"
+          },
+          "name": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          },
+          "compute_multiplier": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 4
+          }
+        },
+        "required": ["slug", "name", "body"]
       },
       "FunctionSlugResponse": {
         "type": "object",

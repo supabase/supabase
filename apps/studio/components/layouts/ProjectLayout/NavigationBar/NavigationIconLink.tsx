@@ -23,10 +23,13 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
   ({ route, isActive = false, onClick = noop, ...props }, ref) => {
     const snap = useAppStateSnapshot()
 
-    const [allowNavPanelToExpand] = useLocalStorageQuery(
+    const [storedAllowNavPanel] = useLocalStorageQuery(
       LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
       true
     )
+    // Don't allow the nav panel to expand in playwright tests
+    const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
+
     const iconClasses = [
       'absolute left-0 top-0 flex rounded items-center h-10 w-10 items-center justify-center text-foreground-lighter', // Layout
       'group-hover/item:text-foreground-light',

@@ -1,3 +1,5 @@
+import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+
 export interface UserContent<
   T = Dashboards.Content | SqlSnippets.Content | LogSqlSnippets.Content,
 > {
@@ -67,7 +69,6 @@ export namespace Dashboards {
    */
   export interface Content {
     schema_version: 1 // we can add some versioning to this schema in case we need to change the format.
-
     period_start: {
       time_period?: string // "0m", "1m", "5m", "1h", "1d", "1w", "1M", "1y"
       date?: string // "2017-01-01T00:00:00.000Z"
@@ -104,10 +105,11 @@ export namespace Dashboards {
     y: number
     w: number
     h: number
+    label: string
     attribute: ChartType
-    provider: 'daily-stats' | 'prometheus'
+    provider: 'daily-stats' | 'infra-monitoring'
     chart_type: 'bar' | 'line' | 'area'
-    // title: string // Eventually we might need this "per chart" right?
+    chartConfig?: Partial<ChartConfig>
   }
 }
 
