@@ -25,7 +25,7 @@ import { setProjectStatus } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useFlag, usePHFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
@@ -75,6 +75,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const selectedOrganization = useSelectedOrganization()
   const enforceNinetyDayUnpauseExpiry = useFlag('enforceNinetyDayUnpauseExpiry')
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
+  const enableProBenefitWording = usePHFlag('proBenefitWording')
 
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
@@ -216,7 +217,9 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                         ) : isFreePlan ? (
                           <>
                             <p className="text-sm text-foreground-light text-center">
-                              To prevent future pauses, consider upgrading to Pro.
+                              {enableProBenefitWording === 'variant-a'
+                                ? 'Upgrade to Pro plan to prevent future pauses and use Pro features like branching, compute upgrades, and daily backups.'
+                                : 'To prevent future pauses, consider upgrading to Pro.'}
                             </p>
                             <Alert_Shadcn_>
                               <AlertTitle_Shadcn_>
