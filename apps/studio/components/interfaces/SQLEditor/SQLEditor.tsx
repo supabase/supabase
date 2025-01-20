@@ -10,7 +10,6 @@ import { toast } from 'sonner'
 import { useCompletion } from 'ai/react'
 import { useParams } from 'common'
 import { GridFooter } from 'components/ui/GridFooter'
-import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { constructHeaders } from 'data/fetchers'
@@ -153,7 +152,6 @@ export const SQLEditor = () => {
   /* React query mutations */
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
-  const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
@@ -390,7 +388,7 @@ export const SQLEditor = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debugSql, entityDefinitions, id, snapV2.results, snapV2.snippets])
+  }, [entityDefinitions, id, snapV2.results, snapV2.snippets])
 
   const acceptAiHandler = useCallback(async () => {
     try {
@@ -806,7 +804,6 @@ export const SQLEditor = () => {
                   id={id}
                   isExecuting={isExecuting}
                   isDisabled={isDiffOpen}
-                  isDebugging={isDebugSqlLoading}
                   hasSelection={hasSelection}
                   prettifyQuery={prettifyQuery}
                   executeQuery={executeQuery}

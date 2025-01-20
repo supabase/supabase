@@ -21,6 +21,7 @@ import {
 type Results = { rows: readonly any[] }
 
 export type ChartConfig = {
+  view?: 'table' | 'chart'
   type: 'bar'
   cumulative: boolean
   xKey: string

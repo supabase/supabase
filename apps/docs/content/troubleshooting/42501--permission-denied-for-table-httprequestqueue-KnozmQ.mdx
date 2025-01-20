@@ -1,0 +1,18 @@
+---
+title = "42501 : permission denied for table http_request_queue"
+github_url = "https://github.com/orgs/supabase/discussions/21450"
+date_created = "2024-02-22T10:26:29+00:00"
+topics = [ "database" ]
+keywords = [ "permission", "pg_net", "http_request_queue" ]
+database_id = "97923126-7d0b-4bf0-bb65-55dae289a8a3"
+
+[[errors]]
+code = "42501"
+message = "permission denied for table http_request_queue"
+---
+
+If you're currently blocked by the above error, please run the following in your Supabase SQL editor:
+
+- Check `select * from net.http_request_queue` and make sure it's empty.
+- Try `drop extension pg_net; create extension pg_net schema extensions;`
+- If that doesn't work (e.g. because some objects depend on it), then please [contact support](https://supabase.com/support).

@@ -1,12 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import type { Message as MessageType } from 'ai/react'
+import { useChat } from 'ai/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
 import { ArrowDown, FileText, Info, X } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import type { Message as MessageType } from 'ai/react'
-import { useChat } from 'ai/react'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -26,7 +27,6 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { TelemetryActions } from 'lib/constants/telemetry'
 import uuidv4 from 'lib/uuid'
-import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -508,7 +508,7 @@ export const AIAssistant = ({
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
-              'z-20 [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
+              'z-20 [&>textarea]:text-base [&>textarea]:md:text-sm [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
             )}
             loading={isChatLoading}
             disabled={!isApiKeySet || disablePrompts || isChatLoading}

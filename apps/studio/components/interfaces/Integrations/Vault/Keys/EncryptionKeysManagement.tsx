@@ -90,11 +90,11 @@ export const EncryptionKeysManagement = () => {
 
   return (
     <>
-      <div className="space-y-4 p-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+      <div className="space-y-4 p-4 md:p-10">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+          <div className="flex flex-col md:flex-row md:items-center gap-2">
             <Input
-              className="w-52 input-clear"
+              className="md:w-52 input-clear"
               size="tiny"
               placeholder="Search by name or ID"
               value={searchValue}
@@ -115,7 +115,7 @@ export const EncryptionKeysManagement = () => {
                   : []
               }
             />
-            <div className="w-44">
+            <div className="md:w-44">
               <Listbox size="tiny" value={selectedSort} onChange={setSelectedSort}>
                 <Listbox.Option
                   id="created"

@@ -269,3 +269,17 @@ div[data-radix-portal]:not(.portal--toast) {
 .settings-container {
   @apply mx-auto max-w-4xl xl:max-w-6xl;
 }
+
+.react-grid-item.react-grid-placeholder {
+  @apply bg-brand-500 #{!important};
+}
+
+.react-grid-item > .react-resizable-handle::after {
+  content: "";
+  position: absolute;
+  right: 3px !important;
+  bottom: 3px !important;
+  width: 6px !important;
+  height: 6px !important;
+  @apply dark:border-r-2 dark:border-b-2 dark:border-overlay #{!important};
+}

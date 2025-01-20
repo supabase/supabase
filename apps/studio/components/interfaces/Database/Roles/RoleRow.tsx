@@ -92,7 +92,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
               <button
                 id="collapsible-trigger"
                 type="button"
-                className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
+                className="group flex w-full items-center justify-between rounded py-3 px-4 md:px-6 text-foreground"
                 onClick={(event: any) => {
                   if (event.target.id === 'collapsible-trigger') setIsExpanded(!isExpanded)
                 }}
@@ -155,7 +155,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
               </button>
             </Collapsible.Trigger>
             <Collapsible.Content>
-              <div className="group border-t border-default bg-surface-100 py-6 px-20 text-foreground">
+              <div className="group border-t border-default bg-surface-100 py-6 px-5 md:px-20 text-foreground">
                 <div className="py-4 space-y-[9px]">
                   {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[]).map(
                     (permission) => (
