@@ -17,6 +17,20 @@
         "description": "Analyze query performance metrics",
         "type": "query",
         "code": "select\n  substring(query, 1, 50) as short_query,\n  round(total_exec_time::numeric, 2) as total_exec_time,\n  calls,\n  round(mean_exec_time::numeric, 2) as mean_exec_time,\n  round((100 * total_exec_time / sum(total_exec_time) over())::numeric, 2) as percentage_cpu\nfrom pg_stat_statements\norder by total_exec_time desc\nlimit 20;"
+      },
+      {
+        "id": "table-bloat-analysis",
+        "title": "Table bloat analysis",
+        "description": "Identify tables with potential bloat issues",
+        "type": "query",
+        "code": "with constants as (\n  select current_setting('block_size')::numeric as bs,\n         23 as hdr,\n         8 as ma\n),\nbloat_info as (\n  select\n    schemaname, tablename, cc.reltuples, cc.relpages, cc.relallvisible,\n    ceil((cc.reltuples*((datahdr+ma-\n      (case when datahdr%ma=0 then ma else datahdr%ma end))+nullhdr2+4)/bs)) as expected\n  from (\n    select\n      ma,bs,schemaname,tablename,\n      (datawidth+(hdr+ma-(case when hdr%ma=0 then ma else hdr%ma end)))::numeric as datahdr,\n      (maxfracsum*(nullhdr+ma-(case when nullhdr%ma=0 then ma else nullhdr%ma end))) as nullhdr2\n    from (\n      select\n        schemaname, tablename, hdr, ma, bs,\n        sum((1-null_frac)*avg_width) as datawidth,\n        max(null_frac) as maxfracsum,\n        hdr+(\n          select 1+count(*)/8\n          from pg_stats s2\n          where null_frac<>0 and s2.schemaname = s.schemaname and s2.tablename = s.tablename\n        ) as nullhdr\n      from pg_stats s, constants\n      group by 1,2,3,4,5\n    ) as foo\n  ) as rs\n  join pg_class cc on cc.relname = rs.tablename\n  join pg_namespace nn on cc.relnamespace = nn.oid and nn.nspname = rs.schemaname\n  where schemaname <> 'information_schema'\n)\nselect\n  schemaname as schema,\n  tablename as table,\n  reltuples::bigint as rows,\n  relpages::bigint as pages,\n  relallvisible::bigint as visible,\n  expected as expected_pages,\n  round(100*(relpages-expected)/relpages) as bloat_percent\nfrom bloat_info\nwhere\n  relpages - expected > 0\norder by bloat_percent desc\nlimit 10;"
+      },
+      {
+        "id": "daily-analytics-report",
+        "title": "Daily analytics report",
+        "description": "Generate and email daily analytics report",
+        "type": "cron",
+        "code": "import { createClient } from '@supabase/supabase-js'\nimport { format } from 'date-fns'\n\nexport const dailyAnalyticsReport = async () => {\n  const supabase = createClient(\n    process.env.SUPABASE_URL!,\n    process.env.SUPABASE_SERVICE_ROLE_KEY!\n  )\n\n  const yesterday = new Date()\n  yesterday.setDate(yesterday.getDate() - 1)\n  const formattedDate = format(yesterday, 'yyyy-MM-dd')\n\n  // Get daily stats\n  const { data: stats } = await supabase\n    .from('analytics_events')\n    .select('event_type, count(*)')\n    .gte('created_at', `${formattedDate}T00:00:00`)\n    .lte('created_at', `${formattedDate}T23:59:59`)\n    .group_by('event_type')\n\n  // Generate report content\n  const reportContent = generateReportContent(stats)\n\n  // Send email\n  await sendEmail({\n    to: 'team@example.com',\n    subject: `Daily Analytics Report - ${formattedDate}`,\n    content: reportContent\n  })\n}\n\n// Run daily at 1 AM\nexport default {\n  schedule: '0 1 * * *',\n  handler: 'dailyAnalyticsReport'\n}"
       }
     ]
   },
@@ -80,6 +94,13 @@
         "description": "Monitor recent file uploads across all buckets",
         "type": "query",
         "code": "select\n  storage.objects.name,\n  storage.buckets.name as bucket,\n  storage.objects.created_at,\n  pg_size_pretty(storage.objects.metadata->>'size') as size,\n  storage.objects.metadata->>'mimetype' as mime_type\nfrom storage.objects\njoin storage.buckets on storage.objects.bucket_id = storage.buckets.id\norder by storage.objects.created_at desc\nlimit 50;"
+      },
+      {
+        "id": "storage-cleanup",
+        "title": "Storage cleanup",
+        "description": "Automatically clean up expired temporary files",
+        "type": "cron",
+        "code": "import { createClient } from '@supabase/supabase-js'\n\nexport const cleanupTemporaryFiles = async () => {\n  const supabase = createClient(\n    process.env.SUPABASE_URL!,\n    process.env.SUPABASE_SERVICE_ROLE_KEY!\n  )\n\n  // Find expired temporary files\n  const { data: expiredFiles } = await supabase\n    .from('storage.objects')\n    .select('name, bucket_id')\n    .eq('metadata->>temporary', 'true')\n    .lt('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())\n\n  // Delete expired files\n  for (const file of expiredFiles || []) {\n    const { error } = await supabase\n      .storage\n      .from(file.bucket_id)\n      .remove([file.name])\n\n    if (error) {\n      console.error(`Failed to delete ${file.name}:`, error)\n    }\n  }\n\n  console.log(`Cleaned up ${expiredFiles?.length || 0} expired files`)\n}\n\n// Run every 6 hours\nexport default {\n  schedule: '0 */6 * * *',\n  handler: 'cleanupTemporaryFiles'\n}"
       }
     ]
   },
@@ -157,6 +178,13 @@
         "description": "Estimate bloat in tables",
         "type": "query",
         "code": "with constants as (\n  select current_setting('block_size')::numeric as bs,\n         23 as hdr,\n         8 as ma\n),\nbloat_info as (\n  select\n    ma,bs,schemaname,tablename,\n    (datawidth + (hdr + ma - (case when hdr%ma=0 then ma else hdr%ma end)))::numeric as datahdr\n  from (\n    select\n      schemaname, tablename, hdr, ma, bs,\n      avg(coalesce(null_frac,0)) * (sum((case when null_frac >= 0.7 then 0 else avg_width end)::numeric))/count(*) as datawidth\n    from pg_stats s\n    cross join constants\n    group by 1,2,3,4,5\n  ) as foo\n)\nselect\n  schemaname || '.' || tablename as table,\n  pg_size_pretty(real_size::numeric) as actual_size,\n  pg_size_pretty(bloat_size::numeric) as bloat_size,\n  round(100 * bloat_size/real_size) as bloat_ratio\nfrom (\n  select bs,\n         schemaname, tablename,\n         reltuples,\n         relpages * bs as real_size,\n         (relpages - est_pages_ff) * bs as bloat_size\n  from pg_class c\n  join pg_namespace n on n.oid = c.relnamespace\n  cross join bloat_info\n  where nspname not in ('pg_catalog','information_schema')\n  and relkind = 'r'\n) as a\norder by bloat_size desc\nlimit 20;"
+      },
+      {
+        "id": "vacuum-analyze",
+        "title": "Database maintenance",
+        "description": "Regular VACUUM ANALYZE to optimize database performance",
+        "type": "cron",
+        "code": "import { createClient } from '@supabase/supabase-js'\nimport { Pool } from 'pg'\n\nexport const performDatabaseMaintenance = async () => {\n  // Direct Postgres connection for maintenance operations\n  const pool = new Pool({\n    connectionString: process.env.DATABASE_URL\n  })\n\n  try {\n    // Get list of user tables\n    const { rows: tables } = await pool.query(`\n      SELECT schemaname, tablename\n      FROM pg_tables\n      WHERE schemaname NOT IN ('pg_catalog', 'information_schema')\n    `)\n\n    // Perform VACUUM ANALYZE on each table\n    for (const table of tables) {\n      const fullTableName = `\"${table.schemaname}\".\"${table.tablename}\"`\n      console.log(`Maintaining ${fullTableName}...`)\n      \n      await pool.query(`VACUUM ANALYZE ${fullTableName}`)\n    }\n\n    console.log('Database maintenance completed successfully')\n  } catch (error) {\n    console.error('Database maintenance failed:', error)\n  } finally {\n    await pool.end()\n  }\n}\n\n// Run at 2 AM every Sunday\nexport default {\n  schedule: '0 2 * * 0',\n  handler: 'performDatabaseMaintenance'\n}"
       }
     ]
   },

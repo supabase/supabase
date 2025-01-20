@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react'
+import { Database, Code, Plus, Clock } from 'lucide-react'
 import { Button } from 'ui'
 import {
   Dialog,
@@ -12,7 +12,7 @@ import {
 } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 
-type RecipeType = 'query' | 'edge-function'
+type RecipeType = 'query' | 'edge-function' | 'cron'
 
 interface RecipeDialogProps {
   recipe: {
@@ -33,7 +33,17 @@ export default function RecipeDialog({ recipe, onClose }: RecipeDialogProps) {
         size="xlarge"
         className="grid grid-cols-2 items-stretch w-full max-w-[75vw] overflow-hidden"
       >
-        <div className="flex flex-col justify-center p-12 max-h-screen bg-surface-100">
+        <div className="flex flex-col justify-center p-12 max-h-screen bg-surface-100 min-h-96 relative">
+          <div className="text-foreground-muted font-mono text-xs flex items-center gap-2 justify-end mb-4 absolute right-4 top-4">
+            {recipe.type === 'edge-function' ? (
+              <Code size={16} strokeWidth={1.5} />
+            ) : recipe.type === 'cron' ? (
+              <Clock size={16} strokeWidth={1.5} />
+            ) : (
+              <Database size={16} strokeWidth={1.5} />
+            )}
+            <span className="text-foreground-muted">{recipe.type}</span>
+          </div>
           <div>
             <h2>{recipe.title}</h2>
             <p className="text-foreground-light">{recipe.description}</p>
@@ -55,7 +65,7 @@ export default function RecipeDialog({ recipe, onClose }: RecipeDialogProps) {
         </div>
         <div className="border-l bg">
           <CodeBlock
-            lang={recipe.type === 'edge-function' ? 'ts' : 'sql'}
+            lang={recipe.type === 'edge-function' ? 'ts' : recipe.type === 'cron' ? 'ts' : 'sql'}
             className="!rounded-none !bg h-full max-h-96 !border-none"
             showLineNumbers
             size="small"

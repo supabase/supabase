@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { motion } from 'framer-motion'
-import { Search, Database, Code, X } from 'lucide-react'
+import { Search, Database, Code, Clock } from 'lucide-react'
 
 import { Button, Input, Card, CardContent } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -10,7 +10,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import RecipeDialog from '~/components/RecipeDialog'
 import recipesData from '~/data/recipes.json'
 
-type RecipeType = 'query' | 'edge-function'
+type RecipeType = 'query' | 'edge-function' | 'cron'
 
 interface Recipe {
   id: string
@@ -565,12 +565,12 @@ function CookbookPage() {
             </div> */}
 
             {filteredRecipes.map((category) => (
-              <div key={category.id} className="mb-12">
-                <div className="mb-6">
+              <div key={category.id} className="mb-16 grid grid-cols-4 gap-8">
+                <div className="mb-6 col-span-1">
                   <h2 className="text-xl text-foreground mb-1">{category.title}</h2>
                   <p className="text-sm text-foreground-light">{category.description}</p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-stretch justify-items-stretch">
+                <div className="col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-stretch justify-items-stretch">
                   {category.items.map((recipe) => (
                     <div
                       className="rounded border bg-surface-100/50 hover:bg-surface-100 cursor-pointer flex flex-col justify-between px-5 py-4"
@@ -579,6 +579,8 @@ function CookbookPage() {
                       <div className="text-foreground-muted font-mono text-xs flex items-center gap-2 justify-end mb-4">
                         {recipe.type === 'edge-function' ? (
                           <Code size={16} strokeWidth={1.5} />
+                        ) : recipe.type === 'cron' ? (
+                          <Clock size={16} strokeWidth={1.5} />
                         ) : (
                           <Database size={16} strokeWidth={1.5} />
                         )}
