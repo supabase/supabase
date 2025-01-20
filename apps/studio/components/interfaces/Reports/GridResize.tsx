@@ -30,6 +30,7 @@ import dayjs from 'dayjs'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import QueryBlock from 'components/interfaces/Reports/QueryBlock'
 import QueryBlockWrapper from './QueryBlockWrapper'
+import { useNewQuery } from 'components/interfaces/SQLEditor/hooks'
 
 const ReactGridLayout = WidthProvider(Responsive)
 
@@ -80,6 +81,7 @@ const GridResize = ({
   onSetParameter,
 }: GridResizeProps) => {
   const [collectedParams, setCollectedParams] = useState<Parameter[]>([])
+  const { newQuery } = useNewQuery()
 
   // Merge parameters from all blocks
   const handleBlockParameters = (params: Parameter[]) => {
@@ -122,17 +124,67 @@ const GridResize = ({
   function onLayoutChange(layout: any) {
     let updatedLayout = [...editableReport.layout]
     layout.map((item: any) => {
+      console.log('item', item)
       const index = updatedLayout.findIndex((x: any) => x.id === item.i)
-      updatedLayout[index].w = layout[index].w
-      updatedLayout[index].h = layout[index].h
-      updatedLayout[index].x = layout[index].x
-      updatedLayout[index].y = layout[index].y
+      if (index === -1) {
+        // New item - add it to layout
+        updatedLayout.push({
+          id: item.i,
+          w: item.w,
+          h: item.h,
+          x: item.x,
+          y: item.y,
+        })
+      } else {
+        // Update existing item
+        updatedLayout[index].w = item.w
+        updatedLayout[index].h = item.h
+        updatedLayout[index].x = item.x
+        updatedLayout[index].y = item.y
+      }
     })
+    console.log('updatedLayout', updatedLayout)
     setEditableReport({
       ...editableReport,
       layout: updatedLayout,
     })
   }
+
+  const handleDrop = useCallback(
+    async (layout: any[], layoutItem: any, e: any) => {
+      try {
+        const queryData = JSON.parse(e.dataTransfer.getData('application/json'))
+
+        // Create new query when dropped
+        const queryId = await newQuery(queryData.sql, queryData.label, false)
+
+        // Update the layout with the new item
+        const updatedLayout = [...editableReport.layout]
+        const newItem = {
+          id: queryId,
+          sql: queryData.sql,
+          label: queryData.label,
+          isChart: queryData.isChart || false,
+          chartConfig: queryData.chartConfig || DEFAULT_CHART_CONFIG,
+          // Grid properties
+          h: 3,
+          w: 1,
+          x: layoutItem.x,
+          y: layoutItem.y - 1, // Increment y position by 1 to drop after the target position
+        }
+
+        updatedLayout.push(newItem)
+
+        setEditableReport({
+          ...editableReport,
+          layout: updatedLayout,
+        })
+      } catch (error) {
+        console.error('Error handling drop:', error)
+      }
+    },
+    [editableReport, setEditableReport, newQuery]
+  )
 
   // Notify parent when all parameters are collected
   useEffect(() => {
@@ -144,7 +196,7 @@ const GridResize = ({
   return (
     <ReactGridLayout
       autoSize={true}
-      layout={editableReport}
+      layouts={{ lg: editableReport.layout }}
       onLayoutChange={(layout) => onLayoutChange(layout)}
       rowHeight={100}
       cols={{ lg: LAYOUT_COLUMN_COUNT, md: 2, sm: 1, xs: 1, xxs: 1 }}
@@ -154,6 +206,8 @@ const GridResize = ({
       isDraggable={true}
       isResizable={true}
       draggableHandle=".grid-item-drag-handle"
+      isDroppable={true}
+      onDrop={handleDrop}
     >
       {editableReport.layout.map((item: LayoutItem) => (
         <div
