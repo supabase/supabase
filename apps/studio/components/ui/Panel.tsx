@@ -69,7 +69,7 @@ const PanelNotice = forwardRef<
       ref={ref}
       {...props}
       className={cn(
-        'relative mx-4 md:px-4 md:px-6 py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center',
+        'relative px-4 md:px-6 py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center',
         className
       )}
     >
