@@ -1,7 +1,7 @@
 import { memo, ReactNode, useContext } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { cn, CodeBlock, CodeBlockLang } from 'ui'
 import { DebouncedComponent } from '../DebouncedComponent'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
