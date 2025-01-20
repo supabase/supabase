@@ -34,9 +34,9 @@ import {
   HoverCard_Shadcn_,
   Separator,
   Theme,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
   singleThemes,
 } from 'ui'
@@ -344,12 +344,12 @@ export const NavContent = () => {
         {IS_PLATFORM && (
           <>
             {!allowNavPanelToExpand && (
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>{CommandButton}</TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="right">
+              <Tooltip>
+                <TooltipTrigger asChild>{CommandButton}</TooltipTrigger>
+                <TooltipContent side="right">
                   <span>Commands</span>
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             )}
             {allowNavPanelToExpand && CommandButton}
           </>
@@ -365,14 +365,14 @@ export const NavContent = () => {
           {allowNavPanelToExpand ? (
             <DropdownMenuTrigger asChild>{UserAccountButton}</DropdownMenuTrigger>
           ) : (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>{UserAccountButton}</DropdownMenuTrigger>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="right">
+              </TooltipTrigger>
+              <TooltipContent side="right">
                 <span>Account settings</span>
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+              </TooltipContent>
+            </Tooltip>
           )}
 
           <DropdownMenuContent side="top" align="start">

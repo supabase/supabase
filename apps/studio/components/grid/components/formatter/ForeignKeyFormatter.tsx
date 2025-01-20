@@ -8,7 +8,7 @@ import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { SupaRow } from '../../types'
 import { NullValue } from '../common/NullValue'
 
@@ -56,8 +56,8 @@ export const ForeignKeyFormatter = (props: Props) => {
         {value === null ? <NullValue /> : value}
       </span>
       {relationship !== undefined && targetTable !== undefined && value !== null && (
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <Button
               asChild
               type="default"
@@ -80,9 +80,9 @@ export const ForeignKeyFormatter = (props: Props) => {
                 <ArrowRight size={14} />
               </EditorTablePageLink>
             </Button>
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">View referencing record</TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">View referencing record</TooltipContent>
+        </Tooltip>
       )}
     </div>
   )
