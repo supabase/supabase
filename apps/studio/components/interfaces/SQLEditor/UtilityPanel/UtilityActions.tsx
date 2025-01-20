@@ -24,9 +24,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import SavingIndicator from './SavingIndicator'
@@ -143,8 +143,8 @@ const UtilityActions = ({
         </DropdownMenu>
 
         {IS_PLATFORM && (
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
+          <Tooltip>
+            <TooltipTrigger asChild>
               {isFavorite ? (
                 <Button
                   type="text"
@@ -162,24 +162,24 @@ const UtilityActions = ({
                   icon={<Heart className="fill-none stroke-foreground-light" />}
                 />
               )}
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom">
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
               {isFavorite ? 'Remove from' : 'Add to'} favorites
-            </TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
+            </TooltipContent>
+          </Tooltip>
         )}
 
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <Button
               type="text"
               onClick={prettifyQuery}
               className="px-1"
               icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
             />
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">Prettify SQL</TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Prettify SQL</TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="flex items-center justify-between gap-x-2">

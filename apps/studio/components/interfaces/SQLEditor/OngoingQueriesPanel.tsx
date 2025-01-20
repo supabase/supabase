@@ -21,9 +21,9 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -147,17 +147,17 @@ export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) =
                   </div>
                 </div>
 
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     <Button
                       type="warning"
                       className="px-1.5"
                       icon={<StopCircle />}
                       onClick={() => setSelectedId(query.pid)}
                     />
-                  </TooltipTrigger_Shadcn_>
-                  <TooltipContent_Shadcn_ side="bottom">Abort query</TooltipContent_Shadcn_>
-                </Tooltip_Shadcn_>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Abort query</TooltipContent>
+                </Tooltip>
               </SheetSection>
             ))}
           </div>
