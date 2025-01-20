@@ -25,20 +25,20 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { addTab, createTabId } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
   const monaco = useMonaco()
-  const { id, ref, content } = useParams()
+  const { id, ref, content, skip } = useParams()
 
   const { project } = useProjectContext()
   const appSnap = useAppStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const snippets = useSnippets(ref!)
+  const allSnippets = useSnippets(ref!)
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
@@ -46,21 +46,23 @@ const SqlEditor: NextPageWithLayout = () => {
     true
   )
 
-  useContentIdQuery(
+  // [Refactor] There's an unnecessary request getting triggered when we start typing while on /new
+  // the URL ID gets updated and we attempt to fetch content for a snippet that's not been created yet
+  const { data } = useContentIdQuery(
     { projectRef: ref, id },
     {
       // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
       // the snapV2 valtio store for some reason hence why the added typeof check here
       retry: false,
       enabled: Boolean(id !== 'new' && typeof snapV2.addSnippet === 'function'),
-      onSuccess: (data) => {
-        snapV2.addSnippet({ projectRef: ref as string, snippet: data })
-      },
-      onError: () => {
-        // [Joshen] Thinking if we need some error handler - it'll error out here when a new snippet is created from quickstart/templates
-      },
     }
   )
+
+  useEffect(() => {
+    if (ref && data) {
+      snapV2.setSnippet(ref, data as unknown as SnippetWithContent)
+    }
+  }, [ref, data])
 
   async function formatPgsql(value: string) {
     try {
@@ -127,12 +129,19 @@ const SqlEditor: NextPageWithLayout = () => {
     pgInfoRef.current.functions = functions
   }
 
+  // Load the last visited snippet when landing on /new
   useEffect(() => {
-    if (id === 'new' && appSnap.dashboardHistory.sql !== undefined && content === undefined) {
-      const snippet = snippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
+    if (
+      id === 'new' &&
+      skip !== 'true' && // [Joshen] Skip flag implies to skip loading the last visited snippet
+      appSnap.dashboardHistory.sql !== undefined &&
+      content === undefined
+    ) {
+      const snippet = allSnippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
       if (snippet !== undefined) router.push(`/project/${ref}/sql/${appSnap.dashboardHistory.sql}`)
     }
-  }, [id, snippets, content])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, allSnippets, content])
 
   // Enable pgsql format
   useEffect(() => {
@@ -147,6 +156,7 @@ const SqlEditor: NextPageWithLayout = () => {
       })
       return () => formatProvider.dispose()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monaco])
 
   // Register auto completion item provider for pgsql
@@ -171,6 +181,7 @@ const SqlEditor: NextPageWithLayout = () => {
         signatureHelpProvider?.dispose()
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPgInfoReady])
 
   const { flags } = useFeaturePreviewContext()
@@ -181,7 +192,7 @@ const SqlEditor: NextPageWithLayout = () => {
       if (!router.isReady || !id || id === 'new') return
 
       const tabId = createTabId('sql', { id })
-      const snippet = snippets.find((s) => s.id === id)
+      const snippet = data
 
       addTab(ref, {
         id: tabId,
@@ -193,7 +204,7 @@ const SqlEditor: NextPageWithLayout = () => {
         },
       })
     }
-  }, [router.isReady, id, snippets, isSqlEditorTabsEnabled])
+  }, [router.isReady, id, data, isSqlEditorTabsEnabled])
 
   return <SQLEditor />
 }

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ComputeInstanceAddonVariantId } from './DiskManagement.types'
 import {
   calculateDiskSizeRequiredForIopsWithGp3,
   calculateDiskSizeRequiredForIopsWithIo2,
@@ -7,7 +8,6 @@ import {
   calculateMaxIopsAllowedForDiskSizeWithio2,
   formatNumber,
 } from './DiskManagement.utils'
-import { ComputeInstanceAddonVariantId } from './DiskManagement.types'
 import { DISK_LIMITS, DiskType, IOPS_RANGE, THROUGHPUT_RANGE } from './ui/DiskManagement.constants'
 
 const baseSchema = z.object({
@@ -21,17 +21,46 @@ const baseSchema = z.object({
   computeSize: z
     .custom<ComputeInstanceAddonVariantId>((val): val is ComputeInstanceAddonVariantId => true)
     .describe('Compute size'),
+  growthPercent: z
+    .number()
+    .int('Value must be an integer')
+    .min(10, 'Growth percent must be at least 10%')
+    .max(100, 'Growth percent cannot exceed 100%')
+    .optional()
+    .nullable(),
+  minIncrementGb: z
+    .number()
+    .int('Value must be an integer')
+    .min(1, 'Minimum increment must be at least 1 GB')
+    .max(200, 'Minimum increment cannot exceed 200 GB')
+    .optional()
+    .nullable(),
+  maxSizeGb: z
+    .number()
+    .int('Value must be an integer')
+    .max(60000, 'Maximum size cannot exceed 60TB')
+    .optional()
+    .nullable(),
 })
 
 export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
   const schema = baseSchema.superRefine((data, ctx) => {
-    const { storageType, totalSize, provisionedIOPS, throughput, computeSize } = data
+    const { storageType, totalSize, provisionedIOPS, throughput, maxSizeGb } = data
 
     if (totalSize < defaultTotalSize) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Disk size cannot be reduced in size. Must be at least ${formatNumber(defaultTotalSize)} GB.`,
         path: ['totalSize'],
+      })
+    }
+
+    // Validate maxSizeGb cannot be lower than totalSize
+    if (!!maxSizeGb && maxSizeGb < totalSize) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Max disk size cannot be lower than the current disk size. Must be at least ${formatNumber(totalSize)} GB.`,
+        path: ['maxSizeGb'],
       })
     }
 
@@ -59,11 +88,13 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
           const diskSizeRequiredForIopsWithIo2 =
             calculateDiskSizeRequiredForIopsWithIo2(provisionedIOPS)
 
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Larger Disk size of at least ${formatNumber(diskSizeRequiredForIopsWithIo2)} GB required. Current max is ${formatNumber(maxIOPSforDiskSizeWithio2)} IOPS.`,
-            path: ['provisionedIOPS'],
-          })
+          if (diskSizeRequiredForIopsWithIo2 > totalSize) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Larger Disk size of at least ${formatNumber(diskSizeRequiredForIopsWithIo2)} GB required. Current max is ${formatNumber(maxIOPSforDiskSizeWithio2)} IOPS.`,
+              path: ['provisionedIOPS'],
+            })
+          }
         } else {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,

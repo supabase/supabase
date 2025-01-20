@@ -180,7 +180,7 @@ Restoring to a new project is an excellent way to manage environments more effec
 
 ### Logical backups
 
-#### search_path issues
+#### `search_path` issues
 
 During the `pg_restore` process, the `search_path` is set to an empty string for predictability, and security. Using unqualified references to functions or relations can cause restorations using logical backups to fail, as the database will not be able to locate the function or relation being referenced. This can happen even if the database functions without issues during normal operations, as the `search_path` is usually set to include several schemas during normal operations. Therefore, you should always use schema-qualified names within your SQL code.
 

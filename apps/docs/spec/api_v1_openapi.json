@@ -336,6 +336,25 @@
         "operationId": "v1-list-all-snippets",
         "summary": "Lists SQL snippets for the logged in user",
         "parameters": [
+          { "name": "cursor", "required": false, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string", "minimum": 1, "maximum": 100 }
+          },
+          {
+            "name": "sort_by",
+            "required": false,
+            "in": "query",
+            "schema": { "enum": ["name", "inserted_at"], "type": "string" }
+          },
+          {
+            "name": "sort_order",
+            "required": false,
+            "in": "query",
+            "schema": { "enum": ["asc", "desc"], "type": "string" }
+          },
           {
             "name": "project_ref",
             "required": false,
@@ -2042,6 +2061,95 @@
         "security": [{ "bearer": [] }]
       }
     },
+    "/v1/projects/{ref}/restore": {
+      "get": {
+        "operationId": "v1-list-available-restore-versions",
+        "summary": "Lists available restore versions for the given project",
+        "parameters": [
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetProjectAvailableRestoreVersionsResponse"
+                }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      },
+      "post": {
+        "operationId": "v1-restore-a-project",
+        "summary": "Restores the given project",
+        "parameters": [
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RestoreProjectBodyDto" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "" }, "403": { "description": "" } },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/restore/cancel": {
+      "post": {
+        "operationId": "v1-cancel-a-project-restoration",
+        "summary": "Cancels the given project restoration",
+        "parameters": [
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "" }, "403": { "description": "" } },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/analytics/endpoints/logs.all": {
+      "get": {
+        "operationId": "getLogs",
+        "summary": "Gets project's logs",
+        "parameters": [
+          {
+            "name": "iso_timestamp_end",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "iso_timestamp_start",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          { "name": "sql", "required": false, "in": "query", "schema": { "type": "string" } },
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1AnalyticsResponse" }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Analytics"],
+        "security": [{ "bearer": [] }]
+      }
+    },
     "/v1/projects/{ref}/database/query": {
       "post": {
         "operationId": "v1-run-a-query",
@@ -2692,43 +2800,43 @@
       "BranchDetailResponse": {
         "type": "object",
         "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "INACTIVE",
+              "ACTIVE_HEALTHY",
+              "ACTIVE_UNHEALTHY",
+              "COMING_UP",
+              "UNKNOWN",
+              "GOING_DOWN",
+              "INIT_FAILED",
+              "REMOVED",
+              "RESTORING",
+              "UPGRADING",
+              "PAUSING",
+              "RESTORE_FAILED",
+              "RESTARTING",
+              "PAUSE_FAILED",
+              "RESIZING"
+            ]
+          },
           "db_port": { "type": "integer" },
           "ref": { "type": "string" },
           "postgres_version": { "type": "string" },
           "postgres_engine": { "type": "string" },
           "release_channel": { "type": "string" },
-          "status": {
-            "enum": [
-              "ACTIVE_HEALTHY",
-              "ACTIVE_UNHEALTHY",
-              "COMING_UP",
-              "GOING_DOWN",
-              "INACTIVE",
-              "INIT_FAILED",
-              "REMOVED",
-              "RESTARTING",
-              "UNKNOWN",
-              "UPGRADING",
-              "PAUSING",
-              "RESTORING",
-              "RESTORE_FAILED",
-              "PAUSE_FAILED",
-              "RESIZING"
-            ],
-            "type": "string"
-          },
           "db_host": { "type": "string" },
           "db_user": { "type": "string" },
           "db_pass": { "type": "string" },
           "jwt_secret": { "type": "string" }
         },
         "required": [
+          "status",
           "db_port",
           "ref",
           "postgres_version",
           "postgres_engine",
           "release_channel",
-          "status",
           "db_host"
         ]
       },
@@ -2744,6 +2852,7 @@
           "git_branch": { "type": "string" },
           "persistent": { "type": "boolean" },
           "status": {
+            "type": "string",
             "enum": [
               "CREATING_PROJECT",
               "RUNNING_MIGRATIONS",
@@ -2751,8 +2860,7 @@
               "MIGRATIONS_FAILED",
               "FUNCTIONS_DEPLOYED",
               "FUNCTIONS_FAILED"
-            ],
-            "type": "string"
+            ]
           }
         }
       },
@@ -2765,14 +2873,8 @@
             "deprecated": true,
             "description": "This field is deprecated and will not be populated."
           },
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "project_ref": { "type": "string" },
-          "parent_project_ref": { "type": "string" },
-          "is_default": { "type": "boolean" },
-          "git_branch": { "type": "string" },
-          "persistent": { "type": "boolean" },
           "status": {
+            "type": "string",
             "enum": [
               "CREATING_PROJECT",
               "RUNNING_MIGRATIONS",
@@ -2780,20 +2882,26 @@
               "MIGRATIONS_FAILED",
               "FUNCTIONS_DEPLOYED",
               "FUNCTIONS_FAILED"
-            ],
-            "type": "string"
+            ]
           },
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "project_ref": { "type": "string" },
+          "parent_project_ref": { "type": "string" },
+          "is_default": { "type": "boolean" },
+          "git_branch": { "type": "string" },
+          "persistent": { "type": "boolean" },
           "created_at": { "type": "string" },
           "updated_at": { "type": "string" }
         },
         "required": [
+          "status",
           "id",
           "name",
           "project_ref",
           "parent_project_ref",
           "is_default",
           "persistent",
-          "status",
           "created_at",
           "updated_at"
         ]
@@ -2834,29 +2942,29 @@
             "description": "Creation timestamp",
             "example": "2023-03-29T16:32:59Z"
           },
-          "database": { "$ref": "#/components/schemas/V1DatabaseResponse" },
           "status": {
+            "type": "string",
             "enum": [
+              "INACTIVE",
               "ACTIVE_HEALTHY",
               "ACTIVE_UNHEALTHY",
               "COMING_UP",
+              "UNKNOWN",
               "GOING_DOWN",
-              "INACTIVE",
               "INIT_FAILED",
               "REMOVED",
-              "RESTARTING",
-              "UNKNOWN",
+              "RESTORING",
               "UPGRADING",
               "PAUSING",
-              "RESTORING",
               "RESTORE_FAILED",
+              "RESTARTING",
               "PAUSE_FAILED",
               "RESIZING"
-            ],
-            "type": "string"
-          }
+            ]
+          },
+          "database": { "$ref": "#/components/schemas/V1DatabaseResponse" }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "database", "status"]
+        "required": ["id", "organization_id", "name", "region", "created_at", "status", "database"]
       },
       "V1CreateProjectBodyDto": {
         "type": "object",
@@ -2951,24 +3059,24 @@
             "example": "2023-03-29T16:32:59Z"
           },
           "status": {
+            "type": "string",
             "enum": [
+              "INACTIVE",
               "ACTIVE_HEALTHY",
               "ACTIVE_UNHEALTHY",
               "COMING_UP",
+              "UNKNOWN",
               "GOING_DOWN",
-              "INACTIVE",
               "INIT_FAILED",
               "REMOVED",
-              "RESTARTING",
-              "UNKNOWN",
+              "RESTORING",
               "UPGRADING",
               "PAUSING",
-              "RESTORING",
               "RESTORE_FAILED",
+              "RESTARTING",
               "PAUSE_FAILED",
               "RESIZING"
-            ],
-            "type": "string"
+            ]
           }
         },
         "required": ["id", "organization_id", "name", "region", "created_at", "status"]
@@ -3042,7 +3150,7 @@
           "type": { "type": "string", "enum": ["sql"] },
           "visibility": { "type": "string", "enum": ["user", "project", "org", "public"] },
           "name": { "type": "string" },
-          "description": { "type": "string" },
+          "description": { "type": "string", "nullable": true },
           "project": { "$ref": "#/components/schemas/SnippetProject" },
           "owner": { "$ref": "#/components/schemas/SnippetUser" },
           "updated_by": { "$ref": "#/components/schemas/SnippetUser" }
@@ -3054,6 +3162,7 @@
           "type",
           "visibility",
           "name",
+          "description",
           "project",
           "owner",
           "updated_by"
@@ -3062,7 +3171,8 @@
       "SnippetList": {
         "type": "object",
         "properties": {
-          "data": { "type": "array", "items": { "$ref": "#/components/schemas/SnippetMeta" } }
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/SnippetMeta" } },
+          "cursor": { "type": "string" }
         },
         "required": ["data"]
       },
@@ -3084,7 +3194,7 @@
           "type": { "type": "string", "enum": ["sql"] },
           "visibility": { "enum": ["user", "project", "org", "public"], "type": "string" },
           "name": { "type": "string" },
-          "description": { "type": "string" },
+          "description": { "type": "string", "nullable": true },
           "project": { "$ref": "#/components/schemas/SnippetProject" },
           "owner": { "$ref": "#/components/schemas/SnippetUser" },
           "updated_by": { "$ref": "#/components/schemas/SnippetUser" },
@@ -3097,6 +3207,7 @@
           "type",
           "visibility",
           "name",
+          "description",
           "project",
           "owner",
           "updated_by",
@@ -3607,14 +3718,20 @@
         "properties": { "enabled": { "type": "boolean" } },
         "required": ["enabled"]
       },
+      "StorageFeatureS3Protocol": {
+        "type": "object",
+        "properties": { "enabled": { "type": "boolean" } },
+        "required": ["enabled"]
+      },
       "StorageFeatures": {
         "type": "object",
         "properties": {
           "imageTransformation": {
             "$ref": "#/components/schemas/StorageFeatureImageTransformation"
-          }
+          },
+          "s3Protocol": { "$ref": "#/components/schemas/StorageFeatureS3Protocol" }
         },
-        "required": ["imageTransformation"]
+        "required": ["imageTransformation", "s3Protocol"]
       },
       "StorageConfigResponse": {
         "type": "object",
@@ -3704,11 +3821,11 @@
       "SupavisorConfigResponse": {
         "type": "object",
         "properties": {
+          "database_type": { "type": "string", "enum": ["PRIMARY", "READ_REPLICA"] },
           "db_port": { "type": "integer" },
           "default_pool_size": { "type": "integer", "nullable": true },
           "max_client_conn": { "type": "integer", "nullable": true },
           "identifier": { "type": "string" },
-          "database_type": { "enum": ["PRIMARY", "READ_REPLICA"], "type": "string" },
           "is_using_scram_auth": { "type": "boolean" },
           "db_user": { "type": "string" },
           "db_host": { "type": "string" },
@@ -3717,11 +3834,11 @@
           "pool_mode": { "enum": ["transaction", "session"], "type": "string" }
         },
         "required": [
+          "database_type",
           "db_port",
           "default_pool_size",
           "max_client_conn",
           "identifier",
-          "database_type",
           "is_using_scram_auth",
           "db_user",
           "db_host",
@@ -4316,6 +4433,73 @@
           "resolved_at": { "type": "string", "nullable": true }
         },
         "required": ["id", "type", "inserted_at", "updated_at"]
+      },
+      "ProjectAvailableRestoreVersion": {
+        "type": "object",
+        "properties": {
+          "version": { "type": "string" },
+          "release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+          },
+          "postgres_engine": { "type": "string", "enum": ["13", "14", "15", "17-oriole"] }
+        },
+        "required": ["version", "release_channel", "postgres_engine"]
+      },
+      "GetProjectAvailableRestoreVersionsResponse": {
+        "type": "object",
+        "properties": {
+          "available_versions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ProjectAvailableRestoreVersion" }
+          }
+        },
+        "required": ["available_versions"]
+      },
+      "RestoreProjectBodyDto": {
+        "type": "object",
+        "properties": {
+          "release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
+            "description": "Release channel version. If not provided, GeneralAvailability will be used."
+          },
+          "postgres_engine": {
+            "type": "string",
+            "enum": ["15", "17-oriole"],
+            "description": "Postgres engine version. If not provided, the latest version from the given release channel will be used."
+          }
+        }
+      },
+      "V1AnalyticsResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "oneOf": [
+              {
+                "properties": {
+                  "code": { "type": "number" },
+                  "errors": {
+                    "type": "array",
+                    "items": {
+                      "properties": {
+                        "domain": { "type": "string" },
+                        "location": { "type": "string" },
+                        "locationType": { "type": "string" },
+                        "message": { "type": "string" },
+                        "reason": { "type": "string" }
+                      }
+                    }
+                  },
+                  "message": { "type": "string" },
+                  "status": { "type": "string" }
+                }
+              },
+              { "type": "string" }
+            ]
+          },
+          "result": { "type": "array", "items": { "type": "object" } }
+        }
       },
       "V1RunQueryBody": {
         "type": "object",

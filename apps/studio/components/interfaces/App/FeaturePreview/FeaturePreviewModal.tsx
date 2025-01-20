@@ -29,14 +29,6 @@ const FeaturePreviewModal = () => {
   const isNotReleased =
     selectedFeatureKey === 'supabase-ui-functions-assistant' && !enableFunctionsAssistant
 
-  // this modal can be triggered on other pages
-  // Update local state when valtio state changes
-  useEffect(() => {
-    if (snap.selectedFeaturePreview !== '') {
-      setSelectedFeatureKey(snap.selectedFeaturePreview)
-    }
-  }, [snap.selectedFeaturePreview])
-
   const { flags, onUpdateFlag } = featurePreviewContext
   const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
   const isSelectedFeatureEnabled = flags[selectedFeatureKey]
@@ -73,6 +65,20 @@ const FeaturePreviewModal = () => {
   //       return isFeaturePreviewTabsSqlEditorFlag
   //   }
   // }
+  // this modal can be triggered on other pages
+  // Update local state when valtio state changes
+
+  useEffect(() => {
+    if (snap.selectedFeaturePreview !== '') {
+      setSelectedFeatureKey(snap.selectedFeaturePreview)
+    }
+  }, [snap.selectedFeaturePreview])
+
+  useEffect(() => {
+    if (snap.showFeaturePreviewModal) {
+      sendEvent({ action: TelemetryActions.FEATURE_PREVIEWS_CLICKED })
+    }
+  }, [snap.showFeaturePreviewModal])
 
   return (
     <Modal

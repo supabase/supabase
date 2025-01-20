@@ -1,9 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Loader2 } from 'lucide-react'
+import { ChevronRightIcon, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import BackupsEmpty from 'components/interfaces/Database/Backups/BackupsEmpty'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import { PITRForm } from 'components/interfaces/Database/Backups/PITR/pitr-form'
 import { BackupsList } from 'components/interfaces/Database/Backups/RestoreToNewProject/BackupsList'
@@ -21,7 +20,6 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useCloneStatusQuery } from 'data/projects/clone-status-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -29,8 +27,13 @@ import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Button } from 'ui'
+import { Admonition, TimestampInfo } from 'ui-patterns'
+import Panel from 'components/ui/Panel'
+import { projectSpecToMonthlyPrice } from 'components/interfaces/Database/Backups/RestoreToNewProject/RestoreToNewProject.utils'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { DiskType } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   return (
@@ -67,8 +70,6 @@ const RestoreToNewProject = () => {
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
   const [recoveryTimeTarget, setRecoveryTimeTarget] = useState<number | null>(null)
 
-  const { data: projects } = useProjectsQuery()
-
   const {
     data: cloneBackups,
     error,
@@ -85,11 +86,15 @@ const RestoreToNewProject = () => {
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
-  const hasPITREnabled = cloneBackups?.pitr_enabled
-
+  const PITR_ENABLED = cloneBackups?.pitr_enabled
+  const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
   const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
   const IS_PG15_OR_ABOVE = dbVersion >= 15
-  const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
+  const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb
+  const targetComputeSize = cloneBackups?.target_compute_size
+  const planId = subscription?.plan?.id ?? 'free'
+  const { data } = useDiskAttributesQuery({ projectRef: project?.ref })
+  const storageType = data?.attributes?.type ?? 'gp3'
 
   const {
     data: cloneStatus,
@@ -103,18 +108,95 @@ const RestoreToNewProject = () => {
       refetchInterval,
       refetchOnWindowFocus: false,
       onSuccess: (data) => {
-        const hasTransientState = data.clones.some((c) => c.status === 'IN_PROGRESS')
+        const hasTransientState = data?.clones.some((c) => c.status === 'IN_PROGRESS')
         if (!hasTransientState) setRefetchInterval(false)
       },
+      enabled: PHYSICAL_BACKUPS_ENABLED || PITR_ENABLED,
     }
   )
-  const lastClone = cloneStatus?.clones?.[cloneStatus?.clones.length - 1]
   const IS_CLONED_PROJECT = (cloneStatus?.cloned_from?.source_project as any)?.ref ? true : false
-
   const isLoading = !isPermissionsLoaded || cloneBackupsLoading || cloneStatusLoading
-  const clonedProject = projects?.find(
-    (p) => p.ref === cloneStatus?.clones?.[0]?.target_project.ref
-  )
+
+  const previousClones = cloneStatus?.clones
+  const isRestoring = previousClones?.some((c) => c.status === 'IN_PROGRESS')
+  const restoringClone = previousClones?.find((c) => c.status === 'IN_PROGRESS')
+
+  const StatusBadge = ({
+    status,
+  }: {
+    status: NonNullable<typeof previousClones>[number]['status']
+  }) => {
+    const statusTextMap = {
+      IN_PROGRESS: 'RESTORING',
+      COMPLETED: 'COMPLETED',
+      REMOVED: 'REMOVED',
+      FAILED: 'FAILED',
+    }
+
+    if (status === 'IN_PROGRESS') {
+      return <Badge variant="warning">{statusTextMap[status]}</Badge>
+    }
+
+    if (status === 'FAILED') {
+      return <Badge variant="destructive">{statusTextMap[status]}</Badge>
+    }
+
+    return <Badge>{statusTextMap[status]}</Badge>
+  }
+
+  const PreviousRestoreItem = ({
+    clone,
+  }: {
+    clone: NonNullable<typeof previousClones>[number]
+  }) => {
+    if (clone.status === 'REMOVED') {
+      return (
+        <div className="grid grid-cols-4 gap-2 text-sm p-4 group">
+          <div className="min-w-24 truncate">{(clone.target_project as any).name}</div>
+          <div>
+            <StatusBadge status={clone.status} />
+          </div>
+          <div>
+            <TimestampInfo
+              className="font-mono text-xs text-foreground-lighter"
+              utcTimestamp={clone.inserted_at ?? ''}
+            />
+          </div>
+        </div>
+      )
+    } else {
+      return (
+        <Link
+          href={`/project/${clone.target_project.ref}`}
+          className="grid grid-cols-4 gap-2 text-sm p-4 group"
+        >
+          <div className="min-w-24 truncate">{(clone.target_project as any).name}</div>
+          <div>
+            <StatusBadge status={clone.status} />
+          </div>
+          <div>
+            <TimestampInfo
+              className="font-mono text-xs text-foreground-lighter"
+              utcTimestamp={clone.inserted_at ?? ''}
+            />
+          </div>
+          <div className="flex items-center justify-end text-foreground-lighter group-hover:text-foreground">
+            <ChevronRightIcon className="w-4 h-4" />
+          </div>
+        </Link>
+      )
+    }
+  }
+
+  if (isFreePlan) {
+    return (
+      <UpgradeToPro
+        buttonText="Upgrade"
+        primaryText="Restore to a new project requires a pro plan or above."
+        secondaryText="To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled."
+      />
+    )
+  }
 
   if (isOrioleDb) {
     return (
@@ -126,10 +208,6 @@ const RestoreToNewProject = () => {
         <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
       </Admonition>
     )
-  }
-
-  if (isLoading) {
-    return <GenericSkeletonLoader />
   }
 
   if (!canReadPhysicalBackups) {
@@ -180,14 +258,8 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (plan === 'free') {
-    return (
-      <UpgradeToPro
-        buttonText="Upgrade"
-        primaryText="Restore to a new project requires a pro plan or above."
-        secondaryText="To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled."
-      />
-    )
+  if (isLoading) {
+    return <GenericSkeletonLoader />
   }
 
   if (IS_CLONED_PROJECT) {
@@ -196,12 +268,10 @@ const RestoreToNewProject = () => {
         <Markdown
           className="max-w-full [&>p]:!leading-normal"
           content={`This is a temporary limitation whereby projects that were originally restored from another project cannot be restored to yet another project. 
-          If you need to restore a project to multiple other projects, please reach out via [support](/support/new?ref=${project?.ref}).`}
+          If you need to restore from a restored project, please reach out via [support](/support/new?ref=${project?.ref}).`}
         />
         <Button asChild type="default">
-          <Link
-            href={`/dashboard/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''}`}
-          >
+          <Link href={`/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''}`}>
             Go to original project
           </Link>
         </Button>
@@ -223,58 +293,9 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (lastClone?.status === 'FAILED') {
-    return (
-      <Admonition type="destructive" title="Failed to restore to new project">
-        <Markdown content="Sorry! The new project failed to be created, please reach out to support for assistance." />
-        <Button asChild type="default">
-          <Link
-            target="_blank"
-            rel="noreferrer noopener"
-            href={`/support/new?category=dashboard_bug&subject=Failed%20to%20restore%20to%20new%20project&message=Target%20project%20reference:%20${clonedProject?.ref ?? 'unknown'}`}
-          >
-            Contact support
-          </Link>
-        </Button>
-      </Admonition>
-    )
-  }
-
-  if (lastClone?.status === 'COMPLETED') {
-    return (
-      <Admonition type="default" title="Restoration completed">
-        <Markdown
-          className="max-w-full"
-          content={`The new project${!!clonedProject ? ` ${clonedProject.name}` : ''} has been created. A project can only be restored to another project once.`}
-        />
-        <Button asChild type="default">
-          <Link href={`/project/${lastClone?.target_project.ref}`}>Go to new project</Link>
-        </Button>
-      </Admonition>
-    )
-  }
-
-  if (lastClone?.status === 'IN_PROGRESS') {
-    return (
-      <Alert_Shadcn_ className="[&>svg]:bg-none! [&>svg]:text-foreground-light">
-        <Loader2 className="animate-spin" />
-        <AlertTitle_Shadcn_>Restoration in progress</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
-          <p>
-            The new project{!!clonedProject ? ` ${clonedProject.name}` : ''} is currently being
-            created
-          </p>
-          <Button asChild type="default" className="mt-2">
-            <Link href={`/project/${lastClone?.target_project.ref}`}>Go to new project</Link>
-          </Button>
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
-    )
-  }
-
   if (
     !isLoading &&
-    hasPITREnabled &&
+    PITR_ENABLED &&
     !cloneBackups?.physicalBackupData.earliestPhysicalBackupDateUnix
   ) {
     return (
@@ -286,12 +307,27 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (!isLoading && !hasPITREnabled && cloneBackups?.backups.length === 0) {
-    return <BackupsEmpty />
+  if (!isLoading && !PITR_ENABLED && cloneBackups?.backups.length === 0) {
+    return (
+      <>
+        <Admonition
+          type="default"
+          title="No backups found"
+          description="Backups are enabled, but no backups were found. Check again tomorrow."
+        />
+      </>
+    )
   }
 
+  const additionalMonthlySpend = projectSpecToMonthlyPrice({
+    targetVolumeSizeGb: targetVolumeSizeGb ?? 0,
+    targetComputeSize: targetComputeSize ?? 'nano',
+    planId: planId ?? 'free',
+    storageType: storageType as DiskType,
+  })
+
   return (
-    <>
+    <div className="flex flex-col gap-4">
       <ConfirmRestoreDialog
         open={showConfirmationDialog}
         onOpenChange={setShowConfirmationDialog}
@@ -299,11 +335,13 @@ const RestoreToNewProject = () => {
           setShowConfirmationDialog(false)
           setShowNewProjectDialog(true)
         }}
+        additionalMonthlySpend={additionalMonthlySpend}
       />
       <CreateNewProjectDialog
         open={showNewProjectDialog}
         selectedBackupId={selectedBackupId}
         recoveryTimeTarget={recoveryTimeTarget}
+        additionalMonthlySpend={additionalMonthlySpend}
         onOpenChange={setShowNewProjectDialog}
         onCloneSuccess={() => {
           refetchCloneStatus()
@@ -311,9 +349,33 @@ const RestoreToNewProject = () => {
           setShowNewProjectDialog(false)
         }}
       />
-      {hasPITREnabled ? (
+      {isRestoring ? (
+        <Alert_Shadcn_ className="[&>svg]:bg-none! [&>svg]:text-foreground-light mb-6">
+          <Loader2 className="animate-spin" />
+          <AlertTitle_Shadcn_>Restoration in progress</AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_>
+            <p>
+              The new project {(restoringClone?.target_project as any)?.name || ''} is currently
+              being created. You'll be able to restore again once the project is ready.
+            </p>
+            <Button asChild type="default" className="mt-2">
+              <Link href={`/project/${restoringClone?.target_project.ref}`}>Go to new project</Link>
+            </Button>
+          </AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
+      ) : null}
+      {previousClones?.length ? (
+        <div className="flex flex-col gap-2">
+          <h3 className="text-sm font-medium">Previous restorations</h3>
+          <Panel className="flex flex-col divide-y divide-border">
+            {previousClones?.map((c) => <PreviousRestoreItem key={c.inserted_at} clone={c} />)}
+          </Panel>
+        </div>
+      ) : null}
+      {PITR_ENABLED ? (
         <>
           <PITRForm
+            disabled={isRestoring}
             onSubmit={(v) => {
               setShowConfirmationDialog(true)
               setRecoveryTimeTarget(v.recoveryTimeTargetUnix)
@@ -328,13 +390,14 @@ const RestoreToNewProject = () => {
         </>
       ) : (
         <BackupsList
+          disabled={isRestoring}
           onSelectRestore={(id) => {
             setSelectedBackupId(id)
             setShowConfirmationDialog(true)
           }}
         />
       )}
-    </>
+    </div>
   )
 }
 

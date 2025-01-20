@@ -118,12 +118,6 @@ export const AIAssistant = ({
   const currentSchema = searchParams?.get('schema') ?? 'public'
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const sendTelemetryEvent = (action: TelemetryActions) => {
-    sendEvent({
-      action,
-      properties: { contextAdded: (sqlSnippets ?? []).length > 0 },
-    })
-  }
 
   const {
     messages: chatMessages,
@@ -194,9 +188,13 @@ export const AIAssistant = ({
     setLastSentMessage(payload)
 
     if (content.includes('Help me to debug')) {
-      sendTelemetryEvent(TelemetryActions.ASSISTANT_DEBUG_SUBMITTED)
+      sendEvent({
+        action: TelemetryActions.ASSISTANT_DEBUG_SUBMITTED,
+      })
     } else {
-      sendTelemetryEvent(TelemetryActions.ASSISTANT_PROMPT_SUBMITTED)
+      sendEvent({
+        action: TelemetryActions.ASSISTANT_PROMPT_SUBMITTED,
+      })
     }
   }
 
@@ -516,7 +514,9 @@ export const AIAssistant = ({
               title="OpenAI API key not set"
               description={
                 <Markdown
-                  content={'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'}
+                  content={
+                    'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
+                  }
                 />
               }
             />

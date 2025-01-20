@@ -70,7 +70,7 @@ Breaking changes are generally only present in major version upgrades of Postgre
 
 If you are upgrading from a significantly older version, you will need to consider the release notes for any intermediary releases as well.
 
-#### Time Limits
+#### Time limits
 
 Starting from 2024-06-24, when a project is paused, users then have a 90-day window to restore the project on the platform from within Supabase Studio.
 
@@ -100,7 +100,12 @@ If you upgrade to a paid plan while your project is paused, any expired one-clic
   src="/docs/img/guides/platform/paused-paid-tier.png"
 />
 
-#### Restoring a Downloaded Backup Locally
+#### Restoring a downloaded backup locally
+
+<Admonition type="caution">
+  If you want to restore your backup to a hosted Supabase project, you will need to use the
+  [Migrating within Supabase guide](/docs/guides/platform/migrating-within-supabase)
+</Admonition>
 
 If the 90 day project restore window has expired but you need to access data contained within your project using SQL, you can attempt to restore the project into a local Postgres instance. Supabase publishes tooling that can be used for that purpose. Be aware that this workflow does not produce a complete Supabase environment with REST/Auth/Storage. Instead, it creates a standalone Postgres instance that is maximally compatible with your project's backup file to assist with recovering your data.
 
@@ -157,7 +162,7 @@ When upgrading, the Supabase platform will "right-size" your disk based on the c
 pg_upgrade does not support upgrading of databases containing reg\* data types referencing system OIDs.
 If you have created any objects that depend on the following extensions, you will need to recreate them after the upgrade.
 
-#### pg_cron records
+#### `pg_cron` records
 
 [pg_cron](https://github.com/citusdata/pg_cron#viewing-job-run-details) does not automatically clean up historical records. This can lead to extremely large `cron.job_run_details` tables if the records are not regularly pruned; you should clean unnecessary records from this table prior to an upgrade.
 

@@ -38,8 +38,7 @@ const ProjectSettings: NextPageWithLayout = () => {
         {!isBranch ? (
           <>
             {/* this is only setable on compliance orgs, currently that means HIPAA orgs */}
-            {/* hasHipaaAddon */}
-            {true && <ComplianceConfig />}
+            {hasHipaaAddon && <ComplianceConfig />}
             <CustomDomainConfig />
             {projectTransferEnabled && <TransferProjectPanel />}
             <DeleteProjectPanel />

@@ -42,7 +42,7 @@ export const useContentDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(contentKeys.list(projectRef))
+        await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
 
         // Update Tabs state
         // currently unknown how to differentiate between sql and non-sql content

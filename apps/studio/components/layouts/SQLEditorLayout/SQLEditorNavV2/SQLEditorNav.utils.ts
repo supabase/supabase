@@ -8,7 +8,7 @@ export interface TreeViewItemProps {
   metadata?: any
 }
 
-export const ROOT_NODE = { id: 0, name: '', parent: null, children: [] }
+export const ROOT_NODE: TreeViewItemProps = { id: 0, name: '', parent: null, children: [] }
 
 // [Joshen] At the moment this is only tuned for single level folders
 // Will need to relook at this for multi level folders,
@@ -51,4 +51,29 @@ export const formatFolderResponseForTreeView = (
   }
 
   return [root, ...formattedFolders, ...formattedContents]
+}
+
+export function getLastItemIds(items: TreeViewItemProps[]) {
+  let lastItemIds = new Set<string>()
+
+  const topLevelItems = items.filter((item) => item.parent === 0)
+
+  if (topLevelItems.length > 0) {
+    const lastItem = topLevelItems[topLevelItems.length - 1]
+    if (typeof lastItem.id === 'string') {
+      lastItemIds.add(lastItem.id)
+    }
+
+    topLevelItems.forEach((item) => {
+      if (item.children.length > 0) {
+        const childrenLastItem = item.children[item.children.length - 1]
+
+        if (typeof childrenLastItem === 'string') {
+          lastItemIds.add(childrenLastItem)
+        }
+      }
+    })
+  }
+
+  return lastItemIds
 }

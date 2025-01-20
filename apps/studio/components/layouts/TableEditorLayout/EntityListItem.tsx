@@ -300,6 +300,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       }}
     >
       <>
+        {/* <> // there was a px-2 in here because scroll bar was messing up */}
         {!isPreview && isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
         <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
           <Tooltip.Trigger className="min-w-4">

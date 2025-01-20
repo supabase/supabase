@@ -102,6 +102,7 @@ export const Admonition = forwardRef<
         variant={typeMapped}
         {...props}
         className={cn(
+          'not-prose',
           'mb-2',
           admonitionSVG({ type: typeMapped }),
           admonitionBase({ type: typeMapped }),

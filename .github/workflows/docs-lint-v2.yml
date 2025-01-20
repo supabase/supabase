@@ -5,9 +5,17 @@ on:
       - '.github/workflows/docs-lint-v2.yml'
       - 'supa-mdx-lint.config.toml'
       - 'apps/docs/content/**'
+  push:
+    branches:
+      - master
+  workflow_dispatch:
 
 env:
   CARGO_NET_GIT_FETCH_WITH_CLI: true
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   supa-mdx-lint:
@@ -38,13 +46,42 @@ jobs:
         uses: reviewdog/action-setup@3f401fe1d58fe77e10d665ab713057375e39b887 # v1.3.0
         with:
           reviewdog_version: v0.20.2
-      - name: run linter
+      - name: run linter on PR
+        if: github.event_name == 'pull_request'
         env:
           BASE_REF: ${{ github.base_ref }}
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -o pipefail
           git diff --name-only origin/$BASE_REF HEAD \
-            | { grep -E "^apps/docs/content/guides/(getting-started|ai|api|auth|database|deployment|functions)/" || test $? = 1; } \
+            | { grep -E "^apps/docs/content/guides/" || test $? = 1; } \
             | xargs -r supa-mdx-lint --format rdf \
             | reviewdog -f=rdjsonl -reporter=github-pr-review
+      - name: run linter on push or workflow dispatch
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          supa-mdx-lint apps/docs/content || {
+            echo "Linter failed, attempting to fix errors..."
+            git config --global user.name 'github-docs-bot'
+            git config --global user.email 'github-docs-bot@supabase.com'
+            BRANCH_NAME="bot/docs-lint-fixes"
+            EXISTING_BRANCH=$(git ls-remote --heads origin $BRANCH_NAME)
+            if [ -n "$EXISTING_BRANCH" ]; then
+              git checkout $BRANCH_NAME
+            else
+              git checkout -b $BRANCH_NAME
+            fi
+            supa-mdx-lint apps/docs/content --fix || FIX_FAILED=1
+            git add .
+            git commit -m '[bot] fix lint errors' || true
+            git push origin $BRANCH_NAME
+            if [ -z "$EXISTING_BRANCH" ]; then
+              gh pr create --title '[bot] fix lint errors' --body 'This PR fixes lint errors in the documentation.' --head $BRANCH_NAME
+            fi
+            if [ "${FIX_FAILED:-0}" -eq 1 ]; then
+              echo "Fix did not correct all errors."
+              exit 1
+            fi
+          }

@@ -12,18 +12,17 @@ import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
+import { ReactNode, useMemo } from 'react'
+import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
-import { useAppStateSnapshot } from 'state/app-state'
 
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger">
@@ -43,7 +42,22 @@ const LayoutHeaderDivider = () => (
   </span>
 )
 
-const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
+interface LayoutHeaderProps {
+  customHeaderComponents?: ReactNode
+  breadcrumbs?: any[]
+  headerBorder?: boolean
+  showProductMenu?: boolean
+  customSidebarContent?: ReactNode
+  handleMobileMenu: Function
+}
+
+const LayoutHeader = ({
+  customHeaderComponents,
+  breadcrumbs = [],
+  headerBorder = true,
+  showProductMenu,
+  handleMobileMenu,
+}: LayoutHeaderProps) => {
   const { ref: projectRef } = useParams()
   const router = useRouter()
   const selectedProject = useSelectedProject()
@@ -51,8 +65,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
   const isOrgPage = router.pathname.startsWith('/org/') // Add this check
   const { aiAssistantPanel } = useAppStateSnapshot()
-
-  const connectDialogUpdate = useFlag('connectDialogUpdate')
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganization?.slug,
@@ -142,7 +154,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                       ease: 'easeOut',
                     }}
                   >
-                    {connectDialogUpdate && <Connect />}
+                    <Connect />
                     {!isBranchingEnabled && <EnableBranchingButton />}
                   </motion.div>
                 )}
@@ -193,4 +205,5 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     </>
   )
 }
+
 export default LayoutHeader

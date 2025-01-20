@@ -92,7 +92,7 @@ const SQLTemplates = () => {
                 handleNewQuery(x.sql, x.title)
                 sendEvent({
                   action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED,
-                  properties: { title: x.title },
+                  properties: { templateName: x.title },
                 })
               }}
             />
