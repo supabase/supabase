@@ -40,15 +40,18 @@ import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
 import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
-import { useContentInsertMutation } from 'data/content/content-insert-mutation'
 import { useContentQuery } from 'data/content/content-query'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from 'data/content/content-upsert-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 
 const PLACEHOLDER_WAREHOUSE_QUERY =
@@ -64,10 +67,8 @@ const PLACEHOLDER_QUERY = IS_PLATFORM ? PLATFORM_PLACEHOLDER_QUERY : LOCAL_PLACE
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
   const router = useRouter()
-  const queryId = router.query.queryId as string
-  const routerSource = router.query.source as SourceType
-
-  const { ref, q, ite, its } = useParams()
+  const { profile } = useProfile()
+  const { ref, q, ite, its, queryId, source: routerSource } = useParams()
   const projectRef = ref as string
   const organization = useSelectedOrganization()
 
@@ -79,7 +80,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   )
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
-  const [sourceType, setSourceType] = useState<SourceType>(routerSource || 'logs')
+  const [sourceType, setSourceType] = useState<SourceType>((routerSource as SourceType) || 'logs')
   const [selectedLog, setSelectedLog] = useState<any>(null)
 
   const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
@@ -127,29 +128,24 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const { data: warehouseCollections } = useWarehouseCollectionsQuery({ projectRef })
 
-  const { isLoading: isSubmitting, mutate: createContent } = useContentInsertMutation({
-    onError: (e) => {
-      const error = e as { message: string }
-      console.error(error)
-      setSaveModalOpen(false)
-      toast.error(`Failed to save query: ${error.message}`)
-    },
-    onSuccess: (values) => {
-      setSaveModalOpen(false)
-      toast.success(`Saved "${values.name}" log query`)
-    },
-  })
-
   const { mutate: upsertContent, isLoading: isUpsertingContent } = useContentUpsertMutation({
     onError: (e) => {
       const error = e as { message: string }
       console.error(error)
       setSaveModalOpen(false)
-      toast.error(`Failed to update query: ${error.message}`)
+      if (queryId) {
+        toast.error(`Failed to update query: ${error.message}`)
+      } else {
+        toast.error(`Failed to save query: ${error.message}`)
+      }
     },
     onSuccess: (_data, vars) => {
       setSaveModalOpen(false)
-      toast.success(`Updated "${vars.payload.name}" log query`)
+      if (queryId) {
+        toast.success(`Updated "${vars.payload.name}" log query`)
+      } else {
+        toast.success(`Saved "${vars.payload.name}" log query`)
+      }
     },
   })
 
@@ -228,13 +224,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     addRecentLogSqlSnippet({ sql: query })
   }
 
-  const handleClear = () => {
-    setEditorValue('')
-    setEditorId(uuidv4())
-    setWarehouseEditorId(uuidv4())
-    changeQuery('')
-  }
-
   const handleInsertSource = (source: string) => {
     if (sourceType === 'warehouse') {
       //TODO: Only one collection can be queried at a time, we need to replace the current collection from the query for the new one
@@ -249,12 +238,39 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     setEditorId(uuidv4())
   }
 
+  const handleCreateQuery = async (values: any, { setSubmitting }: any) => {
+    if (!projectRef) return console.error('Project ref is required')
+    if (!profile) return console.error('Profile is required')
+    setSubmitting(true)
+
+    const id = uuidv4()
+    const payload: UpsertContentPayload = {
+      id,
+      name: values.name,
+      description: values.description || '',
+      type: 'log_sql' as const,
+      content: {
+        content_id: editorId,
+        sql: editorValue,
+        schema_version: '1',
+        favorite: false,
+      } as LogSqlSnippets.Content,
+      owner_id: profile.id,
+      visibility: 'user' as const,
+    }
+    upsertContent(
+      { projectRef, payload },
+      {
+        onSuccess: () => router.push(`/project/${projectRef}/logs/explorer?queryId=${id}`),
+      }
+    )
+  }
+
   function handleOnSave() {
     if (!projectRef) return console.error('Project ref is required')
-    if (!query) return console.error('Query is required')
 
     // if we have a queryId, we are editing a saved query
-    if (queryId) {
+    if (queryId && query) {
       upsertContent({
         projectRef: projectRef!,
         payload: {
@@ -413,25 +429,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             name: '',
             desdcription: '',
           }}
-          onSubmit={async (values: any, { setSubmitting }: any) => {
-            setSubmitting(true)
-
-            const payload = {
-              id: uuidv4(),
-              name: values.name,
-              description: values.description || '',
-              type: 'log_sql' as const,
-              content: {
-                content_id: editorId,
-                sql: editorValue,
-                schema_version: '1',
-                favorite: false,
-              },
-              visibility: 'user' as const,
-            }
-
-            createContent({ projectRef: projectRef!, payload })
-          }}
+          onSubmit={handleCreateQuery}
         >
           {() => (
             <>
@@ -454,8 +452,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
                 </Button>
                 <Button
                   size="tiny"
-                  loading={isSubmitting}
-                  disabled={isSubmitting}
+                  loading={isUpsertingContent}
+                  disabled={isUpsertingContent}
                   htmlType="submit"
                 >
                   Save
