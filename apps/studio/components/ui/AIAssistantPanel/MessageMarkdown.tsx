@@ -2,6 +2,7 @@ import { useRouter } from 'next/router'
 import { memo, ReactNode, useContext } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useFlag } from 'hooks/ui/useFlag'
 import { TelemetryActions } from 'lib/constants/telemetry'
 import { cn, CodeBlock, CodeBlockLang } from 'ui'
 import { DebouncedComponent } from '../DebouncedComponent'
@@ -103,6 +104,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
   const router = useRouter()
   const { isLoading, readOnly } = useContext(MessageContext)
   const { mutate: sendEvent } = useSendEventMutation()
+  const supportSQLBlocks = useFlag('reportsV2')
 
   const language = children[0].props.className?.replace('language-', '') || 'sql'
   const rawSql = language === 'sql' ? children[0].props.children : undefined
@@ -115,7 +117,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
   const isChart = snippetProps.isChart === 'true'
   const runQuery = snippetProps.runQuery === 'true'
   const sql = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
-  const isDraggable = router.pathname.endsWith('/reports/[id]')
+  const isDraggable = supportSQLBlocks && router.pathname.endsWith('/reports/[id]')
 
   const onRunQuery = async (queryType: 'select' | 'mutation') => {
     sendEvent({
