@@ -1,11 +1,12 @@
 import RGL, { WidthProvider } from 'react-grid-layout'
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
+import { toast } from 'sonner'
 
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { Dashboards } from 'types'
-import useNewQuery from '../SQLEditor/hooks'
+import { useNewQuery } from '../SQLEditor/hooks'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { ReportBlock } from './ReportBlock/ReportBlock'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
@@ -60,6 +61,7 @@ export const GridResize = ({
 
     if (!label || !sql) return console.error('SQL and Label required')
     const id = await newQuery(sql, label, false)
+    toast.success(`Successfully created new query: ${label}`)
 
     const updatedLayout = layout.map((x) => {
       const existingBlock = editableReport.layout.find((y) => x.i === y.id)
