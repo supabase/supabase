@@ -1469,9 +1469,15 @@ importers:
         specifier: ^3.22.4
         version: 3.23.8
     devDependencies:
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.5
       typescript:
         specifier: ~5.5.0
         version: 5.5.2
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.8(@types/node@22.10.7)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.37.0)
 
   packages/shared-data: {}
 
@@ -7659,6 +7665,7 @@ packages:
     resolution: {integrity: sha512-t0q23FIpvHDTtnORW+bDJziGsal5uh9RJTJ1fyH8drd4lICOoXhJ5pLMUZ5C0VQei6dNmwTzzoTRgMkO9JgHEQ==}
     peerDependencies:
       eslint: '>= 5'
+    bundledDependencies: []
 
   eslint-plugin-import@2.29.1:
     resolution: {integrity: sha512-BbPC0cuExzhiMo4Ff1BTVwHpjjv28C5R+btTOGaCRC7UEz801up0JadwkeSk5Ued6TG34uaczuVuH6qyy5YUxw==}
@@ -10717,6 +10724,10 @@ packages:
   postgres-interval@1.2.0:
     resolution: {integrity: sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==}
     engines: {node: '>=0.10.0'}
+
+  postgres@3.4.5:
+    resolution: {integrity: sha512-cDWgoah1Gez9rN3H4165peY9qfpEo+SA61oQv65O3cRUE1pOEoJWwddwcqKE8XZYjbblOJlYDlLV4h67HrEVDg==}
+    engines: {node: '>=12'}
 
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -18338,6 +18349,15 @@ snapshots:
       msw: 2.4.11(typescript@5.5.2)
       vite: 5.2.14(@types/node@20.12.11)(sass@1.72.0)(terser@5.37.0)
 
+  '@vitest/mocker@2.1.8(msw@2.4.11(typescript@5.5.2))(vite@5.2.14(@types/node@22.10.7)(sass@1.72.0)(terser@5.37.0))':
+    dependencies:
+      '@vitest/spy': 2.1.8
+      estree-walker: 3.0.3
+      magic-string: 0.30.12
+    optionalDependencies:
+      msw: 2.4.11(typescript@5.5.2)
+      vite: 5.2.14(@types/node@22.10.7)(sass@1.72.0)(terser@5.37.0)
+
   '@vitest/pretty-format@2.1.8':
     dependencies:
       tinyrainbow: 1.2.0
@@ -24588,6 +24608,8 @@ snapshots:
     dependencies:
       xtend: 4.0.2
 
+  postgres@3.4.5: {}
+
   prelude-ls@1.2.1: {}
 
   prettier-plugin-sql-cst@0.11.1:
@@ -27117,6 +27139,23 @@ snapshots:
       - supports-color
       - terser
 
+  vite-node@2.1.8(@types/node@22.10.7)(sass@1.72.0)(supports-color@8.1.1)(terser@5.37.0):
+    dependencies:
+      cac: 6.7.14
+      debug: 4.3.7(supports-color@8.1.1)
+      es-module-lexer: 1.5.4
+      pathe: 1.1.2
+      vite: 5.2.14(@types/node@22.10.7)(sass@1.72.0)(terser@5.37.0)
+    transitivePeerDependencies:
+      - '@types/node'
+      - less
+      - lightningcss
+      - sass
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+
   vite-tsconfig-paths@4.3.2(supports-color@8.1.1)(typescript@5.5.2)(vite@5.2.14(@types/node@20.12.11)(sass@1.72.0)(terser@5.37.0)):
     dependencies:
       debug: 4.3.7(supports-color@8.1.1)
@@ -27146,6 +27185,17 @@ snapshots:
       rollup: 4.22.4
     optionalDependencies:
       '@types/node': 20.12.11
+      fsevents: 2.3.3
+      sass: 1.72.0
+      terser: 5.37.0
+
+  vite@5.2.14(@types/node@22.10.7)(sass@1.72.0)(terser@5.37.0):
+    dependencies:
+      esbuild: 0.20.2
+      postcss: 8.4.38
+      rollup: 4.22.4
+    optionalDependencies:
+      '@types/node': 22.10.7
       fsevents: 2.3.3
       sass: 1.72.0
       terser: 5.37.0
@@ -27220,6 +27270,41 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 20.12.11
+      jsdom: 20.0.3(supports-color@8.1.1)
+    transitivePeerDependencies:
+      - less
+      - lightningcss
+      - msw
+      - sass
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+
+  vitest@2.1.8(@types/node@22.10.7)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.37.0):
+    dependencies:
+      '@vitest/expect': 2.1.8
+      '@vitest/mocker': 2.1.8(msw@2.4.11(typescript@5.5.2))(vite@5.2.14(@types/node@22.10.7)(sass@1.72.0)(terser@5.37.0))
+      '@vitest/pretty-format': 2.1.8
+      '@vitest/runner': 2.1.8
+      '@vitest/snapshot': 2.1.8
+      '@vitest/spy': 2.1.8
+      '@vitest/utils': 2.1.8
+      chai: 5.1.2
+      debug: 4.3.7(supports-color@8.1.1)
+      expect-type: 1.1.0
+      magic-string: 0.30.12
+      pathe: 1.1.2
+      std-env: 3.8.0
+      tinybench: 2.9.0
+      tinyexec: 0.3.1
+      tinypool: 1.0.2
+      tinyrainbow: 1.2.0
+      vite: 5.2.14(@types/node@22.10.7)(sass@1.72.0)(terser@5.37.0)
+      vite-node: 2.1.8(@types/node@22.10.7)(sass@1.72.0)(supports-color@8.1.1)(terser@5.37.0)
+      why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@types/node': 22.10.7
       jsdom: 20.0.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - less
