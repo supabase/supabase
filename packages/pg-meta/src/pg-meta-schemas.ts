@@ -127,7 +127,7 @@ function remove(
     id?: number
     name?: string
   },
-  { cascade = false }: SchemaRemoveParams = { cascade: false }
+  { cascade = false }: SchemaRemoveParams = {}
 ): { sql: string } {
   const sql = `
 do $$
