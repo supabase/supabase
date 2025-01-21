@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { memo, ReactNode, useContext } from 'react'
+import { DragEvent, memo, ReactNode, useContext } from 'react'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -60,6 +60,7 @@ const MemoizedQueryBlock = memo(
     isDraggable,
     runQuery,
     onRunQuery,
+    onDragStart,
   }: {
     sql: string
     title: string
@@ -70,6 +71,7 @@ const MemoizedQueryBlock = memo(
     isDraggable: boolean
     runQuery: boolean
     onRunQuery: (queryType: 'select' | 'mutation') => void
+    onDragStart: (e: DragEvent<Element>) => void
   }) => (
     <DebouncedComponent
       delay={500}
@@ -97,6 +99,7 @@ const MemoizedQueryBlock = memo(
         draggable={isDraggable}
         runQuery={runQuery}
         onRunQuery={onRunQuery}
+        onDragStart={onDragStart}
       />
     </DebouncedComponent>
   )
@@ -159,6 +162,9 @@ export const MarkdownPre = ({ children }: { children: any }) => {
             isDraggable={isDraggableToReports}
             runQuery={runQuery}
             onRunQuery={onRunQuery}
+            onDragStart={(e: DragEvent<Element>) =>
+              e.dataTransfer.setData('application/json', JSON.stringify({ label: title, sql }))
+            }
           />
         )
       ) : (

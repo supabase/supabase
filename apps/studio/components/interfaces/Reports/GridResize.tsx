@@ -71,7 +71,10 @@ export const GridResize = ({
     if (!profile) return console.error('Profile is required')
     if (!project) return console.error('Project is required')
 
-    const queryData = JSON.parse(e.dataTransfer.getData('application/json'))
+    const data = e.dataTransfer.getData('application/json')
+    if (!data) return
+
+    const queryData = JSON.parse(data)
     const { label, sql } = queryData
     if (!label || !sql) return console.error('SQL and Label required')
 

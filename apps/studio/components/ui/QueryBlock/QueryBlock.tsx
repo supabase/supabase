@@ -1,5 +1,5 @@
 import { Code, Play } from 'lucide-react'
-import { ReactNode, useEffect, useMemo, useState } from 'react'
+import { DragEvent, ReactNode, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 import { toast } from 'sonner'
 
@@ -69,6 +69,8 @@ interface QueryBlockProps {
   onSetParameter?: (params: Parameter[]) => void
   /** Optional callback the SQL query is run */
   onRunQuery?: (queryType: 'select' | 'mutation') => void
+  /** Optional callback on drag start */
+  onDragStart?: (e: DragEvent<Element>) => void
 
   // [Joshen] Params below are currently only used by ReportsV2 (Might revisit to see how to improve these)
   /** Optional height set to render the SQL query (Used in Reports) */
@@ -103,6 +105,7 @@ export const QueryBlock = ({
   onRunQuery,
   onSetParameter,
   onUpdateChartConfig,
+  onDragStart,
 }: QueryBlockProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
@@ -168,13 +171,7 @@ export const QueryBlock = ({
     <ReportBlockContainer
       draggable={draggable}
       showDragHandle={draggable}
-      onDragStart={
-        draggable
-          ? (e) => {
-              e.dataTransfer.setData('application/json', JSON.stringify({ label, sql }))
-            }
-          : undefined
-      }
+      onDragStart={(e: DragEvent<Element>) => onDragStart?.(e)}
       icon={
         <SQL_ICON
           className={cn(
