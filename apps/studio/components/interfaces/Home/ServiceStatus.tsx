@@ -291,13 +291,17 @@ const ServiceStatus = () => {
             </div>
           </Link>
         ))}
-        <PopoverSeparator />
-        <div className="flex gap-2 text-xs text-foreground-light px-3 py-2">
-          <div className="mt-0.5">
-            <InfoIcon />
-          </div>
-          Recently restored projects can take up to 5 minutes to become fully operational.
-        </div>
+        {allServicesOperational ? null : (
+          <>
+            <PopoverSeparator />
+            <div className="flex gap-2 text-xs text-foreground-light px-3 py-2">
+              <div className="mt-0.5">
+                <InfoIcon />
+              </div>
+              Recently restored projects can take up to 5 minutes to become fully operational.
+            </div>
+          </>
+        )}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )
