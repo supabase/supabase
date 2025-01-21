@@ -1,9 +1,10 @@
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { ReactNode, useState } from 'react'
-import { ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import {
   InfraMonitoringAttribute,
@@ -19,6 +20,7 @@ import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'rec
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { WarningIcon } from 'ui'
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
+import { ReportBlockContainer } from './ReportBlockContainer'
 
 interface ChartBlockProps {
   label: string
@@ -29,6 +31,7 @@ interface ChartBlockProps {
   interval?: AnalyticsInterval
   defaultChartStyle?: 'bar' | 'line'
   isLoading?: boolean
+  draggable?: boolean
   actions?: ReactNode
   maxHeight?: number
 }
@@ -42,6 +45,7 @@ export const ChartBlock = ({
   interval = '1d',
   defaultChartStyle = 'bar',
   isLoading = false,
+  draggable = false,
   actions,
   maxHeight,
 }: ChartBlockProps) => {
@@ -128,13 +132,12 @@ export const ChartBlock = ({
   })
 
   return (
-    <div
-      className={cn('h-full bg-surface-100 border-overlay group relative rounded border shadow-sm')}
-    >
-      <div className="flex py-1 pl-3 pr-1 items-center gap-2 z-10 shrink-0">
-        {metric?.category?.icon('text-foreground-muted')}
-        <h3 className="text-xs font-medium text-foreground-light flex-1">{label}</h3>
-        <div className="flex items-center">
+    <ReportBlockContainer
+      draggable={draggable}
+      icon={metric?.category?.icon('text-foreground-muted')}
+      label={label}
+      actions={
+        <>
           <ButtonTooltip
             type="text"
             size="tiny"
@@ -151,22 +154,30 @@ export const ChartBlock = ({
             }}
           />
           {actions}
-        </div>
-      </div>
-
+        </>
+      }
+    >
       {loading ? (
-        <div className="flex h-52 w-full flex-col items-center justify-center gap-y-2 border-t">
+        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2">
           <Loader2 size={18} className="animate-spin text-border-strong" />
           <p className="text-xs text-foreground-lighter">Loading data for {label}</p>
         </div>
       ) : chartData === undefined ? (
-        <div className="flex h-52 w-full flex-col items-center justify-center gap-y-2 border-t">
+        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2">
           <WarningIcon />
           <p className="text-xs text-foreground-lighter">Unable to load data for {label}</p>
         </div>
+      ) : data.length === 0 ? (
+        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2">
+          <NoDataPlaceholder
+            size="small"
+            className="border-0"
+            description="It may take up to 24 hours for data to refresh"
+          />
+        </div>
       ) : (
         <ChartContainer
-          className="flex-1 border-t aspect-auto px-3 py-2"
+          className="w-full aspect-auto px-3 py-2"
           config={{}}
           style={{
             height: maxHeight ? `${maxHeight}px` : undefined,
@@ -215,11 +226,11 @@ export const ChartBlock = ({
                   />
                 }
               />
-              <Line dataKey={metricLabel} radius={4} />
+              <Line dataKey={metricLabel} stroke="var(--chart-1)" radius={4} />
             </LineChart>
           )}
         </ChartContainer>
       )}
-    </div>
+    </ReportBlockContainer>
   )
 }

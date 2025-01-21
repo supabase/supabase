@@ -64,6 +64,7 @@ export const GridResize = ({
       compactType="vertical"
       onDragStop={onUpdateLayout}
       onResizeStop={onUpdateLayout}
+      draggableHandle=".grid-item-drag-handle"
     >
       {editableReport.layout.map((item) => {
         return (

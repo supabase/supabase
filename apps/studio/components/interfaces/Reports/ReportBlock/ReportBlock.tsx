@@ -49,6 +49,7 @@ export const ReportBlock = ({
         <QueryBlock
           runQuery
           isChart
+          draggable
           disableRunIfMutation
           id={item.id}
           label={item.label}
@@ -67,25 +68,28 @@ export const ReportBlock = ({
           }
           onUpdateChartConfig={onUpdateChart}
           noResultPlaceholder={
-            isReadOnlySQL ? (
-              <div className="border-t flex flex-col gap-y-1 items-center justify-center h-full">
-                <p className="text-xs text-foreground-light">SQL query is not readonly</p>
-                <p className="text-xs text-foreground-lighter">
-                  Queries that involve any mutation will not be run or rendered in reports
-                </p>
-              </div>
-            ) : (
-              <div className="border-t flex flex-col gap-y-1 items-center justify-center h-full">
-                <p className="text-xs text-foreground-light">No results returned from query</p>
-                <p className="text-xs text-foreground-lighter">
-                  Results from the SQL query can be viewed as a table or chart here
-                </p>
-              </div>
-            )
+            <div className="flex flex-col gap-y-1 items-center justify-center h-full px-4 w-full">
+              {isReadOnlySQL ? (
+                <>
+                  <p className="text-xs text-foreground-light">No results returned from query</p>
+                  <p className="text-xs text-foreground-lighter text-center">
+                    Results from the SQL query can be viewed as a table or chart here
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs text-foreground-light">SQL query is not readonly</p>
+                  <p className="text-xs text-foreground-lighter text-center">
+                    Queries that involve any mutation will not be run or rendered in reports
+                  </p>
+                </>
+              )}
+            </div>
           }
         />
       ) : (
         <ChartBlock
+          draggable
           startDate={startDate}
           endDate={endDate}
           interval={interval}
