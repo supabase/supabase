@@ -406,12 +406,12 @@ export const DatabaseConnectionString = () => {
                 {poolerConnStringSyntax.map((x, idx) => {
                   if (x.tooltip) {
                     return (
-                      <Tooltip_Shadcn_ key={`syntax-${idx}`}>
-                        <TooltipTrigger_Shadcn_ asChild>
+                      <Tooltip key={`syntax-${idx}`}>
+                        <TooltipTrigger asChild>
                           <span className="text-foreground text-xs font-mono">{x.value}</span>
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom">{x.tooltip}</TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">{x.tooltip}</TooltipContent>
+                      </Tooltip>
                     )
                   } else {
                     return (
