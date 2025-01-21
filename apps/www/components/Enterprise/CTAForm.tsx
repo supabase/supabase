@@ -4,18 +4,19 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { CustomerLogo, CustomerQuote } from '../../pages/contact/sales'
 import EnterpriseFormQuotes from '../EnterpriseFormQuotes'
 import RequestADemoForm from '../Forms/RequestADemoForm'
+import { useT } from '~/lib/intl'
 
 interface Props {}
 
 const UseCases: FC<Props> = (props) => {
+  const t = useT()
+
   return (
     <SectionContainer className="text grid gap-8 lg:gap-12 md:grid-cols-2">
       <div className="lg:pb-8 md:h-full w-full flex flex-col justify-between gap-2">
         <div className="flex flex-col gap-2 md:max-w-md">
-          <h1 className="h1 !m-0">Request a demo</h1>
-          <p className="md:text-lg text-foreground-lighter">
-            We can take your requirements and show you how Supabase can help you achieve your goals.
-          </p>
+          <h1 className="h1 !m-0">{t('enterprise.demo.title')}</h1>
+          <p className="md:text-lg text-foreground-lighter">{t('enterprise.demo.description')}</p>
         </div>
         <EnterpriseFormQuotes
           className="hidden md:flex"
@@ -24,8 +25,8 @@ const UseCases: FC<Props> = (props) => {
               label: <CustomerLogo title="Goodtape" logo="/images/customers/logos/good-tape.png" />,
               panel: (
                 <CustomerQuote
-                  quote="My biggest regret is not having gone with Supabase from the beginning."
-                  author="Jakob Steinn, Co-founder & Tech Lead, Good Tape"
+                  quote={t('enterprise.quotes.goodtape.quote')}
+                  author={t('enterprise.quotes.goodtape.author')}
                 />
               ),
             },
@@ -33,8 +34,8 @@ const UseCases: FC<Props> = (props) => {
               label: <CustomerLogo title="Xendit" logo="/images/customers/logos/xendit.png" />,
               panel: (
                 <CustomerQuote
-                  quote="The full solution was built and in production in less than one week."
-                  author="Developer, Xendit"
+                  quote={t('enterprise.quotes.xendit.quote')}
+                  author={t('enterprise.quotes.xendit.author')}
                 />
               ),
             },
@@ -42,8 +43,8 @@ const UseCases: FC<Props> = (props) => {
               label: <CustomerLogo title="Chatbase" logo="/images/customers/logos/chatbase.png" />,
               panel: (
                 <CustomerQuote
-                  quote="Supabase is great because it has everything. I don’t need a different solution for authentication, a different solution for database, or a different solution for storage."
-                  author="Yasser Elsaid, Founder, Chatbase"
+                  quote={t('enterprise.quotes.chatbase.quote')}
+                  author={t('enterprise.quotes.chatbase.author')}
                   className="max-w-none"
                 />
               ),
@@ -59,8 +60,8 @@ const UseCases: FC<Props> = (props) => {
             label: <CustomerLogo title="Goodtape" logo="/images/customers/logos/good-tape.png" />,
             panel: (
               <CustomerQuote
-                quote="My biggest regret is not having gone with Supabase from the beginning."
-                author="Jakob Steinn Co-founder & Tech Lead"
+                quote={t('enterprise.quotes.goodtape.quote')}
+                author={t('enterprise.quotes.goodtape.author.short')}
               />
             ),
           },
@@ -68,8 +69,8 @@ const UseCases: FC<Props> = (props) => {
             label: <CustomerLogo title="Xendit" logo="/images/customers/logos/xendit.png" />,
             panel: (
               <CustomerQuote
-                quote="The full solution was built and in production in less than one week."
-                author="Xendit developer"
+                quote={t('enterprise.quotes.xendit.quote')}
+                author={t('enterprise.quotes.xendit.author.short')}
               />
             ),
           },
@@ -77,8 +78,8 @@ const UseCases: FC<Props> = (props) => {
             label: <CustomerLogo title="Chatbase" logo="/images/customers/logos/chatbase.png" />,
             panel: (
               <CustomerQuote
-                quote="Supabase is great because it has everything. I don’t need a different solution for authentication, a different solution for database, or a different solution for storage."
-                author="Yasser Elsaid, Founder, Chatbase"
+                quote={t('enterprise.quotes.chatbase.quote')}
+                author={t('enterprise.quotes.chatbase.author')}
                 className="max-w-none"
               />
             ),

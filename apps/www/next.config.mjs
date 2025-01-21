@@ -82,7 +82,13 @@ const nextConfig = {
     ]
   },
   async rewrites() {
-    return rewrites
+    return [
+      ...rewrites,
+      {
+        source: '/ja/enterprise',
+        destination: '/enterprise',
+      },
+    ]
   },
   async redirects() {
     return redirects

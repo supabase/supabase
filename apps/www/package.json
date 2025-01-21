@@ -59,6 +59,7 @@
     "react-copy-to-clipboard": "^5.1.0",
     "react-countdown": "^2.3.5",
     "react-dom": "^18.2.0",
+    "react-intl": "^7.1.1",
     "react-markdown": "^8.0.3",
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "^4.2.17",

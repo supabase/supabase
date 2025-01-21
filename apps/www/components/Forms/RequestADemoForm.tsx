@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { CircleAlert } from 'lucide-react'
 import { Button, cn, Input_Shadcn_, Label_Shadcn_, Separator, TextArea_Shadcn_ } from 'ui'
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
+import { useReverseNameOrder, useT } from '~/lib/intl'
 
 interface FormData {
   firstName: string
@@ -26,41 +27,6 @@ type FormConfig = {
 
 interface Props {
   className?: string
-}
-
-const formConfig: FormConfig = {
-  firstName: {
-    type: 'text',
-    label: 'First Name',
-    placeholder: 'First Name',
-    required: true,
-    className: 'md:col-span-1',
-    component: Input_Shadcn_,
-  },
-  secondName: {
-    type: 'text',
-    label: 'Last Name',
-    placeholder: 'Last Name',
-    required: true,
-    className: 'md:col-span-1',
-    component: Input_Shadcn_,
-  },
-  companyEmail: {
-    type: 'text',
-    label: 'Company Email',
-    placeholder: 'Company Email',
-    required: true,
-    className: '',
-    component: Input_Shadcn_,
-  },
-  message: {
-    type: 'textarea',
-    label: 'What are you interested in?',
-    placeholder: 'Share more about what you want to accomplish',
-    required: true,
-    className: '[&_textarea]:min-h-[100px] [&_textarea]:bg-foreground/[.026]',
-    component: TextArea_Shadcn_,
-  },
 }
 
 const isValidEmail = (email: string): boolean => {
@@ -105,6 +71,48 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
   const [startTime, setStartTime] = useState<number>(0)
+  const t = useT()
+
+  const firstName: FormItem = {
+    type: 'text',
+    label: t('forms.demo.firstName.label'),
+    placeholder: t('forms.demo.firstName.placeholder'),
+    required: true,
+    className: 'md:col-span-1',
+    component: Input_Shadcn_,
+  }
+  const secondName: FormItem = {
+    type: 'text',
+    label: t('forms.demo.secondName.label'),
+    placeholder: t('forms.demo.secondName.placeholder'),
+    required: true,
+    className: 'md:col-span-1',
+    component: Input_Shadcn_,
+  }
+
+  const orderedNameInputs = useReverseNameOrder()
+    ? { secondName, firstName }
+    : { firstName, secondName }
+
+  const formConfig: FormConfig = {
+    ...orderedNameInputs,
+    companyEmail: {
+      type: 'text',
+      label: t('forms.demo.companyEmail.label'),
+      placeholder: t('forms.demo.companyEmail.placeholder'),
+      required: true,
+      className: '',
+      component: Input_Shadcn_,
+    },
+    message: {
+      type: 'textarea',
+      label: t('forms.demo.message.label'),
+      placeholder: t('forms.demo.message.placeholder'),
+      required: true,
+      className: '[&_textarea]:min-h-[100px] [&_textarea]:bg-foreground/[.026]',
+      component: TextArea_Shadcn_,
+    },
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -125,23 +133,21 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
     // Check required fields
     for (const key in formConfig) {
       if (formConfig[key as keyof FormData].required && !formData[key as keyof FormData]) {
-        newErrors[key as keyof FormData] = `This field is required`
+        newErrors[key as keyof FormData] = t('forms.demo.errors.required')
       }
     }
 
     // Validate email
     if (formData.companyEmail && !isValidEmail(formData.companyEmail)) {
-      newErrors.companyEmail = 'Invalid email address'
+      newErrors.companyEmail = t('forms.demo.errors.invalidEmail')
     }
 
     // Validate company email
     if (formData.companyEmail && !isCompanyEmail(formData.companyEmail)) {
-      newErrors.companyEmail = 'Please use a company email address'
+      newErrors.companyEmail = t('forms.demo.errors.companyEmail')
     }
 
     setErrors(newErrors)
-
-    // Return validation status, also check if honeypot is filled (indicating a bot)
     return Object.keys(newErrors).length === 0 && honeypot === ''
   }
 
@@ -151,9 +157,8 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
     const currentTime = Date.now()
     const timeElapsed = (currentTime - startTime) / 1000
 
-    // Spam prevention: Reject form if submitted too quickly (less than 3 seconds)
     if (timeElapsed < 3) {
-      setErrors({ general: 'Submission too fast. Please fill the form correctly.' })
+      setErrors({ general: t('forms.demo.errors.tooFast') })
       return
     }
 
@@ -174,14 +179,14 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
       })
 
       if (response.ok) {
-        setSuccess('Thank you for your submission!')
+        setSuccess(t('forms.demo.success'))
         setFormData({ firstName: '', secondName: '', companyEmail: '', message: '' })
       } else {
         const errorData = await response.json()
         setErrors({ general: `Submission failed: ${errorData.message}` })
       }
     } catch (error) {
-      setErrors({ general: 'An unexpected error occurred. Please try again.' })
+      setErrors({ general: t('forms.demo.errors.unexpected') })
     } finally {
       setIsSubmitting(false)
     }
@@ -202,7 +207,7 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
         {success ? (
           <div className="flex flex-col h-full w-full min-w-[300px] gap-4 items-center justify-center opacity-0 transition-opacity animate-fade-in scale-1">
             <p className="text-center text-sm">{success}</p>
-            <Button onClick={handleReset}>Reset</Button>
+            <Button onClick={handleReset}>{t('forms.demo.reset')}</Button>
           </div>
         ) : (
           <form
@@ -263,12 +268,12 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
               disabled={isSubmitting}
               loading={isSubmitting}
             >
-              Request a demo
+              {t('forms.demo.submit')}
             </Button>
             <p className="text-foreground-lighter text-sm col-span-full">
-              By submitting this form, I confirm that I have read and understood the{' '}
+              {t('forms.demo.privacy')}{' '}
               <Link href="/privacy" className="text-foreground hover:underline">
-                Privacy Policy
+                {t('forms.demo.privacy.link')}
               </Link>
               .
             </p>
@@ -282,9 +287,9 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
       </div>
       <p className="text-foreground-lighter text-sm">
         <Link href="/support" className="text-foreground hover:underline">
-          Contact support
+          {t('forms.demo.support')}
         </Link>{' '}
-        if you need technical help
+        {t('forms.demo.support.suffix')}
       </p>
     </div>
   )

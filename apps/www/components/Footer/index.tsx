@@ -10,6 +10,7 @@ import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-w
 import footerData from 'data/Footer'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
+import { LanguageSelector } from '../LanguageSelector'
 
 interface Props {
   className?: string
@@ -115,6 +116,7 @@ const Footer = (props: Props) => {
                 <IconYoutubeSolid size={22} />
               </a>
             </div>
+            <LanguageSelector />
           </div>
           <div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-2 xl:mt-0">
             <div className="grid grid-cols-2 gap-8 md:grid-cols-4">

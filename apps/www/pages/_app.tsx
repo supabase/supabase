@@ -10,13 +10,12 @@ import {
   useThemeSandbox,
 } from 'common'
 import { DefaultSeo } from 'next-seo'
-import { AppProps } from 'next/app'
+import { AppContext, AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { SonnerToaster, themes } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
-
 import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,
   DEFAULT_FAVICON_THEME_COLOR,
@@ -24,8 +23,15 @@ import MetaFaviconsPagesRouter, {
 import { WwwCommandMenu } from '~/components/CommandMenu'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
+import { IntlProvider } from 'react-intl'
+import { extractIntlFromContext, LocaleMessages, Locale } from '~/lib/intl'
 
-export default function App({ Component, pageProps }: AppProps) {
+interface SupabaseAppProps extends AppProps {
+  locale: Locale
+  messages: LocaleMessages
+}
+
+export default function App({ Component, pageProps, messages, locale }: SupabaseAppProps) {
   const router = useRouter()
   const { hasAcceptedConsent } = useConsent()
 
@@ -60,46 +66,53 @@ export default function App({ Component, pageProps }: AppProps) {
         includeMsApplicationConfig
         includeRssXmlFeed
       />
-      <DefaultSeo
-        title={site_title}
-        description={DEFAULT_META_DESCRIPTION}
-        openGraph={{
-          type: 'website',
-          url: 'https://supabase.com/',
-          site_name: 'Supabase',
-          images: [
-            {
-              url: `https://supabase.com${basePath}/images/og/supabase-og.png`,
-              width: 800,
-              height: 600,
-              alt: 'Supabase Og Image',
-            },
-          ],
-        }}
-        twitter={{
-          handle: '@supabase',
-          site: '@supabase',
-          cardType: 'summary_large_image',
-        }}
-      />
+      <IntlProvider messages={messages} locale={locale}>
+        <DefaultSeo
+          title={site_title}
+          description={DEFAULT_META_DESCRIPTION}
+          openGraph={{
+            type: 'website',
+            url: 'https://supabase.com/',
+            site_name: 'Supabase',
+            images: [
+              {
+                url: `https://supabase.com${basePath}/images/og/supabase-og.png`,
+                width: 800,
+                height: 600,
+                alt: 'Supabase Og Image',
+              },
+            ],
+          }}
+          twitter={{
+            handle: '@supabase',
+            site: '@supabase',
+            cardType: 'summary_large_image',
+          }}
+        />
 
-      <AuthProvider>
-        <FeatureFlagProvider API_URL={API_URL}>
-          <ThemeProvider
-            themes={themes.map((theme) => theme.value)}
-            enableSystem
-            disableTransitionOnChange
-            forcedTheme={forceDarkMode ? 'dark' : undefined}
-          >
-            <CommandProvider>
-              <SonnerToaster position="top-right" />
-              <Component {...pageProps} />
-              <WwwCommandMenu />
-              <PageTelemetry API_URL={API_URL} hasAcceptedConsent={hasAcceptedConsent} />
-            </CommandProvider>
-          </ThemeProvider>
-        </FeatureFlagProvider>
-      </AuthProvider>
+        <AuthProvider>
+          <FeatureFlagProvider API_URL={API_URL}>
+            <ThemeProvider
+              themes={themes.map((theme) => theme.value)}
+              enableSystem
+              disableTransitionOnChange
+              forcedTheme={forceDarkMode ? 'dark' : undefined}
+            >
+              <CommandProvider>
+                <SonnerToaster position="top-right" />
+                <Component {...pageProps} />
+                <WwwCommandMenu />
+                <PageTelemetry API_URL={API_URL} hasAcceptedConsent={hasAcceptedConsent} />
+              </CommandProvider>
+            </ThemeProvider>
+          </FeatureFlagProvider>
+        </AuthProvider>
+      </IntlProvider>
     </>
   )
+}
+
+App.getInitialProps = async ({ ctx }: AppContext) => {
+  const { messages, locale } = await extractIntlFromContext(ctx)
+  return { messages, locale }
 }
