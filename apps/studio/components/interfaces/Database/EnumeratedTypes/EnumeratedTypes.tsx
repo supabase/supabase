@@ -60,10 +60,10 @@ const EnumeratedTypes = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-x-2">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-2">
           <SchemaSelector
-            className="w-[180px]"
+            className="w-full lg:w-[180px]"
             size="tiny"
             showError={false}
             selectedSchemaName={selectedSchema}
@@ -72,17 +72,21 @@ const EnumeratedTypes = () => {
           <Input
             size="tiny"
             value={search}
-            className="w-52"
+            className="w-full lg:w-52"
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search for a type"
             icon={<Search size={14} />}
           />
         </div>
 
-        <div className="flex items-center gap-x-2">
+        <div className="flex items-center gap-2">
           <DocsButton href="https://www.postgresql.org/docs/current/datatype-enum.html" />
           {!isLocked && (
-            <Button className="ml-auto" type="primary" onClick={() => setShowCreateTypePanel(true)}>
+            <Button
+              className="ml-auto flex-1"
+              type="primary"
+              onClick={() => setShowCreateTypePanel(true)}
+            >
               Create type
             </Button>
           )}

@@ -1,0 +1,62 @@
+---
+title = "Avoiding timeouts in long running queries"
+github_url = "https://github.com/orgs/supabase/discussions/21133"
+date_created = "2024-02-09T02:46:42+00:00"
+topics = [ "database", "platform" ]
+keywords = [ "timeout", "query", "database", "psql", "compute" ]
+database_id = "8bb130d5-d298-49c7-8cfb-dd7a3f231154"
+---
+
+<Admonition type="tip">
+
+This page covers long-running queries via the Dashboard or external interfaces. For Supabase Client API timeout errors, check this [guide](https://github.com/orgs/supabase/discussions/14256) instead.
+
+</Admonition>
+
+Certain queries, like indexing a table or changing a column's data type, are inherently time-consuming. The [Dashboard's SQL Editor](https://supabase.com/dashboard/project/_/sql/) has a 1-minute timeout limit.
+
+To execute long-running queries, follow the below steps.
+
+### Install an external SQL client
+
+The guide focuses on [psql](https://supabase.com/docs/guides/database/psql) but you can use any Postgres client.
+
+Some other options include:
+
+- [pgadmin](https://supabase.com/docs/guides/database/pgadmin)
+- [DBeaver](https://supabase.com/docs/guides/database/dbeaver)
+
+You can install PSQL in [macOS](https://stackoverflow.com/a/49689589/2188186) and [Windows](https://www.postgresql.org/download/windows/) by following these links and instructions. For Linux (Debian) you can run the following:
+
+```bash
+sudo apt-get update
+sudo apt-get install postgresql-client
+```
+
+Once installed, you can find your PSQL string in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database). Please make sure if you are using the pooler connection that it is in session mode (port 5432).
+
+<Admonition type="tip">
+
+If you are working in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, it is preferable to use the direct connection.
+
+</Admonition>
+
+### Increase the query timeout
+
+Then you can increase the query timeout solely for your session:
+
+Long timeout
+
+```sql
+set statement_timeout = '120min';
+```
+
+Disable timeout
+
+```sql
+set statement_timeout = '0';
+```
+
+If your task is particularly long, you can may want to consider boosting your computing power temporarily. Compute size on Supabase is charged by the hour, so you can increase it for an hour or two, complete your task faster, then scale it back afterward.
+
+If you want to temporarily upgrade, you can find the add-ons for your project in your [Dashboard's Add-Ons Settings.](https://supabase.green/dashboard/project/_/settings/addons)

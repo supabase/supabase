@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, useMotionValue, useSpring } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { useRef, useState, memo } from 'react'
 import { cn } from '../../lib/utils'
 
 interface AiIconAnimationProps {
@@ -11,7 +11,7 @@ interface AiIconAnimationProps {
   allowHoverEffect?: boolean
 }
 
-export const AiIconAnimation = ({
+const AiIconAnimationComponent = ({
   size = 24,
   loading = false,
   className,
@@ -122,3 +122,5 @@ export const AiIconAnimation = ({
     </div>
   )
 }
+
+export const AiIconAnimation = memo(AiIconAnimationComponent)

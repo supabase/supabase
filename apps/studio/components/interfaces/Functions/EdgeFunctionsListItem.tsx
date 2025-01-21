@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import { Check, Clipboard } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -9,6 +8,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import Table from 'components/to-be-cleaned/Table'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
@@ -82,28 +82,16 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
         </p>
       </Table.td>
       <Table.td className="lg:table-cell">
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
+        <Tooltip>
+          <TooltipTrigger>
             <div className="flex items-center space-x-2">
               <p className="text-sm text-foreground-light">{dayjs(item.updated_at).fromNow()}</p>
             </div>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  Last updated on {dayjs(item.updated_at).format('DD MMM, YYYY HH:mm')}
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            Last updated on {dayjs(item.updated_at).format('DD MMM, YYYY HH:mm')}
+          </TooltipContent>
+        </Tooltip>
       </Table.td>
       <Table.td className="lg:table-cell">
         <p className="text-foreground-light">{item.version}</p>

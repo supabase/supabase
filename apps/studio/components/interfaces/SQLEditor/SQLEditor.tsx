@@ -10,7 +10,6 @@ import { toast } from 'sonner'
 import { useCompletion } from 'ai/react'
 import { useParams } from 'common'
 import { GridFooter } from 'components/ui/GridFooter'
-import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { constructHeaders } from 'data/fetchers'
@@ -45,9 +44,9 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
@@ -153,7 +152,6 @@ export const SQLEditor = () => {
   /* React query mutations */
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
-  const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
@@ -390,7 +388,7 @@ export const SQLEditor = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debugSql, entityDefinitions, id, snapV2.results, snapV2.snippets])
+  }, [entityDefinitions, id, snapV2.results, snapV2.snippets])
 
   const acceptAiHandler = useCallback(async () => {
     try {
@@ -806,7 +804,6 @@ export const SQLEditor = () => {
                   id={id}
                   isExecuting={isExecuting}
                   isDisabled={isDiffOpen}
-                  isDebugging={isDebugSqlLoading}
                   hasSelection={hasSelection}
                   prettifyQuery={prettifyQuery}
                   executeQuery={executeQuery}
@@ -818,8 +815,8 @@ export const SQLEditor = () => {
             <ResizablePanel maxSize={10} minSize={10} className="max-h-9">
               {results?.rows !== undefined && !isExecuting && (
                 <GridFooter className="flex items-center justify-between gap-2">
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_>
+                  <Tooltip>
+                    <TooltipTrigger>
                       <p className="text-xs">
                         <span className="text-foreground">
                           {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
@@ -829,8 +826,8 @@ export const SQLEditor = () => {
                             ` (Limited to only ${results.autoLimit} rows)`}
                         </span>
                       </p>
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_ className="max-w-xs">
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
                       <p className="flex flex-col gap-y-1">
                         <span>
                           Results are automatically limited to preserve browser performance, in
@@ -841,8 +838,8 @@ export const SQLEditor = () => {
                           You may change or remove this limit from the dropdown on the right
                         </span>
                       </p>
-                    </TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
+                    </TooltipContent>
+                  </Tooltip>
                   {results.autoLimit !== undefined && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

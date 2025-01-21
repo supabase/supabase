@@ -1,7 +1,8 @@
 'use client'
 
+import { useBreakpoint } from 'common'
 import { Loader2 } from 'lucide-react'
-import React, { ChangeEvent, useRef } from 'react'
+import React, { ChangeEvent, memo, useRef } from 'react'
 import { ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
 
@@ -28,7 +29,7 @@ export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   placeholder?: string
 }
 
-const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
+const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
   (
     {
       loading = false,
@@ -47,6 +48,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
   ) => {
     const formRef = useRef<HTMLFormElement>(null)
     const submitRef = useRef<HTMLButtonElement>(null)
+    const isMobile = useBreakpoint('md')
 
     /**
      * This function is used to handle the "Enter" key press
@@ -54,11 +56,9 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
       // Check if the pressed key is "Enter" (key code 13) without the "Shift" key
       // also checks if the commands popover is open
-      if (event.key === 'Enter' && !event.shiftKey && !commandsOpen) {
+      if (event.key === 'Enter' && event.keyCode === 13 && !event.shiftKey && !commandsOpen) {
         event.preventDefault()
-        if (submitRef.current) {
-          submitRef.current.click()
-        }
+        if (submitRef.current) submitRef.current.click()
       }
 
       // handles closing the commands popover if open
@@ -69,6 +69,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
 
     return (
       <form
+        id="assistant-chat"
         ref={formRef}
         {...props}
         onSubmit={onSubmit}
@@ -81,7 +82,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
         )}
         <ExpandingTextArea
           ref={textAreaRef}
-          autoFocus
+          autoFocus={isMobile}
           disabled={disabled}
           className={cn(icon ? 'pl-12' : '', 'text-sm pr-10 rounded-[18px]')}
           placeholder={placeholder}
@@ -117,7 +118,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
                 clipRule="evenodd"
                 d="M13.5 3V2.25H15V3V10C15 10.5523 14.5522 11 14 11H3.56062L5.53029 12.9697L6.06062 13.5L4.99996 14.5607L4.46963 14.0303L1.39641 10.9571C1.00588 10.5666 1.00588 9.93342 1.39641 9.54289L4.46963 6.46967L4.99996 5.93934L6.06062 7L5.53029 7.53033L3.56062 9.5H13.5V3Z"
                 fill="currentColor"
-              ></path>
+              />
             </svg>
           </button>
         </div>
@@ -126,6 +127,6 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
   }
 )
 
-AssistantChatForm.displayName = 'AssistantChatForm'
+AssistantChatFormComponent.displayName = 'AssistantChatFormComponent'
 
-export { AssistantChatForm }
+export const AssistantChatForm = memo(AssistantChatFormComponent)

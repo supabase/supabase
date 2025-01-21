@@ -10,7 +10,7 @@ import { THRESHOLD_COUNT, useTableRowsCountQuery } from 'data/table-rows/table-r
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDispatch, useTrackedState } from '../../../store/Store'
@@ -213,8 +213,8 @@ const Pagination = () => {
             </p>
 
             {data.is_estimate && (
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <Button
                     size="tiny"
                     type="text"
@@ -228,15 +228,15 @@ const Pagination = () => {
                       } else snap.setEnforceExactCount(true)
                     }}
                   />
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="top" className="w-72">
+                </TooltipTrigger>
+                <TooltipContent side="top" className="w-72">
                   This is an estimated value as your table has more than{' '}
                   {THRESHOLD_COUNT.toLocaleString()} rows. <br />
                   <span className="text-brand">
                     Click to retrieve the exact count of the table.
                   </span>
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         </>

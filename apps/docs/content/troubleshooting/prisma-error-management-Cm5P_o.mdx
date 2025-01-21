@@ -27,7 +27,7 @@ message = "Drift detected: Your database schema is not in sync with your migrati
 
 > This guide has been deprecated. Please use the troubleshooting guide in the [Supabase docs](https://supabase.com/docs/guides/database/prisma/prisma-troubleshooting).
 
-# Addressing Specific Errors:
+# Addressing specific errors:
 
 Prisma, unlike other libraries, uses [query parameters for configurations](https://www.prisma.io/docs/orm/overview/databases/postgresql#arguments).
 
@@ -75,7 +75,7 @@ Prisma will try to act as the source of truth for your database structures. If y
 
 Some users have discussed how they managed this problem in a [GitHub Discussion.](https://github.com/prisma/prisma/issues/19100#top)
 
-# Management Suggestions
+# Management suggestions
 
 ## Make a custom role for Prisma to increase observability
 
@@ -85,7 +85,7 @@ Some users have discussed how they managed this problem in a [GitHub Discussion.
 - it's usually safer to give Prisma its own key! This way, it can only access the rooms (tables) it needs.
 - Plus, with separate keys, it's easier to see what Prisma is doing in your house with monitoring tools, such as [PGAudit](https://supabase.com/docs/guides/database/extensions/pgaudit?queryGroups=database-method&database-method=sql) and [pg_stat_activity](https://supabase.com/docs/guides/platform/performance).
 
-### Creating the Prisma User:
+### Creating the Prisma user:
 
 ```sql
 create user "prisma" with password 'secret_password' bypassrls createdb;
@@ -93,7 +93,7 @@ create user "prisma" with password 'secret_password' bypassrls createdb;
 
 > Prisma requires the [createdb modifier](https://supabase.com/blog/postgres-roles-and-privileges#role-attributes) to create shadow databases. It uses them to help manage migrations.
 
-### Give Postgres Ownership of the New User:
+### Give Postgres ownership of the new user:
 
 This allows you to view Prisma migration changes in the [Dashboard](https://supabase.com/dashboard/project/_/editor)
 
@@ -111,7 +111,7 @@ If you need to change it later, you can use the below SQL:
 alter user "prisma" with password 'new_password';
 ```
 
-### Grant Prisma Access
+### Grant Prisma access
 
 The below example gives Prisma full authority over all database objects in the public schema:
 
@@ -129,7 +129,7 @@ The below example gives Prisma full authority over all database objects in the p
 
 > For more guidance on specifying access, check out this [article](https://supabase.com/blog/postgres-roles-and-privileges#creating-objects-and-assigning-privileges) on privileges
 
-## Optimize Prisma Queries:
+## Optimize Prisma queries:
 
 In the [Query Performance Advisor](https://supabase.com/dashboard/project/_/database/query-performance), you can view long-running or frequently accessed queries by role:
 
@@ -141,7 +141,7 @@ In the [Query Performance Advisor](https://supabase.com/dashboard/project/_/data
 
 Selecting a query can reveal suggestions to improve its performance
 
-## Configuring Connections
+## Configuring connections
 
 Useful Links:
 
@@ -150,7 +150,7 @@ Useful Links:
 
 Supabase provides 3 connection strings in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database). You can use all three or just the ones most relevant to your project.
 
-### Direct Connection:
+### Direct connection:
 
 Best used with stationary servers, such as VMs and long-standing containers, but it only works in IPv6 environments unless the [IPv4 Add-On](https://supabase.com/dashboard/project/_/settings/addons) is enabled. If you are unsure if your network is IPv6 compatible, [check here](https://github.com/orgs/supabase/discussions/27034).
 
@@ -160,7 +160,7 @@ Best used with stationary servers, such as VMs and long-standing containers, but
 postgresql://postgres:[PASSWORD]@db.[PROJECT REF].supabase.co:5432/postgres
 ```
 
-### Supavisor in Session Mode (port 5432):
+### Supavisor in session mode (port 5432):
 
 ```md
 # Example Connection
@@ -172,7 +172,7 @@ An alternative to direct connections when working in IPv4-only environments.
 
 > Session mode is a good option for migrations
 
-### Supavisor in Transaction Mode (port 6543):
+### Supavisor in transaction mode (port 6543):
 
 ```md
 # Example Connection

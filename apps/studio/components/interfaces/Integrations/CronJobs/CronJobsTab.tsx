@@ -72,7 +72,7 @@ export const CronjobsTab = () => {
 
   return (
     <>
-      <div className="w-full space-y-4 p-10">
+      <div className="w-full space-y-4 p-4 md:p-10">
         {(cronJobs ?? []).length == 0 ? (
           <div className="border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed">
             <p className="text-sm text-foreground">No cron jobs created yet</p>

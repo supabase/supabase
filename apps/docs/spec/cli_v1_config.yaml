@@ -385,6 +385,17 @@ parameters:
       - name: 'PostgreSQL configuration'
         link: 'https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-STATEMENT-TIMEOUT'
 
+  - id: 'db.settings.track_activity_query_size'
+    title: 'db.settings.track_activity_query_size'
+    tags: ['database']
+    required: false
+    description: |
+      Sets the maximum size of the query string that will be tracked in pg_stat_activity.current_query field.
+      Note: Changing this parameter requires a database restart.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-statistics.html#GUC-TRACK-ACTIVITY-QUERY-SIZE'
+
   - id: 'db.settings.track_commit_timestamp'
     title: 'db.settings.track_commit_timestamp'
     tags: ['database']

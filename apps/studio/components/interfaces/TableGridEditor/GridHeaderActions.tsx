@@ -30,9 +30,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
@@ -174,16 +174,16 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
       {showHeaderActions && (
         <div className="flex items-center gap-x-2">
           {isReadOnly && (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <div className="border border-strong rounded bg-overlay-hover px-3 py-1 text-xs">
                   Viewing as read-only
                 </div>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom">
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
                 You need additional permissions to manage your project's data
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+              </TooltipContent>
+            </Tooltip>
           )}
           {isTable ? (
             table.rls_enabled ? (
@@ -371,7 +371,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
-                        href="https://github.com/orgs/supabase/discussions/21647"
+                        href="https://supabase.com/docs/guides/database/extensions/wrappers/overview#security"
                       >
                         Learn more
                       </Link>
