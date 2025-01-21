@@ -14,7 +14,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
+  TooltipContent,
 } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -33,7 +33,7 @@ export const EditQueryButton = ({ id, sql, title }: EditQueryButtonProps) => {
 
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
-  const tooltip: { content: ComponentProps<typeof TooltipContent_Shadcn_> & { text: string } } = {
+  const tooltip: { content: ComponentProps<typeof TooltipContent> & { text: string } } = {
     content: { side: 'bottom', text: 'Edit in SQL Editor' },
   }
 

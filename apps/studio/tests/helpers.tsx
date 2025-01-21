@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, getByText, render as originalRender, screen } from '@testing-library/react'
 import React, { useState } from 'react'
 
-import { TooltipProvider_Shadcn_ } from 'ui'
+import { TooltipProvider } from 'ui'
 interface SelectorOptions {
   container?: HTMLElement
 }
@@ -63,9 +63,9 @@ const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) =
   )
 
   return (
-    <TooltipProvider_Shadcn_>
+    <TooltipProvider>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </TooltipProvider_Shadcn_>
+    </TooltipProvider>
   )
 }
 type renderParams = Parameters<typeof originalRender>

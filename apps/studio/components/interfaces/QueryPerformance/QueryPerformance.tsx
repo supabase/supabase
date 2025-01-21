@@ -16,9 +16,9 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
@@ -156,12 +156,12 @@ export const QueryPerformance = ({
 
                 <div className="flex items-center gap-x-2">
                   <span className="">{tab.label}</span>
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_ asChild>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
                       <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_ side="top">{tab.description}</TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">{tab.description}</TooltipContent>
+                  </Tooltip>
                 </div>
                 {tab.isLoading ? (
                   <ShimmeringLoader className="w-32 pt-1" />
