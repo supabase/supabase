@@ -30,7 +30,7 @@ export async function getJwtSecretUpdatingStatus(
   if (error) handleError(error)
 
   // @ts-expect-error API typing issue here
-  const { meta } = data.jwtSecretUpdateStatus
+  const meta = data.jwtSecretUpdateStatus?.meta ?? data.jwtSecretUpdateStatus
 
   return meta
     ? ({
