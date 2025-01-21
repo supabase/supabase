@@ -2,9 +2,10 @@ import RGL, { WidthProvider } from 'react-grid-layout'
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 
+import { AnalyticsInterval } from 'data/analytics/constants'
 import { Dashboards } from 'types'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
-import { ReportChartBlock } from './ReportChartBlock'
+import { ReportBlock } from './ReportBlock/ReportBlock'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 
 const ReactGridLayout = WidthProvider(RGL)
@@ -12,7 +13,7 @@ const ReactGridLayout = WidthProvider(RGL)
 interface GridResizeProps {
   startDate: string
   endDate: string
-  interval: string
+  interval: AnalyticsInterval
   editableReport: Dashboards.Content
   disableUpdate: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
@@ -63,6 +64,7 @@ export const GridResize = ({
       compactType="vertical"
       onDragStop={onUpdateLayout}
       onResizeStop={onUpdateLayout}
+      draggableHandle=".grid-item-drag-handle"
     >
       {editableReport.layout.map((item) => {
         return (
@@ -70,7 +72,7 @@ export const GridResize = ({
             key={item.id}
             data-grid={{ ...item, minH: 1, maxH: 1, minW: 1, maxW: LAYOUT_COLUMN_COUNT }}
           >
-            <ReportChartBlock
+            <ReportBlock
               key={item.id}
               item={item}
               startDate={startDate}

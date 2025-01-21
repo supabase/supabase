@@ -12,6 +12,7 @@ import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { Loading } from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
+import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentQuery } from 'data/content/content-query'
 import { useContentUpdateMutation } from 'data/content/content-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -354,7 +355,7 @@ const Reports = () => {
             <GridResize
               startDate={startDate}
               endDate={endDate}
-              interval={config.interval}
+              interval={config.interval as AnalyticsInterval}
               editableReport={config}
               disableUpdate={!canUpdateReport}
               onRemoveChart={popChart}
