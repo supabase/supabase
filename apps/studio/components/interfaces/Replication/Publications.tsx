@@ -24,18 +24,14 @@ export const ReplicationPublications = () => {
   const sources = sources_data ?? []
   const thisProjectSource = sources.find((s) => s.name === ref)
 
-  if (!thisProjectSource) {
-    toast.error("Failed to find this project's source")
-  }
-
   const { data: pub_data } = useReplicationPublicationsQuery({
     projectRef: ref,
-    sourceId: thisProjectSource!.id,
+    sourceId: thisProjectSource?.id,
   })
 
   const publications = pub_data ?? []
 
-  return (
+  return thisProjectSource ? (
     <>
       <ScaffoldContainer>
         <ScaffoldSection>
@@ -121,5 +117,7 @@ export const ReplicationPublications = () => {
         onClose={() => setShowDeletePublicationModal(false)}
       />
     </>
+  ) : (
+    <></>
   )
 }

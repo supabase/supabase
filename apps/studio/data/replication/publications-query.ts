@@ -4,13 +4,15 @@ import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { replicationKeys } from './keys'
 
-type ReplicationPublicationsParams = { projectRef?: string; sourceId: number }
+type ReplicationPublicationsParams = { projectRef?: string; sourceId?: number }
 
 async function fetchReplicationPublications(
   { projectRef, sourceId }: ReplicationPublicationsParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
+
+  if (!sourceId) throw new Error('sourceId is required')
 
   const { data, error } = await get(
     '/platform/replication/{ref}/sources/{source_id}/publications',
@@ -38,5 +40,8 @@ export const useReplicationPublicationsQuery = <TData = ReplicationPublicationsD
   useQuery<ReplicationPublicationsData, ResponseError, TData>(
     replicationKeys.publications(projectRef, sourceId),
     ({ signal }) => fetchReplicationPublications({ projectRef, sourceId }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    {
+      enabled: enabled && typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined',
+      ...options,
+    }
   )
