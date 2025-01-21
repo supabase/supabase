@@ -1,4 +1,5 @@
 import { useIsLoggedIn } from 'common'
+import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import { toast } from 'sonner'
 
@@ -6,9 +7,10 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
 import type { Profile } from 'data/profile/types'
-import { useSendIdentifyMutation } from 'data/telemetry/send-identify-mutation'
-import type { ResponseError } from 'types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSendIdentifyMutation } from 'data/telemetry/send-identify-mutation'
+import { ResponseError } from 'types'
+import { useSignOut } from './auth'
 import { TelemetryActions } from './constants/telemetry'
 
 export type ProfileContextType = {
@@ -29,6 +31,8 @@ export const ProfileContext = createContext<ProfileContextType>({
 
 export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const isLoggedIn = useIsLoggedIn()
+  const router = useRouter()
+  const signOut = useSignOut()
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: sendIdentify } = useSendIdentifyMutation()
@@ -53,8 +57,16 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     },
     onError(err) {
       // if the user does not yet exist, create a profile for them
-      if (typeof err === 'object' && err !== null && err.message === "User's profile not found") {
+      if (err.message === "User's profile not found") {
         createProfile()
+      }
+
+      // [Alaister] If the user has a bad auth token, auth-js won't know about it
+      // and will think the user is authenticated. Since fetching the profile happens
+      // on every page load, we can check for a 401 here and sign the user out if
+      // they have a bad token.
+      if (err.code === 401) {
+        signOut().then(() => router.push('/sign-in'))
       }
     },
   })
