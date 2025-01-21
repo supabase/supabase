@@ -29,7 +29,9 @@ Deno.serve(async (req: Request) => {
 })
 ```
 
-Importantly, this is done _inside_ the `Deno.serve()` callback argument, so that the Authorization header is set for each request.
+Important notes to consider:
+* This is done _inside_ the `Deno.serve()` callback argument, so that the Authorization header is set for each request.
+* If you plan to test locally with `supabase functions serve` you _must_ use `Deno.env.get('SUPABASE_URL')`; `http://localhost:54321` will fail because of docker containerization – see [github discussion](https://github.com/orgs/supabase/discussions/32437#discussioncomment-11706231) for more info.
 
 ## Fetching the user
 
