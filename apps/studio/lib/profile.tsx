@@ -56,7 +56,6 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
       sendIdentify({ user: profile })
     },
     onError(err) {
-      console.log('err:', err instanceof ResponseError, err)
       // if the user does not yet exist, create a profile for them
       if (err.message === "User's profile not found") {
         createProfile()
