@@ -130,12 +130,15 @@ export const PauseDisabledState = () => {
       <WarningIcon />
       <AlertTitle_Shadcn_>Project cannot be restored through the dashboard</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>
-        This project has been paused for over{' '}
+        This Free project has been paused for over{' '}
         <span className="text-foreground">
           {pauseStatus?.max_days_till_restore_disabled ?? 90} days
         </span>{' '}
         and cannot be restored through the dashboard. However, your data remains intact and can be
         downloaded as a backup.
+      </AlertDescription_Shadcn_>
+      <AlertDescription_Shadcn_>
+        Alternatively, you can upgrade your organization to a paid plan to restore this project.
       </AlertDescription_Shadcn_>
       <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
         <DropdownMenu>
