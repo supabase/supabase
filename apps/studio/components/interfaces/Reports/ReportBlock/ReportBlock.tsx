@@ -56,8 +56,6 @@ export const ReportBlock = ({
   const isReadOnlySQL = isReadOnlySelect(sql ?? '')
   const snippetMissing = error?.message.includes('Content not found')
 
-  if (isSnippet) console.log(item.id, { data, isLoading })
-
   return (
     <>
       {isSnippet ? (

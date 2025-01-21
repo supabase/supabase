@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router'
 import { memo, ReactNode, useContext } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -52,6 +53,7 @@ const MemoizedQueryBlock = memo(
     yAxis,
     isChart,
     isLoading,
+    isDraggable,
     runQuery,
     onRunQuery,
   }: {
@@ -61,6 +63,7 @@ const MemoizedQueryBlock = memo(
     yAxis?: string
     isChart: boolean
     isLoading: boolean
+    isDraggable: boolean
     runQuery: boolean
     onRunQuery: (queryType: 'select' | 'mutation') => void
   }) => (
@@ -74,8 +77,6 @@ const MemoizedQueryBlock = memo(
       }
     >
       <QueryBlock
-        // [Joshen] To update only draggable if in custom reports
-        draggable
         lockColumns
         label={title}
         sql={sql}
@@ -89,6 +90,7 @@ const MemoizedQueryBlock = memo(
         showSql={!isChart}
         isChart={isChart}
         isLoading={isLoading}
+        draggable={isDraggable}
         runQuery={runQuery}
         onRunQuery={onRunQuery}
       />
@@ -98,6 +100,7 @@ const MemoizedQueryBlock = memo(
 MemoizedQueryBlock.displayName = 'MemoizedQueryBlock'
 
 export const MarkdownPre = ({ children }: { children: any }) => {
+  const router = useRouter()
   const { isLoading, readOnly } = useContext(MessageContext)
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -112,6 +115,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
   const isChart = snippetProps.isChart === 'true'
   const runQuery = snippetProps.runQuery === 'true'
   const sql = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
+  const isDraggable = router.pathname.endsWith('/reports/[id]')
 
   const onRunQuery = async (queryType: 'select' | 'mutation') => {
     sendEvent({
@@ -140,6 +144,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
             yAxis={yAxis}
             isChart={isChart}
             isLoading={isLoading}
+            isDraggable={isDraggable}
             runQuery={runQuery}
             onRunQuery={onRunQuery}
           />

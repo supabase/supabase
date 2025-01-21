@@ -31,7 +31,12 @@ export const ReportBlockContainer = ({
       onDragStart={onDragStart}
       className="h-full flex flex-col overflow-hidden bg-surface-100 border-overlay relative rounded border shadow-sm"
     >
-      <div className="grid-item-drag-handle cursor-move flex py-1 pl-3 pr-1 items-center gap-2 z-10 shrink-0 group">
+      <div
+        className={cn(
+          'grid-item-drag-handle flex py-1 pl-3 pr-1 items-center gap-2 z-10 shrink-0 group',
+          draggable && 'cursor-move'
+        )}
+      >
         <div
           className={cn(showDragHandle && 'transition-opacity opacity-100 group-hover:opacity-0')}
         >
