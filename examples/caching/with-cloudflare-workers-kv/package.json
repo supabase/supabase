@@ -2,7 +2,7 @@
   "name": "supabase-at-the-edge",
   "version": "0.0.0",
   "devDependencies": {
-    "wrangler": "2.20.1"
+    "wrangler": "3.103.2"
   },
   "private": true,
   "scripts": {
