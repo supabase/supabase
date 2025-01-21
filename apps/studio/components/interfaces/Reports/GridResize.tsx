@@ -3,10 +3,18 @@ import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from 'data/content/content-upsert-mutation'
+import { useProfile } from 'lib/profile'
+import uuidv4 from 'lib/uuid'
 import { Dashboards } from 'types'
-import { useNewQuery } from '../SQLEditor/hooks'
+import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { ReportBlock } from './ReportBlock/ReportBlock'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
@@ -34,7 +42,10 @@ export const GridResize = ({
   onUpdateChart,
   setEditableReport,
 }: GridResizeProps) => {
-  const { newQuery } = useNewQuery()
+  const { ref } = useParams()
+  const { profile } = useProfile()
+  const { project } = useProjectContext()
+  const { mutate: upsertContent } = useContentUpsertMutation()
 
   const onUpdateLayout = (layout: RGL.Layout[]) => {
     const updatedLayout = [...editableReport.layout]
@@ -56,13 +67,17 @@ export const GridResize = ({
   }
 
   const onDropBlock = async (layout: RGL.Layout[], layoutItem: RGL.Layout, e: any) => {
+    if (!ref) return console.error('Project ref is required')
+    if (!profile) return console.error('Profile is required')
+    if (!project) return console.error('Project is required')
+
     const queryData = JSON.parse(e.dataTransfer.getData('application/json'))
     const { label, sql } = queryData
-
     if (!label || !sql) return console.error('SQL and Label required')
-    const id = await newQuery(sql, label, false)
-    toast.success(`Successfully created new query: ${label}`)
 
+    const toastId = toast.loading(`Creating new query: ${label}`)
+
+    const id = uuidv4()
     const updatedLayout = layout.map((x) => {
       const existingBlock = editableReport.layout.find((y) => x.i === y.id)
       if (existingBlock) {
@@ -70,7 +85,7 @@ export const GridResize = ({
       } else {
         return {
           id,
-          attribute: `snippet_${id}`,
+          attribute: `snippetnew_${id}`,
           chartConfig: { ...DEFAULT_CHART_CONFIG },
           label,
           chart_type: 'bar',
@@ -82,6 +97,29 @@ export const GridResize = ({
       }
     })
     setEditableReport({ ...editableReport, layout: updatedLayout })
+
+    const payload = createSqlSnippetSkeletonV2({
+      id,
+      name: label,
+      sql,
+      owner_id: profile?.id,
+      project_id: project?.id,
+    }) as UpsertContentPayload
+
+    upsertContent(
+      { projectRef: ref, payload },
+      {
+        onSuccess: () => {
+          toast.success(`Successfully created new query: ${label}`, { id: toastId })
+          const finalLayout = updatedLayout.map((x) => {
+            if (x.id === id) {
+              return { ...x, attribute: `snippet_${id}` }
+            } else return x
+          })
+          setEditableReport({ ...editableReport, layout: finalLayout })
+        },
+      }
+    )
   }
 
   if (!editableReport) return null

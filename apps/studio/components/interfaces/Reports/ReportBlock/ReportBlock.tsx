@@ -34,7 +34,6 @@ export const ReportBlock = ({
 }: ReportBlockProps) => {
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
-  // const [refetchInterval, setRefetchInterval] = useState(0)
 
   const isSnippet = item.attribute.startsWith('snippet_')
 
@@ -46,7 +45,7 @@ export const ReportBlock = ({
       refetchOnMount: false,
       refetchIntervalInBackground: false,
       retry: (failureCount: number) => {
-        if (failureCount >= 3) return false
+        if (failureCount >= 2) return false
         return true
       },
     }

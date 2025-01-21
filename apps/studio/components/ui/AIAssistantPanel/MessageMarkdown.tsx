@@ -1,9 +1,12 @@
 import { useRouter } from 'next/router'
 import { memo, ReactNode, useContext } from 'react'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { TelemetryActions } from 'lib/constants/telemetry'
+import { useProfile } from 'lib/profile'
 import { cn, CodeBlock, CodeBlockLang } from 'ui'
 import { DebouncedComponent } from '../DebouncedComponent'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
@@ -102,9 +105,15 @@ MemoizedQueryBlock.displayName = 'MemoizedQueryBlock'
 
 export const MarkdownPre = ({ children }: { children: any }) => {
   const router = useRouter()
+  const { profile } = useProfile()
   const { isLoading, readOnly } = useContext(MessageContext)
   const { mutate: sendEvent } = useSendEventMutation()
   const supportSQLBlocks = useFlag('reportsV2')
+
+  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
+  })
 
   const language = children[0].props.className?.replace('language-', '') || 'sql'
   const rawSql = language === 'sql' ? children[0].props.children : undefined
@@ -117,7 +126,8 @@ export const MarkdownPre = ({ children }: { children: any }) => {
   const isChart = snippetProps.isChart === 'true'
   const runQuery = snippetProps.runQuery === 'true'
   const sql = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
-  const isDraggable = supportSQLBlocks && router.pathname.endsWith('/reports/[id]')
+  const isDraggableToReports =
+    supportSQLBlocks && canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
 
   const onRunQuery = async (queryType: 'select' | 'mutation') => {
     sendEvent({
@@ -146,7 +156,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
             yAxis={yAxis}
             isChart={isChart}
             isLoading={isLoading}
-            isDraggable={isDraggable}
+            isDraggable={isDraggableToReports}
             runQuery={runQuery}
             onRunQuery={onRunQuery}
           />
