@@ -63,14 +63,14 @@ interface QueryBlockProps {
   lockColumns?: boolean
   /** Max height set to render results / charts (Defaults to 250) */
   maxHeight?: number
+  /** Whether query block is draggable */
+  draggable?: boolean
   /** Not implemented yet: Will be the next part of ReportsV2 */
   onSetParameter?: (params: Parameter[]) => void
   /** Optional callback the SQL query is run */
   onRunQuery?: (queryType: 'select' | 'mutation') => void
 
   // [Joshen] Params below are currently only used by ReportsV2 (Might revisit to see how to improve these)
-  /** Whether query block is draggable */
-  draggable?: boolean
   /** Optional height set to render the SQL query (Used in Reports) */
   queryHeight?: number
   /** Override hiding Run Query button if SQL query is NOT readonly (Used in Reports) */
@@ -167,6 +167,14 @@ export const QueryBlock = ({
   return (
     <ReportBlockContainer
       draggable={draggable}
+      showDragHandle={draggable}
+      onDragStart={
+        draggable
+          ? (e) => {
+              e.dataTransfer.setData('application/json', JSON.stringify({ label, sql }))
+            }
+          : undefined
+      }
       icon={
         <SQL_ICON
           className={cn(

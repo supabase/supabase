@@ -74,6 +74,8 @@ const MemoizedQueryBlock = memo(
       }
     >
       <QueryBlock
+        // [Joshen] To update only draggable if in custom reports
+        draggable
         lockColumns
         label={title}
         sql={sql}

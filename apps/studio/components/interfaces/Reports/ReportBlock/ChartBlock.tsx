@@ -31,7 +31,6 @@ interface ChartBlockProps {
   interval?: AnalyticsInterval
   defaultChartStyle?: 'bar' | 'line'
   isLoading?: boolean
-  draggable?: boolean
   actions?: ReactNode
   maxHeight?: number
 }
@@ -45,7 +44,6 @@ export const ChartBlock = ({
   interval = '1d',
   defaultChartStyle = 'bar',
   isLoading = false,
-  draggable = false,
   actions,
   maxHeight,
 }: ChartBlockProps) => {
@@ -133,7 +131,8 @@ export const ChartBlock = ({
 
   return (
     <ReportBlockContainer
-      draggable={draggable}
+      draggable
+      showDragHandle
       icon={metric?.category?.icon('text-foreground-muted')}
       label={label}
       actions={

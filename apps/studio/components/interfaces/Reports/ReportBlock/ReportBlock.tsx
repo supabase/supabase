@@ -8,6 +8,8 @@ import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentIdQuery } from 'data/content/content-id-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Dashboards, SqlSnippets } from 'types'
+import { cn } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { ChartConfig } from '../../SQLEditor/UtilityPanel/ChartConfig'
 import { ChartBlock } from './ChartBlock'
 
@@ -32,16 +34,29 @@ export const ReportBlock = ({
 }: ReportBlockProps) => {
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
+  // const [refetchInterval, setRefetchInterval] = useState(0)
 
   const isSnippet = item.attribute.startsWith('snippet_')
 
-  const { data } = useContentIdQuery(
+  const { data, error, isLoading, isError } = useContentIdQuery(
     { projectRef, id: item.id },
-    { enabled: isSnippet && !!item.id }
+    {
+      enabled: isSnippet && !!item.id,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchIntervalInBackground: false,
+      retry: (failureCount: number) => {
+        if (failureCount >= 3) return false
+        return true
+      },
+    }
   )
   const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.sql : undefined
   const chartConfig = { ...DEFAULT_CHART_CONFIG, ...(item.chartConfig ?? {}) }
   const isReadOnlySQL = isReadOnlySelect(sql ?? '')
+  const snippetMissing = error?.message.includes('Content not found')
+
+  if (isSnippet) console.log(item.id, { data, isLoading })
 
   return (
     <>
@@ -52,6 +67,7 @@ export const ReportBlock = ({
           draggable
           disableRunIfMutation
           id={item.id}
+          isLoading={isLoading}
           label={item.label}
           chartConfig={chartConfig}
           sql={sql}
@@ -68,8 +84,30 @@ export const ReportBlock = ({
           }
           onUpdateChartConfig={onUpdateChart}
           noResultPlaceholder={
-            <div className="flex flex-col gap-y-1 items-center justify-center h-full px-4 w-full">
-              {isReadOnlySQL ? (
+            <div
+              className={cn(
+                'flex flex-col gap-y-1 items-center h-full w-full',
+                isLoading
+                  ? 'justify-start items-start p-2 gap-y-2'
+                  : 'justify-center items-center px-4 gap-y-1'
+              )}
+            >
+              {isLoading ? (
+                <>
+                  <ShimmeringLoader className="w-full" />
+                  <ShimmeringLoader className="w-full w-3/4" />
+                  <ShimmeringLoader className="w-full w-1/2" />
+                </>
+              ) : isError ? (
+                <>
+                  <p className="text-xs text-foreground-light">
+                    {snippetMissing ? 'SQL snippet cannot be found' : 'Error fetching SQL snippet'}
+                  </p>
+                  <p className="text-xs text-foreground-lighter text-center">
+                    {snippetMissing ? 'Please remove this block from your report' : error.message}
+                  </p>
+                </>
+              ) : isReadOnlySQL ? (
                 <>
                   <p className="text-xs text-foreground-light">No results returned from query</p>
                   <p className="text-xs text-foreground-lighter text-center">
@@ -89,7 +127,6 @@ export const ReportBlock = ({
         />
       ) : (
         <ChartBlock
-          draggable
           startDate={startDate}
           endDate={endDate}
           interval={interval}

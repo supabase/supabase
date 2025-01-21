@@ -2,8 +2,10 @@ import RGL, { WidthProvider } from 'react-grid-layout'
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 
+import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { Dashboards } from 'types'
+import useNewQuery from '../SQLEditor/hooks'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { ReportBlock } from './ReportBlock/ReportBlock'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
@@ -31,6 +33,8 @@ export const GridResize = ({
   onUpdateChart,
   setEditableReport,
 }: GridResizeProps) => {
+  const { newQuery } = useNewQuery()
+
   const onUpdateLayout = (layout: RGL.Layout[]) => {
     const updatedLayout = [...editableReport.layout]
 
@@ -50,18 +54,48 @@ export const GridResize = ({
     setEditableReport({ ...editableReport, layout: updatedLayout })
   }
 
+  const onDropBlock = async (layout: RGL.Layout[], layoutItem: RGL.Layout, e: any) => {
+    const queryData = JSON.parse(e.dataTransfer.getData('application/json'))
+    const { label, sql } = queryData
+
+    if (!label || !sql) return console.error('SQL and Label required')
+    const id = await newQuery(sql, label, false)
+
+    const updatedLayout = layout.map((x) => {
+      const existingBlock = editableReport.layout.find((y) => x.i === y.id)
+      if (existingBlock) {
+        return { ...existingBlock, x: x.x, y: x.y }
+      } else {
+        return {
+          id,
+          attribute: `snippet_${id}`,
+          chartConfig: { ...DEFAULT_CHART_CONFIG },
+          label,
+          chart_type: 'bar',
+          h: layoutItem.h,
+          w: layoutItem.w,
+          x: layoutItem.x,
+          y: layoutItem.y,
+        }
+      }
+    })
+    setEditableReport({ ...editableReport, layout: updatedLayout })
+  }
+
   if (!editableReport) return null
 
   return (
     <ReactGridLayout
       autoSize
       isDraggable
+      isDroppable
       isResizable
       rowHeight={270}
       cols={LAYOUT_COLUMN_COUNT}
       containerPadding={[0, 0]}
       resizeHandles={['sw', 'se']}
       compactType="vertical"
+      onDrop={onDropBlock}
       onDragStop={onUpdateLayout}
       onResizeStop={onUpdateLayout}
       draggableHandle=".grid-item-drag-handle"
