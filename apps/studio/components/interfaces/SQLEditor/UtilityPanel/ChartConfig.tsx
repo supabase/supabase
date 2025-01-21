@@ -2,10 +2,10 @@ import dayjs from 'dayjs'
 import { ArrowUpDown } from 'lucide-react'
 import { useMemo } from 'react'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import BarChart from 'components/ui/Charts/BarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import {
-  Button,
   Checkbox_Shadcn_,
   Label_Shadcn_,
   ResizableHandle,
@@ -66,6 +66,24 @@ export const ChartConfig = ({
     })
   }, [results])
 
+  // Only allow Y-axis keys that are numbers
+  const yAxisKeys = useMemo(() => {
+    if (!results.rows[0]) return []
+    return Object.keys(results.rows[0]).filter((key) => {
+      const value = results.rows[0][key]
+      return typeof value === 'number' || !isNaN(Number(value))
+    })
+  }, [results])
+
+  const hasConfig = config.xKey && config.yKey
+
+  const canFlip = useMemo(() => {
+    if (!hasConfig) return false
+    const xKeyType = typeof results.rows[0]?.[config.xKey]
+    const yKeyType = typeof results.rows[0]?.[config.yKey]
+    return xKeyType === 'number' && yKeyType === 'number'
+  }, [hasConfig, results.rows, config.xKey, config.yKey])
+
   // Compute cumulative results only if necessary
   const cumulativeResults = useMemo(() => getCumulativeResults(results, config), [results, config])
 
@@ -83,7 +101,7 @@ export const ChartConfig = ({
   }
 
   const getDateFormat = (key: any) => {
-    const value = resultToRender[0][key]
+    const value = resultToRender?.[0]?.[key] || ''
     if (typeof value === 'number') return 'number'
     if (dayjs(value).isValid()) return 'date'
     return 'string'
@@ -91,38 +109,61 @@ export const ChartConfig = ({
 
   const xKeyDateFormat = getDateFormat(config.xKey)
 
+  const ChartPanel = () => {
+    if (!hasConfig) {
+      return (
+        <ResizablePanel className="p-4 h-full" defaultSize={75}>
+          <NoDataPlaceholder
+            size="normal"
+            title="Configure your chart"
+            description="Select your X and Y axis in the chart options panel"
+          />
+        </ResizablePanel>
+      )
+    }
+
+    if (config.type === 'bar') {
+      return (
+        <BarChart
+          showLegend
+          size="normal"
+          xAxisIsDate={xKeyDateFormat === 'date'}
+          data={resultToRender}
+          xAxisKey={config.xKey}
+          yAxisKey={config.yKey}
+          showGrid={config.showGrid}
+          XAxisProps={{
+            angle: 0,
+            interval: 'preserveStart',
+            hide: !config.showLabels,
+            tickFormatter: (idx: string) => {
+              const value = resultToRender[+idx][config.xKey]
+              if (xKeyDateFormat === 'date') {
+                return dayjs(value).format('MMM D YYYY HH:mm')
+              }
+              return value
+            },
+          }}
+          YAxisProps={{
+            tickFormatter: (value: number) => value.toLocaleString(),
+            hide: !config.showLabels,
+            domain: [0, 'dataMax'],
+          }}
+        />
+      )
+    }
+  }
+
+  const onFlip = () => {
+    const newY = config.xKey
+    const newX = config.yKey
+    onConfigChange({ ...config, xKey: newX, yKey: newY })
+  }
+
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-grow h-full">
       <ResizablePanel className="p-4 h-full" defaultSize={75}>
-        {config.type === 'bar' && (
-          <BarChart
-            showLegend
-            size="normal"
-            xAxisIsDate={xKeyDateFormat === 'date'}
-            data={resultToRender}
-            xAxisKey={config.xKey}
-            yAxisKey={config.yKey}
-            emptyStateMessage="Execute a query and configure the chart options"
-            showGrid={config.showGrid}
-            XAxisProps={{
-              angle: 0,
-              interval: 'preserveStart',
-              hide: !config.showLabels,
-              tickFormatter: (idx: string) => {
-                const value = resultToRender[+idx][config.xKey]
-                if (xKeyDateFormat === 'date') {
-                  return dayjs(value).format('MMM D YYYY')
-                }
-                return value
-              },
-            }}
-            YAxisProps={{
-              tickFormatter: (value: number) => value.toLocaleString(),
-              hide: !config.showLabels,
-              domain: [0, 'dataMax'],
-            }}
-          />
-        )}
+        <ChartPanel />
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel
@@ -133,18 +174,24 @@ export const ChartConfig = ({
         <div className="flex justify-between items-center h-5">
           <h2 className="text-sm text-foreground-lighter">Chart options</h2>
           {config.xKey && config.yKey && (
-            <Button
+            <ButtonTooltip
               type="text"
-              onClick={() => {
-                const currentX = config.xKey
-                const currentY = config.yKey
-                onConfigChange({ ...config, xKey: currentY, yKey: currentX })
-              }}
-              title="Swap X and Y axis"
+              size="tiny"
+              onClick={onFlip}
+              disabled={!canFlip}
               icon={<ArrowUpDown size="15" className="text-foreground-lighter" />}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  className: 'w-64 text-center',
+                  text: canFlip
+                    ? 'Swap X and Y axis'
+                    : 'Unable to swap X and Y axis - both axes need to numerical values',
+                },
+              }}
             >
               Flip
-            </Button>
+            </ButtonTooltip>
           )}
         </div>
 
@@ -180,7 +227,7 @@ export const ChartConfig = ({
             <SelectTrigger_Shadcn_>{config.yKey || 'Select Y Axis'}</SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_>
               <SelectGroup_Shadcn_>
-                {resultKeys.map((key) => (
+                {yAxisKeys.map((key) => (
                   <SelectItem_Shadcn_ value={key} key={key}>
                     {key}
                   </SelectItem_Shadcn_>
