@@ -47,7 +47,7 @@ import { API_URL, BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
-import { SonnerToaster, TooltipProvider_Shadcn_ } from 'ui'
+import { SonnerToaster, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
@@ -113,7 +113,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                 </Head>
                 <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
-                <TooltipProvider_Shadcn_ delayDuration={0}>
+                <TooltipProvider delayDuration={0}>
                   <RouteValidationWrapper>
                     <ThemeProvider
                       defaultTheme="system"
@@ -136,7 +136,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       </AppBannerContextProvider>
                     </ThemeProvider>
                   </RouteValidationWrapper>
-                </TooltipProvider_Shadcn_>
+                </TooltipProvider>
 
                 <PageTelemetry
                   API_URL={API_URL}

@@ -34,9 +34,9 @@ import {
   Modal,
   Radio,
   SidePanel,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   WarningIcon,
 } from 'ui'
 
@@ -341,19 +341,19 @@ const ComputeInstanceSidePanel = () => {
                             </span>
                           </div>
                           {option.price_interval === 'hourly' && (
-                            <Tooltip_Shadcn_>
-                              <TooltipTrigger_Shadcn_>
+                            <Tooltip>
+                              <TooltipTrigger>
                                 <Info
                                   size={14}
                                   strokeWidth={2}
                                   className="hover:text-foreground-light"
                                 />
-                              </TooltipTrigger_Shadcn_>
-                              <TooltipContent_Shadcn_ side="bottom">
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
                                 ${Number(option.price * 672).toFixed(0)} - $
                                 {Number(option.price * 744).toFixed(0)} per month
-                              </TooltipContent_Shadcn_>
-                            </Tooltip_Shadcn_>
+                              </TooltipContent>
+                            </Tooltip>
                           )}
                         </div>
                       </div>

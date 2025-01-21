@@ -49,9 +49,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
@@ -366,8 +366,8 @@ const TableList = ({
                   entities.map((x) => (
                     <Table.tr key={x.id}>
                       <Table.td className="!pl-5 !pr-1">
-                        <Tooltip_Shadcn_>
-                          <TooltipTrigger_Shadcn_ asChild>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
                             {x.type === ENTITY_TYPE.TABLE ? (
                               <Table2
                                 size={15}
@@ -399,25 +399,25 @@ const TableList = ({
                                   ?.toUpperCase()}
                               </div>
                             )}
-                          </TooltipTrigger_Shadcn_>
-                          <TooltipContent_Shadcn_ side="bottom" className="capitalize">
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="capitalize">
                             {formatTooltipText(x.type)}
-                          </TooltipContent_Shadcn_>
-                        </Tooltip_Shadcn_>
+                          </TooltipContent>
+                        </Tooltip>
                       </Table.td>
                       <Table.td>
                         {/* only show tooltips if required, to reduce noise */}
                         {x.name.length > 20 ? (
-                          <Tooltip_Shadcn_ disableHoverableContent={true}>
-                            <TooltipTrigger_Shadcn_
+                          <Tooltip disableHoverableContent={true}>
+                            <TooltipTrigger
                               asChild
                               className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
                             >
                               <p>{x.name}</p>
-                            </TooltipTrigger_Shadcn_>
+                            </TooltipTrigger>
 
-                            <TooltipContent_Shadcn_ side="bottom">{x.name}</TooltipContent_Shadcn_>
-                          </Tooltip_Shadcn_>
+                            <TooltipContent side="bottom">{x.name}</TooltipContent>
+                          </Tooltip>
                         ) : (
                           <p>{x.name}</p>
                         )}
@@ -484,8 +484,8 @@ const TableList = ({
                                 {x.type === ENTITY_TYPE.TABLE && (
                                   <>
                                     <DropdownMenuSeparator />
-                                    <Tooltip_Shadcn_>
-                                      <TooltipTrigger_Shadcn_ asChild>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
                                         <DropdownMenuItem
                                           className="!pointer-events-auto gap-x-2"
                                           disabled={!canUpdateTables}
@@ -496,13 +496,13 @@ const TableList = ({
                                           <Edit size={12} />
                                           <p>Edit table</p>
                                         </DropdownMenuItem>
-                                      </TooltipTrigger_Shadcn_>
+                                      </TooltipTrigger>
                                       {!canUpdateTables && (
-                                        <TooltipContent_Shadcn_ side="left">
+                                        <TooltipContent side="left">
                                           You need additional permissions to edit this table
-                                        </TooltipContent_Shadcn_>
+                                        </TooltipContent>
                                       )}
-                                    </Tooltip_Shadcn_>
+                                    </Tooltip>
                                     <DropdownMenuItem
                                       key="duplicate-table"
                                       className="space-x-2"
@@ -516,8 +516,8 @@ const TableList = ({
                                       <Copy size={12} />
                                       <span>Duplicate Table</span>
                                     </DropdownMenuItem>
-                                    <Tooltip_Shadcn_>
-                                      <TooltipTrigger_Shadcn_ asChild>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
                                         <DropdownMenuItem
                                           disabled={!canUpdateTables || isLocked}
                                           className="!pointer-events-auto gap-x-2"
@@ -533,13 +533,13 @@ const TableList = ({
                                           <Trash stroke="red" size={12} />
                                           <p>Delete table</p>
                                         </DropdownMenuItem>
-                                      </TooltipTrigger_Shadcn_>
+                                      </TooltipTrigger>
                                       {!canUpdateTables && (
-                                        <TooltipContent_Shadcn_ side="left">
+                                        <TooltipContent side="left">
                                           You need additional permissions to delete tables
-                                        </TooltipContent_Shadcn_>
+                                        </TooltipContent>
                                       )}
-                                    </Tooltip_Shadcn_>
+                                    </Tooltip>
                                   </>
                                 )}
                               </DropdownMenuContent>

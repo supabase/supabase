@@ -22,9 +22,9 @@ import {
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 const Home: NextPageWithLayout = () => {
@@ -54,19 +54,19 @@ const Home: NextPageWithLayout = () => {
         <div className="flex flex-col md:flex-row md:items-center gap-3">
           <h1 className="text-3xl">{projectName}</h1>
           {isOrioleDb && (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_>
+            <Tooltip>
+              <TooltipTrigger>
                 <Badge variant="warning">OrioleDB</Badge>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom" align="start" className="max-w-80 text-center">
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="start" className="max-w-80 text-center">
                 This project is using Postgres with OrioleDB which is currently in preview and not
                 suitable for production workloads. View our{' '}
                 <InlineLink href="https://supabase.com/docs/guides/database/orioledb">
                   documentation
                 </InlineLink>{' '}
                 for all limitations.
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+              </TooltipContent>
+            </Tooltip>
           )}
           <ComputeBadgeWrapper
             project={{
