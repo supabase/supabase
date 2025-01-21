@@ -28,15 +28,19 @@ export type ContentType = Content['type']
 interface GetContentVariables {
   projectRef?: string
   type: ContentType
+  name?: string
 }
 
-export async function getContent({ projectRef, type }: GetContentVariables, signal?: AbortSignal) {
+export async function getContent(
+  { projectRef, type, name }: GetContentVariables,
+  signal?: AbortSignal
+) {
   if (typeof projectRef === 'undefined') {
     throw new Error('projectRef is required for getContent')
   }
 
   const { data, error } = await get('/platform/projects/{ref}/content', {
-    params: { path: { ref: projectRef }, query: { type } },
+    params: { path: { ref: projectRef }, query: { type, name } },
     signal,
   })
 
@@ -54,11 +58,11 @@ export type ContentData = Awaited<ReturnType<typeof getContent>>
 export type ContentError = unknown
 
 export const useContentQuery = <TData = ContentData>(
-  { projectRef, type }: GetContentVariables,
+  { projectRef, type, name }: GetContentVariables,
   { enabled = true, ...options }: UseQueryOptions<ContentData, ContentError, TData> = {}
 ) =>
   useQuery<ContentData, ContentError, TData>(
-    contentKeys.list(projectRef, type),
-    ({ signal }) => getContent({ projectRef, type }, signal),
+    contentKeys.list(projectRef, { type, name }),
+    ({ signal }) => getContent({ projectRef, type, name }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )

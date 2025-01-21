@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
 import { useContextMenu } from 'react-contexify'
@@ -34,6 +33,9 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import {
   CONTEXT_MENU_KEYS,
@@ -382,26 +384,14 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
             {item.name}
           </p>
           {item.isCorrupted && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+            <Tooltip>
+              <TooltipTrigger>
                 <AlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      File is corrupted, please delete and reupload again.
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                File is corrupted, please delete and reupload again.
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
 

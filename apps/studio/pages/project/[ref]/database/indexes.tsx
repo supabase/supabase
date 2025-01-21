@@ -24,7 +24,7 @@ const IndexesPage: NextPageWithLayout = () => {
             description="Improve query performance against your database"
           />
         </ScaffoldSectionContent>
-        <ScaffoldSectionDetail className="flex items-center justify-end gap-2 flex-wrap">
+        <ScaffoldSectionDetail className="flex items-center lg:justify-end gap-2 flex-wrap">
           <DocsButton
             className="no-underline"
             href="https://supabase.com/docs/guides/database/query-optimization"
