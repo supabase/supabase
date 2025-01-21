@@ -36,19 +36,15 @@ export type SourceType = 'logs' | 'warehouse'
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
   warehouseTemplates?: WarehouseQueryTemplate[]
-  onSelectTemplate: (template: LogTemplate) => void
-  onSelectWarehouseTemplate: (template: WarehouseQueryTemplate) => void
-  onSelectSource: (source: string) => void
-  onClear: () => void
-  onSave?: () => void
-  hasEditorValue: boolean
-  isLoading: boolean
-  onDateChange: React.ComponentProps<typeof DatePickers>['onChange']
-  defaultTo: string
   defaultFrom: string
+  defaultTo: string
   warnings: LogsWarning[]
   warehouseCollections: WarehouseCollection[]
   dataSource: SourceType
+  onSelectTemplate: (template: LogTemplate) => void
+  onSelectWarehouseTemplate: (template: WarehouseQueryTemplate) => void
+  onSelectSource: (source: string) => void
+  onDateChange: React.ComponentProps<typeof DatePickers>['onChange']
   onDataSourceChange: (sourceType: SourceType) => void
 }
 
@@ -64,15 +60,15 @@ function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: strin
 const LogsQueryPanel = ({
   templates = [],
   warehouseTemplates = [],
-  onSelectTemplate,
-  onSelectWarehouseTemplate,
-  onSelectSource,
   defaultFrom,
   defaultTo,
-  onDateChange,
   warnings,
   warehouseCollections,
   dataSource,
+  onSelectTemplate,
+  onSelectWarehouseTemplate,
+  onSelectSource,
+  onDateChange,
   onDataSourceChange,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
