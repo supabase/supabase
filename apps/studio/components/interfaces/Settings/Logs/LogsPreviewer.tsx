@@ -22,6 +22,7 @@ import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import useSingleLog from 'hooks/analytics/useSingleLog'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
+import dayjs from 'dayjs'
 
 /**
  * Acts as a container component for the entire log display
@@ -154,14 +155,6 @@ export const LogsPreviewer = ({
         iso_timestamp_start: nextStart,
         iso_timestamp_end: nextEnd,
       }))
-      router.push({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          its: nextStart,
-          ite: nextEnd,
-        },
-      })
     } else if (event === 'datepicker-change') {
       const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, subscription?.plan?.id)
 
@@ -234,18 +227,25 @@ export const LogsPreviewer = ({
               data={eventChartData}
               onBarClick={(datum) => {
                 if (!datum?.timestamp) return
+
+                const datumTimestamp = dayjs(datum.timestamp).toISOString()
+
+                const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
+                const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
+
                 handleSearch('event-chart-bar-click', {
-                  query: filters.search_query as string,
-                  to: datum.timestamp.toString(),
-                  from: null,
+                  query: filters.search_query?.toString(),
+                  to: end,
+                  from: start,
                 })
               }}
               EmptyState={
-                <NoDataPlaceholder
-                  message={'No data'}
-                  description="It may take up to 24 hours for data to refresh"
-                  size={'tiny'}
-                />
+                <div className="flex flex-col items-center justify-center h-[67px]">
+                  <h2 className="text-foreground-light text-xs">No data</h2>
+                  <p className="text-foreground-lighter text-xs">
+                    It may take up to 24 hours for data to refresh
+                  </p>
+                </div>
               }
             />
           )}
