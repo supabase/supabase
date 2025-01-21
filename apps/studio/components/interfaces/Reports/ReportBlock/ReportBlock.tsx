@@ -1,6 +1,7 @@
 import { X } from 'lucide-react'
 
 import { useParams } from 'common'
+import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { isReadOnlySelect } from 'components/ui/AIAssistantPanel/AIAssistant.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from 'components/ui/QueryBlock/QueryBlock'
@@ -10,7 +11,6 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Dashboards, SqlSnippets } from 'types'
 import { cn } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { ChartConfig } from '../../SQLEditor/UtilityPanel/ChartConfig'
 import { ChartBlock } from './ChartBlock'
 
 interface ReportBlockProps {
