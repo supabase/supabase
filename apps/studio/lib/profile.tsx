@@ -8,7 +8,6 @@ import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
 import type { Profile } from 'data/profile/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSendIdentifyMutation } from 'data/telemetry/send-identify-mutation'
 import type { ResponseError } from 'types'
 
 export type ProfileContextType = {
@@ -31,7 +30,6 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const isLoggedIn = useIsLoggedIn()
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: sendIdentify } = useSendIdentifyMutation()
   const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
     onSuccess: () => {
       sendEvent({ action: TelemetryActions.SIGN_UP, properties: { category: 'conversion' } })
@@ -48,9 +46,6 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     isSuccess,
   } = useProfileQuery({
     enabled: isLoggedIn,
-    onSuccess(profile) {
-      sendIdentify({ user: profile })
-    },
     onError(err) {
       // if the user does not yet exist, create a profile for them
       if (typeof err === 'object' && err !== null && err.message === "User's profile not found") {

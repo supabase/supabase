@@ -8,6 +8,7 @@ import { post } from './fetchWrappers'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useTelemetryCookie } from './hooks'
 import { TelemetryEvent } from './telemetry-constants'
+import { useUser } from './auth'
 
 //---
 // PAGE TELEMETRY
@@ -144,6 +145,9 @@ export const PageTelemetry = ({
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [enabled, sendPageLeaveTelemetry])
 
+  // Identify the user
+  useTelemetryIdentify(API_URL)
+
   return null
 }
 
@@ -170,6 +174,37 @@ export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathn
   return post(`${ensurePlatformSuffix(API_URL)}/telemetry/event`, body, {
     headers: { Version: '2' },
   })
+}
+
+//---
+// TELEMETRY IDENTIFY
+//---
+
+type IdentifyBody = components['schemas']['TelemetryIdentifyBodyV2']
+
+export function sendTelemetryIdentify(API_URL: string, body: IdentifyBody) {
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null) === 'true'
+
+  if (!consent) return Promise.resolve()
+
+  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/identify`, body, {
+    headers: { Version: '2' },
+  })
+}
+
+export function useTelemetryIdentify(API_URL: string) {
+  const user = useUser()
+
+  useEffect(() => {
+    if (user?.id) {
+      sendTelemetryIdentify(API_URL, {
+        user_id: user.id,
+      })
+    }
+  }, [API_URL, user?.id])
 }
 
 //---
