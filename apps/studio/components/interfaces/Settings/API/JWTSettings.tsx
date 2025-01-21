@@ -14,7 +14,7 @@ import {
   PenTool,
   RefreshCw,
 } from 'lucide-react'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -39,12 +39,12 @@ import {
   Modal,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
 } from './API.constants'
-import { Admonition } from 'ui-patterns'
 
 const JWTSettings = () => {
   const { ref: projectRef } = useParams()
@@ -62,8 +62,16 @@ const JWTSettings = () => {
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
-  const { mutateAsync: updateJwt, isLoading: isSubmittingJwtSecretUpdateRequest } =
-    useJwtSecretUpdateMutation()
+  const { mutate: updateJwt, isLoading: isSubmittingJwtSecretUpdateRequest } =
+    useJwtSecretUpdateMutation({
+      onSuccess: () => {
+        setIsCreatingKey(false)
+        setIsGeneratingKey(false)
+        toast(
+          'Successfully submitted JWT secret update request. Please wait while your project is updated.'
+        )
+      },
+    })
 
   const { Failed, Updated, Updating } = JwtSecretUpdateStatus
 
@@ -76,19 +84,10 @@ const JWTSettings = () => {
   const jwtSecretUpdateProgressMessage =
     JWT_SECRET_UPDATE_PROGRESS_MESSAGES[data?.jwtSecretUpdateProgress as JwtSecretUpdateProgress]
 
-  async function handleJwtSecretUpdate(
-    jwt_secret: string,
-    setModalVisibility: Dispatch<SetStateAction<boolean>>
-  ) {
+  async function handleJwtSecretUpdate(jwt_secret: string) {
     if (!projectRef) return console.error('Project ref is required')
     const trackingId = uuidv4()
-    try {
-      await updateJwt({ projectRef, jwtSecret: jwt_secret, changeTrackingId: trackingId })
-      setModalVisibility(false)
-      toast(
-        'Successfully submitted JWT secret update request. Please wait while your project is updated.'
-      )
-    } catch (error) {}
+    updateJwt({ projectRef, jwtSecret: jwt_secret, changeTrackingId: trackingId })
   }
 
   return (
@@ -213,7 +212,7 @@ const JWTSettings = () => {
         confirmLabel="Generate new secret"
         confirmLabelLoading="Generating"
         onCancel={() => setIsGeneratingKey(false)}
-        onConfirm={() => handleJwtSecretUpdate('ROLL', setIsGeneratingKey)}
+        onConfirm={() => handleJwtSecretUpdate('ROLL')}
         alert={{
           title: 'This will invalidate all existing API keys',
           description: (
@@ -250,7 +249,7 @@ const JWTSettings = () => {
                 customToken.length < 32 || customToken.includes('@') || customToken.includes('$')
               }
               loading={isSubmittingJwtSecretUpdateRequest}
-              onClick={() => handleJwtSecretUpdate(customToken, setIsCreatingKey)}
+              onClick={() => handleJwtSecretUpdate(customToken)}
             >
               Apply new JWT secret
             </Button>
