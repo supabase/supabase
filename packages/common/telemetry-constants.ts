@@ -51,6 +51,11 @@ export enum TelemetryActions {
   PRICING_PLAN_CTA_CLICKED = 'pricing_plan_cta_clicked',
   PRICING_COMPARISON_PLAN_CLICKED = 'pricing_comparison_plan_clicked',
   EVENT_PAGE_CTA_CLICKED = 'event_page_cta_clicked',
+  HOMEPAGE_GITHUB_BUTTON_CLICKED = 'homepage_github_button_clicked',
+  HOMEPAGE_GITHUB_DISCUSSIONS_BUTTON_CLICKED = 'homepage_github_discussions_button_clicked',
+  HOMEPAGE_DISCORD_BUTTON_CLICKED = 'homepage_discord_button_clicked',
+  HOMEPAGE_CUSTOMER_STORY_CARD_CLICKED = 'homepage_customer_story_card_clicked',
+  HOMEPAGE_PROJECT_TEMPLATE_CARD_CLICKED = 'homepage_project_template_card_clicked',
 }
 
 /**
@@ -754,6 +759,74 @@ export interface EventPageCtaClickedEvent {
   }
 }
 
+/**
+ * User clicked on the GitHub button in the homepage header section. Is hidden when in mobile view.
+ *
+ * @group Events
+ * @source www
+ * @page /
+ */
+export interface HomepageGitHubButtonClickedEvent {
+  action: TelemetryActions.HOMEPAGE_GITHUB_BUTTON_CLICKED
+}
+
+/**
+ * User clicked on the GitHub Discussions button in the homepage community section.
+ *
+ * @group Events
+ * @source www
+ * @page /
+ */
+export interface HomepageGitHubDiscussionsButtonClickedEvent {
+  action: TelemetryActions.HOMEPAGE_GITHUB_DISCUSSIONS_BUTTON_CLICKED
+}
+
+/**
+ * User clicked on the Discord button in the homepage community section.
+ *
+ * @group Events
+ * @source www
+ * @page /
+ */
+export interface HomepageDiscordButtonClickedEvent {
+  action: TelemetryActions.HOMEPAGE_DISCORD_BUTTON_CLICKED
+}
+
+/**
+ * User clicked on a customer story in the homepage.
+ *
+ * @group Events
+ * @source www
+ * @page /
+ */
+export interface HomepageCustomerStoryCardClickedEvent {
+  action: TelemetryActions.HOMEPAGE_CUSTOMER_STORY_CARD_CLICKED
+  properties: {
+    customer?: string
+    /**
+     * The size of the card clicked.
+     */
+    cardType: 'expanded' | 'narrow'
+  }
+}
+
+/**
+ * User clicked on a project template card in the homepage.
+ *
+ * @group Events
+ * @source www
+ * @page /
+ */
+export interface HomepageProjectTemplateCardClickedEvent {
+  action: TelemetryActions.HOMEPAGE_PROJECT_TEMPLATE_CARD_CLICKED
+  properties: {
+    /**
+     * The title of the project template card clicked.
+     */
+    templateTitle: string
+  }
+}
+
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
@@ -796,3 +869,8 @@ export type TelemetryEvent =
   | PricingPlanCtaClickedEvent
   | PricingComparisonPlanClickedEvent
   | EventPageCtaClickedEvent
+  | HomepageGitHubButtonClickedEvent
+  | HomepageGitHubDiscussionsButtonClickedEvent
+  | HomepageDiscordButtonClickedEvent
+  | HomepageCustomerStoryCardClickedEvent
+  | HomepageProjectTemplateCardClickedEvent
