@@ -1,8 +1,9 @@
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
 
+import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { AnalyticsInterval } from 'data/analytics/constants'
@@ -18,6 +19,7 @@ import { METRICS } from 'lib/constants/metrics'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { Dashboards } from 'types'
 import { WarningIcon } from 'ui'
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
@@ -31,9 +33,15 @@ interface ChartBlockProps {
   interval?: AnalyticsInterval
   defaultChartStyle?: 'bar' | 'line'
   isLoading?: boolean
-  draggable?: boolean
   actions?: ReactNode
   maxHeight?: number
+  onUpdateChartConfig?: ({
+    chart,
+    chartConfig,
+  }: {
+    chart?: Partial<Dashboards.Chart>
+    chartConfig?: Partial<ChartConfig>
+  }) => void
 }
 
 export const ChartBlock = ({
@@ -45,9 +53,9 @@ export const ChartBlock = ({
   interval = '1d',
   defaultChartStyle = 'bar',
   isLoading = false,
-  draggable = false,
   actions,
   maxHeight,
+  onUpdateChartConfig,
 }: ChartBlockProps) => {
   const router = useRouter()
   const { ref } = router.query
@@ -91,6 +99,7 @@ export const ChartBlock = ({
 
   const loading =
     isLoading ||
+    attribute.startsWith('new_snippet_') ||
     (provider === 'infra-monitoring'
       ? isFetchingInfraMonitoring
       : provider === 'daily-stats'
@@ -119,7 +128,8 @@ export const ChartBlock = ({
   }
 
   const data = (chartData?.data ?? []).map((x: any) => {
-    const value = chartData?.format === '%' ? x[attribute].toFixed(1) : x[attribute].toFixed(2)
+    const value =
+      chartData?.format === '%' ? x[attribute].toFixed(1) : x[attribute].toLocaleString()
     const color = getCellColor(attribute, x[attribute])
     return {
       ...x,
@@ -131,9 +141,14 @@ export const ChartBlock = ({
     }
   })
 
+  useEffect(() => {
+    if (defaultChartStyle) setChartStyle(defaultChartStyle)
+  }, [defaultChartStyle])
+
   return (
     <ReportBlockContainer
-      draggable={draggable}
+      draggable
+      showDragHandle
       icon={metric?.category?.icon('text-foreground-muted')}
       label={label}
       actions={
@@ -144,7 +159,11 @@ export const ChartBlock = ({
             disabled={loading}
             className="w-7 h-7"
             icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
-            onClick={() => setChartStyle(chartStyle === 'bar' ? 'line' : 'bar')}
+            onClick={() => {
+              const style = chartStyle === 'bar' ? 'line' : 'bar'
+              if (onUpdateChartConfig) onUpdateChartConfig({ chart: { chart_type: style } })
+              setChartStyle(style)
+            }}
             tooltip={{
               content: {
                 side: 'bottom',
@@ -158,14 +177,16 @@ export const ChartBlock = ({
       }
     >
       {loading ? (
-        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2">
+        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2 px-4">
           <Loader2 size={18} className="animate-spin text-border-strong" />
-          <p className="text-xs text-foreground-lighter">Loading data for {label}</p>
+          <p className="text-xs text-foreground-lighter text-center">Loading data for {label}</p>
         </div>
       ) : chartData === undefined ? (
-        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2">
+        <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2 px-4">
           <WarningIcon />
-          <p className="text-xs text-foreground-lighter">Unable to load data for {label}</p>
+          <p className="text-xs text-foreground-lighter text-center">
+            Unable to load data for {label}
+          </p>
         </div>
       ) : data.length === 0 ? (
         <div className="flex flex-grow w-full flex-col items-center justify-center gap-y-2">
@@ -199,7 +220,7 @@ export const ChartBlock = ({
                 content={
                   <ChartTooltipContent
                     className="w-[200px]"
-                    labelSuffix="%"
+                    labelSuffix={chartData?.format === '%' ? '%' : ''}
                     labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
                   />
                 }
@@ -221,7 +242,7 @@ export const ChartBlock = ({
                 content={
                   <ChartTooltipContent
                     className="w-[200px]"
-                    labelSuffix="%"
+                    labelSuffix={chartData?.format === '%' ? '%' : ''}
                     labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
                   />
                 }

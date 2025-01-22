@@ -200,12 +200,22 @@ const Reports = () => {
     setConfig({ ...config, layout: [...current] })
   }
 
-  const updateChart = (id: string, chartConfig: Partial<ChartConfig>) => {
+  const updateChart = (
+    id: string,
+    {
+      chart,
+      chartConfig,
+    }: { chart?: Partial<Dashboards.Chart>; chartConfig?: Partial<ChartConfig> }
+  ) => {
     const currentChart = config?.layout.find((x) => x.id === id)
+
     if (currentChart) {
       const updatedChart: Dashboards.Chart = {
         ...currentChart,
-        chartConfig: { ...(currentChart?.chartConfig ?? {}), ...chartConfig },
+        ...(chart ?? {}),
+      }
+      if (chartConfig) {
+        updatedChart.chartConfig = { ...(currentChart?.chartConfig ?? {}), ...chartConfig }
       }
 
       const foundIndex = config?.layout.findIndex((x) => x.id === id)
@@ -255,16 +265,16 @@ const Reports = () => {
           <div className="flex items-center gap-x-2">
             <Button
               type="default"
-              onClick={() => setConfig(currentReportContent)}
               disabled={isSaving}
+              onClick={() => setConfig(currentReportContent)}
             >
               Cancel
             </Button>
             <Button
               type="primary"
               icon={<Save />}
-              onClick={() => onSaveReport()}
               loading={isSaving}
+              onClick={() => onSaveReport()}
             >
               Save changes
             </Button>
@@ -354,7 +364,7 @@ const Reports = () => {
           )}
         </div>
       ) : (
-        <div className="relative mb-16 max-w-7xl flex-grow">
+        <div className="relative mb-16 flex-grow">
           {config && startDate && endDate && (
             <GridResize
               startDate={startDate}

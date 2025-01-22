@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -42,7 +41,6 @@ const UtilityPanel = ({
   onDebug,
 }: UtilityPanelProps) => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const snippet = snapV2.snippets[id]?.snippet

@@ -1,5 +1,5 @@
 import { GripHorizontal } from 'lucide-react'
-import { PropsWithChildren, ReactNode } from 'react'
+import { DragEvent, PropsWithChildren, ReactNode } from 'react'
 import { cn } from 'ui'
 
 interface ReportBlockContainerProps {
@@ -7,6 +7,8 @@ interface ReportBlockContainerProps {
   label: string
   actions: ReactNode
   draggable?: boolean
+  showDragHandle?: boolean
+  onDragStart?: (e: DragEvent) => void
 }
 
 export const ReportBlockContainer = ({
@@ -14,6 +16,8 @@ export const ReportBlockContainer = ({
   label,
   actions,
   draggable = false,
+  showDragHandle = false,
+  onDragStart,
   children,
 }: PropsWithChildren<ReportBlockContainerProps>) => {
   const hasChildren = Array.isArray(children)
@@ -21,17 +25,31 @@ export const ReportBlockContainer = ({
     : !!children
 
   return (
-    <div className="h-full flex flex-col overflow-hidden bg-surface-100 border-overlay relative rounded border shadow-sm">
-      <div className="grid-item-drag-handle cursor-move flex py-1 pl-3 pr-1 items-center gap-2 z-10 shrink-0 group">
-        <div className={cn(draggable && 'transition-opacity opacity-100 group-hover:opacity-0')}>
+    <div
+      draggable={draggable}
+      unselectable={draggable ? 'on' : undefined}
+      onDragStart={onDragStart}
+      className="h-full flex flex-col overflow-hidden bg-surface-100 border-overlay relative rounded border shadow-sm"
+    >
+      <div
+        className={cn(
+          'grid-item-drag-handle flex py-1 pl-3 pr-1 items-center gap-2 z-10 shrink-0 group',
+          draggable && 'cursor-move'
+        )}
+      >
+        <div
+          className={cn(showDragHandle && 'transition-opacity opacity-100 group-hover:opacity-0')}
+        >
           {icon}
         </div>
-        {draggable && (
+        {showDragHandle && (
           <div className="absolute left-3 top-2.5 z-10 opacity-0 transition-opacity group-hover:opacity-100">
             <GripHorizontal size={16} strokeWidth={1.5} />
           </div>
         )}
-        <h3 className="text-xs font-medium text-foreground-light flex-1">{label}</h3>
+        <h3 title={label} className="text-xs font-medium text-foreground-light flex-1 truncate">
+          {label}
+        </h3>
         <div className="flex items-center">{actions}</div>
       </div>
       <div

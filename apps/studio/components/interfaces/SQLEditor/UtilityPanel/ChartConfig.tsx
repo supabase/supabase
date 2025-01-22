@@ -22,7 +22,7 @@ type Results = { rows: readonly any[] }
 
 export type ChartConfig = {
   view?: 'table' | 'chart'
-  type: 'bar'
+  type: 'bar' | 'line'
   cumulative: boolean
   xKey: string
   yKey: string

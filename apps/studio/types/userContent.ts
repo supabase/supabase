@@ -43,7 +43,7 @@ export namespace SqlSnippets {
     favorite: boolean
 
     chart?: {
-      type: 'bar'
+      type: 'bar' | 'line'
       cumulative: boolean
       xKey: string
       yKey: string
@@ -108,7 +108,7 @@ export namespace Dashboards {
     label: string
     attribute: ChartType
     provider: 'daily-stats' | 'infra-monitoring'
-    chart_type: 'bar' | 'line' | 'area'
+    chart_type: 'bar' | 'line'
     chartConfig?: Partial<ChartConfig>
   }
 }
