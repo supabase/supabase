@@ -14,10 +14,12 @@ import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
 import { TelemetryActions } from 'lib/constants/telemetry'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const SQLTemplates = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { profile } = useProfile()
   const { project } = useProjectContext()
   const [sql] = partition(SQL_TEMPLATES, { type: 'template' })
@@ -79,6 +81,7 @@ const SQLTemplates = () => {
                 sendEvent({
                   action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED,
                   properties: { templateName: title },
+                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
                 })
               }}
             />

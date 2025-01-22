@@ -115,6 +115,8 @@ export const AIAssistant = ({
   const currentTable = tables?.find((t) => t.id.toString() === entityId)
   const currentSchema = searchParams?.get('schema') ?? 'public'
 
+  const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const {
@@ -178,10 +180,12 @@ export const AIAssistant = ({
     if (content.includes('Help me to debug')) {
       sendEvent({
         action: TelemetryActions.ASSISTANT_DEBUG_SUBMITTED,
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     } else {
       sendEvent({
         action: TelemetryActions.ASSISTANT_PROMPT_SUBMITTED,
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     }
   }
