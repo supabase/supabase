@@ -117,7 +117,7 @@ First, download your project's backup file from dashboard and identify its backu
   src="/docs/img/guides/platform/paused-dl-image-version.png"
 />
 
-Given Postgres version `15.6.1.115`, start Postgres locally with `db_cluster.backup` pointing to the location of your backup file.
+Given Postgres version `15.6.1.115`, start Postgres locally with `db_cluster.backup` being the path to your backup file.
 
 ```sh
 supabase init
@@ -140,7 +140,7 @@ supabase stop
 supabase start
 ```
 
-A Postgres database started with Supabase CLI is not production ready and should never be used outside a local development workflow.
+A Postgres database started with Supabase CLI is not production ready and should not be used outside of local development.
 
 #### Disk sizing
 
