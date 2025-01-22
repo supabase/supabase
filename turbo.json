@@ -110,7 +110,7 @@
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
     "lint": {
-      "outputs": []
+      "cache": false
     },
     "clean": {
       "outputs": [],
