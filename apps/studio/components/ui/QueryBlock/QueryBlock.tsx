@@ -1,5 +1,5 @@
 import { Code, Play } from 'lucide-react'
-import { ReactNode, useEffect, useMemo, useState } from 'react'
+import { DragEvent, ReactNode, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 import { toast } from 'sonner'
 
@@ -10,6 +10,7 @@ import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { Parameter, parseParameters } from 'lib/sql-parameters'
+import { Dashboards } from 'types'
 import {
   Button,
   ChartContainer,
@@ -63,14 +64,16 @@ interface QueryBlockProps {
   lockColumns?: boolean
   /** Max height set to render results / charts (Defaults to 250) */
   maxHeight?: number
+  /** Whether query block is draggable */
+  draggable?: boolean
   /** Not implemented yet: Will be the next part of ReportsV2 */
   onSetParameter?: (params: Parameter[]) => void
   /** Optional callback the SQL query is run */
   onRunQuery?: (queryType: 'select' | 'mutation') => void
+  /** Optional callback on drag start */
+  onDragStart?: (e: DragEvent<Element>) => void
 
   // [Joshen] Params below are currently only used by ReportsV2 (Might revisit to see how to improve these)
-  /** Whether query block is draggable */
-  draggable?: boolean
   /** Optional height set to render the SQL query (Used in Reports) */
   queryHeight?: number
   /** Override hiding Run Query button if SQL query is NOT readonly (Used in Reports) */
@@ -78,7 +81,13 @@ interface QueryBlockProps {
   /** UI to render if there's no query results (Used in Reports) */
   noResultPlaceholder?: ReactNode
   /** Optional callback whenever a chart configuration is updated (Used in Reports) */
-  onUpdateChartConfig?: (config: Partial<ChartConfig>) => void
+  onUpdateChartConfig?: ({
+    chart,
+    chartConfig,
+  }: {
+    chart?: Partial<Dashboards.Chart>
+    chartConfig: Partial<ChartConfig>
+  }) => void
 }
 
 // [Joshen ReportsV2] JFYI we may adjust this in subsequent PRs when we implement this into Reports V2
@@ -103,6 +112,7 @@ export const QueryBlock = ({
   onRunQuery,
   onSetParameter,
   onUpdateChartConfig,
+  onDragStart,
 }: QueryBlockProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
@@ -148,6 +158,10 @@ export const QueryBlock = ({
     }
   }
 
+  useEffect(() => {
+    setChartSettings(chartConfig)
+  }, [chartConfig])
+
   // Run once on mount to parse parameters and notify parent
   useEffect(() => {
     if (!!sql && onSetParameter) {
@@ -167,6 +181,8 @@ export const QueryBlock = ({
   return (
     <ReportBlockContainer
       draggable={draggable}
+      showDragHandle={draggable}
+      onDragStart={(e: DragEvent<Element>) => onDragStart?.(e)}
       icon={
         <SQL_ICON
           className={cn(
@@ -209,11 +225,11 @@ export const QueryBlock = ({
                   chartConfig={chartSettings}
                   columns={Object.keys(queryResult[0] || {})}
                   changeView={(view) => {
-                    if (onUpdateChartConfig) onUpdateChartConfig({ view })
+                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: { view } })
                     setChartSettings({ ...chartSettings, view })
                   }}
                   updateChartConfig={(config) => {
-                    if (onUpdateChartConfig) onUpdateChartConfig(config)
+                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: config })
                     setChartSettings(config)
                   }}
                 />
