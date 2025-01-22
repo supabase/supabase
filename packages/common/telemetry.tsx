@@ -169,6 +169,7 @@ export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathn
     ...getSharedTelemetryData(pathname),
     action: event.action,
     custom_properties: 'properties' in event ? event.properties : {},
+    groups: 'groups' in event ? event.groups : {},
   }
 
   return post(`${ensurePlatformSuffix(API_URL)}/telemetry/event`, body, {

@@ -17,6 +17,7 @@ import {
   TooltipContent,
 } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface EditQueryButtonProps {
   id?: string
@@ -36,6 +37,7 @@ export const EditQueryButton = ({ id, sql, title }: EditQueryButtonProps) => {
     content: { side: 'bottom', text: 'Edit in SQL Editor' },
   }
 
+  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const handleEditInSQLEditor = () => {
@@ -77,6 +79,7 @@ export const EditQueryButton = ({ id, sql, title }: EditQueryButtonProps) => {
             isInSQLEditor,
             isInNewSnippet,
           },
+          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
         })
       }}
       tooltip={tooltip}

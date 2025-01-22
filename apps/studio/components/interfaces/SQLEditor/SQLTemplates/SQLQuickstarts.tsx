@@ -14,10 +14,12 @@ import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const SQLQuickstarts = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { profile } = useProfile()
   const project = useSelectedProject()
   const [, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
@@ -79,6 +81,7 @@ const SQLQuickstarts = () => {
                 sendEvent({
                   action: TelemetryActions.SQL_EDITOR_QUICKSTART_CLICKED,
                   properties: { quickstartName: title },
+                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
                 })
               }}
             />

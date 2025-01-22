@@ -2,8 +2,10 @@ import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import { Dispatch, SetStateAction, useState } from 'react'
 
+import { useParams } from 'common'
 import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Badge,
   Button,
@@ -32,6 +34,8 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
   const [applyConfigOpen, setApplyConfigOpen] = useState(false)
   const [tempConfig, setTempConfig] = useState(config)
 
+  const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const onOpen = (v: boolean) => {
@@ -201,7 +205,10 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
         visible={applyConfigOpen}
         onCancel={() => setApplyConfigOpen(false)}
         onConfirm={() => {
-          sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_FILTERS_APPLIED })
+          sendEvent({
+            action: TelemetryActions.REALTIME_INSPECTOR_FILTERS_APPLIED,
+            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+          })
           onChangeConfig(tempConfig)
           setApplyConfigOpen(false)
           setOpen(false)

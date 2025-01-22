@@ -106,6 +106,10 @@ export interface ConnectionStringCopiedEvent {
      */
     connectionMethod: 'direct' | 'transaction_pooler' | 'session_pooler'
   }
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -126,6 +130,10 @@ export interface CronJobCreatedEvent {
      * Schedule of the cron job in the format of * * * * *
      */
     schedule: string
+  }
+  groups: {
+    project: string
+    organization: string
   }
 }
 
@@ -148,6 +156,10 @@ export interface CronJobUpdatedEvent {
      */
     schedule: string
   }
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -159,6 +171,10 @@ export interface CronJobUpdatedEvent {
  */
 export interface CronJobDeletedEvent {
   action: TelemetryActions.CRON_JOB_DELETED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -170,6 +186,10 @@ export interface CronJobDeletedEvent {
  */
 export interface CronJobCreateClickedEvent {
   action: TelemetryActions.CRON_JOB_CREATE_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -181,6 +201,10 @@ export interface CronJobCreateClickedEvent {
  */
 export interface CronJobUpdateClickedEvent {
   action: TelemetryActions.CRON_JOB_UPDATE_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -192,6 +216,10 @@ export interface CronJobUpdateClickedEvent {
  */
 export interface CronJobDeleteClickedEvent {
   action: TelemetryActions.CRON_JOB_DELETE_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -203,6 +231,10 @@ export interface CronJobDeleteClickedEvent {
  */
 export interface CronJobHistoryClickedEvent {
   action: TelemetryActions.CRON_JOB_HISTORY_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -215,6 +247,10 @@ export interface CronJobHistoryClickedEvent {
  */
 export interface FeaturePreviewsClickedEvent {
   action: TelemetryActions.FEATURE_PREVIEWS_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -233,6 +269,10 @@ export interface FeaturePreviewEnabledEvent {
      */
     feature: string
   }
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -250,6 +290,10 @@ export interface FeaturePreviewDisabledEvent {
      * Feature key of the preview that was disabled. e.g. supabase-ui-api-side-panel
      */
     feature: string
+  }
+  groups: {
+    project: string
+    organization: string
   }
 }
 
@@ -328,6 +372,10 @@ export interface ProjectCreationSecondStepSubmittedEvent {
  */
 export interface RealtimeInspectorListenChannelClickedEvent {
   action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -339,6 +387,10 @@ export interface RealtimeInspectorListenChannelClickedEvent {
  */
 export interface RealtimeInspectorBroadcastSentEvent {
   action: TelemetryActions.REALTIME_INSPECTOR_BROADCAST_SENT
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -350,6 +402,10 @@ export interface RealtimeInspectorBroadcastSentEvent {
  */
 export interface RealtimeInspectorMessageClickedEvent {
   action: TelemetryActions.REALTIME_INSPECTOR_MESSAGE_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -361,6 +417,10 @@ export interface RealtimeInspectorMessageClickedEvent {
  */
 export interface RealtimeInspectorCopyMessageClickedEvent {
   action: TelemetryActions.REALTIME_INSPECTOR_COPY_MESSAGE_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -372,6 +432,10 @@ export interface RealtimeInspectorCopyMessageClickedEvent {
  */
 export interface RealtimeInspectorFiltersAppliedEvent {
   action: TelemetryActions.REALTIME_INSPECTOR_FILTERS_APPLIED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -383,6 +447,10 @@ export interface RealtimeInspectorFiltersAppliedEvent {
  */
 export interface RealtimeInspectorDatabaseRoleUpdatedEvent {
   action: TelemetryActions.REALTIME_INSPECTOR_DATABASE_ROLE_UPDATED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -399,6 +467,10 @@ export interface SqlEditorQuickstartClickedEvent {
      * The title of the quickstart card clicked.
      */
     quickstartName: string
+  }
+  groups: {
+    project: string
+    organization: string
   }
 }
 
@@ -417,6 +489,10 @@ export interface SqlEditorTemplateClickedEvent {
      */
     templateName: string
   }
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -428,6 +504,10 @@ export interface SqlEditorTemplateClickedEvent {
  */
 export interface SqlEditorResultDownloadCsvClickedEvent {
   action: TelemetryActions.SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -439,6 +519,10 @@ export interface SqlEditorResultDownloadCsvClickedEvent {
  */
 export interface SqlEditorResultCopyMarkdownClickedEvent {
   action: TelemetryActions.SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -450,6 +534,10 @@ export interface SqlEditorResultCopyMarkdownClickedEvent {
  */
 export interface SqlEditorResultCopyJsonClickedEvent {
   action: TelemetryActions.SQL_EDITOR_RESULT_COPY_JSON_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -460,6 +548,10 @@ export interface SqlEditorResultCopyJsonClickedEvent {
  */
 export interface AssistantPromptSubmittedEvent {
   action: TelemetryActions.ASSISTANT_PROMPT_SUBMITTED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -470,6 +562,10 @@ export interface AssistantPromptSubmittedEvent {
  */
 export interface AssistantDebugSubmittedEvent {
   action: TelemetryActions.ASSISTANT_DEBUG_SUBMITTED
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -504,6 +600,10 @@ export interface AssistantSqlDiffHandlerEvaluatedEvent {
      */
     handlerAccepted: boolean
   }
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -520,6 +620,10 @@ export interface AssistantEditInSqlEditorClickedEvent {
      */
     isInSQLEditor: boolean
     isInNewSnippet: boolean
+  }
+  groups: {
+    project: string
+    organization: string
   }
 }
 
