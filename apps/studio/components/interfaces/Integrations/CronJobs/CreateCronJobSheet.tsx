@@ -50,6 +50,7 @@ import { HTTPHeaderFieldsSection } from './HttpHeaderFieldsSection'
 import { HttpRequestSection } from './HttpRequestSection'
 import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export interface CreateCronJobSheetProps {
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
@@ -199,6 +200,7 @@ export const CreateCronJobSheet = ({
   onClose,
 }: CreateCronJobSheetProps) => {
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
   const isEditing = !!selectedCronJob?.jobname
 
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
@@ -336,6 +338,10 @@ export const CreateCronJobSheet = ({
                 type: values.type,
                 schedule: schedule,
               },
+              groups: {
+                project: project?.ref ?? 'Unknown',
+                organization: org?.slug ?? 'Unknown',
+              },
             })
           } else {
             sendEvent({
@@ -343,6 +349,10 @@ export const CreateCronJobSheet = ({
               properties: {
                 type: values.type,
                 schedule: schedule,
+              },
+              groups: {
+                project: project?.ref ?? 'Unknown',
+                organization: org?.slug ?? 'Unknown',
               },
             })
           }
