@@ -1120,6 +1120,7 @@ commands:
     subcommands:
       - supabase-postgres-config-get
       - supabase-postgres-config-update
+      - supabase-postgres-config-delete
     flags: []
   - id: supabase-postgres-config-update
     title: supabase postgres-config update
@@ -1144,6 +1145,32 @@ commands:
         name: --replace-existing-overrides
         description: |
           If true, replaces all existing overrides with the ones provided. If false (default), merges existing overrides with the ones provided.
+        default_value: 'false'
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-postgres-config-delete
+    title: supabase postgres-config delete
+    summary: Delete Postgres database config overrides
+    description: Delete specific config overrides, reverting them to their default values.
+    tags: []
+    links: []
+    usage: supabase postgres-config delete [flags]
+    subcommands: []
+    flags:
+      - id: config
+        name: --config <strings>
+        description: Config keys to delete (comma-separated)
+        default_value: '[]'
+      - id: no-restart
+        name: --no-restart
+        description: Do not restart the database after deleting config.
         default_value: 'false'
       - id: experimental
         name: --experimental
