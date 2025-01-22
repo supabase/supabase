@@ -81,7 +81,7 @@ export const GridResize = ({
     if (!data) return
 
     const queryData = JSON.parse(data)
-    const { label, sql } = queryData
+    const { label, sql, config } = queryData
     if (!label || !sql) return console.error('SQL and Label required')
 
     const toastId = toast.loading(`Creating new query: ${label}`)
@@ -95,7 +95,7 @@ export const GridResize = ({
         return {
           id,
           attribute: `new_snippet_${id}`,
-          chartConfig: { ...DEFAULT_CHART_CONFIG },
+          chartConfig: { ...DEFAULT_CHART_CONFIG, ...(config ?? {}) },
           label,
           chart_type: 'bar',
           h: layoutItem.h,
