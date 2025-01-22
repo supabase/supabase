@@ -1,8 +1,9 @@
----
+m---
 id: 'auth'
 title: 'Integrating With Supabase Auth'
 description: 'Supabase Edge Functions and Auth.'
 subtitle: 'Supabase Edge Functions and Auth.'
+
 ---
 
 Edge Functions work seamlessly with [Supabase Auth](/docs/guides/auth).
@@ -16,15 +17,18 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 Deno.serve(async (req: Request) => {
 
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-  );
-
   // Get the session or user object
-  const authHeader = req.headers.get('Authorization')!;
-  const token = authHeader.replace('Bearer ', '');
-  const { data } = await supabaseClient.auth.getUser(token);
+  const userAuthHeader = req.headers.get('Authorization')!;
+
+  const supabase = createClient(Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
+    global: {
+      headers: {
+        Authorization: userAuthHeader,
+      },
+    },
+  });
+  const { data } = await supabaseClient.auth.getUser();
 
 })
 ```
@@ -40,15 +44,17 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 Deno.serve(async (req: Request) => {
 
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-  )
+  const userAuthHeader = req.headers.get('Authorization')!;
 
-  // Get the session or user object
-  const authHeader = req.headers.get('Authorization')!
-  const token = authHeader.replace('Bearer ', '')
-  const { data } = await supabaseClient.auth.getUser(token)
+  const supabaseClient = createClient(Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
+    global: {
+      headers: {
+        Authorization: userAuthHeader,
+      },
+    },
+  });
+  const { data } = await supabaseClient.auth.getUser()
   const user = data.user
 
   return new Response(JSON.stringify({ user }), {
@@ -68,15 +74,17 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 Deno.serve(async (req: Request) => {
 
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-  );
+  const userAuthHeader = req.headers.get('Authorization')!;
 
-  // Get the session or user object
-  const authHeader = req.headers.get('Authorization')!;
-  const token = authHeader.replace('Bearer ', '');
-  const { data: userData } = await supabaseClient.auth.getUser(token);
+  const supabaseClient = createClient(Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
+    global: {
+      headers: {
+        Authorization: userAuthHeader,
+      },
+    },
+  });
+  const { data: userData } = await supabaseClient.auth.getUser();
   const { data, error } = await supabaseClient.from('profiles').select('*');
 
   return new Response(JSON.stringify({ data }), {
