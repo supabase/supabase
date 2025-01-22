@@ -70,7 +70,7 @@ export const GridResize = ({
         return (
           <div
             key={item.id}
-            data-grid={{ ...item, minH: 1, maxH: 1, minW: 1, maxW: LAYOUT_COLUMN_COUNT }}
+            data-grid={{ ...item, h: 1, minH: 1, maxH: 1, minW: 1, maxW: LAYOUT_COLUMN_COUNT }}
           >
             <ReportBlock
               key={item.id}
