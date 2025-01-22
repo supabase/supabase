@@ -5,8 +5,11 @@ import { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { copyToClipboard } from 'lib/helpers'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -16,9 +19,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { TelemetryActions } from 'lib/constants/telemetry'
-import { useParams } from 'common'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export type ResultsDropdownProps = {
   id: string

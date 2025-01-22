@@ -1,14 +1,14 @@
 import { X } from 'lucide-react'
 import { useMemo } from 'react'
 
+import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import CopyButton from 'components/ui/CopyButton'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Button, cn } from 'ui'
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
-import { TelemetryActions } from 'lib/constants/telemetry'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useParams } from 'common'
 
 export interface MessageSelectionProps {
   log: LogData | null

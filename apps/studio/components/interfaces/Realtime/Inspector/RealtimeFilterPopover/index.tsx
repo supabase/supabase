@@ -2,7 +2,10 @@ import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import { Dispatch, SetStateAction, useState } from 'react'
 
+import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Badge,
   Button,
@@ -20,9 +23,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
-import { TelemetryActions } from 'lib/constants/telemetry'
-import { useParams } from 'common'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig

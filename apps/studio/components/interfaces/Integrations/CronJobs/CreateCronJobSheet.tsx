@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useWatch } from '@ui/components/shadcn/ui/form'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -16,7 +17,6 @@ import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import {
   Button,
   Form_Shadcn_,

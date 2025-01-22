@@ -1,10 +1,10 @@
 import { toast } from 'sonner'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseCronJobDeleteMutation } from 'data/database-cron-jobs/database-cron-jobs-delete-mutation'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 

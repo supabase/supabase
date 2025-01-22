@@ -41,6 +41,16 @@ export enum TelemetryActions {
   SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED = 'sql_editor_result_download_csv_clicked',
   SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED = 'sql_editor_result_copy_markdown_clicked',
   SQL_EDITOR_RESULT_COPY_JSON_CLICKED = 'sql_editor_result_copy_markdown_clicked',
+
+  DOCS_FEEDBACK_CLICKED = 'docs_feedback_clicked',
+
+  HOMEPAGE_HERO_START_PROJECT_CLICKED = 'homepage_hero_start_project_clicked',
+  HOMEPAGE_HERO_REQUEST_DEMO_CLICKED = 'homepage_hero_request_demo_clicked',
+  HOMEPAGE_FRAMEWORK_QUICKSTART_CLICKED = 'homepage_framework_quickstart_clicked',
+  HOMEPAGE_PRODUCT_CARD_CLICKED = 'homepage_product_card_clicked',
+  PRICING_PLAN_CTA_CLICKED = 'pricing_plan_cta_clicked',
+  PRICING_COMPARISON_PLAN_CLICKED = 'pricing_comparison_plan_clicked',
+  EVENT_PAGE_CTA_CLICKED = 'event_page_cta_clicked',
 }
 
 /**
@@ -616,3 +626,173 @@ export interface AssistantEditInSqlEditorClickedEvent {
     organization: string
   }
 }
+
+/**
+ * User voted on the feedback button on a docs page. The feedback button is located at the sidebar of every docs page.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsFeedbackClickedEvent {
+  action: TelemetryActions.DOCS_FEEDBACK_CLICKED
+  properties: {
+    /**
+     * 'yes' means clicking on the tick button, 'no' means clicking on the cross button.
+     */
+    response: 'yes' | 'no'
+  }
+}
+
+/**
+ * User clicked the "Start Project" button in the homepage hero section.
+ *
+ * @group Events
+ * @source www
+ * @page /
+ */
+export interface HomepageHeroStartProjectClickedEvent {
+  action: TelemetryActions.HOMEPAGE_HERO_START_PROJECT_CLICKED
+}
+
+/**
+ * User clicked the "Request a Demo" button in the homepage hero section.
+ *
+ * @group Events
+ * @source www
+ * @page /
+ */
+export interface HomepageHeroRequestDemoClickedEvent {
+  action: TelemetryActions.HOMEPAGE_HERO_REQUEST_DEMO_CLICKED
+}
+
+/**
+ * Framework quickstart card clicked in homepage and will lead to specific framework doc.
+ *
+ * @group Events
+ * @source www
+ * @page /
+ */
+export interface HomepageFrameworkQuickstartClickedEvent {
+  action: TelemetryActions.HOMEPAGE_FRAMEWORK_QUICKSTART_CLICKED
+  properties: {
+    /**
+     * The name of the framework quickstart card clicked.
+     */
+    frameworkName: string
+  }
+}
+
+/**
+ * User clicked on a product card in the homepage products section.
+ *
+ * @group Events
+ * @source www
+ * @page /
+ */
+export interface HomepageProductCardClickedEvent {
+  action: TelemetryActions.HOMEPAGE_PRODUCT_CARD_CLICKED
+  properties: {
+    product: string
+  }
+}
+
+/**
+ * User clicked on the green button on a plan in the pricing page.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing
+ */
+export interface PricingPlanCtaClickedEvent {
+  action: TelemetryActions.PRICING_PLAN_CTA_CLICKED
+  properties: {
+    /**
+     * The plan type that was clicked.
+     */
+    plan: string
+    /**
+     * Whether the upgrade now text is shown on the cta button. This is only shown when org is upgradeable and user is logged in.
+     */
+    showUpgradeText: boolean
+    /**
+     * The section of the page where the plan was clicked. Main means the big top section of the page, comparison_table means the comparison table with all plans listen together below.
+     */
+    section: 'main' | 'comparison_table'
+    tableMode?: 'mobile' | 'desktop'
+  }
+}
+
+/**
+ * User clicked on a plan in the pricing comparison section.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing
+ */
+export interface PricingComparisonPlanClickedEvent {
+  action: TelemetryActions.PRICING_COMPARISON_PLAN_CLICKED
+  properties: {
+    category: 'pricing_comparison'
+    /**
+     * The plan type that was clicked.
+     */
+    plan: 'free' | 'pro' | 'team' | 'enterprise'
+  }
+}
+
+/**
+ * User clicked on the main CTA button in an event page.
+ *
+ * @group Events
+ * @source www
+ * @page /events/*
+ */
+export interface EventPageCtaClickedEvent {
+  action: TelemetryActions.EVENT_PAGE_CTA_CLICKED
+  properties: {
+    eventTitle: string
+  }
+}
+
+export type TelemetryEvent =
+  | SignUpEvent
+  | SignInEvent
+  | ConnectionStringCopiedEvent
+  | CronJobCreatedEvent
+  | CronJobUpdatedEvent
+  | CronJobDeletedEvent
+  | CronJobCreateClickedEvent
+  | CronJobUpdateClickedEvent
+  | CronJobDeleteClickedEvent
+  | CronJobHistoryClickedEvent
+  | FeaturePreviewsClickedEvent
+  | FeaturePreviewEnabledEvent
+  | FeaturePreviewDisabledEvent
+  | ProjectCreationInitialStepPromptIntendedEvent
+  | ProjectCreationInitialStepSubmittedEvent
+  | ProjectCreationSecondStepPromptIntendedEvent
+  | ProjectCreationSecondStepSubmittedEvent
+  | RealtimeInspectorListenChannelClickedEvent
+  | RealtimeInspectorBroadcastSentEvent
+  | RealtimeInspectorMessageClickedEvent
+  | RealtimeInspectorCopyMessageClickedEvent
+  | RealtimeInspectorFiltersAppliedEvent
+  | RealtimeInspectorDatabaseRoleUpdatedEvent
+  | SqlEditorQuickstartClickedEvent
+  | SqlEditorTemplateClickedEvent
+  | SqlEditorResultDownloadCsvClickedEvent
+  | SqlEditorResultCopyMarkdownClickedEvent
+  | SqlEditorResultCopyJsonClickedEvent
+  | AssistantPromptSubmittedEvent
+  | AssistantDebugSubmittedEvent
+  | AssistantSuggestionRunQueryClickedEvent
+  | AssistantSqlDiffHandlerEvaluatedEvent
+  | AssistantEditInSqlEditorClickedEvent
+  | DocsFeedbackClickedEvent
+  | HomepageHeroStartProjectClickedEvent
+  | HomepageHeroRequestDemoClickedEvent
+  | HomepageFrameworkQuickstartClickedEvent
+  | HomepageProductCardClickedEvent
+  | PricingPlanCtaClickedEvent
+  | PricingComparisonPlanClickedEvent
+  | EventPageCtaClickedEvent
