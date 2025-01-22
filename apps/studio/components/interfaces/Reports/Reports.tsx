@@ -14,7 +14,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentQuery } from 'data/content/content-query'
-import { useContentUpdateMutation } from 'data/content/content-update-mutation'
+import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
@@ -46,7 +46,7 @@ const Reports = () => {
     projectRef: ref,
     type: 'report',
   })
-  const { mutate: saveReport, isLoading: isSaving } = useContentUpdateMutation({
+  const { mutate: upsertContent, isLoading: isSaving } = useContentUpsertMutation({
     onSuccess: () => {
       setHasEdits(false)
       toast.success('Successfully saved report!')
@@ -200,12 +200,22 @@ const Reports = () => {
     setConfig({ ...config, layout: [...current] })
   }
 
-  const updateChart = (id: string, chartConfig: Partial<ChartConfig>) => {
+  const updateChart = (
+    id: string,
+    {
+      chart,
+      chartConfig,
+    }: { chart?: Partial<Dashboards.Chart>; chartConfig?: Partial<ChartConfig> }
+  ) => {
     const currentChart = config?.layout.find((x) => x.id === id)
+
     if (currentChart) {
       const updatedChart: Dashboards.Chart = {
         ...currentChart,
-        chartConfig: { ...(currentChart?.chartConfig ?? {}), ...chartConfig },
+        ...(chart ?? {}),
+      }
+      if (chartConfig) {
+        updatedChart.chartConfig = { ...(currentChart?.chartConfig ?? {}), ...chartConfig }
       }
 
       const foundIndex = config?.layout.findIndex((x) => x.id === id)
@@ -220,8 +230,12 @@ const Reports = () => {
   // Updates the report and reloads the report again
   const onSaveReport = async () => {
     if (ref === undefined) return console.error('Project ref is required')
-    if (id === undefined) return console.error('Report ID is required')
-    saveReport({ projectRef: ref, id, type: 'report', content: config })
+    if (currentReport === undefined) return console.error('Report is required')
+    if (config === undefined) return console.error('Config is required')
+    upsertContent({
+      projectRef: ref,
+      payload: { ...currentReport, content: config },
+    })
   }
 
   useEffect(() => {
@@ -251,16 +265,16 @@ const Reports = () => {
           <div className="flex items-center gap-x-2">
             <Button
               type="default"
-              onClick={() => setConfig(currentReportContent)}
               disabled={isSaving}
+              onClick={() => setConfig(currentReportContent)}
             >
               Cancel
             </Button>
             <Button
               type="primary"
               icon={<Save />}
-              onClick={() => onSaveReport()}
               loading={isSaving}
+              onClick={() => onSaveReport()}
             >
               Save changes
             </Button>
@@ -350,7 +364,7 @@ const Reports = () => {
           )}
         </div>
       ) : (
-        <div className="relative mb-16 max-w-7xl flex-grow">
+        <div className="relative mb-16 flex-grow">
           {config && startDate && endDate && (
             <GridResize
               startDate={startDate}

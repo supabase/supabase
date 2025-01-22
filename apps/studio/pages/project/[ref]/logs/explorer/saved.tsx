@@ -10,6 +10,7 @@ import { useContentQuery } from 'data/content/content-query'
 import type { NextPageWithLayout } from 'types'
 import { Loading } from 'ui'
 
+// [Joshen] This page looks like its not longer in use from a UI POV - double checking and deprecate + add redirects
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { data, isLoading } = useContentQuery({

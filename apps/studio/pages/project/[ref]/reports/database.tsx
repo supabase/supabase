@@ -100,7 +100,13 @@ const DatabaseUsage = () => {
                 value={'7d'}
                 options={TIME_PERIODS_INFRA}
                 currentBillingPeriodStart={undefined}
-                onChange={setDateRange}
+                onChange={(values) => {
+                  if (values.interval === '1d') {
+                    setDateRange({ ...values, interval: '1h' })
+                  } else {
+                    setDateRange(values)
+                  }
+                }}
               />
               {dateRange && (
                 <div className="flex items-center gap-x-2">
