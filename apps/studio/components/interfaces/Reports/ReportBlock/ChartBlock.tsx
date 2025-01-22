@@ -1,8 +1,9 @@
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
 
+import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { AnalyticsInterval } from 'data/analytics/constants'
@@ -18,6 +19,7 @@ import { METRICS } from 'lib/constants/metrics'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { Dashboards } from 'types'
 import { WarningIcon } from 'ui'
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
@@ -33,6 +35,13 @@ interface ChartBlockProps {
   isLoading?: boolean
   actions?: ReactNode
   maxHeight?: number
+  onUpdateChartConfig?: ({
+    chart,
+    chartConfig,
+  }: {
+    chart?: Partial<Dashboards.Chart>
+    chartConfig?: Partial<ChartConfig>
+  }) => void
 }
 
 export const ChartBlock = ({
@@ -46,6 +55,7 @@ export const ChartBlock = ({
   isLoading = false,
   actions,
   maxHeight,
+  onUpdateChartConfig,
 }: ChartBlockProps) => {
   const router = useRouter()
   const { ref } = router.query
@@ -131,6 +141,10 @@ export const ChartBlock = ({
     }
   })
 
+  useEffect(() => {
+    if (defaultChartStyle) setChartStyle(defaultChartStyle)
+  }, [defaultChartStyle])
+
   return (
     <ReportBlockContainer
       draggable
@@ -145,7 +159,11 @@ export const ChartBlock = ({
             disabled={loading}
             className="w-7 h-7"
             icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
-            onClick={() => setChartStyle(chartStyle === 'bar' ? 'line' : 'bar')}
+            onClick={() => {
+              const style = chartStyle === 'bar' ? 'line' : 'bar'
+              if (onUpdateChartConfig) onUpdateChartConfig({ chart: { chart_type: style } })
+              setChartStyle(style)
+            }}
             tooltip={{
               content: {
                 side: 'bottom',

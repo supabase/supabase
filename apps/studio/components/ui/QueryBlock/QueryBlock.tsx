@@ -10,6 +10,7 @@ import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { Parameter, parseParameters } from 'lib/sql-parameters'
+import { Dashboards } from 'types'
 import {
   Button,
   ChartContainer,
@@ -80,7 +81,13 @@ interface QueryBlockProps {
   /** UI to render if there's no query results (Used in Reports) */
   noResultPlaceholder?: ReactNode
   /** Optional callback whenever a chart configuration is updated (Used in Reports) */
-  onUpdateChartConfig?: (config: Partial<ChartConfig>) => void
+  onUpdateChartConfig?: ({
+    chart,
+    chartConfig,
+  }: {
+    chart?: Partial<Dashboards.Chart>
+    chartConfig: Partial<ChartConfig>
+  }) => void
 }
 
 // [Joshen ReportsV2] JFYI we may adjust this in subsequent PRs when we implement this into Reports V2
@@ -151,6 +158,10 @@ export const QueryBlock = ({
     }
   }
 
+  useEffect(() => {
+    setChartSettings(chartConfig)
+  }, [chartConfig])
+
   // Run once on mount to parse parameters and notify parent
   useEffect(() => {
     if (!!sql && onSetParameter) {
@@ -214,11 +225,11 @@ export const QueryBlock = ({
                   chartConfig={chartSettings}
                   columns={Object.keys(queryResult[0] || {})}
                   changeView={(view) => {
-                    if (onUpdateChartConfig) onUpdateChartConfig({ view })
+                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: { view } })
                     setChartSettings({ ...chartSettings, view })
                   }}
                   updateChartConfig={(config) => {
-                    if (onUpdateChartConfig) onUpdateChartConfig(config)
+                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: config })
                     setChartSettings(config)
                   }}
                 />

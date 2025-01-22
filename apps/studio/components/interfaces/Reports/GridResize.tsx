@@ -28,7 +28,13 @@ interface GridResizeProps {
   editableReport: Dashboards.Content
   disableUpdate: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
-  onUpdateChart: (id: string, config: Partial<ChartConfig>) => void
+  onUpdateChart: (
+    id: string,
+    {
+      chart,
+      chartConfig,
+    }: { chart?: Partial<Dashboards.Chart>; chartConfig?: Partial<ChartConfig> }
+  ) => void
   setEditableReport: (payload: any) => void
 }
 

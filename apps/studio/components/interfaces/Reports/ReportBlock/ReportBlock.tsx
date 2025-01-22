@@ -20,7 +20,13 @@ interface ReportBlockProps {
   interval: AnalyticsInterval
   disableUpdate: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
-  onUpdateChart: (config: Partial<ChartConfig>) => void
+  onUpdateChart: ({
+    chart,
+    chartConfig,
+  }: {
+    chart?: Partial<Dashboards.Chart>
+    chartConfig?: Partial<ChartConfig>
+  }) => void
 }
 
 export const ReportBlock = ({
@@ -129,6 +135,7 @@ export const ReportBlock = ({
           interval={interval}
           attribute={item.attribute}
           provider={item.provider}
+          defaultChartStyle={item.chart_type}
           maxHeight={232}
           label={`${item.label}${projectRef !== state.selectedDatabaseId ? (item.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
           actions={
@@ -142,6 +149,7 @@ export const ReportBlock = ({
               />
             ) : null
           }
+          onUpdateChartConfig={onUpdateChart}
         />
       )}
     </>
