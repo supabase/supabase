@@ -326,7 +326,7 @@ export const genChartQuery = (
   // pg_cron logs are a subset of postgres logs
   // to calculate the chart, we need to query postgres logs
   if (table === LogsTableName.PG_CRON) {
-    table = LogsTableName.POSTGREST
+    table = LogsTableName.POSTGRES
     where = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
   }
 
