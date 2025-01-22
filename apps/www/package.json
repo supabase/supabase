@@ -9,7 +9,7 @@
     "build": "pnpm run content:build && next build",
     "export": "next export",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "clean": "rimraf node_modules",
     "typecheck": "pnpm run content:build && tsc --noEmit",
     "content:build": "contentlayer2 build && node scripts/generateStaticContent.mjs",
