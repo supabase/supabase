@@ -43,7 +43,7 @@ export namespace SqlSnippets {
     favorite: boolean
 
     chart?: {
-      type: 'bar'
+      type: 'bar' | 'line'
       cumulative: boolean
       xKey: string
       yKey: string
