@@ -1,7 +1,14 @@
-import { memo, ReactNode, useContext } from 'react'
+import { useRouter } from 'next/router'
+import { DragEvent, memo, ReactNode, useContext, useEffect, useMemo, useRef } from 'react'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useFlag } from 'hooks/ui/useFlag'
 import { TelemetryActions } from 'lib/constants/telemetry'
+import { useProfile } from 'lib/profile'
+import { Dashboards } from 'types'
 import { cn, CodeBlock, CodeBlockLang } from 'ui'
 import { DebouncedComponent } from '../DebouncedComponent'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
@@ -52,8 +59,11 @@ const MemoizedQueryBlock = memo(
     yAxis,
     isChart,
     isLoading,
+    isDraggable,
     runQuery,
     onRunQuery,
+    onDragStart,
+    onUpdateChartConfig,
   }: {
     sql: string
     title: string
@@ -61,8 +71,17 @@ const MemoizedQueryBlock = memo(
     yAxis?: string
     isChart: boolean
     isLoading: boolean
+    isDraggable: boolean
     runQuery: boolean
     onRunQuery: (queryType: 'select' | 'mutation') => void
+    onDragStart: (e: DragEvent<Element>) => void
+    onUpdateChartConfig?: ({
+      chart,
+      chartConfig,
+    }: {
+      chart?: Partial<Dashboards.Chart>
+      chartConfig: Partial<ChartConfig>
+    }) => void
   }) => (
     <DebouncedComponent
       delay={500}
@@ -87,8 +106,11 @@ const MemoizedQueryBlock = memo(
         showSql={!isChart}
         isChart={isChart}
         isLoading={isLoading}
+        draggable={isDraggable}
         runQuery={runQuery}
         onRunQuery={onRunQuery}
+        onDragStart={onDragStart}
+        onUpdateChartConfig={onUpdateChartConfig}
       />
     </DebouncedComponent>
   )
@@ -96,20 +118,52 @@ const MemoizedQueryBlock = memo(
 MemoizedQueryBlock.displayName = 'MemoizedQueryBlock'
 
 export const MarkdownPre = ({ children }: { children: any }) => {
+  const router = useRouter()
+  const { profile } = useProfile()
   const { isLoading, readOnly } = useContext(MessageContext)
   const { mutate: sendEvent } = useSendEventMutation()
+  const supportSQLBlocks = useFlag('reportsV2')
+
+  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
+  })
+
+  // [Joshen] Using a ref as this data doesn't need to trigger a re-render
+  const chartConfig = useRef<ChartConfig>({
+    view: 'table',
+    type: 'bar',
+    xKey: '',
+    yKey: '',
+    cumulative: false,
+  })
 
   const language = children[0].props.className?.replace('language-', '') || 'sql'
   const rawSql = language === 'sql' ? children[0].props.children : undefined
   const formatted = (rawSql || [''])[0]
   const propsMatch = formatted.match(/--\s*props:\s*(\{[^}]+\})/)
 
-  const snippetProps: AssistantSnippetProps = propsMatch ? JSON.parse(propsMatch[1]) : {}
+  const snippetProps: AssistantSnippetProps = useMemo(
+    () => (propsMatch ? JSON.parse(propsMatch[1]) : {}),
+    [propsMatch]
+  )
   const { xAxis, yAxis } = snippetProps
   const title = snippetProps.title || 'SQL Query'
   const isChart = snippetProps.isChart === 'true'
   const runQuery = snippetProps.runQuery === 'true'
   const sql = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
+  const isDraggableToReports =
+    supportSQLBlocks && canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
+
+  useEffect(() => {
+    chartConfig.current = {
+      ...chartConfig.current,
+      view: isChart ? 'chart' : 'table',
+      xKey: xAxis ?? '',
+      yKey: yAxis ?? '',
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [snippetProps])
 
   const onRunQuery = async (queryType: 'select' | 'mutation') => {
     sendEvent({
@@ -138,8 +192,18 @@ export const MarkdownPre = ({ children }: { children: any }) => {
             yAxis={yAxis}
             isChart={isChart}
             isLoading={isLoading}
+            isDraggable={isDraggableToReports}
             runQuery={runQuery}
             onRunQuery={onRunQuery}
+            onUpdateChartConfig={({ chartConfig: config }) => {
+              chartConfig.current = { ...chartConfig.current, ...config }
+            }}
+            onDragStart={(e: DragEvent<Element>) => {
+              e.dataTransfer.setData(
+                'application/json',
+                JSON.stringify({ label: title, sql, config: chartConfig.current })
+              )
+            }}
           />
         )
       ) : (
