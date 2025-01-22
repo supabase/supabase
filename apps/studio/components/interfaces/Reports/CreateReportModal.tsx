@@ -1,9 +1,10 @@
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { useContentInsertMutation } from 'data/content/content-insert-mutation'
+import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import { Button, Form, Input, Modal } from 'ui'
 
 type CustomReport = { name: string; description?: string }
@@ -15,13 +16,14 @@ export interface CreateReportModal {
 
 export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateReportModal) => {
   const router = useRouter()
+  const { profile } = useProfile()
   const project = useSelectedProject()
   const ref = project?.ref ?? 'default'
 
-  const { mutate: insertReport, isLoading: isCreating } = useContentInsertMutation({
-    onSuccess: (data) => {
+  const { mutate: upsertContent, isLoading: isCreating } = useContentUpsertMutation({
+    onSuccess: (_, vars) => {
       toast.success('Successfully created new report')
-      const newReportId = data.id
+      const newReportId = vars.payload.id
       router.push(`/project/${ref}/reports/${newReportId}`)
       afterSubmit()
     },
@@ -31,9 +33,10 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
   })
 
   async function createCustomReport({ name, description }: { name: string; description?: string }) {
-    if (!ref) return
+    if (!ref) return console.error('Project ref is required')
+    if (!profile) return console.error('Profile is required')
 
-    insertReport({
+    upsertContent({
       projectRef: ref,
       payload: {
         id: uuidv4(),
@@ -41,6 +44,7 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
         name,
         description: description || '',
         visibility: 'project',
+        owner_id: profile?.id,
         content: {
           schema_version: 1,
           period_start: {

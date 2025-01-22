@@ -1,5 +1,5 @@
 import { useDebounce } from '@uidotdev/usehooks'
-import { Code, Home } from 'lucide-react'
+import { Home } from 'lucide-react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -20,6 +20,7 @@ import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
+  SQL_ICON,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
@@ -64,7 +65,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
         return (
           <DropdownMenuSub key={cat.key}>
             <DropdownMenuSubTrigger className="space-x-2">
-              {cat.icon ? cat.icon : <Home size={14} />}
+              {cat.icon ? cat.icon() : <Home size={14} />}
               <p>{cat.label}</p>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
@@ -91,7 +92,11 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
       {supportSQLBlocks && (
         <DropdownMenuSub>
           <DropdownMenuSubTrigger className="space-x-2">
-            <Code size={14} />
+            <SQL_ICON
+              size={14}
+              strokeWidth={1.5}
+              className="fill-foreground-light w-5 h-4 shrink-0 grow-0 -ml-0.5"
+            />
             <p>SQL Snippets</p>
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>

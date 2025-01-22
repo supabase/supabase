@@ -240,10 +240,10 @@ export const SQLEditorNav = ({
 
   const favoritesTreeState = useMemo(
     () =>
-      numFavoriteSnippets === 0
+      favoriteSnippets.length === 0
         ? [ROOT_NODE]
         : formatFolderResponseForTreeView({ contents: favoriteSnippets }),
-    [favoriteSnippets, numFavoriteSnippets]
+    [favoriteSnippets]
   )
 
   const favoriteSnippetsLastItemIds = useMemo(
@@ -303,10 +303,10 @@ export const SQLEditorNav = ({
 
   const projectSnippetsTreeState = useMemo(
     () =>
-      numProjectSnippets === 0
+      sharedSnippets.length === 0
         ? [ROOT_NODE]
         : formatFolderResponseForTreeView({ contents: sharedSnippets }),
-    [sharedSnippets, numProjectSnippets]
+    [sharedSnippets]
   )
 
   const projectSnippetsLastItemIds = useMemo(
