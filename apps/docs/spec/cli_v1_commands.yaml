@@ -1127,6 +1127,8 @@ commands:
     summary: Update Postgres database config
     description: |-
       Overriding the default Postgres config could result in unstable database behavior.
+      If you experience instability after changing configurations, you can revert to the default values
+      using the 'postgres-config delete' command.
       Custom configuration also overrides the optimizations generated based on the compute add-ons in use.
     tags: []
     links: []
