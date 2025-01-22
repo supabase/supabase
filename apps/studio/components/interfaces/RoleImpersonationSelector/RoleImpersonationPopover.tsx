@@ -42,9 +42,9 @@ const RoleImpersonationPopover = ({
             <span>{currentRole}</span>
             {state.role?.type === 'postgrest' && state.role.role === 'authenticated' && (
               <>
-                {state.role.user ? (
+                {state.role.userType === 'native' && state.role.user ? (
                   <UserRoleButtonSection user={state.role.user} />
-                ) : state.role.externalAuth ? (
+                ) : state.role.userType === 'external' && state.role.externalAuth ? (
                   <ExternalAuthButtonSection sub={state.role.externalAuth.sub} />
                 ) : null}
                 <span className="text-xs text-foreground-lighter font-light">
@@ -83,7 +83,6 @@ const UserRoleButtonSection = ({ user }: { user: User }) => {
   )
 }
 
-// Add new component for external auth display
 const ExternalAuthButtonSection = ({ sub }: { sub: string }) => {
   return (
     <div className="flex gap-1 items-center pl-0.5 pr-1.5 h-[21px] bg-surface-200 rounded-full overflow-hidden">

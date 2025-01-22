@@ -13,8 +13,14 @@ type PostgrestImpersonationRole =
   | {
       type: 'postgrest'
       role: 'authenticated'
+      userType: 'native'
       user?: User
-      // Add optional external auth claims
+      aal?: 'aal1' | 'aal2'
+    }
+  | {
+      type: 'postgrest'
+      role: 'authenticated'
+      userType: 'external'
       externalAuth?: {
         sub: string
         additionalClaims?: Record<string, any>
@@ -39,10 +45,9 @@ function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole
   const nowTimestamp = Math.floor(Date.now() / 1000)
 
   if (role.role === 'authenticated') {
-    const user = role.user
-
     // Supabase native auth case
-    if (user) {
+    if (role.userType === 'native' && role.user) {
+      const user = role.user
       return {
         aal: role.aal ?? 'aal1',
         amr: [{ method: 'password', timestamp: nowTimestamp }],
@@ -62,7 +67,7 @@ function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole
     }
 
     // External auth case
-    if (role.externalAuth) {
+    if (role.userType === 'external' && role.externalAuth) {
       return {
         aal: role.aal ?? 'aal1',
         aud: 'authenticated',

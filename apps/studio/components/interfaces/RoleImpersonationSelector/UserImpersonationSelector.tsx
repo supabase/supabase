@@ -1,6 +1,7 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { ChevronDown, ExternalLink, User as IconUser, Loader2, Search, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
@@ -44,19 +45,24 @@ const UserImpersonationSelector = () => {
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
   const isSearching = isPreviousData && isFetching
   const impersonatingUser =
-    state.role?.type === 'postgrest' && state.role.role === 'authenticated' && state.role.user
+    state.role?.type === 'postgrest' &&
+    state.role.role === 'authenticated' &&
+    state.role.userType === 'native' &&
+    state.role.user
 
   // Check if we're currently impersonating an external auth user (e.g. OAuth, SAML)
   // This is used to show the correct UI state and impersonation details
   const isExternalAuthImpersonating =
     state.role?.type === 'postgrest' &&
     state.role.role === 'authenticated' &&
+    state.role.userType === 'external' &&
     state.role.externalAuth
 
   function impersonateUser(user: User) {
     state.setRole({
       type: 'postgrest',
       role: 'authenticated',
+      userType: 'native',
       user,
       aal,
     })
@@ -69,13 +75,14 @@ const UserImpersonationSelector = () => {
     try {
       parsedClaims = additionalClaims ? JSON.parse(additionalClaims) : {}
     } catch (e) {
-      alert('Invalid JSON in additional claims')
+      toast.error('Invalid JSON in additional claims')
       return
     }
 
     state.setRole({
       type: 'postgrest',
       role: 'authenticated',
+      userType: 'external',
       externalAuth: {
         sub: externalUserId,
         additionalClaims: parsedClaims,
