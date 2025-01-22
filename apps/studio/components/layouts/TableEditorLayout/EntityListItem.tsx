@@ -46,9 +46,9 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 
@@ -240,16 +240,16 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
 
     if (tooltipContent) {
       return (
-        <Tooltip_Shadcn_ disableHoverableContent={true}>
-          <TooltipTrigger_Shadcn_ className="min-w-4" asChild>
+        <Tooltip disableHoverableContent={true}>
+          <TooltipTrigger className="min-w-4" asChild>
             <Unlock
               size={14}
               strokeWidth={2}
               className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
             />
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">{tooltipContent}</TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">{tooltipContent}</TooltipContent>
+        </Tooltip>
       )
     }
 
@@ -275,8 +275,8 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           'transition'
         )}
       >
-        <Tooltip_Shadcn_ disableHoverableContent={true}>
-          <TooltipTrigger_Shadcn_ className="min-w-4" asChild>
+        <Tooltip disableHoverableContent={true}>
+          <TooltipTrigger className="min-w-4" asChild>
             {entity.type === ENTITY_TYPE.TABLE ? (
               <Table2
                 size={15}
@@ -312,11 +312,9 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                   ?.toUpperCase()}
               </div>
             )}
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">
-            {formatTooltipText(entity.type)}
-          </TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">{formatTooltipText(entity.type)}</TooltipContent>
+        </Tooltip>
         <div
           className={cn(
             'truncate',

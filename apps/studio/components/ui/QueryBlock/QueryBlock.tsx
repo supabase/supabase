@@ -1,14 +1,16 @@
 import { Code, Play } from 'lucide-react'
-import { ReactNode, useEffect, useMemo, useState } from 'react'
+import { DragEvent, ReactNode, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { Parameter, parseParameters } from 'lib/sql-parameters'
+import { Dashboards } from 'types'
 import {
   Button,
   ChartContainer,
@@ -62,10 +64,14 @@ interface QueryBlockProps {
   lockColumns?: boolean
   /** Max height set to render results / charts (Defaults to 250) */
   maxHeight?: number
+  /** Whether query block is draggable */
+  draggable?: boolean
   /** Not implemented yet: Will be the next part of ReportsV2 */
   onSetParameter?: (params: Parameter[]) => void
   /** Optional callback the SQL query is run */
   onRunQuery?: (queryType: 'select' | 'mutation') => void
+  /** Optional callback on drag start */
+  onDragStart?: (e: DragEvent<Element>) => void
 
   // [Joshen] Params below are currently only used by ReportsV2 (Might revisit to see how to improve these)
   /** Optional height set to render the SQL query (Used in Reports) */
@@ -75,7 +81,13 @@ interface QueryBlockProps {
   /** UI to render if there's no query results (Used in Reports) */
   noResultPlaceholder?: ReactNode
   /** Optional callback whenever a chart configuration is updated (Used in Reports) */
-  onUpdateChartConfig?: (config: Partial<ChartConfig>) => void
+  onUpdateChartConfig?: ({
+    chart,
+    chartConfig,
+  }: {
+    chart?: Partial<Dashboards.Chart>
+    chartConfig: Partial<ChartConfig>
+  }) => void
 }
 
 // [Joshen ReportsV2] JFYI we may adjust this in subsequent PRs when we implement this into Reports V2
@@ -94,11 +106,13 @@ export const QueryBlock = ({
   isLoading = false,
   runQuery = false,
   lockColumns = false,
+  draggable = false,
   disableRunIfMutation = false,
   noResultPlaceholder = null,
   onRunQuery,
   onSetParameter,
   onUpdateChartConfig,
+  onDragStart,
 }: QueryBlockProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
@@ -144,6 +158,10 @@ export const QueryBlock = ({
     }
   }
 
+  useEffect(() => {
+    setChartSettings(chartConfig)
+  }, [chartConfig])
+
   // Run once on mount to parse parameters and notify parent
   useEffect(() => {
     if (!!sql && onSetParameter) {
@@ -161,8 +179,11 @@ export const QueryBlock = ({
   }, [sql, isLoading, runQuery, project])
 
   return (
-    <div className="h-full flex flex-col overflow-hidden bg-surface-100 border-overlay rounded border shadow-sm">
-      <div className="flex py-1 pl-3 pr-1 items-center gap-2 z-10 shrink-0">
+    <ReportBlockContainer
+      draggable={draggable}
+      showDragHandle={draggable}
+      onDragStart={(e: DragEvent<Element>) => onDragStart?.(e)}
+      icon={
         <SQL_ICON
           className={cn(
             'transition-colors fill-foreground-muted group-aria-selected:fill-foreground',
@@ -171,10 +192,10 @@ export const QueryBlock = ({
           size={16}
           strokeWidth={1.5}
         />
-        <h3 className="text-xs font-medium text-foreground-light flex-1">{label}</h3>
-
-        {/* QueryBlock actions */}
-        <div className="flex items-center">
+      }
+      label={label}
+      actions={
+        <>
           <ButtonTooltip
             type="text"
             size="tiny"
@@ -204,11 +225,11 @@ export const QueryBlock = ({
                   chartConfig={chartSettings}
                   columns={Object.keys(queryResult[0] || {})}
                   changeView={(view) => {
-                    if (onUpdateChartConfig) onUpdateChartConfig({ view })
+                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: { view } })
                     setChartSettings({ ...chartSettings, view })
                   }}
                   updateChartConfig={(config) => {
-                    if (onUpdateChartConfig) onUpdateChartConfig(config)
+                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: config })
                     setChartSettings(config)
                   }}
                 />
@@ -245,13 +266,13 @@ export const QueryBlock = ({
           )}
 
           {actions}
-        </div>
-      </div>
-
-      {showWarning && (
+        </>
+      }
+    >
+      {!!showWarning && (
         <Admonition
           type="warning"
-          className="mb-0 rounded-none border-0 shrink-0 bg-background-100 border-t"
+          className="mb-0 rounded-none border-0 shrink-0 bg-background-100"
         >
           <p>
             {showWarning === 'hasWriteOperation'
@@ -296,16 +317,15 @@ export const QueryBlock = ({
         </Admonition>
       )}
 
-      {/* QueryBlock output */}
       {isExecuting && queryResult === undefined && (
-        <div className="border-t p-3">
+        <div className="p-3 w-full">
           <ShimmeringLoader />
         </div>
       )}
 
       {showSql && (
         <div
-          className="shrink-0 max-h-96 overflow-y-auto border-t"
+          className="shrink-0 w-full max-h-96 overflow-y-auto"
           style={{ height: !!queryHeight ? `${queryHeight}px` : undefined }}
         >
           <CodeBlock
@@ -324,17 +344,17 @@ export const QueryBlock = ({
       {view === 'chart' && queryResult !== undefined ? (
         <>
           {(queryResult ?? []).length === 0 ? (
-            <div className="flex h-full items-center justify-center">
+            <div className="flex w-full h-full items-center justify-center">
               <p className="text-foreground-light text-xs">No results returned from query</p>
             </div>
           ) : !xKey || !yKey ? (
-            <div className="flex h-full items-center justify-center">
+            <div className="flex w-full h-full items-center justify-center">
               <p className="text-foreground-light text-xs">Select columns for the X and Y axes</p>
             </div>
           ) : (
-            <div className={cn('flex-1 border-t')}>
+            <div className={cn('flex-1 w-full')}>
               <ChartContainer
-                className="aspect-auto px-3 pb-2"
+                className="aspect-auto px-3 py-2"
                 config={{}}
                 style={{
                   height: maxHeight ? `${maxHeight}px` : undefined,
@@ -369,7 +389,7 @@ export const QueryBlock = ({
         <>
           {queryResult ? (
             <div
-              className={cn('flex-1 overflow-auto relative border-t')}
+              className={cn('flex-1 w-full overflow-auto relative')}
               style={{ maxHeight: maxHeight ? `${maxHeight}px` : undefined }}
             >
               <Results rows={queryResult} />
@@ -379,6 +399,6 @@ export const QueryBlock = ({
           ) : null}
         </>
       )}
-    </div>
+    </ReportBlockContainer>
   )
 }

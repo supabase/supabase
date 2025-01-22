@@ -31,9 +31,9 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import {
@@ -113,8 +113,8 @@ const ColumnType = ({
 
   if (!isAvailableType) {
     return (
-      <Tooltip_Shadcn_>
-        <TooltipTrigger_Shadcn_>
+      <Tooltip>
+        <TooltipTrigger>
           <Input
             readOnly
             disabled
@@ -130,21 +130,21 @@ const ColumnType = ({
                 : ''
             }
           />
-        </TooltipTrigger_Shadcn_>
+        </TooltipTrigger>
         {!showLabel && (
-          <TooltipContent_Shadcn_ side="bottom" className="w-80">
+          <TooltipContent side="bottom" className="w-80">
             Custom non-native psql data types currently cannot be changed to a different data type
             via Supabase Studio
-          </TooltipContent_Shadcn_>
+          </TooltipContent>
         )}
-      </Tooltip_Shadcn_>
+      </Tooltip>
     )
   }
 
   if (disabled && !showLabel) {
     return (
-      <Tooltip_Shadcn_>
-        <TooltipTrigger_Shadcn_>
+      <Tooltip>
+        <TooltipTrigger>
           <Input
             readOnly
             disabled
@@ -154,13 +154,13 @@ const ColumnType = ({
             size="small"
             value={value}
           />
-        </TooltipTrigger_Shadcn_>
+        </TooltipTrigger>
         {!showLabel && description && (
-          <TooltipContent_Shadcn_ side="bottom">
+          <TooltipContent side="bottom">
             <div className="w-80">{description}</div>
-          </TooltipContent_Shadcn_>
+          </TooltipContent>
         )}
-      </Tooltip_Shadcn_>
+      </Tooltip>
     )
   }
 

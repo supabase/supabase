@@ -20,12 +20,22 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a sql function command when the command is CALL auth.jwt ()', () => {
-    const command = 'CALL auth.jwt ()'
+  it('should return a sql function command when the command is SELECT auth.jwt ()', () => {
+    const command = 'SELECT auth.jwt ()'
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       type: 'sql_function',
       schema: 'auth',
       functionName: 'jwt',
+      snippet: command,
+    })
+  })
+
+  it('should return a sql function command when the command is SELECT public.test_fn(1, 2)', () => {
+    const command = 'SELECT public.test_fn(1, 2)'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_function',
+      schema: 'public',
+      functionName: 'test_fn',
       snippet: command,
     })
   })

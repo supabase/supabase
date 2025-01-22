@@ -1,17 +1,12 @@
-import { memo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Box, Clock, Database, File, ListOrdered, User2, Zap } from 'lucide-react'
+import { memo } from 'react'
 
 import { SchemaVisualizer } from 'components/interfaces/SchemaVisualizer'
 import Globe from 'components/ui/Globe'
 import { BASE_PATH } from 'lib/constants'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
-import {
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipProvider_Shadcn_,
-  TooltipTrigger_Shadcn_,
-} from 'ui'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 
 interface SupabaseService {
   name: 'Auth' | 'Storage' | 'Database' | 'Edge Function' | 'Cron' | 'Queues' | 'Vector'
@@ -126,7 +121,7 @@ export const ProjectVisual = memo(
                 )}
               </div>
 
-              <TooltipProvider_Shadcn_>
+              <TooltipProvider>
                 <div className="flex gap-2 mt-4">
                   {[
                     { name: 'Auth', icon: User2 },
@@ -140,8 +135,8 @@ export const ProjectVisual = memo(
                     const enabledService = services.find((s) => s.name === service.name)
                     const isEnabled = !!enabledService
                     return (
-                      <Tooltip_Shadcn_ key={service.name} delayDuration={100}>
-                        <TooltipTrigger_Shadcn_ asChild>
+                      <Tooltip key={service.name} delayDuration={100}>
+                        <TooltipTrigger asChild>
                           <div
                             className={`
                             flex items-center justify-center w-10 h-10 border rounded cursor-help
@@ -150,15 +145,15 @@ export const ProjectVisual = memo(
                           >
                             <service.icon size={16} strokeWidth={2} />
                           </div>
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_>
+                        </TooltipTrigger>
+                        <TooltipContent>
                           {isEnabled ? `${service.name}: ${enabledService.reason}` : service.name}
-                        </TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
+                        </TooltipContent>
+                      </Tooltip>
                     )
                   })}
                 </div>
-              </TooltipProvider_Shadcn_>
+              </TooltipProvider>
             </motion.div>
           )}
           <motion.div

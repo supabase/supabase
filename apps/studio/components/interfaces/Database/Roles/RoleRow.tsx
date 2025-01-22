@@ -9,9 +9,9 @@ import {
   DropdownMenuTrigger,
   Form,
   Toggle,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -175,18 +175,18 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                         afterLabel={
                           !disabled &&
                           ROLE_PERMISSIONS[permission].disabled && (
-                            <Tooltip_Shadcn_>
-                              <TooltipTrigger_Shadcn_>
+                            <Tooltip>
+                              <TooltipTrigger>
                                 <HelpCircle
                                   size="14"
                                   strokeWidth={2}
                                   className="ml-2 relative top-[3px]"
                                 />
-                              </TooltipTrigger_Shadcn_>
-                              <TooltipContent_Shadcn_ side="bottom">
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
                                 This privilege cannot be updated via the dashboard
-                              </TooltipContent_Shadcn_>
-                            </Tooltip_Shadcn_>
+                              </TooltipContent>
+                            </Tooltip>
                           )
                         }
                       />

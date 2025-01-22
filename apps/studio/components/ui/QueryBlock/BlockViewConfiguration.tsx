@@ -49,7 +49,14 @@ export const BlockViewConfiguration = ({
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ side="bottom" align="center" className="w-[240px] p-3">
         <form className="grid gap-2">
-          <ToggleGroup type="single" value={view} className="w-full" onValueChange={changeView}>
+          <ToggleGroup
+            type="single"
+            value={view}
+            className="w-full"
+            onValueChange={(view: 'chart' | 'table') => {
+              if (view) changeView(view)
+            }}
+          >
             <ToggleGroupItem className="w-full" value="table" aria-label="Show as table">
               <Table className="h-4 w-4" />
               <p className="text-xs ml-2">As table</p>

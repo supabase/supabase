@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useState } from 'react'
-import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import AreaChart from 'components/ui/Charts/AreaChart'
 import BarChart from 'components/ui/Charts/BarChart'
@@ -16,7 +16,7 @@ import {
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { WarningIcon } from 'ui'
-import type { ChartData } from './ChartHandler.types'
+import type { ChartData } from './Charts.types'
 
 interface ChartHandlerProps {
   id?: string
@@ -150,19 +150,19 @@ const ChartHandler = ({
     <div className="h-full w-full">
       <div className="absolute right-6 z-50 flex justify-between">
         {!hideChartType && (
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
+          <Tooltip>
+            <TooltipTrigger asChild>
               <Button
                 type="default"
                 className="px-1.5"
                 icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
                 onClick={() => setChartStyle(chartStyle === 'bar' ? 'line' : 'bar')}
               />
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="left" align="center">
+            </TooltipTrigger>
+            <TooltipContent side="left" align="center">
               View as {chartStyle === 'bar' ? 'line chart' : 'bar chart'}
-            </TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
+            </TooltipContent>
+          </Tooltip>
         )}
         {children}
       </div>

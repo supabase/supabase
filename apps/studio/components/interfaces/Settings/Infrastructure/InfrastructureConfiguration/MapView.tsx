@@ -31,9 +31,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   ScrollArea,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS, REPLICA_STATUS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
@@ -325,8 +325,8 @@ const MapView = ({
                             >
                               Restart replica
                             </DropdownMenuItem>
-                            <Tooltip_Shadcn_>
-                              <TooltipTrigger_Shadcn_ asChild>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
                                 <DropdownMenuItem
                                   className="gap-x-2 !pointer-events-auto"
                                   disabled={!canManageReplicas}
@@ -334,13 +334,13 @@ const MapView = ({
                                 >
                                   Drop replica
                                 </DropdownMenuItem>
-                              </TooltipTrigger_Shadcn_>
+                              </TooltipTrigger>
                               {!canManageReplicas && (
-                                <TooltipContent_Shadcn_ side="left">
+                                <TooltipContent side="left">
                                   You need additional permissions to drop replicas
-                                </TooltipContent_Shadcn_>
+                                </TooltipContent>
                               )}
-                            </Tooltip_Shadcn_>
+                            </Tooltip>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       )}

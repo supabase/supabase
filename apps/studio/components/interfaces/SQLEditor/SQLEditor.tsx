@@ -44,9 +44,9 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
@@ -815,8 +815,8 @@ export const SQLEditor = () => {
             <ResizablePanel maxSize={10} minSize={10} className="max-h-9">
               {results?.rows !== undefined && !isExecuting && (
                 <GridFooter className="flex items-center justify-between gap-2">
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_>
+                  <Tooltip>
+                    <TooltipTrigger>
                       <p className="text-xs">
                         <span className="text-foreground">
                           {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
@@ -826,8 +826,8 @@ export const SQLEditor = () => {
                             ` (Limited to only ${results.autoLimit} rows)`}
                         </span>
                       </p>
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_ className="max-w-xs">
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
                       <p className="flex flex-col gap-y-1">
                         <span>
                           Results are automatically limited to preserve browser performance, in
@@ -838,8 +838,8 @@ export const SQLEditor = () => {
                           You may change or remove this limit from the dropdown on the right
                         </span>
                       </p>
-                    </TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
+                    </TooltipContent>
+                  </Tooltip>
                   {results.autoLimit !== undefined && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
