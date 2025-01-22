@@ -118,7 +118,8 @@ export const ChartBlock = ({
   }
 
   const data = (chartData?.data ?? []).map((x: any) => {
-    const value = chartData?.format === '%' ? x[attribute].toFixed(1) : x[attribute].toFixed(2)
+    const value =
+      chartData?.format === '%' ? x[attribute].toFixed(1) : x[attribute].toLocaleString()
     const color = getCellColor(attribute, x[attribute])
     return {
       ...x,
