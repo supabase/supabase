@@ -35,5 +35,5 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   const { error } = await supabase.auth.admin.deleteUser(id as string)
 
   if (error) return res.status(400).json({ error: { message: error.message } })
-  return res.status(200).json({})
+  return res.status(200).send(undefined)
 }
