@@ -224,7 +224,7 @@ export const ChartBlock = ({
                 content={
                   <ChartTooltipContent
                     className="w-[200px]"
-                    labelSuffix="%"
+                    labelSuffix={chartData?.format === '%' ? '%' : ''}
                     labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
                   />
                 }
