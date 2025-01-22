@@ -101,8 +101,6 @@ const DatabaseUsage = () => {
                 options={TIME_PERIODS_INFRA}
                 currentBillingPeriodStart={undefined}
                 onChange={(values) => {
-                  // override datepicker interval, show DB charts at hourly intervals.
-                  // https://linear.app/supabase/issue/ANL-640/disk-io-consumption-not-displaying-correctly-in-db-report
                   if (values.interval === '1d') {
                     setDateRange({ ...values, interval: '1h' })
                   } else {
