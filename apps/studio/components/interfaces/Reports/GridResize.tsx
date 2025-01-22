@@ -11,6 +11,8 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from 'data/content/content-upsert-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
 import { Dashboards } from 'types'
@@ -51,6 +53,8 @@ export const GridResize = ({
   const { ref } = useParams()
   const { profile } = useProfile()
   const { project } = useProjectContext()
+
+  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: upsertContent } = useContentUpsertMutation()
 
   const onUpdateLayout = (layout: RGL.Layout[]) => {
@@ -129,6 +133,7 @@ export const GridResize = ({
         },
       }
     )
+    sendEvent({ action: TelemetryActions.ASSISTANT_SQL_BLOCK_ADDED_TO_CUSTOM_REPORT })
   }
 
   if (!editableReport) return null

@@ -5,6 +5,12 @@ import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
 import {
+  AssistantDebugSubmittedEvent,
+  AssistantEditInSqlEditorClickedEvent,
+  AssistantPromptSubmittedEvent,
+  AssistantSQLBlockAddedToCustomReportEvent,
+  AssistantSqlDiffHandlerEvaluatedEvent,
+  AssistantSuggestionRunQueryClickedEvent,
   ConnectionStringCopiedEvent,
   CronJobCreateClickedEvent,
   CronJobCreatedEvent,
@@ -13,31 +19,27 @@ import {
   CronJobHistoryClickedEvent,
   CronJobUpdateClickedEvent,
   CronJobUpdatedEvent,
-  FeaturePreviewsClickedEvent,
-  FeaturePreviewEnabledEvent,
+  CustomReportsSQLBlockAddedEvent,
   FeaturePreviewDisabledEvent,
-  SqlEditorQuickstartClickedEvent,
-  SqlEditorTemplateClickedEvent,
-  SqlEditorResultDownloadCsvClickedEvent,
-  SqlEditorResultCopyMarkdownClickedEvent,
-  SqlEditorResultCopyJsonClickedEvent,
-  SignUpEvent,
-  SignInEvent,
-  RealtimeInspectorListenChannelClickedEvent,
-  RealtimeInspectorBroadcastSentEvent,
-  RealtimeInspectorMessageClickedEvent,
-  RealtimeInspectorCopyMessageClickedEvent,
-  RealtimeInspectorFiltersAppliedEvent,
-  RealtimeInspectorDatabaseRoleUpdatedEvent,
+  FeaturePreviewEnabledEvent,
+  FeaturePreviewsClickedEvent,
   ProjectCreationInitialStepPromptIntendedEvent,
   ProjectCreationInitialStepSubmittedEvent,
   ProjectCreationSecondStepPromptIntendedEvent,
   ProjectCreationSecondStepSubmittedEvent,
-  AssistantPromptSubmittedEvent,
-  AssistantDebugSubmittedEvent,
-  AssistantSuggestionRunQueryClickedEvent,
-  AssistantSqlDiffHandlerEvaluatedEvent,
-  AssistantEditInSqlEditorClickedEvent,
+  RealtimeInspectorBroadcastSentEvent,
+  RealtimeInspectorCopyMessageClickedEvent,
+  RealtimeInspectorDatabaseRoleUpdatedEvent,
+  RealtimeInspectorFiltersAppliedEvent,
+  RealtimeInspectorListenChannelClickedEvent,
+  RealtimeInspectorMessageClickedEvent,
+  SignInEvent,
+  SignUpEvent,
+  SqlEditorQuickstartClickedEvent,
+  SqlEditorResultCopyJsonClickedEvent,
+  SqlEditorResultCopyMarkdownClickedEvent,
+  SqlEditorResultDownloadCsvClickedEvent,
+  SqlEditorTemplateClickedEvent,
 } from 'lib/constants/telemetry'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
@@ -76,6 +78,8 @@ export type SendEventVariables =
   | AssistantSuggestionRunQueryClickedEvent
   | AssistantSqlDiffHandlerEvaluatedEvent
   | AssistantEditInSqlEditorClickedEvent
+  | AssistantSQLBlockAddedToCustomReportEvent
+  | CustomReportsSQLBlockAddedEvent
 
 type SendEventPayload = components['schemas']['TelemetryEventBodyV2Dto']
 

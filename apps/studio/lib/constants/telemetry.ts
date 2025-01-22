@@ -9,8 +9,10 @@ export enum TelemetryActions {
   ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED = 'assistant_suggestion_run_query_clicked',
   ASSISTANT_SQL_DIFF_HANDLER_EVALUATED = 'assistant_sql_diff_handler_evaluated',
   ASSISTANT_EDIT_IN_SQL_EDITOR_CLICKED = 'assistant_edit_in_sql_editor_clicked',
+  ASSISTANT_SQL_BLOCK_ADDED_TO_CUSTOM_REPORT = 'assistant_sql_block_added_to_custom_report',
 
   CONNECTION_STRING_COPIED = 'connection_string_copied',
+  CUSTOM_REPORTS_SQL_BLOCK_ADDED = 'custom_reports_sql_block_added',
 
   CRON_JOB_CREATED = 'cron_job_created',
   CRON_JOB_UPDATED = 'cron_job_updated',
@@ -511,4 +513,12 @@ export interface AssistantEditInSqlEditorClickedEvent {
     isInSQLEditor: boolean
     isInNewSnippet: boolean
   }
+}
+
+export interface CustomReportsSQLBlockAddedEvent {
+  action: TelemetryActions.CUSTOM_REPORTS_SQL_BLOCK_ADDED
+}
+
+export interface AssistantSQLBlockAddedToCustomReportEvent {
+  action: TelemetryActions.ASSISTANT_SQL_BLOCK_ADDED_TO_CUSTOM_REPORT
 }
