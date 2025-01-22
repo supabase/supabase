@@ -4,6 +4,7 @@ import { CircleAlert } from 'lucide-react'
 import { Button, cn, Input_Shadcn_, Label_Shadcn_, Separator, TextArea_Shadcn_ } from 'ui'
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
 import { useReverseNameOrder, useT } from '~/lib/intl'
+import { useIntl } from 'react-intl'
 
 interface FormData {
   firstName: string
@@ -71,6 +72,8 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
   const [startTime, setStartTime] = useState<number>(0)
+
+  const intl = useIntl()
   const t = useT()
 
   const firstName: FormItem = {
@@ -271,11 +274,16 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
               {t('forms.demo.submit')}
             </Button>
             <p className="text-foreground-lighter text-sm col-span-full">
-              {t('forms.demo.privacy')}{' '}
-              <Link href="/privacy" className="text-foreground hover:underline">
-                {t('forms.demo.privacy.link')}
-              </Link>
-              .
+              {intl.formatMessage(
+                { id: 'forms.demo.privacy' },
+                {
+                  privacyPolicyLink: (
+                    <Link href="/privacy" className="text-foreground hover:underline">
+                      {t('forms.demo.privacy.link')}
+                    </Link>
+                  ),
+                }
+              )}
             </p>
             {errors.general && (
               <Alert className="flex gap-2 text-foreground text-sm col-span-full">

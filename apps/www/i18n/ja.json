@@ -62,7 +62,7 @@
   "forms.demo.message.label": "ご興味のある内容",
   "forms.demo.message.placeholder": "達成したい目標について詳しくお聞かせください",
   "forms.demo.submit": "デモをリクエスト",
-  "forms.demo.privacy": "このフォームを送信することで、",
+  "forms.demo.privacy": "このフォームを送信することで、{privacyPolicyLink}を読み、理解したことを確認します。",
   "forms.demo.privacy.link": "プライバシーポリシー",
   "forms.demo.support": "サポートに",
   "forms.demo.support.suffix": "技術的なサポートが必要な場合は、お問い合わせください",

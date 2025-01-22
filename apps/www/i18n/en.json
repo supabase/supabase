@@ -62,7 +62,7 @@
   "forms.demo.message.label": "What are you interested in?",
   "forms.demo.message.placeholder": "Share more about what you want to accomplish",
   "forms.demo.submit": "Request a demo",
-  "forms.demo.privacy": "By submitting this form, I confirm that I have read and understood the",
+  "forms.demo.privacy": "By submitting this form, I confirm that I have read and understood the {privacyPolicyLink}.",
   "forms.demo.privacy.link": "Privacy Policy",
   "forms.demo.support": "Contact support",
   "forms.demo.support.suffix": "if you need technical help",

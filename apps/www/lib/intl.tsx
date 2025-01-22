@@ -38,7 +38,7 @@ const fetchMessages = async (locale: string) => {
 
 const getLocaleFromContext = (ctx: NextPageContext) => {
   const pathWithQuery = ctx.req?.url ?? ctx.asPath ?? '/'
-  const pathLocale = pathWithQuery.split('/')[1]
+  const pathLocale = pathWithQuery.split('/')[1] as Locale
   return availableLocales.includes(pathLocale) ? pathLocale : defaultLocale
 }
 
