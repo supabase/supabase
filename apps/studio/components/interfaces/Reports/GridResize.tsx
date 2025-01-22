@@ -94,7 +94,7 @@ export const GridResize = ({
       } else {
         return {
           id,
-          attribute: `snippetnew_${id}`,
+          attribute: `new_snippet_${id}`,
           chartConfig: { ...DEFAULT_CHART_CONFIG },
           label,
           chart_type: 'bar',

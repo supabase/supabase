@@ -99,7 +99,7 @@ export const ChartBlock = ({
 
   const loading =
     isLoading ||
-    attribute.startsWith('snippetnew') ||
+    attribute.startsWith('new_snippet_') ||
     (provider === 'infra-monitoring'
       ? isFetchingInfraMonitoring
       : provider === 'daily-stats'
