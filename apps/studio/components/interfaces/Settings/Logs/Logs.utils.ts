@@ -320,8 +320,15 @@ export const genChartQuery = (
   filters: Filters
 ) => {
   const [startOffset, trunc] = calcChartStart(params)
-  const where = genWhereStatement(table, filters)
+  let where = genWhereStatement(table, filters)
   const errorCondition = getErrorCondition(table)
+
+  // pg_cron logs are a subset of postgres logs
+  // to calculate the chart, we need to query postgres logs
+  if (table === LogsTableName.PG_CRON) {
+    table = 'postgres_logs'
+    where = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+  }
 
   let joins = genCrossJoinUnnests(table)
 
@@ -595,6 +602,8 @@ function getErrorCondition(table: LogsTableName): string {
       return 'response.status_code >= 400'
     case 'function_logs':
       return "metadata.level IN ('error', 'fatal')"
+    case 'pg_cron_logs':
+      return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
     default:
       return 'false' // Default to no errors if table type is unknown
   }
