@@ -3,9 +3,7 @@ import { Box, Clock, Database, File, ListOrdered, User2, Zap } from 'lucide-reac
 import { memo } from 'react'
 
 import { SchemaVisualizer } from 'components/interfaces/SchemaVisualizer'
-import Globe from 'components/ui/Globe'
 import { BASE_PATH } from 'lib/constants'
-import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 
 interface SupabaseService {
