@@ -9,7 +9,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import { Dashboards } from 'types'
-import { cn, CodeBlock, CodeBlockLang } from 'ui'
+import { Badge, cn, CodeBlock, CodeBlockLang } from 'ui'
 import { DebouncedComponent } from '../DebouncedComponent'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'
@@ -103,6 +103,16 @@ const MemoizedQueryBlock = memo(
           yKey: yAxis ?? '',
           view: isChart ? 'chart' : 'table',
         }}
+        tooltip={
+          isDraggable ? (
+            <div className="flex items-center gap-x-2">
+              <Badge variant="success" className="text-xs rounded px-1">
+                NEW
+              </Badge>
+              <p>Drag to add this chart into your custom report</p>
+            </div>
+          ) : undefined
+        }
         showSql={!isChart}
         isChart={isChart}
         isLoading={isLoading}

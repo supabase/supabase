@@ -66,6 +66,8 @@ interface QueryBlockProps {
   maxHeight?: number
   /** Whether query block is draggable */
   draggable?: boolean
+  /** Tooltip when hovering over the header of the block (Used in Assistant Panel) */
+  tooltip?: ReactNode
   /** Not implemented yet: Will be the next part of ReportsV2 */
   onSetParameter?: (params: Parameter[]) => void
   /** Optional callback the SQL query is run */
@@ -109,6 +111,7 @@ export const QueryBlock = ({
   draggable = false,
   disableRunIfMutation = false,
   noResultPlaceholder = null,
+  tooltip,
   onRunQuery,
   onSetParameter,
   onUpdateChartConfig,
@@ -182,6 +185,7 @@ export const QueryBlock = ({
     <ReportBlockContainer
       draggable={draggable}
       showDragHandle={draggable}
+      tooltip={tooltip}
       onDragStart={(e: DragEvent<Element>) => onDragStart?.(e)}
       icon={
         <SQL_ICON

@@ -11,6 +11,8 @@ export enum TelemetryActions {
   ASSISTANT_EDIT_IN_SQL_EDITOR_CLICKED = 'assistant_edit_in_sql_editor_clicked',
 
   CONNECTION_STRING_COPIED = 'connection_string_copied',
+  CUSTOM_REPORT_ADD_SQL_BLOCK_CLICKED = 'custom-report-add-sql-block-clicked',
+  CUSTOM_REPORT_ASSISTANT_SQL_BLOCK_ADDED = 'custom-report-assistant-sql-block-added',
 
   CRON_JOB_CREATED = 'cron_job_created',
   CRON_JOB_UPDATED = 'cron_job_updated',
@@ -633,6 +635,28 @@ export interface AssistantEditInSqlEditorClickedEvent {
 }
 
 /**
+ * User clicked on Add block -> SQL Snippets -> a SQL snippet in a custom reports page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/reports/{id}
+ */
+export interface CustomReportAddSQLBlockClicked {
+  action: TelemetryActions.CUSTOM_REPORT_ADD_SQL_BLOCK_CLICKED
+}
+
+/**
+ * User dragged and dropped a SQL block from the Assistant Panel into the custom report while on a custom report page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/reports/{id}
+ */
+export interface CustomReportAssistantSQLBlockAdded {
+  action: TelemetryActions.CUSTOM_REPORT_ASSISTANT_SQL_BLOCK_ADDED
+}
+
+/**
  * User voted on the feedback button on a docs page. The feedback button is located at the sidebar of every docs page.
  *
  * @group Events
@@ -874,3 +898,5 @@ export type TelemetryEvent =
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
+  | CustomReportAddSQLBlockClicked
+  | CustomReportAssistantSQLBlockAdded
