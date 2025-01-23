@@ -22,6 +22,9 @@ catalogs:
       specifier: 14.2.21
       version: 14.2.21
 
+overrides:
+  '@supabase/supabase-js>@supabase/auth-js': 2.68.0-rc.6
+
 importers:
 
   .:
@@ -613,9 +616,6 @@ importers:
       awesome-debounce-promise:
         specifier: ^2.1.0
         version: 2.1.0
-      cobe:
-        specifier: ^0.6.3
-        version: 0.6.3
       common:
         specifier: workspace:*
         version: link:../../packages/common
@@ -5062,9 +5062,6 @@ packages:
   '@stripe/stripe-js@5.5.0':
     resolution: {integrity: sha512-lkfjyAd34aeMpTKKcEVfy8IUyEsjuAT3t9EXr5yZDtdIUncnZpedl/xLV16Dkd4z+fQwixScsCCDxSMNtBOgpQ==}
     engines: {node: '>=12.16'}
-
-  '@supabase/auth-js@2.67.3':
-    resolution: {integrity: sha512-NJDaW8yXs49xMvWVOkSIr8j46jf+tYHV0wHhrwOaLLMZSFO4g6kKAf+MfzQ2RaD06OCUkUHIzctLAxjTgEVpzw==}
 
   '@supabase/auth-js@2.68.0-rc.6':
     resolution: {integrity: sha512-xq3DDNBD33KTGHCYSAMUmDbcxe+thCTVvlcO/5uixjKhRku0LNMUIm5P67ViDQDmf0OYUqd+vdiAtpmyhL2B/Q==}
@@ -16945,10 +16942,6 @@ snapshots:
 
   '@stripe/stripe-js@5.5.0': {}
 
-  '@supabase/auth-js@2.67.3':
-    dependencies:
-      '@supabase/node-fetch': 2.6.15
-
   '@supabase/auth-js@2.68.0-rc.6':
     dependencies:
       '@supabase/node-fetch': 2.6.15
@@ -17048,7 +17041,7 @@ snapshots:
 
   '@supabase/supabase-js@2.47.14':
     dependencies:
-      '@supabase/auth-js': 2.67.3
+      '@supabase/auth-js': 2.68.0-rc.6
       '@supabase/functions-js': 2.4.4
       '@supabase/node-fetch': 2.6.15
       '@supabase/postgrest-js': 1.17.11
