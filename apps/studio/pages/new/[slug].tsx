@@ -199,7 +199,7 @@ const Wizard: NextPageWithLayout = () => {
   } = useProjectCreateMutation({
     onSuccess: (res) => {
       sendEvent({
-        action: TelemetryActions.PROJECT_CREATION_CURRENT_SUBMITTED,
+        action: TelemetryActions.PROJECT_CREATION_SIMPLE_VERSION_SUBMITTED,
       })
       router.push(`/project/${res.ref}/building`)
     },

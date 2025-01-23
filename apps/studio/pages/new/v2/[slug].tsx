@@ -61,7 +61,7 @@ import {
   PROJECT_STATUS,
   PROVIDERS,
 } from 'lib/constants'
-import { TelemetryActions } from 'common/telemetry-constants'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import passwordStrength from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import type { CloudProvider } from 'shared-data'
@@ -310,7 +310,7 @@ const WizardForm = () => {
     // too important to cause disruption here, make sure to catch and skip any errors
     try {
       sendEvent({
-        action: TelemetryActions.PROJECT_CREATION_SIMPLE_VERSION_SUBMITTED,
+        action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_SUBMITTED,
       })
     } catch (error) {}
 
