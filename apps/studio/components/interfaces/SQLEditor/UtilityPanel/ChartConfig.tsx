@@ -1,11 +1,18 @@
 import dayjs from 'dayjs'
-import { ArrowUpDown } from 'lucide-react'
+import { ArrowUpDown, X } from 'lucide-react'
 import { useMemo } from 'react'
 
+import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import BarChart from 'components/ui/Charts/BarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useFlag } from 'hooks/ui/useFlag'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import Link from 'next/link'
 import {
+  Badge,
+  Button,
   Checkbox_Shadcn_,
   Label_Shadcn_,
   ResizableHandle,
@@ -16,7 +23,11 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 type Results = { rows: readonly any[] }
 
@@ -58,6 +69,14 @@ export const ChartConfig = ({
   config,
   onConfigChange,
 }: ChartConfigProps) => {
+  const { ref } = useParams()
+  const supportSQLBlocks = useFlag('reportsV2')
+
+  const [acknowledged, setAcknowledged] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_SQL_BLOCK_ACKNOWLEDGED(ref as string),
+    false
+  )
+
   // If a result key is not valid, it will be filtered out
   const resultKeys = useMemo(() => {
     return Object.keys(results.rows[0] || {}).filter((key) => {
@@ -194,6 +213,32 @@ export const ChartConfig = ({
             </ButtonTooltip>
           )}
         </div>
+
+        {supportSQLBlocks && !acknowledged && (
+          <Admonition showIcon={false} type="tip" className="p-2 relative group">
+            <Tooltip>
+              <TooltipTrigger
+                onClick={() => setAcknowledged(true)}
+                className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X size={14} className="text-foreground-light" />
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Dismiss</TooltipContent>
+            </Tooltip>
+            <div className="flex items-center gap-x-2">
+              <Badge variant="success" className="text-xs rounded px-1">
+                NEW
+              </Badge>
+              <p className="text-xs">Add this chart to custom reports</p>
+            </div>
+            <p className="text-xs text-foreground-light mt-1">
+              SQL snippets can now be added and saved to your custom reports. Try it out now!
+            </p>
+            <Button asChild size="tiny" type="default" className="mt-2">
+              <Link href={`/project/${ref}/reports`}>Head to Reports</Link>
+            </Button>
+          </Admonition>
+        )}
 
         <div>
           <Label_Shadcn_ className="text-xs text-foreground-light">X Axis</Label_Shadcn_>
