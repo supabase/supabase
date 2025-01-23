@@ -42,7 +42,7 @@ export const DownloadResultsButton = ({
 
   const copyAsMarkdown = () => {
     if (navigator) {
-      if (results.length == 0) return 'Results is empty'
+      if (results.length == 0) toast('Results are empty')
 
       const columns = Object.keys(results[0])
       const rows = results.map((x) => {
@@ -62,7 +62,7 @@ export const DownloadResultsButton = ({
 
   const copyAsJSON = () => {
     if (navigator) {
-      if (results.length === 0) return 'Results is empty'
+      if (results.length === 0) return toast('Results are empty')
       copyToClipboard(JSON.stringify(results, null, 2), () => {
         toast.success('Copied results to clipboard')
         onCopyAsJSON?.()
