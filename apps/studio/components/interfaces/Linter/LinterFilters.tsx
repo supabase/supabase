@@ -30,23 +30,20 @@ const LinterFilters = ({
     }
   }
 
-  return (
-    <div className="bg-surface-200 p-2 px-6 py-2 border-t -mt-px">
-      {LINT_TABS.map((tab) => (
-        <div key={tab.id} className={tab.id === currentTab ? '' : 'hidden'}>
-          <FilterPopover
-            name="Filter"
-            options={filterOptions}
-            disabled={activeLints.filter((x) => x.level === tab.id).length === 0}
-            labelKey="name"
-            valueKey="value"
-            activeOptions={filters.find((filter) => filter.level === tab.id)?.filters || []}
-            onSaveFilters={(values) => updateFilters(tab.id, values)}
-          />
-        </div>
-      ))}
+  return LINT_TABS.map((tab) => (
+    <div key={tab.id} className={tab.id === currentTab ? '' : 'hidden'}>
+      <FilterPopover
+        name="Filter"
+        className="w-52"
+        options={filterOptions}
+        disabled={activeLints.filter((x) => x.level === tab.id).length === 0}
+        labelKey="name"
+        valueKey="value"
+        activeOptions={filters.find((filter) => filter.level === tab.id)?.filters || []}
+        onSaveFilters={(values) => updateFilters(tab.id, values)}
+      />
     </div>
-  )
+  ))
 }
 
 export default LinterFilters

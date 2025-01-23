@@ -8,6 +8,7 @@ import LinterDataGrid from 'components/interfaces/Linter/LinterDataGrid'
 import LinterFilters from 'components/interfaces/Linter/LinterFilters'
 import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
 import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
+import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -16,7 +17,7 @@ import { LoadingLine } from 'ui'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
-  const { preset, id } = useParams()
+  const { ref, preset, id } = useParams()
 
   // need to maintain a list of filters for each tab
   const [filters, setFilters] = useState<{ level: LINTER_LEVELS; filters: string[] }[]>([
@@ -24,42 +25,21 @@ const ProjectLints: NextPageWithLayout = () => {
     { level: LINTER_LEVELS.WARN, filters: [] },
     { level: LINTER_LEVELS.INFO, filters: [] },
   ])
-
   const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
     (preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR
   )
-
   const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
 
-  const {
-    data,
-    isLoading: areLintsLoading,
-    isRefetching,
-    refetch: refetchLintsQuery,
-  } = useProjectLintsQuery({
+  const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({
     projectRef: project?.ref,
   })
 
-  const isLoading = areLintsLoading
-
-  const refetch = () => {
-    refetchLintsQuery()
-  }
-
   const activeLints = (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
-
-  useEffect(() => {
-    // check the URL for an ID and set the selected lint
-    if (id) setSelectedLint(activeLints.find((lint) => lint.cache_key === id) ?? null)
-  }, [id, activeLints])
-
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
-
   const filteredLints = activeLints
     .filter((x) => x.level === currentTab)
     .filter((x) => (currentTabFilters.length > 0 ? currentTabFilters.includes(x.name) : x))
-
   const filterOptions = lintInfoMap
     // only show filters for lint types which are present in the results and not ignored
     .filter((item) =>
@@ -69,6 +49,11 @@ const ProjectLints: NextPageWithLayout = () => {
       name: type.title,
       value: type.name,
     }))
+
+  useEffect(() => {
+    // check the URL for an ID and set the selected lint
+    if (id) setSelectedLint(activeLints.find((lint) => lint.cache_key === id) ?? null)
+  }, [id, activeLints])
 
   return (
     <div className="h-full flex flex-col">
@@ -84,13 +69,20 @@ const ProjectLints: NextPageWithLayout = () => {
         setCurrentTab={setCurrentTab}
         setSelectedLint={setSelectedLint}
       />
-      <LinterFilters
-        filterOptions={filterOptions}
-        activeLints={activeLints}
-        currentTab={currentTab}
-        filters={filters}
-        setFilters={setFilters}
-      />
+      <div className="pl-6 pr-2 py-2 -mt-px flex bg-surface-200 items-center justify-between border-t">
+        <LinterFilters
+          filterOptions={filterOptions}
+          activeLints={activeLints}
+          currentTab={currentTab}
+          filters={filters}
+          setFilters={setFilters}
+        />
+        <DownloadResultsButton
+          align="end"
+          results={filteredLints}
+          fileName={`Supabase Performance Security Lints (${ref})`}
+        />
+      </div>
       <LoadingLine loading={isRefetching} />
       <LinterDataGrid
         filteredLints={filteredLints}
