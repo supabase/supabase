@@ -8,7 +8,6 @@ import LinterDataGrid from 'components/interfaces/Linter/LinterDataGrid'
 import LinterFilters from 'components/interfaces/Linter/LinterFilters'
 import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
 import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
-import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -72,20 +71,16 @@ const ProjectLints: NextPageWithLayout = () => {
         setCurrentTab={setCurrentTab}
         setSelectedLint={setSelectedLint}
       />
-      <div className="px-6 py-2 -mt-px flex bg-surface-200 items-center justify-between border-t">
-        <LinterFilters
-          filterOptions={filterOptions}
-          activeLints={activeLints}
-          currentTab={currentTab}
-          filters={filters}
-          setFilters={setFilters}
-        />
-        <DownloadResultsButton
-          align="end"
-          results={filteredLints}
-          fileName={`Supabase Performance Advisor Lints (${ref})`}
-        />
-      </div>
+      <LinterFilters
+        filterOptions={filterOptions}
+        activeLints={activeLints}
+        filteredLints={filteredLints}
+        currentTab={currentTab}
+        filters={filters}
+        isLoading={isLoading || isRefetching}
+        setFilters={setFilters}
+        onClickRefresh={refetch}
+      />
       <LoadingLine loading={isRefetching} />
       <LinterDataGrid
         filteredLints={filteredLints}
