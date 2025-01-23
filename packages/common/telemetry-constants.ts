@@ -609,7 +609,10 @@ export interface AssistantSuggestionRunQueryClickedEvent {
 }
 
 /**
- * User accepted or rejected changes in sql ai diff handler. They can accept change by clicking accept button or typing shortcut (CMD+Enter) or reject by clicking reject button or typing shortcut (Esc). Handler only appears after clicking any dropdown option in Edit in Sql Editor in suggestion provided by the assistant. The dropdown options only appear in any page with 'sql' in url.
+ * User accepted or rejected changes in sql ai diff handler.
+ * They can accept change by clicking accept button or typing shortcut (CMD+Enter) or reject by clicking reject button or typing shortcut (Esc).
+ * Handler only appears after clicking any dropdown option in Edit in Sql Editor in suggestion provided by the assistant.
+ * The dropdown options only appear in any page with 'sql' in url.
  *
  * @group Events
  * @source studio
@@ -749,7 +752,9 @@ export interface PricingPlanCtaClickedEvent {
      */
     showUpgradeText: boolean
     /**
-     * The section of the page where the plan was clicked. Main means the big top section of the page, comparison_table means the comparison table with all plans listen together below.
+     * The section of the page where the plan was clicked.
+     * Main means the big top section of the page,
+     * comparison_table means the comparison table with all plans listen together below.
      */
     section: 'main' | 'comparison_table'
     tableMode?: 'mobile' | 'desktop'
@@ -916,6 +921,7 @@ export interface RequestDemoButtonClickedEvent {
   properties: {
     /**
      * The source of the button click, e.g. homepage hero, cta banner, product page header.
+     * If it states it came from the request demo form, it can come from different pages so refer to path name to determine.
      */
     buttonLocation: string
   }
