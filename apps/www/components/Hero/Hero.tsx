@@ -34,7 +34,8 @@ const Hero = () => {
                       as="https://supabase.com/dashboard"
                       onClick={() =>
                         sendTelemetryEvent({
-                          action: TelemetryActions.HOMEPAGE_HERO_START_PROJECT_CLICKED,
+                          action: TelemetryActions.START_PROJECT_BUTTON_CLICKED,
+                          properties: { buttonLocation: 'Homepage Hero' },
                         })
                       }
                     >
@@ -47,7 +48,8 @@ const Hero = () => {
                       as="/contact/sales"
                       onClick={() =>
                         sendTelemetryEvent({
-                          action: TelemetryActions.HOMEPAGE_HERO_REQUEST_DEMO_CLICKED,
+                          action: TelemetryActions.REQUEST_DEMO_BUTTON_CLICKED,
+                          properties: { buttonLocation: 'Homepage Hero' },
                         })
                       }
                     >
