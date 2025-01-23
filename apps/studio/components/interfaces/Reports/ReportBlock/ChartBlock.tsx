@@ -163,12 +163,13 @@ export const ChartBlock = ({
 
   const handleMouseEvent = useCallback(
     (event: 'move' | 'leave', data?: any) => {
-      if (event === 'leave') {
+      const value = data?.activePayload?.[0]?.payload?.[metricLabel]
+
+      if (event === 'leave' || !value) {
         setHighlightedValue(getInitialHighlightedValue())
         return
       }
 
-      const value = data?.activePayload?.[0]?.payload?.[metricLabel]
       setHighlightedValue(chartData?.format === '%' ? `${value}%` : value)
     },
     [chartData?.format, metricLabel, getInitialHighlightedValue]
