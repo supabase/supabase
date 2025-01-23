@@ -190,7 +190,7 @@ export const QueryPerformance = ({
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
 
-      <div className="px-6 py-3 bg-surface-200 border-t -mt-px">
+      <div className="px-6 py-2 bg-surface-200 border-t -mt-px">
         <QueryPerformanceFilterBar
           queryPerformanceQuery={queryPerformanceQuery}
           onResetReportClick={() => {
@@ -210,9 +210,7 @@ export const QueryPerformance = ({
           className="absolute top-1.5 right-3 px-1.5"
           type="text"
           size="tiny"
-          onClick={() => {
-            setShowBottomSection(false)
-          }}
+          onClick={() => setShowBottomSection(false)}
         >
           <X size="14" />
         </Button>

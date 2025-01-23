@@ -69,7 +69,7 @@ const ProjectLints: NextPageWithLayout = () => {
         setCurrentTab={setCurrentTab}
         setSelectedLint={setSelectedLint}
       />
-      <div className="pl-6 pr-2 py-2 -mt-px flex bg-surface-200 items-center justify-between border-t">
+      <div className="px-6 py-2 -mt-px flex bg-surface-200 items-center justify-between border-t">
         <LinterFilters
           filterOptions={filterOptions}
           activeLints={activeLints}

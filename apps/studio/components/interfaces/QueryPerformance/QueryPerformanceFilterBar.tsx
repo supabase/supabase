@@ -2,7 +2,9 @@ import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
@@ -27,6 +29,7 @@ export const QueryPerformanceFilterBar = ({
   onResetReportClick?: () => void
 }) => {
   const router = useRouter()
+  const { ref } = useParams()
   const { project } = useProjectContext()
   const [showBottomSection] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.QUERY_PERF_SHOW_BOTTOM_SECTION,
@@ -126,29 +129,27 @@ export const QueryPerformanceFilterBar = ({
 
       <div className="flex gap-2 items-center">
         {!showBottomSection && onResetReportClick && (
-          <Button
-            onClick={() => {
-              onResetReportClick()
-            }}
-            type="default"
-          >
+          <Button type="default" onClick={() => onResetReportClick()}>
             Reset report
           </Button>
         )}
         <Button
-          type="default"
           size="tiny"
+          type="default"
           onClick={() => queryPerformanceQuery.runQuery()}
           disabled={isLoading || isRefetching}
           icon={
             <RefreshCw
-              size={12}
               className={`text-foreground-light ${isLoading || isRefetching ? 'animate-spin' : ''}`}
             />
           }
         >
           Refresh
         </Button>
+        <DownloadResultsButton
+          results={queryPerformanceQuery.data ?? []}
+          fileName={`Supabase Query Performance (${ref})`}
+        />
       </div>
     </div>
   )
