@@ -24,8 +24,8 @@ import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 const ReactGridLayout = WidthProvider(RGL)
 
 interface GridResizeProps {
-  startDate: string
-  endDate: string
+  startDate?: string
+  endDate?: string
   interval: AnalyticsInterval
   editableReport: Dashboards.Content
   disableUpdate: boolean

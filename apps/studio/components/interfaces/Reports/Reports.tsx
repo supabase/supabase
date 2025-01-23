@@ -34,8 +34,8 @@ const Reports = () => {
   const { profile } = useProfile()
 
   const [config, setConfig] = useState<Dashboards.Content>()
-  const [startDate, setStartDate] = useState<string | null>(null)
-  const [endDate, setEndDate] = useState<string | null>(null)
+  const [startDate, setStartDate] = useState<string>()
+  const [endDate, setEndDate] = useState<string>()
   const [hasEdits, setHasEdits] = useState<boolean>(false)
 
   const {
@@ -365,7 +365,7 @@ const Reports = () => {
         </div>
       ) : (
         <div className="relative mb-16 flex-grow">
-          {config && startDate && endDate && (
+          {config && (
             <GridResize
               startDate={startDate}
               endDate={endDate}
