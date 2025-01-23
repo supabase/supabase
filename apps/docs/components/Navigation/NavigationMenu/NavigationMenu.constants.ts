@@ -2080,20 +2080,26 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'How billing works',
-          url: '/guides/platform/org-based-billing',
-        },
-        {
-          name: 'Spend caps and cost-controls',
-          url: '/guides/platform/spend-cap',
-        },
-        {
-          name: 'Billing FAQ',
-          url: '/guides/platform/billing-faq',
+          name: 'Get set up for billing',
+          url: '/guides/platform/get-set-up-for-billing',
         },
         {
           name: 'Manage your subscription',
           url: '/guides/platform/manage-your-subscription',
+          items: [
+            {
+              name: 'Change your subscription plan',
+              url: '/guides/platform/manage-your-subscription/change-your-subscription-plan',
+            },
+            {
+              name: 'Manage your payment methods',
+              url: '/guides/platform/manage-your-subscription/manage-your-payment-methods',
+            },
+            {
+              name: 'Manage your billing details',
+              url: '/guides/platform/manage-your-subscription/manage-your-billing-details',
+            },
+          ],
         },
         {
           name: 'Your monthly invoice',
@@ -2102,6 +2108,18 @@ export const platform: NavMenuConstant = {
         {
           name: 'Control your costs',
           url: '/guides/platform/cost-control',
+        },
+        {
+          name: 'Billing FAQ',
+          url: '/guides/platform/billing-faq',
+        },
+        {
+          name: 'How billing works',
+          url: '/guides/platform/org-based-billing',
+        },
+        {
+          name: 'Spend caps and cost-controls',
+          url: '/guides/platform/spend-cap',
         },
       ],
     },
