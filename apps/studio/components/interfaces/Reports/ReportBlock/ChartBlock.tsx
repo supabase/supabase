@@ -161,20 +161,6 @@ export const ChartBlock = ({
     setHighlightedValue(getInitialHighlightedValue())
   }, [chartData, getInitialHighlightedValue])
 
-  const handleMouseEvent = useCallback(
-    (event: 'move' | 'leave', data?: any) => {
-      const value = data?.activePayload?.[0]?.payload?.[metricLabel]
-
-      if (event === 'leave' || !value) {
-        setHighlightedValue(getInitialHighlightedValue())
-        return
-      }
-
-      setHighlightedValue(chartData?.format === '%' ? `${value}%` : value)
-    },
-    [chartData?.format, metricLabel, getInitialHighlightedValue]
-  )
-
   return (
     <ReportBlockContainer
       draggable
@@ -229,7 +215,10 @@ export const ChartBlock = ({
       ) : (
         <>
           {highlightedValue && (
-            <div className="p-3 w-full text-left">
+            <div className="pt-2 px-3 w-full text-left leading-tight">
+              <span className="text-xs font-mono uppercase text-foreground-light">
+                Most recently
+              </span>
               <p className="text-lg text">{highlightedValue}</p>
             </div>
           )}
@@ -242,13 +231,7 @@ export const ChartBlock = ({
             }}
           >
             {chartStyle === 'bar' ? (
-              <BarChart
-                onMouseMove={(data) => handleMouseEvent('move', data)}
-                onMouseLeave={() => handleMouseEvent('leave')}
-                accessibilityLayer
-                margin={{ left: 0, right: 0 }}
-                data={data}
-              >
+              <BarChart accessibilityLayer margin={{ left: 0, right: 0 }} data={data}>
                 <CartesianGrid vertical={false} />
                 <XAxis
                   dataKey="period_start"
@@ -270,13 +253,7 @@ export const ChartBlock = ({
                 <Bar dataKey={metricLabel} radius={4} />
               </BarChart>
             ) : (
-              <LineChart
-                onMouseMove={(data) => handleMouseEvent('move', data)}
-                onMouseLeave={() => handleMouseEvent('leave')}
-                accessibilityLayer
-                margin={{ left: 0, right: 0 }}
-                data={data}
-              >
+              <LineChart accessibilityLayer margin={{ left: 0, right: 0 }} data={data}>
                 <CartesianGrid vertical={false} />
                 <XAxis
                   dataKey="period_start"
