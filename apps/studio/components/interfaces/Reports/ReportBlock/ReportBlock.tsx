@@ -15,8 +15,8 @@ import { ChartBlock } from './ChartBlock'
 
 interface ReportBlockProps {
   item: Dashboards.Chart
-  startDate?: string
-  endDate?: string
+  startDate: string
+  endDate: string
   interval: AnalyticsInterval
   disableUpdate: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
@@ -129,31 +129,28 @@ export const ReportBlock = ({
           }
         />
       ) : (
-        !!startDate &&
-        !!endDate && (
-          <ChartBlock
-            startDate={startDate}
-            endDate={endDate}
-            interval={interval}
-            attribute={item.attribute}
-            provider={item.provider}
-            defaultChartStyle={item.chart_type}
-            maxHeight={176}
-            label={`${item.label}${projectRef !== state.selectedDatabaseId ? (item.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
-            actions={
-              !disableUpdate ? (
-                <ButtonTooltip
-                  type="text"
-                  icon={<X />}
-                  className="w-7 h-7"
-                  onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
-                  tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
-                />
-              ) : null
-            }
-            onUpdateChartConfig={onUpdateChart}
-          />
-        )
+        <ChartBlock
+          startDate={startDate}
+          endDate={endDate}
+          interval={interval}
+          attribute={item.attribute}
+          provider={item.provider}
+          defaultChartStyle={item.chart_type}
+          maxHeight={176}
+          label={`${item.label}${projectRef !== state.selectedDatabaseId ? (item.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
+          actions={
+            !disableUpdate ? (
+              <ButtonTooltip
+                type="text"
+                icon={<X />}
+                className="w-7 h-7"
+                onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
+                tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+              />
+            ) : null
+          }
+          onUpdateChartConfig={onUpdateChart}
+        />
       )}
     </>
   )
