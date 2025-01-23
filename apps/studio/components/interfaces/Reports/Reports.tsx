@@ -6,9 +6,9 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DateRangePicker } from 'components/ui/DateRangePicker'
 import { Loading } from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
@@ -34,8 +34,8 @@ const Reports = () => {
   const { profile } = useProfile()
 
   const [config, setConfig] = useState<Dashboards.Content>()
-  const [startDate, setStartDate] = useState<string | null>(null)
-  const [endDate, setEndDate] = useState<string | null>(null)
+  const [startDate, setStartDate] = useState<string>()
+  const [endDate, setEndDate] = useState<string>()
   const [hasEdits, setHasEdits] = useState<boolean>(false)
 
   const {
@@ -58,9 +58,6 @@ const Reports = () => {
 
   const currentReport = userContents?.content.find((report) => report.id === id)
   const currentReportContent = currentReport?.content as Dashboards.Content
-  const showDatePicker = !!config?.layout.some(
-    (x) => x.provider === 'daily-stats' || x.provider === 'infra-monitoring'
-  )
 
   const canReadReport = useCheckPermissions(PermissionAction.READ, 'user_content', {
     resource: {
@@ -281,36 +278,37 @@ const Reports = () => {
           </div>
         )}
       </div>
-      <div
-        className={cn(
-          'mb-4 flex items-center gap-x-3',
-          showDatePicker ? 'justify-between' : 'justify-end'
-        )}
-      >
-        {showDatePicker && (
-          <div className="flex items-center gap-x-3">
-            <DateRangePicker
-              onChange={handleDateRangePicker}
-              value="7d"
-              options={TIME_PERIODS_REPORTS}
-              loading={isLoading}
-            />
-
-            {startDate && endDate && (
-              <div className="hidden items-center space-x-1 lg:flex ">
-                <span className="text-sm text-foreground-light">
-                  {dayjs(startDate).format('MMM D, YYYY')}
-                </span>
-                <span className="text-foreground-lighter">
-                  <ArrowRight size={12} />
-                </span>
-                <span className="text-sm text-foreground-light">
-                  {dayjs(endDate).format('MMM D, YYYY')}
-                </span>
+      <div className={cn('mb-4 flex items-center gap-x-3 justify-between')}>
+        <div className="flex items-center gap-x-3">
+          <DateRangePicker
+            value="7d"
+            className="w-48"
+            onChange={handleDateRangePicker}
+            options={TIME_PERIODS_REPORTS}
+            loading={isLoading}
+            footer={
+              <div className="px-2 py-1">
+                <p className="text-xs text-foreground-lighter">
+                  SQL blocks are independent of the selected date range
+                </p>
               </div>
-            )}
-          </div>
-        )}
+            }
+          />
+
+          {startDate && endDate && (
+            <div className="hidden items-center space-x-1 lg:flex ">
+              <span className="text-sm text-foreground-light">
+                {dayjs(startDate).format('MMM D, YYYY')}
+              </span>
+              <span className="text-foreground-lighter">
+                <ArrowRight size={12} />
+              </span>
+              <span className="text-sm text-foreground-light">
+                {dayjs(endDate).format('MMM D, YYYY')}
+              </span>
+            </div>
+          )}
+        </div>
 
         <div className="flex items-center gap-x-2">
           {canUpdateReport ? (
