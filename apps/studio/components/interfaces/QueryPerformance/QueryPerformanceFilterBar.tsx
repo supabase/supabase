@@ -89,7 +89,7 @@ export const QueryPerformanceFilterBar = ({
   }
 
   return (
-    <div className="flex justify-between items-center">
+    <div className="px-6 py-2 bg-surface-200 border-t -mt-px flex justify-between items-center">
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-2">
           <p className="text-xs prose">Filter by</p>

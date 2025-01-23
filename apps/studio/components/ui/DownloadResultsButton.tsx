@@ -74,7 +74,7 @@ export const DownloadResultsButton = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type={type} iconRight={<ChevronDown />}>
+          <Button type={type} iconRight={<ChevronDown />} disabled={results.length === 0}>
             Export
           </Button>
         </DropdownMenuTrigger>
