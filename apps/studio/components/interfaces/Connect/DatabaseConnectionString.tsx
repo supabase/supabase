@@ -2,6 +2,7 @@ import { ChevronDown } from 'lucide-react'
 import { HTMLAttributes, ReactNode, useState } from 'react'
 
 import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
@@ -10,7 +11,6 @@ import { usePoolingConfigurationQuery } from 'data/database/pooling-configuratio
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -36,6 +36,7 @@ import {
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings } from './DatabaseSettings.utils'
 import examples, { Example } from './DirectConnectionExamples'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const StepLabel = ({
   number,
@@ -52,6 +53,7 @@ const StepLabel = ({
 
 export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
@@ -103,6 +105,7 @@ export const DatabaseConnectionString = () => {
     sendEvent({
       action: TelemetryActions.CONNECTION_STRING_COPIED,
       properties: { connectionType, lang, connectionMethod },
+      groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
   }
 

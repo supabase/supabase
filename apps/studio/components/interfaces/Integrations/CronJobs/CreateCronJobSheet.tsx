@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useWatch } from '@ui/components/shadcn/ui/form'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -16,7 +17,6 @@ import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import {
   Button,
   Form_Shadcn_,
@@ -50,6 +50,7 @@ import { HTTPHeaderFieldsSection } from './HttpHeaderFieldsSection'
 import { HttpRequestSection } from './HttpRequestSection'
 import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export interface CreateCronJobSheetProps {
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
@@ -199,6 +200,7 @@ export const CreateCronJobSheet = ({
   onClose,
 }: CreateCronJobSheetProps) => {
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
   const isEditing = !!selectedCronJob?.jobname
 
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
@@ -336,6 +338,10 @@ export const CreateCronJobSheet = ({
                 type: values.type,
                 schedule: schedule,
               },
+              groups: {
+                project: project?.ref ?? 'Unknown',
+                organization: org?.slug ?? 'Unknown',
+              },
             })
           } else {
             sendEvent({
@@ -343,6 +349,10 @@ export const CreateCronJobSheet = ({
               properties: {
                 type: values.type,
                 schedule: schedule,
+              },
+              groups: {
+                project: project?.ref ?? 'Unknown',
+                organization: org?.slug ?? 'Unknown',
               },
             })
           }

@@ -5,8 +5,11 @@ import { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { copyToClipboard } from 'lib/helpers'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -16,7 +19,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { TelemetryActions } from 'lib/constants/telemetry'
 
 export type ResultsDropdownProps = {
   id: string
@@ -29,6 +31,8 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
   const result = snapV2.results?.[id]?.[0] ?? undefined
   const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
 
+  const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const csvData = useMemo(() => {
@@ -67,7 +71,10 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
 
   function onDownloadCSV() {
     csvRef.current?.link.click()
-    sendEvent({ action: TelemetryActions.SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED })
+    sendEvent({
+      action: TelemetryActions.SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED,
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
   }
 
   function onCopyAsMarkdown() {
@@ -87,7 +94,10 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
 
       copyToClipboard(markdownData, () => {
         toast.success('Copied results to clipboard')
-        sendEvent({ action: TelemetryActions.SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED })
+        sendEvent({
+          action: TelemetryActions.SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED,
+          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        })
       })
     }
   }
@@ -100,7 +110,10 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
 
       copyToClipboard(JSON.stringify(result.rows, null, 2), () => {
         toast.success('Copied results to clipboard')
-        sendEvent({ action: TelemetryActions.SQL_EDITOR_RESULT_COPY_JSON_CLICKED })
+        sendEvent({
+          action: TelemetryActions.SQL_EDITOR_RESULT_COPY_JSON_CLICKED,
+          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        })
       })
     }
   }

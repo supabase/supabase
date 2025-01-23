@@ -4,6 +4,7 @@ import 'react-resizable/css/styles.css'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
@@ -12,7 +13,6 @@ import {
   useContentUpsertMutation,
 } from 'data/content/content-upsert-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
 import { Dashboards } from 'types'
@@ -133,7 +133,7 @@ export const GridResize = ({
         },
       }
     )
-    sendEvent({ action: TelemetryActions.ASSISTANT_SQL_BLOCK_ADDED_TO_CUSTOM_REPORT })
+    sendEvent({ action: TelemetryActions.CUSTOM_REPORT_ASSISTANT_SQL_BLOCK_ADDED })
   }
 
   if (!editableReport) return null

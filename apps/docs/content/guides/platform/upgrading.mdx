@@ -107,17 +107,9 @@ If you upgrade to a paid plan while your project is paused, any expired one-clic
   [Migrating within Supabase guide](/docs/guides/platform/migrating-within-supabase)
 </Admonition>
 
-If the 90 day project restore window has expired but you need to access data contained within your project using SQL, you can attempt to restore the project into a local Postgres instance. Supabase publishes tooling that can be used for that purpose. Be aware that this workflow does not produce a complete Supabase environment with REST/Auth/Storage. Instead, it creates a standalone Postgres instance that is maximally compatible with your project's backup file to assist with recovering your data.
+If the 90 day project restore window has expired but you need to access data contained within your project using SQL, you can use the [Supabase CLI](/docs/guides/local-development) to restore the project into a local Postgres instance.
 
-Downloaded backups are plain text SQL files that can be executed in Postgres to restore your project's schema and data. If you need to access data within a backup we recommend restoring into a Postgres instance built using the Supabase open source build tooling to ensure that the local instance is as similar to the original project as possible. Here are the steps to start Supabase Postgres locally and restore the backup:
-
-Install [nix](https://nixos.org/):
-
-```sh
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-```
-
-To identify your project's backup image version, reference the backup's download button following the `PG:` prefix:
+First, download your project's backup file from dashboard and identify its backup image version (following the `PG:` prefix):
 
 <Image
   zoomable
@@ -125,33 +117,30 @@ To identify your project's backup image version, reference the backup's download
   src="/docs/img/guides/platform/paused-dl-image-version.png"
 />
 
-Given Postgres version `15.6.1.115`, start Postgres locally with the nix command:
+Given Postgres version `15.6.1.115`, start Postgres locally with `db_cluster.backup` being the path to your backup file.
 
 ```sh
-nix run 'github:supabase/postgres?ref=15.6.1.115#start-server' 15
+supabase init
+echo '15.6.1.115' > supabase/.temp/postgres-version
+supabase db start --from-backup db_cluster.backup
 ```
 
-where `15` refers to the backup's Postgres major version.
+Note that the earliest Supabase Postgres version that supports a local restore is `15.1.0.55`. If your hosted project was running on earlier versions, you will likely run into errors during restore. Before submitting any support ticket, make sure you have attached the error logs from `supabase_db_*` docker container.
 
-Note that the earliest Supabase Postgres version that supports a direct reference is `15.6.1.115`. If you don't know your project's Postgres version or it is lower than `15.6.1.115` then omit the `ref` option to build our most recent image:
+Once your local database starts up successfully, you can connect using psql to verify that all your data is restored.
 
 ```sh
-nix run 'github:supabase/postgres#start-server' -- 15
+psql 'postgresql://postgres:postgres@localhost:54322/postgres'
 ```
 
-Then restore the backup file from a separate shell session:
+If you want to use other services like Auth, Storage, and Studio dashboard together with your restored database, restart the local development stack.
 
 ```sh
-nix run github:supabase/postgres#start-client -- --file <BACKUP FILE>
+supabase stop
+supabase start
 ```
 
-Which loads the backup into Postgres and drops you into a [psql](https://www.postgresql.org/docs/current/app-psql.html) prompt. For `start-client` you do not need to provide a reference to the backup's Postgres version.
-
-Once your project has been restored, connect to it with your preferred Postgres tooling using `host=localhost`, `user=postgres`, `port=5432`, and an empty password. This will allow you to inspect your saved data and export whatever is necessary.
-
-Errors encountered during the restore process are logged to the console by the `start-server` process. Review those errors and edit the backup file as needed until the project restores successfully. The backup file is a plain text sequence of SQL statements that recreate your database. To resolve common error classes like `relation "xxx" does not exist`, identify the line raising the exception and shuffle the `create ... "xxx"` statement before it. A failed restore leaves artifacts on the Postgres server so be sure to restart the `start-server` process between restore attempts.
-
-A Postgres database started with `start-server` command is not production ready and should never be used outside a local development workflow.
+A Postgres database started with Supabase CLI is not production ready and should not be used outside of local development.
 
 #### Disk sizing
 
