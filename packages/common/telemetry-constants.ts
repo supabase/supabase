@@ -24,6 +24,7 @@ export enum TelemetryActions {
   FEATURE_PREVIEW_ENABLED = 'feature_preview_enabled',
   FEATURE_PREVIEW_DISABLED = 'feature_preview_disabled',
 
+  PROJECT_CREATION_CURRENT_SUBMITTED = 'project_creation_current_submitted',
   PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED = 'project_creation_initial_step_prompt_intended',
   PROJECT_CREATION_INITIAL_STEP_SUBMITTED = 'project_creation_initial_step_submitted',
   PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED = 'project_creation_second_step_prompt_intended',
@@ -300,6 +301,17 @@ export interface FeaturePreviewDisabledEvent {
     project: string
     organization: string
   }
+}
+
+/**
+ * Existing project creation form was submitted and the project was created.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationCurrentSubmittedEvent {
+  action: TelemetryActions.PROJECT_CREATION_CURRENT_SUBMITTED
 }
 
 /**
