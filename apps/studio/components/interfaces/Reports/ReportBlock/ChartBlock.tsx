@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState, useCallback } from 'react'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
 
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
@@ -62,6 +62,7 @@ export const ChartBlock = ({
 
   const state = useDatabaseSelectorStateSnapshot()
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
+  const [highlightedValue, setHighlightedValue] = useState<string | undefined>()
 
   const databaseIdentifier = state.selectedDatabaseId
 
@@ -141,9 +142,24 @@ export const ChartBlock = ({
     }
   })
 
+  const getInitialHighlightedValue = useCallback(() => {
+    if (!chartData?.data?.length) return undefined
+    const lastDataPoint = chartData.data[chartData.data.length - 1]
+    const value = lastDataPoint[attribute]
+    return chartData.format === '%'
+      ? `${typeof value === 'number' ? value.toFixed(1) : value}%`
+      : typeof value === 'number'
+        ? value.toLocaleString()
+        : value
+  }, [chartData?.data, chartData?.format, attribute])
+
   useEffect(() => {
     if (defaultChartStyle) setChartStyle(defaultChartStyle)
   }, [defaultChartStyle])
+
+  useEffect(() => {
+    setHighlightedValue(getInitialHighlightedValue())
+  }, [chartData, getInitialHighlightedValue])
 
   return (
     <ReportBlockContainer
@@ -197,60 +213,70 @@ export const ChartBlock = ({
           />
         </div>
       ) : (
-        <ChartContainer
-          className="w-full aspect-auto px-3 py-2"
-          config={{}}
-          style={{
-            height: maxHeight ? `${maxHeight}px` : undefined,
-            minHeight: maxHeight ? `${maxHeight}px` : undefined,
-          }}
-        >
-          {chartStyle === 'bar' ? (
-            <BarChart accessibilityLayer margin={{ left: 0, right: 0 }} data={data}>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="period_start"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                minTickGap={32}
-              />
-              {chartData.format === '%' && <YAxis hide domain={[0, 100]} />}
-              <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    className="w-[200px]"
-                    labelSuffix={chartData?.format === '%' ? '%' : ''}
-                    labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
-                  />
-                }
-              />
-              <Bar dataKey={metricLabel} radius={4} />
-            </BarChart>
-          ) : (
-            <LineChart accessibilityLayer margin={{ left: 0, right: 0 }} data={data}>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="period_start"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                minTickGap={32}
-              />
-              {chartData.format === '%' && <YAxis hide domain={[0, 100]} />}
-              <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    className="w-[200px]"
-                    labelSuffix={chartData?.format === '%' ? '%' : ''}
-                    labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
-                  />
-                }
-              />
-              <Line dataKey={metricLabel} stroke="var(--chart-1)" radius={4} />
-            </LineChart>
+        <>
+          {highlightedValue && (
+            <div className="pt-2 px-3 w-full text-left leading-tight">
+              <span className="text-xs font-mono uppercase text-foreground-light">
+                Most recently
+              </span>
+              <p className="text-lg text">{highlightedValue}</p>
+            </div>
           )}
-        </ChartContainer>
+          <ChartContainer
+            className="w-full aspect-auto px-3 py-2"
+            config={{}}
+            style={{
+              height: maxHeight ? `${maxHeight}px` : undefined,
+              minHeight: maxHeight ? `${maxHeight}px` : undefined,
+            }}
+          >
+            {chartStyle === 'bar' ? (
+              <BarChart accessibilityLayer margin={{ left: 0, right: 0 }} data={data}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="period_start"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  minTickGap={32}
+                />
+                {chartData.format === '%' && <YAxis hide domain={[0, 100]} />}
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      className="w-[200px]"
+                      labelSuffix={chartData?.format === '%' ? '%' : ''}
+                      labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
+                    />
+                  }
+                />
+                <Bar dataKey={metricLabel} radius={4} />
+              </BarChart>
+            ) : (
+              <LineChart accessibilityLayer margin={{ left: 0, right: 0 }} data={data}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="period_start"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  minTickGap={32}
+                />
+                {chartData.format === '%' && <YAxis hide domain={[0, 100]} />}
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      className="w-[200px]"
+                      labelSuffix={chartData?.format === '%' ? '%' : ''}
+                      labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
+                    />
+                  }
+                />
+                <Line dataKey={metricLabel} stroke="var(--chart-1)" radius={4} />
+              </LineChart>
+            )}
+          </ChartContainer>
+        </>
       )}
     </ReportBlockContainer>
   )
