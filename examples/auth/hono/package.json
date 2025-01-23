@@ -15,6 +15,6 @@
     "@hono/vite-build": "^1.1.0",
     "@hono/vite-dev-server": "^0.17.0",
     "@types/node": "^20.11.17",
-    "vite": "^5.4.2"
+    "vite": "^5.4.12"
   }
 }
