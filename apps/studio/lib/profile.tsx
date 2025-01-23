@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { useIsLoggedIn } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
@@ -38,7 +39,10 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     onSuccess: () => {
       sendEvent({ action: TelemetryActions.SIGN_UP, properties: { category: 'conversion' } })
     },
-    onError: () => toast.error('Failed to create your profile. Please refresh to try again.'),
+    onError: (error) => {
+      Sentry.captureMessage('Failed to create users profile: ' + error.message)
+      toast.error('Failed to create your profile. Please refresh to try again.')
+    },
   })
 
   // Track telemetry for the current user
