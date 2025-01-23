@@ -613,9 +613,6 @@ importers:
       awesome-debounce-promise:
         specifier: ^2.1.0
         version: 2.1.0
-      cobe:
-        specifier: ^0.6.3
-        version: 0.6.3
       common:
         specifier: workspace:*
         version: link:../../packages/common
