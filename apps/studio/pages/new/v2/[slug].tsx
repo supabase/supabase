@@ -310,7 +310,7 @@ const WizardForm = () => {
     // too important to cause disruption here, make sure to catch and skip any errors
     try {
       sendEvent({
-        action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_SUBMITTED,
+        action: TelemetryActions.PROJECT_CREATION_SIMPLE_VERSION_SUBMITTED,
       })
     } catch (error) {}
 
