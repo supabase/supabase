@@ -78,7 +78,7 @@ export const ProjectVisual = memo(
               key="info"
               variants={variants}
               transition={{
-                duration: 1.25,
+                duration: 0.3,
                 ease: 'easeInOut',
               }}
               className={`hidden lg:block absolute z-30 p-4 bg-surface-100 min-w-80 rounded-lg border shadow-lg`}
@@ -156,65 +156,15 @@ export const ProjectVisual = memo(
               </TooltipProvider>
             </motion.div>
           )}
-          <motion.div
-            layout
-            layoutId="globe"
-            className="hidden lg:block absolute z-10 pointer-events-none aspect-square right-0"
-            initial={{
-              scale: showInfo ? '100%' : '95%',
-              x: showInfo ? '0%' : '10%',
-              opacity: showInfo ? 1 : 0.3,
-              width: sqlStatements.length > 0 ? '60%' : '100%',
-              top: sqlStatements.length > 0 ? '0' : '50%',
-              y: sqlStatements.length > 0 ? '-35%' : '-50%',
-            }}
-            animate={{
-              scale: showInfo ? '100%' : '90%',
-              x: showInfo ? (sqlStatements.length > 0 ? '20%' : '0%') : '10%',
-              opacity: showInfo ? 1 : 0.3,
-              width: sqlStatements.length > 0 ? '50%' : '100%',
-              top: sqlStatements.length > 0 ? '0' : '50%',
-              y: sqlStatements.length > 0 ? '-35%' : '-50%',
-            }}
-            transition={{
-              duration: 1.25,
-              ease: 'easeInOut',
-            }}
-          >
-            <div className="absolute inset-[10%] bg-background-200 rounded-full" />
-            <div
-              className="absolute inset-0"
-              style={{ maskImage: 'linear-gradient(to top right, black, transparent 50%)' }}
-            >
-              <Globe
-                currentLocation={
-                  showInfo && selectedRegion?.location
-                    ? [selectedRegion.location.latitude, selectedRegion.location.longitude]
-                    : undefined
-                }
-                markers={[
-                  ...Object.values(AWS_REGIONS).map(
-                    (region) => region.location as [number, number]
-                  ),
-                  ...Object.values(FLY_REGIONS).map(
-                    (region) => region.location as [number, number]
-                  ),
-                ]}
-              />
-            </div>
-          </motion.div>
-
           <AnimatePresence>
-            {sqlStatements.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, scale: 1.05 }}
-                animate={{ opacity: 1, scale: 1, transition: { delay: 1 } }}
-                exit={{ opacity: 0 }}
-                className="h-full z-20"
-              >
-                <SchemaVisualizer sqlStatements={sqlStatements} className="h-full z-20" />
-              </motion.div>
-            )}
+            <motion.div
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1, transition: { delay: 1 } }}
+              exit={{ opacity: 0 }}
+              className={`h-full z-20 ${sqlStatements.length === 0 ? 'pointer-events-none' : ''}`}
+            >
+              <SchemaVisualizer sqlStatements={sqlStatements} className="h-full z-20" />
+            </motion.div>
           </AnimatePresence>
         </div>
       </div>
