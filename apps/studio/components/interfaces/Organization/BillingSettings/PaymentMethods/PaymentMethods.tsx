@@ -22,10 +22,11 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { getURL } from 'lib/helpers'
 import { CreditCardIcon, Plus } from 'lucide-react'
-import { Alert, Button } from 'ui'
+import { Button } from 'ui'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import CreditCard from './CreditCard'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
+import { Admonition } from 'ui-patterns'
 
 const PaymentMethods = () => {
   const { slug } = useParams()
@@ -92,26 +93,21 @@ const PaymentMethods = () => {
               {isSuccess && (
                 <>
                   {subscription?.payment_method_type === 'invoice' && (
-                    <Alert
-                      withIcon
-                      variant="info"
-                      title="Payment is currently by invoice"
-                      actions={[
-                        <Button key="payment-method-support" asChild type="default">
-                          <Link
-                            href={`/support/new?category=billing&subject=Request%20to%20change%20payment%20method`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="ml-3"
-                          >
-                            Contact support
-                          </Link>
-                        </Button>,
-                      ]}
-                    >
-                      You get a monthly invoice and payment link via email. To change your payment
-                      method, please contact us via our support form.
-                    </Alert>
+                    <Admonition type="tip" title="Payment is currently by invoice">
+                      <p className="mb-2">
+                        You get a monthly invoice and payment link via email. To change your payment
+                        method, please contact us via our support form.
+                      </p>
+                      <Button key="payment-method-support" asChild type="default">
+                        <Link
+                          href={`/support/new?category=billing&subject=Request%20to%20change%20payment%20method`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Contact support
+                        </Link>
+                      </Button>
+                    </Admonition>
                   )}
                   <FormPanel
                     footer={
