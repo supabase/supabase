@@ -593,7 +593,7 @@ functions:
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
-      - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
@@ -677,7 +677,7 @@ functions:
         code: |
           ```
           response = supabase.auth.sign_in_with_oauth({
-            "provider": 'github'
+            "provider": "github"
           })
           ```
       - id: sign-in-using-a-third-party-provider-with-redirect
@@ -1355,7 +1355,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.link_identity({
-            provider: 'github'
+            "provider": "github"
           })
           ```
         response: |
@@ -1714,7 +1714,9 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          response = supabase.auth.exchange_code_for_session("auth_code": "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          response = supabase.auth.exchange_code_for_session({
+            "auth_code": "34e770dd-9ff9-416c-87fa-43b31d7ef225"
+          })
           ```
         response: |
           ```json
@@ -2062,7 +2064,7 @@ functions:
         isOptional: true
         type: PageParams
         description: |
-          An object which supports page and perPage as numbers, to alter the paginated results.
+          An object which supports page and per_page as numbers, to alter the paginated results.
         subContent:
           - name: page
             isOptional: true
@@ -2089,7 +2091,7 @@ functions:
           ```python
           response = supabase.auth.admin.list_users(
             page=1,
-            perPage=1000
+            per_page=1000
           )
           ```
   - id: create-user
@@ -5863,6 +5865,7 @@ functions:
           ```
         data:
           sql: |
+            ```sql
             create table
               countries (id int8 primary key, name text);
             create table
@@ -5882,6 +5885,7 @@ functions:
             values
               (1, 1, 'Atlanta'),
               (2, 1, 'New York City');
+            ```
         response: |
           ```json
           {
