@@ -40,34 +40,23 @@ import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 
 interface SQLEditorNavProps {
   sort?: 'inserted_at' | 'name'
-  showPrivateSnippets: boolean
-  showSharedSnippets: boolean
-  setShowPrivateSnippets: (value: boolean) => void
-  setShowSharedSnippets: (value: boolean) => void
 }
 
-export const SQLEditorNav = ({
-  sort = 'inserted_at',
-  showPrivateSnippets,
-  showSharedSnippets,
-  setShowPrivateSnippets,
-  setShowSharedSnippets,
-}: SQLEditorNavProps) => {
+export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
   const { ref: projectRef, id } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const [mountedId, setMountedId] = useState(false)
   const [showMoveModal, setShowMoveModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showRenameModal, setShowRenameModal] = useState(false)
   const [showFavoriteSnippets, setShowFavoriteSnippets] = useState(false)
-  // const [showSharedSnippets, setShowSharedSnippets] = useState(false)
-  // const [showPrivateSnippets, setShowPrivateSnippets] = useState(true)
+  const [showSharedSnippets, setShowSharedSnippets] = useState(false)
+  const [showPrivateSnippets, setShowPrivateSnippets] = useState(true)
 
-  const [defaultExpandedFolderIds, setDefaultExpandedFolderIds] = useState<string[]>()
+  const [expandedFolderIds, setExpandedFolderIds] = useState<string[]>([])
   const [selectedSnippets, setSelectedSnippets] = useState<Snippet[]>([])
   const [selectedSnippetToShare, setSelectedSnippetToShare] = useState<Snippet>()
   const [selectedSnippetToUnshare, setSelectedSnippetToUnshare] = useState<Snippet>()
@@ -82,6 +71,7 @@ export const SQLEditorNav = ({
   // ==========================
   const {
     data: privateSnippetsPages,
+    isSuccess,
     isLoading,
     isPreviousData,
     isFetching,
@@ -89,23 +79,6 @@ export const SQLEditorNav = ({
     fetchNextPage,
     isFetchingNextPage,
   } = useSQLSnippetFoldersQuery({ projectRef, sort }, { keepPreviousData: true })
-
-  useEffect(() => {
-    if (projectRef && privateSnippetsPages) {
-      privateSnippetsPages.pages.forEach((page) => {
-        page.contents?.forEach((snippet) => {
-          snapV2.addSnippet({
-            projectRef,
-            snippet,
-          })
-        })
-
-        page.folders?.forEach((folder) => {
-          snapV2.addFolder({ projectRef, folder })
-        })
-      })
-    }
-  }, [projectRef, privateSnippetsPages?.pages])
 
   const [subResults, setSubResults] = useState<{
     [id: string]: { snippets?: Snippet[]; isLoading: boolean }
@@ -200,19 +173,6 @@ export const SQLEditorNav = ({
     { enabled: showFavoriteSnippets, keepPreviousData: true }
   )
 
-  useEffect(() => {
-    if (projectRef === undefined || !isFavoriteSnippetsSuccess) return
-
-    favoriteSqlSnippetsData.pages.forEach((page) => {
-      page.contents?.forEach((snippet) => {
-        snapV2.addSnippet({
-          projectRef,
-          snippet,
-        })
-      })
-    })
-  }, [projectRef, privateSnippetsPages?.pages])
-
   const favoriteSnippets = useMemo(() => {
     let snippets = favoriteSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
 
@@ -263,19 +223,6 @@ export const SQLEditorNav = ({
     },
     { enabled: showSharedSnippets, keepPreviousData: true }
   )
-
-  useEffect(() => {
-    if (projectRef === undefined || !isSharedSqlSnippetsSuccess) return
-
-    sharedSqlSnippetsData.pages.forEach((page) => {
-      page.contents?.forEach((snippet) => {
-        snapV2.addSnippet({
-          projectRef,
-          snippet,
-        })
-      })
-    })
-  }, [projectRef, privateSnippetsPages?.pages])
 
   const sharedSnippets = useMemo(() => {
     let snippets = sharedSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
@@ -509,21 +456,59 @@ export const SQLEditorNav = ({
   // ===============
 
   useEffect(() => {
-    if (snippet !== undefined && !mountedId) {
+    if (snippet !== undefined && isSuccess) {
       if (snippet.visibility === 'project') setShowSharedSnippets(true)
-      if (snippet.folder_id) {
-        setDefaultExpandedFolderIds([snippet.folder_id])
+      if (snippet.folder_id && !expandedFolderIds.includes(snippet.folder_id)) {
+        setExpandedFolderIds([...expandedFolderIds, snippet.folder_id])
       }
-
-      // Only want to run this once when loading sql/[id] route
-      setMountedId(true)
     }
-  }, [snippet, mountedId, sort])
+  }, [snippet, sort, isSuccess])
 
   useEffect(() => {
     // Unselect all snippets whenever opening another snippet
     setSelectedSnippets([])
   }, [id])
+
+  useEffect(() => {
+    if (projectRef && privateSnippetsPages) {
+      privateSnippetsPages.pages.forEach((page) => {
+        page.contents?.forEach((snippet) => {
+          snapV2.addSnippet({
+            projectRef,
+            snippet,
+          })
+        })
+
+        page.folders?.forEach((folder) => snapV2.addFolder({ projectRef, folder }))
+      })
+    }
+  }, [projectRef, privateSnippetsPages?.pages])
+
+  useEffect(() => {
+    if (projectRef === undefined || !isFavoriteSnippetsSuccess) return
+
+    favoriteSqlSnippetsData.pages.forEach((page) => {
+      page.contents?.forEach((snippet) => {
+        snapV2.addSnippet({
+          projectRef,
+          snippet,
+        })
+      })
+    })
+  }, [projectRef, privateSnippetsPages?.pages])
+
+  useEffect(() => {
+    if (projectRef === undefined || !isSharedSqlSnippetsSuccess) return
+
+    sharedSqlSnippetsData.pages.forEach((page) => {
+      page.contents?.forEach((snippet) => {
+        snapV2.addSnippet({
+          projectRef,
+          snippet,
+        })
+      })
+    })
+  }, [projectRef, privateSnippetsPages?.pages])
 
   return (
     <>
@@ -669,7 +654,16 @@ export const SQLEditorNav = ({
               data={privateSnippetsTreeState}
               selectedIds={selectedSnippets.map((x) => x.id)}
               aria-label="private-snippets"
-              expandedIds={defaultExpandedFolderIds}
+              onExpand={(props) => {
+                const folderId = props.element.id.toString()
+                if (props.isExpanded && !expandedFolderIds.includes(folderId)) {
+                  setExpandedFolderIds([...expandedFolderIds, folderId])
+                }
+                if (!props.isExpanded && expandedFolderIds.includes(folderId)) {
+                  setExpandedFolderIds(expandedFolderIds.filter((x) => x !== folderId))
+                }
+              }}
+              expandedIds={expandedFolderIds}
               nodeRenderer={({ element, ...props }) => (
                 <SQLEditorTreeViewItem
                   {...props}

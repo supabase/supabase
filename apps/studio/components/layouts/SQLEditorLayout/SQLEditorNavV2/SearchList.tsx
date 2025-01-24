@@ -1,16 +1,16 @@
+import Link from 'next/link'
+import { useMemo } from 'react'
+
 import { useParams } from 'common'
 import InfiniteList from 'components/ui/InfiniteList'
 import { useContentCountQuery } from 'data/content/content-count-query'
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
-import { Content } from 'data/content/content-query'
-import Link from 'next/link'
-import { useMemo } from 'react'
 import { SQL_ICON } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 interface SearchListProps {
   search: string
-  onSelectSnippet: (snippet: Content) => void
+  onSelectSnippet: () => void
 }
 
 export const SearchList = ({ search, onSelectSnippet }: SearchListProps) => {
@@ -56,7 +56,7 @@ export const SearchList = ({ search, onSelectSnippet }: SearchListProps) => {
             <Link
               className="h-full flex items-center gap-x-3 pl-4 hover:bg-control"
               href={`/project/${projectRef}/sql/${props.item.id}`}
-              onClick={() => onSelectSnippet(props.item)}
+              onClick={() => onSelectSnippet()}
             >
               <SQL_ICON
                 size={16}

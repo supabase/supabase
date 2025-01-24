@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Content } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -52,11 +51,6 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
-
-  const onShowSection = (visibility: 'user' | 'project' | 'org' | 'public') => {
-    if (visibility === 'user') setShowPrivateSnippets(true)
-    else if (visibility === 'project') setShowSharedSnippets(true)
-  }
 
   const createNewFolder = () => {
     if (!ref) return console.error('Project ref is required')
@@ -135,10 +129,9 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
         {showSearch ? (
           <SearchList
             search={debouncedSearch}
-            onSelectSnippet={(snippet: Content) => {
+            onSelectSnippet={() => {
               setSearch('')
               setShowSearch(false)
-              onShowSection(snippet.visibility)
             }}
           />
         ) : (
@@ -160,13 +153,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
               </InnerSideMenuItem>
             </div>
 
-            <SQLEditorNav
-              sort={sort}
-              showPrivateSnippets={showPrivateSnippets}
-              showSharedSnippets={showSharedSnippets}
-              setShowPrivateSnippets={setShowPrivateSnippets}
-              setShowSharedSnippets={setShowSharedSnippets}
-            />
+            <SQLEditorNav sort={sort} />
           </>
         )}
       </div>
