@@ -5,6 +5,7 @@ import { useParams } from 'common'
 import InfiniteList from 'components/ui/InfiniteList'
 import { useContentCountQuery } from 'data/content/content-count-query'
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
+import { SNIPPET_PAGE_LIMIT } from 'data/content/sql-folders-query'
 import { SQL_ICON } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
@@ -18,7 +19,12 @@ export const SearchList = ({ search, onSelectSnippet }: SearchListProps) => {
 
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useContentInfiniteQuery(
-      { projectRef, type: 'sql', limit: 10, name: search.length === 0 ? undefined : search },
+      {
+        projectRef,
+        type: 'sql',
+        limit: SNIPPET_PAGE_LIMIT,
+        name: search.length === 0 ? undefined : search,
+      },
       { keepPreviousData: true }
     )
 
