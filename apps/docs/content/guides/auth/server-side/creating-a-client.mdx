@@ -680,6 +680,25 @@ exports.createClient = (context) => {
         return parseCookieHeader(context.req.headers.cookie ?? '')
       },
       setAll(cookiesToSet) {
+        // getAll must return the new cookies after calling setAll
+
+        const reqCookies = parseCookieHeader(context.req.headers.cookie ?? '').reduce(
+          (a, { name, value }) => {
+            a[name] = value
+            return a
+          },
+          {}
+        )
+
+        cookiesToSet.forEach(({ name, value }) => {
+          reqCookies[name] = value
+        })
+
+        context.req.headers.cookie = Object.keys(reqCookies)
+          .filter((name) => reqCookies[name])
+          .map((name) => `${name}=${reqCookies[name]}`)
+          .join(';')
+
         cookiesToSet.forEach(({ name, value, options }) =>
           context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value, options))
         )
