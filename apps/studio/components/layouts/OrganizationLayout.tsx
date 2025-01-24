@@ -76,11 +76,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
 
   return (
     <div className="flex flex-row h-full w-full">
-      <div
-        className={cn(
-          'border-l w-full rounded-tl-[7px] rounded-bl-[7px] border-t border-b my-1.5 bg-dash-sidebar flex flex-col overflow-hidden'
-        )}
-      >
+      <div className={cn('border-l w-full flex flex-col overflow-hidden')}>
         {/* <NoticeBanner /> */}
         <OrganizationResourceBanner />
         {/* <AnimatePresence>

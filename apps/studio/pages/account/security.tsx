@@ -1,5 +1,6 @@
 import { TOTPFactors } from 'components/interfaces/Account'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { Smartphone } from 'lucide-react'
@@ -23,14 +24,12 @@ const Security: NextPageWithLayout = () => {
   const { data } = useMfaListFactorsQuery()
 
   return (
-    <div className="1xl:px-28 mx-auto flex flex-col px-5 pt-6 pb-14 lg:px-16 xl:px-24 2xl:px-32">
-      <div className="flex items-center justify-between">
-        <FormHeader
-          title="Multi-factor authentication"
-          description="Add an additional layer of security to your account by requiring more than just a password to sign in."
-        />
-      </div>
-      <Collapsible className={cn(collapsibleClasses)}>
+    <>
+      <FormHeader
+        title="Multi-factor authentication"
+        description="Add an additional layer of security to your account by requiring more than just a password to sign in."
+      />
+      <Collapsible className={cn(collapsibleClasses, 'w-full flex flex-1 flex-grow')}>
         <Collapsible.Trigger asChild>
           <button
             type="button"
@@ -52,14 +51,16 @@ const Security: NextPageWithLayout = () => {
           <TOTPFactors />
         </Collapsible.Content>
       </Collapsible>
-    </div>
+    </>
   )
 }
 
 Security.getLayout = (page) => (
-  <AccountLayout title="Security" breadcrumbs={[{ key: 'security', label: 'Security' }]}>
-    {page}
-  </AccountLayout>
+  <AppLayout>
+    <AccountLayout title="Security" breadcrumbs={[{ key: 'security', label: 'Security' }]}>
+      {page}
+    </AccountLayout>
+  </AppLayout>
 )
 
 export default Security

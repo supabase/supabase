@@ -88,7 +88,7 @@ const LayoutHeader = ({
 
   return (
     <>
-      <header className={cn('flex h-12 max-h-12 min-h-12 items-center flex-shrink-0')}>
+      <header className={cn('flex h-16 max-h-16 min-h-16 items-center flex-shrink-0')}>
         <div className={cn('flex items-center justify-between py-2 px-3 flex-1', 'pl-5')}>
           <div className="flex items-center text-sm">
             <Link

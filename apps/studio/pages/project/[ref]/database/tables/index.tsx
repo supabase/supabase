@@ -53,7 +53,9 @@ DatabaseTables.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout>
       <DatabaseLayout title="Database">
-        <ProjectPageNavigation navKey="postgres-items">{page}</ProjectPageNavigation>
+        {/* <ProjectPageNavigation navKey="postgres-items"> */}
+        {page}
+        {/* </ProjectPageNavigation> */}
       </DatabaseLayout>
     </DefaultLayout>
   </AppLayout>

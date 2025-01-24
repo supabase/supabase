@@ -11,8 +11,9 @@ import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import type { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 
 export interface AccountLayoutProps {
   title: string
@@ -77,13 +78,26 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
         <meta name="description" content="Supabase Studio" />
       </Head>
       <div className="flex flex-col h-screen w-screen">
-        <div className="flex flex-row min-w-5xl max-w-5xl mx-auto py-20">
-          <nav className="py-5">
-            <ul className="flex flex-col gap-1">
+        <div className="flex flex-row min-w-5xl max-w-5xl mx-auto py-20 gap-10">
+          <nav className="py-0">
+            <Link href="/">
+              <Button type="text" icon={<ArrowLeft strokeWidth={1.5} />}>
+                Back to dashboard
+              </Button>
+            </Link>
+            <ul className="flex flex-col gap-1 mt-8">
               {links.map((link) => (
                 <li key={link.key}>
                   <Link href={link.href}>
-                    <Button type={link.isActive ? 'default' : 'text'} className="border-0">
+                    <Button
+                      type={link.isActive ? 'default' : 'text'}
+                      className={cn(
+                        'border-0',
+                        link.isActive
+                          ? 'bg-selection text-foreground'
+                          : 'hover:bg-overlay-hover text-foreground-lighter'
+                      )}
+                    >
                       {link.label}
                     </Button>
                   </Link>

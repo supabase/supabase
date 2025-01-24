@@ -4,6 +4,12 @@ import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWra
 import { SidebarOpenTopBanner } from 'components/interfaces/sidebar-open-top-banner'
 import { PropsWithChildren } from 'react'
 import { SidebarProvider } from 'ui'
+import MobileViewNav from './ProjectLayout/NavigationBar/MobileViewNav'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
+import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
+import { useAppStateSnapshot } from 'state/app-state'
 
 export interface DefaultLayoutProps {
   title?: string
@@ -12,6 +18,7 @@ export interface DefaultLayoutProps {
 }
 
 const DefaultLayout = ({ children }: PropsWithChildren<DefaultLayoutProps>) => {
+  const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
   return (
     <>
       <AppBannerContextProvider>
@@ -21,6 +28,8 @@ const DefaultLayout = ({ children }: PropsWithChildren<DefaultLayoutProps>) => {
             <div className="flex-shrink-0">
               <AppBannerWrapper />
               <SidebarOpenTopBanner />
+              <MobileNavigationBar />
+              <MobileViewNav title={'test'} />
             </div>
             {/* Main Content Area */}
             <div className="flex flex-1 w-full overflow-y-hidden">
@@ -31,6 +40,9 @@ const DefaultLayout = ({ children }: PropsWithChildren<DefaultLayoutProps>) => {
             </div>
           </div>
         </SidebarProvider>
+        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <span>mobile menu here</span>
+        </MobileSheetNav>
       </AppBannerContextProvider>
     </>
   )

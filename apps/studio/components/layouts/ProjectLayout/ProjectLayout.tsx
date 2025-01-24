@@ -176,11 +176,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           {/* <ProjectNavigationBarHorizontal /> */}
           {/* <div className="flex h-full flex-row flex-grow gap-1"> */}
           {/* {!hideIconBar && <NavigationBar />} */}
-          <div
-            className={cn(
-              'border-l w-full overflow-hidden rounded-tl-[7px] rounded-bl-[7px] border-t border-b flex-row my-1.5'
-            )}
-          >
+          <div className={cn('border-l w-full overflow-hidden flex-row')}>
             <ResizablePanelGroup className="" direction="horizontal" autoSaveId="project-layout">
               {showProductMenu && productMenu && (
                 <ResizablePanel
@@ -221,7 +217,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               )}
               <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col w-full">
                 <ResizablePanelGroup
-                  className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-1"
+                  className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
                   direction="horizontal"
                   autoSaveId="project-layout-content"
                 >
@@ -229,7 +225,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                     id="panel-content"
                     className={cn(
                       'w-full min-w-[600px] bg-dash-sidebar',
-                      aiAssistantPanel.open && 'border-r rounded-tr-[7px]'
+                      aiAssistantPanel.open && ''
                     )}
                   >
                     <main
@@ -264,7 +260,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                           'bg absolute right-0 top-[48px] bottom-0 xl:relative xl:top-0',
                           'min-w-[400px] max-w-[500px]',
                           '2xl:min-w-[500px] 2xl:max-w-[600px]',
-                          'border-l border-t rounded-tl-[7px]'
+                          'border-l'
                         )}
                       >
                         <AIAssistantPanel />

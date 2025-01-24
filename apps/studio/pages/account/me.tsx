@@ -6,6 +6,7 @@ import {
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -22,17 +23,19 @@ const User: NextPageWithLayout = () => {
 }
 
 User.getLayout = (page) => (
-  <AccountLayout
-    title="Preferences"
-    breadcrumbs={[
-      {
-        key: `supabase-settings`,
-        label: 'Preferences',
-      },
-    ]}
-  >
-    {page}
-  </AccountLayout>
+  <AppLayout>
+    <AccountLayout
+      title="Preferences"
+      breadcrumbs={[
+        {
+          key: `supabase-settings`,
+          label: 'Preferences',
+        },
+      ]}
+    >
+      {page}
+    </AccountLayout>
+  </AppLayout>
 )
 
 export default User

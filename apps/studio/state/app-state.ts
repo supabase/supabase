@@ -70,6 +70,8 @@ const getInitialState = () => {
       navigationPanelJustClosed: false,
       showConnectDialog: false,
       ongoingQueriesPanelOpen: false,
+      mobileMenuOpen: false,
+      mobileInnerMenuOpen: false,
     }
   }
 
@@ -115,6 +117,8 @@ const getInitialState = () => {
     navigationPanelJustClosed: false,
     showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
+    mobileMenuOpen: false,
+    mobileInnerMenuOpen: false,
   }
 }
 
@@ -223,6 +227,16 @@ export const appState = proxy({
   showOngoingQueriesPanelOpen: false,
   setOnGoingQueriesPanelOpen: (value: boolean) => {
     appState.ongoingQueriesPanelOpen = value
+  },
+
+  mobileMenuOpen: false,
+  setMobileMenuOpen: (value: boolean) => {
+    appState.mobileMenuOpen = value
+  },
+
+  mobileInnerMenuOpen: false,
+  setMobileInnerMenuOpen: (value: boolean) => {
+    appState.mobileInnerMenuOpen = value
   },
 })
 

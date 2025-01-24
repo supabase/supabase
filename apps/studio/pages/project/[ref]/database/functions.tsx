@@ -3,7 +3,9 @@ import { useState } from 'react'
 
 import { CreateFunction, DeleteFunction } from 'components/interfaces/Database'
 import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
@@ -69,6 +71,12 @@ const FunctionsPage: NextPageWithLayout = () => {
   )
 }
 
-FunctionsPage.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+FunctionsPage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout>
+      <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default FunctionsPage

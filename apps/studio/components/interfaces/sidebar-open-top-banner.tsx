@@ -69,7 +69,7 @@ export function SidebarOpenTopBanner() {
         //   paddingLeft: open ? '16px' : '8px',
         //   paddingRight: open ? '16px' : '8px',
         // }}
-        className="relative items-center flex w-full gap-4 pt-[6px] pb-[1px] px-4"
+        className="relative items-center flex w-full gap-4 px-4 h-12 border-b bg-dash-sidebar"
       >
         <Link
           href={IS_PLATFORM ? `/org/${org?.slug}` : `/project/${project?.ref}`}

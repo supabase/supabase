@@ -38,7 +38,7 @@ import {
 } from 'ui'
 import { UserDropdown } from './user-dropdown'
 
-export const ICON_SIZE = 18
+export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
 
 const SidebarMotion = motion(Sidebar)
@@ -114,14 +114,14 @@ function NavLink({ route, active }: { route: any; active?: boolean }) {
     <SidebarMenuItem key={route.key}>
       <SidebarMenuButton
         tooltip={route.label}
-        asChild
         isActive={active}
-        className="text-sm [&_svg]:opacity-50"
-        size={'sm'}
+        className="text-sm"
+        size={'default'}
+        asChild
       >
         <Link href={route.link ?? ''}>
           {route.icon}
-          {route.label}
+          <span>{route.label}</span>
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>

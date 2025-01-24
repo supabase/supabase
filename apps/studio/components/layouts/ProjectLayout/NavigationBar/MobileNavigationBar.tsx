@@ -8,16 +8,13 @@ import { useAppStateSnapshot } from 'state/app-state'
 
 import { buttonVariants, cn, Sheet, SheetContent } from 'ui'
 import { CommandMenuTrigger } from 'ui-patterns'
-import { NavContent } from './NavigationBar'
-import { useState } from 'react'
-import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
+// import { NavContent } from './NavigationBar'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
 const MobileNavigationBar = () => {
   const router = useRouter()
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
   const { ref: projectRef } = useParams()
   const snap = useAppStateSnapshot()
 
@@ -74,15 +71,12 @@ const MobileNavigationBar = () => {
               buttonVariants({ type: 'default' }),
               'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30'
             )}
-            onClick={() => setIsSheetOpen(true)}
+            onClick={() => snap.setMobileMenuOpen(true)}
           >
             <Menu size={18} strokeWidth={1} />
           </button>
         </div>
       </nav>
-      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <NavContent />
-      </MobileSheetNav>
     </div>
   )
 }
