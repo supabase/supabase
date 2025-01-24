@@ -851,6 +851,11 @@ export const database: NavMenuConstant = {
           name: 'Managing connections',
           url: '/guides/database/connection-management',
         },
+        { name: 'Sharding', url: '/guides/database/sharding' },
+        {
+          name: 'Combining Sharding and Partitioning',
+          url: '/guides/database/sharding-partitioning',
+        },
       ],
     },
     {
