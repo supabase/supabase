@@ -70,8 +70,8 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
     },
   })
 
-  const [showEnableRealtime, setShowEnableRealtime] = useState(false)
   const [open, setOpen] = useState(false)
+  const [showEnableRealtime, setShowEnableRealtime] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
 
   const state = useTrackedState()
@@ -185,7 +185,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               </TooltipContent>
             </Tooltip>
           )}
-          {isTable ? (
+          {isTable && !isLocked ? (
             table.rls_enabled ? (
               <>
                 {policies.length < 1 && !isLocked ? (
