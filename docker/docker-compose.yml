@@ -178,7 +178,7 @@ services:
       PGRST_DB_USE_LEGACY_GUCS: "false"
       PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET}
       PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY}
-    command: 
+    command:
       [
         "postgrest"
       ]
@@ -186,7 +186,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.33.70
+    image: supabase/realtime:v2.34.7
     restart: unless-stopped
     depends_on:
       db:
@@ -407,7 +407,7 @@ services:
       # Use named volume to persist pgsodium decryption key between restarts
       - db-config:/etc/postgresql-custom
     healthcheck:
-      test: 
+      test:
         [
         "CMD",
         "pg_isready",
@@ -463,7 +463,7 @@ services:
       retries: 3
     environment:
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
-    command: 
+    command:
       [
         "--config",
         "/etc/vector/vector.yml"
