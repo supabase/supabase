@@ -28,11 +28,14 @@ export const SearchList = ({ search, onSelectSnippet }: SearchListProps) => {
       { keepPreviousData: true }
     )
 
-  const { data: count, isLoading: isLoadingCount } = useContentCountQuery({
-    projectRef,
-    type: 'sql',
-    name: search,
-  })
+  const { data: count, isLoading: isLoadingCount } = useContentCountQuery(
+    {
+      projectRef,
+      type: 'sql',
+      name: search,
+    },
+    { keepPreviousData: true }
+  )
   const { private: _private, shared, favorites } = count || { private: 0, shared: 0, favorites: 0 }
   const totalNumber = _private + shared - favorites
 
