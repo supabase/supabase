@@ -3,6 +3,7 @@ import {
   GitHubDiscussionLoader,
   type GitHubDiscussionSource,
   fetchDiscussions,
+  fetchDiscussionsSinceDate,
 } from './github-discussion'
 import { MarkdownLoader, type MarkdownSource } from './markdown'
 import { IntegrationLoader, type IntegrationSource, fetchPartners } from './partner-integrations'
@@ -115,6 +116,33 @@ export async function fetchSources() {
     )
   ).map((discussion) => new GitHubDiscussionLoader('supabase/supabase', discussion).load())
 
+  const oneYearAgo = new Date()
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
+
+  const threeMonthsAgo = new Date()
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
+
+  const githubChangeLogSources = (
+    await fetchDiscussionsSinceDate(
+      'supabase',
+      'supabase',
+      'DIC_kwDODMpXOc4CAFUr', // 'Changelog' category
+      {
+        orderBy: 'CREATED_AT',
+        sinceDate: oneYearAgo,
+      }
+    )
+  ).map((discussion) => {
+    if (
+      new Date(discussion.createdAt) < threeMonthsAgo &&
+      !discussion.labels.nodes.some((label) => label.name === 'persist-in-search')
+    ) {
+      discussion.ragIgnore = true
+    }
+
+    return new GitHubDiscussionLoader('supabase/supabase', discussion).load()
+  })
+
   const sources: SearchSource[] = (
     await Promise.all([
       openApiReferenceSource,
@@ -126,6 +154,7 @@ export async function fetchSources() {
       ktLibReferenceSource,
       cliReferenceSource,
       ...githubDiscussionSources,
+      ...githubChangeLogSources,
       ...partnerIntegrationSources,
       ...guideSources,
     ])
