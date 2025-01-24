@@ -38,6 +38,7 @@ import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
+import { TimestampInfo } from 'ui-patterns'
 
 interface Props {
   data?: LogData[]
@@ -130,6 +131,9 @@ const LogTable = ({
       name: v as string,
       resizable: true,
       renderCell: ({ row }: any) => {
+        if (v === 'timestamp') {
+          return <TimestampInfo utcTimestamp={row.timestamp!} />
+        }
         return (
           <span onContextMenu={(e) => showContextMenu(e, { id: LOGS_EXPLORER_CONTEXT_MENU_ID })}>
             {formatCellValue(row?.[v])}
