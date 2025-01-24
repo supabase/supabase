@@ -1339,6 +1339,7 @@ class StorageExplorerStore {
     if (this.selectedBucket.id === undefined) return
 
     this.abortApiCalls()
+
     this.updateRowStatus(folderName, STORAGE_ROW_STATUS.LOADING, index)
     this.pushColumnAtIndex(
       { id: folderId, name: folderName, status: STORAGE_ROW_STATUS.LOADING, items: [] },
@@ -1382,7 +1383,9 @@ class StorageExplorerStore {
         index
       )
     } catch (error: any) {
-      if (!error.message.includes('aborted')) {
+      if (error.name === 'AbortError') {
+        this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
+      } else {
         toast.error(`Failed to retrieve folder contents from "${folderName}": ${error.message}`)
       }
     }
@@ -1838,7 +1841,6 @@ class StorageExplorerStore {
   setSelectedItemToRename = (file: { name: string; columnIndex: number }) => {
     this.updateRowStatus(file.name, STORAGE_ROW_STATUS.EDITING, file.columnIndex)
   }
-
   private updateRowStatus = (
     name: string,
     status: STORAGE_ROW_STATUS,
