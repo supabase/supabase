@@ -2,7 +2,6 @@ import { Transition } from '@headlessui/react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { isEmpty } from 'lodash'
 import { AlertCircle, ChevronDown, Clipboard, Download, Loader, Trash2, X } from 'lucide-react'
-import { useCallback } from 'react'
 import SVG from 'react-inlinesvg'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -20,7 +19,7 @@ import {
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
 import { useCopyUrl } from './useCopyUrl'
-import { fetchFileUrl, useFetchFileUrlQuery } from './useFetchFileUrlQuery'
+import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 
 const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
 
@@ -128,34 +127,16 @@ const PreviewFile = ({ item }: { item: StorageItem }) => {
 const PreviewPane = () => {
   const storageExplorerStore = useStorageStore()
   const {
-    projectRef,
     downloadFile,
     selectedBucket,
     selectedFilePreview: file,
     closeFilePreview,
     setSelectedItemsToDelete,
     setSelectedFileCustomExpiry,
-    getPathAlongOpenedFolders,
   } = storageExplorerStore
-  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
+  const { onCopyUrl } = useCopyUrl()
 
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
-
-  const getFileUrl = useCallback(
-    (expiresIn?: URL_EXPIRY_DURATION) => {
-      const pathToFile = getPathAlongOpenedFolders(false)
-      const formattedPathToFile = [pathToFile, file?.name].join('/')
-
-      return fetchFileUrl(
-        formattedPathToFile,
-        projectRef,
-        selectedBucket.id,
-        selectedBucket.public,
-        expiresIn
-      )
-    },
-    [file?.name, projectRef, selectedBucket.id, selectedBucket.public]
-  )
 
   if (!file) {
     return null
@@ -248,7 +229,7 @@ const PreviewPane = () => {
                 <Button
                   type="outline"
                   icon={<Clipboard size={16} strokeWidth={2} />}
-                  onClick={async () => onCopyUrl(file.name, await getFileUrl())}
+                  onClick={async () => onCopyUrl(file.name)}
                   disabled={file.isCorrupted}
                 >
                   Get URL
@@ -268,25 +249,19 @@ const PreviewPane = () => {
                   <DropdownMenuContent side="bottom" align="center">
                     <DropdownMenuItem
                       key="expires-one-week"
-                      onClick={async () =>
-                        onCopyUrl(file.name, await getFileUrl(URL_EXPIRY_DURATION.WEEK))
-                      }
+                      onClick={async () => onCopyUrl(file.name, URL_EXPIRY_DURATION.WEEK)}
                     >
                       Expire in 1 week
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       key="expires-one-month"
-                      onClick={async () =>
-                        onCopyUrl(file.name, await getFileUrl(URL_EXPIRY_DURATION.MONTH))
-                      }
+                      onClick={async () => onCopyUrl(file.name, URL_EXPIRY_DURATION.MONTH)}
                     >
                       Expire in 1 month
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       key="expires-one-year"
-                      onClick={async () =>
-                        onCopyUrl(file.name, await getFileUrl(URL_EXPIRY_DURATION.YEAR))
-                      }
+                      onClick={async () => onCopyUrl(file.name, URL_EXPIRY_DURATION.YEAR)}
                     >
                       Expire in 1 year
                     </DropdownMenuItem>
