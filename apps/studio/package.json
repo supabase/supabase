@@ -115,7 +115,7 @@
     "semver": "^6.3.1",
     "shared-data": "workspace:*",
     "sonner": "^1.5.0",
-    "sql-formatter": "^13.1.0",
+    "sql-formatter": "^15.0.0",
     "sqlstring": "^2.3.2",
     "tus-js-client": "^4.1.0",
     "ui": "workspace:*",
