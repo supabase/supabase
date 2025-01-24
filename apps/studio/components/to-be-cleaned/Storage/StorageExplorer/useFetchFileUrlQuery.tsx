@@ -48,7 +48,7 @@ export const useFetchFileUrlQuery = (
   const formattedPathToFile = [pathToFile, file?.name].join('/')
 
   return useQuery({
-    queryKey: [projectRef, 'buckets', bucket.public, bucket.id, 'file', pathToFile],
+    queryKey: [projectRef, 'buckets', bucket.public, bucket.id, 'file', formattedPathToFile],
     queryFn: () =>
       fetchFileUrl(formattedPathToFile, projectRef, bucket.id, bucket.public, DEFAULT_EXPIRY),
     staleTime: DEFAULT_EXPIRY * 1000,

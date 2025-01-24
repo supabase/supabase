@@ -21,42 +21,32 @@ import { StorageItem } from '../Storage.types'
 import { useCopyUrl } from './useCopyUrl'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 
-const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
+const PREVIEW_SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
 
 const PreviewFile = ({ item }: { item: StorageItem }) => {
   const storageExplorerStore = useStorageStore()
   const { projectRef, selectedBucket } = storageExplorerStore
 
-  const {
-    data: previewUrl,
-    isLoading,
-    isSuccess,
-  } = useFetchFileUrlQuery({
+  const { data: previewUrl, isLoading } = useFetchFileUrlQuery({
     file: item,
     projectRef: projectRef,
     bucket: selectedBucket,
   })
 
-  const size = item.metadata?.size
+  // if the size is not available, we set it to be greater than the max size
+  const size = +(item.metadata?.size ?? PREVIEW_SIZE_LIMIT + 1)
   const mimeType = item.metadata?.mimetype
 
-  const isSkipped = !!mimeType && !!size && size < PREVIEW_SIZE_LIMIT
+  const isSkipped = !!mimeType && !!size && size > PREVIEW_SIZE_LIMIT
 
-  let status = 'ready'
   if (isLoading) {
-    status = 'loading'
-  } else if (isSuccess) {
-    status = 'ready'
-  }
-
-  if (status === 'loading') {
     return (
       <div className="flex h-full w-full items-center justify-center text-foreground-lighter">
         <Loader size={14} strokeWidth={2} className="animate-spin" />
       </div>
     )
   }
-  if (status === 'skipped') {
+  if (isSkipped) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center">
         <SVG
@@ -229,7 +219,7 @@ const PreviewPane = () => {
                 <Button
                   type="outline"
                   icon={<Clipboard size={16} strokeWidth={2} />}
-                  onClick={async () => onCopyUrl(file.name)}
+                  onClick={() => onCopyUrl(file.name)}
                   disabled={file.isCorrupted}
                 >
                   Get URL
@@ -249,19 +239,19 @@ const PreviewPane = () => {
                   <DropdownMenuContent side="bottom" align="center">
                     <DropdownMenuItem
                       key="expires-one-week"
-                      onClick={async () => onCopyUrl(file.name, URL_EXPIRY_DURATION.WEEK)}
+                      onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.WEEK)}
                     >
                       Expire in 1 week
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       key="expires-one-month"
-                      onClick={async () => onCopyUrl(file.name, URL_EXPIRY_DURATION.MONTH)}
+                      onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.MONTH)}
                     >
                       Expire in 1 month
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       key="expires-one-year"
-                      onClick={async () => onCopyUrl(file.name, URL_EXPIRY_DURATION.YEAR)}
+                      onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.YEAR)}
                     >
                       Expire in 1 year
                     </DropdownMenuItem>

@@ -6,10 +6,6 @@ import { DATETIME_FORMAT } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { useCopyUrl } from './useCopyUrl'
 
-export interface CustomExpiryModalProps {
-  onCopyUrl: (name: string, url: string) => void
-}
-
 const unitMap = {
   days: 3600 * 24,
   weeks: 3600 * 24 * 7,
