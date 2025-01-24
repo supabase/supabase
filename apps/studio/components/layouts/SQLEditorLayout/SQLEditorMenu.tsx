@@ -54,6 +54,8 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
 
   const createNewFolder = () => {
     if (!ref) return console.error('Project ref is required')
+    setSearch('')
+    setShowSearch(false)
     snapV2.addNewFolder({ projectRef: ref })
   }
 
@@ -67,6 +69,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
     try {
       router.push(`/project/${ref}/sql/new?skip=true`)
       setSearch('')
+      setShowSearch(false)
     } catch (error: any) {
       toast.error(`Failed to create new query: ${error.message}`)
     }
@@ -90,6 +93,12 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
                 const value = e.target.value
                 setSearch(value)
                 if (value.length === 0) setShowSearch(false)
+              }}
+              onKeyDown={(e) => {
+                if (e.code === 'Escape') {
+                  setSearch('')
+                  setShowSearch(false)
+                }
               }}
             >
               <InnerSideBarFilterSortDropdown

@@ -4,9 +4,20 @@ import { useMemo } from 'react'
 import { useParams } from 'common'
 import InfiniteList from 'components/ui/InfiniteList'
 import { useContentCountQuery } from 'data/content/content-count-query'
+import { useContentIdQuery } from 'data/content/content-id-query'
 import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
+import { Content } from 'data/content/content-query'
 import { SNIPPET_PAGE_LIMIT } from 'data/content/sql-folders-query'
-import { SQL_ICON } from 'ui'
+import { SqlSnippets } from 'types'
+import {
+  cn,
+  CodeBlock,
+  HoverCard_Shadcn_,
+  HoverCardContent_Shadcn_,
+  HoverCardTrigger_Shadcn_,
+  ScrollArea,
+  SQL_ICON,
+} from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 interface SearchListProps {
@@ -62,18 +73,7 @@ export const SearchList = ({ search, onSelectSnippet }: SearchListProps) => {
         <InfiniteList
           items={snippets}
           ItemComponent={(props) => (
-            <Link
-              className="h-full flex items-center gap-x-3 pl-4 hover:bg-control"
-              href={`/project/${projectRef}/sql/${props.item.id}`}
-              onClick={() => onSelectSnippet()}
-            >
-              <SQL_ICON
-                size={16}
-                strokeWidth={1.5}
-                className="w-5 h-5 -ml-0.5 transition-colors fill-foreground-muted group-aria-selected:fill-foreground"
-              />
-              <p className="text-sm text-foreground-light truncate">{props.item.name}</p>
-            </Link>
+            <SearchListItem snippet={props.item} onSelectSnippet={onSelectSnippet} />
           )}
           itemProps={{}}
           getItemSize={() => 28}
@@ -81,6 +81,70 @@ export const SearchList = ({ search, onSelectSnippet }: SearchListProps) => {
           isLoadingNextPage={isFetchingNextPage}
           onLoadNextPage={() => fetchNextPage()}
         />
+      )}
+    </div>
+  )
+}
+
+const SearchListItem = ({
+  snippet,
+  onSelectSnippet,
+}: {
+  snippet: Content
+  onSelectSnippet: () => void
+}) => {
+  const { ref } = useParams()
+  return (
+    <HoverCard_Shadcn_ openDelay={500} closeDelay={100}>
+      <HoverCardTrigger_Shadcn_>
+        <Link
+          className="h-full flex items-center gap-x-3 pl-4 hover:bg-control"
+          href={`/project/${ref}/sql/${snippet.id}`}
+          onClick={() => onSelectSnippet()}
+        >
+          <SQL_ICON
+            size={16}
+            strokeWidth={1.5}
+            className="w-5 h-5 -ml-0.5 transition-colors fill-foreground-muted group-aria-selected:fill-foreground"
+          />
+          <p className="text-sm text-foreground-light truncate">{snippet.name}</p>
+        </Link>
+      </HoverCardTrigger_Shadcn_>
+      <HoverCardContent_Shadcn_ side="right" className="p-0 w-[300px]">
+        <SearchItemListHover id={snippet.id} />
+      </HoverCardContent_Shadcn_>
+    </HoverCard_Shadcn_>
+  )
+}
+
+const SearchItemListHover = ({ id }: { id: string }) => {
+  const { ref } = useParams()
+  const { data, isLoading } = useContentIdQuery({ projectRef: ref, id })
+  const sql = (data?.content as SqlSnippets.Content)?.sql ?? ''
+  const newLines = (sql.match(new RegExp('\n', 'g')) || []).length
+
+  return (
+    <div>
+      {isLoading ? (
+        <div className="p-2">
+          <ShimmeringLoader />
+        </div>
+      ) : sql.length === 0 ? (
+        <div className="px-4 py-2">
+          <p className="text-xs text-foreground-lighter">Snippet is empty</p>
+        </div>
+      ) : (
+        <ScrollArea className={cn(newLines > 6 ? 'h-[140px]' : '')}>
+          <CodeBlock
+            hideLineNumbers
+            language="sql"
+            value={sql}
+            className={cn(
+              'border-0 py-0 px-3 max-w-full prose dark:prose-dark text-xs',
+              '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
+            )}
+          />
+        </ScrollArea>
       )}
     </div>
   )
