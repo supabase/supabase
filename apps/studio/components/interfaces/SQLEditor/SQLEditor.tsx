@@ -588,10 +588,8 @@ export const SQLEditor = () => {
     const modified = promptState.beforeSelection + completion + promptState.afterSelection
 
     if (isCompletionLoading) {
-      let formattedModified = modified
-
       // Attempt to format the modified SQL in case the LLM left out indentation, etc
-      formattedModified = formatSql(modified)
+      let formattedModified = formatSql(modified)
 
       setSourceSqlDiff({
         original,
