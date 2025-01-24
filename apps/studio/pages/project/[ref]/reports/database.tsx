@@ -177,6 +177,62 @@ const DatabaseUsage = () => {
                   endDate={dateRange?.period_end?.date}
                 />
               )}
+
+              {dateRange && (
+                <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="client_connections_postgres"
+                  label="Client connections - Postgres"
+                  defaultChartStyle="stackedAreaLine"
+                  interval={dateRange.interval}
+                  startDate={dateRange?.period_start?.date}
+                  endDate={dateRange?.period_end?.date}
+                />
+              )}
+              {dateRange && (
+                <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="client_connections_supavisor"
+                  label="Client connections - Supavisor"
+                  defaultChartStyle="stackedAreaLine"
+                  interval={dateRange.interval}
+                  startDate={dateRange?.period_start?.date}
+                  endDate={dateRange?.period_end?.date}
+                />
+              )}
+              {dateRange && (
+                <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="client_connections_pgbouncer"
+                  label="Client connections - pgbouncer"
+                  defaultChartStyle="stackedAreaLine"
+                  interval={dateRange.interval}
+                  startDate={dateRange?.period_start?.date}
+                  endDate={dateRange?.period_end?.date}
+                />
+              )}
+              {dateRange && (
+                <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="client_connections_realtime"
+                  label="Client connections - Realtime"
+                  defaultChartStyle="stackedAreaLine"
+                  interval={dateRange.interval}
+                  startDate={dateRange?.period_start?.date}
+                  endDate={dateRange?.period_end?.date}
+                />
+              )}
+              {dateRange && (
+                <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="client_connections_max_limit"
+                  label="Client connections - Max limit"
+                  defaultChartStyle="stackedAreaLine"
+                  interval={dateRange.interval}
+                  startDate={dateRange?.period_start?.date}
+                  endDate={dateRange?.period_end?.date}
+                />
+              )}
             </div>
           </Panel.Content>
         </Panel>

@@ -37,7 +37,7 @@ const BarChart = ({
   yAxisKey,
   xAxisKey,
   format,
-  customDateFormat = DateTimeFormats.FULL,
+  customDateFormat = DateTimeFormats.FULL_SECONDS,
   title,
   highlightedValue,
   highlightedLabel,

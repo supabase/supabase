@@ -17,6 +17,7 @@ import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { WarningIcon } from 'ui'
 import type { ChartData } from './Charts.types'
+import StackedAreaLineChart from './StackedAreaLineChart'
 
 interface ChartHandlerProps {
   id?: string
@@ -27,7 +28,7 @@ interface ChartHandlerProps {
   endDate: string
   interval: string
   customDateFormat?: string
-  defaultChartStyle?: 'bar' | 'line'
+  defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hideChartType?: boolean
   data?: ChartData
   isLoading?: boolean
@@ -92,6 +93,8 @@ const ChartHandler = ({
       },
       { enabled: provider === 'infra-monitoring' && data === undefined }
     )
+
+  console.log(label, infraMonitoringData)
 
   const chartData =
     data ||
@@ -172,6 +175,16 @@ const ChartHandler = ({
           data={(chartData?.data ?? []) as any}
           format={format || chartData?.format}
           xAxisKey={'period_start'}
+          yAxisKey={attribute}
+          highlightedValue={_highlightedValue}
+          title={label}
+          customDateFormat={customDateFormat}
+        />
+      ) : chartStyle === 'stackedAreaLine' ? (
+        <StackedAreaLineChart
+          data={(chartData?.data ?? []) as any}
+          format={format || chartData?.format}
+          xAxisKey="period_start"
           yAxisKey={attribute}
           highlightedValue={_highlightedValue}
           title={label}

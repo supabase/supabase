@@ -372,6 +372,10 @@ export const TIME_PERIODS_REPORTS = [
 
 export const TIME_PERIODS_INFRA = [
   {
+    key: '10m',
+    label: 'Last 10 minutes',
+  },
+  {
     key: '1h',
     label: 'Last hour',
   },

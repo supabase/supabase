@@ -410,19 +410,11 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /**
-     * Gets users
-     * @deprecated
-     */
-    get: operations['UsersController_getUsers']
+    get?: never
     put?: never
     /** Creates user */
     post: operations['UsersController_createUser']
-    /**
-     * Delete user with given ID
-     * @deprecated
-     */
-    delete: operations['UsersController_deleteUser']
+    delete?: never
     options?: never
     head?: never
     patch?: never
@@ -1503,58 +1495,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/organizations/{slug}/members/invite': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Gets invited users
-     * @deprecated
-     */
-    get: operations['OrganizationInviteController_getInvitedUsers']
-    put?: never
-    /**
-     * Invites user
-     * @deprecated
-     */
-    post: operations['OrganizationInviteController_inviteUser']
-    /**
-     * Delete invited user
-     * @deprecated
-     */
-    delete: operations['OrganizationInviteController_deleteInvitedUser']
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/organizations/{slug}/members/join': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Gets invite
-     * @deprecated
-     */
-    get: operations['JoinController_getInvite']
-    put?: never
-    /**
-     * Joins organization
-     * @deprecated
-     */
-    post: operations['JoinController_joinOrganization']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/organizations/{slug}/members/reached-free-project-limit': {
     parameters: {
       query?: never
@@ -2002,26 +1942,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/pg-meta/{ref}/roles': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets project pg.roles */
-    get: operations['RolesController_getRoles']
-    put?: never
-    /** Creates project pg.role */
-    post: operations['RolesController_createRole']
-    /** Deletes project pg.role with the given ID */
-    delete: operations['RolesController_deleteRole']
-    options?: never
-    head?: never
-    /** Updates project pg.role with the given ID */
-    patch: operations['RolesController_updateRole']
-    trace?: never
-  }
   '/platform/pg-meta/{ref}/schemas': {
     parameters: {
       query?: never
@@ -2040,40 +1960,6 @@ export interface paths {
     head?: never
     /** Updates project pg.schema with the given ID */
     patch: operations['SchemasController_updateSchema']
-    trace?: never
-  }
-  '/platform/pg-meta/{ref}/search/columns': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Searches project pg.columns. Return maximum 50 results. */
-    post: operations['SearchController_searchColumns']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/pg-meta/{ref}/search/tables': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Searches project pg.tables. Return maximum 50 results. */
-    post: operations['SearchController_searchTables']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
     trace?: never
   }
   '/platform/pg-meta/{ref}/tables': {
@@ -2858,11 +2744,7 @@ export interface paths {
     delete: operations['ContentController_deleteContents']
     options?: never
     head?: never
-    /**
-     * Updates project's content
-     * @deprecated
-     */
-    patch: operations['ContentController_updateContent']
+    patch?: never
     trace?: never
   }
   '/platform/projects/{ref}/content/count': {
@@ -3357,27 +3239,6 @@ export interface paths {
     put?: never
     /** Previews transfering a project to a different organizations, shows eligibility and impact. */
     post: operations['ProjectTransferController_previewTransfer']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/projects/{ref}/update': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Updates the project
-     * @deprecated
-     * @description Replaced by PATCH /platform/projects/:ref
-     */
-    post: operations['UpdateController_updateProject']
     delete?: never
     options?: never
     head?: never
@@ -4881,19 +4742,11 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /**
-     * Gets users
-     * @deprecated
-     */
-    get: operations['UsersController_getUsers']
+    get?: never
     put?: never
     /** Creates user */
     post: operations['UsersController_createUser']
-    /**
-     * Delete user with given ID
-     * @deprecated
-     */
-    delete: operations['UsersController_deleteUser']
+    delete?: never
     options?: never
     head?: never
     patch?: never
@@ -5299,58 +5152,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v0/organizations/{slug}/members/invite': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Gets invited users
-     * @deprecated
-     */
-    get: operations['OrganizationInviteController_getInvitedUsers']
-    put?: never
-    /**
-     * Invites user
-     * @deprecated
-     */
-    post: operations['OrganizationInviteController_inviteUser']
-    /**
-     * Delete invited user
-     * @deprecated
-     */
-    delete: operations['OrganizationInviteController_deleteInvitedUser']
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v0/organizations/{slug}/members/join': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Gets invite
-     * @deprecated
-     */
-    get: operations['JoinController_getInvite']
-    put?: never
-    /**
-     * Joins organization
-     * @deprecated
-     */
-    post: operations['JoinController_joinOrganization']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/v0/organizations/{slug}/roles': {
     parameters: {
       query?: never
@@ -5588,26 +5389,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v0/pg-meta/{ref}/roles': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets project pg.roles */
-    get: operations['RolesController_getRoles']
-    put?: never
-    /** Creates project pg.role */
-    post: operations['RolesController_createRole']
-    /** Deletes project pg.role with the given ID */
-    delete: operations['RolesController_deleteRole']
-    options?: never
-    head?: never
-    /** Updates project pg.role with the given ID */
-    patch: operations['RolesController_updateRole']
-    trace?: never
-  }
   '/v0/pg-meta/{ref}/schemas': {
     parameters: {
       query?: never
@@ -5626,40 +5407,6 @@ export interface paths {
     head?: never
     /** Updates project pg.schema with the given ID */
     patch: operations['SchemasController_updateSchema']
-    trace?: never
-  }
-  '/v0/pg-meta/{ref}/search/columns': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Searches project pg.columns. Return maximum 50 results. */
-    post: operations['SearchController_searchColumns']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v0/pg-meta/{ref}/search/tables': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Searches project pg.tables. Return maximum 50 results. */
-    post: operations['SearchController_searchTables']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
     trace?: never
   }
   '/v0/pg-meta/{ref}/tables': {
@@ -6300,11 +6047,7 @@ export interface paths {
     delete: operations['ContentController_deleteContents']
     options?: never
     head?: never
-    /**
-     * Updates project's content
-     * @deprecated
-     */
-    patch: operations['ContentController_updateContent']
+    patch?: never
     trace?: never
   }
   '/v0/projects/{ref}/content/count': {
@@ -7541,6 +7284,27 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/database/context': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Gets database metadata for the given project.
+     * @deprecated
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     */
+    get: operations['V1DatabaseContextController_getDatabaseMetadata']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/database/query': {
     parameters: {
       query?: never
@@ -8562,13 +8326,6 @@ export interface components {
       /** @default 0 */
       recoveryTimeTarget?: number
     }
-    Column: {
-      id: number
-      name: string
-      schema: string
-      table: string
-      table_id: number
-    }
     ColumnPrivilege: {
       grantee: string
       grantor: string
@@ -8825,23 +8582,6 @@ export interface components {
       publish_truncate?: boolean
       publish_update?: boolean
       tables?: string[] | null
-    }
-    CreateRoleBody: {
-      admins?: string[]
-      can_bypass_rls?: boolean
-      can_create_db?: boolean
-      can_create_role?: boolean
-      can_login?: boolean
-      config?: Record<string, never>
-      connection_limit?: number
-      inherit_role?: boolean
-      is_replication_role?: boolean
-      is_superuser?: boolean
-      member_of?: string[]
-      members?: string[]
-      name: string
-      password?: string
-      valid_until?: string
     }
     CreateSchemaBody: {
       name: string
@@ -9367,6 +9107,8 @@ export interface components {
       version: number
     }
     GetArchiveResponse: {
+      archive_empty: boolean
+      file_url: string
       fileUrl: string
     }
     GetContentCountResponse: {
@@ -9450,6 +9192,11 @@ export interface components {
     }
     GetProjectByFlyExtensionIdResponse: {
       ref: string
+    }
+    GetProjectDbMetadataResponseDto: {
+      databases: {
+        [key: string]: unknown
+      }[]
     }
     GetProviderResponse: {
       created_at?: string
@@ -9802,26 +9549,6 @@ export interface components {
     InvitationResponse: {
       invitations: components['schemas']['Invitation'][]
     }
-    Invite: {
-      invited_at: string
-      invited_email: string
-      invited_id: number
-      role_id: number
-    }
-    InviteResponse: {
-      authorized_user: boolean
-      email_match: boolean
-      expired_token: boolean
-      invite_id: string
-      organization_name: string
-      sso_mismatch: boolean
-      token_does_not_exist: boolean
-    }
-    InviteUserBody: {
-      invited_email: string
-      owner_id: number
-      role_id: number
-    }
     Invoice: {
       amount_due: number
       id: string
@@ -9835,13 +9562,6 @@ export interface components {
     }
     InvoicePaymentLinkResponse: {
       redirectUrl: string
-    }
-    JoinResponse: {
-      billing_email: string
-      id: number
-      name: string
-      slug: string
-      stripe_customer_id: string
     }
     JwtSecretUpdateStatus: {
       jwtSecretUpdateStatus: {
@@ -10147,12 +9867,7 @@ export interface components {
       id: string
       name: string
     }
-    OrganizationRole: {
-      description: string | null
-      id: number
-      name: string
-    }
-    OrganizationRoleResponseV2: {
+    OrganizationRoleResponse: {
       org_scoped_roles: components['schemas']['OrganizationRoleV2'][]
       project_scoped_roles: components['schemas']['OrganizationRoleV2'][]
     }
@@ -10471,22 +10186,6 @@ export interface components {
       publish_truncate: boolean
       publish_update: boolean
       tables: components['schemas']['Table'][] | null
-    }
-    PostgresRole: {
-      active_connections: number
-      can_bypass_rls: boolean
-      can_create_db: boolean
-      can_create_role: boolean
-      can_login: boolean
-      config: string[] | null
-      connection_limit: number
-      id: number
-      inherit_role: boolean
-      is_replication_role: boolean
-      is_superuser: boolean
-      name: string
-      password: string
-      valid_until: string | null
     }
     PostgresSchema: {
       id: number
@@ -11183,16 +10882,8 @@ export interface components {
       target_plan: components['schemas']['BillingPlanId']
       usage_billing_enabled: boolean
     }
-    SearchColumnBody: {
-      name: string
-      schema: string
-    }
     SearchProfileBody: {
       keywords: string
-    }
-    SearchTableBody: {
-      name: string
-      schema: string
     }
     SecretResponse: {
       name: string
@@ -11251,11 +10942,6 @@ export interface components {
     }
     SendFeedbackResponse: {
       result: string
-    }
-    SendInviteResponse: {
-      invited_at: string
-      invited_email: string
-      role_id: number
     }
     SendUpgradeSurveyBody: {
       additionalFeedback?: string
@@ -11935,21 +11621,6 @@ export interface components {
       name?: string
       type?: string
     }
-    UpdateContentBodyDto: {
-      content?: {
-        [key: string]: unknown
-      }
-      description?: string
-      /** Format: uuid */
-      folder_id?: null | string
-      id?: string
-      name?: string
-      owner_id?: number
-      /** @enum {string} */
-      type?: 'sql' | 'report' | 'log_sql'
-      /** @enum {string} */
-      visibility?: 'user' | 'project' | 'org' | 'public'
-    }
     UpdateContentFolderBodyDto: {
       name: string
     }
@@ -12336,20 +12007,6 @@ export interface components {
       restriction_status?: 'grace_period' | 'grace_period_over' | 'null' | 'restricted'
       slug: string
     }
-    UpdateRoleBody: {
-      can_bypass_rls?: boolean
-      can_create_db?: boolean
-      can_create_role?: boolean
-      can_login?: boolean
-      config?: Record<string, never>
-      connection_limit?: number
-      inherit_role?: boolean
-      is_replication_role?: boolean
-      is_superuser?: boolean
-      name?: string
-      password?: string
-      valid_until?: string
-    }
     UpdateSchemaBody: {
       name?: string
       owner?: string
@@ -12579,10 +12236,6 @@ export interface components {
       updated_at: string
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    UsersResponse: {
-      total: number
-      users: components['schemas']['UserBody'][]
     }
     V1AnalyticsResponse: {
       error?:
@@ -13661,46 +13314,6 @@ export interface operations {
       }
     }
   }
-  UsersController_getUsers: {
-    parameters: {
-      query: {
-        keywords: string
-        limit: string
-        offset: string
-        verified: string
-      }
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['UsersResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to retrieve users */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   UsersController_createUser: {
     parameters: {
       query?: never
@@ -13732,45 +13345,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to create user */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  UsersController_deleteUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UserBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete user */
       500: {
         headers: {
           [name: string]: unknown
@@ -16259,159 +15833,6 @@ export interface operations {
       }
     }
   }
-  OrganizationInviteController_getInvitedUsers: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['Invite'][]
-        }
-      }
-      /** @description Failed to get invited users */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  OrganizationInviteController_inviteUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['InviteUserBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['SendInviteResponse']
-        }
-      }
-      /** @description Failed to invite user */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  OrganizationInviteController_deleteInvitedUser: {
-    parameters: {
-      query: {
-        invited_id: number
-      }
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete invited user */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  JoinController_getInvite: {
-    parameters: {
-      query: {
-        token: string
-      }
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['InviteResponse']
-        }
-      }
-      /** @description Failed to get invite */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  JoinController_joinOrganization: {
-    parameters: {
-      query: {
-        token: string
-      }
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['JoinResponse']
-        }
-      }
-      /** @description Failed to join organization */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   ReachedFreeProjectLimitController_getMembersWhoReachedFreeProjectLimit: {
     parameters: {
       query?: never
@@ -16851,7 +16272,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['OrganizationRoleResponseV2']
+          'application/json': components['schemas']['OrganizationRoleResponse']
         }
       }
       /** @description Failed to retrieve the organization's roles */
@@ -18140,168 +17561,6 @@ export interface operations {
       }
     }
   }
-  RolesController_getRoles: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresRole'][]
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get pg.roles */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  RolesController_createRole: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateRoleBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresRole']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create pg.role */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  RolesController_deleteRole: {
-    parameters: {
-      query: {
-        /** @description Role ID */
-        id: string
-      }
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresRole']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete pg.role with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  RolesController_updateRole: {
-    parameters: {
-      query: {
-        /** @description Role ID */
-        id: number
-      }
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateRoleBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresRole']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update pg.role with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   SchemasController_getSchemas: {
     parameters: {
       query?: never
@@ -18456,88 +17715,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update pg.schema with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  SearchController_searchColumns: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SearchColumnBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['Column'][]
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to search pg.columns */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  SearchController_searchTables: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SearchTableBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['Table'][]
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to search pg.tables */
       500: {
         headers: {
           [name: string]: unknown
@@ -21083,40 +20260,6 @@ export interface operations {
       }
     }
   }
-  ContentController_updateContent: {
-    parameters: {
-      query: {
-        id: string
-      }
-      header?: never
-      path: {
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateContentBodyDto']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['UserContentObject'][]
-        }
-      }
-      /** @description Failed to update project's content */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   ContentController_getContentCountV2: {
     parameters: {
       query?: {
@@ -21696,9 +20839,14 @@ export interface operations {
           | 'swap_usage'
           | 'physical_replication_lag_physical_replica_lag_seconds'
           | 'pg_stat_database_num_backends'
+          | 'client_connections_postgres'
+          | 'client_connections_supavisor'
+          | 'client_connections_pgbouncer'
+          | 'client_connections_realtime'
+          | 'client_connections_max_limit'
         databaseIdentifier?: string
         endDate: string
-        interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
+        interval?: '15s' | '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
         startDate: string
       }
       header?: never
@@ -22242,43 +21390,6 @@ export interface operations {
         }
       }
       403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  UpdateController_updateProject: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateProjectBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update project */
-      500: {
         headers: {
           [name: string]: unknown
         }
@@ -25529,46 +24640,6 @@ export interface operations {
       }
     }
   }
-  UsersController_getUsers: {
-    parameters: {
-      query: {
-        keywords: string
-        limit: string
-        offset: string
-        verified: string
-      }
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['UsersResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to retrieve users */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   UsersController_createUser: {
     parameters: {
       query?: never
@@ -25600,45 +24671,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to create user */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  UsersController_deleteUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UserBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete user */
       500: {
         headers: {
           [name: string]: unknown
@@ -26635,159 +25667,6 @@ export interface operations {
       }
     }
   }
-  OrganizationInviteController_getInvitedUsers: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['Invite'][]
-        }
-      }
-      /** @description Failed to get invited users */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  OrganizationInviteController_inviteUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['InviteUserBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['SendInviteResponse']
-        }
-      }
-      /** @description Failed to invite user */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  OrganizationInviteController_deleteInvitedUser: {
-    parameters: {
-      query: {
-        invited_id: number
-      }
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete invited user */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  JoinController_getInvite: {
-    parameters: {
-      query: {
-        token: string
-      }
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['InviteResponse']
-        }
-      }
-      /** @description Failed to get invite */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  JoinController_joinOrganization: {
-    parameters: {
-      query: {
-        token: string
-      }
-      header?: never
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['JoinResponse']
-        }
-      }
-      /** @description Failed to join organization */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   OrganizationRolesController_getAllRolesV2: {
     parameters: {
       query?: never
@@ -26805,7 +25684,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['OrganizationRoleResponseV2']
+          'application/json': components['schemas']['OrganizationRoleResponse']
         }
       }
       /** @description Failed to retrieve the organization's roles */
@@ -27926,168 +26805,6 @@ export interface operations {
       }
     }
   }
-  RolesController_getRoles: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresRole'][]
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get pg.roles */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  RolesController_createRole: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateRoleBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresRole']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create pg.role */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  RolesController_deleteRole: {
-    parameters: {
-      query: {
-        /** @description Role ID */
-        id: string
-      }
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresRole']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete pg.role with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  RolesController_updateRole: {
-    parameters: {
-      query: {
-        /** @description Role ID */
-        id: number
-      }
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateRoleBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PostgresRole']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update pg.role with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   SchemasController_getSchemas: {
     parameters: {
       query?: never
@@ -28242,88 +26959,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update pg.schema with the given ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  SearchController_searchColumns: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SearchColumnBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['Column'][]
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to search pg.columns */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  SearchController_searchTables: {
-    parameters: {
-      query?: never
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SearchTableBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['Table'][]
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to search pg.tables */
       500: {
         headers: {
           [name: string]: unknown
@@ -30506,40 +29141,6 @@ export interface operations {
       }
     }
   }
-  ContentController_updateContent: {
-    parameters: {
-      query: {
-        id: string
-      }
-      header?: never
-      path: {
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateContentBodyDto']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['UserContentObject'][]
-        }
-      }
-      /** @description Failed to update project's content */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   ContentController_getContentCountV2: {
     parameters: {
       query?: {
@@ -30882,9 +29483,14 @@ export interface operations {
           | 'swap_usage'
           | 'physical_replication_lag_physical_replica_lag_seconds'
           | 'pg_stat_database_num_backends'
+          | 'client_connections_postgres'
+          | 'client_connections_supavisor'
+          | 'client_connections_pgbouncer'
+          | 'client_connections_realtime'
+          | 'client_connections_max_limit'
         databaseIdentifier?: string
         endDate: string
-        interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
+        interval?: '15s' | '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
         startDate: string
       }
       header?: never
@@ -33609,6 +32215,33 @@ export interface operations {
     }
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  V1DatabaseContextController_getDatabaseMetadata: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetProjectDbMetadataResponseDto']
+        }
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
