@@ -15,6 +15,9 @@ import { ChevronRight } from 'lucide-react'
 import ProductModulesData from '~/data/ProductModules'
 import { jobsCount } from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
 
+import { TelemetryActions } from 'common/telemetry-constants'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
@@ -24,6 +27,7 @@ interface Props {
 const MobileMenu = ({ open, setOpen, menu }: Props) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
+  const sendTelemetryEvent = useSendTelemetryEvent()
   const container = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { duration: 0.15, staggerChildren: 0.05, ease: DEFAULT_EASE } },
@@ -240,14 +244,34 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                     </Link>
                   ) : (
                     <>
-                      <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
+                      <Link
+                        href="https://supabase.com/dashboard"
+                        passHref
+                        legacyBehavior
+                        onClick={() =>
+                          sendTelemetryEvent({
+                            action: TelemetryActions.SIGN_IN_BUTTON_CLICKED,
+                            properties: { buttonLocation: 'Mobile Nav' },
+                          })
+                        }
+                      >
                         <Button block type="default" asChild>
                           <a type={undefined} className="h-10 py-4">
                             Sign in
                           </a>
                         </Button>
                       </Link>
-                      <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
+                      <Link
+                        href="https://supabase.com/dashboard"
+                        passHref
+                        legacyBehavior
+                        onClick={() =>
+                          sendTelemetryEvent({
+                            action: TelemetryActions.START_PROJECT_BUTTON_CLICKED,
+                            properties: { buttonLocation: 'Mobile Nav' },
+                          })
+                        }
+                      >
                         <Button block asChild>
                           <a type={undefined} className="h-10 py-4">
                             Start your project

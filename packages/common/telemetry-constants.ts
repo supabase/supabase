@@ -47,7 +47,6 @@ export enum TelemetryActions {
 
   DOCS_FEEDBACK_CLICKED = 'docs_feedback_clicked',
 
-  HOMEPAGE_HERO_START_PROJECT_CLICKED = 'homepage_hero_start_project_clicked',
   HOMEPAGE_HERO_REQUEST_DEMO_CLICKED = 'homepage_hero_request_demo_clicked',
   HOMEPAGE_FRAMEWORK_QUICKSTART_CLICKED = 'homepage_framework_quickstart_clicked',
   HOMEPAGE_PRODUCT_CARD_CLICKED = 'homepage_product_card_clicked',
@@ -59,6 +58,11 @@ export enum TelemetryActions {
   HOMEPAGE_DISCORD_BUTTON_CLICKED = 'homepage_discord_button_clicked',
   HOMEPAGE_CUSTOMER_STORY_CARD_CLICKED = 'homepage_customer_story_card_clicked',
   HOMEPAGE_PROJECT_TEMPLATE_CARD_CLICKED = 'homepage_project_template_card_clicked',
+  OPEN_SOURCE_REPO_CARD_CLICKED = 'open_source_repo_card_clicked',
+  START_PROJECT_BUTTON_CLICKED = 'start_project_button_clicked',
+  SEE_DOCUMENTATION_BUTTON_CLICKED = 'see_documentation_button_clicked',
+  REQUEST_DEMO_BUTTON_CLICKED = 'request_demo_button_clicked',
+  SIGN_IN_BUTTON_CLICKED = 'sign_in_button_clicked',
 }
 
 /**
@@ -605,7 +609,10 @@ export interface AssistantSuggestionRunQueryClickedEvent {
 }
 
 /**
- * User accepted or rejected changes in sql ai diff handler. They can accept change by clicking accept button or typing shortcut (CMD+Enter) or reject by clicking reject button or typing shortcut (Esc). Handler only appears after clicking any dropdown option in Edit in Sql Editor in suggestion provided by the assistant. The dropdown options only appear in any page with 'sql' in url.
+ * User accepted or rejected changes in sql ai diff handler.
+ * They can accept change by clicking accept button or typing shortcut (CMD+Enter) or reject by clicking reject button or typing shortcut (Esc).
+ * Handler only appears after clicking any dropdown option in Edit in Sql Editor in suggestion provided by the assistant.
+ * The dropdown options only appear in any page with 'sql' in url.
  *
  * @group Events
  * @source studio
@@ -685,17 +692,6 @@ export interface DocsFeedbackClickedEvent {
 }
 
 /**
- * User clicked the "Start Project" button in the homepage hero section.
- *
- * @group Events
- * @source www
- * @page /
- */
-export interface HomepageHeroStartProjectClickedEvent {
-  action: TelemetryActions.HOMEPAGE_HERO_START_PROJECT_CLICKED
-}
-
-/**
  * User clicked the "Request a Demo" button in the homepage hero section.
  *
  * @group Events
@@ -756,7 +752,9 @@ export interface PricingPlanCtaClickedEvent {
      */
     showUpgradeText: boolean
     /**
-     * The section of the page where the plan was clicked. Main means the big top section of the page, comparison_table means the comparison table with all plans listen together below.
+     * The section of the page where the plan was clicked.
+     * Main means the big top section of the page,
+     * comparison_table means the comparison table with all plans listen together below.
      */
     section: 'main' | 'comparison_table'
     tableMode?: 'mobile' | 'desktop'
@@ -863,6 +861,88 @@ export interface HomepageProjectTemplateCardClickedEvent {
   }
 }
 
+/**
+ * User clicked on an open source repo card.
+ *
+ * @group Events
+ * @source www
+ * @page /open-source
+ */
+export interface OpenSourceRepoCardClickedEvent {
+  action: TelemetryActions.OPEN_SOURCE_REPO_CARD_CLICKED
+  properties: {
+    /**
+     * The name of the open source repository clicked.
+     */
+    repoName: string
+  }
+}
+
+/**
+ * User clicked the green "Start Project" button in various locations described in properties..
+ *
+ * @group Events
+ * @source www
+ */
+export interface StartProjectButtonClickedEvent {
+  action: TelemetryActions.START_PROJECT_BUTTON_CLICKED
+  properties: {
+    /**
+     * The source of the button click, e.g. homepage hero, product page header.
+     */
+    buttonLocation: string
+  }
+}
+
+/**
+ * User clicked the "See Documentation" button usually next to the "Start Project" button in various locations described in properties.
+ *
+ * @group Events
+ * @source www
+ */
+export interface SeeDocumentationButtonClickedEvent {
+  action: TelemetryActions.SEE_DOCUMENTATION_BUTTON_CLICKED
+  properties: {
+    /**
+     * The source of the button click, e.g. homepage hero, product page header - product name.
+     */
+    buttonLocation: string
+  }
+}
+
+/**
+ * User clicked the "Request a Demo" button in various locations described in properties.
+ *
+ * @group Events
+ * @source www
+ */
+export interface RequestDemoButtonClickedEvent {
+  action: TelemetryActions.REQUEST_DEMO_BUTTON_CLICKED
+  properties: {
+    /**
+     * The source of the button click, e.g. homepage hero, cta banner, product page header.
+     * If it states it came from the request demo form, it can come from different pages so refer to path name to determine.
+     */
+    buttonLocation: string
+  }
+}
+
+/**
+ * User clicked the sign-in button in various locations described in properties.
+ *
+ * @group Events
+ * @source www
+ */
+export interface SignInButtonClickedEvent {
+  action: TelemetryActions.SIGN_IN_BUTTON_CLICKED
+  properties: {
+    /**
+     * The source of the button click, e.g. homepage hero, cta banner, product page header.
+     */
+    buttonLocation: string
+  }
+}
+
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
@@ -899,7 +979,6 @@ export type TelemetryEvent =
   | AssistantSqlDiffHandlerEvaluatedEvent
   | AssistantEditInSqlEditorClickedEvent
   | DocsFeedbackClickedEvent
-  | HomepageHeroStartProjectClickedEvent
   | HomepageHeroRequestDemoClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
@@ -913,3 +992,8 @@ export type TelemetryEvent =
   | HomepageProjectTemplateCardClickedEvent
   | CustomReportAddSQLBlockClicked
   | CustomReportAssistantSQLBlockAdded
+  | OpenSourceRepoCardClickedEvent
+  | StartProjectButtonClickedEvent
+  | SeeDocumentationButtonClickedEvent
+  | RequestDemoButtonClickedEvent
+  | SignInButtonClickedEvent
