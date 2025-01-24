@@ -1,10 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { FilePlus, FolderPlus, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
+import { Content } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -24,7 +26,8 @@ import {
   InnerSideBarFilters,
   InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
-import { SQLEditorNav as SQLEditorNavV2 } from './SQLEditorNavV2/SQLEditorNav'
+import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
+import { SearchList } from './SQLEditorNavV2/SearchList'
 
 interface SQLEditorMenuProps {
   onViewOngoingQueries: () => void
@@ -37,14 +40,23 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
   const { ref } = useParams()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const [searchText, setSearchText] = useState('')
-  const [isSearching, setIsSearching] = useState(false)
+  const [search, setSearch] = useState('')
+  const [showSearch, setShowSearch] = useState(false)
   const [sort, setSort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
+  const [showSharedSnippets, setShowSharedSnippets] = useState(false)
+  const [showPrivateSnippets, setShowPrivateSnippets] = useState(true)
+
+  const debouncedSearch = useDebounce(search, 500)
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
+
+  const onShowSection = (visibility: 'user' | 'project' | 'org' | 'public') => {
+    if (visibility === 'user') setShowPrivateSnippets(true)
+    else if (visibility === 'project') setShowSharedSnippets(true)
+  }
 
   const createNewFolder = () => {
     if (!ref) return console.error('Project ref is required')
@@ -60,24 +72,31 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
     }
     try {
       router.push(`/project/${ref}/sql/new?skip=true`)
-      setSearchText('')
+      setSearch('')
     } catch (error: any) {
       toast.error(`Failed to create new query: ${error.message}`)
     }
   }
 
+  useEffect(() => {
+    setShowSearch(debouncedSearch.length > 0)
+  }, [debouncedSearch])
+
   return (
     <div className="h-full flex flex-col justify-between">
-      <div className="mt-4 mb-2 flex flex-col gap-y-4">
-        <div className="mx-4 flex items-center justify-between gap-x-2">
+      <div className="flex flex-col gap-y-4 flex-grow">
+        <div className="mt-4 mx-4 flex items-center justify-between gap-x-2">
           <InnerSideBarFilters className="w-full p-0 gap-0">
             <InnerSideBarFilterSearchInput
               name="search-queries"
               placeholder="Search queries..."
               aria-labelledby="Search queries"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              isLoading={isSearching}
+              value={search}
+              onChange={(e) => {
+                const value = e.target.value
+                setSearch(value)
+                if (value.length === 0) setShowSearch(false)
+              }}
             >
               <InnerSideBarFilterSortDropdown
                 value={sort}
@@ -113,24 +132,43 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
           </DropdownMenu>
         </div>
 
-        <div className="px-2">
-          <InnerSideMenuItem
-            title="Templates"
-            isActive={router.asPath === `/project/${ref}/sql/templates`}
-            href={`/project/${ref}/sql/templates`}
-          >
-            Templates
-          </InnerSideMenuItem>
-          <InnerSideMenuItem
-            title="Quickstarts"
-            isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
-            href={`/project/${ref}/sql/quickstarts`}
-          >
-            Quickstarts
-          </InnerSideMenuItem>
-        </div>
+        {showSearch ? (
+          <SearchList
+            search={debouncedSearch}
+            onSelectSnippet={(snippet: Content) => {
+              setSearch('')
+              setShowSearch(false)
+              onShowSection(snippet.visibility)
+            }}
+          />
+        ) : (
+          <>
+            <div className="px-2">
+              <InnerSideMenuItem
+                title="Templates"
+                isActive={router.asPath === `/project/${ref}/sql/templates`}
+                href={`/project/${ref}/sql/templates`}
+              >
+                Templates
+              </InnerSideMenuItem>
+              <InnerSideMenuItem
+                title="Quickstarts"
+                isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
+                href={`/project/${ref}/sql/quickstarts`}
+              >
+                Quickstarts
+              </InnerSideMenuItem>
+            </div>
 
-        <SQLEditorNavV2 searchText={searchText} sort={sort} setIsSearching={setIsSearching} />
+            <SQLEditorNav
+              sort={sort}
+              showPrivateSnippets={showPrivateSnippets}
+              showSharedSnippets={showSharedSnippets}
+              setShowPrivateSnippets={setShowPrivateSnippets}
+              setShowSharedSnippets={setShowSharedSnippets}
+            />
+          </>
+        )}
       </div>
 
       <div className="p-4 border-t sticky bottom-0 bg-studio">

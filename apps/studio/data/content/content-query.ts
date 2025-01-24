@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { Dashboards, LogSqlSnippets, SqlSnippets } from 'types'
 import { contentKeys } from './keys'
 
@@ -29,10 +29,11 @@ interface GetContentVariables {
   projectRef?: string
   type: ContentType
   name?: string
+  limit?: number
 }
 
 export async function getContent(
-  { projectRef, type, name }: GetContentVariables,
+  { projectRef, type, name, limit = 10 }: GetContentVariables,
   signal?: AbortSignal
 ) {
   if (typeof projectRef === 'undefined') {
@@ -40,13 +41,11 @@ export async function getContent(
   }
 
   const { data, error } = await get('/platform/projects/{ref}/content', {
-    params: { path: { ref: projectRef }, query: { type, name } },
+    params: { path: { ref: projectRef }, query: { type, name, limit: limit.toString() } },
     signal,
   })
 
-  if (error) {
-    throw error
-  }
+  if (error) handleError(error)
 
   return {
     cursor: data.cursor,
@@ -57,12 +56,13 @@ export async function getContent(
 export type ContentData = Awaited<ReturnType<typeof getContent>>
 export type ContentError = unknown
 
+/** @deprecated Use useContentInfiniteQuery from content-infinite-query instead */
 export const useContentQuery = <TData = ContentData>(
-  { projectRef, type, name }: GetContentVariables,
+  { projectRef, type, name, limit }: GetContentVariables,
   { enabled = true, ...options }: UseQueryOptions<ContentData, ContentError, TData> = {}
 ) =>
   useQuery<ContentData, ContentError, TData>(
-    contentKeys.list(projectRef, { type, name }),
-    ({ signal }) => getContent({ projectRef, type, name }, signal),
+    contentKeys.list(projectRef, { type, name, limit }),
+    ({ signal }) => getContent({ projectRef, type, name, limit }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )

@@ -1,7 +1,6 @@
-import { useDebounce } from '@uidotdev/usehooks'
 import { Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -26,7 +25,7 @@ import {
   useSqlEditorV2StateSnapshot,
 } from 'state/sql-editor-v2'
 import { SqlSnippets } from 'types'
-import { cn, Separator, TreeView } from 'ui'
+import { Separator, TreeView } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
@@ -40,20 +39,20 @@ import { formatFolderResponseForTreeView, getLastItemIds, ROOT_NODE } from './SQ
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 
 interface SQLEditorNavProps {
-  searchText: string
   sort?: 'inserted_at' | 'name'
-  setIsSearching?: Dispatch<SetStateAction<boolean>>
+  showPrivateSnippets: boolean
+  showSharedSnippets: boolean
+  setShowPrivateSnippets: (value: boolean) => void
+  setShowSharedSnippets: (value: boolean) => void
 }
 
 export const SQLEditorNav = ({
-  searchText: _searchText,
   sort = 'inserted_at',
-  setIsSearching,
+  showPrivateSnippets,
+  showSharedSnippets,
+  setShowPrivateSnippets,
+  setShowSharedSnippets,
 }: SQLEditorNavProps) => {
-  const searchText = _searchText.trim()
-  const debouncedSearchText = useDebounce(searchText, 250)
-  const isSearching = searchText.length > 0
-
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
@@ -65,8 +64,8 @@ export const SQLEditorNav = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showRenameModal, setShowRenameModal] = useState(false)
   const [showFavoriteSnippets, setShowFavoriteSnippets] = useState(false)
-  const [showSharedSnippets, setShowSharedSnippets] = useState(false)
-  const [showPrivateSnippets, setShowPrivateSnippets] = useState(true)
+  // const [showSharedSnippets, setShowSharedSnippets] = useState(false)
+  // const [showPrivateSnippets, setShowPrivateSnippets] = useState(true)
 
   const [defaultExpandedFolderIds, setDefaultExpandedFolderIds] = useState<string[]>()
   const [selectedSnippets, setSelectedSnippets] = useState<Snippet[]>([])
@@ -89,10 +88,7 @@ export const SQLEditorNav = ({
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useSQLSnippetFoldersQuery(
-    { projectRef, name: debouncedSearchText, sort },
-    { keepPreviousData: true }
-  )
+  } = useSQLSnippetFoldersQuery({ projectRef, sort }, { keepPreviousData: true })
 
   useEffect(() => {
     if (projectRef && privateSnippetsPages) {
@@ -169,7 +165,6 @@ export const SQLEditorNav = ({
   const { data: snippetCountData } = useContentCountQuery({
     projectRef,
     type: 'sql',
-    name: debouncedSearchText,
   })
   const numPrivateSnippets = snippetCountData?.private ?? 0
 
@@ -200,7 +195,6 @@ export const SQLEditorNav = ({
     {
       projectRef,
       favorite: true,
-      name: debouncedSearchText,
       sort,
     },
     { enabled: showFavoriteSnippets, keepPreviousData: true }
@@ -265,7 +259,6 @@ export const SQLEditorNav = ({
     {
       projectRef,
       visibility: 'project',
-      name: debouncedSearchText,
       sort,
     },
     { enabled: showSharedSnippets, keepPreviousData: true }
@@ -516,10 +509,6 @@ export const SQLEditorNav = ({
   // ===============
 
   useEffect(() => {
-    setIsSearching?.(filteredSnippets.isLoading)
-  }, [filteredSnippets.isLoading, setIsSearching])
-
-  useEffect(() => {
     if (snippet !== undefined && !mountedId) {
       if (snippet.visibility === 'project') setShowSharedSnippets(true)
       if (snippet.folder_id) {
@@ -529,7 +518,7 @@ export const SQLEditorNav = ({
       // Only want to run this once when loading sql/[id] route
       setMountedId(true)
     }
-  }, [snippet, mountedId, sort, debouncedSearchText])
+  }, [snippet, mountedId, sort])
 
   useEffect(() => {
     // Unselect all snippets whenever opening another snippet
@@ -552,13 +541,9 @@ export const SQLEditorNav = ({
             <SQLEditorLoadingSnippets />
           ) : numProjectSnippets === 0 ? (
             <InnerSideBarEmptyPanel
-              className={cn('mx-2 px-3', isSearching ? '[&>div>p]:text-foreground-lighter' : '')}
-              title={isSearching ? 'No results found based on your search' : 'No shared queries'}
-              description={
-                isSearching
-                  ? undefined
-                  : 'Share queries with your team by right-clicking on the query'
-              }
+              className="mx-2 px-3"
+              title="No shared queries"
+              description="Share queries with your team by right-clicking on the query"
             />
           ) : (
             <TreeView
@@ -610,16 +595,14 @@ export const SQLEditorNav = ({
             <SQLEditorLoadingSnippets />
           ) : numFavoriteSnippets === 0 ? (
             <InnerSideBarEmptyPanel
-              title={isSearching ? 'No results found based on your search' : 'No favorite queries'}
-              className={cn('mx-2 px-3', isSearching ? '[&>div>p]:text-foreground-lighter' : '')}
+              title="No favorite queries"
+              className="mx-2 px-3"
               description={
-                isSearching ? null : (
-                  <>
-                    Save a query to favorites for easy accessibility by clicking the{' '}
-                    <Heart size={12} className="inline-block relative align-center -top-[1px]" />{' '}
-                    icon.
-                  </>
-                )
+                <>
+                  Save a query to favorites for easy accessibility by clicking the{' '}
+                  <Heart size={12} className="inline-block relative align-center -top-[1px]" />{' '}
+                  icon.
+                </>
               }
             />
           ) : (
@@ -747,7 +730,6 @@ export const SQLEditorNav = ({
                   fetchNextPage={fetchNextPage}
                   isFetchingNextPage={isFetchingNextPage}
                   sort={sort}
-                  name={debouncedSearchText}
                   onFolderContentsChange={({ isLoading, snippets }) => {
                     setSubResults((prev) => ({
                       ...prev,
