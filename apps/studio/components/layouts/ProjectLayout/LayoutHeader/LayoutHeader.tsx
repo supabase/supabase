@@ -23,6 +23,7 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
+import { set } from 'lodash'
 
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger">
@@ -46,17 +47,15 @@ interface LayoutHeaderProps {
   customHeaderComponents?: ReactNode
   breadcrumbs?: any[]
   headerBorder?: boolean
-  showProductMenu?: boolean
+  hasProductMenu?: boolean
   customSidebarContent?: ReactNode
-  handleMobileMenu: Function
 }
 
 const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
   headerBorder = true,
-  showProductMenu,
-  handleMobileMenu,
+  hasProductMenu,
 }: LayoutHeaderProps) => {
   const { ref: projectRef } = useParams()
   const router = useRouter()
@@ -64,7 +63,7 @@ const LayoutHeader = ({
   const selectedOrganization = useSelectedOrganization()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
   const isOrgPage = router.pathname.startsWith('/org/') // Add this check
-  const { aiAssistantPanel } = useAppStateSnapshot()
+  const { aiAssistantPanel, setMobileInnerMenuOpen } = useAppStateSnapshot()
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganization?.slug,
@@ -88,8 +87,22 @@ const LayoutHeader = ({
 
   return (
     <>
-      <header className={cn('flex h-16 max-h-16 min-h-16 items-center flex-shrink-0')}>
-        <div className={cn('flex items-center justify-between py-2 px-3 flex-1', 'pl-5')}>
+      <header className={cn('flex h-16 max-h-16 min-h-16 items-center flex-shrink-0 border-b')}>
+        <div className={cn('flex items-center justify-between py-2 pl-1.5 pr-3 flex-1', 'pl-5')}>
+          {hasProductMenu && (
+            <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
+              <button
+                title="Menu dropdown button"
+                className={cn(
+                  'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
+                )}
+                onClick={() => setMobileInnerMenuOpen(true)}
+              >
+                <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+                <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+              </button>
+            </div>
+          )}
           <div className="flex items-center text-sm">
             <Link
               href={IS_PLATFORM ? `/org/${selectedOrganization?.slug}` : `/project/${projectRef}`}

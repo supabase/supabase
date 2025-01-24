@@ -11,6 +11,8 @@ import {
   TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useApiReport } from 'data/reports/api-report-query'
@@ -102,6 +104,12 @@ export const ApiReport: NextPageWithLayout = () => {
   )
 }
 
-ApiReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
+ApiReport.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="API Report">
+      <ReportsLayout>{page}</ReportsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default ApiReport

@@ -61,7 +61,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
 QueryPerformanceReport.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="Query Performance">
       <AdvisorsLayout title="Query performance">{page}</AdvisorsLayout>
     </DefaultLayout>
   </AppLayout>

@@ -10,14 +10,20 @@ import { PROJECT_STATUS } from 'lib/constants'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import { useAppStateSnapshot } from 'state/app-state'
+import { LayoutHeader } from './ProjectLayout/LayoutHeader'
 
 export interface DefaultLayoutProps {
   title?: string
   product?: string
   selectedTable?: string
+  hasProductMenu?: boolean
 }
 
-const DefaultLayout = ({ children }: PropsWithChildren<DefaultLayoutProps>) => {
+const DefaultLayout = ({
+  children,
+  hasProductMenu,
+  product,
+}: PropsWithChildren<DefaultLayoutProps>) => {
   const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
   return (
     <>
@@ -27,9 +33,10 @@ const DefaultLayout = ({ children }: PropsWithChildren<DefaultLayoutProps>) => {
             {/* Top Banner */}
             <div className="flex-shrink-0">
               <AppBannerWrapper />
-              <SidebarOpenTopBanner />
-              <MobileNavigationBar />
-              <MobileViewNav title={'test'} />
+              {/* <SidebarOpenTopBanner /> */}
+              <LayoutHeader hasProductMenu={hasProductMenu} />
+              {/* <MobileNavigationBar /> */}
+              <MobileViewNav title={product} />
             </div>
             {/* Main Content Area */}
             <div className="flex flex-1 w-full overflow-y-hidden">

@@ -159,7 +159,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
 
 LogDrainsSettings.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="Log Drains">
       <SettingsLayout title="Log Drains">{page}</SettingsLayout>
     </DefaultLayout>
   </AppLayout>

@@ -37,6 +37,7 @@ import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
 import { ProjectNavigationBarHorizontal } from './NavigationBar/navigation-bar-horizontal'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -95,7 +96,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
-    const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+    const { aiAssistantPanel, setAiAssistantPanel, mobileInnerMenuOpen, setMobileInnerMenuOpen } =
+      useAppStateSnapshot()
     const { open } = aiAssistantPanel
 
     // tabs preview flag logic
@@ -276,6 +278,9 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
         <EnableBranchingModal />
         <AISettingsModal />
         <ProjectAPIDocs />
+        <MobileSheetNav open={mobileInnerMenuOpen} onOpenChange={setMobileInnerMenuOpen}>
+          {productMenu}
+        </MobileSheetNav>
       </ProjectContextProvider>
     )
   }

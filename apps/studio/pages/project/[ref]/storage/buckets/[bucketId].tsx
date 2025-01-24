@@ -41,7 +41,7 @@ const PageLayout: NextPageWithLayout = () => {
 
 PageLayout.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="Bucket">
       <StorageLayout title="Buckets">{page}</StorageLayout>
     </DefaultLayout>
   </AppLayout>

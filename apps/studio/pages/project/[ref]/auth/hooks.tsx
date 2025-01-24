@@ -26,7 +26,7 @@ const Hooks: NextPageWithLayout = () => {
 Hooks.getLayout = (page) => {
   return (
     <AppLayout>
-      <DefaultLayout>
+      <DefaultLayout product="Hooks">
         <AuthLayout>{page}</AuthLayout>
       </DefaultLayout>
     </AppLayout>

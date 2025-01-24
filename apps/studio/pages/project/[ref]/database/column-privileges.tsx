@@ -31,6 +31,8 @@ import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 
@@ -361,7 +363,11 @@ const PrivilegesPage: NextPageWithLayout = () => {
 }
 
 PrivilegesPage.getLayout = (page) => (
-  <DatabaseLayout title="Column Privileges">{page}</DatabaseLayout>
+  <AppLayout>
+    <DefaultLayout product="Column privileges">
+      <DatabaseLayout title="Column Privileges">{page}</DatabaseLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 export default PrivilegesPage

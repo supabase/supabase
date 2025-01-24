@@ -26,7 +26,7 @@ const ProjectAddons: NextPageWithLayout = () => {
 
 ProjectAddons.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="Add ons">
       <SettingsLayout title="Add ons">{page}</SettingsLayout>
     </DefaultLayout>
   </AppLayout>

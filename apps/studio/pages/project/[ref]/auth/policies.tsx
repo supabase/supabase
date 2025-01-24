@@ -176,7 +176,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
 AuthPoliciesPage.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="Policies">
       <AuthLayout title="Auth">
         <div className="h-full p-4">{page}</div>
       </AuthLayout>

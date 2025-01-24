@@ -9,7 +9,7 @@ const Storage: NextPageWithLayout = () => {
 
 Storage.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="Storage">
       <StorageLayout title="Storage">{page}</StorageLayout>
     </DefaultLayout>
   </AppLayout>

@@ -42,14 +42,14 @@ export function UserDropdown() {
               alt="shadcn"
               src="https://avatars.githubusercontent.com/u/8291514?s=96&v=4"
             ></img>
-            <div className="flex-grow flex flex-col gap-0 justify-start text-left">
+            {/* <div className="flex-grow flex flex-col gap-0 justify-start text-left">
               <span className="text-foreground-light truncate text-xs leading-none">
                 {profile?.username}
               </span>
               <span className="text-foreground-lighter truncate text-xs">
                 {profile?.primary_email}
               </span>
-            </div>
+            </div> */}
           </div>
         </Button>
       </DropdownMenuTrigger>

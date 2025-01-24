@@ -52,7 +52,7 @@ const TableEditorPage: NextPageWithLayout = () => {
 
 TableEditorPage.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout hasProductMenu>
       <ProjectLayoutWithAuth productMenu={<TableEditorMenu />} product="Table Editor">
         <EditorBaseLayout>
           <TableEditorLayout>

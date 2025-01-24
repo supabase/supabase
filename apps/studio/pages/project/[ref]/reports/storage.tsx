@@ -16,6 +16,8 @@ import { useStorageReport } from 'data/reports/storage-report-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
@@ -71,6 +73,12 @@ export const StorageReport: NextPageWithLayout = () => {
   )
 }
 
-StorageReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
+StorageReport.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Storage Report">
+      <ReportsLayout title="Storage">{page}</ReportsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default StorageReport

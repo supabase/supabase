@@ -30,7 +30,7 @@ const PageLayout: NextPageWithLayout = () => {
 
 PageLayout.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="Functions">
       <SettingsLayout title="Settings">{page}</SettingsLayout>
     </DefaultLayout>
   </AppLayout>

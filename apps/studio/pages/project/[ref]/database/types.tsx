@@ -12,6 +12,8 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { DocsButton } from 'components/ui/DocsButton'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
   return (
@@ -33,7 +35,11 @@ const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
 }
 
 DatabaseEnumeratedTypes.getLayout = (page) => (
-  <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  <AppLayout>
+    <DefaultLayout product="Enumerated Types">
+      <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 export default DatabaseEnumeratedTypes

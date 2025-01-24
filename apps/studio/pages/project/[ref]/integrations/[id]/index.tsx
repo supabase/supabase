@@ -1,6 +1,8 @@
 import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useRouter } from 'next/compat/router'
@@ -58,6 +60,12 @@ const IntegrationPage: NextPageWithLayout = () => {
   return <Component />
 }
 
-IntegrationPage.getLayout = (page) => <IntegrationsLayout>{page}</IntegrationsLayout>
+IntegrationPage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Integration">
+      <IntegrationsLayout>{page}</IntegrationsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default IntegrationPage

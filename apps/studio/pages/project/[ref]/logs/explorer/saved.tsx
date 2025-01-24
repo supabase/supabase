@@ -9,6 +9,8 @@ import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import { useContentQuery } from 'data/content/content-query'
 import type { NextPageWithLayout } from 'types'
 import { Loading } from 'ui'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -64,6 +66,12 @@ export const LogsSavedPage: NextPageWithLayout = () => {
   )
 }
 
-LogsSavedPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
+LogsSavedPage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Saved logs">
+      <LogsLayout>{page}</LogsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default LogsSavedPage

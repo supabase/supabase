@@ -45,7 +45,7 @@ const SqlQuickstarts: NextPageWithLayout = () => {
 
 SqlQuickstarts.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="SQL editor">
       <ProjectLayoutWithAuth productMenu={<SQLEditorMenu />} product="SQL Editor">
         <EditorBaseLayout>
           <SQLEditorLayout>

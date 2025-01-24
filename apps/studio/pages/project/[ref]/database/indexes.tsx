@@ -12,6 +12,8 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const IndexesPage: NextPageWithLayout = () => {
   return (
@@ -48,6 +50,12 @@ const IndexesPage: NextPageWithLayout = () => {
   )
 }
 
-IndexesPage.getLayout = (page) => <DatabaseLayout title="Indexes">{page}</DatabaseLayout>
+IndexesPage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Indexes">
+      <DatabaseLayout title="Indexes">{page}</DatabaseLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default IndexesPage

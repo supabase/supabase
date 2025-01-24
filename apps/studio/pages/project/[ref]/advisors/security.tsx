@@ -113,7 +113,7 @@ const ProjectLints: NextPageWithLayout = () => {
 
 ProjectLints.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="Security">
       <AdvisorsLayout title="Linter">{page}</AdvisorsLayout>
     </DefaultLayout>
   </AppLayout>

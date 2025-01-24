@@ -28,7 +28,7 @@ const URLConfiguration: NextPageWithLayout = () => {
 URLConfiguration.getLayout = (page) => {
   return (
     <AppLayout>
-      <DefaultLayout>
+      <DefaultLayout product="URL Configuration">
         <AuthLayout>{page}</AuthLayout>
       </DefaultLayout>
     </AppLayout>

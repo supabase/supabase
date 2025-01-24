@@ -14,7 +14,7 @@ const EditorNewPage: NextPageWithLayout = () => {
 
 EditorNewPage.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout hasProductMenu>
       <ProjectLayoutWithAuth productMenu={<TableEditorMenu />} product="Table Editor">
         <EditorBaseLayout>
           <TableEditorLayout>

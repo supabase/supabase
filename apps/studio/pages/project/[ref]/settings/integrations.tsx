@@ -26,7 +26,7 @@ const OrgIntegrationSettings: NextPageWithLayout = () => {
 
 OrgIntegrationSettings.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="Integrations">
       <SettingsLayout>{page}</SettingsLayout>
     </DefaultLayout>
   </AppLayout>

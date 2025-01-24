@@ -45,7 +45,7 @@ const DatabasePhysicalBackups: NextPageWithLayout = () => {
 
 DatabasePhysicalBackups.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="Database backups">
       <DatabaseLayout title="Database">{page}</DatabaseLayout>
     </DefaultLayout>
   </AppLayout>

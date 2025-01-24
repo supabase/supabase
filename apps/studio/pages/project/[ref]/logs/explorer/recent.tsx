@@ -9,6 +9,8 @@ import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Clock } from 'lucide-react'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -58,6 +60,12 @@ export const LogsSavedPage: NextPageWithLayout = () => {
   )
 }
 
-LogsSavedPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
+LogsSavedPage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Recent logs">
+      <LogsLayout>{page}</LogsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default LogsSavedPage

@@ -17,7 +17,7 @@ const SchemasPage: NextPageWithLayout = () => {
 
 SchemasPage.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="Schemas">
       <DatabaseLayout title="Database">{page}</DatabaseLayout>
     </DefaultLayout>
   </AppLayout>

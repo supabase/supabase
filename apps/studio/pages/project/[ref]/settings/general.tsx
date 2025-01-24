@@ -51,7 +51,7 @@ const ProjectSettings: NextPageWithLayout = () => {
 
 ProjectSettings.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="General">
       <SettingsLayout title="General">{page}</SettingsLayout>
     </DefaultLayout>
   </AppLayout>

@@ -95,8 +95,8 @@ const TableEditorPage: NextPageWithLayout = () => {
 
 TableEditorPage.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
-      <ProjectLayoutWithAuth productMenu={<TableEditorMenu />} product="Table Editor">
+    <DefaultLayout hasProductMenu product="Table Editor">
+      <ProjectLayoutWithAuth productMenu={<TableEditorMenu />}>
         <EditorBaseLayout>
           <TableEditorLayout>
             <ProjectContextFromParamsProvider>{page}</ProjectContextFromParamsProvider>

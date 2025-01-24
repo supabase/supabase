@@ -22,7 +22,7 @@ const ApiSettings: NextPageWithLayout = () => {
 
 ApiSettings.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="API">
       <SettingsLayout title="API Settings">{page}</SettingsLayout>
     </DefaultLayout>
   </AppLayout>

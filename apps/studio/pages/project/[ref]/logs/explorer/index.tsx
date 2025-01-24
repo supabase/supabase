@@ -50,6 +50,8 @@ import { uuidv4 } from 'lib/helpers'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 import { useContentUpdateMutation } from 'data/content/content-update-mutation'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const PLACEHOLDER_WAREHOUSE_QUERY =
   '-- Fetch the last 10 logs in the last 7 days \nselect id, timestamp, event_message from `COLLECTION_NAME` \nwhere timestamp > timestamp_sub(current_timestamp(), interval 7 day) \norder by timestamp desc limit 10'
@@ -472,6 +474,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   )
 }
 
-LogsExplorerPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
+LogsExplorerPage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Explorer">
+      <LogsLayout>{page}</LogsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default LogsExplorerPage

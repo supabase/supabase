@@ -1,7 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { Extensions } from 'components/interfaces/Database'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
@@ -31,6 +33,12 @@ const DatabaseExtensions: NextPageWithLayout = () => {
   )
 }
 
-DatabaseExtensions.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+DatabaseExtensions.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Extensions">
+      <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default DatabaseExtensions

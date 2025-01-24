@@ -48,7 +48,7 @@ const TableEditorPage: NextPageWithLayout = () => {
 
 TableEditorPage.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="SQL Editor">
       <ProjectLayoutWithAuth productMenu={<SQLEditorMenu />} product="SQL Editor">
         <EditorBaseLayout>
           <SQLEditorLayout>

@@ -18,6 +18,7 @@ import Connect from './Connect/Connect'
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
 import Image from 'next/image'
 import Link from 'next/link'
+import { UserDropdown } from './user-dropdown'
 
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger mr-1">
@@ -159,6 +160,7 @@ export function SidebarOpenTopBanner() {
               <FeedbackDropdown />
               <NotificationsPopoverV2 />
               <HelpPopover />
+              <UserDropdown />
             </>
           )}
         </div>

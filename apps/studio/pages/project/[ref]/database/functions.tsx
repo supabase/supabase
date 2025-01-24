@@ -73,7 +73,7 @@ const FunctionsPage: NextPageWithLayout = () => {
 
 FunctionsPage.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout>
+    <DefaultLayout product="Functions">
       <DatabaseLayout title="Database">{page}</DatabaseLayout>
     </DefaultLayout>
   </AppLayout>

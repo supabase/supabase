@@ -27,7 +27,7 @@ const PageLayout: NextPageWithLayout = () => {
 PageLayout.getLayout = (page) => {
   return (
     <AppLayout>
-      <DefaultLayout>
+      <DefaultLayout product="Providers">
         <AuthLayout>{page}</AuthLayout>
       </DefaultLayout>
     </AppLayout>
