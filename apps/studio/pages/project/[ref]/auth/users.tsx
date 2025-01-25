@@ -5,7 +5,11 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import type { NextPageWithLayout } from 'types'
 
 const UsersPage: NextPageWithLayout = () => {
-  return <UsersV2 />
+  return (
+    <>
+      <UsersV2 />
+    </>
+  )
 }
 
 UsersPage.getLayout = (page) => (
