@@ -6,7 +6,7 @@ import {
 } from 'components/grid/utils/gridColumns'
 import { Key } from 'lucide-react'
 import DataGrid, { Column } from 'react-data-grid'
-import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export interface SelectorGridProps {
   table: SupaTable
@@ -18,14 +18,14 @@ const columnRender = (name: string, isPrimaryKey = false) => {
   return (
     <div className="flex h-full items-center justify-center gap-2">
       {isPrimaryKey && (
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_>
+        <Tooltip>
+          <TooltipTrigger>
             <div className="text-brand">
               <Key size={14} strokeWidth={2} />
             </div>
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">Primary key</TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Primary key</TooltipContent>
+        </Tooltip>
       )}
 
       <span className="sb-grid-column-header__inner__name">{name}</span>

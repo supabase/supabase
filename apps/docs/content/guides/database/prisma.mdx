@@ -140,7 +140,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
                   In your .env file, set the DATABASE_URL variable to your connection string
                     ```text .env
                     # Used for Prisma Migrations and within your application
-                    DATABASE_URL="postgres://[DB-USER].[PROJECT-REF]:[PRISMA-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
+                    DATABASE_URL="postgres://[DB-USER].[PROJECT-REF]:[PRISMA-PASSWORD]@[DB-REGION].pooler.supabase.com:5432/postgres"
                     ```
 
                     Change your string's `[DB-USER]` to `prisma` and add the password you created in step 1

@@ -1,16 +1,18 @@
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
+import { ChevronDown } from 'lucide-react'
+import { ReactNode, useEffect, useState } from 'react'
+
+import { DATE_FORMAT } from 'lib/constants'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-
-import { DATE_FORMAT } from 'lib/constants'
-import { ChevronDown } from 'lucide-react'
 
 /**
  * There's timestamp rounding that kicks in if there are more than 50 data points
@@ -23,6 +25,7 @@ import { ChevronDown } from 'lucide-react'
 interface DateRangePickerProps {
   value: string
   loading: boolean
+  className?: string
   onChange: ({
     period_start,
     period_end,
@@ -35,15 +38,18 @@ interface DateRangePickerProps {
   options: { key: string; label: string; interval?: string }[]
   currentBillingPeriodStart?: number
   currentBillingPeriodEnd?: number
+  footer?: ReactNode
 }
 
-const DateRangePicker = ({
+export const DateRangePicker = ({
   onChange,
   value,
   options,
+  className,
   loading,
   currentBillingPeriodStart,
   currentBillingPeriodEnd,
+  footer,
 }: DateRangePickerProps) => {
   const [timePeriod, setTimePeriod] = useState(value)
 
@@ -193,27 +199,31 @@ const DateRangePicker = ({
   }
 
   return (
-    <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown />}>
-            <span>{timePeriod && options.find((x) => x.key === timePeriod)?.label}</span>
-          </Button>
-        </DropdownMenuTrigger>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button type="default" iconRight={<ChevronDown />}>
+          <span>{timePeriod && options.find((x) => x.key === timePeriod)?.label}</span>
+        </Button>
+      </DropdownMenuTrigger>
 
-        <DropdownMenuContent side="bottom" align="start">
-          <DropdownMenuRadioGroup value={timePeriod} onValueChange={(x) => handleChange(x)}>
-            {options.map((option) => {
-              return (
-                <DropdownMenuRadioItem value={option.key} key={option.key}>
-                  {option.label}
-                </DropdownMenuRadioItem>
-              )
-            })}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </>
+      <DropdownMenuContent side="bottom" align="start" className={cn(!footer && 'w-36', className)}>
+        <DropdownMenuRadioGroup value={timePeriod} onValueChange={(x) => handleChange(x)}>
+          {options.map((option) => {
+            return (
+              <DropdownMenuRadioItem value={option.key} key={option.key}>
+                {option.label}
+              </DropdownMenuRadioItem>
+            )
+          })}
+        </DropdownMenuRadioGroup>
+        {!!footer && (
+          <>
+            <DropdownMenuSeparator />
+            {footer}
+          </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

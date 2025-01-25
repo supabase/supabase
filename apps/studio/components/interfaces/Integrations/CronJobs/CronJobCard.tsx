@@ -4,12 +4,12 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useCronJobRunQuery } from 'data/database-cron-jobs/database-cron-jobs-run-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import {
   Badge,
   Button,
@@ -27,6 +27,7 @@ import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { convertCronToString, getNextRun } from './CronJobs.utils'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface CronJobCardProps {
   job: CronJob
@@ -36,6 +37,7 @@ interface CronJobCardProps {
 
 export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCardProps) => {
   const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { project: selectedProject } = useProjectContext()
 
   const [toggleConfirmationModalShown, showToggleConfirmationModal] = useState(false)
@@ -93,6 +95,10 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 onClick={() => {
                   sendEvent({
                     action: TelemetryActions.CRON_JOB_HISTORY_CLICKED,
+                    groups: {
+                      project: selectedProject?.ref ?? 'Unknown',
+                      organization: org?.slug ?? 'Unknown',
+                    },
                   })
                 }}
               >
@@ -107,6 +113,10 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                     onClick={() => {
                       sendEvent({
                         action: TelemetryActions.CRON_JOB_UPDATE_CLICKED,
+                        groups: {
+                          project: selectedProject?.ref ?? 'Unknown',
+                          organization: org?.slug ?? 'Unknown',
+                        },
                       })
                       onEditCronJob(job)
                     }}
@@ -118,6 +128,10 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                     onClick={() => {
                       sendEvent({
                         action: TelemetryActions.CRON_JOB_DELETE_CLICKED,
+                        groups: {
+                          project: selectedProject?.ref ?? 'Unknown',
+                          organization: org?.slug ?? 'Unknown',
+                        },
                       })
                       onDeleteCronJob(job)
                     }}

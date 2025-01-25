@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 
 import { useCompletion } from 'ai/react'
 import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
@@ -25,7 +26,6 @@ import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import { detectOS, uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
@@ -44,9 +44,9 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
@@ -80,6 +80,7 @@ export const SQLEditor = () => {
   const os = detectOS()
   const router = useRouter()
   const { ref, id: urlId } = useParams()
+  const org = useSelectedOrganization()
   const { profile } = useProfile()
   const queryClient = useQueryClient()
   const project = useSelectedProject()
@@ -423,6 +424,7 @@ export const SQLEditor = () => {
       sendEvent({
         action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
         properties: { handlerAccepted: true },
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
 
       setSelectedDiffType(DiffType.Modification)
@@ -447,6 +449,7 @@ export const SQLEditor = () => {
     sendEvent({
       action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
       properties: { handlerAccepted: false },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
     resetPrompt()
     closeDiff()
@@ -815,8 +818,8 @@ export const SQLEditor = () => {
             <ResizablePanel maxSize={10} minSize={10} className="max-h-9">
               {results?.rows !== undefined && !isExecuting && (
                 <GridFooter className="flex items-center justify-between gap-2">
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_>
+                  <Tooltip>
+                    <TooltipTrigger>
                       <p className="text-xs">
                         <span className="text-foreground">
                           {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
@@ -826,8 +829,8 @@ export const SQLEditor = () => {
                             ` (Limited to only ${results.autoLimit} rows)`}
                         </span>
                       </p>
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_ className="max-w-xs">
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
                       <p className="flex flex-col gap-y-1">
                         <span>
                           Results are automatically limited to preserve browser performance, in
@@ -838,8 +841,8 @@ export const SQLEditor = () => {
                           You may change or remove this limit from the dropdown on the right
                         </span>
                       </p>
-                    </TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
+                    </TooltipContent>
+                  </Tooltip>
                   {results.autoLimit !== undefined && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
