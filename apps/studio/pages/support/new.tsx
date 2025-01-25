@@ -14,8 +14,11 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 import { toast } from 'sonner'
 import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import { NextPageWithLayout } from 'types'
 
-const SupportPage = () => {
+const SupportPage: NextPageWithLayout = () => {
   const [sentCategory, setSentCategory] = useState<string>()
   const [selectedProject, setSelectedProject] = useState<string>('no-project')
   const { data, isLoading } = usePlatformStatusQuery()
@@ -162,5 +165,11 @@ const SupportPage = () => {
     </div>
   )
 }
+
+SupportPage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Support">{page}</DefaultLayout>
+  </AppLayout>
+)
 
 export default withAuth(SupportPage, { useHighestAAL: false })

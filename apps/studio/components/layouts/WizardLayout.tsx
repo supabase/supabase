@@ -20,7 +20,7 @@ const WizardLayout = ({
 }: PropsWithChildren<WizardLayoutProps>) => {
   return (
     <div className="flex w-full flex-col">
-      <Header organization={organization} project={project} />
+      {/* <Header organization={organization} project={project} /> */}
       <div className="overflow-auto">
         <section className="has-slide-in slide-in relative mx-auto my-10 max-w-2xl">
           {children}
