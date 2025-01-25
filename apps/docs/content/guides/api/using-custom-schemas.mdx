@@ -31,15 +31,16 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA myschema GRANT ALL ON ROUTI
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA myschema GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
 ```
 
-## Accessing custom schemas through data APIs
+Now you can access these schemas from data APIs:
 
-When accessing tables within custom schemas through the REST API, you must specify the schema. The approach varies depending on whether you're using SDKs or cURL commands.
-
-### Accessing custom schemas via SDKs
-
-For SDKs like JavaScript or Dart, you can specify the schema when initializing the client or on a per-query basis.
-
-#### JavaScript Example
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
 
 ```js
 // Initialize the JS client
@@ -49,11 +50,12 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { db: { schema: '
 // Make a request
 const { data: todos, error } = await supabase.from('todos').select('*')
 
-// Change schema on a per-query basis
+// You can also change the target schema on a per-query basis
 const { data: todos, error } = await supabase.schema('myschema').from('todos').select('*')
 ```
 
-#### Dart Example
+</TabPanel>
+<TabPanel id="dart" label="Dart">
 
 ```dart
 // Initialize the Flutter client
@@ -67,29 +69,23 @@ final supabase = Supabase.instance.client;
 // Make a request
 final data = await supabase.from('todos').select();
 
-// Change schema on a per-query basis
+// You can also change the target schema on a per-query basis
 final data = await supabase.schema('myschema').from('todos').select();
 ```
 
-### Accessing custom schemas via cURL
+</TabPanel>
+<TabPanel id="curl" label="cURL">
 
-When using cURL to interact with the REST API, you must use specific headers to specify the schema:
-
-- Use the `Accept-Profile` header for `GET` and `HEAD` requests.
-- Use the `Content-Profile` header for `POST`, `PATCH`, `PUT`, and `DELETE` requests.
-
-#### Examples
-
-**GET request (uses Accept-Profile):**
 ```bash
+# Append /rest/v1/ to your URL, and then use the table name as the route.
+
+# for GET or HEAD request use Accept-Profile
 curl '<SUPABASE_URL>/rest/v1/todos' \
   -H "apikey: <SUPABASE_ANON_KEY>" \
   -H "Authorization: Bearer <SUPABASE_ANON_KEY>" \
   -H "Accept-Profile: myschema"
-```
 
-**POST request (uses Content-Profile):**
-```bash
+# for POST, PATCH, PUT and DELETE Request use Content-Profile
 curl -X POST '<SUPABASE_URL>/rest/v1/todos' \
   -H "apikey: <SUPABASE_ANON_KEY>" \
   -H "Authorization: Bearer <SUPABASE_ANON_KEY>" \
@@ -97,3 +93,6 @@ curl -X POST '<SUPABASE_URL>/rest/v1/todos' \
   -H "Content-Profile: myschema" \
   -d '{"column_name": "value"}'
 ```
+
+</TabPanel>
+</Tabs>
