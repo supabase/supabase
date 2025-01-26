@@ -65,7 +65,7 @@ const useLogsQuery = (
   } = useQuery(
     ['projects', projectRef, 'logs', queryParams],
     ({ signal }) =>
-      get<Logs>(`${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}`, {
+      get<Logs>(`${API_URL}/platform/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}`, {
         signal,
       }),
     {
