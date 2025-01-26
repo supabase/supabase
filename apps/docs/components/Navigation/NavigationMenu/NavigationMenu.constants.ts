@@ -2086,20 +2086,6 @@ export const platform: NavMenuConstant = {
         {
           name: 'Manage your subscription',
           url: '/guides/platform/manage-your-subscription',
-          items: [
-            {
-              name: 'Change your subscription plan',
-              url: '/guides/platform/manage-your-subscription/change-your-subscription-plan',
-            },
-            {
-              name: 'Manage your payment methods',
-              url: '/guides/platform/manage-your-subscription/manage-your-payment-methods',
-            },
-            {
-              name: 'Manage your billing details',
-              url: '/guides/platform/manage-your-subscription/manage-your-billing-details',
-            },
-          ],
         },
         {
           name: 'Your monthly invoice',

@@ -15,7 +15,6 @@ import QuickstartIntro from './quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './social_provider_settings_supabase.mdx'
 import SocialProviderSetup from './social_provider_setup.mdx'
 import PostgresInstallation from './postgres_installation.mdx'
-import BillingDetails from './billing/billing-details.mdx'
 
 export {
   AuthErrorCodesTable,
@@ -33,5 +32,4 @@ export {
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
   PostgresInstallation,
-  BillingDetails,
 }

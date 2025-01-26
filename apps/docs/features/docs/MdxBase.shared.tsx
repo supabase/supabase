@@ -29,7 +29,6 @@ import {
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
   PostgresInstallation,
-  BillingDetails,
 } from '~/components/MDX/partials'
 import { NavData } from '~/components/NavData'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
@@ -52,7 +51,6 @@ const components = {
   AuthSmsProviderConfig,
   AppleSecretGenerator,
   AuthProviders,
-  BillingDetails,
   Button,
   ButtonCard,
   CH,
