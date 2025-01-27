@@ -45,7 +45,7 @@ interface SQLEditorNavProps {
 }
 
 type SectionState = { shared: boolean; favorite: boolean; private: boolean }
-const DEFAULT_SECTION_STATE: SectionState = { shared: false, favorite: false, private: false }
+const DEFAULT_SECTION_STATE: SectionState = { shared: false, favorite: false, private: true }
 
 export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const router = useRouter()
@@ -53,17 +53,19 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const project = useSelectedProject()
   const { ref: projectRef, id } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const [sections, setSections] = useLocalStorage<SectionState | undefined>(
+  const [sectionVisibility, setSectionVisibility] = useLocalStorage<SectionState>(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_SECTION_STATE(projectRef ?? ''),
-    undefined
+    DEFAULT_SECTION_STATE
   )
+  const {
+    shared: showSharedSnippets,
+    favorite: showFavoriteSnippets,
+    private: showPrivateSnippets,
+  } = sectionVisibility
 
   const [showMoveModal, setShowMoveModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showRenameModal, setShowRenameModal] = useState(false)
-  const [showFavoriteSnippets, setShowFavoriteSnippets] = useState(false)
-  const [showSharedSnippets, setShowSharedSnippets] = useState(false)
-  const [showPrivateSnippets, setShowPrivateSnippets] = useState(true)
 
   const [expandedFolderIds, setExpandedFolderIds] = useState<string[]>([])
   const [selectedSnippets, setSelectedSnippets] = useState<Snippet[]>([])
@@ -361,7 +363,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         onSuccess: () => {
           setSelectedSnippetToShare(undefined)
           setSelectedSnippetToUnshare(undefined)
-          setShowSharedSnippets(true)
+          setSectionVisibility({ ...sectionVisibility, shared: true })
           snapV2.updateSnippet({
             id: snippet.id,
             snippet: { visibility, folder_id: null },
@@ -466,7 +468,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
   useEffect(() => {
     if (snippet !== undefined && isSuccess) {
-      if (snippet.visibility === 'project') setShowSharedSnippets(true)
+      if (snippet.visibility === 'project') {
+        setSectionVisibility({ ...sectionVisibility, shared: true })
+      } else if (snippet.visibility === 'user') {
+        setSectionVisibility({ ...sectionVisibility, private: true })
+      }
       if (snippet.folder_id && !expandedFolderIds.includes(snippet.folder_id)) {
         setExpandedFolderIds([...expandedFolderIds, snippet.folder_id])
       }
@@ -519,15 +525,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     })
   }, [projectRef, privateSnippetsPages?.pages])
 
-  useEffect(() => {
-    if (!!sections) {
-      const { private: _private, shared, favorite } = sections
-      setShowFavoriteSnippets(favorite)
-      setShowSharedSnippets(shared)
-      setShowPrivateSnippets(_private)
-    }
-  }, [sections])
-
   return (
     <>
       <InnerSideMenuSeparator />
@@ -535,8 +532,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       <InnerSideMenuCollapsible
         open={showSharedSnippets}
         onOpenChange={(value) => {
-          setShowSharedSnippets(value)
-          setSections({ ...(sections ?? DEFAULT_SECTION_STATE), shared: value })
+          setSectionVisibility({ ...(sectionVisibility ?? DEFAULT_SECTION_STATE), shared: value })
         }}
         className="px-0"
       >
@@ -594,8 +590,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         className="px-0"
         open={showFavoriteSnippets}
         onOpenChange={(value) => {
-          setShowFavoriteSnippets(value)
-          setSections({ ...(sections ?? DEFAULT_SECTION_STATE), favorite: value })
+          setSectionVisibility({ ...(sectionVisibility ?? DEFAULT_SECTION_STATE), favorite: value })
         }}
       >
         <InnerSideMenuCollapsibleTrigger
@@ -658,8 +653,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       <InnerSideMenuCollapsible
         open={showPrivateSnippets}
         onOpenChange={(value) => {
-          setShowPrivateSnippets(value)
-          setSections({ ...(sections ?? DEFAULT_SECTION_STATE), private: value })
+          setSectionVisibility({ ...(sectionVisibility ?? DEFAULT_SECTION_STATE), private: value })
         }}
         className="px-0"
       >
