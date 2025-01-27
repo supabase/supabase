@@ -294,16 +294,6 @@ export const SQLEditorTreeViewItem = ({
                   Move query
                 </ContextMenuItem_Shadcn_>
               )}
-              {onSelectDuplicate !== undefined && isOwner && (
-                <ContextMenuItem_Shadcn_
-                  className="gap-x-2"
-                  onSelect={() => onSelectDuplicate()}
-                  onFocusCapture={(e) => e.stopPropagation()}
-                >
-                  <Copy size={14} />
-                  Duplicate query
-                </ContextMenuItem_Shadcn_>
-              )}
               {onSelectShare !== undefined && !isSharedSnippet && canCreateSQLSnippet && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"
@@ -324,19 +314,16 @@ export const SQLEditorTreeViewItem = ({
                   Unshare query with team
                 </ContextMenuItem_Shadcn_>
               )}
-              {onSelectDuplicate !== undefined &&
-                isSharedSnippet &&
-                !isOwner &&
-                canCreateSQLSnippet && (
-                  <ContextMenuItem_Shadcn_
-                    className="gap-x-2"
-                    onSelect={() => onSelectDuplicate()}
-                    onFocusCapture={(e) => e.stopPropagation()}
-                  >
-                    <Copy size={14} />
-                    Duplicate personal copy
-                  </ContextMenuItem_Shadcn_>
-                )}
+              {onSelectDuplicate !== undefined && canCreateSQLSnippet && (
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onSelect={() => onSelectDuplicate()}
+                  onFocusCapture={(e) => e.stopPropagation()}
+                >
+                  <Copy size={14} />
+                  Duplicate query
+                </ContextMenuItem_Shadcn_>
+              )}
               {onSelectDownload !== undefined && IS_PLATFORM && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"
