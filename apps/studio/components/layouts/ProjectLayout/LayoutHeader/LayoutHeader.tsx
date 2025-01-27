@@ -189,24 +189,22 @@ const LayoutHeader = ({
             )}
           </div>
         </div>
-        {!!projectRef && (
-          <motion.div
-            className="border-l h-full flex items-center justify-center flex-shrink-0"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{
-              opacity: !aiAssistantPanel.open ? 1 : 0,
-              x: !aiAssistantPanel.open ? 0 : -20,
-              width: aiAssistantPanel.open ? 0 : 48,
-            }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{
-              duration: 0.15,
-              ease: 'easeOut',
-            }}
-          >
-            <AssistantButton />
-          </motion.div>
-        )}
+        <AnimatePresence initial={false}>
+          {!!projectRef && !aiAssistantPanel.open && (
+            <motion.div
+              className="border-l h-full flex items-center justify-center flex-shrink-0"
+              initial={{ opacity: 0, x: 0, width: 0 }}
+              animate={{ opacity: 1, x: 0, width: 48 }}
+              exit={{ opacity: 0, x: 0, width: 0 }}
+              transition={{
+                duration: 0.15,
+                ease: 'easeOut',
+              }}
+            >
+              <AssistantButton />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
       {/* {!isOrgPage && (
         <motion.div
