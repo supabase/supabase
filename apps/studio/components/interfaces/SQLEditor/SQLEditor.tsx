@@ -66,6 +66,7 @@ import {
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
+import { useAddDefinitions } from './useAddDefinitions'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 
 // Load the monaco editor client-side only (does not behave well server-side)
@@ -130,6 +131,8 @@ export const SQLEditor = () => {
     id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
   )
   const isLoading = urlId === 'new' ? false : snippetIsLoading
+
+  useAddDefinitions(id, monacoRef.current)
 
   /** React query data fetching  */
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
