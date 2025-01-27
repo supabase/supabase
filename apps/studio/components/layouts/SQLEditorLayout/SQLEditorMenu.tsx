@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { FilePlus, FolderPlus, Plus } from 'lucide-react'
+import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -17,12 +17,15 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import {
+  InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
-  InnerSideBarFilters,
   InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
@@ -42,8 +45,6 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(false)
   const [sort, setSort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
-  const [showSharedSnippets, setShowSharedSnippets] = useState(false)
-  const [showPrivateSnippets, setShowPrivateSnippets] = useState(true)
 
   const debouncedSearch = useDebounce(search, 500)
 
@@ -101,17 +102,32 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
                 }
               }}
             >
-              <InnerSideBarFilterSortDropdown
-                value={sort}
-                onValueChange={(value: any) => setSort(value)}
-              >
-                <InnerSideBarFilterSortDropdownItem key="name" value="name">
-                  Alphabetical
-                </InnerSideBarFilterSortDropdownItem>
-                <InnerSideBarFilterSortDropdownItem key="inserted_at" value="inserted_at">
-                  Created At
-                </InnerSideBarFilterSortDropdownItem>
-              </InnerSideBarFilterSortDropdown>
+              {showSearch ? (
+                <Tooltip>
+                  <TooltipTrigger
+                    className="absolute right-1 top-[.4rem] md:top-[.3rem] transition-colors text-foreground-light hover:text-foreground"
+                    onClick={() => {
+                      setSearch('')
+                      setShowSearch(false)
+                    }}
+                  >
+                    <X size={18} />
+                  </TooltipTrigger>
+                  <TooltipContent>Clear search</TooltipContent>
+                </Tooltip>
+              ) : (
+                <InnerSideBarFilterSortDropdown
+                  value={sort}
+                  onValueChange={(value: any) => setSort(value)}
+                >
+                  <InnerSideBarFilterSortDropdownItem key="name" value="name">
+                    Alphabetical
+                  </InnerSideBarFilterSortDropdownItem>
+                  <InnerSideBarFilterSortDropdownItem key="inserted_at" value="inserted_at">
+                    Created At
+                  </InnerSideBarFilterSortDropdownItem>
+                </InnerSideBarFilterSortDropdown>
+              )}
             </InnerSideBarFilterSearchInput>
           </InnerSideBarFilters>
           <DropdownMenu>

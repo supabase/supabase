@@ -42,13 +42,13 @@ export const SearchList = ({ search, onSelectSnippet }: SearchListProps) => {
   const { data: count, isLoading: isLoadingCount } = useContentCountQuery(
     {
       projectRef,
+      cumulative: true,
       type: 'sql',
       name: search,
     },
     { keepPreviousData: true }
   )
-  const { private: _private, shared, favorites } = count || { private: 0, shared: 0, favorites: 0 }
-  const totalNumber = _private + shared - favorites
+  const totalNumber = (count as unknown as { count: number })?.count ?? 0
 
   const snippets = useMemo(() => data?.pages.flatMap((page) => page.content), [data?.pages])
 

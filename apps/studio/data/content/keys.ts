@@ -39,6 +39,11 @@ export const contentKeys = {
   count: (
     projectRef: string | undefined,
     type?: string,
-    options?: { visibility?: SqlSnippet['visibility']; favorite?: boolean; name?: string }
+    options?: {
+      cumulative?: boolean
+      visibility?: SqlSnippet['visibility']
+      favorite?: boolean
+      name?: string
+    }
   ) => ['projects', projectRef, 'content', 'count', type, options].filter(Boolean),
 }
