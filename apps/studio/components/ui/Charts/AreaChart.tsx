@@ -1,12 +1,13 @@
 import dayjs from 'dayjs'
 import { useState } from 'react'
-import { Area, AreaChart as RechartAreaChart, Tooltip, XAxis } from 'recharts'
+import { Area, AreaChart as RechartAreaChart, ReferenceArea, Tooltip, XAxis } from 'recharts'
 
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import ChartHeader from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
+import type { ChartHighlight } from './useChartHighlight'
 
 export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -14,6 +15,7 @@ export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   format?: string
   customDateFormat?: string
   displayDateInUtc?: boolean
+  chartHighlight?: ChartHighlight
 }
 
 const AreaChart = ({
@@ -30,6 +32,7 @@ const AreaChart = ({
   className = '',
   valuePrecision,
   size = 'normal',
+  chartHighlight,
 }: AreaChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -70,6 +73,7 @@ const AreaChart = ({
         }
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
+        chartHighlight={chartHighlight}
       />
       <Container>
         <RechartAreaChart
@@ -86,7 +90,20 @@ const AreaChart = ({
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
             }
+            const activeTimestamp = data[e.activeTooltipIndex]?.[xAxisKey]
+            chartHighlight?.handleMouseMove({
+              activeLabel: activeTimestamp?.toString(),
+              coordinates: e.activeLabel,
+            })
           }}
+          onMouseDown={(e: any) => {
+            const activeTimestamp = data[e.activeTooltipIndex]?.[xAxisKey]
+            chartHighlight?.handleMouseDown({
+              activeLabel: activeTimestamp?.toString(),
+              coordinates: e.activeLabel,
+            })
+          }}
+          onMouseUp={chartHighlight?.handleMouseUp}
           onMouseLeave={() => setFocusDataIndex(null)}
         >
           <defs>
@@ -113,6 +130,16 @@ const AreaChart = ({
             fillOpacity={1}
             fill="url(#colorUv)"
           />
+          {(chartHighlight?.coordinates.left || chartHighlight?.coordinates.right) && (
+            <ReferenceArea
+              x1={chartHighlight?.coordinates.left}
+              x2={chartHighlight?.coordinates.right ?? chartHighlight?.coordinates.left}
+              strokeOpacity={0.5}
+              stroke="#3ECF8E"
+              fill="#3ECF8E"
+              fillOpacity={0.3}
+            />
+          )}
         </RechartAreaChart>
       </Container>
       {data && (

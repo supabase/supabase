@@ -18,7 +18,8 @@ import ChartHeader from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-import { ChartHighlight } from './useChartHighlight'
+import { cn } from 'ui'
+import type { ChartHighlight } from './useChartHighlight'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -109,7 +110,7 @@ const BarChart = ({
   }
 
   return (
-    <div className={['flex flex-col gap-y-3', className].join(' ')}>
+    <div className={cn('flex flex-col gap-y-3', className)}>
       <ChartHeader
         title={title}
         format={format}
@@ -188,7 +189,7 @@ const BarChart = ({
           {(chartHighlight?.coordinates.left || chartHighlight?.coordinates.right) && (
             <ReferenceArea
               x1={chartHighlight?.coordinates.left}
-              x2={chartHighlight?.coordinates.right}
+              x2={chartHighlight?.coordinates.right ?? chartHighlight?.coordinates.left}
               strokeOpacity={0.5}
               stroke="#3ECF8E"
               fill="#3ECF8E"

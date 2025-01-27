@@ -69,23 +69,16 @@ const ChartHeader = ({
       <div>
         {selectedRangeStart && selectedRangeStart && !isSelecting && (
           <div className="flex items-center gap-2">
-            <Button
-              type="outline"
-              className="[&_span]:flex [&_span]:items-center [&_span]:gap-0.5 [&_span]:text-foreground-light [&_span]:text-xs"
-              disabled
-            >
+            <span className="flex items-center gap-0.5 text-foreground-light text-xs border border-dashed py-1 px-2 rounded-md">
               {dayjs(selectedRangeStart).format('MMM D, H:mm')} <ArrowRight size={10} />{' '}
               {dayjs(selectedRangeEnd).format('MMM D, H:mm')}
-            </Button>
+            </span>
             <Button size="tiny" type="default" asChild>
               <Link
                 href={`/project/${ref}/reports/database?dateRange=${selectedRangeStart}-${selectedRangeEnd}`}
               >
-                Open Logs
+                Open in Logs
               </Link>
-            </Button>
-            <Button size="tiny" type="default">
-              Zoom in
             </Button>
           </div>
         )}

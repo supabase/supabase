@@ -17,7 +17,6 @@ import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { WarningIcon } from 'ui'
 import type { ChartData } from './Charts.types'
-import StackedAreaLineChart from './StackedAreaLineChart'
 import Panel from 'components/ui/Panel'
 import { useChartHighlight } from './useChartHighlight'
 
@@ -154,8 +153,6 @@ const ChartHandler = ({
     )
   }
 
-  console.log('chartHighlight', chartHighlight)
-
   return (
     <Panel
       noMargin
@@ -194,16 +191,6 @@ const ChartHandler = ({
             customDateFormat={customDateFormat}
             chartHighlight={chartHighlight}
           />
-        ) : chartStyle === 'stackedAreaLine' ? (
-          <StackedAreaLineChart
-            data={(chartData?.data ?? []) as any}
-            format={format || chartData?.format}
-            xAxisKey="period_start"
-            yAxisKey={attribute}
-            highlightedValue={_highlightedValue}
-            title={label}
-            customDateFormat={customDateFormat}
-          />
         ) : (
           <AreaChart
             data={(chartData?.data ?? []) as any}
@@ -213,6 +200,7 @@ const ChartHandler = ({
             highlightedValue={_highlightedValue}
             title={label}
             customDateFormat={customDateFormat}
+            chartHighlight={chartHighlight}
           />
         )}
       </Panel.Content>
