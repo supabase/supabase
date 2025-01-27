@@ -1,3 +1,10 @@
+import dayjs from 'dayjs'
+import { ChartHighlight } from './useChartHighlight'
+import Link from 'next/link'
+import { Button } from 'ui'
+import { useRouter } from 'next-router-mock'
+import { ArrowRight } from 'lucide-react'
+
 export interface ChartHeaderProps {
   title?: string
   format?: string | ((value: unknown) => string)
@@ -6,6 +13,7 @@ export interface ChartHeaderProps {
   displayDateInUtc?: boolean
   highlightedLabel?: number | string | null
   highlightedValue?: number | string | null
+  chartHighlight?: ChartHighlight
 }
 
 const ChartHeader = ({
@@ -14,7 +22,12 @@ const ChartHeader = ({
   highlightedLabel,
   title,
   minimalHeader = false,
+  chartHighlight,
 }: ChartHeaderProps) => {
+  const router = useRouter()
+  const { ref } = router.query
+  const { left: selectedRangeStart, right: selectedRangeEnd, isSelecting } = chartHighlight ?? {}
+
   const chartTitle = (
     <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
       {title}
@@ -47,10 +60,36 @@ const ChartHeader = ({
   }
 
   return (
-    <div className="h-16">
-      {title && chartTitle}
-      {highlightedValue !== undefined && highlighted}
-      {label}
+    <div className="h-16 flex justify-between items-start">
+      <div className="flex flex-col">
+        {title && chartTitle}
+        {highlightedValue !== undefined && highlighted}
+        {label}
+      </div>
+      <div>
+        {selectedRangeStart && selectedRangeStart && !isSelecting && (
+          <div className="flex items-center gap-2">
+            <Button
+              type="outline"
+              className="[&_span]:flex [&_span]:items-center [&_span]:gap-0.5 [&_span]:text-foreground-light [&_span]:text-xs"
+              disabled
+            >
+              {dayjs(selectedRangeStart).format('MMM D, H:mm')} <ArrowRight size={10} />{' '}
+              {dayjs(selectedRangeEnd).format('MMM D, H:mm')}
+            </Button>
+            <Button size="tiny" type="default" asChild>
+              <Link
+                href={`/project/${ref}/reports/database?dateRange=${selectedRangeStart}-${selectedRangeEnd}`}
+              >
+                Open Logs
+              </Link>
+            </Button>
+            <Button size="tiny" type="default">
+              Zoom in
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

@@ -15,30 +15,21 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
-import { DateRangePicker } from 'components/ui/DateRangePicker'
 import Panel from 'components/ui/Panel'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from 'ui'
 import { REPORTS_DATEPICKER_HELPERS } from 'components/interfaces/Reports/Reports.constants'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
-import DatePickers from '../../../../components/interfaces/Settings/Logs/Logs.DatePickers'
-import { useOrgSubscriptionQuery } from '../../../../data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from '../../../../hooks/misc/useSelectedOrganization'
-import { DATE_FORMAT, DATETIME_FORMAT } from '../../../../lib/constants'
+import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -56,14 +47,9 @@ const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
-  const now = dayjs()
 
   const state = useDatabaseSelectorStateSnapshot()
-  const [dateRange, setDateRange] = useState<any>({
-    period_start: { date: now.subtract(7, 'day').format(DATE_FORMAT), time_period: '7d' },
-    period_end: { date: now.format(DATE_FORMAT), time_period: 'today' },
-    interval: '1h',
-  })
+  const [dateRange, setDateRange] = useState<any>(undefined)
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const plan = subscription?.plan
@@ -110,17 +96,18 @@ const DatabaseUsage = () => {
     }
   }, [db, chart])
 
-  console.log(JSON.stringify(dateRange))
-
-  const handleGranularity = (values: any) => {
+  const handleIntervalGranularity = (from: string, to: string) => {
     const conditions = {
-      '1m': dayjs(values.to).diff(values.from, 'hour') < 3,
-      '10m': dayjs(values.to).diff(values.from, 'hour') < 6,
-      '30m': dayjs(values.to).diff(values.from, 'hour') < 12,
-      '1h': dayjs(values.to).diff(values.from, 'hour') >= 12,
+      '15s': dayjs(to).diff(from, 'hour') < 1, // less than 1 hour
+      '1m': dayjs(to).diff(from, 'hour') < 3, // less than 3 hours
+      '10m': dayjs(to).diff(from, 'hour') < 6, // less than 6 hours
+      '30m': dayjs(to).diff(from, 'hour') < 12, // less than 12 hours
+      '1h': dayjs(to).diff(from, 'hour') >= 12, // more than 12 hours
     }
 
     switch (true) {
+      case conditions['15s']:
+        return '15s'
       case conditions['1m']:
         return '1m'
       case conditions['10m']:
@@ -132,6 +119,11 @@ const DatabaseUsage = () => {
     }
   }
 
+  const handleCustomDateFormat =
+    handleIntervalGranularity(dateRange?.period_start?.date, dateRange?.period_end?.date) === '15s'
+      ? DateTimeFormats.FULL_SECONDS
+      : undefined
+
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
@@ -141,53 +133,39 @@ const DatabaseUsage = () => {
         </div>
       </div>
       <section>
-        <Panel title={<h2>Database health</h2>}>
+        <Panel className="bg-transparent" title={<h2>Database health</h2>}>
           <Panel.Content>
-            <div className="mb-4 flex items-center space-x-3">
+            <div className="mb-4 flex items-center justify-between space-x-3">
               <DatePickers
                 onChange={(values: any) => {
                   setDateRange({
                     period_start: { date: values.from, time_period: '7d' },
                     period_end: { date: values.to, time_period: 'today' },
-                    interval: handleGranularity(values),
+                    interval: handleIntervalGranularity(values.from, values.to),
                   })
                 }}
                 to={dateRange?.period_start?.date}
                 from={dateRange?.period_end?.date}
                 helpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
                   ...helper,
-                  disabled: (index > 0 && plan?.id === 'free') || (index > 1 && plan?.id !== 'pro'),
+                  disabled: (index > 4 && plan?.id === 'free') || (index > 5 && plan?.id !== 'pro'),
                 }))}
               />
-              {/* <DateRangePicker
-                loading={false}
-                value={'7d'}
-                className="opacity-0"
-                options={TIME_PERIODS_INFRA}
-                currentBillingPeriodStart={undefined}
-                onChange={(values) => {
-                  if (values.interval === '1d') {
-                    setDateRange({ ...values, interval: '1h' })
-                  } else {
-                    setDateRange(values)
-                  }
-                }}
-              /> */}
               {dateRange && (
                 <div className="flex items-center gap-x-2">
                   <p className="text-foreground-light">
-                    {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
+                    {dayjs(dateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
                     <ArrowRight size={12} />
                   </p>
                   <p className="text-foreground-light">
-                    {dayjs(dateRange.period_end.date).format('MMMM D, hh:mma')}
+                    {dayjs(dateRange.period_end.date).format('MMM D, h:mma')}
                   </p>
                 </div>
               )}
             </div>
-            <div className="grid lg:grid-cols-2 gap-6">
+            <div className="grid lg:grid-cols-2 gap-4">
               {dateRange && (
                 <ChartHandler
                   provider="infra-monitoring"
@@ -196,6 +174,7 @@ const DatabaseUsage = () => {
                   interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
+                  customDateFormat={handleCustomDateFormat}
                 />
               )}
 
@@ -204,9 +183,10 @@ const DatabaseUsage = () => {
                   provider="infra-monitoring"
                   attribute="avg_cpu_usage"
                   label="Average CPU usage"
-                  interval={dateRange.interval}
+                  interval={dateRange.interval !== '15s' ? dateRange.interval : '1m'}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
+                  customDateFormat={handleCustomDateFormat}
                 />
               )}
 
@@ -218,6 +198,7 @@ const DatabaseUsage = () => {
                   interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
+                  customDateFormat={handleCustomDateFormat}
                 />
               )}
 
@@ -229,6 +210,7 @@ const DatabaseUsage = () => {
                   interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
+                  customDateFormat={handleCustomDateFormat}
                 />
               )}
 
@@ -240,6 +222,7 @@ const DatabaseUsage = () => {
                   interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
+                  customDateFormat={handleCustomDateFormat}
                 />
               )}
 
@@ -248,10 +231,11 @@ const DatabaseUsage = () => {
                   provider="infra-monitoring"
                   attribute="client_connections_postgres"
                   label="Client connections - Postgres"
-                  defaultChartStyle="stackedAreaLine"
+                  // defaultChartStyle="stackedAreaLine"
                   interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
+                  customDateFormat={handleCustomDateFormat}
                 />
               )}
               {dateRange && (
@@ -259,10 +243,11 @@ const DatabaseUsage = () => {
                   provider="infra-monitoring"
                   attribute="client_connections_supavisor"
                   label="Client connections - Supavisor"
-                  defaultChartStyle="stackedAreaLine"
+                  // defaultChartStyle="stackedAreaLine"
                   interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
+                  customDateFormat={handleCustomDateFormat}
                 />
               )}
               {dateRange && (
@@ -270,10 +255,11 @@ const DatabaseUsage = () => {
                   provider="infra-monitoring"
                   attribute="client_connections_pgbouncer"
                   label="Client connections - pgbouncer"
-                  defaultChartStyle="stackedAreaLine"
+                  // defaultChartStyle="stackedAreaLine"
                   interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
+                  customDateFormat={handleCustomDateFormat}
                 />
               )}
               {dateRange && (
@@ -281,10 +267,11 @@ const DatabaseUsage = () => {
                   provider="infra-monitoring"
                   attribute="client_connections_realtime"
                   label="Client connections - Realtime"
-                  defaultChartStyle="stackedAreaLine"
+                  // defaultChartStyle="stackedAreaLine"
                   interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
+                  customDateFormat={handleCustomDateFormat}
                 />
               )}
               {dateRange && (
@@ -292,10 +279,11 @@ const DatabaseUsage = () => {
                   provider="infra-monitoring"
                   attribute="client_connections_max_limit"
                   label="Client connections - Max limit"
-                  defaultChartStyle="stackedAreaLine"
+                  // defaultChartStyle="stackedAreaLine"
                   interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
+                  customDateFormat={handleCustomDateFormat}
                 />
               )}
             </div>

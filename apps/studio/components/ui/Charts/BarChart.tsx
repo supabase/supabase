@@ -6,6 +6,7 @@ import {
   Cell,
   Legend,
   BarChart as RechartBarChart,
+  ReferenceArea,
   Tooltip,
   XAxis,
   YAxis,
@@ -17,6 +18,7 @@ import ChartHeader from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
+import { ChartHighlight } from './useChartHighlight'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -30,6 +32,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   XAxisProps?: ComponentProps<typeof XAxis>
   YAxisProps?: ComponentProps<typeof YAxis>
   showGrid?: boolean
+  chartHighlight?: ChartHighlight
 }
 
 const BarChart = ({
@@ -37,7 +40,7 @@ const BarChart = ({
   yAxisKey,
   xAxisKey,
   format,
-  customDateFormat = DateTimeFormats.FULL_SECONDS,
+  customDateFormat = DateTimeFormats.FULL,
   title,
   highlightedValue,
   highlightedLabel,
@@ -53,6 +56,7 @@ const BarChart = ({
   XAxisProps,
   YAxisProps,
   showGrid = false,
+  chartHighlight,
 }: BarChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -117,20 +121,32 @@ const BarChart = ({
         }
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
+        chartHighlight={chartHighlight}
       />
       <Container>
         <RechartBarChart
           data={data}
           className="overflow-visible"
-          //   mouse hover focusing logic
           onMouseMove={(e: any) => {
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
             }
+            const activeTimestamp = data[e.activeTooltipIndex]?.[xAxisKey]
+            chartHighlight?.handleMouseMove({
+              activeLabel: activeTimestamp?.toString(),
+              coordinates: e.activeLabel,
+            })
           }}
+          onMouseDown={(e: any) => {
+            const activeTimestamp = data[e.activeTooltipIndex]?.[xAxisKey]
+            chartHighlight?.handleMouseDown({
+              activeLabel: activeTimestamp?.toString(),
+              coordinates: e.activeLabel,
+            })
+          }}
+          onMouseUp={chartHighlight?.handleMouseUp}
           onMouseLeave={() => setFocusDataIndex(null)}
           onClick={(tooltipData) => {
-            // receives tooltip data https://github.com/recharts/recharts/blob/2a3405ff64a0c050d2cf94c36f0beef738d9e9c2/src/chart/generateCategoricalChart.tsx
             const datum = tooltipData?.activePayload?.[0]?.payload
             if (onBarClick) onBarClick(datum, tooltipData)
           }}
@@ -154,7 +170,6 @@ const BarChart = ({
             dataKey={yAxisKey}
             fill={CHART_COLORS.GREEN_1}
             animationDuration={300}
-            // Max bar size required to prevent bars from expanding to max width.
             maxBarSize={48}
           >
             {data?.map((_entry: Datum, index: any) => (
@@ -170,6 +185,16 @@ const BarChart = ({
               />
             ))}
           </Bar>
+          {(chartHighlight?.coordinates.left || chartHighlight?.coordinates.right) && (
+            <ReferenceArea
+              x1={chartHighlight?.coordinates.left}
+              x2={chartHighlight?.coordinates.right}
+              strokeOpacity={0.5}
+              stroke="#3ECF8E"
+              fill="#3ECF8E"
+              fillOpacity={0.3}
+            />
+          )}
         </RechartBarChart>
       </Container>
       {data && (

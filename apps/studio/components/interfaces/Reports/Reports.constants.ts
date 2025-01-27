@@ -7,25 +7,45 @@ export const LAYOUT_COLUMN_COUNT = 2
 
 export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
+    text: 'Last 10 minutes',
+    calcFrom: () => dayjs().subtract(10, 'minute').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+  },
+  {
+    text: 'Last 30 minutes',
+    calcFrom: () => dayjs().subtract(30, 'minute').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+  },
+  {
+    text: 'Last hour',
+    calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+  },
+  {
+    text: 'Last 3 hours',
+    calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+  },
+  {
     text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
+    calcTo: () => dayjs().toISOString(),
     default: true,
   },
   {
     text: 'Last 7 days',
     calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
+    calcTo: () => dayjs().toISOString(),
   },
   {
     text: 'Last 14 days',
     calcFrom: () => dayjs().subtract(14, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
+    calcTo: () => dayjs().toISOString(),
   },
   {
     text: 'Last 30 days',
     calcFrom: () => dayjs().subtract(30, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
+    calcTo: () => dayjs().toISOString(),
   },
 ]
 

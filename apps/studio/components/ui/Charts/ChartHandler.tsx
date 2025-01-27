@@ -19,6 +19,7 @@ import { WarningIcon } from 'ui'
 import type { ChartData } from './Charts.types'
 import StackedAreaLineChart from './StackedAreaLineChart'
 import Panel from 'components/ui/Panel'
+import { useChartHighlight } from './useChartHighlight'
 
 interface ChartHandlerProps {
   id?: string
@@ -69,6 +70,7 @@ const ChartHandler = ({
 
   const state = useDatabaseSelectorStateSnapshot()
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
+  const chartHighlight = useChartHighlight()
 
   const databaseIdentifier = state.selectedDatabaseId
 
@@ -152,6 +154,8 @@ const ChartHandler = ({
     )
   }
 
+  console.log('chartHighlight', chartHighlight)
+
   return (
     <Panel
       noMargin
@@ -188,6 +192,7 @@ const ChartHandler = ({
             highlightedValue={_highlightedValue}
             title={label}
             customDateFormat={customDateFormat}
+            chartHighlight={chartHighlight}
           />
         ) : chartStyle === 'stackedAreaLine' ? (
           <StackedAreaLineChart
