@@ -549,7 +549,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                   onSelectDownload={() => {
                     setSelectedSnippetToDownload(element.metadata as Snippet)
                   }}
-                  onSelectCopyPersonal={() => {
+                  onSelectDuplicate={() => {
                     onSelectCopyPersonal(element.metadata as Snippet)
                   }}
                   onSelectUnshare={() => {
@@ -609,7 +609,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                   onSelectDownload={() => {
                     setSelectedSnippetToDownload(element.metadata as Snippet)
                   }}
-                  onSelectCopyPersonal={() => {
+                  onSelectDuplicate={() => {
                     onSelectCopyPersonal(element.metadata as Snippet)
                   }}
                   onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
@@ -711,6 +711,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     }
                   }}
                   onSelectDownload={() => setSelectedSnippetToDownload(element.metadata as Snippet)}
+                  onSelectDuplicate={() => onSelectCopyPersonal(element.metadata as Snippet)}
                   onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                   onEditSave={(name: string) => {
                     // [Joshen] Inline editing only for folders for now
