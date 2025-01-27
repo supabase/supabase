@@ -6,7 +6,7 @@ import {
   NewAccessTokenButton,
   NewTokenBanner,
 } from 'components/interfaces/Account'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import AccountLayout from 'components/layouts/AccountLayout/account-layout'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 import type { NextPageWithLayout } from 'types'
@@ -15,6 +15,7 @@ import { ExternalLink } from 'lucide-react'
 import { Admonition } from 'ui-patterns'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import AccountSettingsLayout from 'components/layouts/AccountLayout/account-settings-layout'
 
 const UserAccessTokens: NextPageWithLayout = () => {
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
@@ -68,12 +69,14 @@ const UserAccessTokens: NextPageWithLayout = () => {
 
 UserAccessTokens.getLayout = (page) => (
   <AppLayout>
-    <AccountLayout
-      title="Access Tokens"
-      breadcrumbs={[{ key: 'supabase-account-tokens', label: 'Access Tokens' }]}
-    >
-      {page}
-    </AccountLayout>
+    <DefaultLayout headerTitle="Account">
+      <AccountLayout
+        title="Access Tokens"
+        breadcrumbs={[{ key: 'supabase-account-tokens', label: 'Access Tokens' }]}
+      >
+        <AccountSettingsLayout>{page}</AccountSettingsLayout>
+      </AccountLayout>
+    </DefaultLayout>
   </AppLayout>
 )
 

@@ -5,7 +5,8 @@ import {
 } from 'components/interfaces/Account/Preferences'
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import AccountLayout from 'components/layouts/AccountLayout/account-layout'
+import AccountSettingsLayout from 'components/layouts/AccountLayout/account-settings-layout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import AlertError from 'components/ui/AlertError'
@@ -16,11 +17,7 @@ import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
-  return (
-    <div className="my-2">
-      <ProfileCard />
-    </div>
-  )
+  return <ProfileCard />
 }
 
 User.getLayout = (page) => (
@@ -35,7 +32,7 @@ User.getLayout = (page) => (
           },
         ]}
       >
-        {page}
+        <AccountSettingsLayout>{page}</AccountSettingsLayout>
       </AccountLayout>
     </DefaultLayout>
   </AppLayout>
@@ -48,7 +45,7 @@ const ProfileCard = () => {
   const { profile, error, isLoading, isError, isSuccess } = useProfile()
 
   return (
-    <article className="max-w-4xl p-4">
+    <article className="max-w-4xl">
       {isLoading && (
         <Panel>
           <div className="p-4">

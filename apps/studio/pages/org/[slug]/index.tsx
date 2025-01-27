@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import AccountLayout from 'components/layouts/AccountLayout/account-layout'
 import AlertError from 'components/ui/AlertError'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'

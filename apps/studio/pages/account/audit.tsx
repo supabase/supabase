@@ -1,5 +1,5 @@
 import { AuditLogs } from 'components/interfaces/Account'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import AccountLayout from 'components/layouts/AccountLayout/account-layout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
@@ -9,12 +9,6 @@ import type { NextPageWithLayout } from 'types'
 const Audit: NextPageWithLayout = () => {
   return (
     <ScaffoldContainerLegacy className="gap-0">
-      <div className="flex items-center justify-between">
-        <FormHeader
-          title="Account audit logs"
-          description="View the audit log trail of actions made from your account"
-        />
-      </div>
       <AuditLogs />
     </ScaffoldContainerLegacy>
   )
