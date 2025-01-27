@@ -33,28 +33,19 @@ export function UserDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="border px-0 flex-shrink-0 px-3" asChild>
-        <Button type="default" className="[&>span]:flex px-1 py-2 pl-0.5" size="medium">
-          <div className="flex flex-row gap-2 items-center">
-            {/* <User size={16} strokeWidth={1.5} /> */}
-            {/* <div className="w-6 h-6 rounded bg-foreground"></div> */}
-            <img
-              className="aspect-square h-8 w-8 rounded-md border"
-              alt="shadcn"
-              src="https://avatars.githubusercontent.com/u/8291514?s=96&v=4"
-            ></img>
-            {/* <div className="flex-grow flex flex-col gap-0 justify-start text-left">
-              <span className="text-foreground-light truncate text-xs leading-none">
-                {profile?.username}
-              </span>
-              <span className="text-foreground-lighter truncate text-xs">
-                {profile?.primary_email}
-              </span>
-            </div> */}
-          </div>
+        <Button
+          type="default"
+          className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
+        >
+          <img
+            className="aspect-square h-8 w-8 rounded-md border"
+            alt="shadcn"
+            src="https://avatars.githubusercontent.com/u/8291514?s=96&v=4"
+          />
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent side="top" align="start">
+      <DropdownMenuContent side="bottom" align="end">
         {IS_PLATFORM && (
           <>
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">

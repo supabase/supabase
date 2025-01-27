@@ -24,7 +24,7 @@ const DefaultLayout = ({
   hasProductMenu,
   product,
 }: PropsWithChildren<DefaultLayoutProps>) => {
-  const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
+  // const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
   return (
     <>
       <AppBannerContextProvider>
@@ -47,7 +47,11 @@ const DefaultLayout = ({
             </div>
           </div>
         </SidebarProvider>
-        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <MobileSheetNav
+          open={false}
+          onOpenChange={() => {}}
+          // open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}
+        >
           <span>mobile menu here</span>
         </MobileSheetNav>
       </AppBannerContextProvider>

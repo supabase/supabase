@@ -9,20 +9,14 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { Home } from 'icons'
 import { isUndefined } from 'lodash'
-import { Blocks, Boxes, ChartArea, ChevronDown, ChevronLeft, Settings, Users } from 'lucide-react'
+import { Blocks, Boxes, ChartArea, ChevronLeft, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import {
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -31,12 +25,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   useSidebar,
 } from 'ui'
-import { UserDropdown } from './user-dropdown'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -44,7 +34,6 @@ export const ICON_STROKE_WIDTH = 1.5
 const SidebarMotion = motion(Sidebar)
 
 export function AppDefaultNavigation() {
-  const router = useRouter()
   const project = useSelectedProject()
   const { open, toggleSidebar } = useSidebar()
 
@@ -100,8 +89,6 @@ export function AppDefaultNavigation() {
                 />
               </button>
             </SidebarGroup>
-
-            <UserDropdown />
           </SidebarFooter>
         </SidebarMotion>
       </AnimatePresence>
@@ -111,7 +98,7 @@ export function AppDefaultNavigation() {
 
 function NavLink({ route, active }: { route: any; active?: boolean }) {
   return (
-    <SidebarMenuItem key={route.key}>
+    <SidebarMenuItem>
       <SidebarMenuButton
         tooltip={route.label}
         isActive={active}
@@ -162,7 +149,7 @@ function ProjectLinks() {
 
   return (
     <SidebarMenu className="gap-[2px]">
-      <SidebarGroup>
+      <SidebarGroup className="gap-0.5">
         <NavLink
           key="home"
           active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
@@ -179,7 +166,7 @@ function ProjectLinks() {
         ))}
       </SidebarGroup>
 
-      <SidebarGroup>
+      <SidebarGroup className="gap-0.5">
         <SidebarGroupLabel className="text-foreground-muted text-xs uppercase font-mono text-[12px] tracking-wider">
           products
         </SidebarGroupLabel>
@@ -188,7 +175,7 @@ function ProjectLinks() {
         ))}
       </SidebarGroup>
 
-      <SidebarGroup>
+      <SidebarGroup className="gap-0.5">
         <SidebarGroupLabel className="text-foreground-muted text-xs uppercase font-mono text-[12px] tracking-wider">
           develop
         </SidebarGroupLabel>
@@ -196,7 +183,7 @@ function ProjectLinks() {
           <NavLink key={`other-routes-${i}`} route={route} active={activeRoute === route.key} />
         ))}
       </SidebarGroup>
-      <SidebarGroup>
+      <SidebarGroup className="gap-0.5">
         {settingsRoutes.map((route, i) => (
           <NavLink key={`settings-routes-${i}`} route={route} active={activeRoute === route.key} />
         ))}
@@ -284,7 +271,7 @@ const OrganizationLinks = () => {
 
   return (
     <SidebarMenu className="flex flex-col gap-1 items-start">
-      <SidebarGroup>
+      <SidebarGroup className="gap-0.5">
         {navMenuItems.map((item, i) => (
           <NavLink
             active={i === 0 ? activeRoute === undefined : activeRoute === item.key}

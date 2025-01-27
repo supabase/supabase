@@ -26,7 +26,7 @@ import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopove
 import { set } from 'lodash'
 
 const LayoutHeaderDivider = () => (
-  <span className="text-border-stronger">
+  <span className="text-border-stronger pr-2">
     <svg
       viewBox="0 0 24 24"
       width="16"
@@ -87,8 +87,8 @@ const LayoutHeader = ({
 
   return (
     <>
-      <header className={cn('flex h-16 max-h-16 min-h-16 items-center flex-shrink-0 border-b')}>
-        <div className={cn('flex items-center justify-between py-2 pl-1.5 pr-3 flex-1', 'pl-5')}>
+      <header className={cn('flex h-12 items-center flex-shrink-0 border-b')}>
+        <div className={cn('flex items-center justify-between py-2 pl-4 pr-3 flex-1')}>
           {hasProductMenu && (
             <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
               <button
@@ -191,12 +191,12 @@ const LayoutHeader = ({
         </div>
         {!!projectRef && (
           <motion.div
-            className="border-l flex-0 h-full"
+            className="border-l h-full flex items-center justify-center flex-shrink-0"
             initial={{ opacity: 0, x: -20 }}
             animate={{
               opacity: !aiAssistantPanel.open ? 1 : 0,
               x: !aiAssistantPanel.open ? 0 : -20,
-              width: aiAssistantPanel.open ? 0 : 'auto',
+              width: aiAssistantPanel.open ? 0 : 48,
             }}
             exit={{ opacity: 0, x: -20 }}
             transition={{
