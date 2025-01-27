@@ -4949,6 +4949,9 @@
                     "maintenance_work_mem": {
                       "type": "string"
                     },
+                    "track_activity_query_size": {
+                      "type": "string"
+                    },
                     "max_connections": {
                       "type": "integer",
                       "minimum": 1,
@@ -5067,6 +5070,9 @@
                   "maintenance_work_mem": {
                     "type": "string"
                   },
+                  "track_activity_query_size": {
+                    "type": "string"
+                  },
                   "max_connections": {
                     "type": "integer",
                     "minimum": 1,
@@ -5160,6 +5166,9 @@
                       "type": "string"
                     },
                     "maintenance_work_mem": {
+                      "type": "string"
+                    },
+                    "track_activity_query_size": {
                       "type": "string"
                     },
                     "max_connections": {
@@ -8534,6 +8543,56 @@
           },
           "500": {
             "description": "Failed to enable Database Webhooks on the project"
+          }
+        },
+        "tags": ["Database"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/database/context": {
+      "get": {
+        "operationId": "getDatabaseMetadata",
+        "summary": "Gets database metadata for the given project.",
+        "description": "This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.",
+        "deprecated": true,
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "databases": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {},
+                        "additionalProperties": true
+                      }
+                    }
+                  },
+                  "required": ["databases"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
           }
         },
         "tags": ["Database"],
@@ -12568,6 +12627,9 @@
           "maintenance_work_mem": {
             "type": "string"
           },
+          "track_activity_query_size": {
+            "type": "string"
+          },
           "max_connections": {
             "type": "integer",
             "minimum": 1,
@@ -12650,6 +12712,9 @@
             "type": "string"
           },
           "maintenance_work_mem": {
+            "type": "string"
+          },
+          "track_activity_query_size": {
             "type": "string"
           },
           "max_connections": {
@@ -14419,6 +14484,20 @@
           }
         },
         "required": ["query"]
+      },
+      "GetProjectDbMetadataResponseDto": {
+        "type": "object",
+        "properties": {
+          "databases": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": true
+            }
+          }
+        },
+        "required": ["databases"]
       },
       "FunctionResponse": {
         "type": "object",

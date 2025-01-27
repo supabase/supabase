@@ -2203,6 +2203,30 @@
         "security": [{ "bearer": [] }]
       }
     },
+    "/v1/projects/{ref}/database/context": {
+      "get": {
+        "operationId": "getDatabaseMetadata",
+        "summary": "Gets database metadata for the given project.",
+        "description": "This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.",
+        "deprecated": true,
+        "parameters": [
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetProjectDbMetadataResponseDto" }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Database"],
+        "security": [{ "bearer": [] }]
+      }
+    },
     "/v1/projects/{ref}/functions": {
       "get": {
         "operationId": "v1-list-all-functions",
@@ -3759,6 +3783,7 @@
           "effective_cache_size": { "type": "string" },
           "logical_decoding_work_mem": { "type": "string" },
           "maintenance_work_mem": { "type": "string" },
+          "track_activity_query_size": { "type": "string" },
           "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
           "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
           "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
@@ -3786,6 +3811,7 @@
           "effective_cache_size": { "type": "string" },
           "logical_decoding_work_mem": { "type": "string" },
           "maintenance_work_mem": { "type": "string" },
+          "track_activity_query_size": { "type": "string" },
           "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
           "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
           "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
@@ -4505,6 +4531,16 @@
         "type": "object",
         "properties": { "query": { "type": "string" } },
         "required": ["query"]
+      },
+      "GetProjectDbMetadataResponseDto": {
+        "type": "object",
+        "properties": {
+          "databases": {
+            "type": "array",
+            "items": { "type": "object", "properties": {}, "additionalProperties": true }
+          }
+        },
+        "required": ["databases"]
       },
       "FunctionResponse": {
         "type": "object",
