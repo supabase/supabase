@@ -61,7 +61,7 @@ export const pricing: Pricing = {
           main: 'Billing is based on the provisioned disk size. Paid plan projects get provisioned with 8 GB of disk by default and autoscale to 1.5x the size once you get close to the limit. The first 8 GB of disk per project comes with no additional fees.\nFree plan customers are limited to 500 MB database size per project.',
         },
         plans: {
-          free: '500 MB database size included',
+          free: '500 MB database size per project included',
           pro: ['8 GB disk size per project included', 'then $0.125 per GB'],
           team: ['8 GB disk size per project included', 'then $0.125 per GB'],
           enterprise: 'Custom',
