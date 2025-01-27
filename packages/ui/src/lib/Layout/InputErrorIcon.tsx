@@ -1,6 +1,8 @@
-import React from 'react'
-import styleHandler from '../theme/styleHandler'
 import { AlertCircle } from 'lucide-react'
+import React from 'react'
+
+import { ICON_SIZES } from '../../components/Icon/IconBase'
+import styleHandler from '../theme/styleHandler'
 
 interface Props {
   style?: React.CSSProperties
