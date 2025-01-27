@@ -8,12 +8,14 @@ import {
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
 import { isUndefined } from 'lodash'
 import { Blocks, Boxes, ChartArea, ChevronLeft, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/router'
 import {
   cn,
@@ -36,61 +38,65 @@ const SidebarMotion = motion(Sidebar)
 export function AppDefaultNavigation() {
   const project = useSelectedProject()
   const { open, toggleSidebar } = useSidebar()
+  const hideSideBar = useHideSidebar()
 
   return (
     <>
       <AnimatePresence>
-        <SidebarMotion
-          className={cn(
-            '!border-r-0'
-            // !open && 'pt-[38px]'
-          )}
-          transition={{
-            delay: 0.4,
-            duration: 0.4,
-          }}
-          collapsible="icon"
-        >
-          <AnimatePresence mode="wait">
-            <SidebarContent className="">
-              {project ? (
-                <motion.div
-                  key="project-links"
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                >
-                  <ProjectLinks />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="org-links"
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                >
-                  <OrganizationLinks />
-                </motion.div>
-              )}
-            </SidebarContent>
-          </AnimatePresence>
-          <SidebarFooter>
-            <SidebarGroup>
-              <button onClick={() => toggleSidebar()}>
-                <ChevronLeft
-                  size={14}
-                  strokeWidth={2}
-                  className={cn(
-                    'text-foreground-muted transition-transform',
-                    !open && 'rotate-180'
-                  )}
-                />
-              </button>
-            </SidebarGroup>
-          </SidebarFooter>
-        </SidebarMotion>
+        {!hideSideBar && (
+          <SidebarMotion
+            className={
+              cn()
+              // '!border-r-0'
+              // !open && 'pt-[38px]'
+            }
+            transition={{
+              delay: 0.4,
+              duration: 0.4,
+            }}
+            collapsible="icon"
+          >
+            <AnimatePresence mode="wait">
+              <SidebarContent className="">
+                {project ? (
+                  <motion.div
+                    key="project-links"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                  >
+                    <ProjectLinks />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="org-links"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                  >
+                    <OrganizationLinks />
+                  </motion.div>
+                )}
+              </SidebarContent>
+            </AnimatePresence>
+            <SidebarFooter>
+              <SidebarGroup>
+                <button onClick={() => toggleSidebar()}>
+                  <ChevronLeft
+                    size={14}
+                    strokeWidth={2}
+                    className={cn(
+                      'text-foreground-muted transition-transform',
+                      !open && 'rotate-180'
+                    )}
+                  />
+                </button>
+              </SidebarGroup>
+            </SidebarFooter>
+          </SidebarMotion>
+        )}
       </AnimatePresence>
     </>
   )

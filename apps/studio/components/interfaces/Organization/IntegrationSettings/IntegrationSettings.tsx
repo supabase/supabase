@@ -7,10 +7,12 @@ import { Markdown } from 'components/interfaces/Markdown'
 import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
 import {
   ScaffoldContainer,
+  ScaffoldContainerLegacy,
   ScaffoldDivider,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
+  ScaffoldTitle,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
@@ -173,6 +175,9 @@ The GitHub app will watch for changes in your repository such as file changes, b
 
   return (
     <>
+      <ScaffoldContainerLegacy>
+        <ScaffoldTitle>Integrations</ScaffoldTitle>
+      </ScaffoldContainerLegacy>
       <GitHubSection />
       <ScaffoldDivider />
       <VercelSection isProjectScoped={false} />

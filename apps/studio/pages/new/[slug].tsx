@@ -939,7 +939,7 @@ const PageLayout = withAuth(({ children }: PropsWithChildren) => {
 
 Wizard.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout product="New Project">
+    <DefaultLayout product="New Project" headerTitle="New project">
       <PageLayout>{page}</PageLayout>
     </DefaultLayout>
   </AppLayout>

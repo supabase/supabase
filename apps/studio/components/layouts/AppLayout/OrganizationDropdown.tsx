@@ -49,11 +49,16 @@ const OrganizationDropdown = () => {
     <>
       <Link href={`/org/${slug}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
         <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-        <span className="text-foreground">{orgName}</span>
+        <span className="text-foreground max-w-32 lg:max-w-none truncate">{orgName}</span>
+        {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
       </Link>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
-          <Button type="text" className={cn('pr-1 pl-1')} iconRight={<ChevronsUpDown />}></Button>
+          <Button
+            type="text"
+            className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
+            iconRight={<ChevronsUpDown strokeWidth={1.5} />}
+          ></Button>
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
           <Command_Shadcn_>

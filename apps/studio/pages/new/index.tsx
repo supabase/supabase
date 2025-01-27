@@ -107,7 +107,7 @@ const Wizard: NextPageWithLayout = () => {
 
 Wizard.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout product="New Organization" hasProductMenu={false}>
+    <DefaultLayout product="New Organization" hasProductMenu={false} headerTitle="New organization">
       <WizardLayout organization={null} project={null}>
         {page}
       </WizardLayout>

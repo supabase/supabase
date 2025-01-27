@@ -4,6 +4,7 @@ import { useCurrentPath } from 'hooks/misc/useCurrentPath'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { cn, NavMenu, NavMenuItem } from 'ui'
+import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 
 function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const currentPath = useCurrentPath()
@@ -45,10 +46,12 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
             ease: 'easeOut',
           }}
         > */}
+      <ScaffoldContainerLegacy>
+        <ScaffoldTitle>Organization Settings</ScaffoldTitle>
+      </ScaffoldContainerLegacy>
       <NavMenu
         className={cn(
-          '[&_ul]:mx-auto [&_ul]:max-w-[1200px] [&_ul]:px-6 [&_ul]:lg:px-14 [&_ul]:xl:px-24 [&_ul]:2xl:px-32',
-          'pt-6'
+          '[&_ul]:mx-auto [&_ul]:max-w-[1200px] [&_ul]:px-6 [&_ul]:lg:px-14 [&_ul]:xl:px-24 [&_ul]:2xl:px-32'
         )}
         aria-label="Organization menu navigation"
       >

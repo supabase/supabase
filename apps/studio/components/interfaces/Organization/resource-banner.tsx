@@ -1,11 +1,9 @@
 import { useParams } from 'common'
-import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { MAX_WIDTH_CLASSES, PADDING_CLASSES } from 'components/layouts/Scaffold'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useOrganizationRestrictions } from 'hooks/misc/useOrganizationRestrictions'
 import Link from 'next/link'
-import { Button, cn, CriticalIcon, WarningIcon } from 'ui'
-import dayjs from 'dayjs'
-import { motion, AnimatePresence } from 'framer-motion'
+import { cn, CriticalIcon, WarningIcon } from 'ui'
 
 const bannerMotionProps = {
   initial: { height: 0, opacity: 0 },
@@ -22,93 +20,52 @@ const containerMotionProps = {
   },
 } as const
 
-export function OrganizationResourceBanner() {
-  const { data: resourceWarnings } = useResourceWarningsQuery()
-  const { data: overdueInvoices } = useOverdueInvoicesQuery()
-  const org = useSelectedOrganization()
+export function OrganizationResourceBanner({ headerBanner }: { headerBanner?: boolean }) {
+  const { warnings } = useOrganizationRestrictions()
 
   return (
-    <AnimatePresence>
-      <motion.div {...containerMotionProps}>
-        {!!overdueInvoices?.length && (
-          <motion.div {...bannerMotionProps}>
-            <WarningBanner
-              type="danger"
-              title="Outstanding Invoices"
-              message="Please pay invoices to avoid service disruption."
-              link={`/org/${org?.slug}/settings/invoices`}
-              org={org}
-            />
-          </motion.div>
-        )}
-        {org?.restriction_status === 'grace_period' && (
-          <motion.div {...bannerMotionProps}>
-            <WarningBanner
-              type="warning"
-              title="Your organization has exceeded its quota"
-              message={`You are given a grace period until ${dayjs(org?.restriction_data?.['grace_period_end']).format('DD MMM, YYYY')}`}
-              link={`/org/${org?.slug}/settings/billing`}
-              org={org}
-            />
-          </motion.div>
-        )}
-        {org?.restriction_status === 'grace_period_over' && (
-          <motion.div {...bannerMotionProps}>
-            <WarningBanner
-              type="warning"
-              title="Grace period is over"
-              message="Your project will not be able to serve requests when you used up your quota."
-              link={`/org/${org?.slug}/settings/billing`}
-              org={org}
-            />
-          </motion.div>
-        )}
-        {org?.restriction_status === 'restricted' && (
-          <motion.div {...bannerMotionProps}>
-            <WarningBanner
-              type="danger"
-              title="Services Restricted"
-              message="Your project is unable to serve any requests as your organization has used up its quota."
-              link={`/org/${org?.slug}/settings/billing`}
-              org={org}
-            />
-          </motion.div>
-        )}
-      </motion.div>
+    <AnimatePresence initial={false}>
+      {warnings.map((warning, i) => (
+        <HeaderBanner key={i} {...warning} headerBanner={headerBanner} />
+      ))}
     </AnimatePresence>
   )
 }
 
-const WarningBanner = ({
+export const HeaderBanner = ({
   type,
   title,
   message,
   link,
-  org,
+  headerBanner,
 }: {
-  type: string
+  type: 'danger' | 'warning' | 'note' | 'incident'
   title: string
   message: string
-  link: string
-  org: any
+  link?: string
+  headerBanner?: boolean
 }) => {
-  const { ref: isProject } = useParams()
+  // const { ref: isProject } = useParams()
 
   const bannerStyles =
     type === 'danger'
       ? 'bg-destructive-300 dark:bg-destructive-200'
-      : 'bg-warning-300 dark:bg-warning-200'
+      : type === 'incident'
+        ? 'bg-brand-400'
+        : 'bg-warning-300 dark:bg-warning-200'
   const Icon = type === 'danger' ? CriticalIcon : WarningIcon
 
   return (
-    <div
+    <motion.div
+      {...bannerMotionProps}
       className={cn(
-        `relative ${bannerStyles} border-b border-muted py-1 flex items-center gap-2 flex-shrink-0 px-10 justify-center`,
-        isProject && 'last:rounded-b-[7px] mx-2 border-default border-l border-r',
+        `relative ${bannerStyles} border-b border-muted py-1 flex items-center justify-center flex-shrink-0 px-0`,
+        // headerBanner && 'last:rounded-b-[7px] mx-2 border-default border-l border-r',
+        type === 'incident' && 'hover:bg-brand-300',
         'flex-shrink-0'
       )}
     >
-      <div className="mx-auto w-full xl:max-w-[700px] items-center flex flex-row gap-3">
+      <div className={cn('items-center flex flex-row gap-3')}>
         <div className="absolute inset-y-0 left-0 right-0 overflow-hidden z-0">
           <div
             className="absolute inset-0 opacity-[0.8%]"
@@ -125,27 +82,48 @@ const WarningBanner = ({
             }}
           />
         </div>
-        <Icon className="z-[1] flex-shrink-0" />
-        <span
-          className={`${type === 'danger' ? 'text-destructive' : 'text-warning'} text-sm z-[1]`}
-        >
-          {title}
-        </span>
-        <span
-          className={`${type === 'danger' ? 'text-destructive' : 'text-warning'} text-sm opacity-75 z-[1] flex-grow`}
-        >
-          {message}
-        </span>
-        <button
-          className={cn(
-            'text-foreground-lighter text-sm z-[1] m-0',
-            type === 'danger' ? 'text-destructive' : 'text-warning'
-          )}
-        >
-          <Link href={link}>View Details</Link>
-        </button>
+        <Icon
+          className={cn('z-[1] flex-shrink-0', type === 'incident' && 'bg-brand text-brand-200')}
+        />
+        <div className="flex flex-col md:flex-row gap-0 md:gap-3">
+          <span
+            className={cn(
+              'text-xs sm:text-sm z-[1]',
+              type === 'danger'
+                ? 'text-destructive'
+                : type === 'incident'
+                  ? 'text-foreground'
+                  : 'text-warning'
+            )}
+          >
+            {title}
+          </span>
+          <span
+            className={cn(
+              'text-xs sm:text-sm z-[1] opacity-75',
+              type === 'danger'
+                ? 'text-destructive'
+                : type === 'incident'
+                  ? 'text-foreground'
+                  : 'text-warning'
+            )}
+          >
+            {message}
+          </span>
+        </div>
+        {link && (
+          <button
+            className={cn(
+              'lg:block hidden',
+              'text-foreground-lighter text-sm z-[1] m-0',
+              type === 'danger' ? 'text-destructive' : 'text-warning'
+            )}
+          >
+            <Link href={link}>View Details</Link>
+          </button>
+        )}
       </div>
-    </div>
+    </motion.div>
   )
 }
 

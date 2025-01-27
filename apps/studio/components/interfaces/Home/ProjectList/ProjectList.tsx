@@ -22,12 +22,15 @@ import type { Organization, ResponseError } from 'types'
 import { Button, cn } from 'ui'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
+import { useParams } from 'common'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
   search: string
   filterStatus?: string[]
   resetFilterStatus?: () => void
+  // if true, only show projects for the current organization
+  filterToSlug?: boolean
 }
 
 const ProjectList = ({
@@ -35,7 +38,9 @@ const ProjectList = ({
   rewriteHref,
   filterStatus,
   resetFilterStatus,
+  filterToSlug,
 }: ProjectListProps) => {
+  const { slug } = useParams()
   const { data: organizations, isLoading, isSuccess } = useOrganizationsQuery()
   const {
     data: allProjects,
@@ -109,9 +114,13 @@ const ProjectList = ({
     )
   }
 
+  const filteredOrganizations = filterToSlug
+    ? organizations?.filter((org) => org.slug === slug)
+    : organizations
+
   return isSuccess && organizations && organizations?.length > 0 ? (
     <>
-      {organizations?.map((organization) => {
+      {filteredOrganizations?.map((organization) => {
         return (
           <OrganizationProjects
             key={organization.slug}
@@ -130,6 +139,7 @@ const ProjectList = ({
             projectsError={projectsError}
             search={search}
             filterStatus={filterStatus}
+            filterToSlug={filterToSlug}
           />
         )
       })}
@@ -155,6 +165,7 @@ type OrganizationProjectsProps = {
   rewriteHref?: (projectRef: string) => string
   search: string
   filterStatus?: string[]
+  filterToSlug?: boolean
 }
 
 const OrganizationProjects = ({
@@ -171,6 +182,7 @@ const OrganizationProjects = ({
   rewriteHref,
   search,
   filterStatus,
+  filterToSlug,
 }: OrganizationProjectsProps) => {
   const isEmpty = !projects || projects.length === 0
   const sortedProjects = [...(projects || [])].sort((a, b) => a.name.localeCompare(b.name))
@@ -222,41 +234,42 @@ const OrganizationProjects = ({
 
   return (
     <div className="space-y-3" key={organization.slug}>
-      <div className="flex space-x-4 items-center">
-        <div className="flex items-center gap-2">
-          <h4 className="text-lg flex items-center">{organization.name}</h4>{' '}
-          <PartnerIcon organization={organization} />
+      {!filterToSlug && (
+        <div className="flex space-x-4 items-center">
+          <div className="flex items-center gap-2">
+            <h4 className="text-lg flex items-center">{organization.name}</h4>{' '}
+            <PartnerIcon organization={organization} />
+          </div>
+          {!!overdueInvoices.length && (
+            <div>
+              <Button asChild type="danger">
+                <Link href={`/org/${organization.slug}/invoices`}>Outstanding Invoices</Link>
+              </Button>
+            </div>
+          )}
+          {organization?.restriction_status === 'grace_period' && (
+            <div>
+              <Button asChild type="warning">
+                <Link href={`/org/${organization.slug}/billing`}>Grace Period</Link>
+              </Button>
+            </div>
+          )}
+          {organization?.restriction_status === 'grace_period_over' && (
+            <div>
+              <Button asChild type="warning">
+                <Link href={`/org/${organization.slug}/billing`}>Grace Period Over</Link>
+              </Button>
+            </div>
+          )}
+          {organization?.restriction_status === 'restricted' && (
+            <div>
+              <Button asChild type="danger">
+                <Link href={`/org/${organization.slug}/billing`}>Services Restricted</Link>
+              </Button>
+            </div>
+          )}
         </div>
-        {!!overdueInvoices.length && (
-          <div>
-            <Button asChild type="danger">
-              <Link href={`/org/${organization.slug}/invoices`}>Outstanding Invoices</Link>
-            </Button>
-          </div>
-        )}
-        {organization?.restriction_status === 'grace_period' && (
-          <div>
-            <Button asChild type="warning">
-              <Link href={`/org/${organization.slug}/billing`}>Grace Period</Link>
-            </Button>
-          </div>
-        )}
-        {organization?.restriction_status === 'grace_period_over' && (
-          <div>
-            <Button asChild type="warning">
-              <Link href={`/org/${organization.slug}/billing`}>Grace Period Over</Link>
-            </Button>
-          </div>
-        )}
-        {organization?.restriction_status === 'restricted' && (
-          <div>
-            <Button asChild type="danger">
-              <Link href={`/org/${organization.slug}/billing`}>Services Restricted</Link>
-            </Button>
-          </div>
-        )}
-      </div>
-
+      )}
       {isLoadingPermissions || isLoadingProjects ? (
         <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           <ShimmeringCard />

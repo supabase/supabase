@@ -14,6 +14,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
   Label_Shadcn_,
@@ -50,9 +51,10 @@ const HomePageActions = ({
             <span>New project</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="center">
+        <DropdownMenuContent side="bottom" align="start">
           <>
             <DropdownMenuLabel>Choose organization</DropdownMenuLabel>
+            <DropdownMenuSeparator />
             {organizations
               .sort((a, b) => a.name.localeCompare(b.name))
               .map((x) => (

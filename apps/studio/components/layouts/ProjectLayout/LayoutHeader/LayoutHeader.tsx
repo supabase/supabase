@@ -23,7 +23,6 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
-import { set } from 'lodash'
 
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger pr-2">
@@ -49,15 +48,16 @@ interface LayoutHeaderProps {
   headerBorder?: boolean
   hasProductMenu?: boolean
   customSidebarContent?: ReactNode
+  headerTitle?: string
 }
 
 const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
-  headerBorder = true,
   hasProductMenu,
+  headerTitle,
 }: LayoutHeaderProps) => {
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, slug } = useParams()
   const router = useRouter()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
@@ -83,7 +83,8 @@ const LayoutHeader = ({
     }
   }, [orgUsage])
 
-  const isProjects = router.asPath.includes('/project/')
+  // show org selection if we are on a project page or on a explicit org route
+  const showOrgSelection = slug || (selectedOrganization && projectRef)
 
   return (
     <>
@@ -119,8 +120,12 @@ const LayoutHeader = ({
 
             <>
               <div className="flex items-center pl-2">
-                <LayoutHeaderDivider />
-                <OrganizationDropdown />
+                {showOrgSelection && (
+                  <>
+                    <LayoutHeaderDivider />
+                    <OrganizationDropdown />
+                  </>
+                )}
                 <AnimatePresence>
                   {projectRef && (
                     <motion.div
@@ -150,6 +155,24 @@ const LayoutHeader = ({
                           <BranchDropdown />
                         </>
                       )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <AnimatePresence>
+                  {headerTitle && (
+                    <motion.div
+                      className="flex items-center"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{
+                        duration: 0.15,
+                        ease: 'easeOut',
+                      }}
+                    >
+                      <LayoutHeaderDivider />
+                      <span className="text-foreground">{headerTitle}</span>
                     </motion.div>
                   )}
                 </AnimatePresence>

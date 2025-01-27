@@ -18,7 +18,7 @@ const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { resolvedTheme } = useTheme()
   const { ref } = useParams()
 
-  const ongoingIncident = useFlag('ongoingIncident')
+  const ongoingIncident = true // useFlag('ongoingIncident')
   const showNoticeBanner = useFlag('showNoticeBanner')
 
   // Define the supabase theme for Monaco before anything is rendered. Using useEffect would sometime load the theme
@@ -34,9 +34,9 @@ const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
     <div className="flex flex-col">
       <div className="flex-shrink-0">
         {ongoingIncident && <IncidentBanner />}
-        {/* {showNoticeBanner && <NoticeBanner />} */}
-        {/* {profile !== undefined && <RestrictionBanner />} */}
-        {/* {ref && <OrganizationResourceBanner />} */}
+        {showNoticeBanner && <NoticeBanner />}
+        {profile !== undefined && <RestrictionBanner />}
+        <OrganizationResourceBanner headerBanner={true} />
       </div>
       {children}
     </div>

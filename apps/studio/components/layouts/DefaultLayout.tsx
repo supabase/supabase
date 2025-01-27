@@ -1,41 +1,39 @@
 import { AppBannerWrapper } from 'components/interfaces/App'
 import { AppDefaultNavigation } from 'components/interfaces/app-default-navigation'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
-import { SidebarOpenTopBanner } from 'components/interfaces/sidebar-open-top-banner'
 import { PropsWithChildren } from 'react'
-import { SidebarProvider } from 'ui'
-import MobileViewNav from './ProjectLayout/NavigationBar/MobileViewNav'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
-import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
-import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import { useAppStateSnapshot } from 'state/app-state'
+import { SidebarProvider } from 'ui'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
+import MobileViewNav from './ProjectLayout/NavigationBar/MobileViewNav'
 
 export interface DefaultLayoutProps {
   title?: string
   product?: string
   selectedTable?: string
   hasProductMenu?: boolean
+  // Shows header in the top left of the page
+  headerTitle?: string
 }
 
 const DefaultLayout = ({
   children,
   hasProductMenu,
   product,
+  headerTitle,
 }: PropsWithChildren<DefaultLayoutProps>) => {
-  // const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
+  const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
+
   return (
     <>
       <AppBannerContextProvider>
         <SidebarProvider>
           <div className="flex flex-col h-screen w-screen">
             {/* Top Banner */}
+            <AppBannerWrapper />
             <div className="flex-shrink-0">
-              <AppBannerWrapper />
-              {/* <SidebarOpenTopBanner /> */}
-              <LayoutHeader hasProductMenu={hasProductMenu} />
-              {/* <MobileNavigationBar /> */}
+              <LayoutHeader hasProductMenu={hasProductMenu} headerTitle={headerTitle} />
               <MobileViewNav title={product} />
             </div>
             {/* Main Content Area */}
@@ -47,11 +45,7 @@ const DefaultLayout = ({
             </div>
           </div>
         </SidebarProvider>
-        <MobileSheetNav
-          open={false}
-          onOpenChange={() => {}}
-          // open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}
-        >
+        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <span>mobile menu here</span>
         </MobileSheetNav>
       </AppBannerContextProvider>

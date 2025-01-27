@@ -38,6 +38,7 @@ import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
 import { ProjectNavigationBarHorizontal } from './NavigationBar/navigation-bar-horizontal'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
+import { OrganizationResourceBanner } from 'components/interfaces/Organization/resource-banner'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -174,11 +175,12 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>
+        {/* <OrganizationResourceBanner /> */}
         <div className="flex flex-row h-full w-full">
           {/* <ProjectNavigationBarHorizontal /> */}
           {/* <div className="flex h-full flex-row flex-grow gap-1"> */}
           {/* {!hideIconBar && <NavigationBar />} */}
-          <div className={cn('border-l w-full overflow-hidden flex-row')}>
+          <div className={cn('w-full overflow-hidden flex-row')}>
             <ResizablePanelGroup className="" direction="horizontal" autoSaveId="project-layout">
               {showProductMenu && productMenu && (
                 <ResizablePanel
