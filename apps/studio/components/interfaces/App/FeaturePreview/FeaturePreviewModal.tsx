@@ -2,17 +2,21 @@ import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useFlag } from 'hooks/ui/useFlag'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
+import { useParams } from 'common'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const FeaturePreviewModal = () => {
   const snap = useAppStateSnapshot()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
+  const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
   const enableFunctionsAssistant = useFlag('functionsAssistantV2')
 
   const selectedFeaturePreview =
@@ -33,6 +37,7 @@ const FeaturePreviewModal = () => {
         ? TelemetryActions.FEATURE_PREVIEW_DISABLED
         : TelemetryActions.FEATURE_PREVIEW_ENABLED,
       properties: { feature: selectedFeatureKey },
+      groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
   }
 
@@ -51,7 +56,10 @@ const FeaturePreviewModal = () => {
 
   useEffect(() => {
     if (snap.showFeaturePreviewModal) {
-      sendEvent({ action: TelemetryActions.FEATURE_PREVIEWS_CLICKED })
+      sendEvent({
+        action: TelemetryActions.FEATURE_PREVIEWS_CLICKED,
+        groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
     }
   }, [snap.showFeaturePreviewModal])
 

@@ -2,10 +2,10 @@ import { Edit } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import useNewQuery from 'components/interfaces/SQLEditor/hooks'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import Link from 'next/link'
 import { ComponentProps } from 'react'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -17,6 +17,7 @@ import {
   TooltipContent,
 } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface EditQueryButtonProps {
   id?: string
@@ -36,6 +37,7 @@ export const EditQueryButton = ({ id, sql, title }: EditQueryButtonProps) => {
     content: { side: 'bottom', text: 'Edit in SQL Editor' },
   }
 
+  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const handleEditInSQLEditor = () => {
@@ -77,6 +79,7 @@ export const EditQueryButton = ({ id, sql, title }: EditQueryButtonProps) => {
             isInSQLEditor,
             isInNewSnippet,
           },
+          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
         })
       }}
       tooltip={tooltip}

@@ -1323,7 +1323,7 @@ export const functions: NavMenuConstant = {
       name: 'Guides',
       url: undefined,
       items: [
-        { name: 'Managing dependencies', url: '/guides/functions/import-maps' },
+        { name: 'Managing dependencies', url: '/guides/functions/dependencies' },
         {
           name: 'Managing environment variables',
           url: '/guides/functions/secrets',

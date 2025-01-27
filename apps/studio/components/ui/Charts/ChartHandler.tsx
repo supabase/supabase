@@ -16,7 +16,7 @@ import {
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { WarningIcon } from 'ui'
-import type { ChartData } from './ChartHandler.types'
+import type { ChartData } from './Charts.types'
 
 interface ChartHandlerProps {
   id?: string

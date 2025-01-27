@@ -13,6 +13,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (method) {
     case 'PATCH':
       return handlePatch(req, res)
+    case 'DELETE':
+      return handleDelete(req, res)
     default:
       res.setHeader('Allow', ['PATCH'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
@@ -26,4 +28,12 @@ const handlePatch = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (error) return res.status(400).json({ error: { message: error.message } })
   return res.status(200).json(data.user)
+}
+
+const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
+  const { id } = req.query
+  const { error } = await supabase.auth.admin.deleteUser(id as string)
+
+  if (error) return res.status(400).json({ error: { message: error.message } })
+  return res.status(200).send(undefined)
 }

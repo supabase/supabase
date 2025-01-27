@@ -38,6 +38,7 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -81,6 +82,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -133,6 +135,8 @@ export type CreateProjectForm = z.infer<typeof FormSchema>
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
@@ -194,6 +198,9 @@ const Wizard: NextPageWithLayout = () => {
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
+      sendEvent({
+        action: TelemetryActions.PROJECT_CREATION_SIMPLE_VERSION_SUBMITTED,
+      })
       router.push(`/project/${res.ref}/building`)
     },
   })
