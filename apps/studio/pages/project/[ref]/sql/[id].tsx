@@ -13,9 +13,9 @@ import { useDatabaseFunctionsQuery } from 'data/database-functions/database-func
 import { useKeywordsQuery } from 'data/database/keywords-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
-import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { formatSql } from 'lib/formatSql'
 import { useAppStateSnapshot } from 'state/app-state'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import type { NextPageWithLayout } from 'types'
@@ -30,7 +30,6 @@ const SqlEditor: NextPageWithLayout = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const allSnippets = useSnippets(ref!)
-  const { mutateAsync: formatQuery } = useFormatQueryMutation()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -54,21 +53,6 @@ const SqlEditor: NextPageWithLayout = () => {
       snapV2.setSnippet(ref, data as unknown as SnippetWithContent)
     }
   }, [ref, data])
-
-  async function formatPgsql(value: string) {
-    try {
-      if (!project) throw new Error('No project')
-      const formatted = await formatQuery({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        sql: value,
-      })
-      return formatted.result
-    } catch (error) {
-      console.error('formatPgsql error:', error)
-      return value
-    }
-  }
 
   const { data: keywords, isSuccess: isKeywordsSuccess } = useKeywordsQuery(
     {
@@ -100,8 +84,6 @@ const SqlEditor: NextPageWithLayout = () => {
   )
 
   const pgInfoRef = useRef<any>(null)
-  const formatPgsqlRef = useRef(formatPgsql)
-  formatPgsqlRef.current = formatPgsql
 
   const isPgInfoReady =
     intellisenseEnabled &&
@@ -140,7 +122,7 @@ const SqlEditor: NextPageWithLayout = () => {
       const formatProvider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
         async provideDocumentFormattingEdits(model: any) {
           const value = model.getValue()
-          const formatted = await formatPgsqlRef.current(value)
+          const formatted = formatSql(value)
           if (id) snapV2.setSql(id, formatted)
           return [{ range: model.getFullModelRange(), text: formatted }]
         },
