@@ -9,7 +9,7 @@
     "pretest": "pnpm run env:setup",
     "test": "playwright test",
     "posttest": "supabase stop --no-backup",
-    "codegen:setup": "pnpm run env:setup && NODE_ENV=test pnpm --prefix ../apps/studio run dev",
+    "codegen:setup": "pnpm run env:setup && NODE_ENV=test pnpm --prefix ../../apps/studio dev",
     "codegen": "playwright codegen http://localhost:8082/project/default",
     "clean": "rimraf node_modules"
   },

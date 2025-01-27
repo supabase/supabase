@@ -2,11 +2,11 @@ import { tool } from 'ai'
 import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
+import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
+import { getDatabaseFunctions } from 'data/database-functions/database-functions-query'
 import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
 import { getEntityDefinitionsSql } from 'data/database/entity-definitions-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
-import { getDatabaseFunctions } from 'data/database-functions/database-functions-query'
 
 export const getTools = ({
   projectRef,
