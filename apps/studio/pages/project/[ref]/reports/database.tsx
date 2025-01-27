@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { ArrowRight, ExternalLink } from 'lucide-react'
+import { ArrowRight, ExternalLink, ChevronDown, Database, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -18,14 +18,27 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import Panel from 'components/ui/Panel'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from 'ui'
+import { REPORTS_DATEPICKER_HELPERS } from 'components/interfaces/Reports/Reports.constants'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
+import ShimmerLine from 'components/ui/ShimmerLine'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
+import DatePickers from '../../../../components/interfaces/Settings/Logs/Logs.DatePickers'
+import { useOrgSubscriptionQuery } from '../../../../data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from '../../../../hooks/misc/useSelectedOrganization'
+import { DATE_FORMAT, DATETIME_FORMAT } from '../../../../lib/constants'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -42,9 +55,18 @@ export default DatabaseReport
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
+  const organization = useSelectedOrganization()
+  const now = dayjs()
 
   const state = useDatabaseSelectorStateSnapshot()
-  const [dateRange, setDateRange] = useState<any>(undefined)
+  const [dateRange, setDateRange] = useState<any>({
+    period_start: { date: now.subtract(7, 'day').format(DATE_FORMAT), time_period: '7d' },
+    period_end: { date: now.format(DATE_FORMAT), time_period: 'today' },
+    interval: '1h',
+  })
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const plan = subscription?.plan
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
@@ -88,16 +110,59 @@ const DatabaseUsage = () => {
     }
   }, [db, chart])
 
+  console.log(JSON.stringify(dateRange))
+
+  const handleGranularity = (values: any) => {
+    const conditions = {
+      '1m': dayjs(values.to).diff(values.from, 'hour') < 3,
+      '10m': dayjs(values.to).diff(values.from, 'hour') < 6,
+      '30m': dayjs(values.to).diff(values.from, 'hour') < 12,
+      '1h': dayjs(values.to).diff(values.from, 'hour') >= 12,
+    }
+
+    switch (true) {
+      case conditions['1m']:
+        return '1m'
+      case conditions['10m']:
+        return '10m'
+      case conditions['30m']:
+        return '30m'
+      default:
+        return '1h'
+    }
+  }
+
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
+      <div className="w-full flex flex-col gap-1">
+        <div className="h-2 w-full">
+          <ShimmerLine active={report.isLoading} />
+        </div>
+      </div>
       <section>
         <Panel title={<h2>Database health</h2>}>
           <Panel.Content>
             <div className="mb-4 flex items-center space-x-3">
-              <DateRangePicker
+              <DatePickers
+                onChange={(values: any) => {
+                  setDateRange({
+                    period_start: { date: values.from, time_period: '7d' },
+                    period_end: { date: values.to, time_period: 'today' },
+                    interval: handleGranularity(values),
+                  })
+                }}
+                to={dateRange?.period_start?.date}
+                from={dateRange?.period_end?.date}
+                helpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
+                  ...helper,
+                  disabled: (index > 0 && plan?.id === 'free') || (index > 1 && plan?.id !== 'pro'),
+                }))}
+              />
+              {/* <DateRangePicker
                 loading={false}
                 value={'7d'}
+                className="opacity-0"
                 options={TIME_PERIODS_INFRA}
                 currentBillingPeriodStart={undefined}
                 onChange={(values) => {
@@ -107,7 +172,7 @@ const DatabaseUsage = () => {
                     setDateRange(values)
                   }
                 }}
-              />
+              /> */}
               {dateRange && (
                 <div className="flex items-center gap-x-2">
                   <p className="text-foreground-light">
@@ -122,7 +187,7 @@ const DatabaseUsage = () => {
                 </div>
               )}
             </div>
-            <div className="space-y-6">
+            <div className="grid lg:grid-cols-2 gap-6">
               {dateRange && (
                 <ChartHandler
                   provider="infra-monitoring"

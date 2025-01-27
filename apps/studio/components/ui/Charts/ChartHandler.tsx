@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useState } from 'react'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import AreaChart from 'components/ui/Charts/AreaChart'
 import BarChart from 'components/ui/Charts/BarChart'
@@ -18,6 +18,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { WarningIcon } from 'ui'
 import type { ChartData } from './Charts.types'
 import StackedAreaLineChart from './StackedAreaLineChart'
+import Panel from 'components/ui/Panel'
 
 interface ChartHandlerProps {
   id?: string
@@ -34,6 +35,7 @@ interface ChartHandlerProps {
   isLoading?: boolean
   format?: string
   highlightedValue?: string | number
+  className?: string
 }
 
 /**
@@ -60,6 +62,7 @@ const ChartHandler = ({
   isLoading,
   format,
   highlightedValue,
+  className,
 }: PropsWithChildren<ChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
@@ -150,58 +153,65 @@ const ChartHandler = ({
   }
 
   return (
-    <div className="h-full w-full">
-      <div className="absolute right-6 z-50 flex justify-between">
-        {!hideChartType && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                type="default"
-                className="px-1.5"
-                icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
-                onClick={() => setChartStyle(chartStyle === 'bar' ? 'line' : 'bar')}
-              />
-            </TooltipTrigger>
-            <TooltipContent side="left" align="center">
-              View as {chartStyle === 'bar' ? 'line chart' : 'bar chart'}
-            </TooltipContent>
-          </Tooltip>
+    <Panel
+      noMargin
+      noHideOverflow
+      className={cn('relative pb-0', className)}
+      wrapWithLoading={false}
+    >
+      <Panel.Content className="space-y-4">
+        <div className="absolute right-6 z-50 flex justify-between">
+          {!hideChartType && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="default"
+                  className="px-1.5"
+                  icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
+                  onClick={() => setChartStyle(chartStyle === 'bar' ? 'line' : 'bar')}
+                />
+              </TooltipTrigger>
+              <TooltipContent side="left" align="center">
+                View as {chartStyle === 'bar' ? 'line chart' : 'bar chart'}
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {children}
+        </div>
+        {chartStyle === 'bar' ? (
+          <BarChart
+            YAxisProps={{ width: 1 }}
+            data={(chartData?.data ?? []) as any}
+            format={format || chartData?.format}
+            xAxisKey={'period_start'}
+            yAxisKey={attribute}
+            highlightedValue={_highlightedValue}
+            title={label}
+            customDateFormat={customDateFormat}
+          />
+        ) : chartStyle === 'stackedAreaLine' ? (
+          <StackedAreaLineChart
+            data={(chartData?.data ?? []) as any}
+            format={format || chartData?.format}
+            xAxisKey="period_start"
+            yAxisKey={attribute}
+            highlightedValue={_highlightedValue}
+            title={label}
+            customDateFormat={customDateFormat}
+          />
+        ) : (
+          <AreaChart
+            data={(chartData?.data ?? []) as any}
+            format={format || chartData?.format}
+            xAxisKey="period_start"
+            yAxisKey={attribute}
+            highlightedValue={_highlightedValue}
+            title={label}
+            customDateFormat={customDateFormat}
+          />
         )}
-        {children}
-      </div>
-      {chartStyle === 'bar' ? (
-        <BarChart
-          YAxisProps={{ width: 1 }}
-          data={(chartData?.data ?? []) as any}
-          format={format || chartData?.format}
-          xAxisKey={'period_start'}
-          yAxisKey={attribute}
-          highlightedValue={_highlightedValue}
-          title={label}
-          customDateFormat={customDateFormat}
-        />
-      ) : chartStyle === 'stackedAreaLine' ? (
-        <StackedAreaLineChart
-          data={(chartData?.data ?? []) as any}
-          format={format || chartData?.format}
-          xAxisKey="period_start"
-          yAxisKey={attribute}
-          highlightedValue={_highlightedValue}
-          title={label}
-          customDateFormat={customDateFormat}
-        />
-      ) : (
-        <AreaChart
-          data={(chartData?.data ?? []) as any}
-          format={format || chartData?.format}
-          xAxisKey="period_start"
-          yAxisKey={attribute}
-          highlightedValue={_highlightedValue}
-          title={label}
-          customDateFormat={customDateFormat}
-        />
-      )}
-    </div>
+      </Panel.Content>
+    </Panel>
   )
 }
 
