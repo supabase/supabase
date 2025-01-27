@@ -4,9 +4,9 @@ import { SCHEMAS_SQL } from './sql/schemas'
 import { z } from 'zod'
 
 const pgSchemaZod = z.object({
-  id: z.number(),
-  name: z.string(),
-  owner: z.string(),
+  id: z.coerce.number(),
+  name: z.coerce.string(),
+  owner: z.coerce.string(),
 })
 const pgSchemaArrayZod = z.array(pgSchemaZod)
 const pgSchemaOptionalZod = z.optional(pgSchemaZod)
@@ -117,8 +117,8 @@ $$;
 type SchemaRemoveParams = {
   cascade?: boolean
 }
-function remove({ id }: { id: number }, params: SchemaRemoveParams): { sql: string }
-function remove({ name }: { name: string }, params: SchemaRemoveParams): { sql: string }
+function remove({ id }: { id: number }, params?: SchemaRemoveParams): { sql: string }
+function remove({ name }: { name: string }, params?: SchemaRemoveParams): { sql: string }
 function remove(
   {
     id,
