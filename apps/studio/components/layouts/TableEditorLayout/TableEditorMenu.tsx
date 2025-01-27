@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useBreakpoint, useParams } from 'common'
@@ -42,6 +43,7 @@ import EntityListItem from './EntityListItem'
 
 const TableEditorMenu = () => {
   const { id: _id } = useParams()
+  const router = useRouter()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
