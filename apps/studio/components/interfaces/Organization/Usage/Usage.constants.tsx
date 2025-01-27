@@ -109,7 +109,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
             chartPrefix: 'Average',
             unit: 'bytes',
             description:
-              'Database size refers to the actual amount of space used by all your database objects, as reported by Postgres. Paid Plans use auto-scaling disks and are billed on allocated disk instead of database size.',
+              'Database size refers to the actual amount of space used by all your database objects, as reported by Postgres.',
             links: [
               {
                 name: 'Documentation',

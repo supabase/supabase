@@ -77,7 +77,9 @@ const DatabaseSizeUsage = ({
 
             <div className="flex items-center justify-between">
               <p className="text-xs text-foreground-light">Max database size</p>
-              <p className="text-xs">{databaseSizeUsage?.usage ? formatBytes(databaseSizeUsage?.usage_original) : '-'}</p>
+              <p className="text-xs">
+                {databaseSizeUsage?.usage ? formatBytes(databaseSizeUsage?.usage_original) : '-'}
+              </p>
             </div>
           </div>
 
@@ -105,7 +107,9 @@ const DatabaseSizeUsage = ({
                   <div
                     key={`usage-project-${project.ref}`}
                     className={
-                      idx !== databaseSizeUsage.project_allocations.length - 1 ? 'border-b pb-2' : ''
+                      idx !== databaseSizeUsage.project_allocations.length - 1
+                        ? 'border-b pb-2'
+                        : ''
                     }
                   >
                     <div className="flex justify-between">
@@ -113,7 +117,9 @@ const DatabaseSizeUsage = ({
                         {project.name}
                       </span>
                       <Button asChild type="default" size={'tiny'}>
-                        <Link href={`/project/${project.ref}/reports/database#database-size-report`}>
+                        <Link
+                          href={`/project/${project.ref}/reports/database#database-size-report`}
+                        >
                           Manage Database Size
                         </Link>
                       </Button>
