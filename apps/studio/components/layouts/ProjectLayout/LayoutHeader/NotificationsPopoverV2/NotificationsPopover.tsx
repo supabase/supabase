@@ -96,9 +96,7 @@ const NotificationsPopoverV2 = () => {
         <Button
           type={hasNewNotifications ? 'outline' : 'text'}
           className={cn(
-            'h-[26px]',
-            // !hasCritical || !hasWarning || !hasNewNotifications ? 'w-[26px]' : '',
-            'group',
+            'h-[26px] group',
             hasNewNotifications ? 'rounded-full px-1.5' : 'px-1',
             hasCritical
               ? 'border-destructive-500 hover:border-destructive-600 hover:bg-destructive-300'
@@ -108,9 +106,9 @@ const NotificationsPopoverV2 = () => {
           )}
           icon={
             hasCritical ? (
-              <CriticalIcon className="relative !w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
+              <CriticalIcon className="relative size-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
             ) : hasWarning ? (
-              <WarningIcon className="relative !w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
+              <WarningIcon className="relative size-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
             ) : hasNewNotifications ? (
               <div
                 className={cn(
