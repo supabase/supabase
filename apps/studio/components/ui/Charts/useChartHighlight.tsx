@@ -22,6 +22,7 @@ export function useChartHighlight(): ChartHighlight {
     if (!e || !e.activeLabel) return
     setIsSelecting(true)
     setLeft(e.activeLabel)
+    setRight(e.activeLabel)
     setCoordinates((prevCoordinates: any) => ({ left: e.coordinates, right: undefined }))
   }
 

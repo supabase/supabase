@@ -49,7 +49,13 @@ const DatabaseUsage = () => {
   const organization = useSelectedOrganization()
 
   const state = useDatabaseSelectorStateSnapshot()
-  const [dateRange, setDateRange] = useState<any>(undefined)
+  const defaultStart = dayjs().subtract(7, 'day').toISOString()
+  const defaultEnd = dayjs().toISOString()
+  const [dateRange, setDateRange] = useState<any>({
+    period_start: { date: defaultStart, time_period: '7d' },
+    period_end: { date: defaultEnd, time_period: 'today' },
+    interval: '1h',
+  })
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const plan = subscription?.plan
@@ -144,8 +150,8 @@ const DatabaseUsage = () => {
                     interval: handleIntervalGranularity(values.from, values.to),
                   })
                 }}
-                to={dateRange?.period_start?.date}
-                from={dateRange?.period_end?.date}
+                to={dateRange?.period_end?.date}
+                from={dateRange?.period_start?.date}
                 helpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
                   ...helper,
                   disabled: (index > 4 && plan?.id === 'free') || (index > 5 && plan?.id !== 'pro'),
