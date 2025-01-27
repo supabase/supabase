@@ -127,7 +127,7 @@ const DatabaseSizeUsage = ({
                           Database Size
                         </span>
                         <InfoTooltip side="top">
-                          <p>{project.usage} GB database size as reported by Postgres.</p>
+                          <p>{formatBytes(project.usage)} GB database size as reported by Postgres.</p>
                         </InfoTooltip>
                       </div>
                     </div>
