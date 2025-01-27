@@ -224,49 +224,12 @@ const OrganizationLinks = () => {
       key: 'usage',
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
-    // {
-    //   label: 'Billing',
-    //   href: `/org/${slug}/billing`,
-    //   key: 'billing',
-    //   icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    // },
     {
       label: 'Organization settings',
       href: `/org/${slug}/settings/general`,
       key: 'settings',
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
-    // {
-    //   label: 'OAuth Apps',
-    //   href: `/org/${slug}/apps`,
-    //   key: 'apps',
-    //   icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    // },
-    // {
-    //   label: 'General',
-    //   href: `/org/${slug}/general`,
-    //   key: 'general',
-    //   icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    // },
-    // {
-    //   label: 'Audit Logs',
-    //   href: `/org/${slug}/audit`,
-    //   key: 'audit',
-    //   icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    // },
-    // {
-    //   label: 'Legal Documents',
-    //   href: `/org/${slug}/documents`,
-    //   key: 'documents',
-    //   icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    // },
-    // {
-    //   label: 'Invoices',
-    //   href: `/org/${slug}/invoices`,
-    //   key: 'invoices',
-    //   icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    //   //   hidden: !invoicesEnabled,
-    // },
   ]
 
   return (
