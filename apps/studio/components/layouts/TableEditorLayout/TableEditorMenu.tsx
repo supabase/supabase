@@ -3,7 +3,7 @@ import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
-import { useParams } from 'common'
+import { useBreakpoint, useParams } from 'common'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -39,7 +39,6 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
-import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 const TableEditorMenu = () => {
   const { id: _id } = useParams()
@@ -124,6 +123,7 @@ const TableEditorMenu = () => {
             onSelectSchema={(name: string) => {
               setSearchText('')
               setSelectedSchema(name)
+              router.push(`/project/${project?.ref}/editor`)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
           />
