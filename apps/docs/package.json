@@ -12,7 +12,7 @@
     "build:sitemap": "tsx ./internals/generate-sitemap.ts",
     "postbuild": "pnpm run build:sitemap",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "lint:mdx": "supa-mdx-lint content/guides --config ../../supa-mdx-lint.config.toml",
     "typecheck": "tsc --noEmit",
     "pretest": "pnpm run codegen:examples",

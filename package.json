@@ -18,7 +18,7 @@
     "dev:docs": "turbo run dev --filter=docs --parallel",
     "dev:www": "turbo run dev --filter=www --parallel",
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
-    "lint": "turbo run lint",
+    "lint": "turbo run lint --log-order grouped --continue --parallel",
     "typecheck": "turbo --continue typecheck",
     "test:prettier": "prettier -c '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "format": "prettier --write '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
