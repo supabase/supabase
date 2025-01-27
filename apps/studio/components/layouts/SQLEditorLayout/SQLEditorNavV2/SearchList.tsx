@@ -1,3 +1,4 @@
+import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
@@ -54,9 +55,9 @@ export const SearchList = ({ search, onSelectSnippet }: SearchListProps) => {
 
   return (
     <div className="flex flex-col flex-grow">
-      {isLoadingCount ? (
-        <div className="px-4 pb-2">
-          <ShimmeringLoader className="py-2.5" />
+      {isLoading ? (
+        <div className="px-4 py-1 pb-2.5">
+          <Loader2 className="animate-spin" size={14} />
         </div>
       ) : !!count ? (
         <p className="px-4 pb-2 text-sm text-foreground-lighter">
