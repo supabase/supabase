@@ -16,7 +16,9 @@ import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
 import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from 'data/content/sql-folders-query'
 import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
 import {
@@ -42,12 +44,19 @@ interface SQLEditorNavProps {
   sort?: 'inserted_at' | 'name'
 }
 
+type SectionState = { shared: boolean; favorite: boolean; private: boolean }
+const DEFAULT_SECTION_STATE: SectionState = { shared: false, favorite: false, private: false }
+
 export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
   const { ref: projectRef, id } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const [sections, setSections] = useLocalStorage<SectionState | undefined>(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_SECTION_STATE(projectRef ?? ''),
+    undefined
+  )
 
   const [showMoveModal, setShowMoveModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -510,12 +519,25 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     })
   }, [projectRef, privateSnippetsPages?.pages])
 
+  useEffect(() => {
+    if (!!sections) {
+      const { private: _private, shared, favorite } = sections
+      setShowFavoriteSnippets(favorite)
+      setShowSharedSnippets(shared)
+      setShowPrivateSnippets(_private)
+    }
+  }, [sections])
+
   return (
     <>
       <InnerSideMenuSeparator />
+
       <InnerSideMenuCollapsible
         open={showSharedSnippets}
-        onOpenChange={setShowSharedSnippets}
+        onOpenChange={(value) => {
+          setShowSharedSnippets(value)
+          setSections({ ...(sections ?? DEFAULT_SECTION_STATE), shared: value })
+        }}
         className="px-0"
       >
         <InnerSideMenuCollapsibleTrigger
@@ -565,12 +587,16 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
           )}
         </InnerSideMenuCollapsibleContent>
       </InnerSideMenuCollapsible>
+
       <InnerSideMenuSeparator />
 
       <InnerSideMenuCollapsible
         className="px-0"
         open={showFavoriteSnippets}
-        onOpenChange={setShowFavoriteSnippets}
+        onOpenChange={(value) => {
+          setShowFavoriteSnippets(value)
+          setSections({ ...(sections ?? DEFAULT_SECTION_STATE), favorite: value })
+        }}
       >
         <InnerSideMenuCollapsibleTrigger
           title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
@@ -626,11 +652,15 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
           )}
         </InnerSideMenuCollapsibleContent>
       </InnerSideMenuCollapsible>
+
       <InnerSideMenuSeparator />
 
       <InnerSideMenuCollapsible
         open={showPrivateSnippets}
-        onOpenChange={setShowPrivateSnippets}
+        onOpenChange={(value) => {
+          setShowPrivateSnippets(value)
+          setSections({ ...(sections ?? DEFAULT_SECTION_STATE), private: value })
+        }}
         className="px-0"
       >
         <InnerSideMenuCollapsibleTrigger
