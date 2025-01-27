@@ -34,7 +34,6 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
   }
 
   const selectedHelper = helpers.find((helper) => {
-    console.log(helper.calcTo(), to, helper.calcFrom(), from)
     if (to === helper.calcTo() && from === helper.calcFrom()) {
       return true
     } else {

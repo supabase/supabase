@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
 import { ChartHighlight } from './useChartHighlight'
 import Link from 'next/link'
-import { Button } from 'ui'
-import { useRouter } from 'next-router-mock'
-import { ArrowRight } from 'lucide-react'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ArrowRight, Activity, BarChartIcon, LogsIcon, XIcon } from 'lucide-react'
+import { useParams } from 'common'
 
 export interface ChartHeaderProps {
   title?: string
@@ -14,6 +14,9 @@ export interface ChartHeaderProps {
   highlightedLabel?: number | string | null
   highlightedValue?: number | string | null
   chartHighlight?: ChartHighlight
+  hideChartType?: boolean
+  chartStyle?: string
+  onChartStyleChange?: (style: string) => void
 }
 
 const ChartHeader = ({
@@ -23,9 +26,11 @@ const ChartHeader = ({
   title,
   minimalHeader = false,
   chartHighlight,
+  hideChartType = false,
+  chartStyle = 'bar',
+  onChartStyleChange,
 }: ChartHeaderProps) => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
   const { left: selectedRangeStart, right: selectedRangeEnd, isSelecting } = chartHighlight ?? {}
 
   const chartTitle = (
@@ -66,21 +71,65 @@ const ChartHeader = ({
         {highlightedValue !== undefined && highlighted}
         {label}
       </div>
-      <div>
+      <div className="flex items-center gap-2">
         {selectedRangeStart && selectedRangeStart && !isSelecting && (
-          <div className="flex items-center gap-2">
-            <span className="flex items-center gap-0.5 text-foreground-light text-xs border border-dashed py-1 px-2 rounded-md">
-              {dayjs(selectedRangeStart).format('MMM D, H:mm')} <ArrowRight size={10} />{' '}
-              {dayjs(selectedRangeEnd).format('MMM D, H:mm')}
-            </span>
-            <Button size="tiny" type="default" asChild>
-              <Link
-                href={`/project/${ref}/reports/database?dateRange=${selectedRangeStart}-${selectedRangeEnd}`}
-              >
-                Open in Logs
-              </Link>
+          <>
+            <Button
+              type="text"
+              className="px-1.5 -mr-1 text-foreground-lighter"
+              onClick={() => chartHighlight?.clearHighlight()}
+            >
+              <XIcon size={12} />
             </Button>
-          </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="outline"
+                    className="[&_span]:flex [&_span]:items-center [&_span]:gap-0.5 border-dashed relative pl-1 pr-2"
+                    asChild
+                  >
+                    <Link
+                      className="flex items-center gap-0.5 text-foreground-light"
+                      href={`/project/${ref}/logs/postgres-logs?iso_timestamp_start=${selectedRangeStart}&iso_timestamp_end=${selectedRangeEnd}`}
+                    >
+                      <div className="h-5 w-5 mr-0.5 flex items-center justify-center rounded border bg-alternative">
+                        <LogsIcon size={12} />
+                      </div>
+                      <span>{dayjs(selectedRangeStart).format('MMM D, H:mm')}</span>
+                      <ArrowRight size={10} />
+                      <span>{dayjs(selectedRangeEnd).format('MMM D, H:mm')}</span>
+                    </Link>
+                  </Button>
+                  {/* <Button size="tiny" type="default" asChild>
+                    <Link
+                      href={`/project/${ref}/reports/database?dateRange=${selectedRangeStart}-${selectedRangeEnd}`}
+                    >
+                      Open in Logs
+                    </Link>
+                  </Button> */}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="left" align="center">
+                Open range in Logs Explorer
+              </TooltipContent>
+            </Tooltip>
+          </>
+        )}
+        {!hideChartType && onChartStyleChange && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="default"
+                className="px-1.5"
+                icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
+                onClick={() => onChartStyleChange(chartStyle === 'bar' ? 'line' : 'bar')}
+              />
+            </TooltipTrigger>
+            <TooltipContent side="left" align="center">
+              View as {chartStyle === 'bar' ? 'line chart' : 'bar chart'}
+            </TooltipContent>
+          </Tooltip>
         )}
       </div>
     </div>

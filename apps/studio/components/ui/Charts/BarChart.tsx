@@ -34,6 +34,9 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   YAxisProps?: ComponentProps<typeof YAxis>
   showGrid?: boolean
   chartHighlight?: ChartHighlight
+  hideChartType?: boolean
+  chartStyle?: string
+  onChartStyleChange?: (style: string) => void
 }
 
 const BarChart = ({
@@ -58,6 +61,9 @@ const BarChart = ({
   YAxisProps,
   showGrid = false,
   chartHighlight,
+  hideChartType,
+  chartStyle,
+  onChartStyleChange,
 }: BarChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -123,6 +129,9 @@ const BarChart = ({
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
         chartHighlight={chartHighlight}
+        hideChartType={hideChartType}
+        chartStyle={chartStyle}
+        onChartStyleChange={onChartStyleChange}
       />
       <Container>
         <RechartBarChart

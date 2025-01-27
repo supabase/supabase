@@ -27,7 +27,6 @@ export function useChartHighlight(): ChartHighlight {
 
   const handleMouseMove = (e: any) => {
     if (!isSelecting || !e || !e.activeLabel) return
-    console.log('handleMouseMove', e.coordinates, e)
     setRight(e.activeLabel)
     setCoordinates((prevCoordinates: any) => ({ left: prevCoordinates.left, right: e.coordinates }))
   }
@@ -40,6 +39,7 @@ export function useChartHighlight(): ChartHighlight {
   const clearHighlight = () => {
     setLeft(undefined)
     setRight(undefined)
+    setCoordinates({ left: undefined, right: undefined })
   }
 
   return {

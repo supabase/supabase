@@ -16,6 +16,9 @@ export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   customDateFormat?: string
   displayDateInUtc?: boolean
   chartHighlight?: ChartHighlight
+  hideChartType?: boolean
+  chartStyle?: string
+  onChartStyleChange?: (style: string) => void
 }
 
 const AreaChart = ({
@@ -33,6 +36,9 @@ const AreaChart = ({
   valuePrecision,
   size = 'normal',
   chartHighlight,
+  hideChartType,
+  chartStyle,
+  onChartStyleChange,
 }: AreaChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -74,6 +80,9 @@ const AreaChart = ({
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
         chartHighlight={chartHighlight}
+        hideChartType={hideChartType}
+        chartStyle={chartStyle}
+        onChartStyleChange={onChartStyleChange}
       />
       <Container>
         <RechartAreaChart

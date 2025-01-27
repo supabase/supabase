@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useState } from 'react'
-import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn } from 'ui'
 
 import AreaChart from 'components/ui/Charts/AreaChart'
 import BarChart from 'components/ui/Charts/BarChart'
@@ -13,7 +13,7 @@ import {
   ProjectDailyStatsAttribute,
   useProjectDailyStatsQuery,
 } from 'data/analytics/project-daily-stats-query'
-import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { WarningIcon } from 'ui'
 import type { ChartData } from './Charts.types'
@@ -157,28 +157,11 @@ const ChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative pb-0', className)}
+      className={cn('relative py-2', className)}
       wrapWithLoading={false}
     >
-      <Panel.Content className="space-y-4">
-        <div className="absolute right-6 z-50 flex justify-between">
-          {!hideChartType && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="default"
-                  className="px-1.5"
-                  icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
-                  onClick={() => setChartStyle(chartStyle === 'bar' ? 'line' : 'bar')}
-                />
-              </TooltipTrigger>
-              <TooltipContent side="left" align="center">
-                View as {chartStyle === 'bar' ? 'line chart' : 'bar chart'}
-              </TooltipContent>
-            </Tooltip>
-          )}
-          {children}
-        </div>
+      <Panel.Content className="flex flex-col gap-4">
+        <div className="absolute right-6 z-50 flex justify-between">{children}</div>
         {chartStyle === 'bar' ? (
           <BarChart
             YAxisProps={{ width: 1 }}
@@ -190,6 +173,9 @@ const ChartHandler = ({
             title={label}
             customDateFormat={customDateFormat}
             chartHighlight={chartHighlight}
+            hideChartType={hideChartType}
+            chartStyle={chartStyle}
+            onChartStyleChange={setChartStyle}
           />
         ) : (
           <AreaChart
@@ -201,6 +187,9 @@ const ChartHandler = ({
             title={label}
             customDateFormat={customDateFormat}
             chartHighlight={chartHighlight}
+            hideChartType={hideChartType}
+            chartStyle={chartStyle}
+            onChartStyleChange={setChartStyle}
           />
         )}
       </Panel.Content>
