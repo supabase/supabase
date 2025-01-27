@@ -123,8 +123,6 @@
     "use-debounce": "^7.0.1",
     "uuid": "^9.0.1",
     "valtio": "^1.12.0",
-    "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^1.6.0",
     "yup": "^1.4.0",
     "yup-password": "^0.3.0",
     "zod": "^3.22.4",
@@ -164,7 +162,7 @@
     "@types/sqlstring": "^2.3.0",
     "@types/uuid": "^8.3.4",
     "@types/zxcvbn": "^4.4.1",
-    "@vitest/ui": "^1.6.0",
+    "@vitest/ui": "^3.0.0",
     "api-types": "workspace:*",
     "autoprefixer": "^10.4.14",
     "common": "workspace:*",
@@ -178,6 +176,8 @@
     "postcss": "^8.4.31",
     "prettier": "3.2.4",
     "tailwindcss": "^3.4.1",
-    "typescript": "~5.5.0"
+    "typescript": "~5.5.0",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^3.0.0"
   }
 }
