@@ -803,8 +803,8 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       sql-formatter:
-        specifier: ^13.1.0
-        version: 13.1.0
+        specifier: ^15.0.0
+        version: 15.4.9
       sqlstring:
         specifier: ^2.3.2
         version: 2.3.3
@@ -1286,8 +1286,8 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0(supports-color@8.1.1)
       sql-formatter:
-        specifier: ^15.0.2
-        version: 15.3.1
+        specifier: ^15.0.0
+        version: 15.4.9
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
@@ -1762,9 +1762,6 @@ importers:
       glob:
         specifier: ^8.1.0
         version: 8.1.0
-      sql-formatter:
-        specifier: ^12.2.0
-        version: 12.2.0
       style-dictionary:
         specifier: ^3.7.1
         version: 3.8.0
@@ -1871,8 +1868,8 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       sql-formatter:
-        specifier: ^15.3.1
-        version: 15.3.1
+        specifier: ^15.0.0
+        version: 15.4.9
       sse.js:
         specifier: ^2.2.0
         version: 2.2.0
@@ -11509,20 +11506,12 @@ packages:
     resolution: {integrity: sha512-6QumAdGHEnI5dXEq1d0aBRP876AyA9Wp/UE7wopKNA2Mp9sKGRKVqGgoWHk4dr0J0nceesC85Y0p36qmGoNqhw==}
     hasBin: true
 
-  sql-formatter@12.2.0:
-    resolution: {integrity: sha512-wNsPUdOD6nnN9RUgHlNprQtm+iLW5LTOy/T0/2DDr2UeWSP8mvlQHrx6TY+IG1nfu5Kipq9GaOtS9SVq8s0Vig==}
-    hasBin: true
-
-  sql-formatter@13.1.0:
-    resolution: {integrity: sha512-/nZQXuN7KzipFNM20ko+dHY4kOr9rymSfZLUDED8rhx3m8OK5y74jcyN+y1L51ZqHqiB0kp40VdpZP99uWvQdA==}
-    hasBin: true
-
   sql-formatter@14.0.0:
     resolution: {integrity: sha512-VcHYMRvZqg3RNjjxNB/puT9O1hR5QLXTvgTaBtxXcvmRQwSnH9M+oW2Ti+uFuVVU8HoNlOjU2uKHv8c0FQNsdQ==}
     hasBin: true
 
-  sql-formatter@15.3.1:
-    resolution: {integrity: sha512-L/dqan+Hrt0PpPdCbHcI9bdfOvqaQZR7v5c5SWMJ3bUGQSezK09Mm9q2I3B4iObjaq7FyoldIM+fDSmfzGRXCA==}
+  sql-formatter@15.4.9:
+    resolution: {integrity: sha512-5vmt2HlCAVozxsBZuXWkAki/KGawaK+b5GG5x+BtXOFVpN/8cqppblFUxHl4jxdA0cvo14lABhM+KBnrUapOlw==}
     hasBin: true
 
   sql-parser-cst@0.24.0:
@@ -25293,24 +25282,13 @@ snapshots:
       argparse: 2.0.1
       nearley: 2.20.1
 
-  sql-formatter@12.2.0:
-    dependencies:
-      argparse: 2.0.1
-      nearley: 2.20.1
-
-  sql-formatter@13.1.0:
-    dependencies:
-      argparse: 2.0.1
-      get-stdin: 8.0.0
-      nearley: 2.20.1
-
   sql-formatter@14.0.0:
     dependencies:
       argparse: 2.0.1
       get-stdin: 8.0.0
       nearley: 2.20.1
 
-  sql-formatter@15.3.1:
+  sql-formatter@15.4.9:
     dependencies:
       argparse: 2.0.1
       get-stdin: 8.0.0
