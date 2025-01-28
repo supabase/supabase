@@ -4,7 +4,6 @@ import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.typ
 import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import type { Organization } from 'types'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export const generateSettingsMenu = (
   ref?: string,
