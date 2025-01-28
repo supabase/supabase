@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode } from 'react'
 
 import { LastSignInType, useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -11,11 +11,6 @@ export function LastSignInWrapper({
   type: LastSignInType
 }) {
   const [lastSignIn] = useLastSignIn()
-  const [_, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   return (
     <div className="flex items-center relative">

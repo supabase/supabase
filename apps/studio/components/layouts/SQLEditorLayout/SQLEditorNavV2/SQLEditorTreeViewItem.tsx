@@ -83,7 +83,7 @@ export const SQLEditorTreeViewItem = ({
   const router = useRouter()
   const { id, ref: projectRef } = useParams()
   const { profile } = useProfile()
-  // const { onClick } = getNodeProps() // alaister says remove
+
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const isOwner = profile?.id === element?.metadata.owner_id
@@ -187,8 +187,6 @@ export const SQLEditorTreeViewItem = ({
                 if (isEditing) {
                   return
                 }
-
-                // onClick(e) // alaister says remove, see above line 86
               }
             }}
             {...props}

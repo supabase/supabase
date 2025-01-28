@@ -14,7 +14,6 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { getTabsStore } from 'state/tabs'
 import { cn, SQL_ICON } from 'ui'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 
@@ -54,17 +53,6 @@ const SQLQuickstarts = () => {
       })
       snapV2.addSnippet({ projectRef: ref, snippet })
       snapV2.addNeedsSaving(snippet.id)
-
-      const store = getTabsStore(ref)
-      const tabId = `sql-${snippet.id}`
-      store.openTabs = [...store.openTabs, tabId]
-      store.tabsMap[tabId] = {
-        id: tabId,
-        type: 'sql',
-        label: name,
-        metadata: { sqlId: snippet.id, name },
-      }
-      store.activeTab = tabId
 
       router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
