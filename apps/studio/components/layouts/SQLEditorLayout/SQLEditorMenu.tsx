@@ -9,6 +9,7 @@ import { useParams } from 'common'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -44,7 +45,10 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(false)
-  const [sort, setSort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
+  const [sort, setSort] = useLocalStorage<'name' | 'inserted_at'>(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_SORT(ref ?? ''),
+    'inserted_at'
+  )
 
   const debouncedSearch = useDebounce(search, 500)
 
