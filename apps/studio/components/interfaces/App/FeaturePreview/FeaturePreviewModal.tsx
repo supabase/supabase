@@ -2,24 +2,27 @@ import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useFlag } from 'hooks/ui/useFlag'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useAppStateSnapshot } from 'state/app-state'
 import { removeTabsByEditor } from 'state/tabs'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
 
 const FeaturePreviewModal = () => {
-  // const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
-  // const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewTabsSqlEditor')
-  const enableFunctionsAssistant = useFlag('functionsAssistantV2')
+  const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
+  const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewTabsSqlEditor')
 
   const snap = useAppStateSnapshot()
   const { ref } = useParams()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
+  const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
+  const enableFunctionsAssistant = useFlag('functionsAssistantV2')
 
   const selectedFeaturePreview =
     snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
@@ -40,9 +43,10 @@ const FeaturePreviewModal = () => {
         ? TelemetryActions.FEATURE_PREVIEW_DISABLED
         : TelemetryActions.FEATURE_PREVIEW_ENABLED,
       properties: { feature: selectedFeatureKey },
+      groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
 
-    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
+    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS) {
       removeTabsByEditor(ref as string | undefined, 'table')
     }
     if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
@@ -55,16 +59,16 @@ const FeaturePreviewModal = () => {
     snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
   }
 
-  // function isReleased(feature) {
-  //   switch (feature.key) {
-  //     case LOCAL_STORAGE_KEYS.UI_PREVIEW_FUNCTIONS_ASSISTANT:
-  //       return enableFunctionsAssistant
-  //     case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
-  //       return isFeaturePreviewTabsTableEditorFlag
-  //     case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
-  //       return isFeaturePreviewTabsSqlEditorFlag
-  //   }
-  // }
+  function isReleasedToPublic(feature: (typeof FEATURE_PREVIEWS)[number]) {
+    switch (feature.key) {
+      case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
+        return isFeaturePreviewTabsTableEditorFlag
+      case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
+        return isFeaturePreviewTabsSqlEditorFlag
+      default:
+        return true
+    }
+  }
   // this modal can be triggered on other pages
   // Update local state when valtio state changes
 
@@ -76,7 +80,10 @@ const FeaturePreviewModal = () => {
 
   useEffect(() => {
     if (snap.showFeaturePreviewModal) {
-      sendEvent({ action: TelemetryActions.FEATURE_PREVIEWS_CLICKED })
+      sendEvent({
+        action: TelemetryActions.FEATURE_PREVIEWS_CLICKED,
+        groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
     }
   }, [snap.showFeaturePreviewModal])
 
@@ -95,14 +102,8 @@ const FeaturePreviewModal = () => {
           <div>
             <ScrollArea className="h-[550px] w-[280px] border-r">
               {FEATURE_PREVIEWS.filter((feature) => {
-                // const isTableEditor = feature.key === LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS
-                // const isSqlEditor = feature.key === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS
-
-                // return (
-                //   (isTableEditor && isFeaturePreviewTabsTableEditorFlag) ||
-                //   (isSqlEditor && isFeaturePreviewTabsSqlEditorFlag)
-                // )
-                return true
+                // filter out preview features that are not released to the public
+                return isReleasedToPublic(feature)
               }).map((feature) => {
                 const isEnabled = flags[feature.key] ?? false
 

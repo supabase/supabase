@@ -110,12 +110,11 @@
     "config": "workspace:*",
     "copyfiles": "^2.4.1",
     "glob": "^8.1.0",
-    "sql-formatter": "^12.2.0",
     "style-dictionary": "^3.7.1",
     "tsconfig": "workspace:*",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
     "typescript": "~5.5.0",
-    "vitest": "^2.0.0"
+    "vitest": "^3.0.0"
   },
   "peerDependencies": {
     "next": "catalog:",

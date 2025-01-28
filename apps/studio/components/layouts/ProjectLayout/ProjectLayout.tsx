@@ -9,23 +9,19 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useActionKey } from 'hooks/useActionKey'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
-import { useSnapshot } from 'valtio'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import { useEditorType } from '../editors/editors-layout.hooks'
-import { sidebarState } from '../tabs/sidebar-state'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
-import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
-import NavigationBar from './NavigationBar/NavigationBar'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
@@ -36,9 +32,6 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import { ProjectNavigationBarHorizontal } from './NavigationBar/navigation-bar-horizontal'
-import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import { OrganizationResourceBanner } from 'components/interfaces/Organization/resource-banner'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -142,22 +135,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
 
-    const sidebar = useSnapshot(sidebarState)
-    const actionKey = useActionKey()
-
-    useEffect(() => {
-      const handleKeyDown = (e: KeyboardEvent) => {
-        const isActionKeyPressed = e.key === actionKey?.[1]
-        if (e.key.toLowerCase() === 'b' && isActionKeyPressed) {
-          e.preventDefault()
-          sidebarState.isOpen = !sidebar.isOpen
-        }
-      }
-      document.addEventListener('keydown', handleKeyDown)
-      return () => document.removeEventListener('keydown', handleKeyDown)
-    }, [actionKey, sidebar.isOpen])
-
-    const sideBarIsOpen = forceShowProductMenu ? true : sidebar.isOpen
+    const sideBarIsOpen = true // @mildtomato - var for later to use collapsible sidebar
 
     return (
       <ProjectContextProvider projectRef={projectRef}>

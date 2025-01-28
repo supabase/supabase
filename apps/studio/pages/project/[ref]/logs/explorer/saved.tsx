@@ -12,6 +12,7 @@ import { Loading } from 'ui'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 
+// [Joshen] This page looks like its not longer in use from a UI POV - double checking and deprecate + add redirects
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { data, isLoading } = useContentQuery({

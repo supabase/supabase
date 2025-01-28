@@ -3,9 +3,10 @@ import Link from 'next/link'
 import { useState } from 'react'
 import SVG from 'react-inlinesvg'
 
-import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
 import Success from 'components/interfaces/Support/Success'
 import { SupportFormV2 } from 'components/interfaces/Support/SupportFormV2'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import CopyButton from 'components/ui/CopyButton'
 import InformationBox from 'components/ui/InformationBox'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
@@ -13,10 +14,8 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 import { toast } from 'sonner'
-import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import { NextPageWithLayout } from 'types'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 const SupportPage: NextPageWithLayout = () => {
   const [sentCategory, setSentCategory] = useState<string>()
@@ -45,8 +44,8 @@ const SupportPage: NextPageWithLayout = () => {
                   Troubleshooting
                 </Link>
               </Button>
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <Button
                     asChild
                     type="default"
@@ -68,11 +67,11 @@ const SupportPage: NextPageWithLayout = () => {
                           : 'Active incident ongoing'}
                     </Link>
                   </Button>
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="bottom" align="center">
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="center">
                   Check Supabase status page
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
 

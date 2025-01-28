@@ -81,7 +81,7 @@ const TeamSettings = () => {
       <ScaffoldContainerLegacy>
         <ScaffoldTitle>Team</ScaffoldTitle>
         <ScaffoldFilterAndContent>
-          <ScaffoldActionsContainer className="justify-between">
+          <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">
             <Input
               size="tiny"
               autoComplete="off"
@@ -92,7 +92,7 @@ const TeamSettings = () => {
               id="email"
               placeholder="Filter members"
             />
-            <ScaffoldActionsGroup>
+            <ScaffoldActionsGroup className="w-full md:w-auto">
               {organizationMembersCreationEnabled &&
                 canAddMembers &&
                 profile !== undefined &&

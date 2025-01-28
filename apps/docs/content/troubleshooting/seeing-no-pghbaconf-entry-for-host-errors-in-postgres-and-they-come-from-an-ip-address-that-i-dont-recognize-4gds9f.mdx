@@ -1,0 +1,19 @@
+---
+title = "Seeing \"no pg_hba.conf entry for host\" errors in Postgres and they come from an IP address that I don't recognize"
+github_url = "https://github.com/orgs/supabase/discussions/26282"
+date_created = "2024-05-14T02:45:41+00:00"
+topics = [ "database", "platform" ]
+keywords = [ "pg_hba.conf", "ip", "authentication" ]
+database_id = "9faf3ed3-d373-41c8-a083-ccc83dfc16d7"
+
+[[errors]]
+message = "FATAL: no pg_hba.conf entry for host"
+---
+
+"FATAL: no pg_hba.conf entry for host" errors indicate that there was a failed authentication attempt to the database, so the connection couldn't be established.
+
+The authentication failed because the user/password credentials were invalid: `(user "xxxx", database "yyyy")`. This could happen if you're trying to connect to the database using wrong or revoked credentials. These errors indicate a failed login attempt was made to your database, meaning the connection wasn't established.
+
+It is common to see failed connection attempts that use default usernames (such as `user "pgbouncer"`, `database "postgres"`). Being on the public internet means some level of unauthorized access attempts are possible. These are very unsophisticated attempts that usually involve trying combinations like root, psql, test and postgres usernames.
+
+Supabase takes security seriously and works diligently to ensure the safety of your data.

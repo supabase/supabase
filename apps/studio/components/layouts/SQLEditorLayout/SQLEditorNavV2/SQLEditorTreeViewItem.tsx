@@ -37,7 +37,7 @@ interface SQLEditorTreeViewItemProps
   onSelectShare?: () => void
   onSelectUnshare?: () => void
   onSelectDownload?: () => void
-  onSelectCopyPersonal?: () => void
+  onSelectDuplicate?: () => void
   onSelectDeleteFolder?: () => void
   onEditSave?: (name: string) => void
   onMultiSelect?: (id: string) => void
@@ -68,7 +68,7 @@ export const SQLEditorTreeViewItem = ({
   onSelectShare,
   onSelectUnshare,
   onSelectDownload,
-  onSelectCopyPersonal,
+  onSelectDuplicate,
   onEditSave,
   onMultiSelect,
   isLastItem,
@@ -83,7 +83,7 @@ export const SQLEditorTreeViewItem = ({
   const router = useRouter()
   const { id, ref: projectRef } = useParams()
   const { profile } = useProfile()
-  // const { onClick } = getNodeProps() // alaister says remove
+
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const isOwner = profile?.id === element?.metadata.owner_id
@@ -187,8 +187,6 @@ export const SQLEditorTreeViewItem = ({
                 if (isEditing) {
                   return
                 }
-
-                // onClick(e) // alaister says remove, see above line 86
               }
             }}
             {...props}
@@ -315,19 +313,16 @@ export const SQLEditorTreeViewItem = ({
                   Unshare query with team
                 </ContextMenuItem_Shadcn_>
               )}
-              {onSelectCopyPersonal !== undefined &&
-                isSharedSnippet &&
-                !isOwner &&
-                canCreateSQLSnippet && (
-                  <ContextMenuItem_Shadcn_
-                    className="gap-x-2"
-                    onSelect={() => onSelectCopyPersonal()}
-                    onFocusCapture={(e) => e.stopPropagation()}
-                  >
-                    <Copy size={14} />
-                    Duplicate personal copy
-                  </ContextMenuItem_Shadcn_>
-                )}
+              {onSelectDuplicate !== undefined && canCreateSQLSnippet && (
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onSelect={() => onSelectDuplicate()}
+                  onFocusCapture={(e) => e.stopPropagation()}
+                >
+                  <Copy size={14} />
+                  Duplicate query
+                </ContextMenuItem_Shadcn_>
+              )}
               {onSelectDownload !== undefined && IS_PLATFORM && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"

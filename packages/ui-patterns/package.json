@@ -34,9 +34,10 @@
     "react-tooltip": "*",
     "react-use": "^17.5.0",
     "reactflow": "*",
+    "recharts": "^2.8.0",
     "remark-gfm": "^4.0.0",
     "sonner": "^1.5.0",
-    "sql-formatter": "^15.3.1",
+    "sql-formatter": "^15.0.0",
     "sse.js": "^2.2.0",
     "tsconfig": "workspace:*",
     "ui": "workspace:*",
@@ -56,7 +57,7 @@
     "api-types": "workspace:*",
     "next-router-mock": "^0.9.13",
     "typescript": "~5.5.0",
-    "vitest": "^2.0.3"
+    "vitest": "^3.0.0"
   },
   "peerDependencies": {
     "next": "catalog:",

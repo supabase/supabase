@@ -1,24 +1,25 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ActionCard } from 'components/layouts/tabs/actions-card'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { partition } from 'lodash'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { getTabsStore } from 'state/tabs'
 import { cn, SQL_ICON } from 'ui'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 
 const SQLTemplates = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { profile } = useProfile()
   const { project } = useProjectContext()
   const [sql] = partition(SQL_TEMPLATES, { type: 'template' })
@@ -52,17 +53,6 @@ const SQLTemplates = () => {
       snapV2.addSnippet({ projectRef: ref, snippet })
       snapV2.addNeedsSaving(snippet.id)
 
-      const store = getTabsStore(ref)
-      const tabId = `sql-${snippet.id}`
-      store.openTabs = [...store.openTabs, tabId]
-      store.tabsMap[tabId] = {
-        id: tabId,
-        type: 'sql',
-        label: name,
-        metadata: { sqlId: snippet.id, name },
-      }
-      store.activeTab = tabId
-
       router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
       toast.error(`Failed to create new query: ${error.message}`)
@@ -93,6 +83,7 @@ const SQLTemplates = () => {
                 sendEvent({
                   action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED,
                   properties: { templateName: x.title },
+                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
                 })
               }}
             />

@@ -161,15 +161,19 @@ function useLogsPreview({
   const newCount = isResponseOk(countData) ? countData.result?.[0]?.count ?? 0 : 0
 
   // chart data
+  const chartQuery = useMemo(
+    () => genChartQuery(table, params, filters),
+    [table, params.iso_timestamp_end, params.project, filters]
+  )
 
-  const chartQuery = useMemo(() => genChartQuery(table, params, filters), [params, filters])
   const chartUrl = useMemo(() => {
     return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
-      iso_timestamp_end: params.iso_timestamp_end,
-      project: params.project,
+      iso_timestamp_start: params.iso_timestamp_start ?? '',
+      iso_timestamp_end: params.iso_timestamp_end ?? '',
+      project: params.project ?? '',
       sql: chartQuery,
-    } as any)}`
-  }, [params, chartQuery])
+    })}`
+  }, [projectRef, params.iso_timestamp_start, params.iso_timestamp_end, params.project, chartQuery])
 
   const { data: eventChartResponse, refetch: refreshEventChart } = useQuery(
     [

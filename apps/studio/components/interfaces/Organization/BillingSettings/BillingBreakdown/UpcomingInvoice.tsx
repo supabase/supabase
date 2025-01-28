@@ -6,14 +6,7 @@ import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgUpcomingInvoiceQuery } from 'data/invoices/org-invoice-upcoming-query'
 import { formatCurrency } from 'lib/helpers'
-import {
-  Button,
-  cn,
-  Collapsible,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-} from 'ui'
+import { Button, cn, Collapsible, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { billingMetricUnit, formatUsage } from '../helpers'
 
 export interface UpcomingInvoiceProps {
@@ -290,11 +283,11 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
 const InvoiceTooltip = ({ text, linkRef }: { text: string; linkRef?: string }) => {
   return (
-    <Tooltip_Shadcn_>
-      <TooltipTrigger_Shadcn_>
+    <Tooltip>
+      <TooltipTrigger>
         <Info size={12} strokeWidth={2} />
-      </TooltipTrigger_Shadcn_>
-      <TooltipContent_Shadcn_
+      </TooltipTrigger>
+      <TooltipContent
         side="bottom"
         className="min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto"
       >
@@ -311,8 +304,8 @@ const InvoiceTooltip = ({ text, linkRef }: { text: string; linkRef?: string }) =
             </Link>
           )}
         </p>
-      </TooltipContent_Shadcn_>
-    </Tooltip_Shadcn_>
+      </TooltipContent>
+    </Tooltip>
   )
 }
 

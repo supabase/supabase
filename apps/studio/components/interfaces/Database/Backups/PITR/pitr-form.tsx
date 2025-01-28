@@ -122,7 +122,7 @@ export function PITRForm({
           </div>
         }
       >
-        <div className="flex justify-between px-10 py-6 space-x-10">
+        <div className="flex justify-between px-4 md:px-10 py-6 space-x-10">
           <div className="w-1/3 space-y-2">
             <DatePicker
               inline

@@ -1,12 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { FilePlus, FolderPlus, Plus } from 'lucide-react'
+import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { getAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -16,15 +18,19 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import {
+  InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
-  InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
 import { SqlEditorMenuStaticLinks } from './sql-editor-menu-static-links'
-import { SQLEditorNav as SQLEditorNavV2 } from './SQLEditorNavV2/SQLEditorNav'
+import { SearchList } from './SQLEditorNavV2/SearchList'
+import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
 
 export const SQLEditorMenu = () => {
   const router = useRouter()
@@ -33,11 +39,15 @@ export const SQLEditorMenu = () => {
   const { ref } = useParams()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const [searchText, setSearchText] = useState('')
-  const [isSearching, setIsSearching] = useState(false)
-  const [sort, setSort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
+  const [search, setSearch] = useState('')
+  const [showSearch, setShowSearch] = useState(false)
+  const [sort, setSort] = useLocalStorage<'name' | 'inserted_at'>(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_SORT(ref ?? ''),
+    'inserted_at'
+  )
 
   const appState = getAppStateSnapshot()
+  const debouncedSearch = useDebounce(search, 500)
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -46,6 +56,8 @@ export const SQLEditorMenu = () => {
 
   const createNewFolder = () => {
     if (!ref) return console.error('Project ref is required')
+    setSearch('')
+    setShowSearch(false)
     snapV2.addNewFolder({ projectRef: ref })
   }
 
@@ -58,38 +70,65 @@ export const SQLEditorMenu = () => {
     }
     try {
       router.push(`/project/${ref}/sql/new?skip=true`)
-      setSearchText('')
+      setSearch('')
+      setShowSearch(false)
     } catch (error: any) {
       toast.error(`Failed to create new query: ${error.message}`)
     }
   }
 
-  console.log('asPath', router.asPath)
+  useEffect(() => {
+    setShowSearch(debouncedSearch.length > 0)
+  }, [debouncedSearch])
 
   return (
     <div className="h-full flex flex-col justify-between">
-      <div className="mt-4 mb-2 flex flex-col gap-y-4">
-        <div className="mx-4 flex items-center justify-between gap-x-2">
+      <div className="flex flex-col gap-y-4 flex-grow">
+        <div className="mt-4 mx-4 flex items-center justify-between gap-x-2">
           <InnerSideBarFilters className="w-full p-0 gap-0">
             <InnerSideBarFilterSearchInput
               name="search-queries"
               placeholder="Search queries..."
               aria-labelledby="Search queries"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              isLoading={isSearching}
+              value={search}
+              onChange={(e) => {
+                const value = e.target.value
+                setSearch(value)
+                if (value.length === 0) setShowSearch(false)
+              }}
+              onKeyDown={(e) => {
+                if (e.code === 'Escape') {
+                  setSearch('')
+                  setShowSearch(false)
+                }
+              }}
             >
-              <InnerSideBarFilterSortDropdown
-                value={sort}
-                onValueChange={(value: any) => setSort(value)}
-              >
-                <InnerSideBarFilterSortDropdownItem key="name" value="name">
-                  Alphabetical
-                </InnerSideBarFilterSortDropdownItem>
-                <InnerSideBarFilterSortDropdownItem key="inserted_at" value="inserted_at">
-                  Created At
-                </InnerSideBarFilterSortDropdownItem>
-              </InnerSideBarFilterSortDropdown>
+              {showSearch ? (
+                <Tooltip>
+                  <TooltipTrigger
+                    className="absolute right-1 top-[.4rem] md:top-[.3rem] transition-colors text-foreground-light hover:text-foreground"
+                    onClick={() => {
+                      setSearch('')
+                      setShowSearch(false)
+                    }}
+                  >
+                    <X size={18} />
+                  </TooltipTrigger>
+                  <TooltipContent>Clear search</TooltipContent>
+                </Tooltip>
+              ) : (
+                <InnerSideBarFilterSortDropdown
+                  value={sort}
+                  onValueChange={(value: any) => setSort(value)}
+                >
+                  <InnerSideBarFilterSortDropdownItem key="name" value="name">
+                    Alphabetical
+                  </InnerSideBarFilterSortDropdownItem>
+                  <InnerSideBarFilterSortDropdownItem key="inserted_at" value="inserted_at">
+                    Created At
+                  </InnerSideBarFilterSortDropdownItem>
+                </InnerSideBarFilterSortDropdown>
+              )}
             </InnerSideBarFilterSearchInput>
           </InnerSideBarFilters>
           <DropdownMenu>
@@ -113,9 +152,20 @@ export const SQLEditorMenu = () => {
           </DropdownMenu>
         </div>
 
-        <SqlEditorMenuStaticLinks />
-
-        <SQLEditorNavV2 searchText={searchText} sort={sort} setIsSearching={setIsSearching} />
+        {showSearch ? (
+          <SearchList
+            search={debouncedSearch}
+            onSelectSnippet={() => {
+              setSearch('')
+              setShowSearch(false)
+            }}
+          />
+        ) : (
+          <>
+            <SqlEditorMenuStaticLinks />
+            <SQLEditorNav sort={sort} />
+          </>
+        )}
       </div>
 
       <div className="p-4 border-t sticky bottom-0 bg-studio">

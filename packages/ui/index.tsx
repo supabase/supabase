@@ -222,10 +222,10 @@ export {
 } from './src/components/shadcn/ui/tabs'
 
 export {
-  TooltipProvider as TooltipProvider_Shadcn_,
-  Tooltip as Tooltip_Shadcn_,
-  TooltipTrigger as TooltipTrigger_Shadcn_,
-  TooltipContent as TooltipContent_Shadcn_,
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
 } from './src/components/shadcn/ui/tooltip'
 
 export {

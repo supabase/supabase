@@ -43,20 +43,6 @@
   <pubDate>Tue, 10 Dec 2024 00:00:00 -0700</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/database-build-v2</guid>
-  <title>database.build v2: Bring-your-own-LLM</title>
-  <link>https://supabase.com/blog/database-build-v2</link>
-  <description>Use any OpenAI API compatible LLMs in database.build</description>
-  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/restore-to-a-new-project</guid>
-  <title>Restore to a New Project</title>
-  <link>https://supabase.com/blog/restore-to-a-new-project</link>
-  <description>Effortlessly Clone Data into a New Supabase Project</description>
-  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
-</item>
-<item>
   <guid>https://supabase.com/blog/hack-the-base</guid>
   <title>Hack the Base! with Supabase</title>
   <link>https://supabase.com/blog/hack-the-base</link>
@@ -68,6 +54,20 @@
   <title>Top 10 Launches of Launch Week 13</title>
   <link>https://supabase.com/blog/launch-week-13-top-10</link>
   <description>Highlights from Launch Week 13</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/database-build-v2</guid>
+  <title>database.build v2: Bring-your-own-LLM</title>
+  <link>https://supabase.com/blog/database-build-v2</link>
+  <description>Use any OpenAI API compatible LLMs in database.build</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/restore-to-a-new-project</guid>
+  <title>Restore to a New Project</title>
+  <link>https://supabase.com/blog/restore-to-a-new-project</link>
+  <description>Effortlessly Clone Data into a New Supabase Project</description>
   <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
 </item>
 <item>

@@ -4683,6 +4683,56 @@ functions:
             }
           ]
           ```
+      - id: order-parent-table-by-a-referenced-table
+        name: Order parent table by a referenced table
+        code: |
+          ```dart
+          final data = await supabase
+              .from('cities')
+              .select('''
+                name,
+                country:countries (
+                  name
+                )
+              ''')
+              .order('country(name)', ascending: true)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 1, 'Munich'),
+              (2, 2, 'Bali');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "name": "Munich",
+              "country": { "name": "Germany" }
+            },
+            {
+              "name": "Bali",
+              "country": { "name": "Indonesia" }
+            }
+          ]
+          ```
   - id: limit
     title: limit()
     description: |

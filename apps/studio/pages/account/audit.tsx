@@ -3,7 +3,6 @@ import AccountLayout from 'components/layouts/AccountLayout/account-layout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
 
 const Audit: NextPageWithLayout = () => {

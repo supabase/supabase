@@ -1,3 +1,5 @@
+import { Smartphone } from 'lucide-react'
+
 import { TOTPFactors } from 'components/interfaces/Account'
 import AccountLayout from 'components/layouts/AccountLayout/account-layout'
 import AccountSettingsLayout from 'components/layouts/AccountLayout/account-settings-layout'
@@ -5,7 +7,6 @@ import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import { Smartphone } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
 import { Badge, cn, Collapsible } from 'ui'
 
@@ -35,7 +36,7 @@ const Security: NextPageWithLayout = () => {
         <Collapsible.Trigger asChild>
           <button
             type="button"
-            className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
+            className="group flex w-full items-center justify-between rounded py-3 px-4 md:px-6 text-foreground"
           >
             <div className="flex flex-row gap-4 items-center py-1">
               <Smartphone strokeWidth={1.5} />
@@ -49,7 +50,7 @@ const Security: NextPageWithLayout = () => {
             ) : null}
           </button>
         </Collapsible.Trigger>
-        <Collapsible.Content className="group border-t border-default bg-surface-100 py-6 px-6 text-foreground">
+        <Collapsible.Content className="group border-t border-default bg-surface-100 py-6 px-4 md:px-6 text-foreground">
           <TOTPFactors />
         </Collapsible.Content>
       </Collapsible>

@@ -2,16 +2,17 @@ import { Search } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import { Button, Input, Sheet, SheetContent } from 'ui'
 import { CronJobCard } from './CronJobCard'
 import { DeleteCronJob } from './DeleteCronJob'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const EMPTY_CRON_JOB = {
   jobname: '',
@@ -22,6 +23,7 @@ const EMPTY_CRON_JOB = {
 
 export const CronjobsTab = () => {
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
@@ -66,13 +68,16 @@ export const CronjobsTab = () => {
       : cronJobs ?? []
 
   const onOpenCreateJobSheet = () => {
-    sendEvent({ action: TelemetryActions.CRON_JOB_CREATE_CLICKED })
+    sendEvent({
+      action: TelemetryActions.CRON_JOB_CREATE_CLICKED,
+      groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
     setCreateCronJobSheetShown(true)
   }
 
   return (
     <>
-      <div className="w-full space-y-4 p-10">
+      <div className="w-full space-y-4 p-4 md:p-10">
         {(cronJobs ?? []).length == 0 ? (
           <div className="border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed">
             <p className="text-sm text-foreground">No cron jobs created yet</p>

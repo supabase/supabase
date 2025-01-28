@@ -212,7 +212,8 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       label: 'Resources',
       menuItems: [
         [
-          /*           {
+          /*
+                     {
             label: 'Troubleshooting',
             icon: 'contributing',
             href: '/guides/troubleshooting',
@@ -1322,7 +1323,7 @@ export const functions: NavMenuConstant = {
       name: 'Guides',
       url: undefined,
       items: [
-        { name: 'Managing dependencies', url: '/guides/functions/import-maps' },
+        { name: 'Managing dependencies', url: '/guides/functions/dependencies' },
         {
           name: 'Managing environment variables',
           url: '/guides/functions/secrets',
@@ -1358,6 +1359,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Running AI Models',
           url: '/guides/functions/ai-models',
+        },
+        {
+          name: 'Wasm modules',
+          url: '/guides/functions/wasm',
         },
         {
           name: 'Deploying with CI / CD pipelines',

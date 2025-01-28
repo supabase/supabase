@@ -1,3 +1,7 @@
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ReactNode, useMemo } from 'react'
+
 import { useParams } from 'common'
 import Connect from 'components/interfaces/Connect/Connect'
 import { UserDropdown } from 'components/interfaces/user-dropdown'
@@ -14,9 +18,6 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import Image from 'next/image'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ReactNode, useMemo } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
@@ -49,6 +50,8 @@ interface LayoutHeaderProps {
   hasProductMenu?: boolean
   customSidebarContent?: ReactNode
   headerTitle?: string
+  handleMobileMenu: Function
+  showHomeLink?: boolean
 }
 
 const LayoutHeader = ({

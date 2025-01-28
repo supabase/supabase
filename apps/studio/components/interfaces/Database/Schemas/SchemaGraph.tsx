@@ -20,15 +20,11 @@ import { TableNode } from './SchemaTableNode'
 
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
-export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelection?: boolean }) => {
-  const { ref, schema: selectedSchemaParam } = useParams()
+export const SchemaGraph = () => {
+  const { ref } = useParams()
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
-  const [selectedSchema, setSelectedSchema] = useState<PostgresSchema['name']>(
-    selectedSchemaParam || 'public'
-  )
-
-  const targetSchema = selectedSchemaParam || selectedSchema
+  const [selectedSchema, setSelectedSchema] = useState<string>('public')
 
   const miniMapNodeColor = '#111318'
   const miniMapMaskColor = resolvedTheme?.includes('dark')
@@ -63,11 +59,11 @@ export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelecti
   } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: targetSchema,
+    schema: selectedSchema,
     includeColumns: true,
   })
 
-  const schema = (schemas ?? []).find((s) => s.name === targetSchema)
+  const schema = (schemas ?? []).find((s) => s.name === selectedSchema)
   const [_, setStoredPositions] = useLocalStorage(
     LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref as string, schema?.id ?? 0),
     {}
@@ -98,7 +94,7 @@ export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelecti
 
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
-      const schema = schemas.find((s) => s.name === targetSchema) as PostgresSchema
+      const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
       getGraphDataFromTables(ref as string, schema, tables).then(({ nodes, edges }) => {
         reactFlowInstance.setNodes(nodes)
         reactFlowInstance.setEdges(edges)
@@ -109,41 +105,36 @@ export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelecti
 
   return (
     <>
-      {!hideSchemaSelection ? (
-        <div className="flex items-center justify-between p-4 border-b border-muted">
-          {isLoadingSchemas && (
-            <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
-          )}
+      <div className="border-default flex max-h-12 items-center justify-between border-b px-4 min-h-10 box-content">
+        {isLoadingSchemas && (
+          <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
+        )}
 
-          {isErrorSchemas && (
-            <AlertError error={errorSchemas as any} subject="Failed to retrieve schemas" />
-          )}
+        {isErrorSchemas && (
+          <AlertError error={errorSchemas as any} subject="Failed to retrieve schemas" />
+        )}
 
-          {isSuccessSchemas && (
-            <>
-              <SchemaSelector
-                className="w-[180px]"
-                size="tiny"
-                showError={false}
-                selectedSchemaName={selectedSchema}
-                onSelectSchema={setSelectedSchema}
-              />
-              <ButtonTooltip
-                type="default"
-                onClick={resetLayout}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: 'Automatically arrange the layout of all nodes',
-                  },
-                }}
-              >
-                Auto layout
-              </ButtonTooltip>
-            </>
-          )}
-        </div>
-      ) : null}
+        {isSuccessSchemas && (
+          <>
+            <SchemaSelector
+              className="w-[180px]"
+              size="tiny"
+              showError={false}
+              selectedSchemaName={selectedSchema}
+              onSelectSchema={setSelectedSchema}
+            />
+            <ButtonTooltip
+              type="default"
+              onClick={resetLayout}
+              tooltip={{
+                content: { side: 'bottom', text: 'Automatically arrange the layout of all nodes' },
+              }}
+            >
+              Auto layout
+            </ButtonTooltip>
+          </>
+        )}
+      </div>
       {isLoadingTables && (
         <div className="w-full h-full flex items-center justify-center gap-x-2">
           <Loader2 className="animate-spin text-foreground-light" size={16} />
@@ -176,7 +167,6 @@ export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelecti
             proOptions={{ hideAttribution: true }}
             onNodeDragStop={() => saveNodePositions()}
           >
-            <SchemaGraphLegend />
             <Background
               gap={16}
               className="[&>*]:stroke-foreground-muted opacity-[25%]"
@@ -190,6 +180,7 @@ export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelecti
               maskColor={miniMapMaskColor}
               className="border rounded-md shadow-sm"
             />
+            <SchemaGraphLegend />
           </ReactFlow>
         </div>
       )}

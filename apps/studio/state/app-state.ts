@@ -238,6 +238,13 @@ export const appState = proxy({
   setMobileInnerMenuOpen: (value: boolean) => {
     appState.mobileInnerMenuOpen = value
   },
+
+  saveLatestMessage: (message: any) => {
+    appState.aiAssistantPanel = {
+      ...appState.aiAssistantPanel,
+      messages: [...appState.aiAssistantPanel.messages, message],
+    }
+  },
 })
 
 // Set up localStorage subscription

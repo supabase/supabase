@@ -61,17 +61,6 @@ export async function getTables(
     return sortBy(data, (t) => t[sortByProperty]) as PostgresTable[]
   }
 
-  // if (data) {
-  //   // handle recent items
-  //   const currentContentIds = [
-  //     ...data
-  //       .filter((content: TablesVariables) => content. === 'sql')
-  //       .map((content: Content) => createTabId('sql', { id: content.id })),
-  //     // append ignored tab IDs
-  //     ...IGNORED_TAB_IDS,
-  //   ]
-  // }
-
   return data as Omit<PostgresTable, 'columns'>[]
 }
 

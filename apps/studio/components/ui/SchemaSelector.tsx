@@ -70,8 +70,14 @@ const SchemaSelector = ({
   return (
     <div className={className}>
       {isSchemasLoading && (
-        <Button type="default" key="schema-selector-skeleton" size={size} disabled>
-          <Skeleton className="w-12 h-3 bg-foreground-muted" />
+        <Button
+          type="default"
+          key="schema-selector-skeleton"
+          className="w-full [&>span]:w-full"
+          size={size}
+          disabled
+        >
+          <Skeleton className="w-full h-3 bg-foreground-muted" />
         </Button>
       )}
 
@@ -96,6 +102,7 @@ const SchemaSelector = ({
               size={size}
               disabled={disabled}
               type="default"
+              data-testid="schema-selector"
               className={`w-full [&>span]:w-full !pr-1 space-x-1`}
               iconRight={
                 <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />

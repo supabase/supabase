@@ -1,5 +1,4 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
-import { handleError } from 'data/fetchers'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
@@ -66,7 +65,7 @@ export async function getDatabaseQueuesMetrics({
         method: 'estimated',
       } as PostgresQueueMetric
     }
-    return handleError(error)
+    throw error
   }
 }
 
