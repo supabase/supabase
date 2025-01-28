@@ -224,7 +224,7 @@ const LogsQueryPanel = ({
                       {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
                     </Badge>
                   </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_>
+                  <PopoverContent_Shadcn_ className="p-0 w-44">
                     <Alert variant="warning" title="">
                       <div className="flex flex-col gap-3">
                         {warnings.map((warning, index) => (

@@ -9,7 +9,7 @@ import {
   PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
 } from 'ui'
-import type { FilterSet, Filters } from './Logs.types'
+import type { Filters, FilterSet } from './Logs.types'
 
 interface LogsFilterPopoverProps {
   options: FilterSet
@@ -40,7 +40,7 @@ const LogsFilterPopover = ({
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={handleToggle}>
+    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
           asChild
@@ -51,7 +51,7 @@ const LogsFilterPopover = ({
           <span>{options.label}</span>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="flex items-center" align="end" side="bottom">
+      <PopoverContent_Shadcn_ className="p-0 w-60" align="end" side="bottom">
         <Form
           className="w-full"
           initialValues={filters}

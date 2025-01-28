@@ -227,7 +227,7 @@ const ReportFilterBar = ({
               </Button>
             </div>
           ))}
-        <Popover_Shadcn_ open={showAdder} onOpenChange={(openValue) => setShowAdder(openValue)}>
+        <Popover_Shadcn_ open={showAdder} onOpenChange={setShowAdder}>
           <PopoverTrigger_Shadcn_>
             <Button
               asChild

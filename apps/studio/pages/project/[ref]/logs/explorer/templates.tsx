@@ -70,8 +70,8 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
                 <span>Preview</span>
               </Button>
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="rounded-lg bg-alternative">
-              <pre className="whitespace-pre-line break-words rounded-lg bg-alternative p-4 text-sm">
+            <PopoverContent_Shadcn_ className="rounded-lg bg-alternative w-96 p-0">
+              <pre className="whitespace-pre-line break-words rounded-lg p-4 text-sm">
                 {template.searchString}
               </pre>
             </PopoverContent_Shadcn_>
