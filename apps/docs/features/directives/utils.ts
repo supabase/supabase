@@ -8,6 +8,7 @@ import { mdxjs } from 'micromark-extension-mdxjs'
 
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
+import { getGitHubFileContents } from '~/lib/octokit'
 import { getGitHubFileContentsImmutableOnly } from '~/lib/octokit'
 import { codeSampleRemark } from './CodeSample'
 

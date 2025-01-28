@@ -16,9 +16,9 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   WarningIcon,
 } from 'ui'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
@@ -199,30 +199,30 @@ const ColumnManagement = ({
             {isNewRecord && <div className="w-[5%]" />}
             <div className="w-[25%] flex items-center space-x-2">
               <h5 className="text-xs text-foreground-lighter">Name</h5>
-              <Tooltip>
-                <TooltipTrigger>
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_>
                   <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="w-[300px]">
+                </TooltipTrigger_Shadcn_>
+                <TooltipContent_Shadcn_ side="bottom" className="w-[300px]">
                   Recommended to use lowercase and use an underscore to separate words e.g.
                   column_name
-                </TooltipContent>
-              </Tooltip>
+                </TooltipContent_Shadcn_>
+              </Tooltip_Shadcn_>
             </div>
             <div className="w-[25%]">
               <h5 className="text-xs text-foreground-lighter">Type</h5>
             </div>
             <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
               <h5 className="text-xs text-foreground-lighter">Default Value</h5>
-              <Tooltip>
-                <TooltipTrigger>
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_>
                   <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="w-[300px]">
+                </TooltipTrigger_Shadcn_>
+                <TooltipContent_Shadcn_ side="bottom" className="w-[300px]">
                   Can either be a literal or an expression. When using an expression wrap your
                   expression in brackets, e.g. (gen_random_uuid())
-                </TooltipContent>
-              </Tooltip>
+                </TooltipContent_Shadcn_>
+              </Tooltip_Shadcn_>
             </div>
             <div className="w-[10%]">
               <h5 className="text-xs text-foreground-lighter">Primary</h5>

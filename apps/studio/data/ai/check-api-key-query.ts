@@ -1,27 +1,20 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { constructHeaders } from 'data/fetchers'
+import { get, isResponseOk } from 'lib/common/fetch'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { ResponseError } from 'types'
-import { aiKeys } from './keys'
+import { resourceKeys } from './keys'
 
 // check to see if the OPENAI_API_KEY env var is set in self-hosted
 // so we can disable the chat editor and add a warning about manually adding the key
 
 export async function checkOpenAIKey(signal?: AbortSignal) {
-  const headers = await constructHeaders()
-  const response = await fetch(`${BASE_PATH}/api/ai/sql/check-api-key`, { headers, signal })
-  let body: any
+  const response = await get(`${BASE_PATH}/api/ai/sql/check-api-key`, { signal })
 
-  try {
-    body = await response.json()
-  } catch {}
-
-  if (!response.ok) {
-    throw new ResponseError(body?.message, response.status)
+  if (!isResponseOk(response)) {
+    throw (response as any).error
   }
 
-  return body as { hasKey: boolean }
+  return response as { hasKey: boolean }
 }
 
 export type ResourceData = Awaited<ReturnType<typeof checkOpenAIKey>>
@@ -32,7 +25,7 @@ export const useCheckOpenAIKeyQuery = <TData = ResourceData>({
   ...options
 }: UseQueryOptions<ResourceData, ResourceError, TData> = {}) =>
   useQuery<ResourceData, ResourceError, TData>(
-    aiKeys.apiKey(),
+    resourceKeys.apiKey(),
     ({ signal }) => checkOpenAIKey(signal),
     { enabled: !IS_PLATFORM && enabled, ...options }
   )

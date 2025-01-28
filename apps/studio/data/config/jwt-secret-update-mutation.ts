@@ -1,7 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, patch } from 'data/fetchers'
+import { patch } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
 
@@ -16,19 +17,15 @@ export async function updateJwtSecret({
   jwtSecret,
   changeTrackingId,
 }: JwtSecretUpdateVariables) {
-  const { data, error } = await patch('/platform/projects/{ref}/config/secrets', {
-    params: {
-      path: { ref: projectRef },
-    },
-    body: {
-      jwt_secret: jwtSecret,
-      change_tracking_id: changeTrackingId,
-    },
+  const response = await patch(`${API_URL}/projects/${projectRef}/config/secrets`, {
+    jwt_secret: jwtSecret,
+    change_tracking_id: changeTrackingId,
   })
+  if (response.error) {
+    throw response.error
+  }
 
-  if (error) handleError(error)
-
-  return data
+  return response
 }
 
 type JwtSecretUpdateData = Awaited<ReturnType<typeof updateJwtSecret>>

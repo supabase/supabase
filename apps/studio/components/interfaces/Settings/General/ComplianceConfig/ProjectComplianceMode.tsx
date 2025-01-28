@@ -5,16 +5,16 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { InlineLink } from 'components/ui/InlineLink'
 import { useComplianceConfigUpdateMutation } from 'data/config/project-compliance-config-mutation'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Switch, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import AlertError from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
 
 const ComplianceConfig = () => {
   const { ref } = useParams()
@@ -93,8 +93,8 @@ const ComplianceConfig = () => {
                 <AlertError error={error} subject="Failed to retrieve project settings" />
               )}
               {isSuccess && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
                     {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
                     <div>
                       <Switch
@@ -104,14 +104,14 @@ const ComplianceConfig = () => {
                         onCheckedChange={toggleIsSensitive}
                       />
                     </div>
-                  </TooltipTrigger>
+                  </TooltipTrigger_Shadcn_>
                   {!canUpdateComplianceConfig && (
-                    <TooltipContent side="bottom" className="w-64 text-center">
+                    <TooltipContent_Shadcn_ side="bottom" className="w-64 text-center">
                       You need additional permissions to update the compliance configuration for
                       your project
-                    </TooltipContent>
+                    </TooltipContent_Shadcn_>
                   )}
-                </Tooltip>
+                </Tooltip_Shadcn_>
               )}
             </div>
           </FormSectionContent>

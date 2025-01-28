@@ -3,7 +3,7 @@ export const DEFAULT_META_DESCRIPTION =
   'Build production-grade applications with a Postgres database, Authentication, instant APIs, Realtime, Functions, Storage and Vector embeddings. Start for free.'
 export const IS_PROD = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
 export const IS_PREVIEW = process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-export const API_URL = process.env.NEXT_PUBLIC_API_URL!
+export const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 // Products
 
@@ -25,18 +25,21 @@ export enum PRODUCT_SHORTNAMES {
   VECTOR = 'vector',
 }
 
-// Launch Week
+// Launch Weeek
 export const SAMPLE_TICKET_NUMBER = 1234
-
-export const SITE_ORIGIN =
+export const SITE_URL =
   process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-    ? 'https://supabase.com'
-    : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
-      : 'http://localhost:3000'
-
-export const LW_URL = `${SITE_ORIGIN}/launch-week`
-
+    ? 'https://supabase.com/launch-week'
+    : process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/launch-week`
+      : 'http://localhost:3000/launch-week'
+export const LW_URL =
+  process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+    ? 'https://supabase.com/launch-week'
+    : process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/launch-week`
+      : 'http://localhost:3000/launch-week'
+export const SITE_ORIGIN = new URL(SITE_URL).origin
 export const TWITTER_USER_NAME = 'supabase'
 export const LW7_DATE = 'April 10th 2023'
 export const LW8_DATE = 'August 7-11'

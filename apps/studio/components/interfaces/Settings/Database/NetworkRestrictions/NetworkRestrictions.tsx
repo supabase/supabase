@@ -19,9 +19,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import AddRestrictionModal from './AddRestrictionModal'
 import AllowAllModal from './AllowAllModal'
@@ -34,18 +34,18 @@ interface AccessButtonProps {
 }
 
 const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
-  <Tooltip>
-    <TooltipTrigger asChild>
+  <Tooltip_Shadcn_>
+    <TooltipTrigger_Shadcn_ asChild>
       <Button type="default" disabled={disabled} onClick={() => onClick(true)}>
         Allow all access
       </Button>
-    </TooltipTrigger>
+    </TooltipTrigger_Shadcn_>
     {disabled && (
-      <TooltipContent side="bottom">
+      <TooltipContent_Shadcn_ side="bottom">
         You need additional permissions to update network restrictions
-      </TooltipContent>
+      </TooltipContent_Shadcn_>
     )}
-  </Tooltip>
+  </Tooltip_Shadcn_>
 )
 
 const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (

@@ -1,7 +1,7 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { PropsWithChildren } from 'react'
-import { Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_, cn } from 'ui'
 
 export const QueryPanelContainer = ({
   children,
@@ -35,14 +35,14 @@ export const QueryPanelScoreSection = ({
   <div className={cn('py-4 px-4 flex', className)}>
     <div className="flex gap-x-2 w-48">
       <span className="text-sm">{name}</span>
-      <Tooltip>
-        <TooltipTrigger asChild className="mt-1">
+      <Tooltip_Shadcn_>
+        <TooltipTrigger_Shadcn_ asChild className="mt-1">
           <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
-        </TooltipTrigger>
-        <TooltipContent side="top" className="w-52 text-center">
+        </TooltipTrigger_Shadcn_>
+        <TooltipContent_Shadcn_ side="top" className="w-52 text-center">
           {description}
-        </TooltipContent>
-      </Tooltip>
+        </TooltipContent_Shadcn_>
+      </Tooltip_Shadcn_>
     </div>
     <div className="flex flex-col gap-y-1">
       <div className="flex gap-x-2 text-sm">

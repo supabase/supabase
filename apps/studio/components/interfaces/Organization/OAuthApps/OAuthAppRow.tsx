@@ -14,9 +14,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 
 export interface OAuthAppRowProps {
@@ -77,8 +77,8 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
             <Button type="default" icon={<MoreVertical />} className="px-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="bottom">
-            <Tooltip>
-              <TooltipTrigger asChild>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
                   key="edit"
                   disabled={!canUpdateOAuthApps}
@@ -90,16 +90,16 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
                   <Edit size={16} />
                   <p>Edit app</p>
                 </DropdownMenuItem>
-              </TooltipTrigger>
+              </TooltipTrigger_Shadcn_>
               {!canUpdateOAuthApps && (
-                <TooltipContent side="left">
+                <TooltipContent_Shadcn_ side="left">
                   You need additional permissions to edit apps
-                </TooltipContent>
+                </TooltipContent_Shadcn_>
               )}
-            </Tooltip>
+            </Tooltip_Shadcn_>
             <DropdownMenuSeparator />
-            <Tooltip>
-              <TooltipTrigger asChild>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
                   disabled={!canDeleteOAuthApps}
                   className="space-x-2 !pointer-events-auto"
@@ -111,13 +111,13 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
                   <Trash size={16} />
                   <p>Delete app</p>
                 </DropdownMenuItem>
-              </TooltipTrigger>
+              </TooltipTrigger_Shadcn_>
               {!canDeleteOAuthApps && (
-                <TooltipContent side="left">
+                <TooltipContent_Shadcn_ side="left">
                   You need additional permissions to delete apps
-                </TooltipContent>
+                </TooltipContent_Shadcn_>
               )}
-            </Tooltip>
+            </Tooltip_Shadcn_>
           </DropdownMenuContent>
         </DropdownMenu>
       </Table.td>

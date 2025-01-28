@@ -12,13 +12,13 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   Modal,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { LogsSidebarItem } from '../Settings/Logs/SidebarV2/SidebarItem'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { CollectionForm } from './CollectionForm'
 
 type Props = {
@@ -68,8 +68,8 @@ export const WarehouseMenuItem = ({ item }: Props) => {
         href={`/project/${projectRef}/logs/collections/${item.token}`}
         dropdownItems={
           <>
-            <Tooltip>
-              <TooltipTrigger asChild>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
                   disabled={!canUpdateCollection}
                   onClick={(e) => {
@@ -80,16 +80,16 @@ export const WarehouseMenuItem = ({ item }: Props) => {
                   <EditIcon className="mr-2" size={14} />
                   <div>Update collection</div>
                 </DropdownMenuItem>
-              </TooltipTrigger>
+              </TooltipTrigger_Shadcn_>
               {!canUpdateCollection && (
-                <TooltipContent side="right">
+                <TooltipContent_Shadcn_ side="right">
                   You need additional permissions to update collections
-                </TooltipContent>
+                </TooltipContent_Shadcn_>
               )}
-            </Tooltip>
+            </Tooltip_Shadcn_>
             <DropdownMenuSeparator />
-            <Tooltip>
-              <TooltipTrigger asChild>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
                   disabled={!canUpdateCollection}
                   onClick={(e) => {
@@ -100,13 +100,13 @@ export const WarehouseMenuItem = ({ item }: Props) => {
                   <TrashIcon className="mr-2" size={14} />
                   <div>Delete collection</div>
                 </DropdownMenuItem>
-              </TooltipTrigger>
+              </TooltipTrigger_Shadcn_>
               {!canUpdateCollection && (
-                <TooltipContent side="right">
+                <TooltipContent_Shadcn_ side="right">
                   You need additional permissions to delete collections
-                </TooltipContent>
+                </TooltipContent_Shadcn_>
               )}
-            </Tooltip>
+            </Tooltip_Shadcn_>
           </>
         }
       ></LogsSidebarItem>

@@ -41,7 +41,7 @@ const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
       <SecondStep
         visible={visible && Boolean(data)}
         factorName={name}
-        factor={data as Extract<typeof data, { type: 'totp' }>}
+        factor={data!}
         isLoading={isEnrolling}
         onSuccess={() => onClose()}
         onClose={onClose}

@@ -2,6 +2,7 @@ import Editor from '@monaco-editor/react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo, useRef } from 'react'
+import { format } from 'sql-formatter'
 
 import { useParams } from 'common'
 import Footer from 'components/grid/components/footer/Footer'
@@ -16,7 +17,6 @@ import {
   isView,
   isViewLike,
 } from 'data/table-editor/table-editor-types'
-import { formatSql } from 'lib/formatSql'
 import { timeout } from 'lib/helpers'
 import { Button } from 'ui'
 
@@ -61,8 +61,19 @@ const TableDefinition = ({ entity }: TableDefinitionProps) => {
       ? `create materialized view ${entity.schema}.${entity.name} as\n`
       : ''
 
+  const formatDefinition = (value: string) => {
+    try {
+      return format(value, {
+        language: 'postgresql',
+        keywordCase: 'lower',
+      })
+    } catch (err) {
+      return value
+    }
+  }
+
   const formattedDefinition = useMemo(
-    () => (definition ? formatSql(prepend + definition) : undefined),
+    () => (definition ? formatDefinition(prepend + definition) : undefined),
     [definition]
   )
 

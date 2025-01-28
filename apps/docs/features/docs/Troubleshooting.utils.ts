@@ -27,9 +27,7 @@ export interface ITroubleshootingEntry {
 export const getArticleSlug = getArticleSlugInternal
 
 async function getAllTroubleshootingEntriesTyped() {
-  const result: ITroubleshootingEntry[] = (
-    IS_PLATFORM ? await getAllTroubleshootingEntriesInternal() : []
-  ) as ITroubleshootingEntry[]
+  const result = (await getAllTroubleshootingEntriesInternal()) as ITroubleshootingEntry[]
   return result
 }
 export const getAllTroubleshootingEntries = cache_fullProcess_withDevCacheBust(

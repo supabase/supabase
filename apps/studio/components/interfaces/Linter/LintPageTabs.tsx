@@ -6,9 +6,9 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
 } from 'ui'
 
@@ -111,12 +111,12 @@ const LintPageTabs = ({
               </span>
 
               <span className="">{tab.label}</span>
-              <Tooltip>
-                <TooltipTrigger asChild>
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>
                   <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
-                </TooltipTrigger>
-                <TooltipContent side="top">{tab.description}</TooltipContent>
-              </Tooltip>
+                </TooltipTrigger_Shadcn_>
+                <TooltipContent_Shadcn_ side="top">{tab.description}</TooltipContent_Shadcn_>
+              </Tooltip_Shadcn_>
             </div>
             <LintCountLabel tab={tab} />
           </TabsTrigger_Shadcn_>

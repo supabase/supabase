@@ -5,16 +5,14 @@ import {
   handlePageTelemetry,
   isBrowser,
   useBreakpoint,
-  useFeatureFlags,
+  useTelemetryProps,
 } from 'common'
+
 import { noop } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn } from 'ui'
-import { proxy, useSnapshot } from 'valtio'
 import { PrivacySettings } from '../PrivacySettings'
-import { useRouter } from 'next/compat/router'
-import { usePathname } from 'next/navigation'
 
 interface ConsentToastProps {
   onAccept: () => void
@@ -79,26 +77,13 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
   )
 }
 
-// [Alaister]: Using global state here so multiple components can access the consent value
-const consentState = proxy({
-  consentValue: (isBrowser ? localStorage?.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT) : null) as
-    | string
-    | null,
-  setConsentValue: (value: string | null) => {
-    consentState.consentValue = value
-  },
-})
-
 export const useConsent = () => {
   const { TELEMETRY_CONSENT, TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
   const consentToastId = useRef<string | number>()
-  const router = useRouter()
-  const appRouterPathname = usePathname()
-  const featureFlags = useFeatureFlags()
+  const telemetryProps = useTelemetryProps()
 
-  const { consentValue } = useSnapshot(consentState)
-  const pathname =
-    router?.pathname ?? appRouterPathname ?? (isBrowser ? window.location.pathname : '')
+  const initialValue = isBrowser ? localStorage?.getItem(TELEMETRY_CONSENT) : null
+  const [consentValue, setConsentValue] = useState<string | null>(initialValue)
 
   const handleConsent = (value: 'true' | 'false') => {
     if (!isBrowser) return
@@ -112,8 +97,7 @@ export const useConsent = () => {
           const telemetryData = JSON.parse(decodeURIComponent(encodedData))
           handlePageTelemetry(
             process.env.NEXT_PUBLIC_API_URL!,
-            pathname,
-            featureFlags.posthog,
+            window.location.pathname,
             telemetryData
           )
           // remove the telemetry cookie
@@ -122,14 +106,32 @@ export const useConsent = () => {
           console.error('Invalid telemetry data:', error)
         }
       } else {
-        handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, pathname, featureFlags.posthog)
+        const telemetryData = {
+          page_url: telemetryProps.page_url,
+          page_title: typeof document !== 'undefined' ? document?.title : '',
+          pathname: telemetryProps.pathname,
+          ph: {
+            referrer: typeof document !== 'undefined' ? document?.referrer : '',
+            language: telemetryProps.language,
+            search: telemetryProps.search,
+            viewport_height: telemetryProps.viewport_height,
+            viewport_width: telemetryProps.viewport_width,
+            user_agent: navigator.userAgent,
+          },
+        }
+
+        handlePageTelemetry(
+          process.env.NEXT_PUBLIC_API_URL!,
+          window.location.pathname,
+          telemetryData
+        )
       }
     } else {
       // remove the telemetry cookie
       document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
     }
 
-    consentState.setConsentValue(value)
+    setConsentValue(value)
     localStorage.setItem(TELEMETRY_CONSENT, value)
 
     if (consentToastId.current) {
@@ -184,6 +186,7 @@ export const useConsent = () => {
 }
 
 export const useConsentValue = (KEY_NAME: string) => {
+  const telemetryProps = useTelemetryProps()
   const initialValue = isBrowser ? localStorage?.getItem(KEY_NAME) : null
   const [consentValue, setConsentValue] = useState<string | null>(initialValue)
 
@@ -193,7 +196,21 @@ export const useConsentValue = (KEY_NAME: string) => {
     localStorage.setItem(KEY_NAME, value)
     window.dispatchEvent(new Event('storage'))
     if (value === 'true') {
-      handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname)
+      const telemetryData = {
+        page_url: telemetryProps.page_url,
+        page_title: typeof document !== 'undefined' ? document?.title : '',
+        pathname: telemetryProps.pathname,
+        ph: {
+          referrer: typeof document !== 'undefined' ? document?.referrer : '',
+          language: telemetryProps.language,
+          search: telemetryProps.search,
+          viewport_height: telemetryProps.viewport_height,
+          viewport_width: telemetryProps.viewport_width,
+          user_agent: navigator.userAgent,
+        },
+      }
+
+      handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname, telemetryData)
     }
   }
 

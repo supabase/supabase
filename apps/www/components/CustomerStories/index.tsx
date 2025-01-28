@@ -12,8 +12,6 @@ import Panel from '~/components/Panel'
 
 import customerStories from '~/data/CustomerStories'
 import type { CustomerStoryType } from '~/data/CustomerStories'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 const CustomersSliderMobile = dynamic(() => import('./CustomersSliderMobile'))
 const CutomsersSliderDesktop = dynamic(() => import('./CutomsersSliderDesktop'))
@@ -101,7 +99,6 @@ const compositionCols: CompositionColType[] = [
 ]
 
 export const CompositionCol: React.FC<CompositionColProps> = ({ column, className }) => {
-  const sendTelemetryEvent = useSendTelemetryEvent()
   return (
     <div className={className}>
       {column.cards.map((customer) =>
@@ -110,12 +107,6 @@ export const CompositionCol: React.FC<CompositionColProps> = ({ column, classNam
             href={customer.url!}
             key={customer.organization}
             className="col-span-12 md:col-span-4 w-full md:w-[450px] h-full"
-            onClick={() =>
-              sendTelemetryEvent({
-                action: TelemetryActions.HOMEPAGE_CUSTOMER_STORY_CARD_CLICKED,
-                properties: { customer: customer.organization, cardType: 'expanded' },
-              })
-            }
           >
             <CustomerCard size="expanded" customer={customer} />
           </Link>
@@ -124,12 +115,6 @@ export const CompositionCol: React.FC<CompositionColProps> = ({ column, classNam
             href={customer.url!}
             key={customer.organization}
             className="col-span-12 md:col-span-4 w-full h-full flex-grow"
-            onClick={() =>
-              sendTelemetryEvent({
-                action: TelemetryActions.HOMEPAGE_CUSTOMER_STORY_CARD_CLICKED,
-                properties: { customer: customer.organization, cardType: 'narrow' },
-              })
-            }
           >
             <CustomerCard size="narrow" customer={customer} />
           </Link>

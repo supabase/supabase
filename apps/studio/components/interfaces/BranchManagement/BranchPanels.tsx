@@ -31,9 +31,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
@@ -265,8 +265,8 @@ export const BranchRow = ({
                 <Button type="text" icon={<MoreVertical />} className="px-1" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" side="bottom" align="end">
-                <Tooltip>
-                  <TooltipTrigger asChild={isBranchActiveHealthy} className="w-full">
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild={isBranchActiveHealthy} className="w-full">
                     <DropdownMenuItem
                       className="gap-x-2"
                       onSelect={() => setShowConfirmResetModal(true)}
@@ -276,17 +276,17 @@ export const BranchRow = ({
                       <RefreshCw size={14} />
                       Reset Branch
                     </DropdownMenuItem>
-                  </TooltipTrigger>
+                  </TooltipTrigger_Shadcn_>
                   {!isBranchActiveHealthy && (
-                    <TooltipContent side="left">
+                    <TooltipContent_Shadcn_ side="left">
                       Branch is still initializing. Please wait for the branch to become healthy
                       before resetting
-                    </TooltipContent>
+                    </TooltipContent_Shadcn_>
                   )}
-                </Tooltip>
+                </Tooltip_Shadcn_>
 
-                <Tooltip>
-                  <TooltipTrigger asChild={isBranchActiveHealthy} className="w-full">
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild={isBranchActiveHealthy} className="w-full">
                     <DropdownMenuItem
                       className="gap-x-2"
                       onSelect={() => setShowBranchModeSwitch(true)}
@@ -303,17 +303,17 @@ export const BranchRow = ({
                         </>
                       )}
                     </DropdownMenuItem>
-                  </TooltipTrigger>
+                  </TooltipTrigger_Shadcn_>
                   {!isBranchActiveHealthy && (
-                    <TooltipContent side="left">
+                    <TooltipContent_Shadcn_ side="left">
                       Branch is still initializing. Please wait for the branch to become healthy
                       before switching modes
-                    </TooltipContent>
+                    </TooltipContent_Shadcn_>
                   )}
-                </Tooltip>
+                </Tooltip_Shadcn_>
 
-                <Tooltip>
-                  <TooltipTrigger asChild={canDeleteBranches} className="w-full">
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild={canDeleteBranches} className="w-full">
                     <DropdownMenuItem
                       className="gap-x-2"
                       disabled={!canDeleteBranches}
@@ -323,13 +323,13 @@ export const BranchRow = ({
                       <Trash2 size={14} />
                       Delete branch
                     </DropdownMenuItem>
-                  </TooltipTrigger>
+                  </TooltipTrigger_Shadcn_>
                   {!canDeleteBranches && (
-                    <TooltipContent side="left">
+                    <TooltipContent_Shadcn_ side="left">
                       You need additional permissions to delete branches
-                    </TooltipContent>
+                    </TooltipContent_Shadcn_>
                   )}
-                </Tooltip>
+                </Tooltip_Shadcn_>
               </DropdownMenuContent>
             </DropdownMenu>
 

@@ -1,17 +1,15 @@
 import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { IS_PLATFORM } from 'lib/constants'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { RealtimeConfig } from '../useRealtimeMessages'
-import { useParams } from 'common'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface RealtimeTokensPopoverProps {
   config: RealtimeConfig
@@ -30,8 +28,6 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   )
   const jwtSecret = postgrestConfig?.jwt_secret
 
-  const { ref } = useParams()
-  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   // only send a telemetry event if the user changes the role. Don't send an event during initial render.
@@ -39,10 +35,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
 
   useEffect(() => {
     if (isMounted.current) {
-      sendEvent({
-        action: TelemetryActions.REALTIME_INSPECTOR_DATABASE_ROLE_UPDATED,
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
+      sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_DATABASE_ROLE_UPDATED })
     }
     isMounted.current = true
     // eslint-disable-next-line react-hooks/exhaustive-deps

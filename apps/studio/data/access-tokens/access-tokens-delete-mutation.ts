@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { delete_, isResponseOk } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import { toast } from 'sonner'
-
-import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { accessTokenKeys } from './keys'
 
@@ -10,13 +10,13 @@ export type AccessTokenDeleteVariables = {
 }
 
 export async function deleteAccessToken({ id }: AccessTokenDeleteVariables) {
-  const { data, error } = await del('/platform/profile/access-tokens/{id}', {
-    params: { path: { id } },
-  })
+  const response = await delete_<void>(`${API_URL}/profile/access-tokens/${id}`)
 
-  if (error) handleError(error)
+  if (!isResponseOk(response)) {
+    throw response.error
+  }
 
-  return data
+  return response
 }
 
 type AccessTokenDeleteData = Awaited<ReturnType<typeof deleteAccessToken>>

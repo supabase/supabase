@@ -9,7 +9,14 @@ import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { Button, Popover, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import {
+  Button,
+  Popover,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useTrackedState } from '../../store/Store'
 import { BlockKeys } from '../common/BlockKeys'
@@ -159,17 +166,17 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-y-1">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
+                    <Tooltip_Shadcn_>
+                      <TooltipTrigger_Shadcn_ asChild>
                         <Button
                           type="default"
                           className="px-1"
                           onClick={() => onSelectExpand()}
                           icon={<Maximize size={12} strokeWidth={2} />}
                         />
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">Expand editor</TooltipContent>
-                    </Tooltip>
+                      </TooltipTrigger_Shadcn_>
+                      <TooltipContent_Shadcn_ side="bottom">Expand editor</TooltipContent_Shadcn_>
+                    </Tooltip_Shadcn_>
                     {isNullable && (
                       <Button
                         size="tiny"

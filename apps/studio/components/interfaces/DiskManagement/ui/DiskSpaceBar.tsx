@@ -1,19 +1,25 @@
-import MotionNumber from '@number-flow/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Info } from 'lucide-react'
+import MotionNumber from '@number-flow/react'
 import { useTheme } from 'next-themes'
 import { UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common'
-import { useDiskBreakdownQuery } from 'data/config/disk-breakdown-query'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { GB } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
-import { useMemo } from 'react'
-import { badgeVariants, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  badgeVariants,
+  cn,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
+import { useDiskBreakdownQuery } from 'data/config/disk-breakdown-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useMemo } from 'react'
 
 interface DiskSpaceBarProps {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -62,17 +68,15 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
   const usedTotalPercentage = Math.min((usedSizeTotal / totalSize) * 100, 100)
 
   const usedSizeDatabase = Math.round(((diskBreakdownBytes?.dbSizeBytes ?? 0) / GB) * 100) / 100
-  const usedPercentageDatabase =
-    totalSize === 0 ? 0 : Math.min((usedSizeDatabase / totalSize) * 100, 100)
+  const usedPercentageDatabase = Math.min((usedSizeDatabase / totalSize) * 100, 100)
   const newUsedPercentageDatabase = Math.min((usedSizeDatabase / newTotalSize) * 100, 100)
 
   const usedSizeWAL = Math.round(((diskBreakdownBytes?.walSizeBytes ?? 0) / GB) * 100) / 100
-  const usedPercentageWAL = totalSize === 0 ? 0 : Math.min((usedSizeWAL / totalSize) * 100, 100)
+  const usedPercentageWAL = Math.min((usedSizeWAL / totalSize) * 100, 100)
   const newUsedPercentageWAL = Math.min((usedSizeWAL / newTotalSize) * 100, 100)
 
   const usedSizeSystem = Math.round(((diskBreakdownBytes?.systemBytes ?? 0) / GB) * 100) / 100
-  const usedPercentageSystem =
-    totalSize === 0 ? 0 : Math.min((usedSizeSystem / totalSize) * 100, 100)
+  const usedPercentageSystem = Math.min((usedSizeSystem / totalSize) * 100, 100)
   const newUsedPercentageSystem = Math.min((usedSizeSystem / newTotalSize) * 100, 100)
 
   const resizePercentage = AUTOSCALING_THRESHOLD * 100
@@ -181,13 +185,13 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                 className="absolute top-0 -left-0 h-full flex items-center transition-all duration-500 ease-in-out"
                 style={{ left: `${showNewSize ? newResizePercentage : resizePercentage}%` }}
               >
-                <Tooltip>
-                  <TooltipTrigger asChild>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
                     <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded text-xs text-foreground-light whitespace-nowrap flex items-center gap-x-1">
                       Autoscaling <Info size={12} />
                     </div>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="w-[310px] flex flex-col gap-y-1">
+                  </TooltipTrigger_Shadcn_>
+                  <TooltipContent_Shadcn_ side="bottom" className="w-[310px] flex flex-col gap-y-1">
                     <p>
                       Supabase expands your disk storage automatically when the database reached 90%
                       of the disk size. However, any disk modifications, including auto-scaling, can
@@ -197,8 +201,8 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                       If within those 6 hours you reach 95% of the disk space, your project{' '}
                       <span className="text-destructive-600">will enter read-only mode.</span>
                     </p>
-                  </TooltipContent>
-                </Tooltip>
+                  </TooltipContent_Shadcn_>
+                </Tooltip_Shadcn_>
                 <div className="w-px h-full bg-border" />
               </div>
             </motion.div>
@@ -259,14 +263,14 @@ const LegendItem = ({
   color: string
   size: number
 }) => (
-  <Tooltip>
-    <TooltipTrigger asChild>
+  <Tooltip_Shadcn_>
+    <TooltipTrigger_Shadcn_ asChild>
       <div className="flex items-center hover:cursor-help z-10">
         <div className={cn('w-2 h-2 rounded-full mr-2', color)} />
         <span>{name}</span>
       </div>
-    </TooltipTrigger>
-    <TooltipContent side="bottom" className="flex flex-col gap-y-1 max-w-xs">
+    </TooltipTrigger_Shadcn_>
+    <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1 max-w-xs">
       <div className="flex items-center">
         <div className={cn('w-2 h-2 rounded-full mr-2', color)} />
         <span>
@@ -274,6 +278,6 @@ const LegendItem = ({
         </span>
       </div>
       <p>{description}</p>
-    </TooltipContent>
-  </Tooltip>
+    </TooltipContent_Shadcn_>
+  </Tooltip_Shadcn_>
 )

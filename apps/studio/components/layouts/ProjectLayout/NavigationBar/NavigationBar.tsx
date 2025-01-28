@@ -34,9 +34,9 @@ import {
   HoverCard_Shadcn_,
   Separator,
   Theme,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
   singleThemes,
 } from 'ui'
@@ -60,12 +60,10 @@ const NavigationBar = () => {
 
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
-  const [storedAllowNavPanel] = useLocalStorageQuery(
+  const [allowNavPanelToExpand] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
     true
   )
-  // Don't allow the nav panel to expand in playwright tests
-  const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
 
   return (
     <div className="w-14 h-full hidden md:flex flex-col">
@@ -102,12 +100,10 @@ export const NavContent = () => {
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
-  const [storedAllowNavPanel] = useLocalStorageQuery(
+  const [allowNavPanelToExpand] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
     true
   )
-  // Don't allow the nav panel to expand in playwright tests
-  const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
 
   const {
     projectAuthAll: authEnabled,
@@ -344,12 +340,12 @@ export const NavContent = () => {
         {IS_PLATFORM && (
           <>
             {!allowNavPanelToExpand && (
-              <Tooltip>
-                <TooltipTrigger asChild>{CommandButton}</TooltipTrigger>
-                <TooltipContent side="right">
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>{CommandButton}</TooltipTrigger_Shadcn_>
+                <TooltipContent_Shadcn_ side="right">
                   <span>Commands</span>
-                </TooltipContent>
-              </Tooltip>
+                </TooltipContent_Shadcn_>
+              </Tooltip_Shadcn_>
             )}
             {allowNavPanelToExpand && CommandButton}
           </>
@@ -365,14 +361,14 @@ export const NavContent = () => {
           {allowNavPanelToExpand ? (
             <DropdownMenuTrigger asChild>{UserAccountButton}</DropdownMenuTrigger>
           ) : (
-            <Tooltip>
-              <TooltipTrigger asChild>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuTrigger asChild>{UserAccountButton}</DropdownMenuTrigger>
-              </TooltipTrigger>
-              <TooltipContent side="right">
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="right">
                 <span>Account settings</span>
-              </TooltipContent>
-            </Tooltip>
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           )}
 
           <DropdownMenuContent side="top" align="start">

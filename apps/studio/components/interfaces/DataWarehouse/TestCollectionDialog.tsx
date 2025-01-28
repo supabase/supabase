@@ -2,12 +2,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components
 import CopyButton from 'components/ui/CopyButton'
 import type { WarehouseAccessTokensData } from 'data/analytics/warehouse-access-tokens-query'
 import type { WarehouseCollectionsData } from 'data/analytics/warehouse-collections-query'
+import { Code } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import {
   Button,
   Checkbox_Shadcn_,
   CodeBlock,
+  DialogSectionSeparator,
   Input_Shadcn_,
   Label_Shadcn_,
   Separator,
@@ -19,9 +21,9 @@ import {
   SheetSection,
   SheetTitle,
   SheetTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -84,18 +86,20 @@ export function TestCollectionDialog({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <Tooltip>
-        <TooltipTrigger asChild>
+      <Tooltip_Shadcn_>
+        <TooltipTrigger_Shadcn_ asChild>
           <SheetTrigger asChild>
             <Button disabled={accessTokens.length === 0} type="outline">
               Connect
             </Button>
           </SheetTrigger>
-        </TooltipTrigger>
+        </TooltipTrigger_Shadcn_>
         {accessTokens.length === 0 && (
-          <TooltipContent>Create an access token to connect to your collection</TooltipContent>
+          <TooltipContent_Shadcn_>
+            Create an access token to connect to your collection
+          </TooltipContent_Shadcn_>
         )}
-      </Tooltip>
+      </Tooltip_Shadcn_>
 
       <SheetContent size="lg" className="h-screen overflow-auto flex flex-col">
         <SheetHeader>

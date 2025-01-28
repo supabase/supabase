@@ -1,11 +1,11 @@
 import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { operations } from 'api-types'
-import { get, handleError } from 'data/fetchers'
+import { get, isResponseOk } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import { analyticsKeys } from './keys'
 
 export type ProjectLogStatsVariables = {
   projectRef?: string
-  interval?: operations['UsageApiController_getApiCounts']['parameters']['query']['interval']
+  interval?: string
 }
 
 export type ProjectLogStatsResponse = {
@@ -30,22 +30,17 @@ export async function getProjectLogStats(
     throw new Error('interval is required')
   }
 
-  const { data, error } = await get(
-    '/platform/projects/{ref}/analytics/endpoints/usage.api-counts',
+  const response = await get<ProjectLogStatsResponse>(
+    `${API_URL}/projects/${projectRef}/analytics/endpoints/usage.api-counts?interval=${interval}`,
     {
-      params: {
-        path: { ref: projectRef },
-        query: {
-          interval,
-        },
-      },
       signal,
     }
   )
+  if (!isResponseOk(response)) {
+    throw response.error
+  }
 
-  if (error) handleError(error)
-
-  return data as unknown as ProjectLogStatsResponse
+  return response
 }
 
 export type ProjectLogStatsData = Awaited<ReturnType<typeof getProjectLogStats>>

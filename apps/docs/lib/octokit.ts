@@ -30,7 +30,7 @@ function octokit() {
   return octokitInstance
 }
 
-async function getGitHubFileContents({
+export async function getGitHubFileContents({
   org,
   repo,
   path,

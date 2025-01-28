@@ -1,7 +1,7 @@
 import { Download } from 'lucide-react'
 import React, { PropsWithChildren, useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import { ButtonProps } from 'ui/src/components/Button/Button'
 
 interface CSVButtonProps {
@@ -52,8 +52,8 @@ const CSVButton = ({
         filename={`supabase_logs.csv`}
         title={title}
       />
-      <Tooltip>
-        <TooltipTrigger asChild>
+      <Tooltip_Shadcn_ delayDuration={100}>
+        <TooltipTrigger_Shadcn_ asChild>
           <Button
             type={buttonType}
             icon={icon || <Download />}
@@ -66,11 +66,11 @@ const CSVButton = ({
           >
             {children}
           </Button>
-        </TooltipTrigger>
-        <TooltipContent side="bottom" className="text-xs">
+        </TooltipTrigger_Shadcn_>
+        <TooltipContent_Shadcn_ side="bottom" className="text-xs">
           Download logs as CSV
-        </TooltipContent>
-      </Tooltip>
+        </TooltipContent_Shadcn_>
+      </Tooltip_Shadcn_>
     </>
   )
 }

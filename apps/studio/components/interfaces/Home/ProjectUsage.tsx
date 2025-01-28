@@ -8,11 +8,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import BarChart from 'components/ui/Charts/BarChart'
 import Panel from 'components/ui/Panel'
-import {
-  ProjectLogStatsVariables,
-  UsageApiCounts,
-  useProjectLogStatsQuery,
-} from 'data/analytics/project-log-stats-query'
+import { UsageApiCounts, useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { ChartIntervals } from 'types'
@@ -47,7 +43,7 @@ const ProjectUsage = () => {
     'project_storage:all',
   ])
 
-  const [interval, setInterval] = useState<ProjectLogStatsVariables['interval']>('hourly')
+  const [interval, setInterval] = useState<string>('hourly')
 
   const { data, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 
@@ -96,12 +92,7 @@ const ProjectUsage = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="start">
-            <DropdownMenuRadioGroup
-              value={interval}
-              onValueChange={(interval) =>
-                setInterval(interval as ProjectLogStatsVariables['interval'])
-              }
-            >
+            <DropdownMenuRadioGroup value={interval} onValueChange={setInterval}>
               {CHART_INTERVALS.map((i) => (
                 <DropdownMenuRadioItem key={i.key} value={i.key}>
                   {i.label}

@@ -142,6 +142,8 @@ const AdvancedAuthSettingsForm = () => {
     authConfig?.HOOK_SEND_SMS_URI !== null && authConfig?.HOOK_SEND_SMS_ENABLED === true
   const hasValidMFAPhoneProvider = authConfig?.EXTERNAL_PHONE_ENABLED === true
   const hasValidMFAProvider = hasValidMFAPhoneProvider || sendSMSHookIsEnabled
+  const phoneMFAIsEnabled =
+    INITIAL_VALUES.MFA_PHONE === 'Enabled' || INITIAL_VALUES.MFA_PHONE === 'Verify Enabled'
 
   const onSubmit = (values: any, { resetForm }: any) => {
     let payload = { ...values }
@@ -212,8 +214,6 @@ const AdvancedAuthSettingsForm = () => {
 
         const hasUpgradedPhoneMFA =
           INITIAL_VALUES.MFA_PHONE === 'Disabled' && values.MFA_PHONE !== INITIAL_VALUES.MFA_PHONE
-        const phoneMFAIsEnabled =
-          values.MFA_PHONE === 'Enabled' || values.MFA_PHONE === 'Verify Enabled'
 
         return (
           <>

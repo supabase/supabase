@@ -15,9 +15,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
 
@@ -84,14 +84,14 @@ const TriggerList = ({
       {_triggers.map((x: any) => (
         <Table.tr key={x.id}>
           <Table.td className="space-x-2">
-            <Tooltip>
-              <TooltipTrigger className="cursor-default truncate max-w-48 inline-block">
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ className="cursor-default truncate max-w-48 inline-block">
                 {x.name}
-              </TooltipTrigger>
-              <TooltipContent side="bottom" align="center">
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom" align="center">
                 {x.name}
-              </TooltipContent>
-            </Tooltip>
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           </Table.td>
 
           <Table.td className="break-all">

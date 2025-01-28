@@ -1,14 +1,8 @@
-import { Smartphone } from 'lucide-react'
-
 import { TOTPFactors } from 'components/interfaces/Account'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
+import { Smartphone } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
 import { Badge, cn, Collapsible } from 'ui'
 
@@ -29,19 +23,18 @@ const Security: NextPageWithLayout = () => {
   const { data } = useMfaListFactorsQuery()
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldHeader>
-        <ScaffoldTitle>Multi-Factor Authentication</ScaffoldTitle>
-        <ScaffoldDescription>
-          Add an additional layer of security to your account by requiring more than just a password
-          to sign in.
-        </ScaffoldDescription>
-      </ScaffoldHeader>
+    <div className="1xl:px-28 mx-auto flex flex-col px-5 pt-6 pb-14 lg:px-16 xl:px-24 2xl:px-32">
+      <div className="flex items-center justify-between">
+        <FormHeader
+          title="Multi-factor authentication"
+          description="Add an additional layer of security to your account by requiring more than just a password to sign in."
+        />
+      </div>
       <Collapsible className={cn(collapsibleClasses)}>
         <Collapsible.Trigger asChild>
           <button
             type="button"
-            className="group flex w-full items-center justify-between rounded py-3 px-4 md:px-6 text-foreground"
+            className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
           >
             <div className="flex flex-row gap-4 items-center py-1">
               <Smartphone strokeWidth={1.5} />
@@ -55,11 +48,11 @@ const Security: NextPageWithLayout = () => {
             ) : null}
           </button>
         </Collapsible.Trigger>
-        <Collapsible.Content className="group border-t border-default bg-surface-100 py-6 px-4 md:px-6 text-foreground">
+        <Collapsible.Content className="group border-t border-default bg-surface-100 py-6 px-6 text-foreground">
           <TOTPFactors />
         </Collapsible.Content>
       </Collapsible>
-    </ScaffoldContainer>
+    </div>
   )
 }
 

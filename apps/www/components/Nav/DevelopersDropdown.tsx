@@ -2,10 +2,7 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 
 import { data as DevelopersData } from 'data/Developers'
-import {
-  jobsCount,
-  latestBlogPosts,
-} from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
+import blogPosts from '~/.contentlayer/generated/LatestBlogPost/_index.json' with { type: 'json' }
 
 type LinkProps = {
   text: string
@@ -32,11 +29,6 @@ const DevelopersDropdown = () => (
                 >
                   {Icon && <Icon size={16} strokeWidth={1.3} />}
                   <span>{link.text}</span>
-                  {link.text === 'Careers' && jobsCount > 0 && (
-                    <span className="text-xs flex items-center justify-center text-foreground-lighter -ml-1">
-                      ({jobsCount})
-                    </span>
-                  )}
                   <ChevronRight
                     strokeWidth={2}
                     className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
@@ -58,7 +50,7 @@ const DevelopersDropdown = () => (
           <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
         </Link>
         <ul className="flex flex-col gap-5">
-          {latestBlogPosts?.map((post) => (
+          {blogPosts?.map((post) => (
             <li key={post.title}>
               <Link
                 href={post.url}

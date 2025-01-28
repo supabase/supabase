@@ -22,8 +22,6 @@ import HamburgerButton from './HamburgerMenu'
 import MenuItem from './MenuItem'
 import MobileMenu from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 interface Props {
   hideNavbar: boolean
@@ -37,7 +35,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const [open, setOpen] = useState(false)
   const isLoggedIn = useIsLoggedIn()
   const menu = getMenu()
-  const sendTelemetryEvent = useSendTelemetryEvent()
 
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('/launch-week')
@@ -137,30 +134,10 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                 ) : (
                   <>
                     <Button type="default" className="hidden lg:block" asChild>
-                      <Link
-                        href="https://supabase.com/dashboard"
-                        onClick={() =>
-                          sendTelemetryEvent({
-                            action: TelemetryActions.SIGN_IN_BUTTON_CLICKED,
-                            properties: { buttonLocation: 'Header Nav' },
-                          })
-                        }
-                      >
-                        Sign in
-                      </Link>
+                      <Link href="https://supabase.com/dashboard">Sign in</Link>
                     </Button>
                     <Button className="hidden lg:block" asChild>
-                      <Link
-                        href="https://supabase.com/dashboard"
-                        onClick={() =>
-                          sendTelemetryEvent({
-                            action: TelemetryActions.START_PROJECT_BUTTON_CLICKED,
-                            properties: { buttonLocation: 'Header Nav' },
-                          })
-                        }
-                      >
-                        Start your project
-                      </Link>
+                      <Link href="https://supabase.com/dashboard">Start your project</Link>
                     </Button>
                   </>
                 )}

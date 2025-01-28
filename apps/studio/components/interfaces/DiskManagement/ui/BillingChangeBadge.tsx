@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 
 import { formatCurrency } from 'lib/helpers'
-import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
 interface BillingChangeBadgeProps {
   beforePrice?: number
@@ -38,8 +38,8 @@ const BillingChangeBadge = ({
               className
             )}
           >
-            <Tooltip>
-              <TooltipTrigger asChild>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <div className="flex items-center gap-1">
                   <span className="text-xs font-mono text-foreground-muted">
                     {formatCurrency(beforePrice)}
@@ -57,9 +57,11 @@ const BillingChangeBadge = ({
                     {`${formatCurrency(afterPrice)}/month`}
                   </motion.span>
                 </div>
-              </TooltipTrigger>
-              {tooltip !== undefined && <TooltipContent side="bottom">{tooltip}</TooltipContent>}
-            </Tooltip>
+              </TooltipTrigger_Shadcn_>
+              {tooltip !== undefined && (
+                <TooltipContent_Shadcn_ side="bottom">{tooltip}</TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
           </Badge>
         </motion.div>
       )}

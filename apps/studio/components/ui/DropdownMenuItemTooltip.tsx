@@ -1,19 +1,25 @@
 import { ComponentProps, ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
-import { DropdownMenuItem, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import {
+  DropdownMenuItem,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+} from 'ui'
 
 export const DropdownMenuItemTooltip = forwardRef<
   ElementRef<typeof DropdownMenuItem>,
   ComponentPropsWithoutRef<typeof DropdownMenuItem> & {
     tooltip: {
-      content: ComponentProps<typeof TooltipContent> & {
+      content: ComponentProps<typeof TooltipContent_Shadcn_> & {
         text?: string
       }
     }
   }
 >(({ ...props }, ref) => {
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
+    <Tooltip_Shadcn_>
+      <TooltipTrigger_Shadcn_ asChild>
         <DropdownMenuItem
           ref={ref}
           {...props}
@@ -24,11 +30,13 @@ export const DropdownMenuItemTooltip = forwardRef<
         >
           {props.children}
         </DropdownMenuItem>
-      </TooltipTrigger>
+      </TooltipTrigger_Shadcn_>
       {props.disabled && props.tooltip.content.text !== undefined && (
-        <TooltipContent {...props.tooltip.content}>{props.tooltip.content.text}</TooltipContent>
+        <TooltipContent_Shadcn_ {...props.tooltip.content}>
+          {props.tooltip.content.text}
+        </TooltipContent_Shadcn_>
       )}
-    </Tooltip>
+    </Tooltip_Shadcn_>
   )
 })
 

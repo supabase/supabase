@@ -1,7 +1,8 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
+import { post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
 import type { User } from './users-infinite-query'
 
@@ -11,14 +12,9 @@ export type UserSendMagicLinkVariables = {
 }
 
 export async function sendMagicLink({ projectRef, user }: UserSendMagicLinkVariables) {
-  const { data, error } = await post('/platform/auth/{ref}/magiclink', {
-    params: { path: { ref: projectRef } },
-    body: user,
-  })
-
-  if (error) handleError(error)
-
-  return data
+  const response = await post(`${API_URL}/auth/${projectRef}/magiclink`, user)
+  if (response.error) throw response.error
+  return response
 }
 
 type UserSendMagicLinkData = Awaited<ReturnType<typeof sendMagicLink>>

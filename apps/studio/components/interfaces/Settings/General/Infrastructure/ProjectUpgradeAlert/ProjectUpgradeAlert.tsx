@@ -9,19 +9,15 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useParams } from 'common'
-import { PLAN_DETAILS } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
-import { Markdown } from 'components/interfaces/Markdown'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import {
   ProjectUpgradeTargetVersion,
   useProjectUpgradeEligibilityQuery,
 } from 'data/config/project-upgrade-eligibility-query'
 import { ReleaseChannel, useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
+import { Admonition } from 'ui-patterns/admonition'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -38,12 +34,16 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { PLAN_DETAILS } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { Markdown } from 'components/interfaces/Markdown'
 
 interface PostgresVersionDetails {
   postgresEngine: string
@@ -139,8 +139,8 @@ const ProjectUpgradeAlert = () => {
           <p className="mb-3">
             The latest version of Postgres ({latestPgVersion}) is available for your project.
           </p>
-          <Tooltip>
-            <TooltipTrigger asChild>
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
               <Button
                 size="tiny"
                 type="primary"
@@ -149,13 +149,13 @@ const ProjectUpgradeAlert = () => {
               >
                 Upgrade project
               </Button>
-            </TooltipTrigger>
+            </TooltipTrigger_Shadcn_>
             {projectUpgradeDisabled && (
-              <TooltipContent side="bottom" align="center">
+              <TooltipContent_Shadcn_ side="bottom" align="center">
                 Project upgrade is currently disabled
-              </TooltipContent>
+              </TooltipContent_Shadcn_>
             )}
-          </Tooltip>
+          </Tooltip_Shadcn_>
         </AlertDescription_Shadcn_>
       </Alert_Shadcn_>
 

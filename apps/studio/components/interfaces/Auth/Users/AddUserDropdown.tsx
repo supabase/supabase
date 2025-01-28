@@ -9,9 +9,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
@@ -32,8 +32,8 @@ const AddUserDropdown = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-40">
-          <Tooltip>
-            <TooltipTrigger asChild>
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
               <DropdownMenuItem
                 className="space-x-2 !pointer-events-auto"
                 disabled={!canInviteUsers}
@@ -44,16 +44,16 @@ const AddUserDropdown = () => {
                 <Mail size={14} />
                 <p>Send invitation</p>
               </DropdownMenuItem>
-            </TooltipTrigger>
+            </TooltipTrigger_Shadcn_>
             {!canInviteUsers && (
-              <TooltipContent side="left">
+              <TooltipContent_Shadcn_ side="left">
                 You need additional permissions to invite users
-              </TooltipContent>
+              </TooltipContent_Shadcn_>
             )}
-          </Tooltip>
+          </Tooltip_Shadcn_>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
               <DropdownMenuItem
                 className="space-x-2 !pointer-events-auto"
                 disabled={!canCreateUsers}
@@ -64,13 +64,13 @@ const AddUserDropdown = () => {
                 <UserPlus size={14} />
                 <p>Create new user</p>
               </DropdownMenuItem>
-            </TooltipTrigger>
+            </TooltipTrigger_Shadcn_>
             {!canCreateUsers && (
-              <TooltipContent side="left">
+              <TooltipContent_Shadcn_ side="left">
                 You need additional permissions to create users
-              </TooltipContent>
+              </TooltipContent_Shadcn_>
             )}
-          </Tooltip>
+          </Tooltip_Shadcn_>
         </DropdownMenuContent>
       </DropdownMenu>
 

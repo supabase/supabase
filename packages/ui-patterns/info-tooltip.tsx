@@ -1,5 +1,5 @@
 import { ElementRef, forwardRef } from 'react'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
 const SVG = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>((props, ref) => (
   <svg
@@ -18,20 +18,20 @@ const SVG = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>((props, ref
 ))
 
 const InfoTooltip = forwardRef<
-  ElementRef<typeof TooltipContent>,
-  React.ComponentPropsWithoutRef<typeof TooltipContent>
+  ElementRef<typeof TooltipContent_Shadcn_>,
+  React.ComponentPropsWithoutRef<typeof TooltipContent_Shadcn_>
 >(({ ...props }, ref) => {
   return (
-    <Tooltip>
-      <TooltipTrigger
+    <Tooltip_Shadcn_>
+      <TooltipTrigger_Shadcn_
         type="button"
         role="button"
         className="flex [&_svg]:data-[state=delayed-open]:fill-foreground-lighter [&_svg]:data-[state=instant-open]:fill-foreground-lighter"
       >
         <SVG strokeWidth={2} className="transition-colors fill-foreground-muted w-4 h-4" />
-      </TooltipTrigger>
-      <TooltipContent {...props} />
-    </Tooltip>
+      </TooltipTrigger_Shadcn_>
+      <TooltipContent_Shadcn_ {...props} />
+    </Tooltip_Shadcn_>
   )
 })
 

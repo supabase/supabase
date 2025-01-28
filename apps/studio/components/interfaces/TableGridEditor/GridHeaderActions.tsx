@@ -30,9 +30,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
@@ -70,8 +70,8 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
     },
   })
 
-  const [open, setOpen] = useState(false)
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
+  const [open, setOpen] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
 
   const state = useTrackedState()
@@ -174,18 +174,18 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
       {showHeaderActions && (
         <div className="flex items-center gap-x-2">
           {isReadOnly && (
-            <Tooltip>
-              <TooltipTrigger asChild>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <div className="border border-strong rounded bg-overlay-hover px-3 py-1 text-xs">
                   Viewing as read-only
                 </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom">
                 You need additional permissions to manage your project's data
-              </TooltipContent>
-            </Tooltip>
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           )}
-          {isTable && !isLocked ? (
+          {isTable ? (
             table.rls_enabled ? (
               <>
                 {policies.length < 1 && !isLocked ? (
@@ -371,7 +371,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
-                        href="https://supabase.com/docs/guides/database/extensions/wrappers/overview#security"
+                        href="https://github.com/orgs/supabase/discussions/21647"
                       >
                         Learn more
                       </Link>

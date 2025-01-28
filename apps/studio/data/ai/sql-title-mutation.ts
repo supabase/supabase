@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { constructHeaders } from 'data/fetchers'
+import { isResponseOk, post } from 'lib/common/fetch'
 import { BASE_PATH } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type SqlTitleGenerateResponse = {
   title: string
@@ -15,25 +15,13 @@ export type SqlTitleGenerateVariables = {
 }
 
 export async function generateSqlTitle({ sql }: SqlTitleGenerateVariables) {
-  const headers = await constructHeaders({ 'Content-Type': 'application/json' })
-  const response = await fetch(`${BASE_PATH}/api/ai/sql/title`, {
-    headers,
-    method: 'POST',
-    body: JSON.stringify({
-      sql,
-    }),
-  })
-  let body: any
+  const response = await post<SqlTitleGenerateResponse>(BASE_PATH + '/api/ai/sql/title', { sql })
 
-  try {
-    body = await response.json()
-  } catch {}
-
-  if (!response.ok) {
-    throw new ResponseError(body?.message, response.status)
+  if (!isResponseOk(response)) {
+    throw response.error
   }
 
-  return body as SqlTitleGenerateResponse
+  return response
 }
 
 type SqlTitleGenerateData = Awaited<ReturnType<typeof generateSqlTitle>>

@@ -24,7 +24,6 @@ interface FilterPopoverProps<T> {
   labelClass?: string
   maxHeightClass?: string
   clearButtonText?: string
-  className?: string
   onSaveFilters: (options: string[]) => void
 }
 
@@ -40,7 +39,6 @@ export const FilterPopover = <T extends Record<string, any>>({
   buttonType,
   disabled,
   labelClass,
-  className,
   maxHeightClass = 'h-[205px]',
   clearButtonText = 'Clear',
   onSaveFilters,
@@ -83,7 +81,7 @@ export const FilterPopover = <T extends Record<string, any>>({
           </div>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className={cn('p-0 w-44', className)} align="start">
+      <PopoverContent_Shadcn_ className="p-0 w-44" align="start">
         <div className="border-b border-overlay bg-surface-200 rounded-t pb-1 px-3">
           <span className="text-xs text-foreground-light">
             {title ?? `Select ${name.toLowerCase()}`}
@@ -110,7 +108,7 @@ export const FilterPopover = <T extends Record<string, any>>({
                   />
                   <Label_Shadcn_
                     htmlFor={option[valueKey]}
-                    className={cn('flex items-center gap-x-2 text-xs', labelClass)}
+                    className={cn('flex items-center gap-x-2', labelClass)}
                   >
                     {icon && (
                       <img

@@ -1,6 +1,7 @@
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
+import { get } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import { configKeys } from './keys'
 
 export type JwtSecretUpdatingStatusVariables = {
@@ -22,23 +23,21 @@ export async function getJwtSecretUpdatingStatus(
     throw new Error('projectRef is required')
   }
 
-  const { data, error } = await get('/platform/props/project/{ref}/jwt-secret-update-status', {
-    params: { path: { ref: projectRef } },
+  const response = await get(`${API_URL}/props/project/${projectRef}/jwt-secret-update-status`, {
     signal,
   })
+  if (response.error) {
+    throw response.error
+  }
 
-  if (error) handleError(error)
+  const meta = response?.jwtSecretUpdateStatus?.meta
 
-  const meta = data.jwtSecretUpdateStatus
-
-  return meta
-    ? ({
-        changeTrackingId: meta.change_tracking_id,
-        jwtSecretUpdateError: meta.error,
-        jwtSecretUpdateProgress: meta.progress,
-        jwtSecretUpdateStatus: meta.status,
-      } as JwtSecretUpdatingStatusResponse)
-    : null
+  return {
+    changeTrackingId: meta?.change_tracking_id,
+    jwtSecretUpdateError: meta?.error,
+    jwtSecretUpdateProgress: meta?.progress,
+    jwtSecretUpdateStatus: meta?.status,
+  } as JwtSecretUpdatingStatusResponse
 }
 
 export type JwtSecretUpdatingStatusData = Awaited<ReturnType<typeof getJwtSecretUpdatingStatus>>

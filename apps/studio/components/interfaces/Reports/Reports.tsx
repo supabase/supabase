@@ -1,52 +1,44 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { groupBy, isEqual, isNull } from 'lodash'
-import { ArrowRight, Plus, Save } from 'lucide-react'
+import { groupBy, isNull } from 'lodash'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { DateRangePicker } from 'components/ui/DateRangePicker'
 import { Loading } from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
-import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
-import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentQuery } from 'data/content/content-query'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import { useContentUpdateMutation } from 'data/content/content-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
+import { TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { Dashboards } from 'types'
-import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
-import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
-import { GridResize } from './GridResize'
+import { ArrowRight, Plus, Save, Settings } from 'lucide-react'
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+import GridResize from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 
-const DEFAULT_CHART_COLUMN_COUNT = 1
-const DEFAULT_CHART_ROW_COUNT = 1
+const DEFAULT_CHART_COLUMN_COUNT = 12
+const DEFAULT_CHART_ROW_COUNT = 4
 
 const Reports = () => {
   const { id, ref } = useParams()
   const { profile } = useProfile()
 
-  const [config, setConfig] = useState<Dashboards.Content>()
-  const [startDate, setStartDate] = useState<string>()
-  const [endDate, setEndDate] = useState<string>()
-  const [hasEdits, setHasEdits] = useState<boolean>(false)
+  const [config, setConfig] = useState<any>(undefined)
+  const [startDate, setStartDate] = useState<any>(null)
+  const [endDate, setEndDate] = useState<any>(null)
+  const [hasEdits, setHasEdits] = useState<any>(false)
 
-  const {
-    data: userContents,
-    isLoading,
-    isSuccess,
-  } = useContentQuery({
+  const { data: userContents, isLoading } = useContentQuery({
     projectRef: ref,
     type: 'report',
   })
-  const { mutate: upsertContent, isLoading: isSaving } = useContentUpsertMutation({
+  const { mutate: saveReport, isLoading: isSaving } = useContentUpdateMutation({
     onSuccess: () => {
       setHasEdits(false)
       toast.success('Successfully saved report!')
@@ -55,9 +47,7 @@ const Reports = () => {
       toast.error(`Failed to update report: ${error.message}`)
     },
   })
-
   const currentReport = userContents?.content.find((report) => report.id === id)
-  const currentReportContent = currentReport?.content as Dashboards.Content
 
   const canReadReport = useCheckPermissions(PermissionAction.READ, 'user_content', {
     resource: {
@@ -92,7 +82,7 @@ const Reports = () => {
      * want to compare fixed dates as possible differences from saved and edited versions of report.
      */
     let _config = JSON.parse(JSON.stringify(config))
-    let _original = JSON.parse(JSON.stringify(currentReportContent))
+    let _original = JSON.parse(JSON.stringify(currentReport?.content))
 
     if (!_original || !_config) return
 
@@ -104,8 +94,8 @@ const Reports = () => {
      * the below would not need to be run
      */
     if (
-      _config.period_start.time_period !== 'custom' ||
-      _config.period_end.time_period !== 'custom'
+      _config.period_start.time_period != 'custom' ||
+      _config.period_end.time_period != 'custom'
     ) {
       _original.period_start.date = ''
       _config.period_start.date = ''
@@ -114,26 +104,25 @@ const Reports = () => {
     }
 
     // Runs comparison
-    if (isEqual(_config, _original)) {
+    if (JSON.stringify(_config) == JSON.stringify(_original)) {
       setHasEdits(false)
     } else {
       setHasEdits(true)
     }
   }
+  // Updates the report and reloads the report again
+  const onSaveReport = async () => {
+    if (ref === undefined) return console.error('Project ref is required')
+    if (id === undefined) return console.error('Report ID is required')
+    saveReport({ projectRef: ref, id, type: 'report', content: config })
+  }
 
-  const handleChartSelection = ({
-    metric,
-    isAddingChart,
-  }: {
-    metric: Metric
-    isAddingChart: boolean
-  }) => {
-    if (isAddingChart) pushChart({ metric })
+  function handleChartSelection({ metric, value }: any) {
+    if (value) pushChart({ metric })
     else popChart({ metric })
   }
 
-  const pushChart = ({ metric }: { metric: Metric }) => {
-    if (!config) return
+  function pushChart({ metric }: any) {
     const current = [...config.layout]
 
     let x = 0
@@ -141,7 +130,6 @@ const Reports = () => {
 
     const chartsByY = groupBy(config.layout, 'y')
     const yValues = Object.keys(chartsByY)
-    const isSnippet = metric.key?.startsWith('snippet_')
 
     if (yValues.length === 0) {
       y = 0
@@ -170,12 +158,10 @@ const Reports = () => {
       y,
       w: DEFAULT_CHART_COLUMN_COUNT,
       h: DEFAULT_CHART_ROW_COUNT,
-      id: metric?.id ?? uuidv4(),
+      id: uuidv4(),
+      attribute: metric.key,
       label: metric.label,
-      attribute: metric.key as Dashboards.ChartType,
-      provider: metric.provider as any,
-      chart_type: 'bar',
-      ...(isSnippet ? { chartConfig: DEFAULT_CHART_CONFIG } : {}),
+      provider: metric.provider,
     })
 
     setConfig({
@@ -184,60 +170,25 @@ const Reports = () => {
     })
   }
 
-  const popChart = ({ metric }: { metric: Partial<Metric> }) => {
-    if (!config) return
-
-    const { key, id } = metric
+  function popChart({ metric }: any) {
+    const { key } = metric
     const current = [...config.layout]
 
-    const foundIndex = current.findIndex((x) => {
-      if (x.attribute === key || x.id === id) return x
+    const foundIndex = current.findIndex((x: any, i: number) => {
+      if (x.attribute === key) {
+        return x
+      }
     })
     current.splice(foundIndex, 1)
-    setConfig({ ...config, layout: [...current] })
-  }
-
-  const updateChart = (
-    id: string,
-    {
-      chart,
-      chartConfig,
-    }: { chart?: Partial<Dashboards.Chart>; chartConfig?: Partial<ChartConfig> }
-  ) => {
-    const currentChart = config?.layout.find((x) => x.id === id)
-
-    if (currentChart) {
-      const updatedChart: Dashboards.Chart = {
-        ...currentChart,
-        ...(chart ?? {}),
-      }
-      if (chartConfig) {
-        updatedChart.chartConfig = { ...(currentChart?.chartConfig ?? {}), ...chartConfig }
-      }
-
-      const foundIndex = config?.layout.findIndex((x) => x.id === id)
-      if (config && foundIndex !== undefined && foundIndex >= 0) {
-        const updatedLayouts = [...config.layout]
-        updatedLayouts[foundIndex] = updatedChart
-        setConfig({ ...config, layout: updatedLayouts })
-      }
-    }
-  }
-
-  // Updates the report and reloads the report again
-  const onSaveReport = async () => {
-    if (ref === undefined) return console.error('Project ref is required')
-    if (currentReport === undefined) return console.error('Report is required')
-    if (config === undefined) return console.error('Config is required')
-    upsertContent({
-      projectRef: ref,
-      payload: { ...currentReport, content: config },
+    setConfig({
+      ...config,
+      layout: [...current],
     })
   }
 
   useEffect(() => {
-    if (isSuccess && currentReportContent !== undefined) setConfig(currentReportContent)
-  }, [isSuccess, currentReportContent])
+    if (currentReport !== undefined) setConfig(currentReport?.content)
+  }, [currentReport])
 
   useEffect(() => {
     checkEditState()
@@ -262,37 +213,29 @@ const Reports = () => {
           <div className="flex items-center gap-x-2">
             <Button
               type="default"
+              onClick={() => setConfig(currentReport?.content)}
               disabled={isSaving}
-              onClick={() => setConfig(currentReportContent)}
             >
               Cancel
             </Button>
             <Button
               type="primary"
               icon={<Save />}
-              loading={isSaving}
               onClick={() => onSaveReport()}
+              loading={isSaving}
             >
               Save changes
             </Button>
           </div>
         )}
       </div>
-      <div className={cn('mb-4 flex items-center gap-x-3 justify-between')}>
-        <div className="flex items-center gap-x-3">
+      <div className="mb-4 flex items-center justify-between space-x-3">
+        <div className="flex items-center space-x-3">
           <DateRangePicker
-            value="7d"
-            className="w-48"
             onChange={handleDateRangePicker}
+            value="7d"
             options={TIME_PERIODS_REPORTS}
             loading={isLoading}
-            footer={
-              <div className="px-2 py-1">
-                <p className="text-xs text-foreground-lighter">
-                  SQL blocks are independent of the selected date range
-                </p>
-              </div>
-            }
           />
 
           {startDate && endDate && (
@@ -314,11 +257,11 @@ const Reports = () => {
           {canUpdateReport ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" icon={<Plus />}>
-                  <span>Add block</span>
+                <Button type="default" iconRight={<Settings size={14} />}>
+                  <span>Add / Remove charts</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="center" className="w-44">
+              <DropdownMenuContent side="bottom" align="end">
                 <MetricOptions config={config} handleChartSelection={handleChartSelection} />
               </DropdownMenuContent>
             </DropdownMenu>
@@ -326,7 +269,7 @@ const Reports = () => {
             <ButtonTooltip
               disabled
               type="default"
-              icon={<Plus />}
+              iconRight={<Settings size={14} />}
               tooltip={{
                 content: {
                   side: 'bottom',
@@ -335,7 +278,7 @@ const Reports = () => {
                 },
               }}
             >
-              Add block
+              Add / Remove charts
             </ButtonTooltip>
           )}
           <DatabaseSelector />
@@ -362,16 +305,15 @@ const Reports = () => {
           )}
         </div>
       ) : (
-        <div className="relative mb-16 flex-grow">
+        <div className="relative mb-16 max-w-7xl flex-grow">
           {config && startDate && endDate && (
             <GridResize
               startDate={startDate}
               endDate={endDate}
-              interval={config.interval as AnalyticsInterval}
+              interval={config.interval}
               editableReport={config}
               disableUpdate={!canUpdateReport}
               onRemoveChart={popChart}
-              onUpdateChart={updateChart}
               setEditableReport={setConfig}
             />
           )}

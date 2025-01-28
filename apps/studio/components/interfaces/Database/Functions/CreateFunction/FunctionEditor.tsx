@@ -1,7 +1,15 @@
 import { Maximize2, Minimize2 } from 'lucide-react'
 
+import SqlEditor from 'components/ui/SqlEditor'
+import {
+  Button,
+  FormControl_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+} from 'ui'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { Button, FormControl_Shadcn_, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 
 export const FunctionEditor = ({
   field,
@@ -33,8 +41,8 @@ export const FunctionEditor = ({
           'opacity-0 group-hover:opacity-100 group-hover:top-2 transition-all'
         )}
       >
-        <Tooltip>
-          <TooltipTrigger asChild>
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>
             <Button
               type="text"
               size="tiny"
@@ -45,11 +53,11 @@ export const FunctionEditor = ({
               onClick={() => setFocused(!focused)}
               icon={focused ? <Minimize2 /> : <Maximize2 />}
             />
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom">
             {focused ? 'Minimize editor' : 'Maximize editor'}
-          </TooltipContent>
-        </Tooltip>
+          </TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
       </div>
     </div>
   )

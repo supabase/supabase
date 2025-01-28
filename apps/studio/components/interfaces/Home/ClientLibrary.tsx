@@ -19,25 +19,16 @@ const ClientLibrary = ({
   altIconName,
 }: ClientLibraryProps) => {
   return (
-    <div className="flex items-start md:space-x-6">
+    <div className="flex items-start space-x-6">
       <img
         src={`${BASE_PATH}/img/libraries/${
           altIconName ? `${altIconName}-icon.svg` : `${language.toLowerCase()}-icon.svg`
         }`}
         alt={`${language} logo`}
         width="21"
-        className="hidden md:block"
       />
       <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <img
-            src={`${BASE_PATH}/img/libraries/${
-              altIconName ? `${altIconName}-icon.svg` : `${language.toLowerCase()}-icon.svg`
-            }`}
-            alt={`${language} logo`}
-            width="21"
-            className="block md:hidden"
-          />
+        <div>
           <h5 className="flex items-center gap-2 text-base text-foreground">
             {language} {!officialSupport && <Badge variant="brand">Community</Badge>}
           </h5>
@@ -52,7 +43,7 @@ const ClientLibrary = ({
           )}
           <a href={gitUrl} target="_blank" rel="noreferrer">
             <Button icon={<Github />} type="default">
-              <span className="hidden md:inline">See</span> GitHub
+              See GitHub
             </Button>
           </a>
         </div>

@@ -131,9 +131,12 @@ const StorageSettings = () => {
     updateStorageConfig({
       projectRef,
       fileSizeLimit: convertToBytes(data.fileSizeLimit, data.unit),
+      // @ts-ignore [Joshen clean up] Remove this once storage changes are deployed'
       features: {
         imageTransformation: { enabled: data.imageTransformationEnabled },
-        s3Protocol: { enabled: config.features.s3Protocol.enabled },
+        ...(config.features.s3Protocol !== undefined
+          ? { s3Protocol: config?.features.s3Protocol }
+          : {}),
       },
     })
   }

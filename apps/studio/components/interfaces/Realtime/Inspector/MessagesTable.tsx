@@ -5,16 +5,15 @@ import { useEffect, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
-import { DocsButton } from 'components/ui/DocsButton'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Button, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
 import MessageSelection from './MessageSelection'
 import type { LogData } from './Messages.types'
 import NoChannelEmptyState from './NoChannelEmptyState'
 import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
+import { DocsButton } from 'components/ui/DocsButton'
+import { TelemetryActions } from 'lib/constants/telemetry'
 
 export const isErrorLog = (l: LogData) => {
   return l.message === 'SYSTEM' && l.metadata?.status === 'error'
@@ -111,8 +110,6 @@ const MessagesTable = ({
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const stringData = JSON.stringify(data)
 
-  const { ref } = useParams()
-  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   useEffect(() => {
@@ -181,13 +178,7 @@ const MessagesTable = ({
                       isRowSelected={false}
                       selectedCellIdx={undefined}
                       onClick={() => {
-                        sendEvent({
-                          action: TelemetryActions.REALTIME_INSPECTOR_MESSAGE_CLICKED,
-                          groups: {
-                            project: ref ?? 'Unknown',
-                            organization: org?.slug ?? 'Unknown',
-                          },
-                        })
+                        sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_MESSAGE_CLICKED })
                         setFocusedLog(row)
                       }}
                     />

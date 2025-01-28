@@ -3,7 +3,6 @@ import { useCallback, useRef } from 'react'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import { useProfile } from 'lib/profile'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
 import type { Project } from './project-detail-query'
@@ -30,11 +29,10 @@ export const useProjectsQuery = <TData = ProjectsData>({
   enabled = true,
   ...options
 }: UseQueryOptions<ProjectsData, ProjectsError, TData> = {}) => {
-  const { profile } = useProfile()
   return useQuery<ProjectsData, ProjectsError, TData>(
     projectKeys.list(),
     ({ signal }) => getProjects(signal),
-    { enabled: enabled && profile !== undefined, ...options }
+    { enabled, ...options }
   )
 }
 

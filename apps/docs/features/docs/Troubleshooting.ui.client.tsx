@@ -2,7 +2,7 @@
 
 import { ChevronDown, RotateCw, Search, X } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
-import { useEffect, useRef, useState, Suspense, useCallback, useMemo } from 'react'
+import { useEffect, useRef, useState, Suspense, useCallback } from 'react'
 
 import {
   Input_Shadcn_,
@@ -14,6 +14,7 @@ import {
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
+import { MultiSelect } from '~/components/MultiSelect.client'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -106,9 +107,7 @@ function entryMatchesFilter(
     selectedTags.length === 0 || selectedTags.some((tag) => dataKeywords?.includes(tag))
   const errorsMatch =
     selectedErrorCodes.length === 0 ||
-    selectedErrorCodes.some((error) =>
-      dataErrors.some((errorCode) => errorCode.includes(error.toString()))
-    )
+    selectedErrorCodes.some((error) => dataErrors.includes(error))
   const searchMatch =
     searchState === '' || content.toLowerCase().includes(searchState.toLowerCase())
 
@@ -201,25 +200,6 @@ function TroubleshootingFilterInternal({
     allEntries.current = entries
   }, [])
 
-  const allErrorCodes: string[] = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          errors?.flatMap((error) => {
-            const result: string[] = []
-            if (error.http_status_code) {
-              result.push(String(error.http_status_code))
-            }
-            if (error.code) {
-              result.push(error.code)
-            }
-            return result
-          }) ?? []
-        )
-      ),
-    [errors]
-  )
-
   return (
     <>
       <h2 className="sr-only">Search and filter</h2>
@@ -240,9 +220,9 @@ function TroubleshootingFilterInternal({
           <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Error codes" />
           <MultiSelector.Content>
             <MultiSelector.List>
-              {allErrorCodes.map((error) => (
-                <MultiSelector.Item key={`error-${error}`} value={error}>
-                  {error}
+              {errors?.map((error) => (
+                <MultiSelector.Item key={`error-${error.code}`} value={error.code}>
+                  {error.code}
                 </MultiSelector.Item>
               ))}
             </MultiSelector.List>

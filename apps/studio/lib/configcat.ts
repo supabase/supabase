@@ -1,3 +1,4 @@
+import type { User } from '@supabase/supabase-js'
 import * as configcat from 'configcat-js'
 
 let client: configcat.IConfigCatClient
@@ -16,10 +17,9 @@ function getClient() {
   return client
 }
 
-export async function getFlags(userEmail: string = '') {
-  if (userEmail) {
-    return getClient().getAllValuesAsync(new configcat.User(userEmail))
+export async function getFlags(user?: User) {
+  if (user) {
+    return getClient().getAllValuesAsync(new configcat.User(user?.email ?? ''))
   }
-
   return []
 }

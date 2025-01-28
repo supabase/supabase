@@ -1,34 +1,37 @@
-import {
-  DesktopComputerIcon,
-  HandIcon,
-  MicrophoneIcon,
-  VideoCameraIcon,
-} from '@heroicons/react/solid'
-import dayjs from 'dayjs'
-import matter from 'gray-matter'
-import capitalize from 'lodash/capitalize'
-import { ChevronLeft, X as XIcon } from 'lucide-react'
+import React from 'react'
+import Link from 'next/link'
+import NextImage from 'next/image'
+import { useRouter } from 'next/router'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
-import NextImage from 'next/image'
-import Link from 'next/link'
+import dayjs from 'dayjs'
+import matter from 'gray-matter'
+import {
+  DesktopComputerIcon,
+  VideoCameraIcon,
+  MicrophoneIcon,
+  HandIcon,
+} from '@heroicons/react/solid'
+import capitalize from 'lodash/capitalize'
+import { ChevronLeft, X as XIcon } from 'lucide-react'
 
 import authors from 'lib/authors.json'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { isNotNullOrUndefined } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata } from '~/lib/posts'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { isBrowser, useTelemetryProps } from 'common'
+import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import gaEvents from '~/lib/gaEvents'
 
-import advancedFormat from 'dayjs/plugin/advancedFormat'
-import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+import advancedFormat from 'dayjs/plugin/advancedFormat'
 
 import { Button, Image } from 'ui'
-import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
@@ -182,7 +185,17 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
 
   const Icon = eventIcons[event.type]
 
-  const sendTelemetryEvent = useSendTelemetryEvent()
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
+  const sendTelemetryEvent = async (event: TelemetryEvent) => {
+    await Telemetry.sendEvent(event, telemetryProps, router)
+  }
+
+  const origin = isBrowser
+    ? location.origin
+    : process.env.VERCEL_URL
+      ? process.env.VERCEL_URL
+      : 'https://supabase.com'
 
   return (
     <>
@@ -285,12 +298,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     <Link
                       href={event.main_cta?.url ?? '#'}
                       target={event.main_cta?.target ? event.main_cta?.target : undefined}
-                      onClick={() =>
-                        sendTelemetryEvent({
-                          action: TelemetryActions.EVENT_PAGE_CTA_CLICKED,
-                          properties: { eventTitle: event.title },
-                        })
-                      }
+                      onClick={() => sendTelemetryEvent(gaEvents['www_event'])}
                     >
                       {IS_REGISTRATION_OPEN
                         ? event.main_cta?.label

@@ -1,21 +1,22 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import SparkBar from 'components/ui/SparkBar'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, Button, Input } from 'ui'
 import CreateRolePanel from './CreateRolePanel'
 import DeleteRoleModal from './DeleteRoleModal'
 import RoleRow from './RoleRow'
 import RoleRowSkeleton from './RoleRowSkeleton'
 import { SUPABASE_ROLES } from './Roles.constants'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
@@ -108,8 +109,8 @@ const RolesList = () => {
           </div>
         </div>
         <div className="flex items-center space-x-6">
-          <Tooltip>
-            <TooltipTrigger>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
               <div className="w-42">
                 <SparkBar
                   type="horizontal"
@@ -136,16 +137,24 @@ const RolesList = () => {
                   labelBottomClass="text-xs"
                 />
               </div>
-            </TooltipTrigger>
-            <TooltipContent align="start" side="bottom" className="space-y-1">
-              <p className="text-foreground-light pr-2">Connections by roles:</p>
-              {rolesWithActiveConnections.map((role) => (
-                <div key={role.id}>
-                  {role.name}: {role.activeConnections}
-                </div>
-              ))}
-            </TooltipContent>
-          </Tooltip>
+            </Tooltip.Trigger>
+            <Tooltip.Content align="start" side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'border border-background space-y-1',
+                ].join(' ')}
+              >
+                <p className="text-xs text-foreground-light pr-2">Connections by roles:</p>
+                {rolesWithActiveConnections.map((role) => (
+                  <div key={role.id} className="text-xs text-foreground">
+                    {role.name}: {role.activeConnections}
+                  </div>
+                ))}
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Root>
           <ButtonTooltip
             type="primary"
             disabled={!canUpdateRoles}
@@ -167,7 +176,7 @@ const RolesList = () => {
 
       <div className="space-y-4">
         <div>
-          <div className="bg-surface-100 border border-default px-4 md:px-6 py-3 rounded-t flex items-center space-x-4">
+          <div className="bg-surface-100 border border-default px-6 py-3 rounded-t flex items-center space-x-4">
             <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
             <Badge variant="brand">Protected</Badge>
           </div>
@@ -185,7 +194,7 @@ const RolesList = () => {
         </div>
 
         <div>
-          <div className="bg-surface-100 border border-default px-4 md:px-6 py-3 rounded-t">
+          <div className="bg-surface-100 border border-default px-6 py-3 rounded-t">
             <p className="text-sm text-foreground-light">Other database roles</p>
           </div>
 

@@ -17,36 +17,27 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
-import { StorageItem } from '../Storage.types'
 import { useCopyUrl } from './useCopyUrl'
-import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 
-const PREVIEW_SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
-
-const PreviewFile = ({ item }: { item: StorageItem }) => {
-  const storageExplorerStore = useStorageStore()
-  const { projectRef, selectedBucket } = storageExplorerStore
-
-  const { data: previewUrl, isLoading } = useFetchFileUrlQuery({
-    file: item,
-    projectRef: projectRef,
-    bucket: selectedBucket,
-  })
-
-  // if the size is not available, we set it to be greater than the max size
-  const size = +(item.metadata?.size ?? PREVIEW_SIZE_LIMIT + 1)
-  const mimeType = item.metadata?.mimetype
-
-  const isSkipped = !!mimeType && !!size && size > PREVIEW_SIZE_LIMIT
-
-  if (isLoading) {
+const PreviewFile = ({ mimeType, previewUrl }: { mimeType?: string; previewUrl?: string }) => {
+  if (!mimeType || !previewUrl) {
+    return (
+      <SVG
+        src={`${BASE_PATH}/img/file-filled.svg`}
+        preProcessor={(code) =>
+          code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
+        }
+      />
+    )
+  }
+  if (previewUrl === 'loading') {
     return (
       <div className="flex h-full w-full items-center justify-center text-foreground-lighter">
         <Loader size={14} strokeWidth={2} className="animate-spin" />
       </div>
     )
   }
-  if (isSkipped) {
+  if (previewUrl === 'skipped') {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center">
         <SVG
@@ -61,17 +52,6 @@ const PreviewFile = ({ item }: { item: StorageItem }) => {
       </div>
     )
   }
-  if (!mimeType || !previewUrl) {
-    return (
-      <SVG
-        src={`${BASE_PATH}/img/file-filled.svg`}
-        preProcessor={(code) =>
-          code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
-        }
-      />
-    )
-  }
-
   if (mimeType.includes('image')) {
     return (
       <div
@@ -117,6 +97,7 @@ const PreviewFile = ({ item }: { item: StorageItem }) => {
 const PreviewPane = () => {
   const storageExplorerStore = useStorageStore()
   const {
+    getFileUrl,
     downloadFile,
     selectedBucket,
     selectedFilePreview: file,
@@ -124,7 +105,7 @@ const PreviewPane = () => {
     setSelectedItemsToDelete,
     setSelectedFileCustomExpiry,
   } = storageExplorerStore
-  const { onCopyUrl } = useCopyUrl()
+  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
 
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
@@ -169,7 +150,7 @@ const PreviewPane = () => {
           {/* Preview Thumbnail*/}
           <div className="my-4 border border-overlay">
             <div className="flex h-56 w-full items-center 2xl:h-72">
-              <PreviewFile item={file} />
+              <PreviewFile mimeType={mimeType} previewUrl={file.previewUrl} />
             </div>
           </div>
 
@@ -219,7 +200,7 @@ const PreviewPane = () => {
                 <Button
                   type="outline"
                   icon={<Clipboard size={16} strokeWidth={2} />}
-                  onClick={() => onCopyUrl(file.name)}
+                  onClick={() => onCopyUrl(file.name, getFileUrl(file))}
                   disabled={file.isCorrupted}
                 >
                   Get URL
@@ -239,19 +220,25 @@ const PreviewPane = () => {
                   <DropdownMenuContent side="bottom" align="center">
                     <DropdownMenuItem
                       key="expires-one-week"
-                      onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.WEEK)}
+                      onClick={() =>
+                        onCopyUrl(file.name, getFileUrl(file, URL_EXPIRY_DURATION.WEEK))
+                      }
                     >
                       Expire in 1 week
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       key="expires-one-month"
-                      onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.MONTH)}
+                      onClick={() =>
+                        onCopyUrl(file.name, getFileUrl(file, URL_EXPIRY_DURATION.MONTH))
+                      }
                     >
                       Expire in 1 month
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       key="expires-one-year"
-                      onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.YEAR)}
+                      onClick={() =>
+                        onCopyUrl(file.name, getFileUrl(file, URL_EXPIRY_DURATION.YEAR))
+                      }
                     >
                       Expire in 1 year
                     </DropdownMenuItem>

@@ -13,13 +13,12 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
-  LoadingLine,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
@@ -44,8 +43,6 @@ export const QueryPerformance = ({
   const { ref, preset } = useParams()
   const { project } = useProjectContext()
   const state = useDatabaseSelectorStateSnapshot()
-
-  const { isLoading, isRefetching } = queryPerformanceQuery
 
   const [page, setPage] = useState<QUERY_PERFORMANCE_REPORT_TYPES>(
     (preset as QUERY_PERFORMANCE_REPORT_TYPES) ?? QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
@@ -129,75 +126,63 @@ export const QueryPerformance = ({
         }}
       >
         <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10')}>
-          {QUERY_PERFORMANCE_TABS.map((tab) => {
-            const tabMax = Number(tab.max)
-            const maxValue =
-              tab.id !== QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT
-                ? tabMax > 1000
-                  ? (tabMax / 1000).toFixed(2)
-                  : tabMax.toLocaleString()
-                : tabMax.toLocaleString()
+          {QUERY_PERFORMANCE_TABS.map((tab) => (
+            <TabsTrigger_Shadcn_
+              key={tab.id}
+              value={tab.id}
+              className={cn(
+                'group relative',
+                'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-default border-t',
+                'even:border-x last:border-r even:!border-x-strong last:!border-r-strong',
+                tab.id === page ? '!bg-surface-200' : '!bg-surface-200/[33%]',
+                'hover:!bg-surface-100',
+                'data-[state=active]:!bg-surface-200',
+                'hover:text-foreground-light',
+                'transition'
+              )}
+            >
+              {tab.id === page && (
+                <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground" />
+              )}
 
-            return (
-              <TabsTrigger_Shadcn_
-                key={tab.id}
-                value={tab.id}
-                className={cn(
-                  'group relative',
-                  'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-default border-t',
-                  'even:border-x last:border-r even:!border-x-strong last:!border-r-strong',
-                  tab.id === page ? '!bg-surface-200' : '!bg-surface-200/[33%]',
-                  'hover:!bg-surface-100',
-                  'data-[state=active]:!bg-surface-200',
-                  'hover:text-foreground-light',
-                  'transition'
-                )}
-              >
-                {tab.id === page && (
-                  <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground" />
-                )}
+              <div className="flex items-center gap-x-2">
+                <span className="">{tab.label}</span>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
+                  </TooltipTrigger_Shadcn_>
+                  <TooltipContent_Shadcn_ side="top">{tab.description}</TooltipContent_Shadcn_>
+                </Tooltip_Shadcn_>
+              </div>
+              {tab.isLoading ? (
+                <ShimmeringLoader className="w-32 pt-1" />
+              ) : tab.max === undefined ? (
+                <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+                  No data yet
+                </span>
+              ) : (
+                <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+                  {Number(tab.max).toLocaleString()}
+                  {tab.id !== QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT ? 'ms' : ' calls'}
+                </span>
+              )}
 
-                <div className="flex items-center gap-x-2">
-                  <span className="">{tab.label}</span>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
-                    </TooltipTrigger>
-                    <TooltipContent side="top">{tab.description}</TooltipContent>
-                  </Tooltip>
-                </div>
-                {tab.isLoading ? (
-                  <ShimmeringLoader className="w-32 pt-1" />
-                ) : tab.max === undefined ? (
-                  <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
-                    No data yet
-                  </span>
-                ) : (
-                  <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
-                    {/* {Number(tab.max).toLocaleString()} */}
-                    {maxValue}
-                    {tab.id !== QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT
-                      ? tabMax > 1000
-                        ? 's'
-                        : 'ms'
-                      : ' calls'}
-                  </span>
-                )}
-
-                {tab.id === page && (
-                  <div className="absolute bottom-0 left-0 w-full h-[1px] bg-surface-200"></div>
-                )}
-              </TabsTrigger_Shadcn_>
-            )
-          })}
+              {tab.id === page && (
+                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-surface-200"></div>
+              )}
+            </TabsTrigger_Shadcn_>
+          ))}
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
 
-      <QueryPerformanceFilterBar
-        queryPerformanceQuery={queryPerformanceQuery}
-        onResetReportClick={() => setShowResetgPgStatStatements(true)}
-      />
-      <LoadingLine loading={isLoading || isRefetching} />
+      <div className="px-6 py-3 bg-surface-200 border-t -mt-px">
+        <QueryPerformanceFilterBar
+          queryPerformanceQuery={queryPerformanceQuery}
+          onResetReportClick={() => {
+            setShowResetgPgStatStatements(true)
+          }}
+        />
+      </div>
 
       <QueryPerformanceGrid queryPerformanceQuery={queryPerformanceQuery} />
 
@@ -210,7 +195,9 @@ export const QueryPerformance = ({
           className="absolute top-1.5 right-3 px-1.5"
           type="text"
           size="tiny"
-          onClick={() => setShowBottomSection(false)}
+          onClick={() => {
+            setShowBottomSection(false)
+          }}
         >
           <X size="14" />
         </Button>

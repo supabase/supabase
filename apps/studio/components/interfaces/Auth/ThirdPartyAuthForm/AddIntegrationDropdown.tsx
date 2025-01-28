@@ -4,7 +4,6 @@ import Image from 'next/image'
 import { IS_PLATFORM } from 'common'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import Link from 'next/link'
 import {
   Button,
   cn,
@@ -20,6 +19,7 @@ import {
   getIntegrationTypeLabel,
   INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
+import Link from 'next/link'
 
 interface AddIntegrationDropdownProps {
   buttonText?: string
@@ -68,9 +68,6 @@ export const AddIntegrationDropdown = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>Select Provider</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-
         <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
 
         {subscription?.plan.id === 'free' ? (

@@ -2,13 +2,14 @@ import dayjs from 'dayjs'
 import { ComponentProps, useState } from 'react'
 import {
   Bar,
-  CartesianGrid,
   Cell,
   Legend,
   BarChart as RechartBarChart,
   Tooltip,
   XAxis,
+  Label,
   YAxis,
+  CartesianGrid,
 } from 'recharts'
 
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
@@ -154,7 +155,7 @@ const BarChart = ({
             dataKey={yAxisKey}
             fill={CHART_COLORS.GREEN_1}
             animationDuration={300}
-            // Max bar size required to prevent bars from expanding to max width.
+            // max bar size required to prevent bars from expanding to max width.
             maxBarSize={48}
           >
             {data?.map((_entry: Datum, index: any) => (

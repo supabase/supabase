@@ -43,7 +43,7 @@ export async function getSQLSnippetFolders(
     signal,
   })
 
-  if (error) handleError(error)
+  if (error) throw handleError(error)
   return {
     ...data.data,
     cursor: data.cursor,

@@ -79,19 +79,18 @@ const TeamSettings = () => {
     <>
       <ScaffoldContainerLegacy>
         <ScaffoldFilterAndContent>
-          <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">
+          <ScaffoldActionsContainer className="justify-between">
             <Input
               autoComplete="off"
               icon={<Search size={12} />}
               size="small"
-              className="w-full md:w-auto"
               value={searchString}
               onChange={(e: any) => setSearchString(e.target.value)}
               name="email"
               id="email"
               placeholder="Filter members"
             />
-            <ScaffoldActionsGroup className="w-full md:w-auto">
+            <ScaffoldActionsGroup>
               {organizationMembersCreationEnabled &&
                 canAddMembers &&
                 profile !== undefined &&

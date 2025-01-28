@@ -57,11 +57,7 @@ const nextConfig = {
   experimental: {
     outputFileTracingIncludes: {
       '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
-      '/guides/**/*': [
-        './content/guides/**/*',
-        './content/troubleshooting/**/*',
-        './examples/**/*',
-      ],
+      '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*'],
       '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
     },
     serverComponentsExternalPackages: ['libpg-query'],

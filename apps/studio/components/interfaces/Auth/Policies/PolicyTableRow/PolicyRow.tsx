@@ -18,9 +18,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
 import { generatePolicyCreateSQL } from './PolicyTableRow.utils'
 
@@ -79,16 +79,16 @@ const PolicyRow = ({
                 role
               </div>
               {policy.roles.length > 3 && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
                     <code key="policy-etc" className="text-foreground-light text-xs">
                       + {policy.roles.length - 3} more roles
                     </code>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" align="center">
+                  </TooltipTrigger_Shadcn_>
+                  <TooltipContent_Shadcn_ side="bottom" align="center">
                     {policy.roles.slice(3).join(', ')}
-                  </TooltipContent>
-                </Tooltip>
+                  </TooltipContent_Shadcn_>
+                </Tooltip_Shadcn_>
               )}
             </div>
           </div>

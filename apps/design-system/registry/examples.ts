@@ -1201,9 +1201,4 @@ export const examples: Registry = [
     type: 'docs:example',
     files: ['example/expanding-textarea-demo.tsx'],
   },
-  {
-    name: 'logs-bar-chart',
-    type: 'components:example',
-    files: ['example/logs-bar-chart.tsx'],
-  },
 ]

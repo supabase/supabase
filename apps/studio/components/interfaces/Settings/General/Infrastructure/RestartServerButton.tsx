@@ -20,9 +20,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
@@ -88,8 +88,8 @@ const RestartServerButton = () => {
 
   return (
     <>
-      <Tooltip>
-        <TooltipTrigger asChild>
+      <Tooltip_Shadcn_>
+        <TooltipTrigger_Shadcn_ asChild>
           <div className="flex items-center">
             <Button
               type="default"
@@ -137,10 +137,10 @@ const RestartServerButton = () => {
               </DropdownMenu>
             )}
           </div>
-        </TooltipTrigger>
+        </TooltipTrigger_Shadcn_>
         {((project !== undefined && (!canRestartProject || !isProjectActive)) ||
           projectRestartDisabled) && (
-          <TooltipContent side="bottom">
+          <TooltipContent_Shadcn_ side="bottom">
             {projectRestartDisabled
               ? 'Project restart is currently disabled'
               : !canRestartProject
@@ -148,9 +148,9 @@ const RestartServerButton = () => {
                 : !isProjectActive
                   ? 'Unable to restart project as project is not active'
                   : ''}
-          </TooltipContent>
+          </TooltipContent_Shadcn_>
         )}
-      </Tooltip>
+      </Tooltip_Shadcn_>
 
       <ConfirmModal
         danger

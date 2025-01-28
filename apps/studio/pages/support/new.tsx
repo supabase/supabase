@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import SVG from 'react-inlinesvg'
 
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
 import Success from 'components/interfaces/Support/Success'
 import { SupportFormV2 } from 'components/interfaces/Support/SupportFormV2'
 import CopyButton from 'components/ui/CopyButton'
@@ -12,7 +13,7 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 import { toast } from 'sonner'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
 const SupportPage = () => {
   const [sentCategory, setSentCategory] = useState<string>()
@@ -41,8 +42,8 @@ const SupportPage = () => {
                   Troubleshooting
                 </Link>
               </Button>
-              <Tooltip>
-                <TooltipTrigger asChild>
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>
                   <Button
                     asChild
                     type="default"
@@ -64,11 +65,11 @@ const SupportPage = () => {
                           : 'Active incident ongoing'}
                     </Link>
                   </Button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" align="center">
+                </TooltipTrigger_Shadcn_>
+                <TooltipContent_Shadcn_ side="bottom" align="center">
                   Check Supabase status page
-                </TooltipContent>
-              </Tooltip>
+                </TooltipContent_Shadcn_>
+              </Tooltip_Shadcn_>
             </div>
           </div>
 

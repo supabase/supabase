@@ -12,7 +12,7 @@ import {
 export interface AlertErrorProps {
   projectRef?: string
   subject?: string
-  error?: { message: string } | null
+  error?: ResponseError | null
   className?: string
   showIcon?: boolean
 }

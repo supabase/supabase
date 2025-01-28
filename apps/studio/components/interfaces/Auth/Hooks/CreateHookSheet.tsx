@@ -431,7 +431,7 @@ export const CreateHookSheet = ({
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col gap-4 px-5">
+                <div className="flex flex-col gap-4">
                   <FormField_Shadcn_
                     key="httpsValues.url"
                     control={form.control}

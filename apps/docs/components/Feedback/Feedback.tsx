@@ -13,7 +13,6 @@ import {
 } from 'react'
 
 import { type Database, useConstant, useIsLoggedIn } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { Button, cn } from 'ui'
 
 import { IS_PLATFORM } from '~/lib/constants'
@@ -109,8 +108,9 @@ function Feedback({ className }: { className?: string }) {
 
   function handleVote(response: Response) {
     sendTelemetryEvent({
-      action: TelemetryActions.DOCS_FEEDBACK_CLICKED,
-      properties: { response },
+      category: 'docs',
+      action: 'feedback_voted',
+      label: response,
     })
     sendFeedbackVote(response)
     dispatch({ event: 'VOTED', response })

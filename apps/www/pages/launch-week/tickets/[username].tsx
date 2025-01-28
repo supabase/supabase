@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Error from 'next/error'
 import { createClient, Session } from '@supabase/supabase-js'
 import { Button } from 'ui'
-import { LW_URL, SITE_ORIGIN } from '~/lib/constants'
+import { SITE_URL, LW_URL } from '~/lib/constants'
 import supabase from '~/lib/supabase'
 import { Database } from '~/lib/database.types'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
@@ -32,6 +32,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
   const DISPLAY_NAME = name || username
   const TITLE = `${DISPLAY_NAME ? DISPLAY_NAME.split(' ')[0] + '’s' : 'Get your'} Launch Week Ticket`
   const DESCRIPTION = `Claim your Supabase Launch Week 13 ticket for a chance to win supa swag.`
+  const PAGE_URL = `${LW_URL}/tickets/${username}`
 
   const [session] = useState<Session | null>(null)
   const [ticketState, setTicketState] = useState<TicketState>('ticket')
@@ -52,7 +53,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: `${LW_URL}/tickets/${username}`,
+          url: PAGE_URL,
           images: [
             {
               url: ogImageUrl,
@@ -98,7 +99,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                       <div>
                         <Button type="primary" asChild size="small">
                           <Link
-                            href={`${LW_URL}${username ? '?referral=' + username : ''}`}
+                            href={`${SITE_URL}${username ? '?referral=' + username : ''}`}
                             className="pointer-events-auto"
                           >
                             Claim your ticket
@@ -134,9 +135,16 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY!
   )
 
+  const SITE_URL = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : 'http://localhost:3000'
+
   // fetch the normal ticket
   // stores the og images in supabase storage
-  fetch(`${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`)
+  fetch(
+    // @ts-ignore
+    `${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`
+  )
 
   // fetch a specific user
   if (username) {
@@ -153,13 +161,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // fetch the platinum ticket
   // stores the og images in supabase storage
   if (user?.secret) {
-    fetch(
-      `${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&secret=true`
-    )
+    fetch(`${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&secret=true`)
   } else if (user?.platinum) {
     // fetch /api-v2/ticket-og
     fetch(
-      `${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&platinum=true`
+      `${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&platinum=true`
     )
   }
 

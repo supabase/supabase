@@ -6,12 +6,6 @@ import {
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -21,15 +15,9 @@ import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
   return (
-    <ScaffoldContainer>
-      <ScaffoldHeader>
-        <ScaffoldTitle>User Preferences</ScaffoldTitle>
-        <ScaffoldDescription>
-          Manage your profile, account settings, and preferences for your Supabase experience
-        </ScaffoldDescription>
-      </ScaffoldHeader>
+    <div className="my-2">
       <ProfileCard />
-    </ScaffoldContainer>
+    </div>
   )
 }
 
@@ -54,7 +42,7 @@ const ProfileCard = () => {
   const { profile, error, isLoading, isError, isSuccess } = useProfile()
 
   return (
-    <article>
+    <article className="max-w-4xl p-4">
       {isLoading && (
         <Panel>
           <div className="p-4">

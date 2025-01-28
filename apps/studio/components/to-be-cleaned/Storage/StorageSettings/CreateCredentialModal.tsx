@@ -22,9 +22,9 @@ import {
   DialogTitle,
   DialogTrigger,
   Form_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -42,7 +42,8 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
   const canCreateCredentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const { data: config } = useProjectStorageConfigQuery({ projectRef })
-  const isS3ConnectionEnabled = config?.features.s3Protocol.enabled
+  // [Joshen clean up] Remove ?? true once storage BE changes are deployed
+  const isS3ConnectionEnabled = config?.features.s3Protocol?.enabled ?? true
   const disableCreation = !isProjectActive || !canCreateCredentials || !isS3ConnectionEnabled
 
   const FormSchema = z.object({
@@ -80,16 +81,16 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
         if (!open) setShowSuccess(false)
       }}
     >
-      <Tooltip>
-        <TooltipTrigger asChild>
+      <Tooltip_Shadcn_>
+        <TooltipTrigger_Shadcn_ asChild>
           <DialogTrigger asChild>
             <Button type="default" disabled={disableCreation} className="pointer-events-auto">
               New access key
             </Button>
           </DialogTrigger>
-        </TooltipTrigger>
+        </TooltipTrigger_Shadcn_>
         {disableCreation && (
-          <TooltipContent side="bottom">
+          <TooltipContent_Shadcn_ side="bottom">
             {!isProjectActive
               ? 'Restore your project to create new access keys'
               : !isS3ConnectionEnabled
@@ -97,9 +98,9 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
                 : !canCreateCredentials
                   ? 'You need additional permissions to create new access keys'
                   : ''}
-          </TooltipContent>
+          </TooltipContent_Shadcn_>
         )}
-      </Tooltip>
+      </Tooltip_Shadcn_>
 
       <DialogContent
         onInteractOutside={(e) => {

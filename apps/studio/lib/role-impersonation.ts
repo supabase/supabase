@@ -13,18 +13,7 @@ type PostgrestImpersonationRole =
   | {
       type: 'postgrest'
       role: 'authenticated'
-      userType: 'native'
-      user?: User
-      aal?: 'aal1' | 'aal2'
-    }
-  | {
-      type: 'postgrest'
-      role: 'authenticated'
-      userType: 'external'
-      externalAuth?: {
-        sub: string
-        additionalClaims?: Record<string, any>
-      }
+      user: User
       aal?: 'aal1' | 'aal2'
     }
 
@@ -45,39 +34,23 @@ function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole
   const nowTimestamp = Math.floor(Date.now() / 1000)
 
   if (role.role === 'authenticated') {
-    // Supabase native auth case
-    if (role.userType === 'native' && role.user) {
-      const user = role.user
-      return {
-        aal: role.aal ?? 'aal1',
-        amr: [{ method: 'password', timestamp: nowTimestamp }],
-        app_metadata: user.raw_app_meta_data,
-        aud: 'authenticated',
-        email: user.email,
-        exp,
-        iat: nowTimestamp,
-        iss: `https://${projectRef}.supabase.co/auth/v1`,
-        phone: user.phone,
-        role: user.role ?? role.role,
-        session_id: uuidv4(),
-        sub: user.id,
-        user_metadata: user.raw_user_meta_data,
-        is_anonymous: user.is_anonymous,
-      }
-    }
+    const user = role.user
 
-    // External auth case
-    if (role.userType === 'external' && role.externalAuth) {
-      return {
-        aal: role.aal ?? 'aal1',
-        aud: 'authenticated',
-        exp,
-        iat: nowTimestamp,
-        role: 'authenticated',
-        session_id: uuidv4(),
-        sub: role.externalAuth.sub,
-        ...role.externalAuth.additionalClaims,
-      }
+    return {
+      aal: role.aal ?? 'aal1',
+      amr: [{ method: 'password', timestamp: nowTimestamp }],
+      app_metadata: user.raw_app_meta_data,
+      aud: 'authenticated',
+      email: user.email,
+      exp,
+      iat: nowTimestamp,
+      iss: `https://${projectRef}.supabase.co/auth/v1`,
+      phone: user.phone,
+      role: user.role ?? role.role,
+      session_id: uuidv4(),
+      sub: user.id,
+      user_metadata: user.raw_user_meta_data,
+      is_anonymous: user.is_anonymous,
     }
   }
 

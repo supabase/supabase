@@ -8,7 +8,14 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { Button, Input, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import {
+  Button,
+  Input,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+} from 'ui'
 import DatePickers from './Logs.DatePickers'
 import {
   FILTER_OPTIONS,
@@ -84,8 +91,8 @@ const PreviewFilterPanel = ({
   }, [defaultSearchValue])
 
   const RefreshButton = () => (
-    <Tooltip>
-      <TooltipTrigger asChild>
+    <Tooltip_Shadcn_ delayDuration={100}>
+      <TooltipTrigger_Shadcn_ asChild>
         <Button
           title="refresh"
           type="default"
@@ -110,11 +117,11 @@ const PreviewFilterPanel = ({
           disabled={isLoading}
           onClick={onRefresh}
         />
-      </TooltipTrigger>
-      <TooltipContent side="bottom" className="text-xs">
+      </TooltipTrigger_Shadcn_>
+      <TooltipContent_Shadcn_ side="bottom" className="text-xs">
         Refresh logs
-      </TooltipContent>
-    </Tooltip>
+      </TooltipContent_Shadcn_>
+    </Tooltip_Shadcn_>
   )
 
   const handleDatepickerChange = ({ to, from }: Partial<Parameters<LogSearchCallback>[1]>) => {
@@ -232,16 +239,16 @@ const PreviewFilterPanel = ({
 
       {showDatabaseSelector ? (
         <div className="flex items-center justify-center gap-x-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
+          <Tooltip_Shadcn_ delayDuration={100}>
+            <TooltipTrigger_Shadcn_ asChild>
               <Button asChild className="px-1.5" type="default" icon={<Terminal />}>
                 <Link href={queryUrl} />
               </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-xs">
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom" className="text-xs">
               Open query in Logs Explorer
-            </TooltipContent>
-          </Tooltip>
+            </TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
           <DatabaseSelector
             onSelectId={onSelectedDatabaseChange}
             additionalOptions={

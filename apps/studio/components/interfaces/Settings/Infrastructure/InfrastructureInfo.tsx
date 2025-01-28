@@ -20,9 +20,9 @@ import {
   Badge,
   Button,
   Input,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
@@ -134,44 +134,47 @@ const InfrastructureInfo = () => {
                           label="Postgres version"
                           actions={[
                             isOnNonGenerallyAvailableReleaseChannel && (
-                              <Tooltip>
-                                <TooltipTrigger>
+                              <Tooltip_Shadcn_>
+                                <TooltipTrigger_Shadcn_>
                                   <Badge variant="warning" className="mr-1 capitalize">
                                     {isOnNonGenerallyAvailableReleaseChannel}
                                   </Badge>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="w-44 text-center">
+                                </TooltipTrigger_Shadcn_>
+                                <TooltipContent_Shadcn_ side="bottom" className="w-44 text-center">
                                   This project uses a {isOnNonGenerallyAvailableReleaseChannel}{' '}
                                   database version release
-                                </TooltipContent>
-                              </Tooltip>
+                                </TooltipContent_Shadcn_>
+                              </Tooltip_Shadcn_>
                             ),
                             isOrioleDb && (
                               <>
-                                <Tooltip>
-                                  <TooltipTrigger>
+                                <Tooltip_Shadcn_>
+                                  <TooltipTrigger_Shadcn_>
                                     <Badge variant="default" className="mr-1">
                                       OrioleDB
                                     </Badge>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="bottom" className="w-44 text-center">
+                                  </TooltipTrigger_Shadcn_>
+                                  <TooltipContent_Shadcn_
+                                    side="bottom"
+                                    className="w-44 text-center"
+                                  >
                                     This project uses OrioleDB
-                                  </TooltipContent>
-                                </Tooltip>
+                                  </TooltipContent_Shadcn_>
+                                </Tooltip_Shadcn_>
                               </>
                             ),
                             isOnLatestVersion && (
-                              <Tooltip>
-                                <TooltipTrigger>
+                              <Tooltip_Shadcn_>
+                                <TooltipTrigger_Shadcn_>
                                   <Badge variant="brand" className="mr-1">
                                     Latest
                                   </Badge>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="w-52 text-center">
+                                </TooltipTrigger_Shadcn_>
+                                <TooltipContent_Shadcn_ side="bottom" className="w-52 text-center">
                                   Project is on the latest version of Postgres that Supabase
                                   supports
-                                </TooltipContent>
-                              </Tooltip>
+                                </TooltipContent_Shadcn_>
+                              </Tooltip_Shadcn_>
                             ),
                           ]}
                         />

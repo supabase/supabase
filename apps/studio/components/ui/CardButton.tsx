@@ -109,7 +109,7 @@ const CardButton = ({
   }
 
   if (fixedHeight) {
-    containerClasses = [...containerClasses, 'min-h-32 md:min-h-44']
+    containerClasses = [...containerClasses, 'h-32']
   }
 
   const ImageContainer = ({ children }: { children: React.ReactNode }) => {

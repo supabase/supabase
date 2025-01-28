@@ -4,10 +4,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { getContentById } from 'data/content/content-id-query'
-import {
-  UpsertContentPayload,
-  useContentUpsertMutation,
-} from 'data/content/content-upsert-mutation'
+import { useContentUpdateMutation } from 'data/content/content-update-mutation'
 import { Snippet } from 'data/content/sql-folders-query'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -76,7 +73,7 @@ const RenameQueryModal = ({
     return errors
   }
 
-  const { mutateAsync: upsertContent } = useContentUpsertMutation()
+  const { mutateAsync: updateContent } = useContentUpdateMutation()
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
     if (!ref) return console.error('Project ref is required')
@@ -93,16 +90,20 @@ const RenameQueryModal = ({
         snapV2.addSnippet({ projectRef: ref, snippet: localSnippet })
       }
 
-      await upsertContent({
+      const updatedSnippet = await updateContent({
         projectRef: ref,
-        payload: {
-          ...localSnippet,
-          name: nameInput,
-          description: descriptionInput,
-        } as UpsertContentPayload,
+        id,
+        type: localSnippet.type,
+        content: (localSnippet as any).content,
+        name: nameInput,
+        description: descriptionInput,
       })
 
-      snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
+      snapV2.renameSnippet({
+        id,
+        name: updatedSnippet.name,
+        description: updatedSnippet.description,
+      })
 
       toast.success('Successfully renamed snippet!')
       if (onComplete) onComplete()

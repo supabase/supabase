@@ -16,9 +16,9 @@ import {
   cn,
   LoadingLine,
   SimpleCodeBlock,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { calculateDuration, formatDate, isSecondsFormat } from './CronJobs.utils'
@@ -41,13 +41,13 @@ const cronJobColumns = [
     minWidth: 200,
     value: (row: CronJobRun) => (
       <div className="flex items-center gap-1.5">
-        <Tooltip>
-          <TooltipTrigger asChild>
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>
             <span className="text-xs cursor-pointer truncate max-w-[300px]">
               {row.return_message}
             </span>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" align="center" className="max-w-[300px] text-wrap">
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom" align="center" className="max-w-[300px] text-wrap">
             <SimpleCodeBlock
               showCopy={true}
               className="sql"
@@ -55,8 +55,8 @@ const cronJobColumns = [
             >
               {row.return_message}
             </SimpleCodeBlock>
-          </TooltipContent>
-        </Tooltip>
+          </TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
       </div>
     ),
   },
@@ -239,8 +239,8 @@ export const PreviousRunsTab = () => {
 
             <div className="grid gap-y-2">
               <h3 className="text-sm">Command</h3>
-              <Tooltip>
-                <TooltipTrigger className=" text-left p-0! cursor-pointer truncate max-w-[300px] h-12 relative">
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ className=" text-left p-0! cursor-pointer truncate max-w-[300px] h-12 relative">
                   <SimpleCodeBlock
                     showCopy={false}
                     className="sql"
@@ -249,8 +249,12 @@ export const PreviousRunsTab = () => {
                     {currentJobState?.command}
                   </SimpleCodeBlock>
                   <div className="bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background-200 to-transparent absolute " />
-                </TooltipTrigger>
-                <TooltipContent side="bottom" align="center" className="max-w-[400px] text-wrap">
+                </TooltipTrigger_Shadcn_>
+                <TooltipContent_Shadcn_
+                  side="bottom"
+                  align="center"
+                  className="max-w-[400px] text-wrap"
+                >
                   <SimpleCodeBlock
                     showCopy={false}
                     className="sql"
@@ -258,8 +262,8 @@ export const PreviousRunsTab = () => {
                   >
                     {currentJobState?.command}
                   </SimpleCodeBlock>
-                </TooltipContent>
-              </Tooltip>
+                </TooltipContent_Shadcn_>
+              </Tooltip_Shadcn_>
             </div>
 
             <div className="grid gap-y-2">

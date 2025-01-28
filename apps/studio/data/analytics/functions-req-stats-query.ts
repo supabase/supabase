@@ -1,12 +1,12 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { operations } from 'api-types'
-import { get, handleError } from 'data/fetchers'
+import { get } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import { analyticsKeys } from './keys'
 
 export type FunctionsReqStatsVariables = {
   projectRef?: string
   functionId?: string
-  interval?: operations['FunctionRequestLogsController_getStatus']['parameters']['query']['interval']
+  interval?: string
 }
 
 export type FunctionsReqStatsResponse = any
@@ -25,25 +25,17 @@ export async function getFunctionsReqStats(
     throw new Error('interval is required')
   }
 
-  const { data, error } = await get(
-    '/platform/projects/{ref}/analytics/endpoints/functions.req-stats',
+  const response = await get<FunctionsReqStatsResponse>(
+    `${API_URL}/projects/${projectRef}/analytics/endpoints/functions.req-stats?interval=${interval}&function_id=${functionId}`,
     {
-      params: {
-        path: {
-          ref: projectRef,
-        },
-        query: {
-          function_id: functionId,
-          interval,
-        },
-      },
       signal,
     }
   )
+  if (response.error) {
+    throw response.error
+  }
 
-  if (error) handleError(error)
-
-  return data
+  return response
 }
 
 export type FunctionsReqStatsData = Awaited<ReturnType<typeof getFunctionsReqStats>>

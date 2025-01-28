@@ -1,24 +1,20 @@
 import { AuditLogs } from 'components/interfaces/Account'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
   return (
-    <ScaffoldContainer>
-      <ScaffoldHeader>
-        <ScaffoldTitle>Account Audit Logs</ScaffoldTitle>
-        <ScaffoldDescription>
-          View the audit log trail of actions made from your account
-        </ScaffoldDescription>
-      </ScaffoldHeader>
+    <ScaffoldContainerLegacy className="gap-0">
+      <div className="flex items-center justify-between">
+        <FormHeader
+          title="Account audit logs"
+          description="View the audit log trail of actions made from your account"
+        />
+      </div>
       <AuditLogs />
-    </ScaffoldContainer>
+    </ScaffoldContainerLegacy>
   )
 }
 

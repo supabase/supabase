@@ -1,3 +1,4 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { sortBy } from 'lodash'
@@ -90,11 +91,11 @@ export const EncryptionKeysManagement = () => {
 
   return (
     <>
-      <div className="space-y-4 p-4 md:p-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-          <div className="flex flex-col md:flex-row md:items-center gap-2">
+      <div className="space-y-4 p-10">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
             <Input
-              className="md:w-52 input-clear"
+              className="w-52 input-clear"
               size="tiny"
               placeholder="Search by name or ID"
               value={searchValue}
@@ -115,7 +116,7 @@ export const EncryptionKeysManagement = () => {
                   : []
               }
             />
-            <div className="md:w-44">
+            <div className="w-44">
               <Listbox size="tiny" value={selectedSort} onChange={setSelectedSort}>
                 <Listbox.Option
                   id="created"
@@ -186,21 +187,34 @@ export const EncryptionKeysManagement = () => {
                         <p className="text-sm text-foreground-light">
                           Added on {dayjs(key.created).format('MMM D, YYYY')}
                         </p>
-                        <ButtonTooltip
-                          type="default"
-                          className="py-2"
-                          icon={<Trash />}
-                          disabled={!canManageKeys}
-                          onClick={() => setSelectedKeyToRemove(key)}
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text: !canManageKeys
-                                ? 'You need additional permissions to delete keys'
-                                : undefined,
-                            },
-                          }}
-                        />
+                        <Tooltip.Root delayDuration={0}>
+                          <Tooltip.Trigger asChild>
+                            <Button
+                              type="default"
+                              className="py-2"
+                              icon={<Trash />}
+                              disabled={!canManageKeys}
+                              onClick={() => setSelectedKeyToRemove(key)}
+                            />
+                          </Tooltip.Trigger>
+                          {!canManageKeys && (
+                            <Tooltip.Portal>
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                    'border border-background',
+                                  ].join(' ')}
+                                >
+                                  <span className="text-xs text-foreground">
+                                    You need additional permissions to delete keys
+                                  </span>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Portal>
+                          )}
+                        </Tooltip.Root>
                       </div>
                     </div>
                     {idx !== keys.length - 1 && <Separator />}

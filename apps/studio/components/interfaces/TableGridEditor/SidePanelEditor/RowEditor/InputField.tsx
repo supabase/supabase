@@ -1,5 +1,5 @@
 import { includes, noop } from 'lodash'
-import { Edit, Edit2 } from 'lucide-react'
+import { Edit, Edit2, Link } from 'lucide-react'
 
 import {
   Button,
@@ -21,6 +21,7 @@ import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.const
 import { DateTimeInput } from './DateTimeInput'
 import type { EditValue, RowField } from './RowEditor.types'
 import { isValueTruncated } from './RowEditor.utils'
+import { checkDomainOfScale } from 'recharts/types/util/ChartUtils'
 
 export interface InputFieldProps {
   field: RowField
@@ -97,7 +98,6 @@ const InputField = ({
       <Input
         data-testid={`${field.name}-input`}
         layout="horizontal"
-        placeholder="NULL"
         label={field.name}
         value={field.value ?? ''}
         descriptionText={
@@ -120,19 +120,15 @@ const InputField = ({
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button type="default" icon={<Edit />} className="px-1.5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-28">
-              {field.isNullable && (
-                <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
-                  Set to NULL
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onClick={onSelectForeignKey}>Select record</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            type="default"
+            className="mr-1"
+            htmlType="button"
+            onClick={onSelectForeignKey}
+            icon={<Link />}
+          >
+            Select record
+          </Button>
         }
       />
     )

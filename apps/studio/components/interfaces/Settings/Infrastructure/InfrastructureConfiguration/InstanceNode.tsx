@@ -2,7 +2,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
 import { Handle, NodeProps, Position } from 'reactflow'
 
 import { useParams } from 'common'
@@ -15,7 +14,6 @@ import {
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
@@ -24,9 +22,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
 } from 'ui'
 import {
@@ -180,9 +178,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
     onSelectDropReplica,
   } = data
   const { ref } = useParams()
-  const dbSelectorState = useDatabaseSelectorStateSnapshot()
+  const created = dayjs(inserted_at).format('DD MMM YYYY')
   const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
-  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { data: databaseStatuses } = useReadReplicasStatusesQuery({ projectRef: ref })
   const { replicaInitializationStatus } =
@@ -200,7 +197,6 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
     error?: string
   }) ?? { status: undefined, progress: undefined, estimations: undefined, error: undefined }
 
-  const created = dayjs(inserted_at).format('DD MMM YYYY')
   const stage = progress !== undefined ? Number(progress.split('_')[0]) : 0
   const stagePercent = stage / (Object.keys(INIT_PROGRESS).length - 1)
 
@@ -254,19 +250,19 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 status === REPLICA_STATUS.INIT_READ_REPLICA_FAILED ? (
                 <>
                   <Badge variant="destructive">Init failed</Badge>
-                  <Tooltip>
-                    <TooltipTrigger>
+                  <Tooltip_Shadcn_>
+                    <TooltipTrigger_Shadcn_>
                       <HelpCircle size={16} />
-                    </TooltipTrigger>
-                    <TooltipContent
+                    </TooltipTrigger_Shadcn_>
+                    <TooltipContent_Shadcn_
                       side="bottom"
                       align="end"
                       alignOffset={-70}
                       className="w-60 text-center"
                     >
                       Replica failed to initialize. Please drop this replica and spin up a new one.
-                    </TooltipContent>
-                  </Tooltip>
+                    </TooltipContent_Shadcn_>
+                  </Tooltip_Shadcn_>
                 </>
               ) : status === REPLICA_STATUS.GOING_DOWN ? (
                 <Badge>Going down</Badge>
@@ -294,8 +290,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               </p>
             </div>
             {initStatus === ReplicaInitializationStatus.InProgress && progress !== undefined ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>
                   <div className="w-56">
                     <SparkBar
                       labelBottom={INIT_PROGRESS[progress as keyof typeof INIT_PROGRESS]}
@@ -306,9 +302,9 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                       barClass="bg-brand"
                     />
                   </div>
-                </TooltipTrigger>
+                </TooltipTrigger_Shadcn_>
                 {estimations !== undefined && (
-                  <TooltipContent asChild side="bottom">
+                  <TooltipContent_Shadcn_ asChild side="bottom">
                     <div className="w-56">
                       <p className="text-foreground-light mb-0.5">Duration estimates:</p>
                       {estimations.baseBackupDownloadEstimateSeconds !== undefined && (
@@ -324,9 +320,9 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                         </p>
                       )}
                     </div>
-                  </TooltipContent>
+                  </TooltipContent_Shadcn_>
                 )}
-              </Tooltip>
+              </Tooltip_Shadcn_>
             ) : error !== undefined ? (
               <p className="text-sm text-foreground-light">
                 Error: {ERROR_STATES[error as keyof typeof ERROR_STATES]}
@@ -344,12 +340,10 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             <DropdownMenuItem
               disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
               className="gap-x-2"
-              onClick={() => {
-                setShowConnect(true)
-                dbSelectorState.setSelectedDatabaseId(id)
-              }}
             >
-              View connection string
+              <Link href={`/project/${ref}/settings/database?connectionString=${id}`}>
+                View connection string
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="gap-x-2"
@@ -370,8 +364,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Resize replica
               </DropdownMenuItem> */}
-            <Tooltip>
-              <TooltipTrigger asChild>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
                   className="gap-x-2 !pointer-events-auto"
                   disabled={!canManageReplicas}
@@ -381,13 +375,13 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 >
                   Drop replica
                 </DropdownMenuItem>
-              </TooltipTrigger>
+              </TooltipTrigger_Shadcn_>
               {!canManageReplicas && (
-                <TooltipContent side="left">
+                <TooltipContent_Shadcn_ side="left">
                   You need additional permissions to drop replicas
-                </TooltipContent>
+                </TooltipContent_Shadcn_>
               )}
-            </Tooltip>
+            </Tooltip_Shadcn_>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

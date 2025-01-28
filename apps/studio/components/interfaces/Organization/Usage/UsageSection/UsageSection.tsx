@@ -6,8 +6,6 @@ import SectionHeader from '../SectionHeader'
 import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'
 import AttributeUsage from './AttributeUsage'
 import DiskUsage from './DiskUsage'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import DatabaseSizeUsage from './DatabaseSizeUsage'
 
 export interface ChartMeta {
   [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
@@ -54,16 +52,6 @@ const UsageSection = ({
       {categoryMeta.attributes.map((attribute) =>
         attribute.key === 'diskSize' ? (
           <DiskUsage
-            key={attribute.name}
-            slug={orgSlug}
-            projectRef={projectRef}
-            attribute={attribute}
-            subscription={subscription}
-            currentBillingCycleSelected={currentBillingCycleSelected}
-            usage={usage}
-          />
-        ) : attribute.key === PricingMetric.DATABASE_SIZE ? (
-          <DatabaseSizeUsage
             key={attribute.name}
             slug={orgSlug}
             projectRef={projectRef}

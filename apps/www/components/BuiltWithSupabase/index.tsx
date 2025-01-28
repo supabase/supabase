@@ -45,7 +45,7 @@ const BuiltWithSupabase = () => {
                 )}
                 key={i}
               >
-                <ExampleCard {...example} showProducts inHomepage />
+                <ExampleCard {...example} showProducts />
               </div>
             )
           })}

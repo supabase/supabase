@@ -42,7 +42,7 @@ function DatabaseBackupsNav({ active }: Props) {
   ] as const
 
   return (
-    <NavMenu className="overflow-hidden overflow-x-auto">
+    <NavMenu>
       {navMenuItems.map(
         (item) =>
           item.enabled && (

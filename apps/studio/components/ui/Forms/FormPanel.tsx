@@ -24,10 +24,7 @@ const FormPanelContainer = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElem
     <div
       ref={ref}
       {...props}
-      className={cn(
-        'bg-surface-100 border overflow-hidden rounded-md shadow max-w-full',
-        props.className
-      )}
+      className={cn('bg-surface-100 border overflow-hidden rounded-md shadow', props.className)}
     >
       {children}
     </div>

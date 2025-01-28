@@ -1,3 +1,4 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { noop } from 'lodash'
 import {
   Calendar,
@@ -31,9 +32,6 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   cn,
 } from 'ui'
 import {
@@ -113,8 +111,8 @@ const ColumnType = ({
 
   if (!isAvailableType) {
     return (
-      <Tooltip>
-        <TooltipTrigger>
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>
           <Input
             readOnly
             disabled
@@ -130,21 +128,33 @@ const ColumnType = ({
                 : ''
             }
           />
-        </TooltipTrigger>
+        </Tooltip.Trigger>
         {!showLabel && (
-          <TooltipContent side="bottom" className="w-80">
-            Custom non-native psql data types currently cannot be changed to a different data type
-            via Supabase Studio
-          </TooltipContent>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'border border-background w-[240px]',
+                ].join(' ')}
+              >
+                <span className="text-xs text-foreground">
+                  Custom non-native psql data types currently cannot be changed to a different data
+                  type via Supabase Studio
+                </span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         )}
-      </Tooltip>
+      </Tooltip.Root>
     )
   }
 
   if (disabled && !showLabel) {
     return (
-      <Tooltip>
-        <TooltipTrigger>
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>
           <Input
             readOnly
             disabled
@@ -154,13 +164,23 @@ const ColumnType = ({
             size="small"
             value={value}
           />
-        </TooltipTrigger>
+        </Tooltip.Trigger>
         {!showLabel && description && (
-          <TooltipContent side="bottom">
-            <div className="w-80">{description}</div>
-          </TooltipContent>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'border border-background w-[240px]',
+                ].join(' ')}
+              >
+                <span className="text-xs text-foreground">{description}</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
         )}
-      </Tooltip>
+      </Tooltip.Root>
     )
   }
 

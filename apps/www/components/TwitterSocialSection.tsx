@@ -6,12 +6,9 @@ import TwitterSocialProof from './Sections/TwitterSocialProof'
 import TwitterSocialProofMobile from './Sections/TwitterSocialProofMobile'
 
 import Tweets from '~/data/tweets/Tweets.json'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 const TwitterSocialSection = () => {
   const tweets = Tweets.slice(0, 18)
-  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <>
@@ -26,26 +23,12 @@ const TwitterSocialSection = () => {
               href={'https://github.com/supabase/supabase/discussions'}
               target="_blank"
               tabIndex={-1}
-              onClick={() =>
-                sendTelemetryEvent({
-                  action: TelemetryActions.HOMEPAGE_GITHUB_DISCUSSIONS_BUTTON_CLICKED,
-                })
-              }
             >
               GitHub discussions
             </Link>
           </Button>
           <Button asChild type="default" size="small" iconRight={<MessageCircle size={14} />}>
-            <Link
-              href={'https://discord.supabase.com/'}
-              target="_blank"
-              tabIndex={-1}
-              onClick={() =>
-                sendTelemetryEvent({
-                  action: TelemetryActions.HOMEPAGE_DISCORD_BUTTON_CLICKED,
-                })
-              }
-            >
+            <Link href={'https://discord.supabase.com/'} target="_blank" tabIndex={-1}>
               Discord
             </Link>
           </Button>

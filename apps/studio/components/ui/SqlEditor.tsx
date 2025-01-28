@@ -3,7 +3,7 @@ import { noop } from 'lodash'
 import { useEffect, useRef } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { formatSql } from 'lib/formatSql'
+import { formatQuery } from 'data/sql/format-sql-query'
 
 // [Joshen] We should deprecate this and use CodeEditor instead
 
@@ -37,7 +37,7 @@ const SqlEditor = ({
       const formatprovider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
         async provideDocumentFormattingEdits(model: any) {
           const value = model.getValue()
-          const formatted = formatSql(value)
+          const formatted = await formatPgsql(value)
           return [
             {
               range: model.getFullModelRange(),
@@ -65,6 +65,20 @@ const SqlEditor = ({
       })
     }
   }, [queryId])
+
+  async function formatPgsql(value: any) {
+    try {
+      const formatted = await formatQuery({
+        projectRef: project?.ref!,
+        connectionString: project?.connectionString,
+        sql: value,
+      })
+      return formatted
+    } catch (error) {
+      console.error('formatPgsql error:', error)
+      return value
+    }
+  }
 
   const onMount = (editor: any, monaco: any) => {
     editorRef.current = editor

@@ -1,4 +1,5 @@
-import { getAccessToken, gotrueClient, type User } from 'common'
+import type { User } from '@supabase/auth-js'
+import { getAccessToken, gotrueClient } from 'common'
 
 export const auth = gotrueClient
 export { getAccessToken }

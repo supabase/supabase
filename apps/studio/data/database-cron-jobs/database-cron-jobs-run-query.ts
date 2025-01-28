@@ -30,10 +30,10 @@ export async function getDatabaseCronJobRun({
     sql: query,
   })
 
-  return result[0] ?? null
+  return result[0]
 }
 
-export type DatabaseCronJobRunData = CronJobRun | null
+export type DatabaseCronJobRunData = CronJobRun
 export type DatabaseCronJobRunError = ResponseError
 
 export const useCronJobRunQuery = <TData = DatabaseCronJobRunData>(

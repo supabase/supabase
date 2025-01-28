@@ -10,7 +10,14 @@ import { DatabaseExtension } from 'data/database-extensions/database-extensions-
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import { extensions } from 'shared-data'
-import { Button, cn, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Button,
+  cn,
+  Switch,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import EnableExtensionModal from './EnableExtensionModal'
@@ -22,6 +29,7 @@ interface ExtensionCardProps {
 
 const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   const { project } = useProjectContext()
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
   const isOn = extension.installed_version !== null
   const isOrioleDb = useIsOrioleDb()
 
@@ -36,10 +44,12 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   const disabled = !canUpdateExtensions || orioleDbCheck
 
   const X_PADDING = 'px-5'
-  const extensionMeta = extensions.find((item) => item.name === extension.name)
+  const extensionMeta = extensions.find((item: any) => item.name === extension.name)
   const docsUrl = extensionMeta?.link.startsWith('/guides')
-    ? `https://supabase.com/docs${extensionMeta?.link}`
-    : extensionMeta?.link ?? undefined
+    ? siteUrl === 'http://localhost:8082'
+      ? `http://localhost:3001/docs${extensions.find((item) => item.name === extension.name)?.link}`
+      : `https://supabase.com/docs${extensions.find((item) => item.name === extension.name)?.link}`
+    : extensions.find((item: any) => item.name === extension.name)?.link ?? undefined
 
   const { mutate: disableExtension, isLoading: isDisabling } = useDatabaseExtensionDisableMutation({
     onSuccess: () => {
@@ -77,8 +87,8 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
           {isDisabling ? (
             <Loader2 className="animate-spin" size={16} />
           ) : (
-            <Tooltip>
-              <TooltipTrigger>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_>
                 <Switch
                   disabled={disabled}
                   checked={isOn}
@@ -86,17 +96,17 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                     isOn ? setIsDisableModalOpen(true) : setShowConfirmEnableModal(true)
                   }
                 />
-              </TooltipTrigger>
+              </TooltipTrigger_Shadcn_>
               {disabled && (
-                <TooltipContent side="bottom">
+                <TooltipContent_Shadcn_ side="bottom">
                   {!canUpdateExtensions
                     ? 'You need additional permissions to toggle extensions'
                     : orioleDbCheck
                       ? 'Project is using OrioleDB and cannot be disabled'
                       : null}
-                </TooltipContent>
+                </TooltipContent_Shadcn_>
               )}
-            </Tooltip>
+            </Tooltip_Shadcn_>
           )}
         </div>
 

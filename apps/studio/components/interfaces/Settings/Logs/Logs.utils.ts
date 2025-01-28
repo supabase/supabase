@@ -321,18 +321,14 @@ export const genChartQuery = (
 ) => {
   const [startOffset, trunc] = calcChartStart(params)
   const where = genWhereStatement(table, filters)
-  const errorCondition = getErrorCondition(table)
-  const warningCondition = getWarningCondition(table)
 
   let joins = genCrossJoinUnnests(table)
 
-  const q = `
+  return `
 SELECT
 -- log-event-chart
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
-  count(CASE WHEN NOT (${errorCondition} OR ${warningCondition}) THEN 1 END) as ok_count,
-  count(CASE WHEN ${errorCondition} THEN 1 END) as error_count,
-  count(CASE WHEN ${warningCondition} THEN 1 END) as warning_count,
+  count(t.timestamp) as count
 FROM
   ${table} t
   ${joins}
@@ -346,7 +342,6 @@ timestamp
 ORDER BY
   timestamp ASC
   `
-  return q
 }
 
 type TsPair = [string | '', string | '']
@@ -583,38 +578,4 @@ export function checkForWildcard(query: string) {
 
   const wildcardRegex = /\*/
   return wildcardRegex.test(queryWithoutCount)
-}
-
-function getErrorCondition(table: LogsTableName): string {
-  switch (table) {
-    case 'edge_logs':
-      return 'response.status_code >= 500'
-    case 'postgres_logs':
-      return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
-    case 'auth_logs':
-      return "metadata.level = 'error' OR metadata.status >= 400"
-    case 'function_edge_logs':
-      return 'response.status_code >= 500'
-    case 'function_logs':
-      return "metadata.level IN ('error', 'fatal')"
-    default:
-      return 'false'
-  }
-}
-
-function getWarningCondition(table: LogsTableName): string {
-  switch (table) {
-    case 'edge_logs':
-      return 'response.status_code >= 400 AND response.status_code < 500'
-    case 'postgres_logs':
-      return "parsed.error_severity IN ('WARNING')"
-    case 'auth_logs':
-      return "metadata.level = 'warning'"
-    case 'function_edge_logs':
-      return 'response.status_code >= 400 AND response.status_code < 500'
-    case 'function_logs':
-      return "metadata.level IN ('warning')"
-    default:
-      return 'false'
-  }
 }

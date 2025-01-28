@@ -3,18 +3,19 @@ import dayjs from 'dayjs'
 
 import { operations } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { AnalyticsData, AnalyticsInterval } from './constants'
+import type { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
 
 export type ProjectDailyStatsAttribute =
   operations['DailyStatsController_getDailyStats']['parameters']['query']['attribute']
+export type ProjectDailyStatsInterval = '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
 
 export type ProjectDailyStatsVariables = {
   projectRef?: string
   attribute: ProjectDailyStatsAttribute
   startDate?: string
   endDate?: string
-  interval?: AnalyticsInterval
+  interval?: ProjectDailyStatsInterval
   dateFormat?: string
   databaseIdentifier?: string
   modifier?: (x: number) => number

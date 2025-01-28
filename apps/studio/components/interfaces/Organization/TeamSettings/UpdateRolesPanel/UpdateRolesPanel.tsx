@@ -36,9 +36,9 @@ import {
   SheetHeader,
   SheetSection,
   Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   WarningIcon,
   cn,
 } from 'ui'
@@ -243,16 +243,16 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
                         <div className="flex items-center gap-x-2">
                           {cannotAddAnyRoles ? (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
+                            <Tooltip_Shadcn_>
+                              <TooltipTrigger_Shadcn_ asChild>
                                 <div className="flex items-center justify-between rounded-md border border-button bg-button px-3 py-2 text-sm h-10 w-56 text-foreground-light">
                                   {role?.name ?? 'Unknown'}
                                 </div>
-                              </TooltipTrigger>
-                              <TooltipContent side="bottom">
+                              </TooltipTrigger_Shadcn_>
+                              <TooltipContent_Shadcn_ side="bottom">
                                 Additional permissions required to update role
-                              </TooltipContent>
-                            </Tooltip>
+                              </TooltipContent_Shadcn_>
+                            </Tooltip_Shadcn_>
                           ) : (
                             <Select_Shadcn_
                               value={(project?.baseRoleId ?? project.roleId).toString()}
@@ -288,8 +288,8 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                           )}
 
                           {!isApplyingRoleToAllProjects && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
+                            <Tooltip_Shadcn_>
+                              <TooltipTrigger_Shadcn_ asChild>
                                 <Button
                                   type="text"
                                   disabled={!canRemoveRole}
@@ -297,13 +297,13 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                   icon={<X />}
                                   onClick={() => onRemoveProject(project?.ref)}
                                 />
-                              </TooltipTrigger>
+                              </TooltipTrigger_Shadcn_>
                               {!canRemoveRole && (
-                                <TooltipContent side="bottom">
+                                <TooltipContent_Shadcn_ side="bottom">
                                   Additional permission required to remove role from member
-                                </TooltipContent>
+                                </TooltipContent_Shadcn_>
                               )}
-                            </Tooltip>
+                            </Tooltip_Shadcn_>
                           )}
                         </div>
                       </div>
