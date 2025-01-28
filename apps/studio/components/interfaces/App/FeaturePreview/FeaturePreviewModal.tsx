@@ -13,8 +13,8 @@ import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
 
 const FeaturePreviewModal = () => {
-  // const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
-  // const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewTabsSqlEditor')
+  const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
+  const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewTabsSqlEditor')
 
   const snap = useAppStateSnapshot()
   const { ref } = useParams()
@@ -59,16 +59,16 @@ const FeaturePreviewModal = () => {
     snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
   }
 
-  // function isReleased(feature) {
-  //   switch (feature.key) {
-  //     case LOCAL_STORAGE_KEYS.UI_PREVIEW_FUNCTIONS_ASSISTANT:
-  //       return enableFunctionsAssistant
-  //     case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
-  //       return isFeaturePreviewTabsTableEditorFlag
-  //     case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
-  //       return isFeaturePreviewTabsSqlEditorFlag
-  //   }
-  // }
+  function isReleasedToPublic(feature: (typeof FEATURE_PREVIEWS)[number]) {
+    switch (feature.key) {
+      case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
+        return isFeaturePreviewTabsTableEditorFlag
+      case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
+        return isFeaturePreviewTabsSqlEditorFlag
+      default:
+        return true
+    }
+  }
   // this modal can be triggered on other pages
   // Update local state when valtio state changes
 
@@ -102,14 +102,8 @@ const FeaturePreviewModal = () => {
           <div>
             <ScrollArea className="h-[550px] w-[280px] border-r">
               {FEATURE_PREVIEWS.filter((feature) => {
-                // const isTableEditor = feature.key === LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS
-                // const isSqlEditor = feature.key === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS
-
-                // return (
-                //   (isTableEditor && isFeaturePreviewTabsTableEditorFlag) ||
-                //   (isSqlEditor && isFeaturePreviewTabsSqlEditorFlag)
-                // )
-                return true
+                // filter out preview features that are not released to the public
+                return isReleasedToPublic(feature)
               }).map((feature) => {
                 const isEnabled = flags[feature.key] ?? false
 
