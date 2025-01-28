@@ -17,6 +17,9 @@ import { useParams } from 'common'
 import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { timeout } from 'lib/helpers'
 import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'common/telemetry-constants'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface FeedbackWidgetProps {
   feedback: string
@@ -42,6 +45,9 @@ const FeedbackWidget = ({
 
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
+
+  const { mutate: sendEvent } = useSendEventMutation()
+  const org = useSelectedOrganization()
 
   const { mutate: submitFeedback } = useSendFeedbackMutation({
     onSuccess: () => {
@@ -261,7 +267,21 @@ const FeedbackWidget = ({
               accept="image/png"
               onChange={onFilesUpload}
             />
-            <Button disabled={isSending} loading={isSending} onClick={sendFeedback}>
+            <Button
+              disabled={isSending}
+              loading={isSending}
+              onClick={() => {
+                sendFeedback()
+                // TODO: pam     "message": "Project reference in URL is not valid. Check the URL of the resource." when in /account/tokens or org level
+                sendEvent({
+                  action: TelemetryActions.SEND_FEEDBACK_BUTTON_CLICKED,
+                  groups: {
+                    project: ref ?? 'Unknown',
+                    organization: org?.slug ?? 'Unknown',
+                  },
+                })
+              }}
+            >
               Send feedback
             </Button>
           </div>

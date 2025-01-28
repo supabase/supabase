@@ -19,6 +19,10 @@ import {
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
 import SpreadsheetImportPreview from './SpreadsheetImportPreview'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'common/telemetry-constants'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useParams } from 'common'
 
 const MAX_CSV_SIZE = 1024 * 1024 * 100 // 100 MB
 
@@ -61,6 +65,9 @@ const SpreadsheetImport = ({
   })
   const [errors, setErrors] = useState<any>([])
   const [selectedHeaders, setSelectedHeaders] = useState<string[]>([])
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
 
   const selectedTableColumns = (selectedTable?.columns ?? []).map((column) => column.name)
   const incompatibleHeaders = selectedHeaders.filter(
@@ -168,6 +175,10 @@ const SpreadsheetImport = ({
       resolve()
     } else {
       saveContent({ file: uploadedFile, ...spreadsheetData, selectedHeaders, resolve })
+      sendEvent({
+        action: TelemetryActions.IMPORT_DATA_ADDED,
+        groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
     }
   }
 

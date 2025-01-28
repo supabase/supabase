@@ -18,6 +18,9 @@ import { useDispatch, useTrackedState } from '../../store/Store'
 import type { Filter, GridProps, SupaRow } from '../../types'
 import { useKeyboardShortcuts } from '../common/Hooks'
 import RowRenderer from './RowRenderer'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'common/telemetry-constants'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
@@ -133,6 +136,8 @@ export const Grid = memo(
 
       const table = state.table
 
+      const { mutate: sendEvent } = useSendEventMutation()
+      const org = useSelectedOrganization()
       const { project } = useProjectContext()
       const { data } = useForeignKeyConstraintsQuery({
         projectRef: project?.ref,
@@ -214,7 +219,20 @@ export const Grid = memo(
                               </p>
                               <div className="flex items-center space-x-2 mt-4">
                                 {onAddRow !== undefined && onImportData !== undefined && (
-                                  <Button type="default" onClick={onImportData}>
+                                  <Button
+                                    type="default"
+                                    onClick={() => {
+                                      onImportData()
+                                      sendEvent({
+                                        action: TelemetryActions.IMPORT_DATA_BUTTON_CLICKED,
+                                        properties: { tableType: 'Existing Table' },
+                                        groups: {
+                                          project: project?.ref ?? 'Unknown',
+                                          organization: org?.slug ?? 'Unknown',
+                                        },
+                                      })
+                                    }}
+                                  >
                                     Import data via CSV
                                   </Button>
                                 )}

@@ -13,10 +13,15 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 import { useProjectContext } from '../ProjectContext'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'common/telemetry-constants'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const HelpPopover = () => {
   const router = useRouter()
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
+  const { mutate: sendEvent } = useSendEventMutation()
   const projectRef = project?.parent_project_ref ?? router.query.ref
   const supportUrl = `/support/new${projectRef ? `?ref=${projectRef}` : ''}`
 
@@ -29,6 +34,16 @@ const HelpPopover = () => {
           className="px-1"
           icon={<HelpCircle size={16} strokeWidth={1.5} className="text-foreground-light" />}
           tooltip={{ content: { side: 'bottom', text: 'Help' } }}
+          onClick={() => {
+            // TODO: pam     "message": "Project reference in URL is not valid. Check the URL of the resource." when in /account/tokens or org level
+            sendEvent({
+              action: TelemetryActions.HELP_BUTTON_CLICKED,
+              groups: {
+                project: project?.ref ?? 'Unknown',
+                organization: org?.slug ?? 'Unknown',
+              },
+            })
+          }}
         />
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0 py-5" align="end" side="bottom">

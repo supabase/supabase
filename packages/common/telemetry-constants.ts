@@ -63,6 +63,12 @@ export enum TelemetryActions {
   SEE_DOCUMENTATION_BUTTON_CLICKED = 'see_documentation_button_clicked',
   REQUEST_DEMO_BUTTON_CLICKED = 'request_demo_button_clicked',
   SIGN_IN_BUTTON_CLICKED = 'sign_in_button_clicked',
+
+  HELP_BUTTON_CLICKED = 'help_button_clicked',
+  SEND_FEEDBACK_BUTTON_CLICKED = 'send_feedback_button_clicked',
+  EXAMPLE_PROJECT_CARD_CLICKED = 'example_project_card_clicked',
+  IMPORT_DATA_BUTTON_CLICKED = 'import_data_button_clicked',
+  IMPORT_DATA_ADDED = 'import_data_added',
 }
 
 /**
@@ -943,6 +949,93 @@ export interface SignInButtonClickedEvent {
   }
 }
 
+/**
+ * User clicked the "Help" button in the top right corner of the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HelpButtonClickedEvent {
+  action: TelemetryActions.HELP_BUTTON_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User clicked the "Send Feedback" button in the top right corner of the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface SendFeedbackButtonClickedEvent {
+  action: TelemetryActions.SEND_FEEDBACK_BUTTON_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User clicked on an example project card.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface ExampleProjectCardClickedEvent {
+  action: TelemetryActions.EXAMPLE_PROJECT_CARD_CLICKED
+  properties: {
+    /**
+     * The title of the example project card clicked.
+     */
+    cardTitle: string
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User clicked the "Import Data" button.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface ImportDataButtonClickedEvent {
+  action: TelemetryActions.IMPORT_DATA_BUTTON_CLICKED
+  properties: {
+    /**
+     * The type of table the data is imported to.
+     * New Table means added when creating new table by clicking from New table sidebar,
+     * Existing Table means added to an existing table by going to the table and clicking from the green Insert button..
+     */
+    tableType: 'New Table' | 'Existing Table'
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User added data from the import data via CSV/spreadsheet successfully.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface ImportDataAddedEvent {
+  action: TelemetryActions.IMPORT_DATA_ADDED
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
@@ -997,3 +1090,8 @@ export type TelemetryEvent =
   | SeeDocumentationButtonClickedEvent
   | RequestDemoButtonClickedEvent
   | SignInButtonClickedEvent
+  | HelpButtonClickedEvent
+  | ExampleProjectCardClickedEvent
+  | ImportDataButtonClickedEvent
+  | ImportDataAddedEvent
+  | SendFeedbackButtonClickedEvent
