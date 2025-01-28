@@ -1,7 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { SkeletonMenuList } from 'components/editor-menu-list-skeleton'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InfiniteList from 'components/ui/InfiniteList'
@@ -39,7 +40,6 @@ import {
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
-import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 const TableEditorMenu = () => {
   const { id: _id } = useParams()
@@ -243,7 +243,7 @@ const TableEditorMenu = () => {
             </Popover_Shadcn_>
           </InnerSideBarFilters>
 
-          {isLoading && <SkeletonMenuList />}
+          {isLoading && <EditorMenuListSkeleton />}
 
           {isError && (
             <div className="mx-4">

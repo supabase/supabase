@@ -4,12 +4,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { SkeletonMenuList } from 'components/editor-menu-list-skeleton'
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import { useContentCountQuery } from 'data/content/content-count-query'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { getContentById } from 'data/content/content-id-query'
@@ -707,7 +707,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoading ? (
-            <SkeletonMenuList />
+            <EditorMenuListSkeleton />
           ) : folders.length === 0 && numPrivateSnippets === 0 ? (
             <EmptyPrivateQueriesPanel />
           ) : (

@@ -1,6 +1,7 @@
+import { memo } from 'react'
 import { Skeleton } from 'ui'
 
-export const SkeletonMenuList = () => {
+const EditorMenuListSkeleton = memo(function EditorMenuListSkeleton() {
   const items = [
     { width: 'w-40', opacity: 'opacity-100' },
     { width: 'w-32', opacity: 'opacity-100' },
@@ -19,4 +20,6 @@ export const SkeletonMenuList = () => {
       ))}
     </div>
   )
-}
+})
+
+export default EditorMenuListSkeleton
