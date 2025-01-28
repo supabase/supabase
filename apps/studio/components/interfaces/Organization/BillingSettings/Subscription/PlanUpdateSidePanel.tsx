@@ -36,11 +36,14 @@ import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import UpgradeSurveyModal from './UpgradeModal'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'common/telemetry-constants'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const queryClient = useQueryClient()
   const originalPlanRef = useRef<string>()
@@ -211,6 +214,8 @@ const PlanUpdateSidePanel = () => {
                     plan={plan}
                     isCurrentPlan={isCurrentPlan}
                     billingPartner={billingPartner}
+                    currentPlan={subscription?.plan?.name}
+                    orgSlug={slug}
                   />
                 )
               }
@@ -260,7 +265,17 @@ const PlanUpdateSidePanel = () => {
                           hasOrioleProjects ||
                           !canUpdateSubscription
                         }
-                        onClick={() => setSelectedTier(plan.id as any)}
+                        onClick={() => {
+                          setSelectedTier(plan.id as any)
+                          sendEvent({
+                            action: TelemetryActions.STUDIO_PRICING_PLAN_CTA_CLICKED,
+                            properties: {
+                              selectedPlan: plan.name,
+                              currentPlan: subscription?.plan?.name,
+                            },
+                            groups: { organization: slug ?? 'Unknown' },
+                          })
+                        }}
                         tooltip={{
                           content: {
                             side: 'bottom',

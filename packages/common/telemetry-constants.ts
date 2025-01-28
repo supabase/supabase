@@ -69,6 +69,7 @@ export enum TelemetryActions {
   IMPORT_DATA_BUTTON_CLICKED = 'import_data_button_clicked',
   IMPORT_DATA_ADDED = 'import_data_added',
   SQL_EDITOR_QUERY_RUN_BUTTON_CLICKED = 'sql_editor_query_run_button_clicked',
+  STUDIO_PRICING_PLAN_CTA_CLICKED = 'studio_pricing_plan_cta_clicked',
 }
 
 /**
@@ -1033,6 +1034,28 @@ export interface SqlEditorQueryRunButtonClickedEvent {
   }
 }
 
+/**
+ * User clicked on the CTA button on a plan in the pricing side panel in studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingPlanCtaClickedEvent {
+  action: TelemetryActions.STUDIO_PRICING_PLAN_CTA_CLICKED
+  properties: {
+    /**
+     * The plan type that was clicked.
+     */
+    selectedPlan: string
+    /**
+     * The plan type the org is currently on.
+     */
+    currentPlan?: string
+  }
+  groups: { organization: string }
+}
+
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
@@ -1092,3 +1115,4 @@ export type TelemetryEvent =
   | ImportDataAddedEvent
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
+  | StudioPricingPlanCtaClickedEvent

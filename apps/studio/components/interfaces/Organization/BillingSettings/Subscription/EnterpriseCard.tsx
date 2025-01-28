@@ -3,15 +3,26 @@ import { Check } from 'lucide-react'
 import { PricingInformation } from 'shared-data'
 import { pickFeatures } from 'shared-data/plans'
 import { Button, cn } from 'ui'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'common/telemetry-constants'
 
 export interface EnterpriseCardProps {
   plan: PricingInformation
   isCurrentPlan: boolean
   billingPartner: 'fly' | 'aws' | 'vercel_marketplace' | undefined
+  currentPlan?: string
+  orgSlug?: string
 }
 
-const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardProps) => {
+const EnterpriseCard = ({
+  plan,
+  isCurrentPlan,
+  billingPartner,
+  currentPlan,
+  orgSlug,
+}: EnterpriseCardProps) => {
   const features = pickFeatures(plan, billingPartner)
+  const { mutate: sendEvent } = useSendEventMutation()
 
   return (
     <div
@@ -38,7 +49,18 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardP
         <p className="text-sm mt-2 mb-4">{plan.description}</p>
 
         <a href={plan.href} className="hidden md:block" target="_blank">
-          <Button block type="default" size="tiny">
+          <Button
+            block
+            type="default"
+            size="tiny"
+            onClick={() =>
+              sendEvent({
+                action: TelemetryActions.STUDIO_PRICING_PLAN_CTA_CLICKED,
+                properties: { selectedPlan: 'Enterprise', currentPlan },
+                groups: { organization: orgSlug ?? 'Unknown' },
+              })
+            }
+          >
             {plan.cta}
           </Button>
         </a>
@@ -63,7 +85,18 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardP
         </ul>
 
         <a href={plan.href} className="visible md:hidden mt-8" target="_blank">
-          <Button block type="default" size="tiny">
+          <Button
+            block
+            type="default"
+            size="tiny"
+            onClick={() =>
+              sendEvent({
+                action: TelemetryActions.STUDIO_PRICING_PLAN_CTA_CLICKED,
+                properties: { selectedPlan: 'Enterprise', currentPlan },
+                groups: { organization: orgSlug ?? 'Unknown' },
+              })
+            }
+          >
             {plan.cta}
           </Button>
         </a>
