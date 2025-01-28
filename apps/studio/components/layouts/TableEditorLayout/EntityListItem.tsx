@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { IS_PLATFORM } from 'common'
 import {
   MAX_EXPORT_ROW_COUNT,
@@ -39,6 +38,9 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   TreeViewItemVariant,
 } from 'ui'
 import { useSnapshot } from 'valtio'
@@ -219,62 +221,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     }
   }
 
-  const EntityTooltipTrigger = ({ entity }: { entity: Entity }) => {
-    let tooltipContent = null
-
-    switch (entity.type) {
-      case ENTITY_TYPE.TABLE:
-        if (tableHasLints) {
-          tooltipContent = 'RLS disabled'
-        }
-        break
-      case ENTITY_TYPE.VIEW:
-        if (viewHasLints) {
-          tooltipContent = 'Security definer view'
-        }
-        break
-      case ENTITY_TYPE.MATERIALIZED_VIEW:
-        if (materializedViewHasLints) {
-          tooltipContent = 'Security definer view'
-        }
-        break
-      case ENTITY_TYPE.FOREIGN_TABLE:
-        tooltipContent = 'RLS is not enforced on foreign tables'
-        break
-      default:
-        break
-    }
-
-    if (tooltipContent) {
-      return (
-        <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-          <Tooltip.Trigger className="min-w-4" asChild>
-            <Unlock
-              size={14}
-              strokeWidth={2}
-              className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
-            />
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="bottom"
-              className={[
-                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                'border border-background',
-                'text-xs text-foreground',
-              ].join(' ')}
-            >
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              {tooltipContent}
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-      )
-    }
-
-    return null
-  }
-
   return (
     <EditorTablePageLink
       title={entity.name}
@@ -302,24 +248,12 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       <>
         {/* <> // there was a px-2 in here because scroll bar was messing up */}
         {!isPreview && isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
-        <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-          <Tooltip.Trigger className="min-w-4">
+        <Tooltip disableHoverableContent={true}>
+          <TooltipTrigger className="min-w-4" asChild>
             <EntityTypeIcon type={entity.type} />
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="bottom"
-              className={[
-                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                'border border-background',
-                'text-xs text-foreground capitalize',
-              ].join(' ')}
-            >
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              {formatTooltipText(entity.type)}
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">{formatTooltipText(entity.type)}</TooltipContent>
+        </Tooltip>
         <div
           className={cn(
             'truncate',
@@ -337,7 +271,13 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           >
             {entity.name}
           </span>
-          <EntityTooltipTrigger entity={entity} />
+          <EntityTooltipTrigger
+            entity={entity}
+            isActive={isActive}
+            tableHasLints={tableHasLints}
+            viewHasLints={viewHasLints}
+            materializedViewHasLints={materializedViewHasLints}
+          />
         </div>
 
         {canEdit && (
@@ -443,6 +383,64 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       </>
     </EditorTablePageLink>
   )
+}
+
+const EntityTooltipTrigger = ({
+  entity,
+  isActive,
+  tableHasLints,
+  viewHasLints,
+  materializedViewHasLints,
+}: {
+  entity: Entity
+  isActive: boolean
+  tableHasLints: boolean
+  viewHasLints: boolean
+  materializedViewHasLints: boolean
+}) => {
+  let tooltipContent = ''
+
+  switch (entity.type) {
+    case ENTITY_TYPE.TABLE:
+      if (tableHasLints) {
+        tooltipContent = 'RLS disabled'
+      }
+      break
+    case ENTITY_TYPE.VIEW:
+      if (viewHasLints) {
+        tooltipContent = 'Security definer view'
+      }
+      break
+    case ENTITY_TYPE.MATERIALIZED_VIEW:
+      if (materializedViewHasLints) {
+        tooltipContent = 'Security definer view'
+      }
+      break
+    case ENTITY_TYPE.FOREIGN_TABLE:
+      tooltipContent = 'RLS is not enforced on foreign tables'
+      break
+    default:
+      break
+  }
+
+  if (tooltipContent) {
+    return (
+      <Tooltip disableHoverableContent={true}>
+        <TooltipTrigger className="min-w-4">
+          <Unlock
+            size={14}
+            strokeWidth={2}
+            className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
+          />
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          <span>{tooltipContent}</span>
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  return null
 }
 
 export default EntityListItem

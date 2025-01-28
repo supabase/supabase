@@ -24,7 +24,14 @@ If you understand Git, you already understand Supabase Branching.
 - **Supabase Project**: You need an existing Supabase project.
 - **GitHub Repository**: Your project must be connected to a GitHub repository containing your Supabase directory.
 
-You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Preview Environments pause automatically after <SharedData data="config">branching.inactivity_period_in_minutes</SharedData> minutes of inactivity. Note that `pg_cron` executions will be impacted by inactivity related pausing.
+You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials.
+
+Preview Environments auto-pause after <SharedData data="config">branching.inactivity_period_in_minutes</SharedData> minutes of inactivity. Upon receiving a new request to your database or REST API, the paused branch will automatically resume to serve the request. The implications of this architecture means
+
+- `pg_cron` jobs will not execute in an auto-paused database.
+- Larger variance in request latency due to database cold starts.
+
+If you need higher performance guarantees on your Preview Environment, you can switch individual branches to [persistent](/docs/guides/deployment/branching#persistent-branches) so they are not auto-paused.
 
 <Image
   zoomable
@@ -576,8 +583,10 @@ For branching to work with Vercel, you also need the [Vercel GitHub integration]
 
 </Admonition>
 
-Supabase automatically updates your Vercel project with the correct environment variables for the corresponding preview branches.
-The synchronization happens at the time of Pull Request being opened, not at the time of branch creation.
+And make sure you have [connected](/dashboard/org/_/integrations) your Supabase project to your Vercel project.
+
+Supabase automatically updates your Vercel project with the correct environment variables for the corresponding preview branches. The synchronization happens at the time of Pull Request being opened, not at the time of branch creation.
+
 As branching integration is tied to the Preview Deployments feature in Vercel, there are possible race conditions between Supabase setting correct variables, and Vercel running a deployment process. Because of that, Supabase is always automatically re-deploying the most recent deployment of the given pull request.
 
 ## Other Git providers
@@ -613,7 +622,7 @@ The new preview branch is reseeded from the `./supabase/seed.sql` file by defaul
 
 ### Deployment failures
 
-A deployment might fail for various reasons, including invalid SQL statements and schema conflicts in migrations. Errors within the `config.toml` config or something else.
+A deployment might fail for various reasons, including invalid SQL statements and schema conflicts in migrations, errors within the `config.toml` config, or something else.
 
 To check the error message, see the Supabase workflow run for your branch under the [View logs](/dashboard/project/_/branches) section.
 

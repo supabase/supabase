@@ -4,6 +4,8 @@ export * from './infrastructure'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 export const DEFAULT_HOME = IS_PLATFORM ? '/projects' : '/project/default'
+
+// TODO: Replace PG_META_URL with STUDIO_PG_META_URL and remove all references to PLATFORM_PG_META_URL
 export const API_URL = IS_PLATFORM ? process.env.NEXT_PUBLIC_API_URL! : '/api'
 export const PG_META_URL = IS_PLATFORM
   ? process.env.PLATFORM_PG_META_URL
@@ -51,6 +53,8 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_AI_SCHEMA: (ref: string) => `supabase_sql-editor-ai-schema-enabled-${ref}`,
   SQL_EDITOR_AI_OPEN: 'supabase_sql-editor-ai-open',
   SQL_EDITOR_LAST_SELECTED_DB: (ref: string) => `sql-editor-last-selected-db-${ref}`,
+  SQL_EDITOR_SQL_BLOCK_ACKNOWLEDGED: (ref: string) => `sql-editor-sql-block-acknowledged-${ref}`,
+
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',
   CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',

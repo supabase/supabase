@@ -38,6 +38,7 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -81,6 +82,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -134,6 +136,8 @@ const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
@@ -146,6 +150,14 @@ const Wizard: NextPageWithLayout = () => {
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
+
+  // TODO: Remove this after project creation experiment
+  const projectCreationExperimentGroup = useFlag<string>('projectCreationExperimentGroup')
+  useEffect(() => {
+    if (currentOrg && projectCreationExperimentGroup === 'group-b') {
+      router.replace(`/new/v2/${currentOrg.slug}`)
+    }
+  }, [currentOrg, projectCreationExperimentGroup, router])
 
   const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
 
@@ -186,6 +198,9 @@ const Wizard: NextPageWithLayout = () => {
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
+      sendEvent({
+        action: TelemetryActions.PROJECT_CREATION_SIMPLE_VERSION_SUBMITTED,
+      })
       router.push(`/project/${res.ref}/building`)
     },
   })
@@ -369,6 +384,15 @@ const Wizard: NextPageWithLayout = () => {
 
   const additionalMonthlySpend =
     instanceSizeSpecs[instanceSize as DbInstanceSize]!.priceMonthly - availableComputeCredits
+
+  // TODO: Remove this after project creation experiment as it delays rendering
+  if (
+    !currentOrg ||
+    !projectCreationExperimentGroup ||
+    projectCreationExperimentGroup === 'group-b'
+  ) {
+    return null
+  }
 
   return (
     <Form_Shadcn_ {...form}>

@@ -1,11 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ActionCard } from 'components/layouts/tabs/actions-card'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { partition } from 'lodash'
@@ -19,6 +20,7 @@ import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 const SQLTemplates = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { profile } = useProfile()
   const { project } = useProjectContext()
   const [sql] = partition(SQL_TEMPLATES, { type: 'template' })
@@ -93,6 +95,7 @@ const SQLTemplates = () => {
                 sendEvent({
                   action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED,
                   properties: { templateName: x.title },
+                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
                 })
               }}
             />

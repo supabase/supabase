@@ -224,6 +224,13 @@ export const appState = proxy({
   setOnGoingQueriesPanelOpen: (value: boolean) => {
     appState.ongoingQueriesPanelOpen = value
   },
+
+  saveLatestMessage: (message: any) => {
+    appState.aiAssistantPanel = {
+      ...appState.aiAssistantPanel,
+      messages: [...appState.aiAssistantPanel.messages, message],
+    }
+  },
 })
 
 // Set up localStorage subscription

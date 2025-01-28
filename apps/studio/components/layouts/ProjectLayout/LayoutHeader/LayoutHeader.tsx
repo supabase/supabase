@@ -19,8 +19,6 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
-import { useRouter } from 'next/router'
-import Image from 'next/image'
 
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger">
@@ -57,7 +55,6 @@ const LayoutHeader = ({
   handleMobileMenu,
 }: LayoutHeaderProps) => {
   const { ref: projectRef } = useParams()
-  const router = useRouter()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
@@ -80,140 +77,83 @@ const LayoutHeader = ({
     }
   }, [orgUsage])
 
-  const isProjects = router.asPath.includes('/project/')
-
   return (
-    <header
+    <div
       className={cn(
-        'flex h-12 max-h-12 min-h-12 items-center bg-dash-sidebar flex-shrink-0',
+        'flex h-12 max-h-12 min-h-12 items-center bg-dash-sidebar',
         headerBorder ? 'border-b border-default' : ''
       )}
     >
-      <div
-        className={cn(
-          'flex items-center justify-between py-2 px-3 flex-1',
-          !isProjects ? 'pl-3' : 'pl-5'
-        )}
-      >
-        <div className="flex items-center text-sm">
-          {isProjects && (
-            <Link
-              href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
-              className="flex items-center justify-center"
-            >
-              <Image
-                alt="Supabase"
-                src={`${router.basePath}/img/supabase-logo.svg`}
-                width={18}
-                height={18}
-                className="w-[18px] h-[18px]"
-              />
-            </Link>
-          )}
-          {projectRef && (
-            <>
-              <div className="flex items-center pl-2">
-                <OrganizationDropdown />
-                <LayoutHeaderDivider />
-                <ProjectDropdown />
-
-                {exceedingLimits && (
-                  <div className="ml-2">
-                    <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                      <Badge variant="destructive">Exceeding usage limits</Badge>
-                    </Link>
-                  </div>
-                )}
-
-                {selectedProject && isBranchingEnabled && (
-                  <>
-                    <LayoutHeaderDivider />
-                    <BranchDropdown />
-                  </>
-                )}
-              </div>
-
-              <div className="ml-3 flex items-center gap-x-3">
-                <Connect />
-                {!isBranchingEnabled && <EnableBranchingButton />}
-              </div>
-            </>
-          )}
-
-          {/* Additional breadcrumbs are supplied */}
-          <BreadcrumbsView defaultValue={breadcrumbs} />
+      {showProductMenu && (
+        <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
+          <button
+            title="Menu dropdown button"
+            className={cn(
+              'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
+            )}
+            onClick={() => handleMobileMenu()}
+          >
+            <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+            <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+          </button>
         </div>
-        {showProductMenu && (
-          <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
-            <button
-              title="Menu dropdown button"
-              className={cn(
-                'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
-              )}
-              onClick={() => handleMobileMenu()}
-            >
-              <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
-              <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
-            </button>
+      )}
+      <div className="relative flex flex-1 overflow-hidden">
+        <div className="flex w-full items-center justify-between py-2 pl-1 pr-3 md:px-3 flex-nowrap overflow-x-auto no-scrollbar">
+          <div className="flex items-center text-sm">
+            {projectRef && (
+              <>
+                <div className="flex items-center">
+                  <OrganizationDropdown />
+                  <LayoutHeaderDivider />
+                  <ProjectDropdown />
+
+                  {exceedingLimits && (
+                    <div className="ml-2">
+                      <Link href={`/org/${selectedOrganization?.slug}/usage`}>
+                        <Badge variant="destructive">Exceeding usage limits</Badge>
+                      </Link>
+                    </div>
+                  )}
+
+                  {selectedProject && isBranchingEnabled && (
+                    <>
+                      <LayoutHeaderDivider />
+                      <BranchDropdown />
+                    </>
+                  )}
+                </div>
+
+                <div className="ml-3 flex items-center gap-x-3">
+                  <Connect />
+                  {!isBranchingEnabled && <EnableBranchingButton />}
+                </div>
+              </>
+            )}
+
+            {/* Additional breadcrumbs are supplied */}
+            <BreadcrumbsView defaultValue={breadcrumbs} />
           </div>
-        )}
-        <div className="relative flex flex-1 overflow-hidden">
-          <div className="flex w-full items-center justify-between py-2 pl-1 pr-3 md:px-3 flex-nowrap overflow-x-auto">
-            <div className="flex items-center text-sm">
-              {projectRef && (
-                <>
-                  <div className="flex items-center">
-                    <OrganizationDropdown />
-                    <LayoutHeaderDivider />
-                    <ProjectDropdown />
-
-                    {exceedingLimits && (
-                      <div className="ml-2">
-                        <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                          <Badge variant="destructive">Exceeding usage limits</Badge>
-                        </Link>
-                      </div>
-                    )}
-
-                    {selectedProject && isBranchingEnabled && (
-                      <>
-                        <LayoutHeaderDivider />
-                        <BranchDropdown />
-                      </>
-                    )}
-                  </div>
-
-                  <div className="ml-3 flex items-center gap-x-3">
-                    <Connect />
-                    {!isBranchingEnabled && <EnableBranchingButton />}
-                  </div>
-                </>
-              )}
-
-              {/* Additional breadcrumbs are supplied */}
-              <BreadcrumbsView defaultValue={breadcrumbs} />
-            </div>
-            <div className="flex items-center gap-x-2">
-              {customHeaderComponents && customHeaderComponents}
-              {IS_PLATFORM && (
-                <>
-                  <FeedbackDropdown />
-                  <NotificationsPopoverV2 />
-                  <HelpPopover />
-                </>
-              )}
-            </div>
+          <div className="flex items-center gap-x-2">
+            {customHeaderComponents && customHeaderComponents}
+            {IS_PLATFORM && (
+              <>
+                <FeedbackDropdown />
+                <NotificationsPopoverV2 />
+                <HelpPopover />
+              </>
+            )}
           </div>
-          <div className="absolute md:hidden left-0 h-full w-3 bg-gradient-to-r from-background-dash-sidebar to-transparent pointer-events-none" />
-          <div className="absolute md:hidden right-0 h-full w-3 bg-gradient-to-l from-background-dash-sidebar to-transparent pointer-events-none" />
         </div>
-        {!!projectRef && (
-          <div className="border-l flex-0 h-full">
-            <AssistantButton />
-          </div>
-        )}
+        <div className="absolute md:hidden left-0 h-full w-3 bg-gradient-to-r from-background-dash-sidebar to-transparent pointer-events-none" />
+        <div className="absolute md:hidden right-0 h-full w-3 bg-gradient-to-l from-background-dash-sidebar to-transparent pointer-events-none" />
       </div>
-    </header>
+      {!!projectRef && (
+        <div className="border-l flex-0 h-full">
+          <AssistantButton />
+        </div>
+      )}
+    </div>
   )
 }
 

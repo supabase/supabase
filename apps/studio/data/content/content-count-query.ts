@@ -1,34 +1,31 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { operations } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { contentKeys } from './keys'
-import { SqlSnippet } from './sql-snippets-query'
 
-type GetContentFilters = {
-  type: 'sql' | 'report' | 'log_sql'
-  visibility?: SqlSnippet['visibility']
-  favorite?: boolean
-  name?: string
-}
-
-interface getContentCountVariables extends GetContentFilters {
-  projectRef?: string
-}
+type GetContentCountVariables =
+  operations['ContentController_getContentCountV2']['parameters']['query'] & {
+    projectRef?: string
+    cumulative?: boolean
+  }
 
 export async function getContentCount(
-  { projectRef, type, visibility, favorite, name }: getContentCountVariables,
+  { projectRef, cumulative, type, name }: GetContentCountVariables,
   signal?: AbortSignal
 ) {
   if (typeof projectRef === 'undefined') throw new Error('projectRef is required')
 
-  const query: GetContentFilters = { type }
-  if (visibility) query.visibility = visibility
-  if (favorite) query.favorite = favorite
-  if (name) query.name = name
-
   const { data, error } = await get('/platform/projects/{ref}/content/count', {
-    params: { path: { ref: projectRef }, query },
+    params: {
+      path: { ref: projectRef },
+      query: {
+        ...(type && { type }),
+        ...(name && { name }),
+      },
+    },
+    ...(cumulative ? {} : { headers: { Version: '2' } }),
     signal,
   })
 
@@ -40,20 +37,17 @@ export type ContentIdData = Awaited<ReturnType<typeof getContentCount>>
 export type ContentIdError = ResponseError
 
 export const useContentCountQuery = <TData = ContentIdData>(
-  { projectRef, type, visibility, favorite, name }: getContentCountVariables,
+  { projectRef, cumulative, type, name }: GetContentCountVariables,
   { enabled = true, ...options }: UseQueryOptions<ContentIdData, ContentIdError, TData> = {}
 ) =>
   useQuery<ContentIdData, ContentIdError, TData>(
     contentKeys.count(projectRef, type, {
-      visibility,
-      favorite,
+      cumulative,
       name,
     }),
-    ({ signal }) => getContentCount({ projectRef, type, visibility, favorite, name }, signal),
+    ({ signal }) => getContentCount({ projectRef, cumulative, type, name }, signal),
     {
-      // count query is causing an api issue  — disabling temporarily
-      //enabled: enabled && typeof projectRef !== 'undefined',
-      enabled: false,
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
