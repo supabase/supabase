@@ -2100,6 +2100,16 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/cost-control',
         },
         {
+          name: 'Manage your usage',
+          url: '/guides/platform/manage-your-usage',
+          items: [
+            {
+              name: 'Compute',
+              url: '/guides/platform/manage-your-usage/compute',
+            },
+          ],
+        },
+        {
           name: 'Billing FAQ',
           url: '/guides/platform/billing-faq',
         },
