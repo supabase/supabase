@@ -1,11 +1,15 @@
 import { Fragment } from 'react'
 
 interface RuleSetButtonTextProps {
+  // used to determine the text of the button
   rules: string[]
+  // used to determine the text of the button
   type: 'sort' | 'filter'
+  // used to render the rule in the button text
   renderRule: (rule: string) => { column: string; operator?: string; value: string }
 }
 
+// used for both sort and filter button content
 const RuleSetButtonText = ({ rules, type, renderRule }: RuleSetButtonTextProps) => {
   if (!rules?.length) return type === 'sort' ? 'Sort' : 'Filter'
 
