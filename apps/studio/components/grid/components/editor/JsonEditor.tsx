@@ -12,6 +12,7 @@ import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
 import {
+  cn,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -164,77 +165,83 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   }
 
   return (
-    <Popover_Shadcn_ open={isPopoverOpen}>
-      <PopoverTrigger_Shadcn_>
+    <Popover_Shadcn_ open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+      <PopoverTrigger_Shadcn_ asChild>
         <div
-          className={`${
-            !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
-          } sb-grid-json-editor__trigger`}
-          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+          className={cn(
+            !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : '',
+            'sb-grid-json-editor__trigger w-full'
+          )}
         >
           {value === null || value === '' ? <NullValue /> : jsonString}
         </div>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ side="bottom" align="start" sideOffset={-35} className="rounded-none">
-        isTruncated && !isSuccess ? (
-        <div
-          style={{ width: `${gridColumn?.width || column.width}px` }}
-          className="flex items-center justify-center flex-col relative"
-        >
-          <MonacoEditor
-            readOnly
-            onChange={() => {}}
-            width={`${gridColumn?.width || column.width}px`}
-            value={value ?? ''}
-            language="markdown"
-          />
-          <TruncatedWarningOverlay isLoading={isLoading} loadFullValue={loadFullValue} />
-        </div>
-        ) : (
-        <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
-          <MonacoEditor
-            width={`${gridColumn?.width || column.width}px`}
-            value={value ?? ''}
-            language="json"
-            readOnly={!isEditable}
-            onChange={onChange}
-          />
-          <div className="flex items-start justify-between p-2 bg-surface-200 gap-x-2">
-            {isEditable && (
-              <div className="space-y-1">
-                <div className="flex items-center space-x-2">
-                  <div className="px-1.5 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
-                    <span className="text-[10px]">⏎</span>
-                  </div>
-                  <p className="text-xs text-foreground-light">Save changes</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="px-1 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
-                    <span className="text-[10px]">Esc</span>
-                  </div>
-                  <p className="text-xs text-foreground-light">Cancel changes</p>
-                </div>
-              </div>
-            )}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div
-                  className={[
-                    'border border-strong rounded p-1 flex items-center justify-center',
-                    'transition cursor-pointer bg-selection hover:bg-border-strong',
-                  ].join(' ')}
-                  onClick={() => onSelectExpand()}
-                >
-                  <Maximize size={12} strokeWidth={2} />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" align="center">
-                <span>Expand editor</span>
-              </TooltipContent>
-            </Tooltip>
+      <PopoverContent_Shadcn_
+        side="bottom"
+        align="start"
+        sideOffset={-35}
+        className="rounded-none p-0"
+        sameWidthAsTrigger
+      >
+        {isTruncated && !isSuccess ? (
+          <div
+            style={{ width: `${gridColumn?.width || column.width}px` }}
+            className="flex items-center justify-center flex-col relative"
+          >
+            <MonacoEditor
+              readOnly
+              onChange={() => {}}
+              width={`${gridColumn?.width || column.width}px`}
+              value={value ?? ''}
+              language="markdown"
+            />
+            <TruncatedWarningOverlay isLoading={isLoading} loadFullValue={loadFullValue} />
           </div>
-        </BlockKeys>
-        )
+        ) : (
+          <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
+            <MonacoEditor
+              width={`${gridColumn?.width || column.width}px`}
+              value={value ?? ''}
+              language="json"
+              readOnly={!isEditable}
+              onChange={onChange}
+            />
+            <div className="flex items-start justify-between p-2 bg-surface-200 gap-x-2">
+              {isEditable && (
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <div className="px-1.5 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center h-[22px]">
+                      <span className="text-[10px]">⏎</span>
+                    </div>
+                    <p className="text-xs text-foreground-light">Save changes</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="px-1 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center h-[22px]">
+                      <span className="text-[10px]">Esc</span>
+                    </div>
+                    <p className="text-xs text-foreground-light">Cancel changes</p>
+                  </div>
+                </div>
+              )}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className={[
+                      'border border-strong rounded p-1 flex items-center justify-center',
+                      'transition cursor-pointer bg-selection hover:bg-border-strong',
+                    ].join(' ')}
+                    onClick={() => onSelectExpand()}
+                  >
+                    <Maximize size={12} strokeWidth={2} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="center">
+                  <span>Expand editor</span>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </BlockKeys>
+        )}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )
