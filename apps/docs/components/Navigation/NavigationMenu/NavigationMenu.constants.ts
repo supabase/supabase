@@ -2080,16 +2080,8 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'How billing works',
-          url: '/guides/platform/org-based-billing',
-        },
-        {
-          name: 'Spend caps and cost-controls',
-          url: '/guides/platform/spend-cap',
-        },
-        {
-          name: 'Billing FAQ',
-          url: '/guides/platform/billing-faq',
+          name: 'Get set up for billing',
+          url: '/guides/platform/get-set-up-for-billing',
         },
         {
           name: 'Manage your subscription',
@@ -2102,6 +2094,18 @@ export const platform: NavMenuConstant = {
         {
           name: 'Control your costs',
           url: '/guides/platform/cost-control',
+        },
+        {
+          name: 'Billing FAQ',
+          url: '/guides/platform/billing-faq',
+        },
+        {
+          name: 'How billing works',
+          url: '/guides/platform/org-based-billing',
+        },
+        {
+          name: 'Spend caps and cost-controls',
+          url: '/guides/platform/spend-cap',
         },
       ],
     },
