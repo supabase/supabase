@@ -16,7 +16,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Popover,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
   SidePanel,
   Tabs,
   Tooltip,
@@ -216,8 +218,13 @@ const LogsQueryPanel = ({
                   warnings.length > 0 ? 'opacity-100' : 'invisible h-0 w-0 opacity-0'
                 }`}
               >
-                <Popover
-                  overlay={
+                <Popover_Shadcn_>
+                  <PopoverTrigger_Shadcn_>
+                    <Badge variant="warning">
+                      {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
+                    </Badge>
+                  </PopoverTrigger_Shadcn_>
+                  <PopoverContent_Shadcn_>
                     <Alert variant="warning" title="">
                       <div className="flex flex-col gap-3">
                         {warnings.map((warning, index) => (
@@ -230,12 +237,8 @@ const LogsQueryPanel = ({
                         ))}
                       </div>
                     </Alert>
-                  }
-                >
-                  <Badge variant="warning">
-                    {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
-                  </Badge>
-                </Popover>
+                  </PopoverContent_Shadcn_>
+                </Popover_Shadcn_>
               </div>
             </div>
           </div>

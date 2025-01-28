@@ -7,8 +7,8 @@ import DatePicker from 'react-datepicker'
 import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
   Button,
-  Popover,
   PopoverContent_Shadcn_,
+  PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
@@ -277,7 +277,7 @@ function _DatePicker({
             from: startDate?.toISOString() || null,
             to: endDate?.toISOString() || null,
           })}
-          <Popover.Separator />
+          <PopoverSeparator_Shadcn_ />
           <div className="flex items-center justify-end gap-2 py-2 px-3 pb-4">
             {!hideClear && (
               <Button type="default" onClick={() => handleClear()}>

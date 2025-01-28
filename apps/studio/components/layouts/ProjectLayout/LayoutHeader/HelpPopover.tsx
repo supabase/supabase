@@ -7,8 +7,8 @@ import SVG from 'react-inlinesvg'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   Button,
-  Popover,
   PopoverContent_Shadcn_,
+  PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
@@ -69,7 +69,7 @@ const HelpPopover = () => {
             </Button>
           </div>
         </div>
-        <Popover.Separator />
+        <PopoverSeparator_Shadcn_ />
         <div className="mb-4 space-y-2">
           <div className="mb-4 px-5">
             <h5 className={'mb-2'}>Reach out to the community</h5>

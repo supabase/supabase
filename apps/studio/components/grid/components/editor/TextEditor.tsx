@@ -9,7 +9,16 @@ import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { Button, Popover, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import {
+  Button,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  cn,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useTrackedState } from '../../store/Store'
 import { BlockKeys } from '../common/BlockKeys'
@@ -108,14 +117,25 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
 
   return (
     <>
-      <Popover
-        open={isPopoverOpen}
-        side="bottom"
-        align="start"
-        sideOffset={-35}
-        className="rounded-none"
-        overlay={
-          isTruncated && !isSuccess ? (
+      <Popover_Shadcn_ open={isPopoverOpen}>
+        <PopoverTrigger_Shadcn_>
+          <div
+            className={cn(
+              !!value && value.toString().trim().length === 0 && 'sb-grid-fill-container',
+              'sb-grid-text-editor__trigger'
+            )}
+            onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+          >
+            {value === null ? <NullValue /> : value === '' ? <EmptyValue /> : value}
+          </div>
+        </PopoverTrigger_Shadcn_>
+        <PopoverContent_Shadcn_
+          side="bottom"
+          align="start"
+          sideOffset={-35}
+          className="rounded-none"
+        >
+          {isTruncated && !isSuccess ? (
             <div
               style={{ width: `${gridColumn?.width || column.width}px` }}
               className="flex items-center justify-center flex-col relative"
@@ -184,19 +204,9 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                 </div>
               )}
             </BlockKeys>
-          )
-        }
-      >
-        <div
-          className={cn(
-            !!value && value.toString().trim().length === 0 && 'sb-grid-fill-container',
-            'sb-grid-text-editor__trigger'
           )}
-          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-        >
-          {value === null ? <NullValue /> : value === '' ? <EmptyValue /> : value}
-        </div>
-      </Popover>
+        </PopoverContent_Shadcn_>
+      </Popover_Shadcn_>
       <ConfirmationModal
         visible={isConfirmNextModalOpen}
         title="Confirm setting value to NULL"
