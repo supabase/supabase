@@ -226,12 +226,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                   <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
                 )}
                 <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col">
-                  {/* {!hideHeader && IS_PLATFORM && (
-                    <LayoutHeader
-                      showProductMenu={!!(showProductMenu && productMenu)}
-                      handleMobileMenu={handleMobileMenu}
-                    />
-                  )} */}
                   <ResizablePanelGroup
                     className="h-full w-full overflow-x-hidden flex-1"
                     direction="horizontal"
