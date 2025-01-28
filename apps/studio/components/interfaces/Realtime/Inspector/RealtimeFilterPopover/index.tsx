@@ -58,7 +58,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
             icon={<PlusCircle size="16" />}
             type={isFiltered ? 'primary' : 'dashed'}
             className={cn('rounded-full px-1.5 text-xs', isFiltered ? '!py-0.5' : '!py-1')}
-            size="small"
+            size="tiny"
           >
             {isFiltered ? (
               <>
