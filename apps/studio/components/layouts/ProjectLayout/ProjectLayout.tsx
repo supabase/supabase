@@ -186,6 +186,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               <LayoutHeader
                 showProductMenu={!!(showProductMenu && productMenu)}
                 handleMobileMenu={handleMobileMenu}
+                showHomeLink={true}
               />
             )}
             {/* <div className="flex h-full flex-row grow overflow-y-auto"></div> */}
