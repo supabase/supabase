@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { Button, cn } from 'ui'
+import { TelemetryActions } from 'common/telemetry-constants'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 interface Props {
   className?: string
@@ -7,6 +9,7 @@ interface Props {
 }
 
 const CTABanner = ({ darkerBg, className }: Props) => {
+  const sendTelemetryEvent = useSendTelemetryEvent()
   return (
     <div
       className={cn(
@@ -23,10 +26,30 @@ const CTABanner = ({ darkerBg, className }: Props) => {
       </div>
       <div className="flex items-center justify-center gap-2 col-span-12 mt-4">
         <Button asChild size="medium">
-          <Link href="https://supabase.com/dashboard">Start your project</Link>
+          <Link
+            href="https://supabase.com/dashboard"
+            onClick={() =>
+              sendTelemetryEvent({
+                action: TelemetryActions.START_PROJECT_BUTTON_CLICKED,
+                properties: { buttonLocation: 'CTA Banner' },
+              })
+            }
+          >
+            Start your project
+          </Link>
         </Button>
         <Button asChild size="medium" type="default">
-          <Link href="/contact/sales">Request a demo</Link>
+          <Link
+            href="/contact/sales"
+            onClick={() =>
+              sendTelemetryEvent({
+                action: TelemetryActions.REQUEST_DEMO_BUTTON_CLICKED,
+                properties: { buttonLocation: 'CTA Banner' },
+              })
+            }
+          >
+            Request a demo
+          </Link>
         </Button>
       </div>
     </div>

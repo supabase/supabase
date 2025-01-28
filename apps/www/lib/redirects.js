@@ -2634,6 +2634,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/import-maps',
+    destination: '/docs/guides/functions/dependencies',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/phone-login/messagebird',
     destination: '/docs/guides/auth/phone-login?showSmsProvider=MessageBird',
   },

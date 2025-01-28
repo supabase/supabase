@@ -1,11 +1,12 @@
 import { toast } from 'sonner'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseCronJobDeleteMutation } from 'data/database-cron-jobs/database-cron-jobs-delete-mutation'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface DeleteCronJobProps {
   cronJob: CronJob
@@ -15,11 +16,15 @@ interface DeleteCronJobProps {
 
 export const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps) => {
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: deleteDatabaseCronJob, isLoading } = useDatabaseCronJobDeleteMutation({
     onSuccess: () => {
-      sendEvent({ action: TelemetryActions.CRON_JOB_DELETED })
+      sendEvent({
+        action: TelemetryActions.CRON_JOB_DELETED,
+        groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
       toast.success(`Successfully removed cron job ${cronJob.jobname}`)
       onClose()
     },

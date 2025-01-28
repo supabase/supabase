@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
@@ -5,7 +6,6 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
@@ -13,16 +13,15 @@ import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
-import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
-import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import ChartHandler from 'components/ui/Charts/ChartHandler'
+import { DateRangePicker } from 'components/ui/DateRangePicker'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -43,14 +42,11 @@ export default DatabaseReport
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
-  const diskManagementV2 = useFlag('diskManagementV2')
 
   const state = useDatabaseSelectorStateSnapshot()
   const [dateRange, setDateRange] = useState<any>(undefined)
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
-
-  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
 
   const report = useDatabaseReport()
   const { data } = useDatabaseSizeQuery({
@@ -104,7 +100,13 @@ const DatabaseUsage = () => {
                 value={'7d'}
                 options={TIME_PERIODS_INFRA}
                 currentBillingPeriodStart={undefined}
-                onChange={setDateRange}
+                onChange={(values) => {
+                  if (values.interval === '1d') {
+                    setDateRange({ ...values, interval: '1h' })
+                  } else {
+                    setDateRange(values)
+                  }
+                }}
               />
               {dateRange && (
                 <div className="flex items-center gap-x-2">
@@ -218,7 +220,7 @@ const DatabaseUsage = () => {
                   </div>
 
                   <div className="col-span-8 text-right">
-                    {showNewDiskManagementUI ? (
+                    {project?.cloud_provider === 'AWS' ? (
                       <Button asChild type="default">
                         <Link href={`/project/${ref}/settings/compute-and-disk`}>
                           Increase disk size

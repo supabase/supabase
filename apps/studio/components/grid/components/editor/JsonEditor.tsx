@@ -11,7 +11,7 @@ import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
-import { Popover, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Popover, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { BlockKeys } from '../common/BlockKeys'
 import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
@@ -204,8 +204,8 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                   </div>
                 </div>
               )}
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <div
                     className={[
                       'border border-strong rounded p-1 flex items-center justify-center',
@@ -215,11 +215,11 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                   >
                     <Maximize size={12} strokeWidth={2} />
                   </div>
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="bottom" align="center">
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="center">
                   <span>Expand editor</span>
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </BlockKeys>
         )

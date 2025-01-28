@@ -205,7 +205,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
         <button
           ref={ref}
           type="button"
-          className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
+          className="group flex w-full items-center justify-between rounded py-3 px-4 text-foreground"
         >
           <div className="flex items-center gap-3">
             <ChevronUp
@@ -246,8 +246,8 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
           return (
             <Collapsible.Content>
-              <div className="group border-t border-strong bg-surface-100 py-6 px-6 text-foreground">
-                <div className="mx-auto my-6 max-w-lg space-y-6">
+              <div className="group border-t border-strong bg-surface-100 py-6 px-4 md:px-6 text-foreground">
+                <div className="mx-auto my-2 md:my-6 max-w-lg space-y-6">
                   {showAlert(provider.title)}
                   {Object.keys(provider.properties).map((x: string) => (
                     <FormField

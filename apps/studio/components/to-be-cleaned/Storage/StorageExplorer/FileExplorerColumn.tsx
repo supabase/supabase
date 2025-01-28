@@ -60,7 +60,6 @@ export interface FileExplorerColumnProps {
   fullWidth?: boolean
   openedFolders?: StorageItem[]
   selectedItems: StorageItemWithColumn[]
-  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null
   itemSearchString: string
   onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
@@ -75,7 +74,6 @@ const FileExplorerColumn = ({
   fullWidth = false,
   openedFolders = [],
   selectedItems = [],
-  selectedFilePreview,
   itemSearchString,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
@@ -221,7 +219,6 @@ const FileExplorerColumn = ({
           columnIndex: index,
           selectedItems,
           openedFolders,
-          selectedFilePreview,
         }}
         ItemComponent={FileExplorerRow}
         getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}

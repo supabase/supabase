@@ -1,0 +1,21 @@
+---
+title = "Next.js 13/14 stale data when changing RLS or table data."
+github_url = "https://github.com/orgs/supabase/discussions/19084"
+date_created = "2023-11-19T19:33:06+00:00"
+topics = [ "auth", "platform" ]
+keywords = [ "cache", "rls", "next.js" ]
+database_id = "9be3727b-c3ea-4dda-b30c-55f3c8aa8f35"
+---
+
+Next.js caches urls in certain cases. This is causing users to lose lots of time debugging early on with RLS changes. Changing the table data in the UI will also not be returned in these cases.
+
+You can look at the Dashboard API Edge log to see if the request is making it to Supabase.
+Another way to check if the url caching is impacting you is to change `.select('*')` to `.select('colname')` or change column names. This would bust the next.js cache.
+
+Users have suggested the following three options to turn off the caching, but please refer to next.js docs as needed.
+
+`export const dynamic = 'force-dynamic'; // no caching`
+or
+`export const fetchCache = 'force-no-store' // to page.js`
+or
+`export const revalidate = 0 `
