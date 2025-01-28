@@ -37,7 +37,7 @@ interface SQLEditorTreeViewItemProps
   onSelectShare?: () => void
   onSelectUnshare?: () => void
   onSelectDownload?: () => void
-  onSelectCopyPersonal?: () => void
+  onSelectDuplicate?: () => void
   onSelectDeleteFolder?: () => void
   onEditSave?: (name: string) => void
   onMultiSelect?: (id: string) => void
@@ -68,7 +68,7 @@ export const SQLEditorTreeViewItem = ({
   onSelectShare,
   onSelectUnshare,
   onSelectDownload,
-  onSelectCopyPersonal,
+  onSelectDuplicate,
   onEditSave,
   onMultiSelect,
   isLastItem,
@@ -315,19 +315,16 @@ export const SQLEditorTreeViewItem = ({
                   Unshare query with team
                 </ContextMenuItem_Shadcn_>
               )}
-              {onSelectCopyPersonal !== undefined &&
-                isSharedSnippet &&
-                !isOwner &&
-                canCreateSQLSnippet && (
-                  <ContextMenuItem_Shadcn_
-                    className="gap-x-2"
-                    onSelect={() => onSelectCopyPersonal()}
-                    onFocusCapture={(e) => e.stopPropagation()}
-                  >
-                    <Copy size={14} />
-                    Duplicate personal copy
-                  </ContextMenuItem_Shadcn_>
-                )}
+              {onSelectDuplicate !== undefined && canCreateSQLSnippet && (
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onSelect={() => onSelectDuplicate()}
+                  onFocusCapture={(e) => e.stopPropagation()}
+                >
+                  <Copy size={14} />
+                  Duplicate query
+                </ContextMenuItem_Shadcn_>
+              )}
               {onSelectDownload !== undefined && IS_PLATFORM && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"
