@@ -241,11 +241,14 @@ function getMenuById(id: MenuId) {
 }
 
 function getMenuElement(menu: Menu | undefined, props?: any) {
-  const menuType = menu?.type
+  if (!menu) return null
+  
+  const menuType = menu.type
   switch (menuType) {
     case 'guide':
       return <NavigationMenuGuideList id={menu.id} {...props} />
     case 'reference':
+      if (!menu.commonSectionsFile) return null // Skip if no commonSectionsFile
       return (
         <NavigationMenuRefList
           id={menu.id}

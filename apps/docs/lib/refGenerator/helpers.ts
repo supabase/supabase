@@ -24,7 +24,7 @@ export function extractTsDocNode(nodeToFind: string, definition: any) {
 }
 
 export function generateParameters(tsDefinition: any) {
-  let functionDeclaration = null
+  let functionDeclaration: any = null
   if (tsDefinition.kindString == 'Method') {
     functionDeclaration = tsDefinition
   } else if (tsDefinition.kindString == 'Constructor') {
@@ -34,7 +34,10 @@ export function generateParameters(tsDefinition: any) {
 
   // Functions can have multiple signatures - select the last one since that
   // tends to be closer to primitive types (citation needed).
-  const paramDefinitions: TsDoc.TypeDefinition[] = functionDeclaration.signatures.at(-1).parameters
+  if (!functionDeclaration.signatures?.length) return ''
+  const lastSignature = functionDeclaration.signatures.at(-1)
+  if (!lastSignature) return ''
+  const paramDefinitions: TsDoc.TypeDefinition[] = lastSignature.parameters ?? []
   if (!paramDefinitions) return ''
 
   // const paramsComments: TsDoc.CommentTag = tsDefinition.comment?.tags?.filter(x => x.tag == 'param')
@@ -46,7 +49,8 @@ function recurseThroughParams(paramDefinition: any) {
   const param = { ...paramDefinition }
   const labelParams = generateLabelParam(param)
 
-  let children: any[]
+  let paramChildren: any[] | undefined
+
   if (param.type?.type === 'literal') {
     // skip: literal types have no children
   } else if (param.type?.type === 'intrinsic') {
@@ -59,9 +63,9 @@ function recurseThroughParams(paramDefinition: any) {
     const dereferenced = param.type.dereferenced
 
     if (dereferenced.children) {
-      children = dereferenced.children
+      paramChildren = dereferenced.children
     } else if (dereferenced.type?.declaration?.children) {
-      children = dereferenced.type.declaration.children
+      paramChildren = dereferenced.type.declaration.children
     } else if (dereferenced.type?.type === 'query') {
       // skip: ignore types created from `typeof` for now, like `type Fetch = typeof fetch`
     } else if (dereferenced.type?.type === 'union') {
@@ -79,7 +83,7 @@ function recurseThroughParams(paramDefinition: any) {
     }
 
     if (declaration.children) {
-      children = declaration.children
+      paramChildren = declaration.children
     } else if (declaration.signatures) {
       // skip: functions have no children
     } else if (declaration.name === '__type') {
@@ -100,8 +104,8 @@ function recurseThroughParams(paramDefinition: any) {
     //throw new Error(`unexpected param type`)
   }
 
-  if (children) {
-    const properties = children
+  if (paramChildren) {
+    const properties = paramChildren
       .sort((a, b) => a.name?.localeCompare(b.name)) // first alphabetical
       .sort((a, b) => (a.flags?.isOptional ? 1 : -1)) // required params first
       .map((x) => recurseThroughParams(x))
@@ -241,7 +245,7 @@ export function gen_v3(
     toArrayWithKey(val!, 'operation').forEach((o) => {
       const operation = o as v3OperationWithPath
       const operationId =
-        type === 'mgmt-api' && isValidSlug(operation.operationId)
+        type === 'mgmt-api' && operation.operationId && isValidSlug(operation.operationId)
           ? operation.operationId
           : slugify(operation.summary!)
       const enriched = {

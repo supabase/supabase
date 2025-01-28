@@ -65,7 +65,7 @@ async function getAiPromptsImpl() {
 }
 export const getAiPrompts = cache(getAiPromptsImpl)
 
-async function getAiPromptImpl(prompt: string) {
+async function getAiPromptImpl(prompt: string): Promise<{ heading: string; content: string } | undefined> {
   const filePath = join(PROMPTS_DIRECTORY, `${prompt}.md`)
   try {
     const rawContent = await readFile(filePath, 'utf-8')
@@ -73,6 +73,7 @@ async function getAiPromptImpl(prompt: string) {
     return { heading, content }
   } catch (err) {
     console.error('Failed to fetch prompt from repo: %o', err)
+    return undefined
   }
 }
 export const getAiPrompt = cache(getAiPromptImpl)
@@ -81,7 +82,7 @@ export async function generateAiPromptMetadata({ params: { slug } }: { params: {
   const prompt = await getAiPrompt(slug)
 
   return {
-    title: `AI Prompt: ${prompt.heading} | Supabase Docs`,
+    title: `AI Prompt: ${prompt?.heading ?? 'Unknown'} | Supabase Docs`,
   }
 }
 

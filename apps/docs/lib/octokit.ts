@@ -10,6 +10,16 @@ let octokitInstance: Octokit
 
 function octokit() {
   if (!octokitInstance) {
+    if (!process.env.DOCS_GITHUB_APP_PRIVATE_KEY) {
+      throw new Error('DOCS_GITHUB_APP_PRIVATE_KEY is required')
+    }
+    if (!process.env.DOCS_GITHUB_APP_ID) {
+      throw new Error('DOCS_GITHUB_APP_ID is required')
+    }
+    if (!process.env.DOCS_GITHUB_APP_INSTALLATION_ID) {
+      throw new Error('DOCS_GITHUB_APP_INSTALLATION_ID is required')
+    }
+
     const privateKeyPkcs8 = crypto
       .createPrivateKey(process.env.DOCS_GITHUB_APP_PRIVATE_KEY)
       .export({

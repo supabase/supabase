@@ -327,7 +327,7 @@ function parseSignature(
     return res
   })
 
-  let ret: ReturnType
+  let ret: ReturnType = { type: { type: 'intrinsic', name: 'void' } }
   if ('type' in signature) {
     const retType = parseType(signature.type, map)
     if (retType) {
@@ -555,10 +555,13 @@ function parsePickType(type: any, map: Map<number, any>) {
 function parseReflectionType(type: any, map: Map<number, any>) {
   if (!type.declaration) return undefined
 
-  let res: TypeDetails
+  let res: TypeDetails = { type: 'intrinsic', name: 'unknown' }
   switch (type.declaration.kindString) {
     case 'Type literal':
-      res = parseTypeLiteral(type, map)
+      const parsedType = parseTypeLiteral(type, map)
+      if (parsedType) {
+        res = parsedType
+      }
       break
     default:
       break
@@ -603,7 +606,7 @@ function parseTypeLiteral(type: any, map: Map<number, any>): TypeDetails {
     }
   }
 
-  return undefined
+  return { type: 'intrinsic', name: 'unknown' }
 }
 
 function parseIndexedAccessType(type: any, map: Map<number, any>) {
@@ -618,7 +621,7 @@ function parseTypeOperatorType(type: any, map: Map<number, any>) {
     case 'readonly':
       return parseType(type.target, map)
     default:
-      return undefined
+      return { type: 'intrinsic', name: 'unknown' }
   }
 }
 
@@ -638,7 +641,7 @@ function parseInterface(type: any, map: Map<number, any>): CustomObjectType {
 function parseTypeInternals(elem: any, map: Map<number, any>) {
   switch (elem.kindString) {
     case 'Property':
-      return parseInternalProperty(elem, map)
+      return parseInternalProperty(elem, map) ?? { name: 'unknown', type: { type: 'intrinsic', name: 'unknown' } }
     case 'Method':
       if (elem.signatures?.[0]) {
         const { params, ret, comment } = parseSignature(elem.signatures?.[0], map)
@@ -657,7 +660,7 @@ function parseTypeInternals(elem: any, map: Map<number, any>) {
         return res
       }
     default:
-      return undefined
+      return { name: 'unknown', type: { type: 'intrinsic', name: 'unknown' } }
   }
 }
 

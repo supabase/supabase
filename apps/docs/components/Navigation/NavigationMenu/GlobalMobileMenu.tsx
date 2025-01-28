@@ -69,13 +69,17 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
             </Fragment>
           ))}
         </Accordion.Item>
-      ) : (
+      ) : section[0].href ? (
         <Link
           href={section[0].href}
           className={cn(activeLabel === section[0].label && '!text-foreground', itemClassName)}
         >
           {section[0].label}
         </Link>
+      ) : (
+        <div className={cn(activeLabel === section[0].label && '!text-foreground', itemClassName)}>
+          {section[0].label}
+        </div>
       )}
     </m.div>
   )

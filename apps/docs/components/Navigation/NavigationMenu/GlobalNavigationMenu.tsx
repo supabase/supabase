@@ -80,7 +80,7 @@ const GlobalNavigationMenu: FC = () => {
                     activeLabel === section[0].label && 'text-foreground border-foreground'
                   )}
                 >
-                  {section[0].label === 'Home' ? (
+                  {section[0].label === 'Home' && section[0].icon ? (
                     <MenuIconPicker icon={section[0].icon} />
                   ) : (
                     section[0].label
@@ -123,22 +123,34 @@ const GlobalNavigationMenu: FC = () => {
                 key={`desktop-docs-menu-section-${section[0].label}-${sectionIdx}`}
                 className="text-sm relative h-full"
               >
-                <NavigationMenuLink asChild>
-                  <Link
-                    href={section[0].href}
+                {section[0].href ? (
+                  <NavigationMenuLink asChild>
+                    <Link
+                      href={section[0].href}
+                      className={cn(
+                        navigationMenuTriggerStyle(),
+                        triggerClassName,
+                        activeLabel === section[0].label && 'text-foreground border-foreground'
+                      )}
+                    >
+                      {section[0].label === 'Home' && section[0].icon ? (
+                        <MenuIconPicker icon={section[0].icon} />
+                      ) : (
+                        section[0].label
+                      )}
+                    </Link>
+                  </NavigationMenuLink>
+                ) : (
+                  <div
                     className={cn(
                       navigationMenuTriggerStyle(),
                       triggerClassName,
                       activeLabel === section[0].label && 'text-foreground border-foreground'
                     )}
                   >
-                    {section[0].label === 'Home' ? (
-                      <MenuIconPicker icon={section[0].icon} />
-                    ) : (
-                      section[0].label
-                    )}
-                  </Link>
-                </NavigationMenuLink>
+                    {section[0].label}
+                  </div>
+                )}
               </NavigationMenuItem>
             )
           )}

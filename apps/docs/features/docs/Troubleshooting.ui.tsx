@@ -54,7 +54,7 @@ export async function TroubleshootingPreview({ entry }: { entry: ITroubleshootin
                 .map((error, index) => (
                   <>
                     <code key={index}>{error}</code>
-                    {index < entry.data.errors.length - 1 ? ', ' : ''}
+                    {index < (entry.data.errors?.length ?? 0) - 1 ? ', ' : ''}
                   </>
                 ))}
             </span>

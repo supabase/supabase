@@ -46,7 +46,7 @@ type RefSectionsProps = {
 async function RefSections({ libraryId, version }: RefSectionsProps) {
   console.log('[Enter] RefSections')
   let flattenedSections = await getFlattenedSections(libraryId, version)
-  flattenedSections = trimIntro(flattenedSections)
+  flattenedSections = flattenedSections ? trimIntro(flattenedSections) : []
 
   console.log('[PreReturn] RefSections')
   return (
@@ -384,11 +384,11 @@ async function FunctionSection({
 }: FunctionSectionProps) {
   const fns = await getFunctionsList(sdkId, version)
 
-  const fn = fns.find((fn) => fn.id === section.id)
+  const fn = fns?.find((fn) => fn.id === section.id) ?? null
   if (!fn) return null
 
   let types: MethodTypes | undefined
-  if (useTypeSpec && '$ref' in fn) {
+  if (useTypeSpec && fn && '$ref' in fn) {
     types = await getTypeSpec(fn['$ref'] as string)
   }
 
@@ -410,14 +410,14 @@ async function FunctionSection({
         </div>
         <FnParameterDetails
           parameters={
-            'overwriteParams' in fn
+            'overwriteParams' in fn && fn.overwriteParams
               ? (fn.overwriteParams as Array<object>).map((overwrittenParams) => ({
                   ...overwrittenParams,
                   __overwritten: true,
                 }))
-              : 'params' in fn
+              : 'params' in fn && fn.params
                 ? (fn.params as Array<object>).map((param) => ({ ...param, __overwritten: true }))
-                : types?.params
+                : types?.params ?? []
           }
           altParameters={types?.altSignatures?.map(({ params }) => params)}
           className="max-w-[80ch]"

@@ -45,14 +45,17 @@ function processMdx(content: string, options?: { yaml?: boolean }): ProcessedMdx
     mdastExtensions: [mdxFromMarkdown()],
   })
 
-  let meta: Record<string, unknown>
+  let meta: Record<string, unknown> = {}
   if (options?.yaml) {
     meta = frontmatter
   } else {
-    meta = extractMetaExport(mdxTree)
+    const extractedMeta = extractMetaExport(mdxTree)
+    if (extractedMeta) {
+      meta = extractedMeta
+    }
   }
 
-  const serializableMeta: Json = meta && JSON.parse(JSON.stringify(meta))
+  const serializableMeta: Json = Object.keys(meta).length > 0 ? JSON.parse(JSON.stringify(meta)) : {}
 
   // Remove all MDX elements from markdown
   const mdTree = filter(
@@ -83,7 +86,7 @@ function processMdx(content: string, options?: { yaml?: boolean }): ProcessedMdx
     const [firstNode] = tree.children
     const content = toMarkdown(tree)
 
-    const rawHeading: string = firstNode.type === 'heading' ? toString(firstNode) : undefined
+    const rawHeading = firstNode.type === 'heading' ? toString(firstNode) : ''
 
     if (!rawHeading) {
       return { content }

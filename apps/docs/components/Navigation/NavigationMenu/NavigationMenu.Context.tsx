@@ -14,8 +14,8 @@ interface Provider extends ContextProps {
 // Make sure the shape of the default value passed to
 // createContext matches the shape that the consumers expect!
 const NavMenuContext = createContext<ContextProps>({
-  activeRefItem: undefined,
-  setActiveRefItem: undefined,
+  activeRefItem: '',
+  setActiveRefItem: () => {},
 })
 
 export const NavigationMenuContextProvider = (props: Provider) => {

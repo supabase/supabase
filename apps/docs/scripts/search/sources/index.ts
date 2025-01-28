@@ -103,9 +103,10 @@ export async function fetchSources() {
     )
     .map((entry) => new MarkdownLoader('guide', entry.path, { yaml: true }).load())
 
-  const partnerIntegrationSources = (await fetchPartners()).map((partner) =>
+  const partners = await fetchPartners()
+  const partnerIntegrationSources = partners ? partners.map((partner) =>
     new IntegrationLoader(partner.slug, partner).load()
-  )
+  ) : []
 
   const githubDiscussionSources = (
     await fetchDiscussions(
@@ -115,7 +116,7 @@ export async function fetchSources() {
     )
   ).map((discussion) => new GitHubDiscussionLoader('supabase/supabase', discussion).load())
 
-  const sources: SearchSource[] = (
+  const sources = (
     await Promise.all([
       openApiReferenceSource,
       jsLibReferenceSource,
@@ -129,7 +130,7 @@ export async function fetchSources() {
       ...partnerIntegrationSources,
       ...guideSources,
     ])
-  ).flat()
+  ).flat().filter((source): source is SearchSource => source !== undefined)
 
   return sources
 }

@@ -8,7 +8,12 @@ import {
 export const dynamicParams = false
 
 export default async function AiPromptsPage({ params: { slug } }: { params: { slug: string } }) {
-  let { heading, content } = await getAiPrompt(slug)
+  const promptData = await getAiPrompt(slug)
+  if (!promptData) {
+    throw new Error(`Prompt not found: ${slug}`)
+  }
+
+  let { heading, content } = promptData
   content = `
 ## How to use
 
