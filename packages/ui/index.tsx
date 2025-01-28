@@ -31,7 +31,6 @@ export * from './src/components/NavMenu'
 export * from './src/components/Modal'
 export * from './src/components/SidePanel'
 export * from './src/components/ContextMenu'
-export * from './src/components/Popover'
 
 // HTML
 

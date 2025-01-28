@@ -15,7 +15,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
-  Popover,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   Select,
   cn,
 } from 'ui'
@@ -224,28 +226,18 @@ const ReportFilterBar = ({
               </Button>
             </div>
           ))}
-        <Popover
-          align="end"
-          header={
-            <div className="flex justify-between items-center py-1">
-              <h5 className="text-sm text-foreground">Add Filter</h5>
-
-              <Button
-                type="primary"
-                size="tiny"
-                onClick={() => {
-                  onAddFilter(addFilterValues)
-                  setShowAdder(false)
-                  resetFilterValues()
-                }}
-              >
-                Save
-              </Button>
-            </div>
-          }
-          open={showAdder}
-          onOpenChange={(openValue) => setShowAdder(openValue)}
-          overlay={
+        <Popover_Shadcn_ open={showAdder} onOpenChange={(openValue) => setShowAdder(openValue)}>
+          <PopoverTrigger_Shadcn_>
+            <Button
+              asChild
+              type="default"
+              size="tiny"
+              icon={<Plus className={`text-foreground-light `} />}
+            >
+              <span>Add filter</span>
+            </Button>
+          </PopoverTrigger_Shadcn_>
+          <PopoverContent_Shadcn_ align="end">
             <div className="px-3 py-3 flex flex-col gap-2">
               <Select
                 size="tiny"
@@ -291,18 +283,8 @@ const ReportFilterBar = ({
                 }}
               />
             </div>
-          }
-          showClose
-        >
-          <Button
-            asChild
-            type="default"
-            size="tiny"
-            icon={<Plus className={`text-foreground-light `} />}
-          >
-            <span>Add filter</span>
-          </Button>
-        </Popover>
+          </PopoverContent_Shadcn_>
+        </Popover_Shadcn_>
       </div>
 
       <DatabaseSelector
