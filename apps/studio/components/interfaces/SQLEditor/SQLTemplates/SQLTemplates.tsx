@@ -13,7 +13,6 @@ import { partition } from 'lodash'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { getTabsStore } from 'state/tabs'
 import { cn, SQL_ICON } from 'ui'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 
@@ -53,17 +52,6 @@ const SQLTemplates = () => {
       })
       snapV2.addSnippet({ projectRef: ref, snippet })
       snapV2.addNeedsSaving(snippet.id)
-
-      const store = getTabsStore(ref)
-      const tabId = `sql-${snippet.id}`
-      store.openTabs = [...store.openTabs, tabId]
-      store.tabsMap[tabId] = {
-        id: tabId,
-        type: 'sql',
-        label: name,
-        metadata: { sqlId: snippet.id, name },
-      }
-      store.activeTab = tabId
 
       router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
