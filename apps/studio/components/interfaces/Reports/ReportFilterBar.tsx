@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
   Input,
   PopoverContent_Shadcn_,
+  PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   Select,
@@ -237,7 +238,22 @@ const ReportFilterBar = ({
               <span>Add filter</span>
             </Button>
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ align="end">
+          <PopoverContent_Shadcn_ align="end" className="p-0 w-56">
+            <div className="flex justify-between items-center py-2.5 px-3 bg-surface-200">
+              <h5 className="text-sm text-foreground">Add Filter</h5>
+              <Button
+                type="primary"
+                size="tiny"
+                onClick={() => {
+                  onAddFilter(addFilterValues)
+                  setShowAdder(false)
+                  resetFilterValues()
+                }}
+              >
+                Save
+              </Button>
+            </div>
+            <PopoverSeparator_Shadcn_ />
             <div className="px-3 py-3 flex flex-col gap-2">
               <Select
                 size="tiny"
