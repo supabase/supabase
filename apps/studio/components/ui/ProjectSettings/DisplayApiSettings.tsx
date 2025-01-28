@@ -1,16 +1,24 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { AlertCircle, BookOpen, Loader2 } from 'lucide-react'
-
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, Input } from 'ui'
+import { useFlag } from 'hooks/ui/useFlag'
+import { AlertCircle, Loader2 } from 'lucide-react'
+import { Input } from 'ui'
 
-const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
+const DisplayApiSettings = ({
+  legacy,
+  showNotice = true,
+}: {
+  legacy?: boolean
+  showNotice?: boolean
+}) => {
   const { ref: projectRef } = useParams()
+
+  const newApiKeysFlag = useFlag('newApiKeys')
 
   const {
     data: settings,
@@ -25,6 +33,8 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
+
+  console.log('old canReadAPIKeys', canReadAPIKeys)
 
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
@@ -45,7 +55,7 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
                 <br />
                 You can use the keys below in the Supabase client libraries.
                 <br />
-                <a
+                {/* <a
                   href="https://supabase.com/docs#client-libraries"
                   target="_blank"
                   rel="noreferrer"
@@ -53,7 +63,7 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
                   <Button icon={<BookOpen />} type="default" className="mt-4">
                     Client Docs
                   </Button>
-                </a>
+                </a> */}
               </p>
             </div>
           )
@@ -130,15 +140,30 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
             </Panel.Content>
           ))
         )}
-        <Panel.Notice
-          className="border-t"
-          title="New API keys coming 2025"
-          description={`
+        {showNotice ? (
+          newApiKeysFlag ? (
+            <Panel.Notice
+              className="border-t"
+              title="API keys have moved"
+              badgeLabel={'Changelog'}
+              description={` 
+  \`anon\` and \`service_role\` API keys can now be replaced with \`publishable\` and \`secret\` API keys.   
+  `}
+              href="https://github.com/orgs/supabase/discussions/29260"
+              buttonText="Read the announcement"
+            />
+          ) : (
+            <Panel.Notice
+              className="border-t"
+              title="New API keys coming Q4 2024"
+              description={`
 \`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.    
 `}
-          href="https://github.com/orgs/supabase/discussions/29260"
-          buttonText="Read the announcement"
-        />
+              href="https://github.com/orgs/supabase/discussions/29260"
+              buttonText="Read the announcement"
+            />
+          )
+        ) : null}
       </Panel>
     </>
   )
