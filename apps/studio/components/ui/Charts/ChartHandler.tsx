@@ -19,6 +19,7 @@ import { WarningIcon } from 'ui'
 import type { ChartData } from './Charts.types'
 import Panel from 'components/ui/Panel'
 import { useChartHighlight } from './useChartHighlight'
+import MockClientConnectionsChart from './MockClientConnectionsChart'
 
 interface ChartHandlerProps {
   id?: string
@@ -36,6 +37,7 @@ interface ChartHandlerProps {
   format?: string
   highlightedValue?: string | number
   className?: string
+  isStacked?: boolean
 }
 
 /**
@@ -63,6 +65,7 @@ const ChartHandler = ({
   format,
   highlightedValue,
   className,
+  isStacked = false,
 }: PropsWithChildren<ChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
@@ -157,14 +160,14 @@ const ChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative py-2', className)}
+      className={cn('relative py-2 w-full', className)}
       wrapWithLoading={false}
     >
       <Panel.Content className="flex flex-col gap-4">
         <div className="absolute right-6 z-50 flex justify-between">{children}</div>
-        {chartStyle === 'bar' ? (
-          <BarChart
-            YAxisProps={{ width: 1 }}
+        {isStacked ? (
+          <MockClientConnectionsChart
+            // YAxisProps={{ width: 1 }}
             data={(chartData?.data ?? []) as any}
             format={format || chartData?.format}
             xAxisKey={'period_start'}
@@ -173,15 +176,16 @@ const ChartHandler = ({
             title={label}
             customDateFormat={customDateFormat}
             chartHighlight={chartHighlight}
-            hideChartType={hideChartType}
+            // hideChartType={hideChartType}
             chartStyle={chartStyle}
             onChartStyleChange={setChartStyle}
           />
         ) : (
-          <AreaChart
+          <BarChart
+            YAxisProps={{ width: 1 }}
             data={(chartData?.data ?? []) as any}
             format={format || chartData?.format}
-            xAxisKey="period_start"
+            xAxisKey={'period_start'}
             yAxisKey={attribute}
             highlightedValue={_highlightedValue}
             title={label}

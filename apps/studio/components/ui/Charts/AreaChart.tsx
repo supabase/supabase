@@ -8,6 +8,7 @@ import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import type { ChartHighlight } from './useChartHighlight'
+import ChartHighlightActions from './ChartHighlightActions'
 
 export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -54,6 +55,11 @@ const AreaChart = ({
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
 
+  const showHighlightActions =
+    chartHighlight?.coordinates.left &&
+    chartHighlight?.coordinates.right &&
+    chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
+
   if (data.length === 0) {
     return (
       <NoDataPlaceholder
@@ -84,7 +90,7 @@ const AreaChart = ({
         chartStyle={chartStyle}
         onChartStyleChange={onChartStyleChange}
       />
-      <Container>
+      <Container className="relative">
         <RechartAreaChart
           data={data}
           margin={{
@@ -139,10 +145,10 @@ const AreaChart = ({
             fillOpacity={1}
             fill="url(#colorUv)"
           />
-          {(chartHighlight?.coordinates.left || chartHighlight?.coordinates.right) && (
+          {showHighlightActions && (
             <ReferenceArea
               x1={chartHighlight?.coordinates.left}
-              x2={chartHighlight?.coordinates.right ?? chartHighlight?.coordinates.left}
+              x2={chartHighlight?.coordinates.right}
               strokeOpacity={0.5}
               stroke="#3ECF8E"
               fill="#3ECF8E"
@@ -150,6 +156,7 @@ const AreaChart = ({
             />
           )}
         </RechartAreaChart>
+        <ChartHighlightActions chartHighlight={chartHighlight} />
       </Container>
       {data && (
         <div className="text-foreground-lighter -mt-8 flex items-center justify-between text-xs">

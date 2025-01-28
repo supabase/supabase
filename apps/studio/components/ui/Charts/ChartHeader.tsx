@@ -11,8 +11,8 @@ export interface ChartHeaderProps {
   customDateFormat?: string
   minimalHeader?: boolean
   displayDateInUtc?: boolean
-  highlightedLabel?: number | string | null
-  highlightedValue?: number | string | null
+  highlightedLabel?: number | string | any | null
+  highlightedValue?: number | string | any | null
   chartHighlight?: ChartHighlight
   hideChartType?: boolean
   chartStyle?: string
@@ -43,7 +43,7 @@ const ChartHeader = ({
     <h5
       className={`text-foreground text-xl font-normal ${minimalHeader ? 'text-base' : 'text-2xl'}`}
     >
-      {highlightedValue !== undefined && String(highlightedValue)}
+      {highlightedValue !== undefined && highlightedValue}
       {format === 'seconds' ? ' ' : ''}
       <span className="text-lg">
         {typeof format === 'function' ? format(highlightedValue) : format}
@@ -65,14 +65,14 @@ const ChartHeader = ({
   }
 
   return (
-    <div className="h-16 flex justify-between items-start">
+    <div className="min-h-16 flex-grow flex justify-between items-start">
       <div className="flex flex-col">
         {title && chartTitle}
         {highlightedValue !== undefined && highlighted}
         {label}
       </div>
       <div className="flex items-center gap-2">
-        {selectedRangeStart && selectedRangeStart && !isSelecting && (
+        {/* {selectedRangeStart && selectedRangeStart && !isSelecting && (
           <>
             <Button
               type="text"
@@ -101,13 +101,6 @@ const ChartHeader = ({
                       <span>{dayjs(selectedRangeEnd).format('MMM D, H:mm')}</span>
                     </Link>
                   </Button>
-                  {/* <Button size="tiny" type="default" asChild>
-                    <Link
-                      href={`/project/${ref}/reports/database?dateRange=${selectedRangeStart}-${selectedRangeEnd}`}
-                    >
-                      Open in Logs
-                    </Link>
-                  </Button> */}
                 </div>
               </TooltipTrigger>
               <TooltipContent side="left" align="center">
@@ -115,7 +108,7 @@ const ChartHeader = ({
               </TooltipContent>
             </Tooltip>
           </>
-        )}
+        )} */}
         {!hideChartType && onChartStyleChange && (
           <Tooltip>
             <TooltipTrigger asChild>

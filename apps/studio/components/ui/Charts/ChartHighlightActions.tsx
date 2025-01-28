@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArrowRight, LogsIcon, SearchIcon } from 'lucide-react'
+import { ArrowRight, ChevronRightIcon, LogsIcon, SearchIcon } from 'lucide-react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import {
@@ -19,7 +19,7 @@ const ChartHighlightActions = ({ chartHighlight }: { chartHighlight?: ChartHighl
   const [isOpen, setIsOpen] = useState(!!chartHighlight?.popoverPosition)
 
   useEffect(() => {
-    setIsOpen(!!chartHighlight?.popoverPosition)
+    setIsOpen(!!chartHighlight?.popoverPosition && selectedRangeStart !== selectedRangeEnd)
   }, [chartHighlight?.popoverPosition])
 
   return (
@@ -32,26 +32,28 @@ const ChartHighlightActions = ({ chartHighlight }: { chartHighlight?: ChartHighl
           top: chartHighlight?.popoverPosition?.y + 'px' ?? 0,
         }}
       />
-      <DropdownMenuContent className="flex flex-col gap-1 p-1 w-fit">
-        <DropdownMenuLabel className="flex items-center gap-1">
+      <DropdownMenuContent className="flex flex-col gap-1 p-1 w-fit text-left">
+        <DropdownMenuLabel className="flex items-center justify-center text-foreground-lighter font-mono gap-1 text-xs">
           <span>{dayjs(selectedRangeStart).format('MMM D, H:mm')}</span>
           <ArrowRight size={10} />
           <span>{dayjs(selectedRangeEnd).format('MMM D, H:mm')}</span>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="my-0" />
         <DropdownMenuItem>
           <Link
-            className="flex items-center gap-1.5"
+            className="w-full flex items-center gap-1.5"
             href={`/project/${ref}/logs/postgres-logs?iso_timestamp_start=${selectedRangeStart}&iso_timestamp_end=${selectedRangeEnd}`}
           >
             <LogsIcon className="text-foreground-lighter" size={12} />
-            <span>Open in Logs Explorer</span>
+            <span className="flex-grow text-left">Open in Logs Explorer</span>
+            <ChevronRightIcon className="text-foreground-lighter ml-2" size={12} />
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <button className="flex items-center gap-1.5" onClick={() => alert('Zoommed in!')}>
+          <button className="w-full flex items-center gap-1.5" onClick={() => alert('Zoommed in!')}>
             <SearchIcon className="text-foreground-lighter" size={12} />
-            <span>Zoom in</span>
+            <span className="flex-grow text-left">Zoom in</span>
+            <ChevronRightIcon className="text-foreground-lighter ml-2" size={12} />
           </button>
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -5,7 +5,9 @@ import {
   CartesianGrid,
   Cell,
   Legend,
+  Area,
   BarChart as RechartBarChart,
+  ComposedChart,
   ReferenceArea,
   Tooltip,
   XAxis,
@@ -18,7 +20,7 @@ import ChartHeader from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
 import type { ChartHighlight } from './useChartHighlight'
 import ChartHighlightActions from './ChartHighlightActions'
 
@@ -103,6 +105,11 @@ const BarChart = ({
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
 
+  const showHighlightActions =
+    chartHighlight?.coordinates.left &&
+    chartHighlight?.coordinates.right &&
+    chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
+
   if (data.length === 0) {
     return (
       <NoDataPlaceholder
@@ -135,7 +142,7 @@ const BarChart = ({
         onChartStyleChange={onChartStyleChange}
       />
       <Container className="relative">
-        <RechartBarChart
+        <ComposedChart
           data={data}
           className="overflow-visible"
           onMouseMove={(e: any) => {
@@ -177,36 +184,46 @@ const BarChart = ({
             key={xAxisKey}
           />
           <Tooltip content={() => null} />
-          <Bar
-            dataKey={yAxisKey}
-            fill={CHART_COLORS.GREEN_1}
-            animationDuration={300}
-            maxBarSize={48}
-          >
-            {data?.map((_entry: Datum, index: any) => (
-              <Cell
-                key={`cell-${index}`}
-                className={`transition-all duration-300 ${onBarClick ? 'cursor-pointer' : ''}`}
-                fill={
-                  focusDataIndex === index || focusDataIndex === null
-                    ? CHART_COLORS.GREEN_1
-                    : CHART_COLORS.GREEN_2
-                }
-                enableBackground={12}
-              />
-            ))}
-          </Bar>
-          {(chartHighlight?.coordinates.left || chartHighlight?.coordinates.right) && (
+          {chartStyle === 'bar' ? (
+            <Bar
+              dataKey={yAxisKey}
+              fill={CHART_COLORS.GREEN_1}
+              animationDuration={300}
+              maxBarSize={48}
+            >
+              {data?.map((_entry: Datum, index: any) => (
+                <Cell
+                  key={`cell-${index}`}
+                  className={`transition-all duration-300 ${onBarClick ? 'cursor-pointer' : ''}`}
+                  fill={
+                    focusDataIndex === index || focusDataIndex === null
+                      ? CHART_COLORS.GREEN_1
+                      : CHART_COLORS.GREEN_2
+                  }
+                  enableBackground={12}
+                />
+              ))}
+            </Bar>
+          ) : (
+            <Area
+              type="monotone"
+              dataKey={yAxisKey}
+              stroke={CHART_COLORS.GREEN_1}
+              fillOpacity={1}
+              fill="url(#colorUv)"
+            />
+          )}
+          {showHighlightActions && (
             <ReferenceArea
               x1={chartHighlight?.coordinates.left}
-              x2={chartHighlight?.coordinates.right ?? chartHighlight?.coordinates.left}
+              x2={chartHighlight?.coordinates.right}
               strokeOpacity={0.5}
               stroke="#3ECF8E"
               fill="#3ECF8E"
               fillOpacity={0.3}
             />
           )}
-        </RechartBarChart>
+        </ComposedChart>
         <ChartHighlightActions chartHighlight={chartHighlight} />
       </Container>
       {data && (
