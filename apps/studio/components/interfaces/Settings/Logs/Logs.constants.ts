@@ -397,17 +397,6 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.PG_CRON]: 'Postgres logs from pg_cron cron jobs',
 }
 
-export const genQueryParams = (params: { [k: string]: string }) => {
-  // remove keys which are empty strings, null, or undefined
-  for (const k in params) {
-    const v = params[k]
-    if (v === null || v === '' || v === undefined) {
-      delete params[k]
-    }
-  }
-  const qs = new URLSearchParams(params).toString()
-  return qs
-}
 export const FILTER_OPTIONS: FilterTableSet = {
   // Postgres logs
   postgres_logs: {
