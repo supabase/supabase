@@ -242,7 +242,7 @@ export interface CronJobDeleteClickedEvent {
 }
 
 /**
- * History button clicked to see previous runs of the cron job
+ * User clicked the history button to see previous runs of the cron job
  *
  * @group Events
  * @source studio
@@ -394,7 +394,7 @@ export interface ProjectCreationSecondStepSubmittedEvent {
 }
 
 /**
- * After selecting channel, either "Listening to channel" or "Start listening" button was clicked.
+ * User clicked either "Listening to channel" or "Start listening" button after selecting a channel.
  *
  * @group Events
  * @source studio
@@ -424,7 +424,7 @@ export interface RealtimeInspectorBroadcastSentEvent {
 }
 
 /**
- * A message was clicked in the RealtimeInspector, which opens a sidebar that shows the messsage details including metadata.
+ * User clicked a message in the RealtimeInspector, which opens a sidebar that shows the messsage details including metadata.
  *
  * @group Events
  * @source studio
@@ -484,7 +484,7 @@ export interface RealtimeInspectorDatabaseRoleUpdatedEvent {
 }
 
 /**
- * Quickstart card clicked in the SQL editor.
+ * User clicked the quickstart card in the SQL editor.
  *
  * @group Events
  * @source studio
@@ -505,7 +505,7 @@ export interface SqlEditorQuickstartClickedEvent {
 }
 
 /**
- * Template card clicked in the SQL editor.
+ * User clicked the template card in the SQL editor.
  *
  * @group Events
  * @source studio
@@ -526,7 +526,7 @@ export interface SqlEditorTemplateClickedEvent {
 }
 
 /**
- * Result download CSV button clicked in the SQL editor.
+ * User clicked the “Result download CSV” button in the SQL editor.
  *
  * @group Events
  * @source studio
@@ -541,7 +541,7 @@ export interface SqlEditorResultDownloadCsvClickedEvent {
 }
 
 /**
- * Result copy markdown button clicked in the SQL editor.
+ * User clicked the “Result copy Markdown” button in the SQL editor.
  *
  * @group Events
  * @source studio
@@ -556,7 +556,7 @@ export interface SqlEditorResultCopyMarkdownClickedEvent {
 }
 
 /**
- * Result copy JSON button clicked in the SQL editor.
+ * User clicked the “Result copy JSON” button in the SQL editor
  *
  * @group Events
  * @source studio
@@ -710,7 +710,7 @@ export interface HomepageHeroRequestDemoClickedEvent {
 }
 
 /**
- * Framework quickstart card clicked in homepage and will lead to specific framework doc.
+ * User clicked the framework quickstart card on the homepage, leading to the specific framework documentation.
  *
  * @group Events
  * @source www
@@ -761,7 +761,7 @@ export interface WwwPricingPlanCtaClickedEvent {
     /**
      * The section of the page where the plan was clicked.
      * Main means the big top section of the page,
-     * comparison_table means the comparison table with all plans listen together below.
+     * comparison_table means the comparison table with all plans listed together below.
      */
     section: 'main' | 'comparison_table'
     tableMode?: 'mobile' | 'desktop'
@@ -769,7 +769,7 @@ export interface WwwPricingPlanCtaClickedEvent {
 }
 
 /**
- * User clicked on the main CTA button in an event page.
+ * User clicked the main CTA button in an event page.
  *
  * @group Events
  * @source www
@@ -778,12 +778,15 @@ export interface WwwPricingPlanCtaClickedEvent {
 export interface EventPageCtaClickedEvent {
   action: TelemetryActions.EVENT_PAGE_CTA_CLICKED
   properties: {
+    /**
+     * The title of the event clicked.
+     */
     eventTitle: string
   }
 }
 
 /**
- * User clicked on the GitHub button in the homepage header section. Is hidden when in mobile view.
+ * User clicked the GitHub button in the homepage header section. The button is hidden in mobile view.
  *
  * @group Events
  * @source www
@@ -794,7 +797,7 @@ export interface HomepageGitHubButtonClickedEvent {
 }
 
 /**
- * User clicked on the GitHub Discussions button in the homepage community section.
+ * User clicked the GitHub Discussions button in the homepage community section.
  *
  * @group Events
  * @source www
@@ -805,7 +808,7 @@ export interface HomepageGitHubDiscussionsButtonClickedEvent {
 }
 
 /**
- * User clicked on the Discord button in the homepage community section.
+ * User clicked the Discord button in the homepage community section.
  *
  * @group Events
  * @source www
@@ -816,7 +819,7 @@ export interface HomepageDiscordButtonClickedEvent {
 }
 
 /**
- * User clicked on a customer story in the homepage.
+ * User clicked a customer story card in the homepage.
  *
  * @group Events
  * @source www
@@ -834,7 +837,7 @@ export interface HomepageCustomerStoryCardClickedEvent {
 }
 
 /**
- * User clicked on a project template card in the homepage.
+ * User clicked the project template card in the homepage.
  *
  * @group Events
  * @source www
@@ -851,7 +854,7 @@ export interface HomepageProjectTemplateCardClickedEvent {
 }
 
 /**
- * User clicked on an open source repo card.
+ * User clicked the open source repository card.
  *
  * @group Events
  * @source www
@@ -868,7 +871,7 @@ export interface OpenSourceRepoCardClickedEvent {
 }
 
 /**
- * User clicked the green "Start Project" button in various locations described in properties..
+ * User clicked the green “Start Project” button in various locations described in properties.
  *
  * @group Events
  * @source www
