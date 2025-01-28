@@ -78,12 +78,20 @@ final data = await supabase.schema('myschema').from('todos').select();
 
 ```bash
 # Append /rest/v1/ to your URL, and then use the table name as the route.
-# Use Accept-Profile header for GET and HEAD.
-# Use Content-Profile header for POST, PATCH, PUT and DELETE.
+
+# for GET or HEAD request use Accept-Profile
 curl '<SUPABASE_URL>/rest/v1/todos' \
   -H "apikey: <SUPABASE_ANON_KEY>" \
   -H "Authorization: Bearer <SUPABASE_ANON_KEY>" \
   -H "Accept-Profile: myschema"
+
+# for POST, PATCH, PUT and DELETE Request use Content-Profile
+curl -X POST '<SUPABASE_URL>/rest/v1/todos' \
+  -H "apikey: <SUPABASE_ANON_KEY>" \
+  -H "Authorization: Bearer <SUPABASE_ANON_KEY>" \
+  -H "Content-Type: application/json" \
+  -H "Content-Profile: myschema" \
+  -d '{"column_name": "value"}'
 ```
 
 </TabPanel>
