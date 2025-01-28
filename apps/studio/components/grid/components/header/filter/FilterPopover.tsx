@@ -16,6 +16,7 @@ import {
 } from 'ui'
 import { FilterOperatorOptions } from './Filter.constants'
 import FilterRow from './FilterRow'
+import RuleSetButtonText from '../rules-set-button-text'
 
 export interface FilterPopoverProps {
   table: SupaTable
@@ -28,33 +29,16 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
   const snap = useTableEditorStateSnapshot()
 
   const btnText = useMemo(() => {
-    if (!filters?.length) return 'Filter'
-
-    const filterElements = (
-      <span className="text-foreground-light">
-        Filtering by
-        {filters.slice(0, 2).map((filter, i) => {
+    return (
+      <RuleSetButtonText
+        rules={filters}
+        type="filter"
+        renderRule={(filter) => {
           const [column, operator, value] = filter.split(':')
-          return (
-            <Fragment key={`filter-${filter}-${i}`}>
-              <span className="ml-1 bg-selection border border-foreground-muted px-2 h-5 text-foreground text-xs rounded-full inline-flex items-center">
-                <span className="opacity-75">{column}</span>
-                <span className="opacity-50 mx-0.5">:{operator}:</span>
-                <span className="font-mono max-w-32 truncate">{value}</span>
-              </span>
-              {i === 0 && filters.length > 1 && <span className="ml-1">and</span>}
-            </Fragment>
-          )
-        })}
-        {filters.length > 2 && (
-          <span className="ml-1 text-xs">
-            and {filters.length - 2} more {filters.length - 2 === 1 ? 'rule' : 'rules'}
-          </span>
-        )}
-      </span>
+          return { column, operator, value }
+        }}
+      />
     )
-
-    return filterElements
   }, [filters])
 
   const onApplyFilters = (appliedFilters: Filter[]) => {

@@ -15,6 +15,7 @@ import {
   cn,
 } from 'ui'
 import SortRow from './SortRow'
+import RuleSetButtonText from '../rules-set-button-text'
 
 export interface SortPopoverProps {
   table: SupaTable
@@ -27,30 +28,15 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
 
   const hasSorts = (sorts || []).length > 0
   const btnText = useMemo(() => {
-    if (!hasSorts) return 'Sort'
-
     return (
-      <span className="text-foreground-light">
-        Sorting by
-        {sorts.slice(0, 2).map((sort, i) => {
+      <RuleSetButtonText
+        rules={sorts}
+        type="sort"
+        renderRule={(sort) => {
           const [column, direction] = sort.split(':')
-          return (
-            <Fragment key={`sort-${sort}-${i}`}>
-              <span className="ml-1 bg-selection border border-foreground-muted px-2 h-5 text-foreground text-xs rounded-full inline-flex items-center">
-                <span className="opacity-75">{column}</span>
-                <span className="opacity-50 mx-0.5">:</span>
-                <span className="font-mono max-w-32 truncate">{direction}</span>
-              </span>
-              {i === 0 && sorts.length > 1 && <span className="ml-1">and</span>}
-            </Fragment>
-          )
-        })}
-        {sorts.length > 2 && (
-          <span className="ml-1 text-xs">
-            and {sorts.length - 2} more {sorts.length - 2 === 1 ? 'rule' : 'rules'}
-          </span>
-        )}
-      </span>
+          return { column, value: direction }
+        }}
+      />
     )
   }, [sorts])
 
