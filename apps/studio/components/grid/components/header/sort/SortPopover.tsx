@@ -39,7 +39,7 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
               <span className="ml-1 bg-selection border border-foreground-muted px-2 h-5 text-foreground text-xs rounded-full inline-flex items-center">
                 <span className="opacity-75">{column}</span>
                 <span className="opacity-50 mx-0.5">:</span>
-                <span className="font-mono">{direction}</span>
+                <span className="font-mono max-w-32 truncate">{direction}</span>
               </span>
               {i === 0 && sorts.length > 1 && <span className="ml-1">and</span>}
             </Fragment>

@@ -40,7 +40,7 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
               <span className="ml-1 bg-selection border border-foreground-muted px-2 h-5 text-foreground text-xs rounded-full inline-flex items-center">
                 <span className="opacity-75">{column}</span>
                 <span className="opacity-50 mx-0.5">:{operator}:</span>
-                <span className="font-mono">{value}</span>
+                <span className="font-mono max-w-32 truncate">{value}</span>
               </span>
               {i === 0 && filters.length > 1 && <span className="ml-1">and</span>}
             </Fragment>
