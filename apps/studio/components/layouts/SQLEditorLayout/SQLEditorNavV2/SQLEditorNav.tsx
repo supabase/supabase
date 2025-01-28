@@ -379,7 +379,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     )
   }
 
-  const onSelectCopyPersonal = async (snippet: SnippetWithContent) => {
+  const onSelectDuplicate = async (snippet: SnippetWithContent) => {
     if (!profile) return console.error('Profile is required')
     if (!project) return console.error('Project is required')
     if (!projectRef) return console.error('Project ref is required')
@@ -398,7 +398,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
     const snippetCopy = createSqlSnippetSkeletonV2({
       id: uuidv4(),
-      name: snippet.name,
+      name: `${snippet.name} (Duplicate)`,
       sql,
       owner_id: profile?.id,
       project_id: project?.id,
@@ -567,8 +567,8 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                   onSelectDownload={() => {
                     setSelectedSnippetToDownload(element.metadata as Snippet)
                   }}
-                  onSelectCopyPersonal={() => {
-                    onSelectCopyPersonal(element.metadata as Snippet)
+                  onSelectDuplicate={() => {
+                    onSelectDuplicate(element.metadata as Snippet)
                   }}
                   onSelectUnshare={() => {
                     setSelectedSnippetToUnshare(element.metadata as Snippet)
@@ -630,8 +630,8 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                   onSelectDownload={() => {
                     setSelectedSnippetToDownload(element.metadata as Snippet)
                   }}
-                  onSelectCopyPersonal={() => {
-                    onSelectCopyPersonal(element.metadata as Snippet)
+                  onSelectDuplicate={() => {
+                    onSelectDuplicate(element.metadata as Snippet)
                   }}
                   onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                   onSelectUnshare={() => {
@@ -735,6 +735,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     }
                   }}
                   onSelectDownload={() => setSelectedSnippetToDownload(element.metadata as Snippet)}
+                  onSelectDuplicate={() => onSelectDuplicate(element.metadata as Snippet)}
                   onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                   onEditSave={(name: string) => {
                     // [Joshen] Inline editing only for folders for now

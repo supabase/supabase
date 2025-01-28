@@ -214,7 +214,6 @@ export const sqlEditorState = proxy({
     const storeSnippet = sqlEditorState.snippets[id]
     if (storeSnippet) {
       storeSnippet.snippet.favorite = true
-
       sqlEditorState.needsSaving.set(id, true)
     }
   },
@@ -223,7 +222,6 @@ export const sqlEditorState = proxy({
     const storeSnippet = sqlEditorState.snippets[id]
     if (storeSnippet.snippet) {
       storeSnippet.snippet.favorite = false
-
       sqlEditorState.needsSaving.set(id, true)
     }
   },
