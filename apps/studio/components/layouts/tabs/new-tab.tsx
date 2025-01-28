@@ -4,7 +4,7 @@ import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { partition } from 'lodash'
