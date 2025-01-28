@@ -176,7 +176,6 @@ export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelecti
             proOptions={{ hideAttribution: true }}
             onNodeDragStop={() => saveNodePositions()}
           >
-            <SchemaGraphLegend />
             <Background
               gap={16}
               className="[&>*]:stroke-foreground-muted opacity-[25%]"
@@ -190,6 +189,7 @@ export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelecti
               maskColor={miniMapMaskColor}
               className="border rounded-md shadow-sm"
             />
+            <SchemaGraphLegend />
           </ReactFlow>
         </div>
       )}

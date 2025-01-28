@@ -4,7 +4,7 @@ export const SchemaGraphLegend = () => {
   const SIZE = 12
 
   return (
-    <div className="absolute top-0 left-0 flex justify-center px-1 py-2 shadow-md bg-surface-100 w-full z-10 border-b">
+    <div className="absolute bottom-0 left-0 flex justify-center px-1 py-2 shadow-md bg-surface-100 w-full z-10 border-t">
       <ul className="flex flex-wrap items-center justify-center gap-4">
         <li className="flex items-center text-[10px] font-mono gap-1 text-foreground-light">
           <Key
