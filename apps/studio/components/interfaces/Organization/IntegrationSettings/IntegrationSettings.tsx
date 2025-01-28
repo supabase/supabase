@@ -33,7 +33,7 @@ import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' | 'gitlab' }) => {
   return (
     <img
-      className="border rounded-lg shadow w-48 mt-6 border-body"
+      className="border rounded-lg shadow w-full sm:w-48 mt-6 border-body"
       src={`${BASE_PATH}/img/integrations/covers/${title}-cover.png`}
       alt={`${title} cover`}
     />

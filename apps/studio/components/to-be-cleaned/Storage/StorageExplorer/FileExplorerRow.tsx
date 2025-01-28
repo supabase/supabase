@@ -1,14 +1,5 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
-import { useContextMenu } from 'react-contexify'
-import SVG from 'react-inlinesvg'
-
-import type { ItemRenderer } from 'components/ui/InfiniteList'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import {
   AlertCircle,
   Clipboard,
@@ -23,6 +14,14 @@ import {
   Music,
   Trash2,
 } from 'lucide-react'
+import { useContextMenu } from 'react-contexify'
+import SVG from 'react-inlinesvg'
+
+import type { ItemRenderer } from 'components/ui/InfiniteList'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import {
   Checkbox,
   DropdownMenu,
@@ -34,6 +33,9 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import {
   CONTEXT_MENU_KEYS,
@@ -99,7 +101,6 @@ export interface FileExplorerRowProps {
   columnIndex: number
   selectedItems: StorageItemWithColumn[]
   openedFolders: StorageItem[]
-  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null
 }
 
 const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
@@ -109,11 +110,9 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   columnIndex = 0,
   selectedItems = [],
   openedFolders = [],
-  selectedFilePreview,
 }) => {
   const storageExplorerStore = useStorageStore()
   const {
-    getFileUrl,
     popColumnAtIndex,
     pushOpenedFolderAtIndex,
     popOpenedFoldersAtIndex,
@@ -130,8 +129,9 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     downloadFile,
     downloadFolder,
     selectRangeItems,
+    selectedFilePreview,
   } = storageExplorerStore
-  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
+  const { onCopyUrl } = useCopyUrl()
 
   const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
@@ -215,8 +215,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                       {
                         name: 'Get URL',
                         icon: <Clipboard size={14} strokeWidth={1} />,
-                        onClick: () =>
-                          onCopyUrl(itemWithColumnIndex.name, getFileUrl(itemWithColumnIndex)),
+                        onClick: () => onCopyUrl(itemWithColumnIndex.name),
                       },
                     ]
                   : [
@@ -227,30 +226,21 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                           {
                             name: 'Expire in 1 week',
                             onClick: () =>
-                              onCopyUrl(
-                                itemWithColumnIndex.name,
-                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.WEEK)
-                              ),
+                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.WEEK),
                           },
                           {
                             name: 'Expire in 1 month',
                             onClick: () =>
-                              onCopyUrl(
-                                itemWithColumnIndex.name,
-                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.MONTH)
-                              ),
+                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.MONTH),
                           },
                           {
                             name: 'Expire in 1 year',
                             onClick: () =>
-                              onCopyUrl(
-                                itemWithColumnIndex.name,
-                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.YEAR)
-                              ),
+                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.YEAR),
                           },
                           {
                             name: 'Custom expiry',
-                            onClick: async () => setSelectedFileCustomExpiry(itemWithColumnIndex),
+                            onClick: () => setSelectedFileCustomExpiry(itemWithColumnIndex),
                           },
                         ],
                       },
@@ -382,26 +372,14 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
             {item.name}
           </p>
           {item.isCorrupted && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+            <Tooltip>
+              <TooltipTrigger>
                 <AlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      File is corrupted, please delete and reupload again.
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                File is corrupted, please delete and reupload again.
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
 

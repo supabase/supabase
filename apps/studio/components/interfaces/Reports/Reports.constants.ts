@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
 
-export const LAYOUT_COLUMN_COUNT = 24
+export const LAYOUT_COLUMN_COUNT = 2
 
 export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
