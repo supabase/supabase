@@ -1,5 +1,6 @@
+import { ReactNode, useEffect, useState } from 'react'
+
 import { LastSignInType, useLastSignIn } from 'hooks/misc/useLastSignIn'
-import { ReactNode } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export function LastSignInWrapper({
@@ -10,7 +11,7 @@ export function LastSignInWrapper({
   type: LastSignInType
 }) {
   const [lastSignIn] = useLastSignIn()
-  const [mounted, setMounted] = useState(false)
+  const [_, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)

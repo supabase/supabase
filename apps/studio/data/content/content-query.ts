@@ -2,10 +2,10 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
+import { getRecentItemsByType, removeRecentItems } from 'state/recent-items'
+import { createTabId, getTabsStore, removeTabs } from 'state/tabs'
 import type { Dashboards, LogSqlSnippets, SqlSnippets } from 'types'
 import { contentKeys } from './keys'
-import { createTabId, getTabsStore, removeTabs } from 'state/tabs'
-import { getRecentItemsByType, removeRecentItems } from 'state/recent-items'
 
 export type ContentBase = components['schemas']['GetUserContentObject']
 
@@ -57,9 +57,9 @@ export async function getContent(
 
   // get current content ids
   const currentContentIds = [
-    ...response.data
-      .filter((content: Content) => content.type === 'sql')
-      .map((content: Content) => createTabId('sql', { id: content.id })),
+    ...data.data
+      .filter((content) => content.type === 'sql')
+      .map((content) => createTabId('sql', { id: content.id })),
     // append ignored tab IDs
     ...IGNORED_TAB_IDS,
   ]

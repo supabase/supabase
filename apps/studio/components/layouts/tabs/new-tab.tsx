@@ -1,17 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
-import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { TelemetryActions } from 'common/telemetry'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
 import { partition } from 'lodash'
 import { Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
+
+import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
+import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
+import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { getTabsStore } from 'state/tabs'
@@ -40,6 +42,7 @@ export function NewTab() {
   const { mutate: sendEvent } = useSendEventMutation()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -132,7 +135,8 @@ export function NewTab() {
                       handleNewQuery(item.sql, item.title)
                       sendEvent({
                         action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED,
-                        properties: { title: item.title },
+                        properties: { templateName: item.title },
+                        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
                       })
                     }}
                     bgColor="bg-alternative border"
@@ -158,7 +162,8 @@ export function NewTab() {
                       handleNewQuery(item.sql, item.title)
                       sendEvent({
                         action: TelemetryActions.SQL_EDITOR_QUICKSTART_CLICKED,
-                        properties: { title: item.title },
+                        properties: { quickstartName: item.title },
+                        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
                       })
                     }}
                     bgColor="bg-alternative border"
