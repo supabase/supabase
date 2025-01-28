@@ -1,5 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
+import {
+  Copy,
+  Download,
+  Edit,
+  ExternalLink,
+  Heart,
+  Lock,
+  Move,
+  Plus,
+  Share,
+  Trash,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
@@ -42,6 +53,8 @@ interface SQLEditorTreeViewItemProps {
   onSelectDeleteFolder?: () => void
   onEditSave?: (name: string) => void
   onMultiSelect?: (id: string) => void
+  onAddFavorite?: () => void
+  onRemoveFavorite?: () => void
 
   // Pagination/filtering options
   isLastItem: boolean
@@ -72,6 +85,8 @@ export const SQLEditorTreeViewItem = ({
   onSelectDuplicate,
   onEditSave,
   onMultiSelect,
+  onAddFavorite,
+  onRemoveFavorite,
   isLastItem,
   hasNextPage: _hasNextPage,
   fetchNextPage: _fetchNextPage,
@@ -100,6 +115,9 @@ export const SQLEditorTreeViewItem = ({
   const parentId = element.parent === 0 ? undefined : element.parent
 
   const isEnabled = isBranch && isExpanded
+
+  const snippet = snapV2.snippets[element.id]
+  const isFavorite = snippet !== undefined ? snippet.snippet.favorite : false
 
   const {
     data,
@@ -273,6 +291,27 @@ export const SQLEditorTreeViewItem = ({
                   Open in new tab
                 </Link>
               </ContextMenuItem_Shadcn_>
+              <ContextMenuSeparator_Shadcn_ />
+              {onRemoveFavorite !== undefined && (
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onSelect={() => {
+                    if (isFavorite) onRemoveFavorite()
+                    else onAddFavorite?.()
+                  }}
+                  onFocusCapture={(e) => e.stopPropagation()}
+                >
+                  <Heart
+                    size={14}
+                    strokeWidth={2}
+                    className={
+                      isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                    }
+                  />
+                  {isFavorite ? 'Remove from' : 'Add to'} favorites
+                </ContextMenuItem_Shadcn_>
+              )}
+
               <ContextMenuSeparator_Shadcn_ />
               {onSelectRename !== undefined && isOwner && (
                 <ContextMenuItem_Shadcn_
