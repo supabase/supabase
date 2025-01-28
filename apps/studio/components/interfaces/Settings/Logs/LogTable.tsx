@@ -2,10 +2,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 import { isEqual } from 'lodash'
 import { ChevronDown, Clipboard, Download, Eye, EyeOff, Play } from 'lucide-react'
+import Papa from 'papaparse'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { toast } from 'sonner'
-import Papa from 'papaparse'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CSVButton from 'components/ui/CSVButton'
@@ -14,6 +14,7 @@ import { copyToClipboard } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { Item, Menu, useContextMenu } from 'react-contexify'
 import { createPortal } from 'react-dom'
+import { ResponseError } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -37,13 +38,13 @@ import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
-import { ResponseError } from 'types'
 
 interface Props {
   data?: LogData[]
   onHistogramToggle?: () => void
   isHistogramShowing?: boolean
   isLoading?: boolean
+  isSaving?: boolean
   error?: LogQueryError | null
   showDownload?: boolean
   queryType?: QueryType
@@ -75,6 +76,7 @@ const LogTable = ({
   onHistogramToggle,
   isHistogramShowing,
   isLoading,
+  isSaving,
   error,
   projectRef,
   onRun,
@@ -308,6 +310,7 @@ const LogTable = ({
           <ButtonTooltip
             type="default"
             onClick={onSave}
+            loading={isSaving}
             disabled={!canCreateLogQuery || !hasEditorValue}
             tooltip={{
               content: {

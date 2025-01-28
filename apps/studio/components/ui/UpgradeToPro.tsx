@@ -47,7 +47,7 @@ const UpgradeToPro = ({
     >
       <div className="flex gap-x-3">
         {icon && <div className="mt-1">{icon}</div>}
-        <div className="flex w-full items-center justify-between gap-x-32">
+        <div className="flex flex-col md:flex-row w-full md:items-center justify-between gap-4 md:gap-x-8 xl:gap-x-32">
           <div className="space-y-1">
             <p className="text-sm">{primaryText}</p>
             <div>

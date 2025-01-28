@@ -1,0 +1,31 @@
+---
+title = "Pausing Pro-Projects"
+github_url = "https://github.com/orgs/supabase/discussions/27399"
+date_created = "2024-06-19T23:24:18+00:00"
+topics = [ "platform", "cli", "storage" ]
+keywords = [ "pause", "projects", "backup", "storage" ]
+database_id = "76b2e2b6-8f1d-448a-a3dd-cdf68755d1a9"
+
+[api]
+cli = [ "supabase-login", "supabase-link", "supabase-init", "supabase-storage-cp" ]
+---
+
+Pro-Projects at the moment cannot paused. However, [You are allowed to have two free organizations](https://supabase.com/docs/guides/platform/org-based-billing#mix-of-free-and-pro-plan-projects) that can support one active project each and an unlimited amount of paused ones.
+
+If a project is under 500MB, you can [transfer it to be under a free organization](https://supabase.com/docs/guides/platform/project-transfer). Afterward, you can initiate a pause.
+
+Alternatively, you can download a [daily backup](https://supabase.com/dashboard/project/_/database/backups/scheduled) of just your database for archiving. You can also manually download a .SQL file of your database and storage buckets by following this [guide](https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#migrate-your-project).
+
+You can also download your storage buckets with the [Supabase CLI:](https://supabase.com/docs/guides/cli/getting-started?queryGroups=platform&platform=npx)
+
+```sql
+npx supabase login
+
+# link to your project
+npx supabase link
+
+npx supabase init
+
+# will download files to current folder
+npx supabase storage cp -r ss://bucket . --experimental
+```

@@ -1,18 +1,20 @@
 import { useParams } from 'common'
 import { useState } from 'react'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'
 import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 /**
  * Acts as a container component for the entire log display
  */
 export const RealtimeInspector = () => {
   const { ref } = useParams()
+  const org = useSelectedOrganization()
   const [sendMessageShown, setSendMessageShown] = useState(false)
 
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
@@ -51,7 +53,10 @@ export const RealtimeInspector = () => {
         visible={sendMessageShown}
         onSelectCancel={() => setSendMessageShown(false)}
         onSelectConfirm={(v) => {
-          sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_BROADCAST_SENT })
+          sendEvent({
+            action: TelemetryActions.REALTIME_INSPECTOR_BROADCAST_SENT,
+            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+          })
           sendMessage(v.message, v.payload, () => setSendMessageShown(false))
         }}
       />

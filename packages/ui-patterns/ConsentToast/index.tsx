@@ -6,7 +6,6 @@ import {
   isBrowser,
   useBreakpoint,
   useFeatureFlags,
-  useTelemetryProps,
 } from 'common'
 import { noop } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -14,6 +13,8 @@ import { toast } from 'sonner'
 import { Button, cn } from 'ui'
 import { proxy, useSnapshot } from 'valtio'
 import { PrivacySettings } from '../PrivacySettings'
+import { useRouter } from 'next/compat/router'
+import { usePathname } from 'next/navigation'
 
 interface ConsentToastProps {
   onAccept: () => void
@@ -91,10 +92,13 @@ const consentState = proxy({
 export const useConsent = () => {
   const { TELEMETRY_CONSENT, TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
   const consentToastId = useRef<string | number>()
-  const telemetryProps = useTelemetryProps()
+  const router = useRouter()
+  const appRouterPathname = usePathname()
   const featureFlags = useFeatureFlags()
 
   const { consentValue } = useSnapshot(consentState)
+  const pathname =
+    router?.pathname ?? appRouterPathname ?? (isBrowser ? window.location.pathname : '')
 
   const handleConsent = (value: 'true' | 'false') => {
     if (!isBrowser) return
@@ -108,7 +112,7 @@ export const useConsent = () => {
           const telemetryData = JSON.parse(decodeURIComponent(encodedData))
           handlePageTelemetry(
             process.env.NEXT_PUBLIC_API_URL!,
-            telemetryProps.pathname,
+            pathname,
             featureFlags.posthog,
             telemetryData
           )
@@ -118,11 +122,7 @@ export const useConsent = () => {
           console.error('Invalid telemetry data:', error)
         }
       } else {
-        handlePageTelemetry(
-          process.env.NEXT_PUBLIC_API_URL!,
-          telemetryProps.pathname,
-          featureFlags.posthog
-        )
+        handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, pathname, featureFlags.posthog)
       }
     } else {
       // remove the telemetry cookie
@@ -184,7 +184,6 @@ export const useConsent = () => {
 }
 
 export const useConsentValue = (KEY_NAME: string) => {
-  const telemetryProps = useTelemetryProps()
   const initialValue = isBrowser ? localStorage?.getItem(KEY_NAME) : null
   const [consentValue, setConsentValue] = useState<string | null>(initialValue)
 
@@ -194,21 +193,7 @@ export const useConsentValue = (KEY_NAME: string) => {
     localStorage.setItem(KEY_NAME, value)
     window.dispatchEvent(new Event('storage'))
     if (value === 'true') {
-      const telemetryData = {
-        page_url: telemetryProps.page_url,
-        page_title: typeof document !== 'undefined' ? document?.title : '',
-        pathname: telemetryProps.pathname,
-        ph: {
-          referrer: typeof document !== 'undefined' ? document?.referrer : '',
-          language: telemetryProps.language,
-          search: telemetryProps.search,
-          viewport_height: telemetryProps.viewport_height,
-          viewport_width: telemetryProps.viewport_width,
-          user_agent: navigator.userAgent,
-        },
-      }
-
-      handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname, telemetryData)
+      handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname)
     }
   }
 

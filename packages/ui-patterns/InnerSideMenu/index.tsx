@@ -12,9 +12,9 @@ import {
   DropdownMenuTrigger,
   Input_Shadcn_,
   Skeleton,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import ShimmeringLoader from '../ShimmeringLoader'
@@ -192,21 +192,21 @@ const InnerSideBarFilterSortDropdown = forwardRef<
 >(({ value, onValueChange, contentClassName, triggerClassName, ...props }, ref) => {
   return (
     <DropdownMenu modal={false}>
-      <Tooltip_Shadcn_ delayDuration={0}>
+      <Tooltip delayDuration={0}>
         <DropdownMenuTrigger
           asChild
           className={cn(
             'absolute right-1 top-[.4rem] md:top-[.3rem]',
-            'text-foreground-muted transition-colors hover:text-foreground data-[state=open]:text-foreground',
+            'text-foreground transition-colors hover:text-foreground data-[state=open]:text-foreground',
             triggerClassName
           )}
         >
-          <TooltipTrigger_Shadcn_>
+          <TooltipTrigger>
             <ChevronsDown size={18} strokeWidth={1} />
-          </TooltipTrigger_Shadcn_>
+          </TooltipTrigger>
         </DropdownMenuTrigger>
-        <TooltipContent_Shadcn_ side="bottom">Sort By</TooltipContent_Shadcn_>
-      </Tooltip_Shadcn_>
+        <TooltipContent side="bottom">Sort By</TooltipContent>
+      </Tooltip>
       <DropdownMenuContent side="bottom" align="end" className={cn('w-48', contentClassName)}>
         <DropdownMenuRadioGroup value={value} onValueChange={onValueChange}>
           {props.children}

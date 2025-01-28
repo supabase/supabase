@@ -1,0 +1,30 @@
+---
+title = "An \"invalid response was received from the upstream server\" error when querying auth"
+github_url = "https://github.com/orgs/supabase/discussions/20722"
+date_created = "2024-01-25T07:08:43+00:00"
+topics = [ "auth" ]
+database_id = "7183351e-dba3-484d-83b3-bb89a027e36a"
+
+[[errors]]
+message = "invalid response was received from the upstream server"
+
+[[errors]]
+message = "running db migrations: error executing migrations/20221208132122_backfill_email_last_sign_in_at.up.sql"
+
+[[errors]]
+message = "operator does not exist: uuid = text"
+---
+
+If you are observing an "invalid response was received from the upstream server" error when making requests to Supabase Auth, it could mean that the respective service is down. One way to confirm this is to visit the [logs explorer](https://supabase.com/dashboard/project/_/logs/explorer) and look at the auth logs to see if there are any errors with the following lines:
+
+- `running db migrations: error executing migrations/20221208132122_backfill_email_last_sign_in_at.up.sql`
+
+We're currently investigating an issue where the tables responsible for keeping track of migrations ran by Auth (`auth.schema_migrations`) are not being restored properly, which leads to the service(s) retrying those migrations. In such cases, migrations which are not idempotent will run into issues.
+
+We've documented some of the migrations that run into this issue and their corresponding fix here:
+
+### Auth: `operator does not exist: uuid = text`
+
+Temporary fix: Run `insert into auth.schema_migrations values ('20221208132122');` via the [sql editor](https://supabase.com/dashboard/project/_/sql/new) to fix the issue.
+
+If the migration error you're seeing looks different, please reach out to [supabase.help](https://supabase.help/) for assistance.

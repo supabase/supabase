@@ -10,16 +10,17 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/sql/suggest',
   '/ai/sql/generate-v2',
   '/ai/sql/generate-v3',
+  '/ai/onboarding/design',
   '/ai/sql/complete',
   '/ai/sql/title',
   '/ai/sql/debug',
   '/ai/sql/cron',
   '/ai/docs',
   '/get-ip-address',
+  '/get-utc-time',
 ]
 
 export function middleware(request: NextRequest) {
-  const url = request.url
   if (IS_PLATFORM && !HOSTED_SUPPORTED_API_URLS.some((url) => request.url.endsWith(url))) {
     return Response.json(
       { success: false, message: 'Endpoint not supported on hosted' },

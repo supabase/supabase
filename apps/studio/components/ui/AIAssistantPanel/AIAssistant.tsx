@@ -1,13 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import type { Message as MessageType } from 'ai/react'
+import { useChat } from 'ai/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
 import { ArrowDown, FileText, Info, X } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import type { Message as MessageType } from 'ai/react'
-import { useChat } from 'ai/react'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { Markdown } from 'components/interfaces/Markdown'
 import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
@@ -24,19 +26,17 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import uuidv4 from 'lib/uuid'
-import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AiIconAnimation,
   Button,
   cn,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipProvider_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -115,6 +115,8 @@ export const AIAssistant = ({
   const currentTable = tables?.find((t) => t.id.toString() === entityId)
   const currentSchema = searchParams?.get('schema') ?? 'public'
 
+  const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const {
@@ -141,16 +143,10 @@ export const AIAssistant = ({
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
   const messages = useMemo(() => {
-    const merged = [
+    return [
       ...chatMessages,
       ...(assistantError !== undefined && lastSentMessage !== undefined ? [lastSentMessage] : []),
     ]
-
-    return merged.sort(
-      (a, b) =>
-        (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0) ||
-        a.role.localeCompare(b.role)
-    )
   }, [chatMessages, assistantError, lastSentMessage])
 
   const renderedMessages = useMemo(
@@ -160,7 +156,7 @@ export const AIAssistant = ({
           <MemoizedMessage
             key={message.id}
             message={message}
-            isLoading={isChatLoading && message === messages[messages.length - 1]}
+            isLoading={isChatLoading && message.id === messages[messages.length - 1].id}
           />
         )
       }),
@@ -184,10 +180,12 @@ export const AIAssistant = ({
     if (content.includes('Help me to debug')) {
       sendEvent({
         action: TelemetryActions.ASSISTANT_DEBUG_SUBMITTED,
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     } else {
       sendEvent({
         action: TelemetryActions.ASSISTANT_PROMPT_SUBMITTED,
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     }
   }
@@ -263,17 +261,17 @@ export const AIAssistant = ({
 
               <div className="text-sm flex-1">Assistant</div>
               <div className="flex gap-4 items-center">
-                <Tooltip_Shadcn_ delayDuration={100}>
-                  <TooltipTrigger_Shadcn_ asChild>
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     <Info size={14} className="text-foreground-light" />
-                  </TooltipTrigger_Shadcn_>
-                  <TooltipContent_Shadcn_ className="w-80">
+                  </TooltipTrigger>
+                  <TooltipContent className="w-80">
                     The Assistant is in Alpha and your prompts might be rate limited.{' '}
                     {includeSchemaMetadata
                       ? 'Project metadata is being shared to improve Assistant responses.'
                       : 'Project metadata is not being shared. Opt in to improve Assistant responses.'}
-                  </TooltipContent_Shadcn_>
-                </Tooltip_Shadcn_>
+                  </TooltipContent>
+                </Tooltip>
                 <div className="flex gap-2">
                   {(hasMessages || suggestions || sqlSnippets) && (
                     <Button type="default" disabled={isChatLoading} onClick={onResetConversation}>
@@ -313,12 +311,12 @@ export const AIAssistant = ({
             </div>
           )}
           {hasMessages ? (
-            <motion.div className="w-full p-5">
+            <div className="w-full p-5">
               {renderedMessages}
               {(last(messages)?.role === 'user' || last(messages)?.content?.length === 0) && (
                 <div className="flex gap-4 w-auto overflow-hidden">
                   <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
-                  <motion.div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
+                  <div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
                     <span>Thinking</span>
                     <div className="flex gap-1">
                       <motion.span
@@ -340,11 +338,11 @@ export const AIAssistant = ({
                         .
                       </motion.span>
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
               )}
               <div className="h-1" />
-            </motion.div>
+            </div>
           ) : suggestions ? (
             <div className="w-full h-full px-8 py-0 flex flex-col flex-1 justify-end">
               <h3 className="text-foreground-light font-mono text-sm uppercase mb-3">
@@ -396,9 +394,9 @@ export const AIAssistant = ({
                   Generate a ...
                 </Button>
                 {SQL_TEMPLATES.filter((t) => t.type === 'quickstart').map((qs) => (
-                  <TooltipProvider_Shadcn_ key={qs.title}>
-                    <Tooltip_Shadcn_>
-                      <TooltipTrigger_Shadcn_ asChild>
+                  <TooltipProvider key={qs.title}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
                         <Button
                           type="outline"
                           className="rounded-full"
@@ -421,12 +419,12 @@ export const AIAssistant = ({
                         >
                           {qs.title}
                         </Button>
-                      </TooltipTrigger_Shadcn_>
-                      <TooltipContent_Shadcn_>
+                      </TooltipTrigger>
+                      <TooltipContent>
                         <p>{qs.description}</p>
-                      </TooltipContent_Shadcn_>
-                    </Tooltip_Shadcn_>
-                  </TooltipProvider_Shadcn_>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 ))}
               </div>
             </div>
@@ -514,7 +512,7 @@ export const AIAssistant = ({
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
-              'z-20 [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
+              'z-20 [&>textarea]:text-base [&>textarea]:md:text-sm [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
             )}
             loading={isChatLoading}
             disabled={!isApiKeySet || disablePrompts || isChatLoading}

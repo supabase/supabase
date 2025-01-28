@@ -39,12 +39,12 @@ const ProjectsPage: NextPageWithLayout = () => {
   return (
     <>
       {isError && (
-        <div className="py-4 px-5">
+        <div className="p-4 md:px-5">
           <AlertError subject="Failed to retrieve organizations" />
         </div>
       )}
 
-      <div className="p-5">
+      <div className="p-4 md:p-5">
         {IS_PLATFORM && projectCreationEnabled && isSuccess && (
           <HomePageActions
             search={search}

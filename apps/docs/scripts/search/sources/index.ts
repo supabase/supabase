@@ -1,3 +1,4 @@
+import { sep } from 'node:path'
 import {
   GitHubDiscussionLoader,
   type GitHubDiscussionSource,
@@ -93,9 +94,13 @@ export async function fetchSources() {
     'spec/common-cli-sections.json'
   ).load()
 
-  const guideSources = (await walk('content'))
-    .filter(({ path }) => /\.mdx?$/.test(path))
-    .filter(({ path }) => !ignoredFiles.includes(path))
+  const guideSources = (await walk('content/guides'))
+    .filter(
+      ({ path }) =>
+        /\.mdx?$/.test(path) &&
+        !ignoredFiles.includes(path) &&
+        !path.split(sep).some((part) => part.startsWith('_'))
+    )
     .map((entry) => new MarkdownLoader('guide', entry.path, { yaml: true }).load())
 
   const partnerIntegrationSources = (await fetchPartners()).map((partner) =>

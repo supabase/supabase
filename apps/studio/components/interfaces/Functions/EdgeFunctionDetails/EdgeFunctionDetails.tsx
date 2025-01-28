@@ -194,7 +194,7 @@ const EdgeFunctionDetails = () => {
                         <div className="!mt-4">
                           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                             <Link
-                              href="https://supabase.com/docs/guides/functions/import-maps"
+                              href="https://supabase.com/docs/guides/functions/dependencies"
                               target="_blank"
                               rel="noreferrer"
                             >

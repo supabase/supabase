@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
 import { IS_PLATFORM, useParams } from 'common'
 import { CreateWarehouseCollectionModal } from 'components/interfaces/DataWarehouse/CreateWarehouseCollection'
 import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/WarehouseMenuItem'
@@ -11,14 +10,11 @@ import { useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
-import { ArrowUpRight, ChevronRight, DatabaseIcon, FilePlus, Plus } from 'lucide-react'
+import { ChevronRight, FilePlus, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
@@ -28,6 +24,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Separator,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import {
   InnerSideBarEmptyPanel,
