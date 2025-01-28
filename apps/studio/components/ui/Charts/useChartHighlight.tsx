@@ -5,6 +5,7 @@ export interface ChartHighlight {
   right: string | undefined
   coordinates: { left: any; right: any }
   isSelecting: boolean
+  popoverPosition: { x: number; y: number } | null
   handleMouseDown: (e: { activeLabel?: string; coordinates?: any }) => void
   handleMouseMove: (e: { activeLabel?: string; coordinates?: any }) => void
   handleMouseUp: (e: any) => void
@@ -16,6 +17,7 @@ export function useChartHighlight(): ChartHighlight {
   const [right, setRight] = useState<string | undefined>(undefined)
   const [coordinates, setCoordinates] = useState<any>({ left: undefined, right: undefined })
   const [isSelecting, setIsSelecting] = useState(false)
+  const [popoverPosition, setPopoverPosition] = useState<{ x: number; y: number } | null>(null)
 
   const handleMouseDown = (e: any) => {
     clearHighlight()
@@ -23,7 +25,7 @@ export function useChartHighlight(): ChartHighlight {
     setIsSelecting(true)
     setLeft(e.activeLabel)
     setRight(e.activeLabel)
-    setCoordinates((prevCoordinates: any) => ({ left: e.coordinates, right: undefined }))
+    setCoordinates({ left: e.coordinates, right: undefined })
   }
 
   const handleMouseMove = (e: any) => {
@@ -35,12 +37,14 @@ export function useChartHighlight(): ChartHighlight {
   const handleMouseUp = (e: any) => {
     if (!isSelecting) return
     setIsSelecting(false)
+    setPopoverPosition({ x: e.chartX, y: e.chartY })
   }
 
   const clearHighlight = () => {
     setLeft(undefined)
     setRight(undefined)
     setCoordinates({ left: undefined, right: undefined })
+    setPopoverPosition(null)
   }
 
   return {
@@ -48,6 +52,7 @@ export function useChartHighlight(): ChartHighlight {
     right,
     coordinates,
     isSelecting,
+    popoverPosition,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,

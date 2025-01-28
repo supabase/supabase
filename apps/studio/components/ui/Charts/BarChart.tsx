@@ -18,8 +18,9 @@ import ChartHeader from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-import { cn } from 'ui'
+import { Button, cn } from 'ui'
 import type { ChartHighlight } from './useChartHighlight'
+import ChartHighlightActions from './ChartHighlightActions'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -133,7 +134,7 @@ const BarChart = ({
         chartStyle={chartStyle}
         onChartStyleChange={onChartStyleChange}
       />
-      <Container>
+      <Container className="relative">
         <RechartBarChart
           data={data}
           className="overflow-visible"
@@ -206,6 +207,7 @@ const BarChart = ({
             />
           )}
         </RechartBarChart>
+        <ChartHighlightActions chartHighlight={chartHighlight} />
       </Container>
       {data && (
         <div className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs">

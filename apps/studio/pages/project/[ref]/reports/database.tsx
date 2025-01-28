@@ -139,162 +139,158 @@ const DatabaseUsage = () => {
         </div>
       </div>
       <section>
-        <Panel className="bg-transparent" title={<h2>Database health</h2>}>
-          <Panel.Content>
-            <div className="mb-4 flex items-center justify-between space-x-3">
-              <DatePickers
-                onChange={(values: any) => {
-                  setDateRange({
-                    period_start: { date: values.from, time_period: '7d' },
-                    period_end: { date: values.to, time_period: 'today' },
-                    interval: handleIntervalGranularity(values.from, values.to),
-                  })
-                }}
-                to={dateRange?.period_end?.date}
-                from={dateRange?.period_start?.date}
-                helpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
-                  ...helper,
-                  disabled: (index > 4 && plan?.id === 'free') || (index > 5 && plan?.id !== 'pro'),
-                }))}
-              />
-              {dateRange && (
-                <div className="flex items-center gap-x-2">
-                  <p className="text-foreground-light">
-                    {dayjs(dateRange.period_start.date).format('MMM D, h:mma')}
-                  </p>
-                  <p className="text-foreground-light">
-                    <ArrowRight size={12} />
-                  </p>
-                  <p className="text-foreground-light">
-                    {dayjs(dateRange.period_end.date).format('MMM D, h:mma')}
-                  </p>
-                </div>
-              )}
+        <div className="mb-4 flex items-center justify-between space-x-3">
+          <DatePickers
+            onChange={(values: any) => {
+              setDateRange({
+                period_start: { date: values.from, time_period: '7d' },
+                period_end: { date: values.to, time_period: 'today' },
+                interval: handleIntervalGranularity(values.from, values.to),
+              })
+            }}
+            from={dateRange?.period_start?.date || ''}
+            to={dateRange?.period_end?.date || ''}
+            helpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
+              ...helper,
+              disabled: (index > 4 && plan?.id === 'free') || (index > 5 && plan?.id !== 'pro'),
+            }))}
+          />
+          {dateRange && (
+            <div className="flex items-center gap-x-2">
+              <p className="text-foreground-light">
+                {dayjs(dateRange.period_start.date).format('MMM D, h:mma')}
+              </p>
+              <p className="text-foreground-light">
+                <ArrowRight size={12} />
+              </p>
+              <p className="text-foreground-light">
+                {dayjs(dateRange.period_end.date).format('MMM D, h:mma')}
+              </p>
             </div>
-            <div className="grid 2xl:grid-cols-2 gap-4">
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="ram_usage"
-                  label="Memory usage"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                  customDateFormat={handleCustomDateFormat}
-                />
-              )}
+          )}
+        </div>
+        <div className="grid xl:grid-cols-2 gap-4">
+          {dateRange && (
+            <ChartHandler
+              provider="infra-monitoring"
+              attribute="ram_usage"
+              label="Memory usage"
+              interval={dateRange.interval}
+              startDate={dateRange?.period_start?.date}
+              endDate={dateRange?.period_end?.date}
+              customDateFormat={handleCustomDateFormat}
+            />
+          )}
 
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="avg_cpu_usage"
-                  label="Average CPU usage"
-                  interval={dateRange.interval !== '15s' ? dateRange.interval : '1m'}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                  customDateFormat={handleCustomDateFormat}
-                />
-              )}
+          {dateRange && (
+            <ChartHandler
+              provider="infra-monitoring"
+              attribute="avg_cpu_usage"
+              label="Average CPU usage"
+              interval={dateRange.interval !== '15s' ? dateRange.interval : '1m'}
+              startDate={dateRange?.period_start?.date}
+              endDate={dateRange?.period_end?.date}
+              customDateFormat={handleCustomDateFormat}
+            />
+          )}
 
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="max_cpu_usage"
-                  label="Max CPU usage"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                  customDateFormat={handleCustomDateFormat}
-                />
-              )}
+          {dateRange && (
+            <ChartHandler
+              provider="infra-monitoring"
+              attribute="max_cpu_usage"
+              label="Max CPU usage"
+              interval={dateRange.interval}
+              startDate={dateRange?.period_start?.date}
+              endDate={dateRange?.period_end?.date}
+              customDateFormat={handleCustomDateFormat}
+            />
+          )}
 
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="disk_io_consumption"
-                  label="Disk IO consumed"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                  customDateFormat={handleCustomDateFormat}
-                />
-              )}
+          {dateRange && (
+            <ChartHandler
+              provider="infra-monitoring"
+              attribute="disk_io_consumption"
+              label="Disk IO consumed"
+              interval={dateRange.interval}
+              startDate={dateRange?.period_start?.date}
+              endDate={dateRange?.period_end?.date}
+              customDateFormat={handleCustomDateFormat}
+            />
+          )}
 
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="pg_stat_database_num_backends"
-                  label="Number of database connections"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                  customDateFormat={handleCustomDateFormat}
-                />
-              )}
+          {dateRange && (
+            <ChartHandler
+              provider="infra-monitoring"
+              attribute="pg_stat_database_num_backends"
+              label="Number of database connections"
+              interval={dateRange.interval}
+              startDate={dateRange?.period_start?.date}
+              endDate={dateRange?.period_end?.date}
+              customDateFormat={handleCustomDateFormat}
+            />
+          )}
 
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="client_connections_postgres"
-                  label="Client connections - Postgres"
-                  // defaultChartStyle="stackedAreaLine"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                  customDateFormat={handleCustomDateFormat}
-                />
-              )}
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="client_connections_supavisor"
-                  label="Client connections - Supavisor"
-                  // defaultChartStyle="stackedAreaLine"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                  customDateFormat={handleCustomDateFormat}
-                />
-              )}
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="client_connections_pgbouncer"
-                  label="Client connections - pgbouncer"
-                  // defaultChartStyle="stackedAreaLine"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                  customDateFormat={handleCustomDateFormat}
-                />
-              )}
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="client_connections_realtime"
-                  label="Client connections - Realtime"
-                  // defaultChartStyle="stackedAreaLine"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                  customDateFormat={handleCustomDateFormat}
-                />
-              )}
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="client_connections_max_limit"
-                  label="Client connections - Max limit"
-                  // defaultChartStyle="stackedAreaLine"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                  customDateFormat={handleCustomDateFormat}
-                />
-              )}
-            </div>
-          </Panel.Content>
-        </Panel>
+          {dateRange && (
+            <ChartHandler
+              provider="infra-monitoring"
+              attribute="client_connections_postgres"
+              label="Client connections - Postgres"
+              // defaultChartStyle="stackedAreaLine"
+              interval={dateRange.interval}
+              startDate={dateRange?.period_start?.date}
+              endDate={dateRange?.period_end?.date}
+              customDateFormat={handleCustomDateFormat}
+            />
+          )}
+          {dateRange && (
+            <ChartHandler
+              provider="infra-monitoring"
+              attribute="client_connections_supavisor"
+              label="Client connections - Supavisor"
+              // defaultChartStyle="stackedAreaLine"
+              interval={dateRange.interval}
+              startDate={dateRange?.period_start?.date}
+              endDate={dateRange?.period_end?.date}
+              customDateFormat={handleCustomDateFormat}
+            />
+          )}
+          {dateRange && (
+            <ChartHandler
+              provider="infra-monitoring"
+              attribute="client_connections_pgbouncer"
+              label="Client connections - pgbouncer"
+              // defaultChartStyle="stackedAreaLine"
+              interval={dateRange.interval}
+              startDate={dateRange?.period_start?.date}
+              endDate={dateRange?.period_end?.date}
+              customDateFormat={handleCustomDateFormat}
+            />
+          )}
+          {dateRange && (
+            <ChartHandler
+              provider="infra-monitoring"
+              attribute="client_connections_realtime"
+              label="Client connections - Realtime"
+              // defaultChartStyle="stackedAreaLine"
+              interval={dateRange.interval}
+              startDate={dateRange?.period_start?.date}
+              endDate={dateRange?.period_end?.date}
+              customDateFormat={handleCustomDateFormat}
+            />
+          )}
+          {dateRange && (
+            <ChartHandler
+              provider="infra-monitoring"
+              attribute="client_connections_max_limit"
+              label="Client connections - Max limit"
+              // defaultChartStyle="stackedAreaLine"
+              interval={dateRange.interval}
+              startDate={dateRange?.period_start?.date}
+              endDate={dateRange?.period_end?.date}
+              customDateFormat={handleCustomDateFormat}
+            />
+          )}
+        </div>
 
         {dateRange && isReplicaSelected && (
           <Panel title="Replica Information">
