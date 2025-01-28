@@ -241,9 +241,7 @@ export const UsersV2 = () => {
   return (
     <>
       <div className="h-full flex flex-col">
-        <div className="border-default flex max-h-12 items-center px-4 min-h-10">
-          <h3 className="text-lg">Users</h3>
-        </div>
+        <FormHeader className="py-4 px-6 !mb-0" title="Users" />
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-center justify-between gap-2 border-t">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
