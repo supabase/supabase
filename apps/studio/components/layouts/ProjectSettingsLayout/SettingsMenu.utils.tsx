@@ -4,6 +4,7 @@ import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.typ
 import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import type { Organization } from 'types'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export const generateSettingsMenu = (
   ref?: string,
@@ -15,6 +16,7 @@ export const generateSettingsMenu = (
     storage?: boolean
     invoices?: boolean
     diskAndCompute?: boolean
+    newApiKeys?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -59,20 +61,28 @@ export const generateSettingsMenu = (
                 url: `/project/${ref}/settings/integrations`,
                 items: [],
               },
-              {
-                name: 'API Keys',
-                key: 'api-keys',
-                url: `/project/${ref}/settings/api-keys`,
-                items: [],
-                label: 'NEW',
-              },
-              {
-                name: 'JWT Secrets',
-                key: 'jwt-secrets',
-                url: `/project/${ref}/settings/jwt-secrets`,
-                items: [],
-                label: 'NEW',
-              },
+              ...(features?.newApiKeys
+                ? [
+                    {
+                      name: 'API Keys',
+                      key: 'api-keys',
+                      url: `/project/${ref}/settings/api-keys`,
+                      items: [],
+                      label: 'NEW',
+                    },
+                  ]
+                : []),
+              ...(features?.newApiKeys
+                ? [
+                    {
+                      name: 'JWT Secrets',
+                      key: 'jwt-secrets',
+                      url: `/project/${ref}/settings/jwt-secrets`,
+                      items: [],
+                      label: 'NEW',
+                    },
+                  ]
+                : []),
             ]
           : []),
         {
