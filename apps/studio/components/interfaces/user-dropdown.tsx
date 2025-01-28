@@ -1,7 +1,7 @@
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { FlaskConical, Settings, User } from 'lucide-react'
+import { Command, FlaskConical, Settings, User } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -20,6 +20,7 @@ import {
   Theme,
   singleThemes,
 } from 'ui'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 export function UserDropdown() {
   const { profile } = useProfile()
@@ -27,6 +28,8 @@ export function UserDropdown() {
   const { theme, setTheme } = useTheme()
   const signOut = useSignOut()
   const router = useRouter()
+
+  const setCommandMenuOpen = useSetCommandMenuOpen()
 
   // const { setAiAssistantPanel, aiAssistantPanel } = useAppStateSnapshot()
 
@@ -84,12 +87,9 @@ export function UserDropdown() {
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem
-                className="flex gap-2"
-                onClick={() => appStateSnapshot.setAiAssistantPanel({ open: true })}
-              >
-                <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                Open Assistant
+              <DropdownMenuItem className="flex gap-2" onClick={() => setCommandMenuOpen(true)}>
+                <Command size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                Command menu
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </DropdownMenuGroup>
