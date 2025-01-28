@@ -22,7 +22,7 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
   const org = useSelectedOrganization()
 
   return (
-    <div className="flex flex-row h-14 gap-2.5 items-center px-4">
+    <div className="flex flex-row h-10 gap-2.5 items-center px-4">
       <div className="flex flex-row">
         <ChooseChannelPopover config={config} onChangeConfig={onChangeConfig} />
         <RealtimeTokensPopover config={config} onChangeConfig={onChangeConfig} />

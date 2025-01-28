@@ -110,7 +110,7 @@ export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelecti
   return (
     <>
       {!hideSchemaSelection ? (
-        <div className="flex items-center justify-between p-4 border-b border-muted">
+        <div className="flex items-center justify-between px-4 py-[7px] border-b border-default">
           {isLoadingSchemas && (
             <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
           )}

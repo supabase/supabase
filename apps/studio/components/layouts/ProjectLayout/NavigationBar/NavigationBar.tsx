@@ -231,17 +231,6 @@ export const NavContent = () => {
   return (
     <>
       <ul className="flex flex-col gap-y-1 justify-start px-2 relative">
-        <Link
-          href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
-          className="mx-2 hidden md:flex items-center w-[40px] h-[40px]"
-          onClick={onCloseNavigationIconLink}
-        >
-          <img
-            alt="Supabase"
-            src={`${router.basePath}/img/supabase-logo.svg`}
-            className="absolute h-[40px] w-6 cursor-pointer rounded"
-          />
-        </Link>
         <NavigationIconLink
           isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
           route={{
