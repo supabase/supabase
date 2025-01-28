@@ -50,7 +50,6 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
     id,
   })
 
-  const gridColumn = state.gridColumns.find((x) => x.name == column.key)
   const rawValue = row[column.key as keyof TRow] as unknown
   const initialValue = rawValue ? String(rawValue) : null
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
@@ -117,14 +116,13 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
 
   return (
     <>
-      <Popover_Shadcn_ open={isPopoverOpen}>
-        <PopoverTrigger_Shadcn_>
+      <Popover_Shadcn_ open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <PopoverTrigger_Shadcn_ asChild>
           <div
             className={cn(
               !!value && value.toString().trim().length === 0 && 'sb-grid-fill-container',
-              'sb-grid-text-editor__trigger'
+              'sb-grid-text-editor__trigger w-full'
             )}
-            onClick={() => setIsPopoverOpen(!isPopoverOpen)}
           >
             {value === null ? <NullValue /> : value === '' ? <EmptyValue /> : value}
           </div>
@@ -133,20 +131,12 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
           side="bottom"
           align="start"
           sideOffset={-35}
-          className="rounded-none"
+          className="rounded-none p-0 min-w-[231px]"
+          sameWidthAsTrigger
         >
           {isTruncated && !isSuccess ? (
-            <div
-              style={{ width: `${gridColumn?.width || column.width}px` }}
-              className="flex items-center justify-center flex-col relative"
-            >
-              <MonacoEditor
-                readOnly
-                onChange={() => {}}
-                width={`${gridColumn?.width || column.width}px`}
-                value={value ?? ''}
-                language="markdown"
-              />
+            <div className="flex items-center justify-center flex-col relative">
+              <MonacoEditor readOnly onChange={() => {}} value={value ?? ''} language="markdown" />
               <TruncatedWarningOverlay isLoading={isLoading} loadFullValue={loadFullValue} />
             </div>
           ) : (
@@ -156,23 +146,18 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
               onEnter={saveChanges}
               ignoreOutsideClicks={isConfirmNextModalOpen}
             >
-              <MonacoEditor
-                width={`${gridColumn?.width || column.width}px`}
-                value={value ?? ''}
-                readOnly={!isEditable}
-                onChange={onChange}
-              />
+              <MonacoEditor value={value ?? ''} readOnly={!isEditable} onChange={onChange} />
               {isEditable && (
                 <div className="flex items-start justify-between p-2 bg-surface-200 space-x-2">
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2">
-                      <div className="px-1.5 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
+                      <div className="px-1.5 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center h-[22px]">
                         <span className="text-[10px]">⏎</span>
                       </div>
                       <p className="text-xs text-foreground-light">Save changes</p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <div className="px-1 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
+                      <div className="px-1 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center h-[22px]">
                         <span className="text-[10px]">Esc</span>
                       </div>
                       <p className="text-xs text-foreground-light">Cancel changes</p>
