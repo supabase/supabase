@@ -15,7 +15,7 @@ const OrganizationDeletePanel = () => {
         </p>
       }
     >
-      <Panel.Content className="p-0">
+      <Panel.Content className="!p-0">
         {selectedOrganization?.managed_by !== 'vercel-marketplace' ? (
           <Admonition
             type="destructive"
