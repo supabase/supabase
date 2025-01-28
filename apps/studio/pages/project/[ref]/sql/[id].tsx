@@ -2,11 +2,17 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { useParams } from 'common/hooks/useParams'
+import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
+import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
+import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
+import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { useContentIdQuery } from 'data/content/content-id-query'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { addTab, createTabId } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const SqlEditor: NextPageWithLayout = () => {
@@ -50,13 +56,37 @@ const SqlEditor: NextPageWithLayout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, allSnippets, content])
 
-  return (
-    <div className="flex-1 overflow-auto">
-      <SQLEditor />
-    </div>
-  )
+  const { flags } = useFeaturePreviewContext()
+  const isSqlEditorTabsEnabled = flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+  // Watch for route changes
+  useEffect(() => {
+    if (isSqlEditorTabsEnabled) {
+      if (!router.isReady || !id || id === 'new') return
+
+      const tabId = createTabId('sql', { id })
+      const snippet = data
+
+      addTab(ref, {
+        id: tabId,
+        type: 'sql',
+        label: snippet?.name || 'Untitled Query',
+        metadata: {
+          sqlId: id,
+          name: snippet?.name,
+        },
+      })
+    }
+  }, [router.isReady, id, data, isSqlEditorTabsEnabled])
+
+  return <SQLEditor />
 }
 
-SqlEditor.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
+SqlEditor.getLayout = (page) => (
+  <ProjectContextFromParamsProvider>
+    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
+      <SQLEditorLayout>{page}</SQLEditorLayout>
+    </EditorBaseLayout>
+  </ProjectContextFromParamsProvider>
+)
 
 export default SqlEditor

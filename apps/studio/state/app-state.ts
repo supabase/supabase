@@ -68,6 +68,8 @@ const getInitialState = () => {
       showGenerateSqlModal: false,
       navigationPanelOpen: false,
       navigationPanelJustClosed: false,
+      showConnectDialog: false,
+      ongoingQueriesPanelOpen: false,
     }
   }
 
@@ -111,6 +113,8 @@ const getInitialState = () => {
     showGenerateSqlModal: false,
     navigationPanelOpen: false,
     navigationPanelJustClosed: false,
+    showConnectDialog: false,
+    ongoingQueriesPanelOpen: false,
   }
 }
 
@@ -209,6 +213,16 @@ export const appState = proxy({
       content: hasEntityChanged ? '' : appState.aiAssistantPanel.content,
       ...value,
     }
+  },
+
+  showConnectDialog: false,
+  setShowConnectDialog: (value: boolean) => {
+    appState.showConnectDialog = value
+  },
+
+  showOngoingQueriesPanelOpen: false,
+  setOnGoingQueriesPanelOpen: (value: boolean) => {
+    appState.ongoingQueriesPanelOpen = value
   },
 
   saveLatestMessage: (message: any) => {
