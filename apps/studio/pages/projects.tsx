@@ -3,13 +3,14 @@ import { useEffect, useState } from 'react'
 
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+
 import AlertError from 'components/ui/AlertError'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import AccountLayout from 'components/layouts/AccountLayout/account-layout'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
