@@ -5021,7 +5021,7 @@ functions:
           const { data, error } = await supabase
             .from('reservations')
             .select()
-            .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30)')
+            .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30]')
           ```
         data:
           sql: |
