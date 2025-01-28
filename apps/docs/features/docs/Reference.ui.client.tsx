@@ -67,7 +67,7 @@ export function ApiOperationBodySchemeSelector({
   requestBody: IApiEndPoint['requestBody']
   className?: string
 }) {
-  const availableSchemes = Object.keys(requestBody.content) as Array<
+  const availableSchemes = (requestBody?.content ? Object.keys(requestBody.content) : []) as Array<
     'application/json' | 'application/x-www-form-urlencoded'
   >
   const [selectedScheme, setSelectedScheme] = useState(availableSchemes[0])

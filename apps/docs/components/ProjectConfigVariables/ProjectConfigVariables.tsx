@@ -118,16 +118,24 @@ function OrgProjectSelector() {
 
   const formattedData: ComboBoxOption[] = useMemo(
     () =>
-      stateSummary !== 'loggedIn.dataSuccess.hasData'
+      stateSummary !== 'loggedIn.dataSuccess.hasData' || !projects || !organizations
         ? []
         : projects.map((project) => {
             const organization = organizations.find((org) => org.id === project.organization_id)
+            if (!organization) return null
+            const value = toOrgProjectValue(organization, project)
+            const displayName = toDisplayNameOrgProject(organization, project)
             return {
               id: project.ref,
-              value: toOrgProjectValue(organization, project),
-              displayName: toDisplayNameOrgProject(organization, project),
+              value,
+              displayName,
             }
-          }),
+          }).filter((item): item is ComboBoxOption => 
+            item !== null && 
+            typeof item.id === 'string' && 
+            typeof item.value === 'string' && 
+            typeof item.displayName === 'string'
+          ),
     [organizations, projects, stateSummary]
   )
 
@@ -136,19 +144,21 @@ function OrgProjectSelector() {
       const storedMaybeOrgId = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_ORG)
       const storedMaybeProjectRef = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_PROJECT)
 
-      let storedOrg: Org
-      let storedProject: Project
-      if (storedMaybeOrgId && storedMaybeProjectRef) {
+      let storedOrg: Org | undefined
+      let storedProject: Project | undefined
+      if (storedMaybeOrgId && storedMaybeProjectRef && organizations && projects) {
         storedOrg = organizations.find((org) => org.id === Number(storedMaybeOrgId))
         storedProject = projects.find((project) => project.ref === storedMaybeProjectRef)
       }
 
-      if (storedOrg && storedProject && storedProject.organization_id === storedOrg.id) {
+      if (storedOrg && storedProject && projects && organizations && storedProject.organization_id === storedOrg.id) {
         setSelectedOrgProject(storedOrg, storedProject)
       } else {
-        const firstProject = projects[0]
-        const matchingOrg = organizations.find((org) => org.id === firstProject.organization_id)
-        if (matchingOrg) setSelectedOrgProject(matchingOrg, firstProject)
+        if (projects && organizations && projects.length > 0) {
+          const firstProject = projects[0]
+          const matchingOrg = organizations.find((org) => org.id === firstProject.organization_id)
+          if (matchingOrg) setSelectedOrgProject(matchingOrg, firstProject)
+        }
       }
     }
   }, [organizations, projects, selectedOrg, selectedProject, setSelectedOrgProject, stateSummary])
@@ -166,11 +176,13 @@ function OrgProjectSelector() {
       selectedOption={
         selectedOrg && selectedProject ? toOrgProjectValue(selectedOrg, selectedProject) : undefined
       }
-      onSelectOption={(optionValue) => {
-        const [orgId, projectRef] = fromOrgProjectValue(optionValue)
+      onSelectOption={(option) => {
+        if (!organizations || !projects) return
+
+        const [orgId, projectRef] = fromOrgProjectValue(option)
         if (!orgId || !projectRef) return
 
-        const org = organizations.find((org) => org.id === orgId)
+        const org = organizations.find((org) => org.id === Number(orgId))
         const project = projects.find((project) => project.ref === projectRef)
 
         if (org && project && project.organization_id === org.id) {
@@ -209,7 +221,7 @@ function BranchSelector() {
               : 'loggedIn.branches.dataSuccess.hasData'
 
   const formattedData: ComboBoxOption[] =
-    stateSummary !== 'loggedIn.branches.dataSuccess.hasData'
+    stateSummary !== 'loggedIn.branches.dataSuccess.hasData' || !data
       ? []
       : data.map((branch) => ({
           id: branch.id,
@@ -218,13 +230,11 @@ function BranchSelector() {
         }))
 
   useEffect(() => {
-    if (stateSummary === 'loggedIn.branches.dataSuccess.hasData' && !selectedBranch) {
+    if (stateSummary === 'loggedIn.branches.dataSuccess.hasData' && !selectedBranch && data) {
       const storedMaybeBranchId = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_BRANCH)
-
-      let storedBranch: Branch
-      if (storedMaybeBranchId) {
-        storedBranch = data.find((branch) => branch.id === storedMaybeBranchId)
-      }
+      const storedBranch = storedMaybeBranchId 
+        ? data.find((branch) => branch.id === storedMaybeBranchId)
+        : undefined
 
       if (storedBranch) {
         setSelectedBranch(storedBranch)
@@ -250,11 +260,13 @@ function BranchSelector() {
       options={formattedData}
       selectedOption={selectedBranch ? toBranchValue(selectedBranch) : undefined}
       onSelectOption={(option) => {
+        if (!data) return
+
         const [branchId] = fromBranchValue(option)
-        if (branchId) {
-          const branch = data.find((branch) => branch.id === branchId)
-          if (branch) setSelectedBranch(branch)
-        }
+        if (!branchId) return
+
+        const branch = data.find((branch) => branch.id === branchId)
+        if (branch) setSelectedBranch(branch)
       }}
     />
   ) : null
@@ -303,16 +315,17 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             ? 'loggedIn.selectedProject.dataError'
             : 'loggedIn.selectedProject.dataSuccess'
 
-  let variableValue: string = null
-  if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
+  let variableValue: string | null = null
+  if (stateSummary === 'loggedIn.selectedProject.dataSuccess' && apiData?.autoApiService) {
+    const service = apiData.autoApiService
     switch (variable) {
       case 'url':
-        variableValue = `${apiData.autoApiService.protocol || 'https'}://${
-          apiData.autoApiService.endpoint
-        }`
+        variableValue = service.endpoint 
+          ? `${service.protocol || 'https'}://${service.endpoint}`
+          : null
         break
       case 'anonKey':
-        variableValue = apiData.autoApiService.defaultApiKey
+        variableValue = service.defaultApiKey ?? null
         break
     }
   }
@@ -330,7 +343,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             stateSummary === 'userLoading' ||
             stateSummary === 'loggedIn.selectedProject.dataPending'
               ? 'Loading...'
-              : stateSummary === 'loggedIn.selectedProject.dataSuccess'
+              : stateSummary === 'loggedIn.selectedProject.dataSuccess' && variableValue !== null
                 ? variableValue
                 : `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
           }

@@ -60,8 +60,8 @@ export function ReferenceNavigationScrollHandler({
   children,
   ...rest
 }: PropsWithChildren & HTMLAttributes<HTMLDivElement>) {
-  const parentRef = useRef<HTMLElement>()
-  const ref = useRef<HTMLDivElement>()
+  const parentRef = useRef<HTMLElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
   const initialScrollHappened = useContext(ReferenceContentInitiallyScrolledContext)
 
   useEffect(() => {
@@ -69,7 +69,7 @@ export function ReferenceNavigationScrollHandler({
 
     let scrollingParent: HTMLElement = ref.current
 
-    while (scrollingParent && !(scrollingParent.scrollHeight > scrollingParent.clientHeight)) {
+    while (scrollingParent && scrollingParent.parentElement && !(scrollingParent.scrollHeight > scrollingParent.clientHeight)) {
       scrollingParent = scrollingParent.parentElement
     }
 
@@ -180,7 +180,7 @@ export function RefLink({
   skipChildren?: boolean
   className?: string
 }) {
-  const ref = useRef<HTMLAnchorElement>()
+  const ref = useRef<HTMLAnchorElement>(null)
 
   const pathname = usePathname()
   const href = deriveHref(basePath, section)
@@ -189,7 +189,7 @@ export function RefLink({
 
   useEffect(() => {
     if (ref.current) {
-      ref.current.ariaCurrent = isActive ? 'page' : undefined
+      ref.current.setAttribute('aria-current', isActive ? 'page' : '')
       ref.current.className = getLinkStyles(isActive, className)
     }
   }, [isActive, className])
@@ -201,7 +201,7 @@ export function RefLink({
 
   if (!('title' in section)) return null
 
-  const isCompoundSection = !skipChildren && 'items' in section && section.items.length > 0
+  const isCompoundSection = !skipChildren && 'items' in section && section.items?.length > 0
 
   return (
     <>
@@ -232,7 +232,7 @@ function useCompoundRefLinkActive(basePath: string, section: AbbrevApiReferenceS
   const isParentActive = pathname === parentHref
 
   const childHrefs = useMemo(
-    () => new Set(section.items.map((item) => deriveHref(basePath, item))),
+    () => new Set((section.items ?? []).map((item) => deriveHref(basePath, item))),
     [basePath, section]
   )
   const isChildActive = childHrefs.has(pathname)
@@ -288,7 +288,7 @@ function CompoundRefLink({
       >
         <ul className="space-y-2">
           <RefLink basePath={basePath} section={section} skipChildren />
-          {section.items.map((item, idx) => {
+          {(section.items ?? []).map((item, idx) => {
             return (
               <li key={`${section.id}-${idx}`}>
                 <RefLink basePath={basePath} section={item} />

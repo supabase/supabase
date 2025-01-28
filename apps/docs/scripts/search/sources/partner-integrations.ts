@@ -12,16 +12,23 @@ type PartnerData = {
 let supabaseClient: SupabaseClient
 function getSupabaseClient() {
   if (!supabaseClient) {
-    supabaseClient = createClient(
-      process.env.NEXT_PUBLIC_MISC_USE_URL!,
-      process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
-    )
-    return supabaseClient
+    const url = process.env.NEXT_PUBLIC_MISC_USE_URL
+    const key = process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY
+    
+    if (!url || !key) {
+      throw new Error('Required environment variables NEXT_PUBLIC_MISC_USE_URL and NEXT_PUBLIC_MISC_USE_ANON_KEY must be set')
+    }
+    
+    supabaseClient = createClient(url, key)
   }
+  return supabaseClient
 }
 
 export async function fetchPartners() {
   const supabase = getSupabaseClient()
+  if (!supabase) {
+    throw new Error('Failed to initialize Supabase client')
+  }
   const { data: partners } = await supabase
     .from('partners')
     .select('slug,overview')

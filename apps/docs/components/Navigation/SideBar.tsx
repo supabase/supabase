@@ -7,36 +7,34 @@ import * as Accordion from '@radix-ui/react-accordion'
 import { ArrowLeft, ChevronRight } from 'lucide-react'
 import { NavMenuGroup, NavMenuSection } from './Navigation.types'
 
-const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
+const SideBar = ({ menuItems = [] }: { menuItems: NavMenuGroup[] }) => {
   const pathname = usePathname()
   const pathSegments = pathname.split('/')
 
   const isInReferencePages = pathSegments.includes('reference') && pathSegments.length >= 3
   const referenceMeta = pathSegments.length >= 3 ? REFERENCES[pathSegments[2]] : undefined
 
-  const currentSection: NavMenuGroup = menuItems.find((group) => {
+  const currentSection: NavMenuGroup | undefined = menuItems.find((group) => {
     const foundItem = group.items.find((section) => {
       if (section.items.length > 0) {
         const foundSubItem = section.items.find((item) => {
-          if (item.url === pathname) return item
+          return item.url === pathname
         })
-        if (foundSubItem) return section
+        return !!foundSubItem
       } else {
-        if (section.url === pathname) return section
+        return section.url === pathname
       }
     })
-    if (foundItem) return group
+    return !!foundItem
   })
 
-  const currentSubSection: NavMenuSection =
+  const currentSubSection: NavMenuSection | undefined =
     currentSection !== undefined
       ? currentSection.items.find((section) => {
           if (section.items.length === 0) {
             return undefined
           } else {
-            return section.items.find((item) => {
-              if (item.url === pathname) return item
-            })
+            return section.items.find((item) => item.url === pathname)
           }
         })
       : undefined
@@ -73,21 +71,22 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
       {menuItems.length === 1 ? (
         <div className="my-2">
           {menuItems[0].items.map((item) => (
-            <Link key={item.name} href={item.url}>
-              <div
-                key={item.name}
-                className={[
-                  'py-1.5 px-5 rounded text-sm transition',
-                  `${
-                    item.url === pathname
-                      ? 'bg-background text-brand-link'
-                      : 'text-foreground-light hover:text-foreground'
-                  }`,
-                ].join(' ')}
-              >
-                {item.name}
-              </div>
-            </Link>
+            typeof item.url === 'string' ? (
+              <Link key={item.name} href={item.url}>
+                <div
+                  className={[
+                    'py-1.5 px-5 rounded text-sm transition',
+                    `${
+                      item.url === pathname
+                        ? 'bg-background text-brand-link'
+                        : 'text-foreground-light hover:text-foreground'
+                    }`,
+                  ].join(' ')}
+                >
+                  {item.name}
+                </div>
+              </Link>
+            ) : null
           ))}
         </div>
       ) : (
@@ -113,20 +112,24 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                 {group.items.map((section: NavMenuSection) => {
                   if (section.items.length === 0) {
                     return (
-                      <Link href={section.url} key={section.name}>
-                        <div
-                          className={[
-                            'py-1.5 px-5 rounded text-sm transition',
-                            `${
-                              section.url === pathname
-                                ? 'bg-background text-brand'
-                                : 'text-foreground-light hover:text-foreground'
-                            }`,
-                          ].join(' ')}
-                        >
-                          {section.name}
-                        </div>
-                      </Link>
+                      <div key={section.name}>
+                        {typeof section.url === 'string' && (
+                          <Link href={section.url}>
+                            <div
+                              className={[
+                                'py-1.5 px-5 rounded text-sm transition',
+                                `${
+                                  section.url === pathname
+                                    ? 'bg-background text-brand'
+                                    : 'text-foreground-light hover:text-foreground'
+                                }`,
+                              ].join(' ')}
+                            >
+                              {section.name}
+                            </div>
+                          </Link>
+                        )}
+                      </div>
                     )
                   } else {
                     return (
@@ -150,21 +153,24 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                           </Accordion.Trigger>
                           <Accordion.Content className="my-2 data-open:animate-slide-down data-closed:animate-slide-up">
                             {section.items.map((item: NavMenuSection) => (
-                              <Link key={item.name} href={item.url}>
-                                <div
-                                  key={item.name}
-                                  className={[
-                                    'py-1.5 ml-4 px-5 rounded text-sm transition',
-                                    `${
-                                      item.url === pathname
-                                        ? 'bg-background text-brand'
-                                        : 'text-foreground-light hover:text-foreground'
-                                    }`,
-                                  ].join(' ')}
-                                >
-                                  {item.name}
-                                </div>
-                              </Link>
+                              <div key={item.name}>
+                                {typeof item.url === 'string' && (
+                                  <Link href={item.url}>
+                                    <div
+                                      className={[
+                                        'py-1.5 ml-4 px-5 rounded text-sm transition',
+                                        `${
+                                          item.url === pathname
+                                            ? 'bg-background text-brand'
+                                            : 'text-foreground-light hover:text-foreground'
+                                        }`,
+                                      ].join(' ')}
+                                    >
+                                      {item.name}
+                                    </div>
+                                  </Link>
+                                )}
+                              </div>
                             ))}
                           </Accordion.Content>
                         </Accordion.Item>

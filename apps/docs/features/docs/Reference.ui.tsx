@@ -37,7 +37,7 @@ function Section({ slug, link, columns = 'single', children }: SectionProps) {
 
   return (
     <ReferenceSectionWrapper
-      id={slug}
+      id={slug ?? ''}
       link={link}
       className={cn(
         'grid grid-cols-[1fr] gap-x-16 gap-y-8',
@@ -67,7 +67,7 @@ function Examples({ children }: PropsWithChildren) {
 
 function EducationSection({ children, slug, ...props }: SectionProps) {
   return (
-    <ReferenceSectionWrapper id={slug} className={'prose max-w-none'} {...props}>
+    <ReferenceSectionWrapper id={slug ?? ''} className={'prose max-w-none'} {...props}>
       {children}
     </ReferenceSectionWrapper>
   )
@@ -161,15 +161,15 @@ export function FnParameterDetails({
   altParameters,
   className,
 }: {
-  parameters: Array<object> | undefined
+  parameters: Array<FunctionParameterType> | undefined
   altParameters?: Array<Array<FunctionParameterType>>
   className?: string
 }) {
-  if (!parameters || parameters.length === 0) return
+  if (!parameters || parameters.length === 0) return null
 
-  const combinedParameters = altParameters
+  const combinedParameters = altParameters && parameters
     ? mergeAlternateParameters(parameters, altParameters)
-    : parameters
+    : parameters ?? []
 
   return (
     <div className={className ?? ''}>
@@ -190,11 +190,11 @@ interface SubContent {
   isOptional?: boolean | 'NA' // not applicable
   type?: string
   description?: string
-  subContent: Array<SubContent>
+  subContent?: Array<SubContent>
 }
 
-function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
-  if (!('name' in paramOrType)) return
+function ParamOrTypeDetails({ paramOrType }: { paramOrType: SubContent | CustomTypePropertyType | TypeDetails }) {
+  if (!('name' in paramOrType)) return null
 
   const description: string =
     'description' in paramOrType
@@ -242,8 +242,9 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
 export function ReturnTypeDetails({ returnType }: { returnType: MethodTypes['ret'] }) {
   // These custom names that aren't defined aren't particularly meaningful, so
   // just don't display them.
+  if (!returnType?.type?.type) return null
   const isNameOnlyType = returnType.type.type === 'nameOnly'
-  if (isNameOnlyType) return
+  if (isNameOnlyType) return null
 
   const subContent = getSubDetails(returnType)
 
@@ -251,15 +252,15 @@ export function ReturnTypeDetails({ returnType }: { returnType: MethodTypes['ret
     <div>
       <h3 className="mb-3 text-base text-foreground">Return Type</h3>
       <div className="border-t border-b py-5 flex flex-col gap-3">
-        <div className="text-xs text-foreground-muted">{getTypeName(returnType)}</div>
-        {returnType.comment?.shortText && (
+        <div className="text-xs text-foreground-muted">{returnType ? getTypeName(returnType) : ''}</div>
+        {returnType?.comment?.shortText ? (
           <div className="prose text-sm">
             <MDXRemoteBase
-              source={returnType.comment?.shortText}
+              source={returnType.comment.shortText}
               customPreprocess={normalizeMarkdown}
             />
           </div>
-        )}
+        ) : null}
         {subContent && subContent.length > 0 && <TypeSubDetails details={subContent} />}
       </div>
     </div>
@@ -368,7 +369,8 @@ export function ApiOperationRequestBodyDetails({
 }: {
   requestBody: IApiEndPoint['requestBody']
 }) {
-  const availableSchemes = Object.keys(requestBody.content) as Array<
+  if (!requestBody?.content) return null
+  const availableSchemes = (requestBody?.content ? Object.keys(requestBody.content) : []) as Array<
     'application/json' | 'application/x-www-form-urlencoded'
   >
 
@@ -377,7 +379,11 @@ export function ApiOperationRequestBodyDetails({
       {availableSchemes.map((scheme, index) => (
         <ApiOperationRequestBodyDetailsInternal
           key={index}
-          schema={requestBody.content[scheme].schema}
+          schema={requestBody.content[scheme]?.schema ?? {
+            type: 'object',
+            properties: {},
+            required: []
+          }}
           hidden={index > 0}
           {...{
             [API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES.KEY]: scheme,
@@ -439,7 +445,9 @@ function ApiOperationRequestBodyDetailsInternal({
   } else if (schema.type === 'array') {
     return (
       <>
-        <span className="font-mono text-sm font-medium text-foreground">{`Array of ${getTypeDisplayFromSchema(schema.items).displayName}`}</span>
+        <span className="font-mono text-sm font-medium text-foreground">
+          {`Array of ${schema.items ? getTypeDisplayFromSchema(schema.items)?.displayName ?? 'unknown' : 'unknown'}`}
+        </span>
         {!(
           'type' in schema.items &&
           ['string', 'boolean', 'number', 'integer'].includes(schema.items.type)
@@ -447,12 +455,12 @@ function ApiOperationRequestBodyDetailsInternal({
       </>
     )
   } else if (schema.type === 'object') {
-    return (
+    return schema.properties ? (
       <ul {...props}>
         {Object.keys(schema.properties)
           .map((property) => ({
             name: property,
-            required: schema.required?.includes(property),
+            required: Array.isArray(schema.required) ? schema.required.includes(property) : false,
             in: 'body' as const,
             schema: schema.properties[property],
           }))
@@ -460,7 +468,7 @@ function ApiOperationRequestBodyDetailsInternal({
             <ApiSchemaParamDetails key={index} param={property} />
           ))}
       </ul>
-    )
+    ) : null
   }
 }
 
@@ -484,21 +492,21 @@ export function ApiSchemaParamSubdetails({
     return null
   }
 
-  const subContent =
-    'enum' in schema
+  const subContent: Array<any> = // TODO: Improve type definition
+    'enum' in schema && Array.isArray(schema.enum)
       ? schema.enum
-      : 'anyOf' in schema
+      : 'anyOf' in schema && Array.isArray(schema.anyOf)
         ? schema.anyOf
-        : 'oneOf' in schema
+        : 'oneOf' in schema && Array.isArray(schema.oneOf)
           ? schema.oneOf
-          : 'allOf' in schema
+          : 'allOf' in schema && Array.isArray(schema.allOf)
             ? schema.allOf
             : 'type' in schema && schema.type === 'string'
               ? ['minLength', 'maxLength', 'pattern']
                   .filter((key) => key in schema)
                   .map((key) => ({
                     constraint: key,
-                    value: schema[key],
+                    value: schema[key as keyof typeof schema],
                   }))
               : []
 
@@ -589,8 +597,8 @@ function isFromTypespec(parameter: object): parameter is MethodTypes['params'][n
   return !('__overwritten' in parameter)
 }
 
-function getTypeName(parameter: object): string {
-  if (!('type' in parameter)) return ''
+function getTypeName(parameter: { type?: any }): string {
+  if (!parameter?.type) return ''
 
   if (typeof parameter.type === 'string') {
     return parameter.type
@@ -608,44 +616,45 @@ function getTypeName(parameter: object): string {
     case 'intrinsic':
       return nameOrDefault(type, '')
     case 'literal':
-      return 'value' in type ? (type.value === null ? 'null' : `"${type.value as string}"`) : ''
+      if (!('value' in type)) return ''
+      return type.value === null ? 'null' : `"${String(type.value)}"`
     case 'record':
-      // Needs an extra level of wrapping to fake the wrapping parameter
-      // @ts-ignore
-      return `Record<${getTypeName({ type: type.keyType })}, ${getTypeName({ type: type.valueType })}>`
+      return `Record<${getTypeName({ type: type.keyType ?? { type: 'intrinsic', name: 'unknown' } })}, ${getTypeName({ type: type.valueType ?? { type: 'intrinsic', name: 'unknown' } })}>`
     case 'object':
       return nameOrDefault(type, 'object')
     case 'function':
       return 'function'
     case 'promise':
-      // Needs an extra level of wrapping to fake the wrapping parameter
-      // @ts-ignore
-      return `Promise<${getTypeName({ type: type.awaited })}>`
+      return `Promise<${getTypeName({ type: type.awaited ?? { type: 'intrinsic', name: 'unknown' } })}>`
     case 'union':
       return 'Union: expand to see options'
     case 'index signature':
-      // Needs an extra level of wrapping to fake the wrapping parameter
-      // @ts-ignore
-      return `{ [key: ${getTypeName({ type: type.keyType })}]: ${getTypeName({ type: type.valueType })} }`
+      return `{ [key: ${getTypeName({ type: type.keyType ?? { type: 'intrinsic', name: 'unknown' } })}]: ${getTypeName({ type: type.valueType ?? { type: 'intrinsic', name: 'unknown' } })} }`
     case 'array':
-      // Needs an extra level of wrapping to fake the wrapping parameter
-      // @ts-ignore
-      return `Array<${getTypeName({ type: type.elemType })}>`
+      return `Array<${getTypeName({ type: type.elemType ?? { type: 'intrinsic', name: 'unknown' } })}>`
+    default:
+      return ''
   }
-
-  return ''
 }
 
-function nameOrDefault(node: object, fallback: string) {
-  return 'name' in node && node.name !== TYPESPEC_NODE_ANONYMOUS ? (node.name as string) : fallback
+function nameOrDefault(node: { name?: string | symbol }, fallback: string) {
+  return 'name' in node && node.name && typeof node.name === 'string' && node.name !== TYPESPEC_NODE_ANONYMOUS ? node.name : fallback
 }
 
-function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['ret']) {
-  let subDetails: Array<any>
+function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['ret']): Array<SubContent> | undefined {
+  let subDetails: Array<SubContent> | undefined
 
-  switch (parentType.type?.type) {
+  if (!parentType?.type) return [];
+  
+  switch (parentType.type.type) {
     case 'object':
-      subDetails = parentType.type.properties
+      subDetails = (parentType.type.properties ?? []).map(prop => ({
+        name: prop.name?.toString() ?? '',
+        type: prop.type,
+        isOptional: prop.isOptional,
+        comment: prop.comment,
+        subContent: []
+      } as SubContent))
       break
     case 'function':
       subDetails = [
@@ -662,7 +671,12 @@ function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['
                 })),
               },
             ]),
-        { name: 'Return', type: parentType.type.ret.type, isOptional: 'NA' },
+        { 
+          name: 'Return', 
+          type: parentType.type.ret?.type?.toString() ?? 'unknown',
+          isOptional: 'NA',
+          subContent: []
+        },
       ]
       break
     // @ts-ignore -- Adding these fake types to take advantage of existing recursion
@@ -689,35 +703,49 @@ function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['
           ...property,
           isOptional: 'NA',
         }))
-      } else if (parentType.type.awaited.type === 'array') {
+      } else if (parentType.type.awaited?.type === 'array') {
         subDetails = [
-          { name: 'array element', type: parentType.type.awaited.elemType, isOptional: 'NA' },
+          { 
+            name: 'array element', 
+            type: parentType.type.awaited.elemType ?? { type: 'intrinsic', name: 'unknown' }, 
+            isOptional: 'NA',
+            subContent: [], // Required by SubContent interface
+          },
         ]
       }
       break
     case 'array':
-      if (parentType.type.elemType.type === 'union') {
-        subDetails = parentType.type.elemType.subTypes.map((subType, index) => ({
+      const elemType = parentType.type.elemType
+      if (elemType?.type === 'union' && elemType.subTypes) {
+        subDetails = elemType.subTypes.map((subType, index) => ({
           name: `union option ${index + 1}`,
           type: { ...subType },
           isOptional: 'NA',
-        }))
+        } as SubContent))
       }
-      if (parentType.type.elemType.type === 'object') {
-        subDetails = parentType.type.elemType.properties
+      if (elemType?.type === 'object' && elemType.properties) {
+        subDetails = elemType.properties.map(property => ({
+          name: property.name?.toString() ?? '',
+          type: property.type,
+          isOptional: property.isOptional,
+          comment: property.comment,
+          subContent: [],
+        } as SubContent))
       }
       break
   }
 
-  subDetails?.sort((a, b) => (a.isOptional === true ? 1 : 0) - (b.isOptional === true ? 1 : 0))
+  if (subDetails) {
+    subDetails.sort((a, b) => (a.isOptional === true ? 1 : 0) - (b.isOptional === true ? 1 : 0))
+  }
 
   return subDetails
 }
 
 function mergeAlternateParameters(
-  parameters: Array<object>,
+  parameters: Array<FunctionParameterType>,
   altParameters: Array<Array<FunctionParameterType>>
-) {
+): Array<FunctionParameterType> {
   const combinedParameters = parameters.map((parameter) => {
     if (!isFromTypespec(parameter)) return parameter
 
@@ -749,9 +777,10 @@ function mergeAlternateParameters(
 }
 
 function applyParameterMergeStrategy(
-  parameter: Pick<FunctionParameterType, 'type'>,
+  parameter: Pick<FunctionParameterType, 'type'> | undefined,
   alternateParameter: Pick<FunctionParameterType, 'type'>
-) {
+): FunctionParameterType {
+  if (!parameter) return alternateParameter as FunctionParameterType
   if (!alternateParameter.type) {
     // Nothing to merge, abort
     return parameter as FunctionParameterType

@@ -2,14 +2,17 @@ import { CodeBlock } from '@ui/components/CodeBlock'
 import { sample } from '@har-sdk/openapi-sampler'
 import { Tabs, TabPanel } from '~/features/ui/Tabs'
 
-type IParamProps = any
+interface IParamProps {
+  schema: any
+  id?: string
+}
 
 const ApiSchema = ({ schema, id }: IParamProps) => {
-  let example: string
+  let example: string | undefined
   try {
     example = sample(schema, { skipReadOnly: true, quiet: true })
   } catch {
-    // ignore
+    example = undefined
   }
   return (
     <Tabs

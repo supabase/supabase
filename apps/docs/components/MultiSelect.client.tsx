@@ -96,7 +96,7 @@ export function MultiSelect({
   const setOpen = _setControlledOpen ?? _setInternalOpen
 
   return (
-    <MultiSelectProvider selected={selected} onSelectedChange={onSelectedChange} setOpen={setOpen}>
+    <MultiSelectProvider selected={selected ?? []} onSelectedChange={onSelectedChange} setOpen={setOpen}>
       <Popover open={open} onOpenChange={setOpen} {...props}>
         {children}
       </Popover>
@@ -111,7 +111,7 @@ const Trigger = forwardRef<
   const { selected } = useMultiSelect()
 
   const [measuredWidth, setMeasuredWidth] = useState(0)
-  const measuredRef = (node: HTMLElement) => {
+  const measuredRef = (node: HTMLDivElement | null) => {
     if (node) {
       setMeasuredWidth(node.getBoundingClientRect().width)
     }

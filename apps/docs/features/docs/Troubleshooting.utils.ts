@@ -15,7 +15,10 @@ import { formatError } from './Troubleshooting.utils.shared'
 // We don't have strictNullChecks on because we still have too many violations
 // in the code base, so required types aren't typed properly by Zod.
 export type ITroubleshootingMetadata = z.infer<typeof TroubleshootingSchema> &
-  Pick<Required<z.infer<typeof TroubleshootingSchema>>, 'title' | 'topics' | 'database_id'>
+  Pick<Required<z.infer<typeof TroubleshootingSchema>>, 'title' | 'topics' | 'database_id'> & {
+    errors?: Array<{ http_status_code?: number; code?: string }>;
+    keywords?: string[];
+  }
 
 export interface ITroubleshootingEntry {
   filePath: string
@@ -65,8 +68,9 @@ export async function getAllTroubleshootingErrors() {
   const entries = await getAllTroubleshootingEntries()
   const allErrors = new Set(
     entries
-      .flatMap((entry) => entry.data.errors)
-      .filter((error) => error?.http_status_code || error?.code)
+      .flatMap((entry) => entry.data.errors ?? [])
+      .filter((error): error is { http_status_code?: number; code?: string } => 
+        (error !== null && typeof error === 'object' && ('http_status_code' in error || 'code' in error)))
   )
 
   const seen = new Set<string>()

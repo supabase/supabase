@@ -1,43 +1,60 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, ReactNode } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { StepHikeContext } from './StepHikeContext'
+import { StepHikeContext, Step as StepType, StepHikeContextType } from './StepHikeContext'
 
-const StepHike = ({ children, title }) => {
-  const [activeStep, setActiveStep] = useState(undefined)
+interface StepHikeProps {
+  children: ReactNode
+  title?: string
+}
+
+const StepHike = ({ children, title }: StepHikeProps) => {
+  const [activeStep, setActiveStep] = useState<import('./StepHikeContext').ActiveStep | undefined>(undefined)
 
   // check if there are any children
   if (!children) throw 'StepHike component requires <StepHike.Step> children'
 
-  const steps = children.filter((x) => {
-    return x.type.name === 'Step'
-  })
+  const steps = Array.isArray(children) ? children.filter((x): x is StepType => {
+    return x && typeof x === 'object' && 'type' in x && x.type && typeof x.type === 'function' && x.type.name === 'Step'
+  }) : []
 
   useEffect(() => {
-    setActiveStep({
-      titleId: steps[0].props.title.replaceAll(' ', '-').toLowerCase(),
-      step: 0,
-    })
+    if (steps.length > 0 && steps[0].props?.title) {
+      setActiveStep({
+        titleId: steps[0].props.title.replaceAll(' ', '-').toLowerCase(),
+        step: 0,
+      })
+    }
   }, [])
 
   // check if there is at least 1 StepHike subcomponent
-  if (steps.length === 0 || !steps)
+  if (!steps || steps.length === 0)
     throw 'StepHike component needs at least 1 <StepHike.Step> child'
 
   return (
     <div>
-      <StepHikeContext.Provider value={{ activeStep, steps }}>{children}</StepHikeContext.Provider>
+      <StepHikeContext.Provider value={{ activeStep, steps } as StepHikeContextType}>{children}</StepHikeContext.Provider>
     </div>
   )
 }
 
-const Step = ({ children, title, step }) => {
+interface StepProps {
+  children: ReactNode
+  title: string
+  step: number
+}
+
+interface ChildrenRenderProps {
+  active: boolean
+}
+
+const Step = ({ children, title, step }: StepProps) => {
   const [show, setShow] = useState(false)
 
   useEffect(() => {
     setShow(true)
   }, [])
 
-  const ChildrenRender = ({ active }) => <div className="pl-[74px]">{children}</div>
+  const ChildrenRender = ({ active }: ChildrenRenderProps) => <div className="pl-[74px]">{children}</div>
 
   const { ref } = useInView({
     rootMargin: '10px 20px 30px 40px',
@@ -51,7 +68,7 @@ const Step = ({ children, title, step }) => {
   return (
     <>
       <StepHikeContext.Consumer>
-        {({ activeStep, steps }) => {
+        {({ activeStep, steps }: StepHikeContextType) => {
           const cleanTitleId = title.replaceAll(' ', '-').toLowerCase()
           const active = cleanTitleId === activeStep?.titleId
 
@@ -80,7 +97,7 @@ const Step = ({ children, title, step }) => {
                     {title}
                   </h3>
                   <span className="font-mono uppercase text-xs">
-                    Step {step} of {steps?.length}
+                    Step {step} of {steps.length}
                   </span>
                 </div>
               </div>

@@ -65,7 +65,7 @@ const Input = forwardRef<
       setHidden(false)
     }
 
-    let inputClasses = []
+    let inputClasses: string[] = []
     if (icon) inputClasses.push(__styles.with_icon)
 
     return (

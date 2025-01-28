@@ -8,7 +8,14 @@ import remarkGfm from 'remark-gfm'
 import type { ICommonMarkdown } from '~/components/reference/Reference.types'
 
 async function generateRefMarkdown(sections: ICommonMarkdown[], slug: string) {
-  let markdownContent = []
+  interface MarkdownContent {
+    id: string
+    title: string
+    meta: { [key: string]: any }
+    content: Awaited<ReturnType<typeof serialize>> | null
+  }
+  
+  let markdownContent: MarkdownContent[] = []
   /**
    * Read all the markdown files that might have
    *  - custom text

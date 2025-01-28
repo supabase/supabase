@@ -32,12 +32,12 @@ export function parseReferencePath(slug: Array<string>) {
   if (isClientSdkReference) {
     let [sdkId, maybeVersion, maybeCrawlers, ...path] = slug
     if (!/v\d+/.test(maybeVersion)) {
-      maybeVersion = null
+      maybeVersion = ''
       maybeCrawlers = maybeVersion
       path = [maybeCrawlers, ...path]
     }
     if (maybeCrawlers !== 'crawlers') {
-      maybeCrawlers = null
+      maybeCrawlers = ''
       path = [maybeCrawlers, ...path]
     }
 
@@ -75,7 +75,7 @@ export function parseReferencePath(slug: Array<string>) {
 async function generateStaticParamsForSdkVersion(sdkId: string, version: string) {
   const flattenedSections = await getFlattenedSections(sdkId, version)
 
-  return flattenedSections
+  return flattenedSections ?? []
     .filter((section) => section.type !== 'category' && !!section.slug)
     .map((section) => ({
       slug: [
@@ -140,7 +140,7 @@ export async function generateReferenceMetadata(
     const displayName = REFERENCES[sdkId].name
     const sectionTitle =
       slug.length > 0
-        ? flattenedSections.find((section) => section.slug === slug[0])?.title
+        ? flattenedSections?.find((section) => section.slug === slug[0])?.title ?? ''
         : undefined
     const url = [BASE_PATH, 'reference', sdkId, maybeVersion, slug[0]].filter(Boolean).join('/')
 
@@ -149,14 +149,16 @@ export async function generateReferenceMetadata(
       title: `${displayName}${sectionTitle ? `: ${sectionTitle}` : ''}`,
     })
 
-    return {
+    const metadata: Metadata = {
       title: `${displayName} API Reference | Supabase Docs`,
       description: `API reference for the ${displayName} Supabase SDK`,
       ...(slug.length > 0
         ? {
             alternates: {
-              ...parentAlternates,
               canonical: url,
+              ...(parentAlternates?.languages ? { languages: parentAlternates.languages } : {}),
+              ...(parentAlternates?.media ? { media: parentAlternates.media } : {}),
+              ...(parentAlternates?.types ? { types: parentAlternates.types } : {})
             },
           }
         : {}),
@@ -166,6 +168,7 @@ export async function generateReferenceMetadata(
         images,
       },
     }
+    return metadata
   } else if (isCliReference) {
     console.log('[PRE-RETURN] generateReferenceMetadata: isCliReference')
     return {
@@ -221,8 +224,8 @@ export function normalizeMarkdown(markdownUnescaped: string): string {
   visit(markdownTree, ['code', 'inlineCode'], (node) => {
     codeBlocks.push({
       type: node.type,
-      start: node.position.start.offset,
-      end: node.position.end.offset,
+      start: node.position?.start?.offset ?? 0,
+      end: node.position?.end?.offset ?? 0,
     })
   })
   // Sort code blocks by start offset in descending order

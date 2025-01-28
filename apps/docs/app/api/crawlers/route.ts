@@ -29,26 +29,25 @@ export async function GET(request: Request) {
     slug = maybeVersion
   }
 
-  let section: AbbrevApiReferenceSection
-  let sectionsWithUrl: Array<AbbrevApiReferenceSection & { url: URL }>
-  try {
-    const flattenedSections = (await getFlattenedSections(lib, version)) ?? []
-    sectionsWithUrl = flattenedSections.map((section) => {
-      const url = new URL(request.url)
-      url.pathname = [BASE_PATH, 'reference', lib, isVersion ? version : null, section.slug]
-        .filter(Boolean)
-        .join('/')
+  let section: AbbrevApiReferenceSection | undefined
+  let sectionsWithUrl: Array<AbbrevApiReferenceSection & { url: URL }> = []
+  
+  const flattenedSections = (await getFlattenedSections(lib, version)) ?? []
+  sectionsWithUrl = flattenedSections.map((section) => {
+    const url = new URL(request.url)
+    url.pathname = [BASE_PATH, 'reference', lib, isVersion ? version : null, section.slug]
+      .filter(Boolean)
+      .join('/')
 
-      return {
-        ...section,
-        url,
-      }
-    })
-    section = flattenedSections.find(
-      (section) =>
-        (section.type === 'markdown' || section.type === 'function') && section.slug === slug
-    )
-  } catch {}
+    return {
+      ...section,
+      url,
+    }
+  })
+  section = flattenedSections.find(
+    (section) =>
+      (section.type === 'markdown' || section.type === 'function') && section.slug === slug
+  )
 
   if (!section) {
     notFound()

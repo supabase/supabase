@@ -106,10 +106,14 @@ function parseOptions(): Options {
 }
 
 function createSupabaseClient() {
-  return createClient(
-    process.env[REQUIRED_ENV_VARS.SUPABASE_URL],
-    process.env[REQUIRED_ENV_VARS.SERVICE_ROLE_KEY]
-  )
+  const url = process.env[REQUIRED_ENV_VARS.SUPABASE_URL]
+  const key = process.env[REQUIRED_ENV_VARS.SERVICE_ROLE_KEY]
+  
+  if (!url || !key) {
+    throw new Error('Missing required environment variables for Supabase client')
+  }
+  
+  return createClient(url, key)
 }
 
 async function updateContentDates({ reset, ctx }: { reset: boolean; ctx: Ctx }) {
@@ -121,7 +125,9 @@ async function updateContentDates({ reset, ctx }: { reset: boolean; ctx: Ctx }) 
   const updateTasks: Array<Promise<void>> = []
   for (const file of mdxFiles) {
     const tasks = await updateTimestamps(file, { reset, timestamp, ctx })
-    updateTasks.push(...tasks)
+    if (tasks) {
+      updateTasks.push(...tasks)
+    }
   }
   await Promise.all(updateTasks)
 }
@@ -179,7 +185,8 @@ function processMdx(rawContent: string): Array<SectionWithChecksum> {
 
     let heading = rawHeading
     if (seenHeadings.has(rawHeading)) {
-      const idx = seenHeadings.get(rawHeading) + 1
+      const currentCount = seenHeadings.get(rawHeading) ?? 0
+      const idx = currentCount + 1
       seenHeadings.set(rawHeading, idx)
       heading = `${rawHeading} (__UNIQUE_MARKER__${idx})`
     } else {

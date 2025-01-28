@@ -37,12 +37,12 @@ export async function ReferenceNavigation({
   return (
     <ReferenceNavigationScrollHandler className="w-full flex flex-col pt-3 pb-5 gap-3">
       <div className="flex items-center gap-3">
-        {'icon' in menuData && <MenuIconPicker icon={menuData.icon} width={21} height={21} />}
+        {'icon' in menuData && menuData.icon && typeof menuData.icon === 'string' && <MenuIconPicker icon={menuData.icon} width={21} height={21} />}
         <span className="text-base text-brand-600">{name}</span>
         <RefVersionDropdown library={libPath} currentVersion={version} />
       </div>
       <ul className="flex flex-col gap-2">
-        {navSections.map((section) => (
+        {(navSections ?? []).map((section) => (
           <Fragment key={section.id}>
             {section.type === 'category' ? (
               <li>
@@ -69,7 +69,7 @@ function RefCategory({
   basePath: string
   section: AbbrevApiReferenceSection
 }) {
-  if (!('items' in section && section.items.length > 0)) return null
+  if (!('items' in section && section.items?.length > 0)) return null
 
   return (
     <>

@@ -19,7 +19,7 @@ function stringToArrayBuffer(value: string) {
   return buf
 }
 
-function arrayBufferToString(buf) {
+function arrayBufferToString(buf: ArrayBuffer): string {
   return String.fromCharCode.apply(null, new Uint8Array(buf))
 }
 
@@ -133,7 +133,8 @@ const AppleSecretGenerator = () => {
         <input
           type="file"
           onChange={(e) => {
-            setFile({ file: e.target.files[0] })
+            const files = e.target.files
+            setFile({ file: files ? files[0] : null })
           }}
         />
       </div>
@@ -152,6 +153,9 @@ const AppleSecretGenerator = () => {
           setError('')
 
           try {
+            if (!file.file) {
+              throw new Error('No file selected')
+            }
             const { kid, jwt, exp } = await generateAppleSecretKey(
               keyID,
               teamID,

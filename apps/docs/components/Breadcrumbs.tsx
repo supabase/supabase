@@ -29,6 +29,27 @@ import {
 import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 
+interface NavMenuSection {
+  title: string
+  icon: string
+  url?: `/${string}` | `https://${string}`
+  items: readonly Partial<NavMenuSection>[]
+}
+
+interface MenuItem {
+  items?: MenuItem[]
+  url?: string
+  name?: string
+  title?: string
+  icon?: string
+}
+
+type BreadcrumbItem = MenuItem | { name: string; url: string }
+
+function isBreadcrumbWithTitle(item: BreadcrumbItem): item is MenuItem {
+  return 'title' in item
+}
+
 interface BreadcrumbsProps extends React.HTMLAttributes<HTMLDivElement> {
   minLength?: number
   forceDisplayOnMobile?: boolean
@@ -69,11 +90,11 @@ const BreadcrumbsInternal = ({
               {breadcrumbs[0].url ? (
                 <BreadcrumbLink asChild>
                   <Link href={breadcrumbs[0].url}>
-                    {breadcrumbs[0].title || breadcrumbs[0].name}
+                    {isBreadcrumbWithTitle(breadcrumbs[0]) ? breadcrumbs[0].title || breadcrumbs[0].name : breadcrumbs[0].name}
                   </Link>
                 </BreadcrumbLink>
               ) : (
-                <BreadcrumbPage>{breadcrumbs[0].title || breadcrumbs[0].name}</BreadcrumbPage>
+                <BreadcrumbPage>{isBreadcrumbWithTitle(breadcrumbs[0]) ? breadcrumbs[0].title || breadcrumbs[0].name : breadcrumbs[0].name}</BreadcrumbPage>
               )}
             </BreadcrumbItem>
             <BreadcrumbSeparator />
@@ -94,9 +115,9 @@ const BreadcrumbsInternal = ({
                         className={cn(!crumb.url && 'pointer-events-none')}
                       >
                         {crumb.url ? (
-                          <Link href={crumb.url}>{crumb.title || crumb.name}</Link>
+                          <Link href={crumb.url}>{isBreadcrumbWithTitle(crumb) ? crumb.title || crumb.name : crumb.name}</Link>
                         ) : (
-                          crumb.title || crumb.name
+                          isBreadcrumbWithTitle(crumb) ? crumb.title || crumb.name : crumb.name
                         )}
                       </DropdownMenuItem>
                     ))}
@@ -113,9 +134,9 @@ const BreadcrumbsInternal = ({
                         .slice(1, -2)
                         .map((crumb) =>
                           crumb.url ? (
-                            <Link href={crumb.url}>{crumb.title || crumb.name}</Link>
+                            <Link href={crumb.url}>{isBreadcrumbWithTitle(crumb) ? crumb.title || crumb.name : crumb.name}</Link>
                           ) : (
-                            crumb.title || crumb.name
+                            isBreadcrumbWithTitle(crumb) ? crumb.title || crumb.name : crumb.name
                           )
                         )}
                     </div>
@@ -141,10 +162,10 @@ const BreadcrumbsInternal = ({
             >
               {crumb.url ? (
                 <BreadcrumbLink asChild>
-                  <Link href={crumb.url}>{crumb.title || crumb.name}</Link>
+                  <Link href={crumb.url}>{isBreadcrumbWithTitle(crumb) ? crumb.title || crumb.name : crumb.name}</Link>
                 </BreadcrumbLink>
               ) : (
-                <BreadcrumbPage>{crumb.title || crumb.name}</BreadcrumbPage>
+                <BreadcrumbPage>{isBreadcrumbWithTitle(crumb) ? crumb.title || crumb.name : crumb.name}</BreadcrumbPage>
               )}
             </BreadcrumbItem>
             <BreadcrumbSeparator
@@ -157,7 +178,7 @@ const BreadcrumbsInternal = ({
   )
 }
 
-function useBreadcrumbs() {
+function useBreadcrumbs(): BreadcrumbItem[] | null {
   const pathname = usePathname()
 
   const isTroubleshootingPage = pathname.startsWith('/guides/troubleshooting')
@@ -176,11 +197,11 @@ function useBreadcrumbs() {
   }
 
   const menuId = getMenuId(pathname)
-  const menu = NavItems[menuId]
+  const menu = NavItems[menuId] as MenuItem
   return findMenuItemByUrl(menu, pathname, [])
 }
 
-function findMenuItemByUrl(menu, targetUrl, parents = []) {
+function findMenuItemByUrl(menu: MenuItem, targetUrl: string, parents: MenuItem[] = []): MenuItem[] | null {
   // If the menu has items, recursively search through them
   if (menu.items) {
     for (let item of menu.items) {
