@@ -417,7 +417,7 @@ export interface RealtimeInspectorBroadcastSentEvent {
 }
 
 /**
- * User clicked A message in the RealtimeInspector, which opens a sidebar that shows the messsage details including metadata.
+ * User clicked a message in the RealtimeInspector, which opens a sidebar that shows the messsage details including metadata.
  *
  * @group Events
  * @source studio
