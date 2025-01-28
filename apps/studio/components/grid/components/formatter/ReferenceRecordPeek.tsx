@@ -1,8 +1,7 @@
-// Show table grid
-// Show open sub view
+import { PostgresTable } from '@supabase/postgres-meta'
+import { Key } from 'lucide-react'
 import DataGrid, { Column } from 'react-data-grid'
 
-import { PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import {
@@ -12,8 +11,7 @@ import {
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { Key } from 'lucide-react'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 interface ReferenceRecordPeekProps {
@@ -74,6 +72,19 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
           <span className="text-xs text-foreground-light font-normal">{column.format}</span>
         </div>
       ),
+      renderCell: ({ column, row }) => {
+        const value = row[column.name as any]
+        return (
+          <div
+            className={cn(
+              'flex items-center h-full w-full whitespace-pre',
+              value === null && 'text-foreground-lighter'
+            )}
+          >
+            {value === null ? 'NULL' : value}
+          </div>
+        )
+      },
     }
     return res
   })

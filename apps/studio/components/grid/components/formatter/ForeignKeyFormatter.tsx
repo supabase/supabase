@@ -64,10 +64,7 @@ export const ForeignKeyFormatter = (props: Props) => {
               type="default"
               className="w-6 h-6"
               icon={<ArrowRight />}
-              onClick={(e) => {
-                e.stopPropagation()
-                console.log({ targetTable, relationship, value })
-              }}
+              onClick={(e) => e.stopPropagation()}
               tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
             />
           </PopoverTrigger_Shadcn_>
