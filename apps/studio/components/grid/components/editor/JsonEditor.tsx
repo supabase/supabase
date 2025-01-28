@@ -71,8 +71,6 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
     id,
   })
 
-  const gridColumn = state.gridColumns.find((x) => x.name == column.key)
-
   const rawInitialValue = row[column.key as keyof TRow] as unknown
   const initialValue =
     rawInitialValue === null || rawInitialValue === undefined || typeof rawInitialValue === 'string'
@@ -180,27 +178,17 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
         side="bottom"
         align="start"
         sideOffset={-35}
-        className="rounded-none p-0"
+        className="rounded-none p-0 min-w-[166px]"
         sameWidthAsTrigger
       >
         {isTruncated && !isSuccess ? (
-          <div
-            style={{ width: `${gridColumn?.width || column.width}px` }}
-            className="flex items-center justify-center flex-col relative"
-          >
-            <MonacoEditor
-              readOnly
-              onChange={() => {}}
-              width={`${gridColumn?.width || column.width}px`}
-              value={value ?? ''}
-              language="markdown"
-            />
+          <div className="flex items-center justify-center flex-col relative">
+            <MonacoEditor readOnly onChange={() => {}} value={value ?? ''} language="markdown" />
             <TruncatedWarningOverlay isLoading={isLoading} loadFullValue={loadFullValue} />
           </div>
         ) : (
           <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
             <MonacoEditor
-              width={`${gridColumn?.width || column.width}px`}
               value={value ?? ''}
               language="json"
               readOnly={!isEditable}
