@@ -92,6 +92,23 @@ const OrganizationDropdown = () => {
                   })}
                 </ScrollArea>
               </CommandGroup_Shadcn_>
+              <>
+                <CommandSeparator_Shadcn_ />
+                <CommandGroup_Shadcn_>
+                  <CommandItem_Shadcn_
+                    className="cursor-pointer w-full"
+                    onSelect={(e) => {
+                      setOpen(false)
+                      router.push(`/organizations`)
+                    }}
+                    onClick={() => setOpen(false)}
+                  >
+                    <Link href="/organizations" className="flex items-center gap-2 w-full">
+                      <p>All Organizations</p>
+                    </Link>
+                  </CommandItem_Shadcn_>
+                </CommandGroup_Shadcn_>
+              </>
               {organizationCreationEnabled && (
                 <>
                   <CommandSeparator_Shadcn_ />
