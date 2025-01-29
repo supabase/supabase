@@ -2203,7 +2203,62 @@
         "security": [{ "bearer": [] }]
       }
     },
+    "/v1/projects/{ref}/database/context": {
+      "get": {
+        "operationId": "getDatabaseMetadata",
+        "summary": "Gets database metadata for the given project.",
+        "description": "This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.",
+        "deprecated": true,
+        "parameters": [
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetProjectDbMetadataResponseDto" }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Database"],
+        "security": [{ "bearer": [] }]
+      }
+    },
     "/v1/projects/{ref}/functions": {
+      "get": {
+        "operationId": "v1-list-all-functions",
+        "summary": "List all functions",
+        "description": "Returns all functions you've previously added to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/FunctionResponse" }
+                }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's functions" }
+        },
+        "tags": ["Edge Functions"],
+        "security": [{ "bearer": [] }]
+      },
       "post": {
         "operationId": "v1-create-a-function",
         "summary": "Create a function",
@@ -2274,37 +2329,6 @@
           },
           "403": { "description": "" },
           "500": { "description": "Failed to create project's function" }
-        },
-        "tags": ["Edge Functions"],
-        "security": [{ "bearer": [] }]
-      },
-      "get": {
-        "operationId": "v1-list-all-functions",
-        "summary": "List all functions",
-        "description": "Returns all functions you've previously added to the specified project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/FunctionResponse" }
-                }
-              }
-            }
-          },
-          "403": { "description": "" },
-          "500": { "description": "Failed to retrieve project's functions" }
         },
         "tags": ["Edge Functions"],
         "security": [{ "bearer": [] }]
@@ -3759,6 +3783,7 @@
           "effective_cache_size": { "type": "string" },
           "logical_decoding_work_mem": { "type": "string" },
           "maintenance_work_mem": { "type": "string" },
+          "track_activity_query_size": { "type": "string" },
           "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
           "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
           "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
@@ -3786,6 +3811,7 @@
           "effective_cache_size": { "type": "string" },
           "logical_decoding_work_mem": { "type": "string" },
           "maintenance_work_mem": { "type": "string" },
+          "track_activity_query_size": { "type": "string" },
           "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
           "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
           "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
@@ -4506,16 +4532,15 @@
         "properties": { "query": { "type": "string" } },
         "required": ["query"]
       },
-      "V1CreateFunctionBody": {
+      "GetProjectDbMetadataResponseDto": {
         "type": "object",
         "properties": {
-          "slug": { "type": "string", "pattern": "/^[A-Za-z0-9_-]+$/" },
-          "name": { "type": "string" },
-          "body": { "type": "string" },
-          "verify_jwt": { "type": "boolean" },
-          "compute_multiplier": { "type": "number", "minimum": 1, "maximum": 4 }
+          "databases": {
+            "type": "array",
+            "items": { "type": "object", "properties": {}, "additionalProperties": true }
+          }
         },
-        "required": ["slug", "name", "body"]
+        "required": ["databases"]
       },
       "FunctionResponse": {
         "type": "object",
@@ -4534,6 +4559,17 @@
           "compute_multiplier": { "type": "number" }
         },
         "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
+      },
+      "V1CreateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "slug": { "type": "string", "pattern": "/^[A-Za-z0-9_-]+$/" },
+          "name": { "type": "string" },
+          "body": { "type": "string" },
+          "verify_jwt": { "type": "boolean" },
+          "compute_multiplier": { "type": "number", "minimum": 1, "maximum": 4 }
+        },
+        "required": ["slug", "name", "body"]
       },
       "FunctionSlugResponse": {
         "type": "object",

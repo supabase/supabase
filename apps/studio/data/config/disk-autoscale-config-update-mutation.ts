@@ -23,9 +23,11 @@ export async function updateDiskAutoscaleConfig({
   const { data, error } = await post('/platform/projects/{ref}/disk/custom-config', {
     params: { path: { ref: projectRef } },
     body: {
-      growth_percent: growthPercent,
-      max_size_gb: maxSizeGb,
-      min_increment_gb: minIncrementGb,
+      // [Alaister]: overriding types here as these values are nullable,
+      // however, the codegen doesn't show that for some reason...
+      growth_percent: growthPercent as number | undefined,
+      max_size_gb: maxSizeGb as number | undefined,
+      min_increment_gb: minIncrementGb as number | undefined,
     },
   })
   if (error) handleError(error)

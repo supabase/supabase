@@ -9,7 +9,7 @@ import { Loading } from 'components/ui/Loading'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import type { NextPageWithLayout } from 'types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()

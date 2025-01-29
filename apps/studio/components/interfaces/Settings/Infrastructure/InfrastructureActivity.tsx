@@ -19,8 +19,8 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DateRangePicker } from 'components/ui/DateRangePicker'
 import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'

@@ -271,7 +271,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
               </ul>
               <p className="mt-4 text-foreground-lighter">
                 If you'd like to retain the member's shared SQL snippets, right click on them and
-                "Duplicate personal copy" in the SQL Editor before removing this member.
+                "Duplicate query" in the SQL Editor before removing this member.
               </p>
             </div>
           ),

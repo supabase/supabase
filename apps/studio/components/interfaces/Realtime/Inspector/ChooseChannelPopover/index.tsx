@@ -1,10 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronDown, ExternalLink } from 'lucide-react'
+import { useParams } from 'common'
+import { ChevronDown } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
+import { TelemetryActions } from 'common/telemetry-constants'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   FormControl_Shadcn_,
@@ -20,8 +24,6 @@ import {
   Switch,
 } from 'ui'
 import { RealtimeConfig } from '../useRealtimeMessages'
-import { DocsButton } from 'components/ui/DocsButton'
-import { TelemetryActions } from 'lib/constants/telemetry'
 
 interface ChooseChannelPopoverProps {
   config: RealtimeConfig
@@ -32,7 +34,8 @@ const FormSchema = z.object({ channel: z.string(), isPrivate: z.boolean() })
 
 export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPopoverProps) => {
   const [open, setOpen] = useState(false)
-
+  const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -52,7 +55,13 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
 
   const onSubmit = () => {
     setOpen(false)
-    sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED })
+    sendEvent({
+      action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED,
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
+    })
     onChangeConfig({
       ...config,
       channelName: form.getValues('channel'),
