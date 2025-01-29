@@ -33,14 +33,18 @@ const CSVButton = ({
     return data.map((datum: any) => {
       return keys.reduce((acc: any, key) => {
         if (typeof datum[key] === 'object') {
-          acc[key] = JSON.stringify(datum[key]) as string
+          acc[key] = JSON.stringify(datum[key], (key, value) => {
+            if (typeof value === 'object' && value !== null) {
+              return JSON.stringify(value)
+            }
+            return value
+          })
         } else {
           acc[key] = String(datum[key])
         }
         return acc
       }, {})
     })
-    // retrieve dot notation of all keys
   }, [JSON.stringify(data)])
 
   return (

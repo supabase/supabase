@@ -40,6 +40,27 @@ export const DownloadResultsButton = ({
     return undefined
   }, [results])
 
+  const formattedData = useMemo(() => {
+    const first = results?.[0]
+    if (!first || !results) return
+    const keys = Object.keys(first as any)
+    return results.map((datum: any) => {
+      return keys.reduce((acc: any, key) => {
+        if (typeof datum[key] === 'object') {
+          acc[key] = JSON.stringify(datum[key], (key, value) => {
+            if (typeof value === 'object' && value !== null) {
+              return JSON.stringify(value)
+            }
+            return value
+          })
+        } else {
+          acc[key] = String(datum[key])
+        }
+        return acc
+      }, {})
+    })
+  }, [JSON.stringify(results)])
+
   const copyAsMarkdown = () => {
     if (navigator) {
       if (results.length == 0) toast('Results are empty')
@@ -97,7 +118,7 @@ export const DownloadResultsButton = ({
         ref={csvRef}
         className="hidden"
         headers={headers}
-        data={results}
+        data={formattedData || ([] as any)}
         filename={`${fileName}.csv`}
       />
     </>
