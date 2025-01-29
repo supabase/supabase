@@ -117,6 +117,20 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
 
           setStartDate(fromDate)
           setEndDate(toDate)
+
+          // Update time states
+          setStartTime({
+            HH: fromDate.getHours().toString(),
+            mm: fromDate.getMinutes().toString(),
+            ss: fromDate.getSeconds().toString(),
+          })
+
+          setEndTime({
+            HH: toDate.getHours().toString(),
+            mm: toDate.getMinutes().toString(),
+            ss: toDate.getSeconds().toString(),
+          })
+
           setPasted(true)
         } catch (error) {
           console.warn('Failed to parse clipboard content as date range:', error)
@@ -128,10 +142,19 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
   }
 
   function handleCopy() {
+    if (!startDate || !endDate) return
+
+    const fromDate = new Date(startDate)
+    const toDate = new Date(endDate)
+
+    // Add time from time states
+    fromDate.setHours(+startTime.HH, +startTime.mm, +startTime.ss)
+    toDate.setHours(+endTime.HH, +endTime.mm, +endTime.ss)
+
     navigator.clipboard.writeText(
       JSON.stringify({
-        from: startDate?.toISOString(),
-        to: endDate?.toISOString(),
+        from: fromDate.toISOString(),
+        to: toDate.toISOString(),
       })
     )
     setCopied(true)
