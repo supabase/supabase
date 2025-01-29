@@ -20,6 +20,8 @@ import type { ChartData } from './Charts.types'
 import Panel from 'components/ui/Panel'
 import { useChartHighlight } from './useChartHighlight'
 import MockClientConnectionsChart from './MockClientConnectionsChart'
+import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
+import MockDiskSpaceUsedChart from './MockDiskSpaceUsedChart'
 
 interface ChartHandlerProps {
   id?: string
@@ -38,6 +40,7 @@ interface ChartHandlerProps {
   highlightedValue?: string | number
   className?: string
   isStacked?: boolean
+  updateDateRange: UpdateDateRange
 }
 
 /**
@@ -66,6 +69,7 @@ const ChartHandler = ({
   highlightedValue,
   className,
   isStacked = false,
+  updateDateRange,
 }: PropsWithChildren<ChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
@@ -164,10 +168,15 @@ const ChartHandler = ({
       wrapWithLoading={false}
     >
       <Panel.Content className="flex flex-col gap-4">
-        <div className="absolute right-6 z-50 flex justify-between">{children}</div>
-        {isStacked ? (
+        <div
+          className="absolute right-6 z-50 flex justify-between scroll-mt-10"
+          id={label.toLowerCase().replaceAll(' ', '-')}
+        >
+          {children}
+        </div>
+        {label.toLowerCase().replaceAll(' ', '-') === 'Client Connections' ? (
           <MockClientConnectionsChart
-            // YAxisProps={{ width: 1 }}
+            YAxisProps={{ width: 1 }}
             data={(chartData?.data ?? []) as any}
             format={format || chartData?.format}
             xAxisKey={'period_start'}
@@ -179,6 +188,23 @@ const ChartHandler = ({
             // hideChartType={hideChartType}
             chartStyle={chartStyle}
             onChartStyleChange={setChartStyle}
+            updateDateRange={updateDateRange}
+          />
+        ) : label === 'Disk IOps' ? (
+          <MockDiskSpaceUsedChart
+            YAxisProps={{ width: 1 }}
+            data={(chartData?.data ?? []) as any}
+            format={format || chartData?.format}
+            xAxisKey={'period_start'}
+            yAxisKey={attribute}
+            highlightedValue={_highlightedValue}
+            title={label}
+            customDateFormat={customDateFormat}
+            chartHighlight={chartHighlight}
+            // hideChartType={hideChartType}
+            chartStyle={chartStyle}
+            onChartStyleChange={setChartStyle}
+            updateDateRange={updateDateRange}
           />
         ) : (
           <BarChart
@@ -194,6 +220,7 @@ const ChartHandler = ({
             hideChartType={hideChartType}
             chartStyle={chartStyle}
             onChartStyleChange={setChartStyle}
+            updateDateRange={updateDateRange}
           />
         )}
       </Panel.Content>

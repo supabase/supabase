@@ -4,11 +4,13 @@ import { Area, AreaChart as RechartAreaChart, ReferenceArea, Tooltip, XAxis } fr
 
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import ChartHeader from './ChartHeader'
-import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-import type { ChartHighlight } from './useChartHighlight'
 import ChartHighlightActions from './ChartHighlightActions'
+
+import type { ChartHighlight } from './useChartHighlight'
+import type { CommonChartProps, Datum } from './Charts.types'
+import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 
 export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -20,6 +22,7 @@ export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   hideChartType?: boolean
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
+  updateDateRange: UpdateDateRange
 }
 
 const AreaChart = ({
@@ -40,6 +43,7 @@ const AreaChart = ({
   hideChartType,
   chartStyle,
   onChartStyleChange,
+  updateDateRange,
 }: AreaChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -156,7 +160,7 @@ const AreaChart = ({
             />
           )}
         </RechartAreaChart>
-        <ChartHighlightActions chartHighlight={chartHighlight} />
+        <ChartHighlightActions chartHighlight={chartHighlight} updateDateRange={updateDateRange} />
       </Container>
       {data && (
         <div className="text-foreground-lighter -mt-8 flex items-center justify-between text-xs">

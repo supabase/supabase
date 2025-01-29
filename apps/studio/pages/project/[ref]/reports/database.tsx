@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { ArrowRight, ExternalLink, ChevronDown, Database, Plus, X } from 'lucide-react'
+import { ArrowRight, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -30,7 +30,8 @@ import type { NextPageWithLayout } from 'types'
 import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import MockClientConnectionsChart from '../../../../components/ui/Charts/MockClientConnectionsChart'
+
+export type UpdateDateRange = (from: string, to: string) => void
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -108,8 +109,9 @@ const DatabaseUsage = () => {
       '15s': dayjs(to).diff(from, 'hour') < 1, // less than 1 hour
       '1m': dayjs(to).diff(from, 'hour') < 3, // less than 3 hours
       '10m': dayjs(to).diff(from, 'hour') < 6, // less than 6 hours
-      '30m': dayjs(to).diff(from, 'hour') < 12, // less than 12 hours
-      '1h': dayjs(to).diff(from, 'hour') >= 12, // more than 12 hours
+      '30m': dayjs(to).diff(from, 'hour') < 18, // less than 18 hours
+      '1h': dayjs(to).diff(from, 'day') < 10, // less than 10 days
+      '1d': dayjs(to).diff(from, 'day') >= 10, // more than 10 days
     }
 
     switch (true) {
@@ -131,6 +133,14 @@ const DatabaseUsage = () => {
       ? DateTimeFormats.FULL_SECONDS
       : undefined
 
+  const updateDateRange: UpdateDateRange = (from: string, to: string) => {
+    setDateRange({
+      period_start: { date: from, time_period: '7d' },
+      period_end: { date: to, time_period: 'today' },
+      interval: handleIntervalGranularity(from, to),
+    })
+  }
+
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
@@ -143,13 +153,7 @@ const DatabaseUsage = () => {
         <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
           <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center justify-between space-x-3 pointer-events-auto">
             <DatePickers
-              onChange={(values: any) => {
-                setDateRange({
-                  period_start: { date: values.from, time_period: '7d' },
-                  period_end: { date: values.to, time_period: 'today' },
-                  interval: handleIntervalGranularity(values.from, values.to),
-                })
-              }}
+              onChange={(values: any) => updateDateRange(values.from, values.to)}
               from={dateRange?.period_start?.date || ''}
               to={dateRange?.period_end?.date || ''}
               helpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
@@ -181,6 +185,7 @@ const DatabaseUsage = () => {
             startDate={dateRange?.period_start?.date}
             endDate={dateRange?.period_end?.date}
             customDateFormat={handleCustomDateFormat}
+            updateDateRange={updateDateRange}
           />
 
           <ChartHandler
@@ -191,6 +196,7 @@ const DatabaseUsage = () => {
             startDate={dateRange?.period_start?.date}
             endDate={dateRange?.period_end?.date}
             customDateFormat={handleCustomDateFormat}
+            updateDateRange={updateDateRange}
           />
 
           <ChartHandler
@@ -201,41 +207,55 @@ const DatabaseUsage = () => {
             startDate={dateRange?.period_start?.date}
             endDate={dateRange?.period_end?.date}
             customDateFormat={handleCustomDateFormat}
+            updateDateRange={updateDateRange}
           />
 
           <ChartHandler
             provider="infra-monitoring"
-            attribute="disk_io_consumption"
-            label="Disk IO consumed"
-            interval={dateRange.interval}
-            startDate={dateRange?.period_start?.date}
-            endDate={dateRange?.period_end?.date}
-            customDateFormat={handleCustomDateFormat}
-          />
-
-          {/* <ChartHandler
-            provider="infra-monitoring"
             attribute="pg_stat_database_num_backends"
-            label="Number of database connections"
+            // attribute="client_connections"
+            label="Client Connections"
             interval={dateRange.interval}
             startDate={dateRange?.period_start?.date}
             endDate={dateRange?.period_end?.date}
             customDateFormat={handleCustomDateFormat}
-          /> */}
-
-          <ChartHandler
-            provider="infra-monitoring"
-            attribute="pg_stat_database_num_backends"
-            label="Number of database connections"
-            interval={dateRange.interval}
-            startDate={dateRange?.period_start?.date}
-            endDate={dateRange?.period_end?.date}
-            customDateFormat={handleCustomDateFormat}
+            updateDateRange={updateDateRange}
             isStacked
             className="!col-span-full"
           />
+
+          <ChartHandler
+            provider="infra-monitoring"
+            attribute="disk_iops_usage"
+            label="Disk IOps"
+            interval={dateRange.interval}
+            startDate={dateRange?.period_start?.date}
+            endDate={dateRange?.period_end?.date}
+            customDateFormat={handleCustomDateFormat}
+            updateDateRange={updateDateRange}
+          />
+          <ChartHandler
+            provider="infra-monitoring"
+            attribute="disk_iops_usage"
+            label="Disk IOps usage"
+            interval={dateRange.interval}
+            startDate={dateRange?.period_start?.date}
+            endDate={dateRange?.period_end?.date}
+            customDateFormat={handleCustomDateFormat}
+            updateDateRange={updateDateRange}
+          />
+
           {/* 
-         
+            <ChartHandler
+              provider="infra-monitoring"
+              attribute="pg_stat_database_num_backends"
+              label="Number of database connections"
+              interval={dateRange.interval}
+              startDate={dateRange?.period_start?.date}
+              endDate={dateRange?.period_end?.date}
+              customDateFormat={handleCustomDateFormat}
+              updateDateRange={updateDateRange}
+            /> 
 
             <ChartHandler
               provider="infra-monitoring"
@@ -246,6 +266,7 @@ const DatabaseUsage = () => {
               startDate={dateRange?.period_start?.date}
               endDate={dateRange?.period_end?.date}
               customDateFormat={handleCustomDateFormat}
+              updateDateRange={updateDateRange}
             />
          
             <ChartHandler
@@ -257,6 +278,7 @@ const DatabaseUsage = () => {
               startDate={dateRange?.period_start?.date}
               endDate={dateRange?.period_end?.date}
               customDateFormat={handleCustomDateFormat}
+              updateDateRange={updateDateRange}
             />
          
             <ChartHandler
@@ -268,6 +290,7 @@ const DatabaseUsage = () => {
               startDate={dateRange?.period_start?.date}
               endDate={dateRange?.period_end?.date}
               customDateFormat={handleCustomDateFormat}
+              updateDateRange={updateDateRange}
             />
          
             <ChartHandler
@@ -279,6 +302,7 @@ const DatabaseUsage = () => {
               startDate={dateRange?.period_start?.date}
               endDate={dateRange?.period_end?.date}
               customDateFormat={handleCustomDateFormat}
+              updateDateRange={updateDateRange}
             />
          
             <ChartHandler
@@ -290,6 +314,7 @@ const DatabaseUsage = () => {
               startDate={dateRange?.period_start?.date}
               endDate={dateRange?.period_end?.date}
               customDateFormat={handleCustomDateFormat}
+              updateDateRange={updateDateRange}
             /> */}
         </div>
 
@@ -304,6 +329,7 @@ const DatabaseUsage = () => {
                   label="Replication lag"
                   interval={dateRange.interval}
                   provider="infra-monitoring"
+                  updateDateRange={updateDateRange}
                 />
               </div>
             </Panel.Content>

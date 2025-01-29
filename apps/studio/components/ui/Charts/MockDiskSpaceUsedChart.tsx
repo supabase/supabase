@@ -28,39 +28,21 @@ import NoDataPlaceholder from './NoDataPlaceholder'
 // Function to generate mock data
 const generateMockData = (startTime: dayjs.Dayjs, endTime: dayjs.Dayjs) => {
   const data = []
-  let maxConnections = 60
   let currentTime = startTime
-  const midpoint = startTime.add(endTime.diff(startTime) / 2, 'millisecond')
+  const maxDiskSpace = 10000 // 10,000 IOps as max disk IOps
 
   while (currentTime.isBefore(endTime) || currentTime.isSame(endTime)) {
-    if (currentTime.isAfter(midpoint) || currentTime.isSame(midpoint)) {
-      maxConnections = 120
-    }
-
-    const totalConnections = Math.floor(maxConnections * 0.75 + Math.random() * 2)
-    const postgres = 6 + Math.floor(Math.random() * 1.25)
-    const pgbouncer = 3 + Math.floor(Math.random() * 2.25)
-    const pgbouncer_waiting = 3 + Math.floor(Math.random() * 2.25)
-    const supavisor = currentTime.isAfter(midpoint.add(10, 'minutes'))
-      ? 25
-      : 15 + Math.floor(Math.random() * 1.25)
-    const realtime = currentTime.isAfter(midpoint.add(10, 'minutes'))
-      ? 56
-      : currentTime.isAfter(midpoint.subtract(10, 'minutes'))
-        ? 26
-        : 6 + Math.floor(Math.random() * 1.25)
+    const readIOps = Math.floor(Math.random() * 1000) // Random value between 0 and 1000
+    const writeIOps = Math.floor(Math.random() * 1000) // Random value between 0 and 1000
 
     data.push({
       timestamp: currentTime.valueOf(),
-      postgres,
-      supavisor,
-      realtime,
-      pgbouncer,
-      pgbouncer_waiting,
-      maxConnections,
+      maxDiskSpace: maxDiskSpace,
+      read: readIOps,
+      write: writeIOps,
     })
 
-    currentTime = currentTime.add(1, 'minute')
+    currentTime = currentTime.add(15, 'second')
   }
 
   return data
@@ -90,19 +72,15 @@ interface TooltipProps {
 
 const CustomLabel = ({ active, payload, label }: TooltipProps) => {
   const data = payload && payload[0].payload
-  const totalConnections =
-    data?.postgres + data?.supavisor + data?.realtime + data?.pgbouncer + data?.pgbouncer_waiting
-  const maxConnections = data?.maxConnections
+  const totalConnections = data?.read + data?.write
+  const maxConnections = data?.maxDiskSpace
 
   const getIcon = (name: string, color: string) => {
     switch (name) {
-      case 'Postgres':
-      case 'Supavisor':
-      case 'pgbouncer':
-      case 'pgbouncer waiting':
-      case 'Realtime':
+      case 'read':
+      case 'write':
         return <CustomIcon color={color} />
-      case 'Max Connections':
+      case 'Max Disk IOps':
         return <MaxConnectionsIcon />
       default:
         return null
@@ -125,7 +103,7 @@ const CustomLabel = ({ active, payload, label }: TooltipProps) => {
               {active && entry.value && (
                 <span className="text-base">{numberFormatter(entry.value)}</span>
               )}
-              {active && entry.value && entry.name !== 'Max Connections' && (
+              {active && entry.value && entry.name !== 'Max Disk IOps' && (
                 <span className="text-[11px] text-foreground-light mb-0.5">
                   ({((entry.value / maxConnections) * 100).toFixed(1)}%)
                 </span>
@@ -186,12 +164,9 @@ const CustomLegend = (props: any) => {
 
 interface ChartDataPoint {
   timestamp: number
-  postgres: number
-  supavisor: number
-  realtime: number
-  pgbouncer: number
-  pgbouncer_waiting: number
-  maxConnections: number
+  read: number
+  write: number
+  maxDiskSpace: number
 }
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
@@ -214,7 +189,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   // initialData?: ChartDataPoint[]
 }
 
-export default function DatabaseConnectionsChart({
+export default function MockDiskSpaceUsedChart({
   // initialData,
   data,
   yAxisKey,
@@ -272,7 +247,7 @@ export default function DatabaseConnectionsChart({
     let [bottom, top] = [0, 0]
 
     refData.forEach((d) => {
-      const total = d.postgres + d.supavisor + d.realtime + d.pgbouncer
+      const total = d.read + d.write
       if (total > top) top = total
       if (total < bottom) bottom = total
     })
@@ -281,28 +256,16 @@ export default function DatabaseConnectionsChart({
   }
 
   const chartConfig = {
-    realtime: {
-      label: 'Realtime',
-      color: '#7DDEB1',
-    },
-    pgbouncer_waiting: {
-      label: 'pgbouncer waiting',
-      color: '#2e6e2a',
-    },
-    pgbouncer: {
-      label: 'pgbouncer',
-      color: '#6a9a67',
-    },
-    supavisor: {
-      label: 'Supavisor',
+    write: {
+      label: 'write',
       color: '#3ECF8E',
     },
-    postgres: {
-      label: 'Postgres',
-      color: '#4E8967',
+    read: {
+      label: 'read',
+      color: '#2e6e2a',
     },
-    maxConnections: {
-      label: 'Max Connections',
+    maxDiskSpace: {
+      label: 'Max Disk IOps',
       color: '#2BA572',
     },
   }
@@ -381,7 +344,7 @@ export default function DatabaseConnectionsChart({
             label={resolvedHighlightedValue}
           />
         }
-        // highlightedLabel={resolvedHighlightedValue}
+        highlightedLabel={''}
         // minimalHeader
         chartHighlight={chartHighlight}
         // hideChartType={hideChartType}
@@ -441,92 +404,37 @@ export default function DatabaseConnectionsChart({
           {/* <Legend content={CustomLegend} /> */}
           <Line
             type="stepAfter"
-            dataKey="maxConnections"
-            stroke={chartConfig.maxConnections.color}
+            dataKey="maxDiskSpace"
+            stroke={chartConfig.maxDiskSpace.color}
             strokeWidth={2}
             strokeDasharray="3 3"
             dot={false}
-            name="Max Connections"
+            name="Max Disk IOps"
           />
           {chartStyle === 'bar' ? (
             <>
-              <Bar
-                dataKey="postgres"
-                stackId="1"
-                fill={chartConfig.postgres.color}
-                name="Postgres"
-              />
-              <Bar
-                dataKey="supavisor"
-                stackId="1"
-                fill={chartConfig.supavisor.color}
-                name="Supavisor"
-              />
-              <Bar
-                dataKey="pgbouncer"
-                stackId="1"
-                fill={chartConfig.pgbouncer.color}
-                name="pgbouncer"
-              />
-              <Bar
-                dataKey="pgbouncer_waiting"
-                stackId="1"
-                fill={chartConfig.pgbouncer_waiting.color}
-                name="pgbouncer waiting"
-              />
-              <Bar
-                dataKey="realtime"
-                stackId="1"
-                fill={chartConfig.realtime.color}
-                name="Realtime"
-              />
+              <Bar dataKey="read" stackId="1" fill={chartConfig.read.color} name="read" />
+              <Bar dataKey="write" stackId="1" fill={chartConfig.write.color} name="write" />
             </>
           ) : (
             <>
               <Area
-                dataKey="postgres"
+                dataKey="read"
                 stackId="1"
-                fill={chartConfig.postgres.color}
+                fill={chartConfig.read.color}
                 strokeOpacity={0.5}
-                stroke={chartConfig.postgres.color}
+                stroke={chartConfig.read.color}
                 fillOpacity={0.25}
-                name="Postgres"
+                name="read"
               />
               <Area
-                dataKey="supavisor"
+                dataKey="write"
                 stackId="1"
-                stroke={chartConfig.supavisor.color}
-                fill={chartConfig.supavisor.color}
+                stroke={chartConfig.write.color}
+                fill={chartConfig.write.color}
                 strokeOpacity={0.5}
                 fillOpacity={0.25}
-                name="Supavisor"
-              />
-              <Area
-                dataKey="realtime"
-                stackId="1"
-                stroke={chartConfig.realtime.color}
-                fill={chartConfig.realtime.color}
-                strokeOpacity={0.5}
-                fillOpacity={0.25}
-                name="Realtime"
-              />
-              <Area
-                dataKey="pgbouncer"
-                stackId="1"
-                stroke={chartConfig.pgbouncer.color}
-                fill={chartConfig.pgbouncer.color}
-                strokeOpacity={0.5}
-                fillOpacity={0.25}
-                name="pgbouncer"
-              />
-              <Area
-                dataKey="pgbouncer_waiting"
-                stackId="1"
-                stroke={chartConfig.pgbouncer_waiting.color}
-                fill={chartConfig.pgbouncer_waiting.color}
-                strokeOpacity={0.5}
-                fillOpacity={0.25}
-                name="pgbouncer waiting"
+                name="write"
               />
             </>
           )}

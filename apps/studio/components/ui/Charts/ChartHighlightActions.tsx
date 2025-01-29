@@ -4,6 +4,8 @@ import { ArrowRight, ChevronRightIcon, LogsIcon, SearchIcon } from 'lucide-react
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import {
+  Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -12,15 +14,30 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { ChartHighlight } from './useChartHighlight'
+import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 
-const ChartHighlightActions = ({ chartHighlight }: { chartHighlight?: ChartHighlight }) => {
+const ChartHighlightActions = ({
+  chartHighlight,
+  updateDateRange,
+}: {
+  chartHighlight?: ChartHighlight
+  updateDateRange: UpdateDateRange
+}) => {
   const { ref } = useParams()
-  const { left: selectedRangeStart, right: selectedRangeEnd, isSelecting } = chartHighlight ?? {}
+  const { left: selectedRangeStart, right: selectedRangeEnd, clearHighlight } = chartHighlight ?? {}
   const [isOpen, setIsOpen] = useState(!!chartHighlight?.popoverPosition)
 
   useEffect(() => {
     setIsOpen(!!chartHighlight?.popoverPosition && selectedRangeStart !== selectedRangeEnd)
   }, [chartHighlight?.popoverPosition])
+
+  const logsRangeUrl = `/project/${ref}/logs/postgres-logs?iso_timestamp_start=${selectedRangeStart}&iso_timestamp_end=${selectedRangeEnd}&its=${selectedRangeStart}&ite=&project=${ref}`
+  const disableZoomIn = dayjs(selectedRangeEnd).diff(dayjs(selectedRangeStart), 'minutes') < 10
+  const handleZoomIn = () => {
+    if (disableZoomIn) return
+    updateDateRange(selectedRangeStart!, selectedRangeEnd!)
+    clearHighlight && clearHighlight()
+  }
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -28,8 +45,8 @@ const ChartHighlightActions = ({ chartHighlight }: { chartHighlight?: ChartHighl
         className="w-auto p-0"
         style={{
           position: 'absolute',
-          left: chartHighlight?.popoverPosition?.x + 'px' ?? 0,
-          top: chartHighlight?.popoverPosition?.y + 'px' ?? 0,
+          left: chartHighlight?.popoverPosition?.x + 'px' || 0,
+          top: chartHighlight?.popoverPosition?.y + 'px' || 0,
         }}
       />
       <DropdownMenuContent className="flex flex-col gap-1 p-1 w-fit text-left">
@@ -40,20 +57,27 @@ const ChartHighlightActions = ({ chartHighlight }: { chartHighlight?: ChartHighl
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="my-0" />
         <DropdownMenuItem>
-          <Link
-            className="w-full flex items-center gap-1.5"
-            href={`/project/${ref}/logs/postgres-logs?iso_timestamp_start=${selectedRangeStart}&iso_timestamp_end=${selectedRangeEnd}`}
-          >
+          <Link href={logsRangeUrl} className="w-full flex items-center gap-1.5">
             <LogsIcon className="text-foreground-lighter" size={12} />
             <span className="flex-grow text-left">Open in Logs Explorer</span>
             <ChevronRightIcon className="text-foreground-lighter ml-2" size={12} />
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <button className="w-full flex items-center gap-1.5" onClick={() => alert('Zoommed in!')}>
+        <DropdownMenuItem
+          disabled={disableZoomIn}
+          className={cn('group', disableZoomIn && '!bg-transparent')}
+        >
+          <button
+            disabled={disableZoomIn}
+            onClick={handleZoomIn}
+            // className="w-full [&>span]:w-full [&>span]:flex [&>span]:items-center [&>span]:gap-1.5 p-0 h-fit"
+            className="w-full flex items-center gap-1.5"
+          >
             <SearchIcon className="text-foreground-lighter" size={12} />
-            <span className="flex-grow text-left">Zoom in</span>
-            <ChevronRightIcon className="text-foreground-lighter ml-2" size={12} />
+            <span className="flex-grow text-left text-foreground-light">Zoom in</span>
+            {disableZoomIn && (
+              <span className="text-foreground-muted text-xs">10 minutes min.</span>
+            )}
           </button>
         </DropdownMenuItem>
       </DropdownMenuContent>

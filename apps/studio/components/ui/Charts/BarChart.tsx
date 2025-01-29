@@ -23,6 +23,7 @@ import NoDataPlaceholder from './NoDataPlaceholder'
 import { cn } from 'ui'
 import type { ChartHighlight } from './useChartHighlight'
 import ChartHighlightActions from './ChartHighlightActions'
+import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -40,6 +41,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   hideChartType?: boolean
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
+  updateDateRange: UpdateDateRange
 }
 
 const BarChart = ({
@@ -67,6 +69,7 @@ const BarChart = ({
   hideChartType,
   chartStyle,
   onChartStyleChange,
+  updateDateRange,
 }: BarChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -224,7 +227,7 @@ const BarChart = ({
             />
           )}
         </ComposedChart>
-        <ChartHighlightActions chartHighlight={chartHighlight} />
+        <ChartHighlightActions chartHighlight={chartHighlight} updateDateRange={updateDateRange} />
       </Container>
       {data && (
         <div className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs">
