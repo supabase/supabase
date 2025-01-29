@@ -2187,11 +2187,6 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/docs/guides/database/extensions/pgmq',
-    destination: '/docs/guides/database/extensions',
-  },
-  {
-    permanent: false,
     source: '/docs/guides/database/extensions/pg_partman',
     destination: '/docs/guides/database/extensions',
   },
