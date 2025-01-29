@@ -3,3 +3,8 @@ volumes/storage
 .env
 test.http
 docker-compose.override.yml
+
+# Volumes
+volumes/db-config
+volumes/db-data
+volumes/storage-data
