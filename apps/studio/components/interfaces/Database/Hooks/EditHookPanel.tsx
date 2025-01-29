@@ -115,10 +115,17 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
           parsedParameters = {}
         }
 
-        const formattedHeaders = tryParseJson(headers) || {}
+        let parsedHeaders: Record<string, string> = {}
+        try {
+          parsedHeaders = JSON.parse(headers.replace(/\\"/g, '"'))
+        } catch (e) {
+          // If parsing still fails, fallback to an empty object
+          parsedHeaders = {}
+        }
+
         setHttpHeaders(
-          Object.keys(formattedHeaders).map((key) => {
-            return { id: uuidv4(), name: key, value: formattedHeaders[key] }
+          Object.keys(parsedHeaders).map((key) => {
+            return { id: uuidv4(), name: key, value: parsedHeaders[key] }
           })
         )
 
