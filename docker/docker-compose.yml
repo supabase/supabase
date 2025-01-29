@@ -5,12 +5,12 @@
 #   Destroy:            docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down -v --remove-orphans
 #   Reset everything:  ./reset.sh
 
-name: supabase
+name: ${STACK_PREFIX:-}supabase
 
 services:
 
   studio:
-    container_name: supabase-studio
+    container_name: ${STACK_PREFIX:-}supabase-studio
     image: supabase/studio:20250113-83c9420
     restart: unless-stopped
     healthcheck:
@@ -50,7 +50,7 @@ services:
       # NEXT_ANALYTICS_BACKEND_PROVIDER: bigquery
 
   kong:
-    container_name: supabase-kong
+    container_name: ${STACK_PREFIX:-}supabase-kong
     image: kong:2.8.1
     restart: unless-stopped
     ports:
@@ -78,7 +78,7 @@ services:
     entrypoint: bash -c 'eval "echo \"$$(cat ~/temp.yml)\"" > ~/kong.yml && /docker-entrypoint.sh kong docker-start'
 
   auth:
-    container_name: supabase-auth
+    container_name: ${STACK_PREFIX:-}supabase-auth
     image: supabase/gotrue:v2.167.0
     restart: unless-stopped
     healthcheck:
@@ -161,7 +161,7 @@ services:
       # GOTRUE_HOOK_SEND_EMAIL_SECRETS: "v1,whsec_VGhpcyBpcyBhbiBleGFtcGxlIG9mIGEgc2hvcnRlciBCYXNlNjQgc3RyaW5n"
 
   rest:
-    container_name: supabase-rest
+    container_name: ${STACK_PREFIX:-}supabase-rest
     image: postgrest/postgrest:v12.2.0
     restart: unless-stopped
     depends_on:
@@ -185,7 +185,7 @@ services:
 
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
-    container_name: realtime-dev.supabase-realtime
+    container_name: ${STACK_PREFIX:-}realtime-dev.supabase-realtime
     image: supabase/realtime:v2.34.7
     restart: unless-stopped
     depends_on:
@@ -230,7 +230,7 @@ services:
 
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
-    container_name: supabase-storage
+    container_name: ${STACK_PREFIX:-}supabase-storage
     image: supabase/storage-api:v1.14.5
     restart: unless-stopped
     volumes:
@@ -273,7 +273,7 @@ services:
       IMGPROXY_URL: http://imgproxy:5001
 
   imgproxy:
-    container_name: supabase-imgproxy
+    container_name: ${STACK_PREFIX:-}supabase-imgproxy
     image: darthsim/imgproxy:v3.8.0
     restart: unless-stopped
     volumes:
@@ -295,7 +295,7 @@ services:
       IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
 
   meta:
-    container_name: supabase-meta
+    container_name: ${STACK_PREFIX:-}supabase-meta
     image: supabase/postgres-meta:v0.84.2
     restart: unless-stopped
     depends_on:
@@ -313,7 +313,7 @@ services:
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
 
   functions:
-    container_name: supabase-edge-functions
+    container_name: ${STACK_PREFIX:-}supabase-edge-functions
     image: supabase/edge-runtime:v1.66.5
     restart: unless-stopped
     volumes:
@@ -337,7 +337,7 @@ services:
       ]
 
   analytics:
-    container_name: supabase-analytics
+    container_name: ${STACK_PREFIX:-}supabase-analytics
     image: supabase/logflare:1.4.0
     restart: unless-stopped
     ports:
@@ -385,7 +385,7 @@ services:
 
   # Comment out everything below this point if you are using an external Postgres database
   db:
-    container_name: supabase-db
+    container_name: ${STACK_PREFIX:-}supabase-db
     image: supabase/postgres:15.8.1.020
     restart: unless-stopped
     volumes:
@@ -442,7 +442,7 @@ services:
       ]
 
   vector:
-    container_name: supabase-vector
+    container_name: ${STACK_PREFIX:-}supabase-vector
     image: timberio/vector:0.28.1-alpine
     restart: unless-stopped
     volumes:
@@ -471,7 +471,7 @@ services:
 
   # Update the DATABASE_URL if you are using an external Postgres database
   supavisor:
-    container_name: supabase-pooler
+    container_name: ${STACK_PREFIX:-}supabase-pooler
     image: supabase/supavisor:1.1.56
     restart: unless-stopped
     ports:
