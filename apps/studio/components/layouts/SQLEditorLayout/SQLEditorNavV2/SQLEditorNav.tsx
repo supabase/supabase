@@ -16,7 +16,9 @@ import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
 import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from 'data/content/sql-folders-query'
 import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
 import {
@@ -42,19 +44,28 @@ interface SQLEditorNavProps {
   sort?: 'inserted_at' | 'name'
 }
 
+type SectionState = { shared: boolean; favorite: boolean; private: boolean }
+const DEFAULT_SECTION_STATE: SectionState = { shared: false, favorite: false, private: true }
+
 export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
   const { ref: projectRef, id } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const [sectionVisibility, setSectionVisibility] = useLocalStorage<SectionState>(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_SECTION_STATE(projectRef ?? ''),
+    DEFAULT_SECTION_STATE
+  )
+  const {
+    shared: showSharedSnippets,
+    favorite: showFavoriteSnippets,
+    private: showPrivateSnippets,
+  } = sectionVisibility
 
   const [showMoveModal, setShowMoveModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showRenameModal, setShowRenameModal] = useState(false)
-  const [showFavoriteSnippets, setShowFavoriteSnippets] = useState(false)
-  const [showSharedSnippets, setShowSharedSnippets] = useState(false)
-  const [showPrivateSnippets, setShowPrivateSnippets] = useState(true)
 
   const [expandedFolderIds, setExpandedFolderIds] = useState<string[]>([])
   const [selectedSnippets, setSelectedSnippets] = useState<Snippet[]>([])
@@ -352,7 +363,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         onSuccess: () => {
           setSelectedSnippetToShare(undefined)
           setSelectedSnippetToUnshare(undefined)
-          setShowSharedSnippets(true)
+          setSectionVisibility({ ...sectionVisibility, shared: true })
           snapV2.updateSnippet({
             id: snippet.id,
             snippet: { visibility, folder_id: null },
@@ -368,7 +379,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     )
   }
 
-  const onSelectCopyPersonal = async (snippet: SnippetWithContent) => {
+  const onSelectDuplicate = async (snippet: SnippetWithContent) => {
     if (!profile) return console.error('Profile is required')
     if (!project) return console.error('Project is required')
     if (!projectRef) return console.error('Project ref is required')
@@ -387,7 +398,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
     const snippetCopy = createSqlSnippetSkeletonV2({
       id: uuidv4(),
-      name: snippet.name,
+      name: `${snippet.name} (Duplicate)`,
       sql,
       owner_id: profile?.id,
       project_id: project?.id,
@@ -457,7 +468,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
   useEffect(() => {
     if (snippet !== undefined && isSuccess) {
-      if (snippet.visibility === 'project') setShowSharedSnippets(true)
+      if (snippet.visibility === 'project') {
+        setSectionVisibility({ ...sectionVisibility, shared: true })
+      } else if (snippet.visibility === 'user') {
+        setSectionVisibility({ ...sectionVisibility, private: true })
+      }
       if (snippet.folder_id && !expandedFolderIds.includes(snippet.folder_id)) {
         setExpandedFolderIds([...expandedFolderIds, snippet.folder_id])
       }
@@ -513,9 +528,12 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   return (
     <>
       <InnerSideMenuSeparator />
+
       <InnerSideMenuCollapsible
         open={showSharedSnippets}
-        onOpenChange={setShowSharedSnippets}
+        onOpenChange={(value) => {
+          setSectionVisibility({ ...(sectionVisibility ?? DEFAULT_SECTION_STATE), shared: value })
+        }}
         className="px-0"
       >
         <InnerSideMenuCollapsibleTrigger
@@ -549,8 +567,8 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                   onSelectDownload={() => {
                     setSelectedSnippetToDownload(element.metadata as Snippet)
                   }}
-                  onSelectCopyPersonal={() => {
-                    onSelectCopyPersonal(element.metadata as Snippet)
+                  onSelectDuplicate={() => {
+                    onSelectDuplicate(element.metadata as Snippet)
                   }}
                   onSelectUnshare={() => {
                     setSelectedSnippetToUnshare(element.metadata as Snippet)
@@ -565,12 +583,15 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
           )}
         </InnerSideMenuCollapsibleContent>
       </InnerSideMenuCollapsible>
+
       <InnerSideMenuSeparator />
 
       <InnerSideMenuCollapsible
         className="px-0"
         open={showFavoriteSnippets}
-        onOpenChange={setShowFavoriteSnippets}
+        onOpenChange={(value) => {
+          setSectionVisibility({ ...(sectionVisibility ?? DEFAULT_SECTION_STATE), favorite: value })
+        }}
       >
         <InnerSideMenuCollapsibleTrigger
           title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
@@ -609,8 +630,8 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                   onSelectDownload={() => {
                     setSelectedSnippetToDownload(element.metadata as Snippet)
                   }}
-                  onSelectCopyPersonal={() => {
-                    onSelectCopyPersonal(element.metadata as Snippet)
+                  onSelectDuplicate={() => {
+                    onSelectDuplicate(element.metadata as Snippet)
                   }}
                   onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                   onSelectUnshare={() => {
@@ -626,11 +647,14 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
           )}
         </InnerSideMenuCollapsibleContent>
       </InnerSideMenuCollapsible>
+
       <InnerSideMenuSeparator />
 
       <InnerSideMenuCollapsible
         open={showPrivateSnippets}
-        onOpenChange={setShowPrivateSnippets}
+        onOpenChange={(value) => {
+          setSectionVisibility({ ...(sectionVisibility ?? DEFAULT_SECTION_STATE), private: value })
+        }}
         className="px-0"
       >
         <InnerSideMenuCollapsibleTrigger
@@ -711,6 +735,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     }
                   }}
                   onSelectDownload={() => setSelectedSnippetToDownload(element.metadata as Snippet)}
+                  onSelectDuplicate={() => onSelectDuplicate(element.metadata as Snippet)}
                   onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                   onEditSave={(name: string) => {
                     // [Joshen] Inline editing only for folders for now
