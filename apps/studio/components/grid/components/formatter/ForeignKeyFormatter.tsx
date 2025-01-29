@@ -3,14 +3,15 @@ import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
 import type { SupaRow } from '../../types'
 import { NullValue } from '../common/NullValue'
+import { ReferenceRecordPeek } from './ReferenceRecordPeek'
 
 interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
   projectRef?: string
@@ -39,6 +40,7 @@ export const ForeignKeyFormatter = (props: Props) => {
   )
   const { data: tables } = useTablesQuery({
     projectRef: project?.ref,
+    includeColumns: true,
     connectionString: project?.connectionString,
     schema: relationship?.target_table_schema,
   })
@@ -56,33 +58,24 @@ export const ForeignKeyFormatter = (props: Props) => {
         {value === null ? <NullValue /> : value}
       </span>
       {relationship !== undefined && targetTable !== undefined && value !== null && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              asChild
+        <Popover_Shadcn_>
+          <PopoverTrigger_Shadcn_ asChild>
+            <ButtonTooltip
               type="default"
-              size="tiny"
-              className="translate-y-[2px]"
-              style={{ padding: '3px' }}
-            >
-              <EditorTablePageLink
-                href={`/project/${projectRef}/editor/${targetTable?.id}?schema=${selectedSchema}&filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
-                projectRef={projectRef}
-                id={targetTable && String(targetTable?.id)}
-                filters={[
-                  {
-                    column: relationship.target_column_name,
-                    operator: '=',
-                    value: String(value),
-                  },
-                ]}
-              >
-                <ArrowRight size={14} />
-              </EditorTablePageLink>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">View referencing record</TooltipContent>
-        </Tooltip>
+              className="w-6 h-6"
+              icon={<ArrowRight />}
+              onClick={(e) => e.stopPropagation()}
+              tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
+            />
+          </PopoverTrigger_Shadcn_>
+          <PopoverContent_Shadcn_ align="end" className="p-0 w-96">
+            <ReferenceRecordPeek
+              table={targetTable}
+              column={relationship.target_column_name}
+              value={value}
+            />
+          </PopoverContent_Shadcn_>
+        </Popover_Shadcn_>
       )}
     </div>
   )
