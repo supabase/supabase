@@ -234,7 +234,7 @@ services:
     image: supabase/storage-api:v1.14.5
     restart: unless-stopped
     volumes:
-      - ./volumes/storage:/var/lib/storage:z
+      - storage-data:/var/lib/storage:z
     healthcheck:
       test:
         [
@@ -277,7 +277,7 @@ services:
     image: darthsim/imgproxy:v3.8.0
     restart: unless-stopped
     volumes:
-      - ./volumes/storage:/var/lib/storage:z
+      - storage-data:/var/lib/storage:z
     healthcheck:
       test:
         [
@@ -397,7 +397,7 @@ services:
       # Initialize the database settings with JWT_SECRET and JWT_EXP
       - ./volumes/db/jwt.sql:/docker-entrypoint-initdb.d/init-scripts/99-jwt.sql:Z
       # PGDATA directory is persisted between restarts
-      - ./volumes/db/data:/var/lib/postgresql/data:Z
+      - db-data:/var/lib/postgresql/data:Z
       # Changes required for internal supabase data such as _analytics
       - ./volumes/db/_supabase.sql:/docker-entrypoint-initdb.d/migrations/97-_supabase.sql:Z
       # Changes required for Analytics support
@@ -524,3 +524,20 @@ services:
 
 volumes:
   db-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOLUME_BASE_PATH:-./volumes}/db-config
+  db-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOLUME_BASE_PATH:-./volumes}/db-data
+  storage-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOLUME_BASE_PATH:-./volumes}/storage-data
