@@ -1,22 +1,13 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import DatePicker from 'react-datepicker'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
 
-import {
-  Button,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  Popover,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-} from 'ui'
-import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD, getDefaultHelper } from './Logs.constants'
-import type { DatePickerToFrom, DatetimeHelper } from './Logs.types'
-import { ChevronLeft, ChevronRight, Clock } from 'lucide-react'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
+import type { DatetimeHelper } from './Logs.types'
+import { ChevronLeft, ChevronRight, Clock, XIcon } from 'lucide-react'
 import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
-import { cn } from 'ui'
 import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
 import { Label } from '@ui/components/shadcn/ui/label'
 
@@ -28,18 +19,13 @@ export type DatePickerValue = {
 }
 
 interface Props {
-  to: string
-  from: string
   value: DatePickerValue
   onSubmit: (args: DatePickerValue) => void
   helpers: DatetimeHelper[]
 }
 
-type Time = { HH: string; mm: string; ss: string }
-
-export const LogsDatePicker: React.FC<Props> = ({ to, from, onSubmit, helpers, value }) => {
-  const defaultHelper = getDefaultHelper(helpers)
-  const [helperValue, setHelperValue] = useState<string>(to || from ? '' : defaultHelper.text)
+export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) => {
+  const [open, setOpen] = useState(false)
 
   const handleHelperChange = (newValue: string) => {
     const selectedHelper = helpers.find((h) => h.text === newValue)
@@ -51,24 +37,9 @@ export const LogsDatePicker: React.FC<Props> = ({ to, from, onSubmit, helpers, v
         text: selectedHelper.text,
       })
     }
+
+    setOpen(false)
   }
-
-  const selectedHelper = helpers.find((helper) => {
-    if (to === helper.calcTo() && from === helper.calcFrom()) {
-      return true
-    }
-    return false
-  })
-
-  useEffect(() => {
-    if (selectedHelper && helperValue !== selectedHelper.text) {
-      setHelperValue(selectedHelper.text)
-    } else if (!selectedHelper && (to || from)) {
-      setHelperValue('')
-    }
-  }, [selectedHelper, to, from])
-
-  const [open, setOpen] = useState(true)
 
   const [startDate, setStartDate] = useState<Date | null>(null)
   const [endDate, setEndDate] = useState<Date | null>(null)
@@ -85,6 +56,7 @@ export const LogsDatePicker: React.FC<Props> = ({ to, from, onSubmit, helpers, v
   })
 
   function handleDatePickerChange(dates: [from: Date | null, to: Date | null]) {
+    console.log('dates', dates)
     const [from, to] = dates
 
     setStartDate(from)
@@ -107,28 +79,100 @@ export const LogsDatePicker: React.FC<Props> = ({ to, from, onSubmit, helpers, v
       to: finalTo.toISOString(),
       isHelper: false,
     })
+
     setOpen(false)
   }
+
+  const [copied, setCopied] = useState(false)
+  const [pasted, setPasted] = useState(false)
+
+  useEffect(() => {
+    if (copied) {
+      setTimeout(() => {
+        setCopied(false)
+      }, 2000)
+    }
+  }, [copied])
+
+  function handlePaste() {
+    navigator.clipboard
+      .readText()
+      .then((text) => {
+        try {
+          const json = JSON.parse(text)
+
+          if (!json.from || !json.to) {
+            console.warn('Invalid date range format in clipboard')
+            return
+          }
+
+          const fromDate = new Date(json.from)
+          const toDate = new Date(json.to)
+
+          // Check if dates are valid
+          if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+            console.warn('Invalid date values in clipboard')
+            return
+          }
+
+          setStartDate(fromDate)
+          setEndDate(toDate)
+          setPasted(true)
+        } catch (error) {
+          console.warn('Failed to parse clipboard content as date range:', error)
+        }
+      })
+      .catch((error) => {
+        console.warn('Failed to read clipboard:', error)
+      })
+  }
+
+  function handleCopy() {
+    navigator.clipboard.writeText(
+      JSON.stringify({
+        from: startDate?.toISOString(),
+        to: endDate?.toISOString(),
+      })
+    )
+    setCopied(true)
+  }
+
+  useEffect(() => {
+    if (pasted) {
+      setTimeout(() => {
+        setPasted(false)
+      }, 2000)
+    }
+  }, [pasted])
+
+  useEffect(() => {
+    document.addEventListener('paste', handlePaste)
+    document.addEventListener('copy', handleCopy)
+    return () => {
+      document.removeEventListener('paste', handlePaste)
+      document.removeEventListener('copy', handleCopy)
+    }
+  }, [startDate, endDate])
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button type="default" icon={<Clock size={12} />}>
-          {value.isHelper
+          {value.isHelper && !value.to
             ? value.text
             : `${dayjs(value.from).format('MMM D, HH:mm')} - ${dayjs(value.to).format('MMM D, HH:mm')}`}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ side="bottom" align="center" className="flex w-full p-0">
+      <PopoverContent_Shadcn_ side="bottom" align="start" className="flex w-full p-0">
         <RadioGroup
           onValueChange={handleHelperChange}
-          value={selectedHelper?.text || ''}
+          value={value.isHelper ? value.text : ''}
           className="border-r p-2 flex flex-col gap-px"
         >
           {helpers.map((helper) => (
             <Label
               key={helper.text}
-              className="[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-2 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm"
+              className="[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs"
             >
               <RadioGroupItem
                 hidden
@@ -142,29 +186,43 @@ export const LogsDatePicker: React.FC<Props> = ({ to, from, onSubmit, helpers, v
         </RadioGroup>
 
         <div>
-          <div className="flex *:flex-grow p-2 gap-2">
-            <TimeSplitInput
-              type="start"
-              startTime={startTime}
-              endTime={endTime}
-              time={startTime}
-              setTime={setStartTime}
-              setStartTime={setStartTime}
-              setEndTime={setEndTime}
-              startDate={startDate}
-              endDate={endDate}
-            />
-            <TimeSplitInput
-              type="end"
-              startTime={startTime}
-              endTime={endTime}
-              time={endTime}
-              setTime={setEndTime}
-              setStartTime={setStartTime}
-              setEndTime={setEndTime}
-              startDate={startDate}
-              endDate={endDate}
-            />
+          <div className="flex p-2 gap-2 items-center">
+            <div className="flex flex-grow *:flex-grow gap-2 font-mono">
+              <TimeSplitInput
+                type="start"
+                startTime={startTime}
+                endTime={endTime}
+                time={startTime}
+                setTime={setStartTime}
+                setStartTime={setStartTime}
+                setEndTime={setEndTime}
+                startDate={startDate}
+                endDate={endDate}
+              />
+              <TimeSplitInput
+                type="end"
+                startTime={startTime}
+                endTime={endTime}
+                time={endTime}
+                setTime={setEndTime}
+                setStartTime={setStartTime}
+                setEndTime={setEndTime}
+                startDate={startDate}
+                endDate={endDate}
+              />
+            </div>
+            <div className="flex-shrink">
+              <Button
+                icon={<XIcon size={14} />}
+                type="text"
+                size="tiny"
+                className="px-1.5"
+                onClick={() => {
+                  setStartTime({ HH: '00', mm: '00', ss: '00' })
+                  setEndTime({ HH: '00', mm: '00', ss: '00' })
+                }}
+              ></Button>
+            </div>
           </div>
           <div className="p-2 border-t [&_.react-datepicker__day--today]:bg-red-500">
             <DatePicker
@@ -187,37 +245,44 @@ export const LogsDatePicker: React.FC<Props> = ({ to, from, onSubmit, helpers, v
               }) => (
                 <div className="flex items-center justify-between">
                   <div className="flex w-full items-center justify-between">
-                    <button
+                    <Button
                       onClick={decreaseMonth}
                       disabled={prevMonthButtonDisabled}
-                      type="button"
-                      className={`
-                        ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-foreground-light hover:text-foreground focus:outline-none p-2
-                    `}
-                    >
-                      <ChevronLeft size={16} strokeWidth={2} />
-                    </button>
+                      icon={<ChevronLeft size={14} strokeWidth={2} />}
+                      type="text"
+                      size="tiny"
+                      className="px-1.5"
+                    ></Button>
                     <span className="text-sm text-foreground-light">
                       {format(date, 'MMMM yyyy')}
                     </span>
-                    <button
+                    <Button
                       onClick={increaseMonth}
                       disabled={nextMonthButtonDisabled}
-                      type="button"
-                      className={`
-                        ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-foreground-light p-2 hover:text-foreground focus:outline-none
-                    `}
-                    >
-                      <ChevronRight size={16} strokeWidth={2} />
-                    </button>
+                      icon={<ChevronRight size={14} strokeWidth={2} />}
+                      type="text"
+                      size="tiny"
+                      className="px-1.5"
+                    ></Button>
                   </div>
                 </div>
               )}
             />
           </div>
           <div className="flex items-center justify-end gap-2 p-2 border-t">
+            {startDate && endDate ? (
+              <Button
+                type="text"
+                size="tiny"
+                onClick={handleCopy}
+                className={cn({
+                  'text-brand-600': copied || pasted,
+                })}
+              >
+                {copied ? 'Copied!' : pasted ? 'Pasted!' : 'Copy range'}
+              </Button>
+            ) : null}
+
             <Button
               type="default"
               onClick={() => {
@@ -225,7 +290,7 @@ export const LogsDatePicker: React.FC<Props> = ({ to, from, onSubmit, helpers, v
                 setEndDate(new Date())
               }}
             >
-              Clear
+              Today
             </Button>
             <Button onClick={handleApply}>Apply</Button>
           </div>

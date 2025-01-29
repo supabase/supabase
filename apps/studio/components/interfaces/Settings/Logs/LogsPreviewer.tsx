@@ -54,7 +54,7 @@ export const LogsPreviewer = ({
   filterPanelClassName,
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
-  const { s, ite, its, db } = useParams()
+  const { db } = useParams()
   const [showChart, setShowChart] = useState(true)
   const organization = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
@@ -97,13 +97,16 @@ export const LogsPreviewer = ({
 
   // Show the prompt on page load based on query params
   useEffect(() => {
-    if (its) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, subscription?.plan?.id)
+    if (params.iso_timestamp_start) {
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(
+        params.iso_timestamp_start,
+        subscription?.plan?.id
+      )
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
     }
-  }, [its, subscription])
+  }, [params.iso_timestamp_start, subscription])
 
   useEffect(() => {
     if (db !== undefined) {
@@ -127,15 +130,6 @@ export const LogsPreviewer = ({
 
   const handleRefresh = () => {
     refresh()
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        ite: undefined,
-        its: undefined,
-        // ...whereFilters,
-      },
-    })
   }
   const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
     if (event === 'search-input-change') {
@@ -166,14 +160,6 @@ export const LogsPreviewer = ({
           iso_timestamp_start: from || '',
           iso_timestamp_end: to || '',
         }))
-        router.push({
-          pathname: router.pathname,
-          query: {
-            ...router.query,
-            its: from || '',
-            ite: to || '',
-          },
-        })
       }
     }
   }

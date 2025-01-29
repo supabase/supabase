@@ -161,10 +161,7 @@ function useLogsPreview({
   const newCount = isResponseOk(countData) ? countData.result?.[0]?.count ?? 0 : 0
 
   // chart data
-  const chartQuery = useMemo(
-    () => genChartQuery(table, params, filters),
-    [table, params.iso_timestamp_end, params.project, filters]
-  )
+  const chartQuery = genChartQuery(table, params, filters)
 
   const chartUrl = useMemo(() => {
     return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({

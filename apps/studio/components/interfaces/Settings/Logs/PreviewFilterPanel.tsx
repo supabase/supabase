@@ -186,8 +186,8 @@ const PreviewFilterPanel = ({
 
         <RefreshButton />
         <LogsDatePicker
-          to={defaultToValue}
-          from={defaultFromValue}
+          // to={defaultToValue}
+          // from={defaultFromValue}
           helpers={PREVIEWER_DATEPICKER_HELPERS}
           onSubmit={(vals) => {
             onSearch('datepicker-change', { to: vals.to, from: vals.from })
