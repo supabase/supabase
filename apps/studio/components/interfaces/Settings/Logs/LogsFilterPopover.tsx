@@ -35,7 +35,7 @@ const LogsFilterPopover = ({
     <Popover
       className="flex items-center"
       open={open}
-      align="end"
+      align="start"
       size="medium"
       onOpenChange={handleToggle}
       overlay={
@@ -50,7 +50,7 @@ const LogsFilterPopover = ({
         >
           {({ isSubmitting }: { isSubmitting: boolean }) => (
             <>
-              <div className="space-y-4 py-6">
+              <div className="space-y-3 py-3">
                 {options.options.map((x, i: number) => (
                   <Fragment key={x.key}>
                     <Checkbox
