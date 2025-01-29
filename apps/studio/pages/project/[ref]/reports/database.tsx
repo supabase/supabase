@@ -226,7 +226,7 @@ const DatabaseUsage = () => {
 
           <ChartHandler
             provider="infra-monitoring"
-            attribute="disk_iops_usage"
+            attribute="pg_stat_database_num_backends"
             label="Disk IOps"
             interval={dateRange.interval}
             startDate={dateRange?.period_start?.date}
@@ -236,7 +236,7 @@ const DatabaseUsage = () => {
           />
           <ChartHandler
             provider="infra-monitoring"
-            attribute="disk_iops_usage"
+            attribute="pg_stat_database_num_backends"
             label="Disk IOps usage"
             interval={dateRange.interval}
             startDate={dateRange?.period_start?.date}

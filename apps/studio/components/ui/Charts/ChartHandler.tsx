@@ -174,7 +174,7 @@ const ChartHandler = ({
         >
           {children}
         </div>
-        {label.toLowerCase().replaceAll(' ', '-') === 'Client Connections' ? (
+        {label === 'Client Connections' ? (
           <MockClientConnectionsChart
             YAxisProps={{ width: 1 }}
             data={(chartData?.data ?? []) as any}
