@@ -2,7 +2,7 @@
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
-  viewBox="0 0 24 24"
+  viewBox="12.5 12 24 24"
   fill="none"
   stroke="currentColor"
   stroke-width="2"
@@ -11,15 +11,15 @@
 >
   <path
     stroke="currentColor"
-    strokeLinejoin="round"
-    strokeMiterlimit={10}
+    stroke-linejoin="round"
+    stroke-miterlimit="10"
     d="m23.149 23.499 3.424 7.83a.5.5 0 0 0 .942-.074l.74-2.868a.5.5 0 0 1 .364-.36l3.039-.756a.5.5 0 0 0 .08-.943l-7.93-3.487a.5.5 0 0 0-.66.658Z"
   />
   <path
     stroke="currentColor"
-    strokeLinejoin="round"
-    strokeMiterlimit={10}
+    stroke-linejoin="round"
+    stroke-miterlimit="10"
     d="M24.544 32.746h-5.623a3 3 0 0 1-3-3V18.5a3 3 0 0 1 3-3h11.247a3 3 0 0 1 3 3v5.623"
-    opacity={0.45}
+    opacity="0.45"
   />
 </svg>
