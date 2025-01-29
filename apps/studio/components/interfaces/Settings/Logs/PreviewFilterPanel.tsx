@@ -9,7 +9,7 @@ import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Button, Input, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
-import DatePickers from './Logs.DatePickers'
+import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import {
   FILTER_OPTIONS,
   LOG_ROUTES_WITH_REPLICA_SUPPORT,
@@ -117,9 +117,12 @@ const PreviewFilterPanel = ({
     </Tooltip>
   )
 
-  const handleDatepickerChange = ({ to, from }: Partial<Parameters<LogSearchCallback>[1]>) => {
-    onSearch('datepicker-change', { to, from })
-  }
+  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>({
+    to: PREVIEWER_DATEPICKER_HELPERS[1].calcTo(),
+    from: PREVIEWER_DATEPICKER_HELPERS[1].calcFrom(),
+    text: 'Last 15 minutes',
+    isHelper: true,
+  })
 
   const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
 
@@ -182,12 +185,15 @@ const PreviewFilterPanel = ({
         </form>
 
         <RefreshButton />
-
-        <DatePickers
-          onChange={handleDatepickerChange}
+        <LogsDatePicker
           to={defaultToValue}
           from={defaultFromValue}
           helpers={PREVIEWER_DATEPICKER_HELPERS}
+          onSubmit={(vals) => {
+            onSearch('datepicker-change', { to: vals.to, from: vals.from })
+            setSelectedDatePickerValue(vals)
+          }}
+          value={selectedDatePickerValue}
         />
 
         {FILTER_OPTIONS[table] !== undefined && (
