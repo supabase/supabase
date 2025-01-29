@@ -216,7 +216,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
 
 export default function DatabaseConnectionsChart({
   // initialData,
-  data,
+  // data,
   yAxisKey,
   xAxisKey,
   format,
@@ -348,18 +348,18 @@ export default function DatabaseConnectionsChart({
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
-  if (data.length === 0) {
-    return (
-      <NoDataPlaceholder
-        message={emptyStateMessage}
-        description="It may take up to 24 hours for data to refresh"
-        size={size}
-        className={className}
-        attribute={title}
-        format={format}
-      />
-    )
-  }
+  // if (data.length === 0) {
+  //   return (
+  //     <NoDataPlaceholder
+  //       message={emptyStateMessage}
+  //       description="It may take up to 24 hours for data to refresh"
+  //       size={size}
+  //       className={className}
+  //       attribute={title}
+  //       format={format}
+  //     />
+  //   )
+  // }
 
   const defaultPayload = Object.values(chartConfig)
     .map((d) => ({
@@ -398,14 +398,14 @@ export default function DatabaseConnectionsChart({
               setFocusDataIndex(e.activeTooltipIndex)
               setActivePayload(e.activePayload)
             }
-            const activeTimestamp = data[e.activeTooltipIndex]?.[xAxisKey]
+            const activeTimestamp = _data[e.activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseMove({
               activeLabel: activeTimestamp?.toString(),
               coordinates: e.activeLabel,
             })
           }}
           onMouseDown={(e: any) => {
-            const activeTimestamp = data[e.activeTooltipIndex]?.[xAxisKey]
+            const activeTimestamp = _data[e.activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseDown({
               activeLabel: activeTimestamp?.toString(),
               coordinates: e.activeLabel,
@@ -546,12 +546,12 @@ export default function DatabaseConnectionsChart({
       {_data && (
         <div className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs">
           <span>
-            {xAxisIsDate ? day(data[0][xAxisKey]).format(customDateFormat) : data[0][xAxisKey]}
+            {xAxisIsDate ? day(_data[0]?.timestamp).format(customDateFormat) : _data[0]?.timestamp}
           </span>
           <span>
             {xAxisIsDate
-              ? day(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)
-              : data[data?.length - 1]?.[xAxisKey]}
+              ? day(_data[_data?.length - 1]?.timestamp).format(customDateFormat)
+              : _data[_data?.length - 1]?.timestamp}
           </span>
         </div>
       )}

@@ -236,7 +236,7 @@ const DatabaseUsage = () => {
           />
           <ChartHandler
             provider="infra-monitoring"
-            attribute="pg_stat_database_num_backends"
+            attribute="disk_iops_usage"
             label="Disk IOps usage"
             interval={dateRange.interval}
             startDate={dateRange?.period_start?.date}
