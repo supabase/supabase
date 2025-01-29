@@ -106,18 +106,15 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         const [url, method, headers, parameters] = selectedHook.function_args
 
         let parsedParameters: Record<string, string> = {}
+
+        // Try to parse the parameters with escaped quotes
         try {
-          // First, try normal JSON parse
-          parsedParameters = JSON.parse(parameters)
+          parsedParameters = JSON.parse(parameters.replace(/\\"/g, '"'))
         } catch (e) {
-          console.log('Failed to parse parameters:', e)
-          // If that fails, try to handle escaped quotes
-          try {
-            parsedParameters = JSON.parse(parameters.replace(/\\\"/g, '"'))
-          } catch (e2) {
-            console.log('Failed second parse attempt:', e2)
-          }
+          // If parsing still fails, fallback to an empty object
+          parsedParameters = {}
         }
+
         const formattedHeaders = tryParseJson(headers) || {}
         setHttpHeaders(
           Object.keys(formattedHeaders).map((key) => {
