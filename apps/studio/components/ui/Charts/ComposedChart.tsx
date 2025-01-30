@@ -63,6 +63,8 @@ const CustomLabel = ({ active, payload, label }: TooltipProps) => {
   const totalConnections = payload?.reduce((acc, curr) => acc + curr.value, 0)
   const maxConnections = payload?.find((p: any) => p.name.toLowerCase().includes('max'))
 
+  const isRamChart = payload?.some((p: any) => p.name.toLowerCase().includes('ram_'))
+
   const getIcon = (name: string, color: string) => {
     switch (name.toLowerCase().includes('max')) {
       case false:
@@ -90,7 +92,11 @@ const CustomLabel = ({ active, payload, label }: TooltipProps) => {
               </span>
             </div>
             <div className="ml-3.5 flex items-end gap-1">
-              {active && <span className="text-base">{formatLargeNumber(entry.value, 2)}</span>}
+              {active && (
+                <span className="text-base">
+                  {isRamChart ? formatLargeNumber(entry.value, 1) : numberFormatter(entry.value)}
+                </span>
+              )}
               {active &&
                 !entry.name.toLowerCase().includes('max') &&
                 !isNaN(entry.value / maxConnections?.value) &&
@@ -106,7 +112,11 @@ const CustomLabel = ({ active, payload, label }: TooltipProps) => {
           <p className="flex md:flex-col gap-1 md:gap-0 text-foreground font-semibold">
             <span className="flex-grow text-foreground-lighter">Total</span>
             <div className="flex items-end gap-1">
-              <span className="text-base">{formatLargeNumber(totalConnections, 2)}</span>
+              <span className="text-base">
+                {isRamChart
+                  ? formatLargeNumber(totalConnections, 1)
+                  : numberFormatter(totalConnections)}
+              </span>
               {!isNaN(totalConnections / maxConnections?.value) &&
                 isFinite(totalConnections / maxConnections?.value) && (
                   <span className="text-[11px] text-foreground-light mb-0.5">
