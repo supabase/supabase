@@ -255,19 +255,6 @@ const DatabaseUsage = () => {
             updateDateRange={updateDateRange}
           />
 
-          {/* <ChartHandler
-            provider="infra-monitoring"
-            attribute="pg_stat_database_num_backends"
-            // attribute="client_connections"
-            label="Client Connections [mock data]"
-            interval={dateRange.interval}
-            startDate={dateRange?.period_start?.date}
-            endDate={dateRange?.period_end?.date}
-            customDateFormat={handleCustomDateFormat}
-            updateDateRange={updateDateRange}
-            isStacked
-            className="!col-span-full"
-          /> */}
           <ComposedChartHandler
             attributes={[
               { attribute: 'client_connections_postgres', provider: 'infra-monitoring' },
@@ -300,16 +287,6 @@ const DatabaseUsage = () => {
             updateDateRange={updateDateRange}
           />
 
-          {/* <ChartHandler
-            provider="infra-monitoring"
-            attribute="pg_stat_database_num_backends"
-            label="Disk IOps [mock data]"
-            interval={dateRange.interval}
-            startDate={dateRange?.period_start?.date}
-            endDate={dateRange?.period_end?.date}
-            customDateFormat={handleCustomDateFormat}
-            updateDateRange={updateDateRange}
-          /> */}
           <ComposedChartHandler
             attributes={[
               { attribute: 'disk_iops_read', provider: 'infra-monitoring' },
@@ -335,78 +312,6 @@ const DatabaseUsage = () => {
             customDateFormat={handleCustomDateFormat}
             updateDateRange={updateDateRange}
           />
-
-          {/* 
-            <ChartHandler
-              provider="infra-monitoring"
-              attribute="pg_stat_database_num_backends"
-              label="Number of database connections"
-              interval={dateRange.interval}
-              startDate={dateRange?.period_start?.date}
-              endDate={dateRange?.period_end?.date}
-              customDateFormat={handleCustomDateFormat}
-              updateDateRange={updateDateRange}
-            /> 
-
-            <ChartHandler
-              provider="infra-monitoring"
-              attribute="client_connections_postgres"
-              label="Client connections - Postgres"
-              // defaultChartStyle="stackedAreaLine"
-              interval={dateRange.interval}
-              startDate={dateRange?.period_start?.date}
-              endDate={dateRange?.period_end?.date}
-              customDateFormat={handleCustomDateFormat}
-              updateDateRange={updateDateRange}
-            />
-         
-            <ChartHandler
-              provider="infra-monitoring"
-              attribute="client_connections_supavisor"
-              label="Client connections - Supavisor"
-              // defaultChartStyle="stackedAreaLine"
-              interval={dateRange.interval}
-              startDate={dateRange?.period_start?.date}
-              endDate={dateRange?.period_end?.date}
-              customDateFormat={handleCustomDateFormat}
-              updateDateRange={updateDateRange}
-            />
-         
-            <ChartHandler
-              provider="infra-monitoring"
-              attribute="client_connections_pgbouncer"
-              label="Client connections - pgbouncer"
-              // defaultChartStyle="stackedAreaLine"
-              interval={dateRange.interval}
-              startDate={dateRange?.period_start?.date}
-              endDate={dateRange?.period_end?.date}
-              customDateFormat={handleCustomDateFormat}
-              updateDateRange={updateDateRange}
-            />
-         
-            <ChartHandler
-              provider="infra-monitoring"
-              attribute="client_connections_realtime"
-              label="Client connections - Realtime"
-              // defaultChartStyle="stackedAreaLine"
-              interval={dateRange.interval}
-              startDate={dateRange?.period_start?.date}
-              endDate={dateRange?.period_end?.date}
-              customDateFormat={handleCustomDateFormat}
-              updateDateRange={updateDateRange}
-            />
-         
-            <ChartHandler
-              provider="infra-monitoring"
-              attribute="client_connections_max_limit"
-              label="Client connections - Max limit"
-              // defaultChartStyle="stackedAreaLine"
-              interval={dateRange.interval}
-              startDate={dateRange?.period_start?.date}
-              endDate={dateRange?.period_end?.date}
-              customDateFormat={handleCustomDateFormat}
-              updateDateRange={updateDateRange}
-            /> */}
         </div>
 
         {dateRange && isReplicaSelected && (
