@@ -10,7 +10,7 @@ import {
   TopApiRoutesRenderer,
   TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
-import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
+import { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useApiReport } from 'data/reports/api-report-query'
@@ -39,8 +39,6 @@ export const ApiReport: NextPageWithLayout = () => {
         <ReportFilterBar
           onRemoveFilters={report.removeFilters}
           onDatepickerChange={handleDatepickerChange}
-          datepickerFrom={report.params.totalRequests.iso_timestamp_start}
-          datepickerTo={report.params.totalRequests.iso_timestamp_end}
           onAddFilter={report.addFilter}
           filters={report.filters}
           datepickerHelpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
