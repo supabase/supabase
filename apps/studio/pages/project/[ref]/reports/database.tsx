@@ -178,10 +178,54 @@ const DatabaseUsage = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 gap-4">
-          <ChartHandler
+          {/* <ChartHandler
             provider="infra-monitoring"
             attribute="ram_usage"
             label="Memory usage"
+            interval={dateRange.interval}
+            startDate={dateRange?.period_start?.date}
+            endDate={dateRange?.period_end?.date}
+            customDateFormat={handleCustomDateFormat}
+            updateDateRange={updateDateRange}
+          /> */}
+          <ComposedChartHandler
+            attributes={[
+              { attribute: 'ram_usage_applications', provider: 'infra-monitoring' },
+              {
+                attribute: 'ram_usage_page_tables',
+                provider: 'infra-monitoring',
+              },
+              {
+                attribute: 'ram_usage_swap_cache',
+                provider: 'infra-monitoring',
+              },
+              {
+                attribute: 'ram_usage_slab',
+                provider: 'infra-monitoring',
+              },
+              {
+                attribute: 'ram_usage_cache',
+                provider: 'infra-monitoring',
+              },
+              {
+                attribute: 'ram_usage_buffers',
+                provider: 'infra-monitoring',
+              },
+              {
+                attribute: 'ram_usage_unused',
+                provider: 'infra-monitoring',
+              },
+              {
+                attribute: 'ram_usage_swap',
+                provider: 'infra-monitoring',
+              },
+              { attribute: 'ram_available_max', provider: 'infra-monitoring' },
+              // {
+              //   attribute: 'ram_usage_hardware_corrupted',
+              //   provider: 'infra-monitoring',
+              // },
+            ]}
+            label="Memory stack"
             interval={dateRange.interval}
             startDate={dateRange?.period_start?.date}
             endDate={dateRange?.period_end?.date}
@@ -211,7 +255,7 @@ const DatabaseUsage = () => {
             updateDateRange={updateDateRange}
           />
 
-          <ChartHandler
+          {/* <ChartHandler
             provider="infra-monitoring"
             attribute="pg_stat_database_num_backends"
             // attribute="client_connections"
@@ -223,7 +267,7 @@ const DatabaseUsage = () => {
             updateDateRange={updateDateRange}
             isStacked
             className="!col-span-full"
-          />
+          /> */}
           <ComposedChartHandler
             attributes={[
               { attribute: 'client_connections_postgres', provider: 'infra-monitoring' },
@@ -256,7 +300,7 @@ const DatabaseUsage = () => {
             updateDateRange={updateDateRange}
           />
 
-          <ChartHandler
+          {/* <ChartHandler
             provider="infra-monitoring"
             attribute="pg_stat_database_num_backends"
             label="Disk IOps [mock data]"
@@ -265,7 +309,7 @@ const DatabaseUsage = () => {
             endDate={dateRange?.period_end?.date}
             customDateFormat={handleCustomDateFormat}
             updateDateRange={updateDateRange}
-          />
+          /> */}
           <ComposedChartHandler
             attributes={[
               { attribute: 'disk_iops_read', provider: 'infra-monitoring' },

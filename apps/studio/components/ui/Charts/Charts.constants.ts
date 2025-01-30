@@ -11,6 +11,37 @@ export const CHART_COLORS = {
   RED_2: 'hsl(var(--destructive-500))',
 }
 
+// export const STACKED_CHART_COLORS = [
+//   '#3ECF8E',
+//   '#6929c4',
+//   '#39A878',
+//   '#1192e8',
+//   '#9f1853',
+//   '#fa4d56',
+//   '#198038',
+//   '#570408',
+//   '#8FE4BE',
+//   '#ee538b',
+//   '#b28600',
+//   '#009d9a',
+//   '#AAEACD',
+//   '#8a3800',
+//   '#a56eff',
+// ]
+export const STACKED_CHART_COLORS = [
+  '#3ECF8E',
+  '#AAEACD',
+  '#28604A',
+  '#8FE4BE',
+  '#1D3F32',
+  '#C5F1DD',
+  '#318362',
+  '#74DDAE',
+  '#39A878',
+  '#E0F8ED',
+  '#59D69E',
+]
+
 // refer to packages/ui/radix-colors.js for full list of colors
 export type ValidStackColor =
   | 'brand'

@@ -13,7 +13,6 @@ export interface ChartHeaderProps {
   displayDateInUtc?: boolean
   highlightedLabel?: number | string | any | null
   highlightedValue?: number | string | any | null
-  chartHighlight?: ChartHighlight
   hideChartType?: boolean
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
@@ -25,14 +24,10 @@ const ChartHeader = ({
   highlightedLabel,
   title,
   minimalHeader = false,
-  chartHighlight,
   hideChartType = false,
   chartStyle = 'bar',
   onChartStyleChange,
 }: ChartHeaderProps) => {
-  const { ref } = useParams()
-  const { left: selectedRangeStart, right: selectedRangeEnd, isSelecting } = chartHighlight ?? {}
-
   const chartTitle = (
     <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
       {title}

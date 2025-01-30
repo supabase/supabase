@@ -383,7 +383,6 @@ export default function DatabaseConnectionsChart({
         }
         // highlightedLabel={resolvedHighlightedValue}
         // minimalHeader
-        chartHighlight={chartHighlight}
         // hideChartType={hideChartType}
         chartStyle={chartStyle}
         onChartStyleChange={onChartStyleChange}

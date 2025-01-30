@@ -348,7 +348,6 @@ export default function MockDiskSpaceUsedChart({
         }
         highlightedLabel={''}
         // minimalHeader
-        chartHighlight={chartHighlight}
         // hideChartType={hideChartType}
         chartStyle={chartStyle}
         onChartStyleChange={onChartStyleChange}

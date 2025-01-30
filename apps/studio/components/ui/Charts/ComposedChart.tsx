@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, ComponentProps } from 'react'
+import { useState, ComponentProps } from 'react'
 import dayjs from 'dayjs'
 import {
   Area,
@@ -18,10 +18,10 @@ import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
 import ChartHeader from './ChartHeader'
 import ChartHighlightActions from './ChartHighlightActions'
-import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
+import { CHART_COLORS, DateTimeFormats, STACKED_CHART_COLORS } from './Charts.constants'
 import { Datum, CommonChartProps } from './Charts.types'
 import { useChartSize, numberFormatter } from './Charts.utils'
-import { ChartHighlight, useChartHighlight } from './useChartHighlight'
+import { ChartHighlight } from './useChartHighlight'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 import NoDataPlaceholder from './NoDataPlaceholder'
 
@@ -47,10 +47,21 @@ interface TooltipProps {
   label?: string | number
 }
 
+const formatLargeNumber = (num: number, precision: number = 0) => {
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(precision)}MiB`
+  } else if (num >= 1000) {
+    return `${(num / 1000).toFixed(precision)}KiB`
+  } else {
+    return num.toString()
+  }
+}
+
 const CustomLabel = ({ active, payload, label }: TooltipProps) => {
-  const data = payload && payload[0].payload
-  const totalConnections = data?.read + data?.write
-  const maxConnections = data?.maxDiskSpace
+  const items = payload ?? []
+  const stackedItems = payload?.filter((p: any) => !p.name.toLowerCase().includes('max')) ?? []
+  const totalConnections = payload?.reduce((acc, curr) => acc + curr.value, 0)
+  const maxConnections = payload?.find((p: any) => p.name.toLowerCase().includes('max'))
 
   const getIcon = (name: string, color: string) => {
     switch (name.toLowerCase().includes('max')) {
@@ -64,7 +75,7 @@ const CustomLabel = ({ active, payload, label }: TooltipProps) => {
   return (
     <div className="flex flex-col gap-0 text-xs w-full h-20 mt-2">
       <div className="flex flex-col md:flex-wrap justify-start md:flex-row gap-0 md:gap-2">
-        {payload?.map((entry) => (
+        {items?.map((entry) => (
           <p
             key={entry.name}
             className="inline-flex md:flex-col gap-1 md:gap-0 w-fit text-foreground"
@@ -72,32 +83,39 @@ const CustomLabel = ({ active, payload, label }: TooltipProps) => {
             <div className="flex items-center gap-1">
               {getIcon(entry.name, entry.color)}
               <span className="text-nowrap text-foreground-lighter pr-2">
-                {entry.name.replace('client_connections_', '').replace('disk_iops_', '')}
+                {entry.name
+                  .replace('client_connections_', '')
+                  .replace('disk_iops_', '')
+                  .replace('ram_usage_', '')}
               </span>
             </div>
             <div className="ml-3.5 flex items-end gap-1">
-              {active && entry.value && (
-                <span className="text-base">{numberFormatter(entry.value)}</span>
-              )}
-              {active && entry.value && !entry.name.includes('max') && (
-                <span className="text-[11px] text-foreground-light mb-0.5">
-                  ({((entry.value / maxConnections) * 100).toFixed(1)}%)
-                </span>
-              )}
+              {active && <span className="text-base">{formatLargeNumber(entry.value, 2)}</span>}
+              {active &&
+                !entry.name.toLowerCase().includes('max') &&
+                !isNaN(entry.value / maxConnections?.value) &&
+                isFinite(entry.value / maxConnections?.value) && (
+                  <span className="text-[11px] text-foreground-light mb-0.5">
+                    ({numberFormatter((entry.value / maxConnections?.value) * 100)}%)
+                  </span>
+                )}
             </div>
           </p>
         ))}
-        {active ? (
+        {active && (
           <p className="flex md:flex-col gap-1 md:gap-0 text-foreground font-semibold">
             <span className="flex-grow text-foreground-lighter">Total</span>
             <div className="flex items-end gap-1">
-              <span className="text-base">{totalConnections}</span>
-              <span className="text-[11px] text-foreground-light mb-0.5">
-                ({((totalConnections / maxConnections) * 100).toFixed(1)}%)
-              </span>
+              <span className="text-base">{formatLargeNumber(totalConnections, 2)}</span>
+              {!isNaN(totalConnections / maxConnections?.value) &&
+                isFinite(totalConnections / maxConnections?.value) && (
+                  <span className="text-[11px] text-foreground-light mb-0.5">
+                    ({numberFormatter((totalConnections / maxConnections?.value) * 100)}%)
+                  </span>
+                )}
             </div>
           </p>
-        ) : null}
+        )}
       </div>
       {active && (
         <h5 className="text-foreground-lighter text-xs mt-2">
@@ -108,48 +126,9 @@ const CustomLabel = ({ active, payload, label }: TooltipProps) => {
   )
 }
 
-type Payload = {
-  value: string
-  color: string
-}
-
-interface CustomLegendProps {
-  payload?: Array<Payload>
-}
-
-const CustomLegend = (props: any) => {
-  const { payload } = props
-
-  if (!payload) return null
-
-  return (
-    <ul className="flex justify-center items-center space-x-4 mt-4 select-none text-xs">
-      {payload.map((entry: Payload, index: number) => (
-        <li key={`item-${index}`} className="flex items-center">
-          {entry.value === 'Max Connections' ? (
-            <MaxConnectionsIcon />
-          ) : (
-            <CustomIcon color={entry.color} />
-          )}
-          <span className="ml-2 text-foreground-lighter">{entry.value}</span>
-        </li>
-      ))}
-    </ul>
-  )
-}
-
-interface ChartDataPoint {
-  timestamp: number
-  read: number
-  write: number
-  maxDiskSpace: number
-}
-
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
   xAxisKey: string
-  // customDateFormat?: string
-  // data: any
   displayDateInUtc?: boolean
   onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
   emptyStateMessage?: string
@@ -159,28 +138,13 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   YAxisProps?: ComponentProps<typeof YAxis>
   showGrid?: boolean
   chartHighlight?: ChartHighlight
-  // hideChartType?: boolean
+  hideChartType?: boolean
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
   updateDateRange: UpdateDateRange
-  // initialData?: ChartDataPoint[]
 }
-const STACKED_CHART_COLORS = [
-  '#3ECF8E',
-  '#28604A',
-  '#1D3F32',
-  '#318362',
-  '#59D69E',
-  '#39A878',
-  '#8FE4BE',
-  '#74DDAE',
-  '#C5F1DD',
-  '#AAEACD',
-  '#E0F8ED',
-]
 
 export default function ComposedChart({
-  // initialData,
   data,
   yAxisKey,
   xAxisKey,
@@ -190,7 +154,7 @@ export default function ComposedChart({
   highlightedValue,
   highlightedLabel,
   displayDateInUtc,
-  // minimalHeader,
+  minimalHeader,
   valuePrecision,
   className = '',
   size = 'normal',
@@ -202,7 +166,7 @@ export default function ComposedChart({
   YAxisProps,
   showGrid = false,
   chartHighlight,
-  // hideChartType,
+  hideChartType,
   chartStyle,
   onChartStyleChange,
   updateDateRange,
@@ -256,7 +220,6 @@ export default function ComposedChart({
   }
 
   const resolvedHighlightedLabel = getHeaderLabel()
-
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.timestamp : highlightedValue
 
@@ -274,7 +237,8 @@ export default function ComposedChart({
         }))
         .filter((att) => att.name !== 'timestamp')
     : []
-  console.log('ComposedChart attributes', attributes)
+
+  const stackedAttributes = attributes.filter((att) => !att.name.includes('max'))
 
   if (data.length === 0) {
     return (
@@ -289,8 +253,6 @@ export default function ComposedChart({
     )
   }
 
-  const defaultPayload = attributes
-
   return (
     <div className={cn('flex flex-col gap-y-3', className)}>
       <ChartHeader
@@ -300,14 +262,13 @@ export default function ComposedChart({
         highlightedValue={
           <CustomLabel
             active={!!resolvedHighlightedLabel}
-            payload={_activePayload || defaultPayload}
+            payload={_activePayload || attributes}
             label={resolvedHighlightedValue}
           />
         }
         highlightedLabel={''}
-        // minimalHeader
-        chartHighlight={chartHighlight}
-        // hideChartType={hideChartType}
+        minimalHeader={minimalHeader}
+        hideChartType={hideChartType}
         chartStyle={chartStyle}
         onChartStyleChange={onChartStyleChange}
       />
@@ -373,7 +334,7 @@ export default function ComposedChart({
               />
             ))}
           {chartStyle === 'bar'
-            ? attributes.map((attribute) => (
+            ? stackedAttributes.map((attribute) => (
                 <Bar
                   key={attribute.name}
                   dataKey={attribute.name}
@@ -382,7 +343,7 @@ export default function ComposedChart({
                   name={attribute.name}
                 />
               ))
-            : attributes.map((attribute) => (
+            : stackedAttributes.map((attribute) => (
                 <Area
                   key={attribute.name}
                   type="step"

@@ -139,7 +139,6 @@ const BarChart = ({
         }
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
-        chartHighlight={chartHighlight}
         hideChartType={hideChartType}
         chartStyle={chartStyle}
         onChartStyleChange={onChartStyleChange}

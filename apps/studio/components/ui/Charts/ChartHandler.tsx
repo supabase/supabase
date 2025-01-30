@@ -192,7 +192,7 @@ const ChartHandler = ({
             onChartStyleChange={setChartStyle}
             updateDateRange={updateDateRange}
           />
-        ) : label.includes('Disk IOps') ? (
+        ) : label === 'Disk IOps' ? (
           <MockDiskSpaceUsedChart
             YAxisProps={{ width: 1 }}
             data={(chartData?.data ?? []) as any}
