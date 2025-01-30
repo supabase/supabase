@@ -173,6 +173,8 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
     }
   }, [startDate, endDate])
 
+  const isLargeRange = Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) > 30
+
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
@@ -243,7 +245,7 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
               ></Button>
             </div>
           </div>
-          <div className="p-2 border-t [&_.react-datepicker__day--today]:bg-red-500">
+          <div className="p-2 border-t">
             <DatePicker
               inline
               selectsRange
@@ -288,6 +290,11 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
               )}
             />
           </div>
+          {isLargeRange && (
+            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning-600">
+              Large ranges may result in memory errors for <br /> big projects.
+            </div>
+          )}
           <div className="flex items-center justify-end gap-2 p-2 border-t">
             {startDate && endDate ? (
               <Button

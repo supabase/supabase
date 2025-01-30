@@ -87,8 +87,6 @@ test('datepicker onChange will return ISO string of selected dates', async () =>
       onSubmit={mockFn}
     />
   )
-  // renders time locally
-  userEvent.click(await screen.findByText('Custom'))
   // inputs with local time
   const toHH = await screen.findByDisplayValue('23')
   userEvent.clear(toHH)
