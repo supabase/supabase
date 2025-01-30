@@ -70,9 +70,6 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
     const finalFrom = new Date(from.setHours(+startTime.HH, +startTime.mm, +startTime.ss))
     const finalTo = new Date(to.setHours(+endTime.HH, +endTime.mm, +endTime.ss))
 
-    console.log('finalFrom', finalFrom.toISOString())
-    console.log('finalTo', finalTo.toISOString())
-
     onSubmit({
       from: finalFrom.toISOString(),
       to: finalTo.toISOString(),
@@ -182,7 +179,7 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
         <Button type="default" icon={<Clock size={12} />}>
           {value.isHelper && !value.to
             ? value.text
-            : `${dayjs(value.from).format('MMM D, HH:mm')} - ${dayjs(value.to).format('MMM D, HH:mm')}`}
+            : `${dayjs(value.from).format('MMM D, HH:mm')} - ${dayjs(value.to || new Date()).format('MMM D, HH:mm')}`}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ side="bottom" align="start" className="flex w-full p-0">
