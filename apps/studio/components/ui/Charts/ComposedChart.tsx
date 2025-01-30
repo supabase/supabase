@@ -5,7 +5,7 @@ import dayjs from 'dayjs'
 import {
   Area,
   Bar,
-  ComposedChart,
+  ComposedChart as RechartComposedChart,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -24,29 +24,6 @@ import { useChartSize, numberFormatter } from './Charts.utils'
 import { ChartHighlight, useChartHighlight } from './useChartHighlight'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 import NoDataPlaceholder from './NoDataPlaceholder'
-
-// Function to generate mock data
-const generateMockData = (startTime: dayjs.Dayjs, endTime: dayjs.Dayjs) => {
-  const data = []
-  let currentTime = startTime
-  const maxDiskSpace = 10000 // 10,000 IOps as max disk IOps
-
-  while (currentTime.isBefore(endTime) || currentTime.isSame(endTime)) {
-    const readIOps = Math.floor(Math.random() * 1000) // Random value between 0 and 1000
-    const writeIOps = Math.floor(Math.random() * 1000) // Random value between 0 and 1000
-
-    data.push({
-      timestamp: currentTime.valueOf(),
-      maxDiskSpace: maxDiskSpace,
-      read: readIOps,
-      write: writeIOps,
-    })
-
-    currentTime = currentTime.add(15, 'second')
-  }
-
-  return data
-}
 
 interface CustomIconProps {
   color: string
@@ -76,14 +53,11 @@ const CustomLabel = ({ active, payload, label }: TooltipProps) => {
   const maxConnections = data?.maxDiskSpace
 
   const getIcon = (name: string, color: string) => {
-    switch (name) {
-      case 'read':
-      case 'write':
+    switch (name.toLowerCase().includes('max')) {
+      case false:
         return <CustomIcon color={color} />
-      case 'Max Disk IOps':
-        return <MaxConnectionsIcon />
       default:
-        return null
+        return <MaxConnectionsIcon />
     }
   }
 
@@ -97,13 +71,15 @@ const CustomLabel = ({ active, payload, label }: TooltipProps) => {
           >
             <div className="flex items-center gap-1">
               {getIcon(entry.name, entry.color)}
-              <span className="text-nowrap text-foreground-lighter pr-2">{entry.name}</span>
+              <span className="text-nowrap text-foreground-lighter pr-2">
+                {entry.name.replace('client_connections_', '').replace('disk_iops_', '')}
+              </span>
             </div>
             <div className="ml-3.5 flex items-end gap-1">
               {active && entry.value && (
                 <span className="text-base">{numberFormatter(entry.value)}</span>
               )}
-              {active && entry.value && entry.name !== 'Max Disk IOps' && (
+              {active && entry.value && !entry.name.includes('max') && (
                 <span className="text-[11px] text-foreground-light mb-0.5">
                   ({((entry.value / maxConnections) * 100).toFixed(1)}%)
                 </span>
@@ -173,6 +149,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
   xAxisKey: string
   // customDateFormat?: string
+  // data: any
   displayDateInUtc?: boolean
   onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
   emptyStateMessage?: string
@@ -188,8 +165,21 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   updateDateRange: UpdateDateRange
   // initialData?: ChartDataPoint[]
 }
+const STACKED_CHART_COLORS = [
+  '#3ECF8E',
+  '#28604A',
+  '#1D3F32',
+  '#318362',
+  '#59D69E',
+  '#39A878',
+  '#8FE4BE',
+  '#74DDAE',
+  '#C5F1DD',
+  '#AAEACD',
+  '#E0F8ED',
+]
 
-export default function MockDiskSpaceUsedChart({
+export default function ComposedChart({
   // initialData,
   data,
   yAxisKey,
@@ -217,37 +207,16 @@ export default function MockDiskSpaceUsedChart({
   onChartStyleChange,
   updateDateRange,
 }: BarChartProps) {
-  const [_data, setData] = useState<ChartDataPoint[]>([])
-  const [refData, setRefData] = useState<ChartDataPoint[]>([])
   const [_activePayload, setActivePayload] = useState<any>(null)
-  const {
-    left,
-    right,
-    coordinates,
-    isSelecting,
-    popoverPosition,
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-    clearHighlight,
-  } = useChartHighlight()
-
   const { Container } = useChartSize(size)
 
-  useEffect(() => {
-    const endTime = dayjs()
-    const startTime = endTime.subtract(1, 'hour')
-    const mockData = generateMockData(startTime, endTime)
-    setData(mockData)
-    setRefData(mockData)
-  }, [])
-
   const getAxisYDomain = (from: number, to: number) => {
-    const refData = _data.slice(from, to)
+    const refData = data.slice(from, to)
     let [bottom, top] = [0, 0]
 
     refData.forEach((d) => {
-      const total = d.read + d.write
+      // const total = d.read + d.write
+      const total = 0
       if (total > top) top = total
       if (total < bottom) bottom = total
     })
@@ -255,26 +224,11 @@ export default function MockDiskSpaceUsedChart({
     return [bottom, Math.max(top, 70)]
   }
 
-  const chartConfig = {
-    write: {
-      label: 'write',
-      color: '#3ECF8E',
-    },
-    read: {
-      label: 'read',
-      color: '#2e6e2a',
-    },
-    maxDiskSpace: {
-      label: 'Max Disk IOps',
-      color: '#2BA572',
-    },
-  }
-
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
   // Default props
   const _XAxisProps = XAxisProps || {
-    interval: _data.length - 2,
+    interval: data.length - 2,
     angle: 0,
     tick: false,
   }
@@ -290,13 +244,13 @@ export default function MockDiskSpaceUsedChart({
   function getHeaderLabel() {
     if (!xAxisIsDate) {
       if (!focusDataIndex) return highlightedLabel
-      return _data[focusDataIndex]?.timestamp
+      return data[focusDataIndex]?.timestamp
     }
     return (
       (focusDataIndex !== null &&
-        _data &&
-        _data[focusDataIndex] !== undefined &&
-        day(_data[focusDataIndex].timestamp).format(customDateFormat)) ||
+        data &&
+        data[focusDataIndex] !== undefined &&
+        day(data[focusDataIndex].timestamp).format(customDateFormat)) ||
       highlightedLabel
     )
   }
@@ -304,12 +258,23 @@ export default function MockDiskSpaceUsedChart({
   const resolvedHighlightedLabel = getHeaderLabel()
 
   const resolvedHighlightedValue =
-    focusDataIndex !== null ? _data[focusDataIndex]?.timestamp : highlightedValue
+    focusDataIndex !== null ? data[focusDataIndex]?.timestamp : highlightedValue
 
   const showHighlightActions =
     chartHighlight?.coordinates.left &&
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
+
+  const attributes = data
+    ? Object.entries(data[0])
+        .map(([key, value], index) => ({
+          name: key,
+          value: value,
+          color: STACKED_CHART_COLORS[index],
+        }))
+        .filter((att) => att.name !== 'timestamp')
+    : []
+  console.log('ComposedChart attributes', attributes)
 
   if (data.length === 0) {
     return (
@@ -324,14 +289,7 @@ export default function MockDiskSpaceUsedChart({
     )
   }
 
-  console.log('Disk IOps mock data', _data)
-
-  const defaultPayload = Object.values(chartConfig)
-    .map((d) => ({
-      name: d.label,
-      color: d.color,
-    }))
-    .reverse()
+  const defaultPayload = attributes
 
   return (
     <div className={cn('flex flex-col gap-y-3', className)}>
@@ -354,23 +312,22 @@ export default function MockDiskSpaceUsedChart({
         onChartStyleChange={onChartStyleChange}
       />
       <Container className="relative">
-        <ComposedChart
+        <RechartComposedChart
           className="overflow-visible"
-          data={_data}
+          data={data}
           onMouseMove={(e: any) => {
-            console.log('e', e)
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
               setActivePayload(e.activePayload)
             }
-            const activeTimestamp = _data[e.activeTooltipIndex]?.timestamp
+            const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseMove({
               activeLabel: activeTimestamp?.toString(),
               coordinates: e.activeLabel,
             })
           }}
           onMouseDown={(e: any) => {
-            const activeTimestamp = _data[e.activeTooltipIndex]?.timestamp
+            const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseDown({
               activeLabel: activeTimestamp?.toString(),
               coordinates: e.activeLabel,
@@ -401,45 +358,43 @@ export default function MockDiskSpaceUsedChart({
             key={xAxisKey}
           />
           <Tooltip content={() => null} />
-          {/* <Tooltip content={(props: TooltipProps) => CustomTooltip(props)} /> */}
-          {/* <Tooltip content={CustomTooltip} /> */}
-          {/* <Legend content={CustomLegend} /> */}
-          <Line
-            type="stepAfter"
-            dataKey="maxDiskSpace"
-            stroke={chartConfig.maxDiskSpace.color}
-            strokeWidth={2}
-            strokeDasharray="3 3"
-            dot={false}
-            name="Max Disk IOps"
-          />
-          {chartStyle === 'bar' ? (
-            <>
-              <Bar dataKey="read" stackId="1" fill={chartConfig.read.color} name="read" />
-              <Bar dataKey="write" stackId="1" fill={chartConfig.write.color} name="write" />
-            </>
-          ) : (
-            <>
-              <Area
-                dataKey="read"
-                stackId="1"
-                fill={chartConfig.read.color}
-                strokeOpacity={0.5}
-                stroke={chartConfig.read.color}
-                fillOpacity={0.25}
-                name="read"
+          {attributes
+            .filter((attribute) => attribute.name.includes('max'))
+            .map((attribute) => (
+              <Line
+                key={attribute.name}
+                type="stepAfter"
+                dataKey={attribute.name}
+                stroke={STACKED_CHART_COLORS[0]}
+                strokeWidth={2}
+                strokeDasharray="3 3"
+                dot={false}
+                name={attribute.name}
               />
-              <Area
-                dataKey="write"
-                stackId="1"
-                stroke={chartConfig.write.color}
-                fill={chartConfig.write.color}
-                strokeOpacity={0.5}
-                fillOpacity={0.25}
-                name="write"
-              />
-            </>
-          )}
+            ))}
+          {chartStyle === 'bar'
+            ? attributes.map((attribute) => (
+                <Bar
+                  key={attribute.name}
+                  dataKey={attribute.name}
+                  stackId="1"
+                  fill={attribute.color}
+                  name={attribute.name}
+                />
+              ))
+            : attributes.map((attribute) => (
+                <Area
+                  key={attribute.name}
+                  type="step"
+                  dataKey={attribute.name}
+                  stackId="1"
+                  fill={attribute.color}
+                  strokeOpacity={0.5}
+                  stroke={attribute.color}
+                  fillOpacity={0.25}
+                  name={attribute.name}
+                />
+              ))}
           {showHighlightActions && (
             <ReferenceArea
               x1={chartHighlight?.coordinates.left}
@@ -450,18 +405,18 @@ export default function MockDiskSpaceUsedChart({
               fillOpacity={0.3}
             />
           )}
-        </ComposedChart>
+        </RechartComposedChart>
         <ChartHighlightActions chartHighlight={chartHighlight} updateDateRange={updateDateRange} />
       </Container>
-      {_data && (
+      {data && (
         <div className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs">
           <span>
-            {xAxisIsDate ? day(_data[0]?.timestamp).format(customDateFormat) : _data[0]?.timestamp}
+            {xAxisIsDate ? day(data[0]?.timestamp).format(customDateFormat) : data[0]?.timestamp}
           </span>
           <span>
             {xAxisIsDate
-              ? day(_data[data?.length - 1]?.timestamp).format(customDateFormat)
-              : _data[data?.length - 1]?.timestamp}
+              ? day(data[data?.length - 1]?.timestamp).format(customDateFormat)
+              : data[data?.length - 1]?.timestamp}
           </span>
         </div>
       )}

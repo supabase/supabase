@@ -160,6 +160,8 @@ const ChartHandler = ({
     )
   }
 
+  console.log('chartData', chartData)
+
   return (
     <Panel
       noMargin
@@ -174,7 +176,7 @@ const ChartHandler = ({
         >
           {children}
         </div>
-        {label === 'Client Connections' ? (
+        {label.includes('Client Connections') ? (
           <MockClientConnectionsChart
             YAxisProps={{ width: 1 }}
             data={(chartData?.data ?? []) as any}
@@ -190,7 +192,7 @@ const ChartHandler = ({
             onChartStyleChange={setChartStyle}
             updateDateRange={updateDateRange}
           />
-        ) : label === 'Disk IOps' ? (
+        ) : label.includes('Disk IOps') ? (
           <MockDiskSpaceUsedChart
             YAxisProps={{ width: 1 }}
             data={(chartData?.data ?? []) as any}

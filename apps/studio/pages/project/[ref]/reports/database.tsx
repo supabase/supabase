@@ -30,6 +30,7 @@ import type { NextPageWithLayout } from 'types'
 import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import ComposedChartHandler from '../../../../components/ui/Charts/ComposedChartHandler'
 
 export type UpdateDateRange = (from: string, to: string) => void
 
@@ -214,7 +215,7 @@ const DatabaseUsage = () => {
             provider="infra-monitoring"
             attribute="pg_stat_database_num_backends"
             // attribute="client_connections"
-            label="Client Connections"
+            label="Client Connections [mock data]"
             interval={dateRange.interval}
             startDate={dateRange?.period_start?.date}
             endDate={dateRange?.period_end?.date}
@@ -223,10 +224,56 @@ const DatabaseUsage = () => {
             isStacked
             className="!col-span-full"
           />
+          <ComposedChartHandler
+            attributes={[
+              { attribute: 'client_connections_postgres', provider: 'infra-monitoring' },
+              {
+                attribute: 'client_connections_supavisor',
+                provider: 'infra-monitoring',
+              },
+              {
+                attribute: 'client_connections_pgbouncer',
+                provider: 'infra-monitoring',
+              },
+              {
+                attribute: 'client_connections_pgbouncer_waiting',
+                provider: 'infra-monitoring',
+              },
+              {
+                attribute: 'client_connections_realtime',
+                provider: 'infra-monitoring',
+              },
+              {
+                attribute: 'client_connections_max_limit',
+                provider: 'infra-monitoring',
+              },
+            ]}
+            label="Client Connections"
+            interval={dateRange.interval}
+            startDate={dateRange?.period_start?.date}
+            endDate={dateRange?.period_end?.date}
+            customDateFormat={handleCustomDateFormat}
+            updateDateRange={updateDateRange}
+          />
 
           <ChartHandler
             provider="infra-monitoring"
             attribute="pg_stat_database_num_backends"
+            label="Disk IOps [mock data]"
+            interval={dateRange.interval}
+            startDate={dateRange?.period_start?.date}
+            endDate={dateRange?.period_end?.date}
+            customDateFormat={handleCustomDateFormat}
+            updateDateRange={updateDateRange}
+          />
+          <ComposedChartHandler
+            attributes={[
+              { attribute: 'disk_iops_read', provider: 'infra-monitoring' },
+              {
+                attribute: 'disk_iops_write',
+                provider: 'infra-monitoring',
+              },
+            ]}
             label="Disk IOps"
             interval={dateRange.interval}
             startDate={dateRange?.period_start?.date}
