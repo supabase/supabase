@@ -510,7 +510,7 @@ importers:
         version: 5.1.3
       vite-tsconfig-paths:
         specifier: ^4.3.2
-        version: 4.3.2(supports-color@8.1.1)(typescript@5.5.2)(vite@5.2.14(@types/node@20.12.11)(sass@1.72.0)(terser@5.37.0))
+        version: 4.3.2(supports-color@8.1.1)(typescript@5.5.2)(vite@5.4.11(@types/node@20.12.11)(sass@1.72.0)(terser@5.37.0))
       vitest:
         specifier: ^2.0.2
         version: 2.1.8(@types/node@20.12.11)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.37.0)
@@ -1387,7 +1387,7 @@ importers:
     dependencies:
       '@mertasan/tailwindcss-variables':
         specifier: ^2.2.3
-        version: 2.7.0(autoprefixer@10.4.16(postcss@8.5.1))(postcss@8.5.1)
+        version: 2.7.0(autoprefixer@10.4.16(postcss@8.4.38))(postcss@8.4.38)
       '@radix-ui/colors':
         specifier: ^0.1.8
         version: 0.1.9
@@ -1469,6 +1469,9 @@ importers:
         specifier: ^3.22.4
         version: 3.23.8
     devDependencies:
+      npm-run-all:
+        specifier: ^4.1.5
+        version: 4.1.5
       postgres:
         specifier: ^3.4.5
         version: 3.4.5
@@ -1628,7 +1631,7 @@ importers:
         version: 0.436.0(react@18.2.0)
       next:
         specifier: 'catalog:'
-        version: 14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+        version: 14.2.21(@babel/core@7.26.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1728,7 +1731,7 @@ importers:
         version: 3.6.1
       '@testing-library/jest-dom':
         specifier: ^6.1.3
-        version: 6.4.6(@jest/globals@29.7.0(supports-color@8.1.1))(@types/jest@29.5.5)(jest@29.7.0(@types/node@20.12.11)(supports-color@8.1.1))(vitest@2.1.8(@types/node@20.12.11)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.37.0))
+        version: 6.4.6(@jest/globals@29.7.0(supports-color@8.1.1))(@types/jest@29.5.5)(jest@29.7.0(@types/node@20.12.11)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))(vitest@2.1.8(@types/node@20.12.11)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.37.0))
       '@testing-library/react':
         specifier: ^14.0.0
         version: 14.0.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1830,7 +1833,7 @@ importers:
         version: 0.33.0
       next:
         specifier: 'catalog:'
-        version: 14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+        version: 14.2.21(@babel/core@7.26.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       next-themes:
         specifier: '*'
         version: 0.3.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1900,7 +1903,7 @@ importers:
         version: 10.1.0
       '@testing-library/jest-dom':
         specifier: ^6.4.6
-        version: 6.4.6(@jest/globals@29.7.0(supports-color@8.1.1))(@types/jest@29.5.5)(jest@29.7.0(@types/node@20.12.11)(supports-color@8.1.1))(vitest@2.1.8(@types/node@20.12.11)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.37.0))
+        version: 6.4.6(@jest/globals@29.7.0(supports-color@8.1.1))(@types/jest@29.5.5)(jest@29.7.0(@types/node@20.12.11)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))(vitest@2.1.8(@types/node@20.12.11)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.37.0))
       '@testing-library/react':
         specifier: ^16.0.0
         version: 16.0.0(@testing-library/dom@10.1.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1927,7 +1930,7 @@ importers:
         version: link:../api-types
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
+        version: 0.9.13(next@14.2.21(@babel/core@7.26.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
       typescript:
         specifier: ~5.5.0
         version: 5.5.2
@@ -7665,7 +7668,6 @@ packages:
     resolution: {integrity: sha512-t0q23FIpvHDTtnORW+bDJziGsal5uh9RJTJ1fyH8drd4lICOoXhJ5pLMUZ5C0VQei6dNmwTzzoTRgMkO9JgHEQ==}
     peerDependencies:
       eslint: '>= 5'
-    bundledDependencies: []
 
   eslint-plugin-import@2.29.1:
     resolution: {integrity: sha512-BbPC0cuExzhiMo4Ff1BTVwHpjjv28C5R+btTOGaCRC7UEz801up0JadwkeSk5Ued6TG34uaczuVuH6qyy5YUxw==}
@@ -9270,6 +9272,7 @@ packages:
 
   lodash.isequal@4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
 
   lodash.isinteger@4.0.4:
     resolution: {integrity: sha512-DBwtEWN2caHQ9/imiNeEA5ys1JoRtRfY3d7V9wkqtbycnAmTvRRmbHKDV4a0EYc678/dia0jrte4tjYwVBaZUA==}
@@ -9291,6 +9294,7 @@ packages:
 
   lodash.template@4.5.0:
     resolution: {integrity: sha512-84vYFxIkmidUiFxidA/KjjH9pAycqW+h980j7Fuz5qxRtO9pgB7MDFTdys1N7A5mcucRiDyEq4fusljItR1T/A==}
+    deprecated: This package is deprecated. Use https://socket.dev/npm/package/eta instead.
 
   lodash.templatesettings@4.2.0:
     resolution: {integrity: sha512-stgLz+i3Aa9mZgnjr/O+v9ruKZsPsndy7qPZOchbqk2cnTU1ZaldKK+v7m54WoKIyxiuMZTKT2H81F8BeAc3ZQ==}
@@ -14302,7 +14306,7 @@ snapshots:
       debug: 4.3.7(supports-color@8.1.1)
       esbuild: 0.21.5
       escape-string-regexp: 4.0.0
-      resolve: 1.22.8
+      resolve: 1.22.10
     transitivePeerDependencies:
       - supports-color
 
@@ -15129,12 +15133,6 @@ snapshots:
       autoprefixer: 10.4.16(postcss@8.4.38)
       lodash: 4.17.21
       postcss: 8.4.38
-
-  '@mertasan/tailwindcss-variables@2.7.0(autoprefixer@10.4.16(postcss@8.5.1))(postcss@8.5.1)':
-    dependencies:
-      autoprefixer: 10.4.16(postcss@8.5.1)
-      lodash: 4.17.21
-      postcss: 8.5.1
 
   '@monaco-editor/loader@1.4.0(monaco-editor@0.33.0)':
     dependencies:
@@ -17662,7 +17660,7 @@ snapshots:
       jest: 29.7.0(@types/node@20.12.11)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2))
       vitest: 1.6.0(@types/node@20.12.11)(@vitest/ui@1.6.0)(jsdom@20.0.3(supports-color@8.1.1))(sass@1.72.0)(supports-color@8.1.1)(terser@5.37.0)
 
-  '@testing-library/jest-dom@6.4.6(@jest/globals@29.7.0(supports-color@8.1.1))(@types/jest@29.5.5)(jest@29.7.0(@types/node@20.12.11)(supports-color@8.1.1))(vitest@2.1.8(@types/node@20.12.11)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.37.0))':
+  '@testing-library/jest-dom@6.4.6(@jest/globals@29.7.0(supports-color@8.1.1))(@types/jest@29.5.5)(jest@29.7.0(@types/node@20.12.11)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))(vitest@2.1.8(@types/node@20.12.11)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.37.0))':
     dependencies:
       '@adobe/css-tools': 4.4.0
       '@babel/runtime': 7.24.7
@@ -18875,16 +18873,6 @@ snapshots:
       normalize-range: 0.1.2
       picocolors: 1.0.1
       postcss: 8.4.38
-      postcss-value-parser: 4.2.0
-
-  autoprefixer@10.4.16(postcss@8.5.1):
-    dependencies:
-      browserslist: 4.23.3
-      caniuse-lite: 1.0.30001651
-      fraction.js: 4.3.6
-      normalize-range: 0.1.2
-      picocolors: 1.0.1
-      postcss: 8.5.1
       postcss-value-parser: 4.2.0
 
   available-typed-arrays@1.0.7:
@@ -21543,7 +21531,6 @@ snapshots:
   is-core-module@2.16.1:
     dependencies:
       hasown: 2.0.2
-    optional: true
 
   is-data-view@1.0.1:
     dependencies:
@@ -23855,6 +23842,11 @@ snapshots:
       next: 14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       react: 18.2.0
 
+  next-router-mock@0.9.13(next@14.2.21(@babel/core@7.26.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0):
+    dependencies:
+      next: 14.2.21(@babel/core@7.26.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+      react: 18.2.0
+
   next-seo@6.5.0(next@14.2.21(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
       next: 14.2.21(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
@@ -23877,6 +23869,34 @@ snapshots:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       styled-jsx: 5.1.1(@babel/core@7.24.7(supports-color@8.1.1))(react@18.2.0)
+    optionalDependencies:
+      '@next/swc-darwin-arm64': 14.2.21
+      '@next/swc-darwin-x64': 14.2.21
+      '@next/swc-linux-arm64-gnu': 14.2.21
+      '@next/swc-linux-arm64-musl': 14.2.21
+      '@next/swc-linux-x64-gnu': 14.2.21
+      '@next/swc-linux-x64-musl': 14.2.21
+      '@next/swc-win32-arm64-msvc': 14.2.21
+      '@next/swc-win32-ia32-msvc': 14.2.21
+      '@next/swc-win32-x64-msvc': 14.2.21
+      '@opentelemetry/api': 1.9.0
+      '@playwright/test': 1.49.1
+      sass: 1.72.0
+    transitivePeerDependencies:
+      - '@babel/core'
+      - babel-plugin-macros
+
+  next@14.2.21(@babel/core@7.26.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0):
+    dependencies:
+      '@next/env': 14.2.21
+      '@swc/helpers': 0.5.5
+      busboy: 1.6.0
+      caniuse-lite: 1.0.30001651
+      graceful-fs: 4.2.11
+      postcss: 8.4.31
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      styled-jsx: 5.1.1(@babel/core@7.26.0(supports-color@8.1.1))(react@18.2.0)
     optionalDependencies:
       '@next/swc-darwin-arm64': 14.2.21
       '@next/swc-darwin-x64': 14.2.21
@@ -23989,7 +24009,7 @@ snapshots:
   normalize-package-data@2.5.0:
     dependencies:
       hosted-git-info: 2.8.9
-      resolve: 1.22.8
+      resolve: 1.22.10
       semver: 5.7.2
       validate-npm-package-license: 3.0.4
 
@@ -25522,7 +25542,7 @@ snapshots:
     dependencies:
       debug: 4.3.7(supports-color@8.1.1)
       module-details-from-path: 1.0.3
-      resolve: 1.22.8
+      resolve: 1.22.10
     transitivePeerDependencies:
       - supports-color
 
@@ -25552,7 +25572,6 @@ snapshots:
       is-core-module: 2.16.1
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
-    optional: true
 
   resolve@1.22.8:
     dependencies:
@@ -26224,6 +26243,13 @@ snapshots:
       react: 18.2.0
     optionalDependencies:
       '@babel/core': 7.24.7(supports-color@8.1.1)
+
+  styled-jsx@5.1.1(@babel/core@7.26.0(supports-color@8.1.1))(react@18.2.0):
+    dependencies:
+      client-only: 0.0.1
+      react: 18.2.0
+    optionalDependencies:
+      '@babel/core': 7.26.0(supports-color@8.1.1)
 
   stylis@4.3.1: {}
 
@@ -27155,17 +27181,6 @@ snapshots:
       - sugarss
       - supports-color
       - terser
-
-  vite-tsconfig-paths@4.3.2(supports-color@8.1.1)(typescript@5.5.2)(vite@5.2.14(@types/node@20.12.11)(sass@1.72.0)(terser@5.37.0)):
-    dependencies:
-      debug: 4.3.7(supports-color@8.1.1)
-      globrex: 0.1.2
-      tsconfck: 3.0.3(typescript@5.5.2)
-    optionalDependencies:
-      vite: 5.2.14(@types/node@20.12.11)(sass@1.72.0)(terser@5.37.0)
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
 
   vite-tsconfig-paths@4.3.2(supports-color@8.1.1)(typescript@5.5.2)(vite@5.4.11(@types/node@20.12.11)(sass@1.72.0)(terser@5.37.0)):
     dependencies:

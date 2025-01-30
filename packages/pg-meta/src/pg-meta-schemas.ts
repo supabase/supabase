@@ -4,9 +4,9 @@ import { SCHEMAS_SQL } from './sql/schemas'
 import { z } from 'zod'
 
 const pgSchemaZod = z.object({
-  id: z.coerce.number(),
-  name: z.coerce.string(),
-  owner: z.coerce.string(),
+  id: z.number(),
+  name: z.string(),
+  owner: z.string(),
 })
 const pgSchemaArrayZod = z.array(pgSchemaZod)
 const pgSchemaOptionalZod = z.optional(pgSchemaZod)
