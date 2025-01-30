@@ -19,7 +19,7 @@ import {
   Select,
   cn,
 } from 'ui'
-import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
+import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
 
@@ -80,8 +80,6 @@ const ReportFilterBar = ({
   filters,
   onAddFilter,
   onDatepickerChange,
-  datepickerTo = '',
-  datepickerFrom = '',
   onRemoveFilters,
   datepickerHelpers,
 }: ReportFilterBarProps) => {
@@ -114,6 +112,11 @@ const ReportFilterBar = ({
     })
   }
 
+  const handleDatepickerChange = (vals: DatePickerValue) => {
+    onDatepickerChange(vals)
+    setSelectedRange(vals)
+  }
+
   const handleProductFilterChange = async (
     nextProductFilter: null | (typeof PRODUCT_FILTERS)[number]
   ) => {
@@ -136,15 +139,20 @@ const ReportFilterBar = ({
     setCurrentProductFilter(nextProductFilter)
   }
 
+  const defaultHelper = datepickerHelpers[0]
+  const [selectedRange, setSelectedRange] = useState<DatePickerValue>({
+    to: defaultHelper.calcTo(),
+    from: defaultHelper.calcFrom(),
+    isHelper: true,
+    text: defaultHelper.text,
+  })
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-row justify-start items-center flex-wrap gap-2">
         <LogsDatePicker
-          onSubmit={onDatepickerChange}
-          value={{
-            from: datepickerFrom || '',
-            to: datepickerTo || '',
-          }}
+          onSubmit={handleDatepickerChange}
+          value={selectedRange}
           helpers={datepickerHelpers}
         />
         <DropdownMenu>
