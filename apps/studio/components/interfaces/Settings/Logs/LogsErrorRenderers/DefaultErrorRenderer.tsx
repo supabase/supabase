@@ -7,7 +7,7 @@ export interface ErrorRendererProps {
 }
 
 export const DefaultErrorRenderer: React.FC<ErrorRendererProps> = ({ error }) => (
-  <div className="w-full prose min-w-full text-foreground text-sm">
+  <div className="w-full prose min-w-full text-foreground text-sm mt-4">
     <CodeBlock
       title="Error fetching logs"
       language="json"
