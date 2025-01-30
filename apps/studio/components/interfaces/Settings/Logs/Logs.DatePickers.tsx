@@ -10,6 +10,7 @@ import { ChevronLeft, ChevronRight, Clock, XIcon } from 'lucide-react'
 import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
 import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
 import { Label } from '@ui/components/shadcn/ui/label'
+import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
 
 export type DatePickerValue = {
   to: string
@@ -173,7 +174,8 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
     }
   }, [startDate, endDate])
 
-  const isLargeRange = Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) > 30
+  const isLargeRange =
+    Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) > LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
