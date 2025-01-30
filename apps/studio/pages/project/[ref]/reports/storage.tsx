@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
@@ -8,8 +8,10 @@ import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
 } from 'components/interfaces/Reports/renderers/StorageRenderers'
-import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
+import {
+  DatePickerValue,
+  LogsDatePicker,
+} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useStorageReport } from 'data/reports/storage-report-query'
@@ -24,12 +26,13 @@ export const StorageReport: NextPageWithLayout = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const plan = subscription?.plan
 
-  const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
-    report.mergeParams({
-      iso_timestamp_start: from || '',
-      iso_timestamp_end: to || '',
-    })
-  }
+  const defaultHelper = REPORTS_DATEPICKER_HELPERS[0] // last 24h
+  const [selectedRange, setSelectedRange] = useState<DatePickerValue>({
+    to: defaultHelper.calcTo(),
+    from: defaultHelper.calcFrom(),
+    isHelper: true,
+    text: defaultHelper.text,
+  })
 
   const datepickerHelpers = useMemo(
     () =>
@@ -40,15 +43,22 @@ export const StorageReport: NextPageWithLayout = () => {
     []
   )
 
+  const handleDatepickerChange = (vals: DatePickerValue) => {
+    report.mergeParams({
+      iso_timestamp_start: vals.from || '',
+      iso_timestamp_end: vals.to || '',
+    })
+    setSelectedRange(vals)
+  }
+
   return (
     <ReportPadding>
       <ReportHeader title="Storage" />
       <div className="w-full flex flex-col gap-1">
         <div>
-          <DatePickers
-            onChange={handleDatepickerChange}
-            to={report.params.cacheHitRate.iso_timestamp_end || ''}
-            from={report.params.cacheHitRate.iso_timestamp_start || ''}
+          <LogsDatePicker
+            onSubmit={handleDatepickerChange}
+            value={selectedRange}
             helpers={datepickerHelpers}
           />
         </div>
