@@ -56,7 +56,6 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
   })
 
   function handleDatePickerChange(dates: [from: Date | null, to: Date | null]) {
-    console.log('dates', dates)
     const [from, to] = dates
 
     setStartDate(from)
