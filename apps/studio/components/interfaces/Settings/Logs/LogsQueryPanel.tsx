@@ -203,13 +203,9 @@ const LogsQueryPanel = ({
 
             {dataSource === 'logs' && (
               <LogsDatePicker
-                to={defaultTo}
-                from={defaultFrom}
                 value={{
                   from: defaultFrom,
                   to: defaultTo,
-                  isHelper: false,
-                  text: '',
                 }}
                 onSubmit={onDateChange}
                 helpers={EXPLORER_DATEPICKER_HELPERS}
