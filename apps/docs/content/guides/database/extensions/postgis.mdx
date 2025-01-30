@@ -215,7 +215,7 @@ $$;
 Before being able to call this function from our client we need to grant access to our `gis` schema:
 
 ```sql
-grant usage on schema gis to anon, authenticated, service_role;
+grant usage on schema gis to anon, authenticated;
 ```
 
 Now you can call this function from your client using `rpc()` like this:
