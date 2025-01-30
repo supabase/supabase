@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { PREVIEWER_DATEPICKER_HELPERS } from 'components/interfaces/Settings/Logs/Logs.constants'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
@@ -18,11 +18,13 @@ test('renders warning', async () => {
   const to = dayjs()
 
   render(
-    <DatePickers
+    <LogsDatePicker
       helpers={PREVIEWER_DATEPICKER_HELPERS}
-      to={to.toISOString()}
-      from={from.toISOString()}
-      onChange={mockFn}
+      onSubmit={mockFn}
+      value={{
+        from: from.toISOString(),
+        to: to.toISOString(),
+      }}
     />
   )
   userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
@@ -34,11 +36,13 @@ test('renders dates in local time', async () => {
   const from = dayjs().subtract(1, 'days')
   const to = dayjs()
   render(
-    <DatePickers
+    <LogsDatePicker
       helpers={PREVIEWER_DATEPICKER_HELPERS}
-      to={to.toISOString()}
-      from={from.toISOString()}
-      onChange={mockFn}
+      onSubmit={mockFn}
+      value={{
+        from: from.toISOString(),
+        to: to.toISOString(),
+      }}
     />
   )
   // renders time locally
@@ -50,11 +54,13 @@ test('renders datepicker selected dates in local time', async () => {
   const from = dayjs().date(25)
   const to = dayjs().date(27)
   render(
-    <DatePickers
+    <LogsDatePicker
       helpers={PREVIEWER_DATEPICKER_HELPERS}
-      to={to.toISOString()}
-      from={from.toISOString()}
-      onChange={mockFn}
+      value={{
+        from: from.toISOString(),
+        to: to.toISOString(),
+      }}
+      onSubmit={mockFn}
     />
   )
   // renders time locally
@@ -71,7 +77,16 @@ test('renders datepicker selected dates in local time', async () => {
 
 test('datepicker onChange will return ISO string of selected dates', async () => {
   const mockFn = vi.fn()
-  render(<DatePickers helpers={PREVIEWER_DATEPICKER_HELPERS} to={''} from={''} onChange={mockFn} />)
+  render(
+    <LogsDatePicker
+      helpers={PREVIEWER_DATEPICKER_HELPERS}
+      value={{
+        from: '',
+        to: '',
+      }}
+      onSubmit={mockFn}
+    />
+  )
   // renders time locally
   userEvent.click(await screen.findByText('Custom'))
   // inputs with local time
