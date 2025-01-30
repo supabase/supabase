@@ -19,7 +19,7 @@ import {
   Select,
   cn,
 } from 'ui'
-import DatePickers from '../Settings/Logs/Logs.DatePickers'
+import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
 
@@ -27,7 +27,7 @@ interface ReportFilterBarProps {
   filters: ReportFilterItem[]
   onAddFilter: (filter: ReportFilterItem) => void
   onRemoveFilters: (filters: ReportFilterItem[]) => void
-  onDatepickerChange: ComponentProps<typeof DatePickers>['onChange']
+  onDatepickerChange: ComponentProps<typeof LogsDatePicker>['onSubmit']
   datepickerTo?: string
   datepickerFrom?: string
   datepickerHelpers: typeof REPORTS_DATEPICKER_HELPERS
@@ -139,10 +139,12 @@ const ReportFilterBar = ({
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-row justify-start items-center flex-wrap gap-2">
-        <DatePickers
-          onChange={onDatepickerChange}
-          to={datepickerTo}
-          from={datepickerFrom}
+        <LogsDatePicker
+          onSubmit={onDatepickerChange}
+          value={{
+            from: datepickerFrom || '',
+            to: datepickerTo || '',
+          }}
           helpers={datepickerHelpers}
         />
         <DropdownMenu>
