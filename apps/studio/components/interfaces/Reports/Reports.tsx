@@ -21,6 +21,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Dashboards } from 'types'
 import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
@@ -35,6 +36,7 @@ const Reports = () => {
   const { id, ref } = useParams()
   const { profile } = useProfile()
   const queryClient = useQueryClient()
+  const state = useDatabaseSelectorStateSnapshot()
 
   const [config, setConfig] = useState<Dashboards.Content>()
   const [startDate, setStartDate] = useState<string>()
@@ -239,6 +241,27 @@ const Reports = () => {
     })
   }
 
+  const onRefreshReport = () => {
+    // [Joshen] Since we can't track individual loading states for each chart
+    // so for now we mock a loading state that only lasts for a second
+    setIsRefreshing(true)
+    const monitoringCharts = config?.layout.filter(
+      (x) => x.provider === 'infra-monitoring' || x.provider === 'daily-stats'
+    )
+    monitoringCharts?.forEach((x) => {
+      queryClient.invalidateQueries(
+        analyticsKeys.infraMonitoring(ref, {
+          attribute: x.attribute,
+          startDate,
+          endDate,
+          interval: config?.interval,
+          databaseIdentifier: state.selectedDatabaseId,
+        })
+      )
+    })
+    setTimeout(() => setIsRefreshing(false), 1000)
+  }
+
   useEffect(() => {
     if (isSuccess && currentReportContent !== undefined) setConfig(currentReportContent)
   }, [isSuccess, currentReportContent])
@@ -290,13 +313,7 @@ const Reports = () => {
             className="w-7"
             disabled={isRefreshing}
             tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-            onClick={async () => {
-              // [Joshen] Since we can't track individual loading states for each chart
-              // so for now we mock a loading state that only lasts for a second
-              setIsRefreshing(true)
-              await queryClient.invalidateQueries(analyticsKeys.allInfraMonitoring(ref))
-              setTimeout(() => setIsRefreshing(false), 1000)
-            }}
+            onClick={onRefreshReport}
           />
           <div className="flex items-center gap-x-3">
             <DateRangePicker
