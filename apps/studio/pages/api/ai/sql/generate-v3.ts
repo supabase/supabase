@@ -88,7 +88,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         - Explain to the user that we create it outside of the public schema as it can present a security risk as foreign tables views cannot be configured to respect RLS policies. Provide this link for users to view more details about the security risk: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0017_foreign_table_in_api
 
       When generating views, do the following:
-      - All views should include 'with (security_invoker=on)' clause in the SQL statement for creating views.
+      - All views should include 'with (security_invoker=on)' clause in the SQL statement for creating views (only views though - do not do this for tables)
       - Place the 'with (security_invoker=on)' immediately after the CREATE VIEW statement, before AS
       - If the view is a materialized view, create it in a new schema called private. If the private schema doesnt exist, create it. 
         - Explain to the user that we create it outside of the public schema as it can present a security risk as materialized views cannot be configured to respect RLS policies of the underlying tables they are built upon, nor can they be secured with RLS directly. Provide this link for users to view more details about the security risk: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0016_materialized_view_in_api
