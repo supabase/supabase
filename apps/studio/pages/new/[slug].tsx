@@ -12,6 +12,7 @@ import { z } from 'zod'
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
 import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
@@ -28,6 +29,7 @@ import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToInci
 import Panel from 'components/ui/Panel'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
@@ -38,9 +40,9 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -81,8 +83,6 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -153,11 +153,11 @@ const Wizard: NextPageWithLayout = () => {
 
   // TODO: Remove this after project creation experiment
   const projectCreationExperimentGroup = useFlag<string>('projectCreationExperimentGroup')
-  useEffect(() => {
-    if (currentOrg && projectCreationExperimentGroup === 'group-b') {
-      router.replace(`/new/v2/${currentOrg.slug}`)
-    }
-  }, [currentOrg, projectCreationExperimentGroup, router])
+  // useEffect(() => {
+  //   if (currentOrg && projectCreationExperimentGroup === 'group-b') {
+  //     router.replace(`/new/v2/${currentOrg.slug}`)
+  //   }
+  // }, [currentOrg, projectCreationExperimentGroup, router])
 
   const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
 
@@ -189,6 +189,12 @@ const Wizard: NextPageWithLayout = () => {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchInterval: false,
+      onSuccess: (res) => {
+        if (res) form.setValue('dbRegion', res)
+      },
+      onError: () => {
+        form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region.displayName)
+      },
     }
   )
 
@@ -368,31 +374,19 @@ const Wizard: NextPageWithLayout = () => {
     }
   }, [isInvalidSlug, isOrganizationsSuccess, organizations])
 
-  useEffect(() => {
-    if (form.getValues('dbRegion') === undefined && defaultRegion) {
-      form.setValue('dbRegion', defaultRegion)
-    }
-  }, [defaultRegion])
-
-  useEffect(() => {
-    if (defaultRegionError) {
-      form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region.displayName)
-    }
-  }, [defaultRegionError])
-
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
 
   const additionalMonthlySpend =
     instanceSizeSpecs[instanceSize as DbInstanceSize]!.priceMonthly - availableComputeCredits
 
   // TODO: Remove this after project creation experiment as it delays rendering
-  if (
-    !currentOrg ||
-    !projectCreationExperimentGroup ||
-    projectCreationExperimentGroup === 'group-b'
-  ) {
-    return null
-  }
+  // if (
+  //   !currentOrg ||
+  //   !projectCreationExperimentGroup ||
+  //   projectCreationExperimentGroup === 'group-b'
+  // ) {
+  //   return null
+  // }
 
   return (
     <Form_Shadcn_ {...form}>
