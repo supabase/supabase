@@ -1,10 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { groupBy, isEqual, isNull } from 'lodash'
-import { ArrowRight, Plus, Save } from 'lucide-react'
+import { ArrowRight, Plus, RefreshCw, Save } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
@@ -13,6 +14,7 @@ import { Loading } from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
+import { analyticsKeys } from 'data/analytics/keys'
 import { useContentQuery } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -32,11 +34,13 @@ const DEFAULT_CHART_ROW_COUNT = 1
 const Reports = () => {
   const { id, ref } = useParams()
   const { profile } = useProfile()
+  const queryClient = useQueryClient()
 
   const [config, setConfig] = useState<Dashboards.Content>()
   const [startDate, setStartDate] = useState<string>()
   const [endDate, setEndDate] = useState<string>()
   const [hasEdits, setHasEdits] = useState<boolean>(false)
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
 
   const {
     data: userContents,
@@ -279,35 +283,51 @@ const Reports = () => {
         )}
       </div>
       <div className={cn('mb-4 flex items-center gap-x-3 justify-between')}>
-        <div className="flex items-center gap-x-3">
-          <DateRangePicker
-            value="7d"
-            className="w-48"
-            onChange={handleDateRangePicker}
-            options={TIME_PERIODS_REPORTS}
-            loading={isLoading}
-            footer={
-              <div className="px-2 py-1">
-                <p className="text-xs text-foreground-lighter">
-                  SQL blocks are independent of the selected date range
-                </p>
-              </div>
-            }
+        <div className="flex items-center gap-x-2">
+          <ButtonTooltip
+            type="default"
+            icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+            className="w-7"
+            disabled={isRefreshing}
+            tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+            onClick={async () => {
+              // [Joshen] Since we can't track individual loading states for each chart
+              // so for now we mock a loading state that only lasts for a second
+              setIsRefreshing(true)
+              await queryClient.invalidateQueries(analyticsKeys.allInfraMonitoring(ref))
+              setTimeout(() => setIsRefreshing(false), 1000)
+            }}
           />
+          <div className="flex items-center gap-x-3">
+            <DateRangePicker
+              value="7d"
+              className="w-48"
+              onChange={handleDateRangePicker}
+              options={TIME_PERIODS_REPORTS}
+              loading={isLoading}
+              footer={
+                <div className="px-2 py-1">
+                  <p className="text-xs text-foreground-lighter">
+                    SQL blocks are independent of the selected date range
+                  </p>
+                </div>
+              }
+            />
 
-          {startDate && endDate && (
-            <div className="hidden items-center space-x-1 lg:flex ">
-              <span className="text-sm text-foreground-light">
-                {dayjs(startDate).format('MMM D, YYYY')}
-              </span>
-              <span className="text-foreground-lighter">
-                <ArrowRight size={12} />
-              </span>
-              <span className="text-sm text-foreground-light">
-                {dayjs(endDate).format('MMM D, YYYY')}
-              </span>
-            </div>
-          )}
+            {startDate && endDate && (
+              <div className="hidden items-center space-x-1 lg:flex ">
+                <span className="text-sm text-foreground-light">
+                  {dayjs(startDate).format('MMM D, YYYY')}
+                </span>
+                <span className="text-foreground-lighter">
+                  <ArrowRight size={12} />
+                </span>
+                <span className="text-sm text-foreground-light">
+                  {dayjs(endDate).format('MMM D, YYYY')}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-x-2">
@@ -370,6 +390,7 @@ const Reports = () => {
               interval={config.interval as AnalyticsInterval}
               editableReport={config}
               disableUpdate={!canUpdateReport}
+              isRefreshing={isRefreshing}
               onRemoveChart={popChart}
               onUpdateChart={updateChart}
               setEditableReport={setConfig}

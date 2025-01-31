@@ -124,6 +124,8 @@ export const analyticsKeys = {
         projectRef,
       },
     ] as const,
+  allInfraMonitoring: (projectRef?: string) =>
+    ['projects', projectRef, 'infra-monitoring'] as const,
   infraMonitoring: (
     projectRef: string | undefined,
     {
