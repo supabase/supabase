@@ -33,13 +33,6 @@ const EmailTemplates = () => {
 
   return (
     <div className="w-full">
-      <div className="w-full flex justify-between items-center">
-        <FormHeader
-          title="Email Templates"
-          description="Customize the emails that will be sent out to your users."
-          docsUrl="https://supabase.com/docs/guides/auth/auth-email-templates"
-        />
-      </div>
       {isError && (
         <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
       )}

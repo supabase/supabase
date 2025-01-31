@@ -232,6 +232,30 @@ const BasicAuthSettingsForm = () => {
                         </Alert_Shadcn_>
                       </div>
                     )}
+                    {/* TODO: CHECK CAPTURE SETTINGS NOW THAT THEY HAVE MOVED FROM THIS PAGE
+                    {!values.SECURITY_CAPTCHA_ENABLED && (
+                      <Alert_Shadcn_>
+                        <WarningIcon />
+                        <AlertTitle_Shadcn_>
+                          We highly recommend{' '}
+                          <span
+                            tabIndex={1}
+                            className="cursor-pointer underline"
+                            onClick={() => {
+                              const el = document.getElementById('enable-captcha')
+                              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                            }}
+                          >
+                            enabling captcha
+                          </span>{' '}
+                          for anonymous sign-ins
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          This will prevent potential abuse on sign-ins which may bloat your
+                          database and incur costs for monthly active users (MAU)
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                    )} */}
                   </FormSectionContent>
                 </FormSection>
               </FormPanel>

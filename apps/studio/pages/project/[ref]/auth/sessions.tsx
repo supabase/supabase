@@ -22,8 +22,7 @@ const AuthSettings: NextPageWithLayout = () => {
     <>
       <ScaffoldContainer>
         <ScaffoldHeader>
-          <ScaffoldTitle>Auth settings</ScaffoldTitle>
-          <ScaffoldDescription>Configure security and user session settings</ScaffoldDescription>
+          <ScaffoldTitle>Sessions</ScaffoldTitle>
         </ScaffoldHeader>
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>

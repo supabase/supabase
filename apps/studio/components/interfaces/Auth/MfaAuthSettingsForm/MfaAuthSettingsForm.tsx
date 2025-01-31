@@ -185,11 +185,6 @@ const MfaAuthSettingsForm = () => {
 
         return (
           <>
-            <FormHeader
-              title="Multi-Factor Authentication Settings"
-              description="Configure your MFA settings."
-            />
-
             <FormPanel
               disabled={true}
               footer={

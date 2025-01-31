@@ -185,10 +185,6 @@ const SmtpForm = () => {
 
         return (
           <>
-            <FormHeader
-              title="SMTP Settings"
-              description="You can use your own SMTP server instead of the built-in email service."
-            />
             <FormPanel
               footer={
                 <div className="flex py-4 px-8">

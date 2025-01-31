@@ -19,12 +19,6 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
         ...(IS_PLATFORM
           ? [
               {
-                name: 'Advanced',
-                key: 'advanced',
-                url: `/project/${ref}/auth/advanced`,
-                items: [],
-              },
-              {
                 name: 'Sign In / Up',
                 key: 'providers',
                 url: `/project/${ref}/auth/providers`,
@@ -72,6 +66,12 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
                 url: `/project/${ref}/auth/hooks`,
                 items: [],
                 label: 'BETA',
+              },
+              {
+                name: 'Advanced',
+                key: 'advanced',
+                url: `/project/${ref}/auth/advanced`,
+                items: [],
               },
             ]
           : []),

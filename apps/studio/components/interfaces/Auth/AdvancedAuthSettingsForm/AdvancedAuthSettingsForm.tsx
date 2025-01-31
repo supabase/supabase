@@ -107,11 +107,6 @@ const AdvancedAuthSettingsForm = () => {
 
         return (
           <>
-            <FormHeader
-              title="Advanced Settings"
-              description="Configure advanced authentication settings."
-            />
-
             <FormPanel
               disabled={true}
               footer={

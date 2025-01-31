@@ -122,11 +122,6 @@ const SessionsAuthSettingsForm = () => {
 
         return (
           <>
-            <FormHeader
-              title="Session Settings"
-              description="Configure how user sessions are handled in your application."
-            />
-
             <FormPanel
               disabled={true}
               footer={
