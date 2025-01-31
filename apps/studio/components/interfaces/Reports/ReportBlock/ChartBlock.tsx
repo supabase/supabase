@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
-import { ReactNode, useEffect, useState, useCallback } from 'react'
+import { ReactNode, useCallback, useEffect, useState } from 'react'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
 
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
@@ -62,7 +62,7 @@ export const ChartBlock = ({
 
   const state = useDatabaseSelectorStateSnapshot()
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
-  const [highlightedValue, setHighlightedValue] = useState<string | undefined>()
+  const [latestValue, setLatestValue] = useState<string | undefined>()
 
   const databaseIdentifier = state.selectedDatabaseId
 
@@ -128,9 +128,9 @@ export const ChartBlock = ({
     }
   }
 
+  const isPercentage = chartData?.format === '%'
   const data = (chartData?.data ?? []).map((x: any) => {
-    const value =
-      chartData?.format === '%' ? x[attribute].toFixed(1) : x[attribute].toLocaleString()
+    const value = isPercentage ? x[attribute] : x[attribute]
     const color = getCellColor(attribute, x[attribute])
     return {
       ...x,
@@ -146,7 +146,7 @@ export const ChartBlock = ({
     if (!chartData?.data?.length) return undefined
     const lastDataPoint = chartData.data[chartData.data.length - 1]
     const value = lastDataPoint[attribute]
-    return chartData.format === '%'
+    return isPercentage
       ? `${typeof value === 'number' ? value.toFixed(1) : value}%`
       : typeof value === 'number'
         ? value.toLocaleString()
@@ -158,7 +158,7 @@ export const ChartBlock = ({
   }, [defaultChartStyle])
 
   useEffect(() => {
-    setHighlightedValue(getInitialHighlightedValue())
+    setLatestValue(getInitialHighlightedValue())
   }, [chartData, getInitialHighlightedValue])
 
   return (
@@ -214,17 +214,16 @@ export const ChartBlock = ({
         </div>
       ) : (
         <>
-          {highlightedValue && (
+          {latestValue && (
             <div className="pt-2 px-3 w-full text-left leading-tight">
               <span className="text-xs font-mono uppercase text-foreground-light">
                 Most recently
               </span>
-              <p className="text-lg text">{highlightedValue}</p>
+              <p className="text-lg text">{latestValue}</p>
             </div>
           )}
           <ChartContainer
             className="w-full aspect-auto px-3 py-2"
-            config={{}}
             style={{
               height: maxHeight ? `${maxHeight}px` : undefined,
               minHeight: maxHeight ? `${maxHeight}px` : undefined,
@@ -240,17 +239,17 @@ export const ChartBlock = ({
                   tickMargin={8}
                   minTickGap={32}
                 />
-                {chartData.format === '%' && <YAxis hide domain={[0, 100]} />}
+                <YAxis hide domain={isPercentage ? [0, 100] : undefined} />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
                       className="w-[200px]"
-                      labelSuffix={chartData?.format === '%' ? '%' : ''}
+                      labelSuffix={isPercentage ? '%' : ''}
                       labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
                     />
                   }
                 />
-                <Bar dataKey={metricLabel} radius={4} />
+                <Bar dataKey={metricLabel} radius={[2, 2, 1, 1]} />
               </BarChart>
             ) : (
               <LineChart accessibilityLayer margin={{ left: 0, right: 0 }} data={data}>
@@ -262,7 +261,7 @@ export const ChartBlock = ({
                   tickMargin={8}
                   minTickGap={32}
                 />
-                {chartData.format === '%' && <YAxis hide domain={[0, 100]} />}
+                <YAxis hide domain={isPercentage ? [0, 100] : undefined} />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
