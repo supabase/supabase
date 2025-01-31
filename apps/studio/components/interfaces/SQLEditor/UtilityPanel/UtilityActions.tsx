@@ -11,7 +11,6 @@ import {
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -197,13 +196,7 @@ const UtilityActions = ({
           />
           <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
           <Button
-            onClick={() => {
-              executeQuery()
-              sendEvent({
-                action: TelemetryActions.SQL_EDITOR_QUERY_RUN_BUTTON_CLICKED,
-                groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-              })
-            }}
+            onClick={executeQuery}
             disabled={isDisabled || isExecuting}
             type="primary"
             size="tiny"

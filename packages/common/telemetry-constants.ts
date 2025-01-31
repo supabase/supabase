@@ -944,8 +944,8 @@ export interface SignInButtonClickedEvent {
 export interface HelpButtonClickedEvent {
   action: TelemetryActions.HELP_BUTTON_CLICKED
   groups: {
-    project: string
-    organization: string
+    project?: string
+    organization?: string
   }
 }
 
@@ -958,8 +958,8 @@ export interface HelpButtonClickedEvent {
 export interface SendFeedbackButtonClickedEvent {
   action: TelemetryActions.SEND_FEEDBACK_BUTTON_CLICKED
   groups: {
-    project: string
-    organization: string
+    project?: string
+    organization?: string
   }
 }
 

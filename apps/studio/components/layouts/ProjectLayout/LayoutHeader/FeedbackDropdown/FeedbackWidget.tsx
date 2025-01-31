@@ -268,17 +268,13 @@ const FeedbackWidget = ({
               onChange={onFilesUpload}
             />
             <Button
-              disabled={isSending}
+              disabled={feedback.length === 0 || isSending}
               loading={isSending}
               onClick={() => {
                 sendFeedback()
-                // TODO: pam     "message": "Project reference in URL is not valid. Check the URL of the resource." when in /account/tokens or org level
                 sendEvent({
                   action: TelemetryActions.SEND_FEEDBACK_BUTTON_CLICKED,
-                  groups: {
-                    project: ref ?? 'Unknown',
-                    organization: org?.slug ?? 'Unknown',
-                  },
+                  groups: { project: ref, organization: org?.slug },
                 })
               }}
             >
