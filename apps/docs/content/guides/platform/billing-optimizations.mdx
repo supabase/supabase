@@ -9,9 +9,9 @@ subtitle: 'This documentation covers advice on debugging and optimizing your cos
 
 As egress is calculated at the organization level, you can view it at the [Usage](https://supabase.com/dashboard/org/_/usage) page in the dashboard.
 
-The `Usage Summary` section shows your egress along with all other usage metrics. Hoevering over it will show your usage for each project in the organization, with any allowance taken into account.
+The `Usage Summary` section shows your egress along with all other usage metrics. Hovering over it will show your usage for each project in the organization, with any allowance taken into account.
 
-Clicking it will take you down to the [egress section](https://supabase.com/dashboard/org/_/usage#egress) where you will see a summary for Clicking it will take you down to the [egress section](https://supabase.com/dashboard/org/_/usage#egress) where you will see a summary for each areaa counted for the selected billing period. 
+Clicking it will take you down to the [egress section](https://supabase.com/dashboard/org/_/usage#egress) where you will see a summary for Clicking it will take you down to the [egress section](https://supabase.com/dashboard/org/_/usage#egress) where you will see a summary for each area counted for the selected billing period. 
 You can use the dropdown menus on the top of the page to select the billing cycle and drill down into a single project.
 
 In this documentation, we will cover each of the measured areas of egress and provide advice on both measuring and reducing egress.
@@ -20,11 +20,11 @@ In this documentation, we will cover each of the measured areas of egress and pr
 
 ### Database
 
-Whetehr you are running queries by directly connecting to your database or you are connecting via Supavisor, you can identify, monitor and take different steps to reduce your egress costs.
+Whether you are running queries by directly connecting to your database or you are connecting via Supavisor, you can identify, monitor and take different steps to reduce your egress costs.
 
 Some general advice:
 - **Avoid `select *`**: Select only the data that you need when querying tables, you may find that there are large strings or JSON objects in your responses that you do not need.
-- **Use pagination**: When showing a dashboard or sumamries of data, it is common to need to select multiple rows. Avoid selecting all of those rows at once and only select them when you need them. Many ORMs and other frameworks have pagination built in.
+- **Use pagination**: When showing a dashboard or summaries of data, it is common to need to select multiple rows. Avoid selecting all of those rows at once and only select them when you need them. Many ORMs and other frameworks have pagination built in.
 - **Select JSON fields**: Avoid selecting entire JSON objects, you can select fields within your JSON to reduce the size of the response. Read more about querying JSON [here](https://supabase.com/docs/guides/database/json?queryGroups=database-method&database-method=sql&queryGroups=language&language=sql#query-json-data)
 - **Cache responses**: Either by using client-side caching within your framework or using one of our [integrations](https://supabase.com/partners/integrations#caching%20/%20offline-first), this can speed up your application and save unnecessary trips to the database.
 
@@ -110,7 +110,7 @@ The Data API can generate egress costs if it transfers large amounts of data. To
      .eq('status', 'active'); // Only fetch active users
    ```
 
-4. **Cache responses**: Use caching within your framaework to reduce unnecessary data transfer. See [supabase-cache-helpers](https://supabase-cache-helpers.vercel.app/) for an excellent example of this.
+4. **Cache responses**: Use caching within your framework to reduce unnecessary data transfer. See [supabase-cache-helpers](https://supabase-cache-helpers.vercel.app/) for an excellent example of this.
 
 
 ### Edge Functions
