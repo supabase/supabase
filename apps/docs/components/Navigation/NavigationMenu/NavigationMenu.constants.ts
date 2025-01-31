@@ -1182,9 +1182,7 @@ export const queues: NavMenuConstant = {
     {
       name: 'References',
       url: undefined,
-      items: [
-        { name: 'PGMQ Extension', url: '/guides/queues/pgmq' },
-      ],
+      items: [{ name: 'PGMQ Extension', url: '/guides/queues/pgmq' }],
     },
   ],
 }
