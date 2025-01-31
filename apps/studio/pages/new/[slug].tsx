@@ -153,11 +153,11 @@ const Wizard: NextPageWithLayout = () => {
 
   // TODO: Remove this after project creation experiment
   const projectCreationExperimentGroup = useFlag<string>('projectCreationExperimentGroup')
-  // useEffect(() => {
-  //   if (currentOrg && projectCreationExperimentGroup === 'group-b') {
-  //     router.replace(`/new/v2/${currentOrg.slug}`)
-  //   }
-  // }, [currentOrg, projectCreationExperimentGroup, router])
+  useEffect(() => {
+    if (currentOrg && projectCreationExperimentGroup === 'group-b') {
+      router.replace(`/new/v2/${currentOrg.slug}`)
+    }
+  }, [currentOrg, projectCreationExperimentGroup, router])
 
   const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
 
@@ -381,13 +381,13 @@ const Wizard: NextPageWithLayout = () => {
     instanceSizeSpecs[instanceSize as DbInstanceSize]!.priceMonthly - availableComputeCredits
 
   // TODO: Remove this after project creation experiment as it delays rendering
-  // if (
-  //   !currentOrg ||
-  //   !projectCreationExperimentGroup ||
-  //   projectCreationExperimentGroup === 'group-b'
-  // ) {
-  //   return null
-  // }
+  if (
+    !currentOrg ||
+    !projectCreationExperimentGroup ||
+    projectCreationExperimentGroup === 'group-b'
+  ) {
+    return null
+  }
 
   return (
     <Form_Shadcn_ {...form}>
