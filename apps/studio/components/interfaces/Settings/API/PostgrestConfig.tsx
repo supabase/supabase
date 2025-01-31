@@ -204,21 +204,10 @@ export const PostgrestConfig = () => {
                               checked={field.value}
                               onCheckedChange={(value) => {
                                 field.onChange(value)
-
                                 if (!value) {
-                                  /**
-                                   * reset the form to default values
-                                   */
                                   form.setValue('enableDataApi', false)
                                   form.setValue('dbSchema', [])
-                                  /**
-                                   * remove all the schema values when disabling the Data API
-                                   */
                                 } else {
-                                  /**
-                                   * reset the form to default values
-                                   * when disabled the Data API
-                                   */
                                   form.setValue('enableDataApi', true)
                                   form.setValue('dbSchema', dbSchema)
                                 }
