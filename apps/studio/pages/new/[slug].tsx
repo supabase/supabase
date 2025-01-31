@@ -190,6 +190,7 @@ const Wizard: NextPageWithLayout = () => {
       refetchOnWindowFocus: false,
       refetchInterval: false,
       refetchOnReconnect: false,
+      retry: false,
       onSuccess: (res) => {
         if (res) form.setValue('dbRegion', res)
       },
