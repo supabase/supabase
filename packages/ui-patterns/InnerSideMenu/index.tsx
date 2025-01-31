@@ -197,7 +197,7 @@ const InnerSideBarFilterSortDropdown = forwardRef<
           asChild
           className={cn(
             'absolute right-1 top-[.4rem] md:top-[.3rem]',
-            'text-foreground-muted transition-colors hover:text-foreground data-[state=open]:text-foreground',
+            'text-foreground transition-colors hover:text-foreground data-[state=open]:text-foreground',
             triggerClassName
           )}
         >

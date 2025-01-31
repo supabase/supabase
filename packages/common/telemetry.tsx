@@ -2,10 +2,17 @@ import { components } from 'api-types'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useRef } from 'react'
+import { LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useTelemetryCookie } from './hooks'
+import { TelemetryEvent } from './telemetry-constants'
+import { useUser } from './auth'
+
+//---
+// PAGE TELEMETRY
+//---
 
 export function handlePageTelemetry(
   API_URL: string,
@@ -20,17 +27,7 @@ export function handlePageTelemetry(
     telemetryDataOverride !== undefined
       ? { feature_flags: featureFlags, ...telemetryDataOverride }
       : {
-          page_url: isBrowser ? window.location.href : '',
-          page_title: isBrowser ? document?.title : '',
-          pathname: pathname ? pathname : isBrowser ? window.location.pathname : '',
-          ph: {
-            referrer: isBrowser ? document?.referrer : '',
-            language: navigator.language ?? 'en-US',
-            user_agent: navigator.userAgent,
-            search: isBrowser ? window.location.search : '',
-            viewport_height: isBrowser ? window.innerHeight : 0,
-            viewport_width: isBrowser ? window.innerWidth : 0,
-          },
+          ...getSharedTelemetryData(pathname),
           feature_flags: featureFlags,
         },
     { headers: { Version: '2' } }
@@ -52,10 +49,6 @@ export function handlePageLeaveTelemetry(
       feature_flags: featureFlags,
     },
   })
-}
-
-export function handleResetTelemetry(API_URL: string) {
-  return post(`${API_URL}/telemetry/reset`, {})
 }
 
 export const PageTelemetry = ({
@@ -152,5 +145,93 @@ export const PageTelemetry = ({
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [enabled, sendPageLeaveTelemetry])
 
+  // Identify the user
+  useTelemetryIdentify(API_URL)
+
   return null
+}
+
+// ---
+// EVENT TELEMETRY
+// ---
+
+type EventBody = components['schemas']['TelemetryEventBodyV2Dto']
+
+export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathname?: string) {
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null) === 'true'
+
+  if (!consent) return
+
+  const body: EventBody = {
+    ...getSharedTelemetryData(pathname),
+    action: event.action,
+    custom_properties: 'properties' in event ? event.properties : {},
+    groups: 'groups' in event ? event.groups : {},
+  }
+
+  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/event`, body, {
+    headers: { Version: '2' },
+  })
+}
+
+//---
+// TELEMETRY IDENTIFY
+//---
+
+type IdentifyBody = components['schemas']['TelemetryIdentifyBodyV2']
+
+export function sendTelemetryIdentify(API_URL: string, body: IdentifyBody) {
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null) === 'true'
+
+  if (!consent) return Promise.resolve()
+
+  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/identify`, body, {
+    headers: { Version: '2' },
+  })
+}
+
+export function useTelemetryIdentify(API_URL: string) {
+  const user = useUser()
+
+  useEffect(() => {
+    if (user?.id) {
+      sendTelemetryIdentify(API_URL, {
+        user_id: user.id,
+      })
+    }
+  }, [API_URL, user?.id])
+}
+
+//---
+// TELEMETRY RESET
+//---
+
+export function handleResetTelemetry(API_URL: string) {
+  return post(`${API_URL}/telemetry/reset`, {})
+}
+
+// ---
+// TELEMETRY UTILS
+// ---
+
+export function getSharedTelemetryData(pathname?: string) {
+  return {
+    page_url: isBrowser ? window.location.href : '',
+    page_title: isBrowser ? document?.title : '',
+    pathname: pathname ? pathname : isBrowser ? window.location.pathname : '',
+    ph: {
+      referrer: isBrowser ? document?.referrer : '',
+      language: navigator.language ?? 'en-US',
+      user_agent: navigator.userAgent,
+      search: isBrowser ? window.location.search : '',
+      viewport_height: isBrowser ? window.innerHeight : 0,
+      viewport_width: isBrowser ? window.innerWidth : 0,
+    },
+  }
 }

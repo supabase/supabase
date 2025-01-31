@@ -1,13 +1,12 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { Snippet } from 'data/content/sql-folders-query'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
 import { ChartConfig } from './ChartConfig'
-import ResultsDropdown from './ResultsDropdown'
 import UtilityActions from './UtilityActions'
 import UtilityTabResults from './UtilityTabResults'
 
@@ -42,7 +41,6 @@ const UtilityPanel = ({
   onDebug,
 }: UtilityPanelProps) => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const snippet = snapV2.snippets[id]?.snippet
@@ -116,7 +114,13 @@ const UtilityPanel = ({
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
             <span className="translate-y-[1px]">Chart</span>
           </TabsTrigger_Shadcn_>
-          {result?.rows && <ResultsDropdown id={id} />}
+          {result?.rows && (
+            <DownloadResultsButton
+              type="text"
+              results={result.rows as any[]}
+              fileName={`Supabase Snippet ${snippet.name}`}
+            />
+          )}
         </div>
         <UtilityActions
           id={id}
