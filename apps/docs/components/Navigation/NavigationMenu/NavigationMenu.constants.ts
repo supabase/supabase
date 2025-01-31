@@ -1917,6 +1917,18 @@ export const local_development: NavMenuConstant = {
         },
       ],
     },
+    {
+      name: 'Testing',
+      url: undefined,
+      items: [
+        { name: 'Getting started', url: '/guides/local-development/testing/overview' },
+        { name: 'Unit testing', url: '/guides/database/testing' },
+        {
+          name: 'Integration testing',
+          url: '/guides/local-development/managing-config',
+        },
+      ],
+    },
   ],
 }
 
