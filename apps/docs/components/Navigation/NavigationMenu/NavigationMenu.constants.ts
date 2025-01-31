@@ -2111,6 +2111,10 @@ export const platform: NavMenuConstant = {
               name: 'Branching',
               url: '/guides/platform/manage-your-usage/branching',
             },
+            {
+              name: 'Read Replicas',
+              url: '/guides/platform/manage-your-usage/read-replicas',
+            },
           ],
         },
         {
