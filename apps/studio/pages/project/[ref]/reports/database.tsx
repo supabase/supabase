@@ -1,11 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { ArrowRight, ExternalLink } from 'lucide-react'
+import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
@@ -18,6 +19,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import Panel from 'components/ui/Panel'
+import { analyticsKeys } from 'data/analytics/keys'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
@@ -42,18 +44,22 @@ export default DatabaseReport
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
+  const queryClient = useQueryClient()
 
   const state = useDatabaseSelectorStateSnapshot()
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [dateRange, setDateRange] = useState<any>(undefined)
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
   const report = useDatabaseReport()
-  const { data } = useDatabaseSizeQuery({
+  const { data, params, largeObjectsSql, isLoading, refresh } = report
+
+  const { data: databaseSizeData } = useDatabaseSizeQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const databaseSizeBytes = data ?? 0
+  const databaseSizeBytes = databaseSizeData ?? 0
   const currentDiskSize = project?.volumeSizeGb ?? 0
 
   const [showIncreaseDiskSizeModal, setshowIncreaseDiskSizeModal] = useState(false)
@@ -94,33 +100,50 @@ const DatabaseUsage = () => {
       <section>
         <Panel title={<h2>Database health</h2>}>
           <Panel.Content>
-            <div className="mb-4 flex items-center space-x-3">
-              <DateRangePicker
-                loading={false}
-                value={'7d'}
-                options={TIME_PERIODS_INFRA}
-                currentBillingPeriodStart={undefined}
-                onChange={(values) => {
-                  if (values.interval === '1d') {
-                    setDateRange({ ...values, interval: '1h' })
-                  } else {
-                    setDateRange(values)
-                  }
+            <div className="mb-4 flex items-center gap-x-2">
+              <ButtonTooltip
+                type="default"
+                disabled={isRefreshing}
+                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                className="w-7"
+                tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+                onClick={async () => {
+                  // [Joshen] Since we can't track individual loading states for each chart
+                  // so for now we mock a loading state that only lasts for a second
+                  refresh()
+                  setIsRefreshing(true)
+                  await queryClient.invalidateQueries(analyticsKeys.allInfraMonitoring(ref))
+                  setTimeout(() => setIsRefreshing(false), 1000)
                 }}
               />
-              {dateRange && (
-                <div className="flex items-center gap-x-2">
-                  <p className="text-foreground-light">
-                    {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
-                  </p>
-                  <p className="text-foreground-light">
-                    <ArrowRight size={12} />
-                  </p>
-                  <p className="text-foreground-light">
-                    {dayjs(dateRange.period_end.date).format('MMMM D, hh:mma')}
-                  </p>
-                </div>
-              )}
+              <div className="flex items-center gap-x-3">
+                <DateRangePicker
+                  loading={false}
+                  value={'7d'}
+                  options={TIME_PERIODS_INFRA}
+                  currentBillingPeriodStart={undefined}
+                  onChange={(values) => {
+                    if (values.interval === '1d') {
+                      setDateRange({ ...values, interval: '1h' })
+                    } else {
+                      setDateRange(values)
+                    }
+                  }}
+                />
+                {dateRange && (
+                  <div className="flex items-center gap-x-2">
+                    <p className="text-foreground-light">
+                      {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
+                    </p>
+                    <p className="text-foreground-light">
+                      <ArrowRight size={12} />
+                    </p>
+                    <p className="text-foreground-light">
+                      {dayjs(dateRange.period_end.date).format('MMMM D, hh:mma')}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="space-y-6">
               {dateRange && (
@@ -200,12 +223,12 @@ const DatabaseUsage = () => {
       </section>
       <section id="database-size-report">
         <ReportWidget
-          isLoading={report.isLoading}
-          params={report.params.largeObjects}
+          isLoading={isLoading}
+          params={params.largeObjects}
           title="Database Size"
-          data={report.data.largeObjects || []}
+          data={data.largeObjects || []}
           queryType={'db'}
-          resolvedSql={report.largeObjectsSql}
+          resolvedSql={largeObjectsSql}
           renderer={(props) => {
             return (
               <div>
