@@ -4,7 +4,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   Popover,
@@ -13,15 +16,14 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 import { useProjectContext } from '../ProjectContext'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'common/telemetry-constants'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const HelpPopover = () => {
   const router = useRouter()
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
+
   const { mutate: sendEvent } = useSendEventMutation()
+
   const projectRef = project?.parent_project_ref ?? router.query.ref
   const supportUrl = `/support/new${projectRef ? `?ref=${projectRef}` : ''}`
 

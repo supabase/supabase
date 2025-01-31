@@ -9,8 +9,12 @@ import {
   DroppableProvided,
 } from 'react-beautiful-dnd'
 
+import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import InformationBox from 'components/ui/InformationBox'
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -28,10 +32,6 @@ import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
 import Column from './Column'
 import type { ImportContent, TableField } from './TableEditor.types'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'common/telemetry-constants'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useParams } from 'common'
 
 interface ColumnManagementProps {
   table: TableField
@@ -58,13 +58,14 @@ const ColumnManagement = ({
   onClearImportContent = noop,
   onUpdateFkRelations,
 }: ColumnManagementProps) => {
+  const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
+
   const [open, setOpen] = useState(false)
   const [selectedColumn, setSelectedColumn] = useState<ColumnField>()
   const [selectedFk, setSelectedFk] = useState<ForeignKey>()
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { ref: projectRef } = useParams()
-  const org = useSelectedOrganization()
 
   const hasImportContent = !isEmpty(importContent)
   const [primaryKeyColumns, otherColumns] = partition(
@@ -178,7 +179,7 @@ const ColumnManagement = ({
                       })
                     }}
                   >
-                    Import data via spreadsheet
+                    Import data from CSV
                   </Button>
                 )}
               </>

@@ -4,6 +4,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+
+import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
+import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { timeout } from 'lib/helpers'
 import {
   Button,
   DropdownMenu,
@@ -12,14 +19,7 @@ import {
   DropdownMenuTrigger,
   Input,
 } from 'ui'
-
-import { useParams } from 'common'
-import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
-import { timeout } from 'lib/helpers'
 import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'common/telemetry-constants'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface FeedbackWidgetProps {
   feedback: string
@@ -41,13 +41,13 @@ const FeedbackWidget = ({
 
   const router = useRouter()
   const { ref, slug } = useParams()
+  const org = useSelectedOrganization()
   const uploadButtonRef = useRef(null)
 
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const org = useSelectedOrganization()
 
   const { mutate: submitFeedback } = useSendFeedbackMutation({
     onSuccess: () => {
