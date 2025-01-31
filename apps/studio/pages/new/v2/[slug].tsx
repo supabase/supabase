@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
+import { TelemetryActions } from 'common/telemetry-constants'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
@@ -61,7 +62,6 @@ import {
   PROJECT_STATUS,
   PROVIDERS,
 } from 'lib/constants'
-import { TelemetryActions } from 'common/telemetry-constants'
 import passwordStrength from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import type { CloudProvider } from 'shared-data'
@@ -128,9 +128,8 @@ const FormSchema = z.object({
   }),
   dbPassStrength: z.number(),
   dbPass: z
-    .string({
-      required_error: 'Please enter a database password.',
-    })
+    .string({ required_error: 'Please enter a database password.' })
+    .regex(/^[^@:\/]*$/, 'Passwords cannot include @, :, or / characters')
     .min(1, 'Password is required.'),
   instanceSize: z.string(),
   dataApi: z.boolean(),
@@ -160,7 +159,6 @@ const WizardForm = () => {
   const [showVisual, setShowVisual] = useState(false)
 
   const [step, setStep] = useState(1)
-  const [aiDescription, setAiDescription] = useState('')
   const [formTitle, setFormTitle] = useState('Create a new project')
   const [formDescription, setFormDescription] = useState(
     'Get started by choosing how you want to create your project'
@@ -534,7 +532,6 @@ const WizardForm = () => {
                     }
                   }}
                   onSubmit={(value) => {
-                    setAiDescription(value)
                     setFormTitle('Create a project')
                     setFormDescription(
                       'We have generated a starting schema for you based on your description'
@@ -1168,9 +1165,13 @@ const WizardForm = () => {
                                   form="project-create-form"
                                   htmlType="submit"
                                   size="large"
-                                  loading={isCreatingNewProject}
-                                  disabled={isCreatingNewProject || projectCreateBlocked}
                                   className="w-full"
+                                  loading={isCreatingNewProject}
+                                  disabled={
+                                    !canCreateProject ||
+                                    isCreatingNewProject ||
+                                    projectCreateBlocked
+                                  }
                                 >
                                   {isCreatingNewProject ? 'Creating project...' : 'Create project'}
                                 </Button>
@@ -1238,13 +1239,9 @@ const instanceLabel = (instance: string | undefined): string => {
 }
 
 const Wizard: NextPageWithLayout = () => {
-  const { slug, projectName } = useParams()
-
-  const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
-  const currentOrg = organizations?.find((o: any) => o.slug === slug)
-
-  const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
-    useFreeProjectLimitCheckQuery({ slug })
+  const { slug } = useParams()
+  const { isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
+  const { isLoading: isLoadingFreeProjectLimitCheck } = useFreeProjectLimitCheckQuery({ slug })
 
   if (!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck) return null
 
