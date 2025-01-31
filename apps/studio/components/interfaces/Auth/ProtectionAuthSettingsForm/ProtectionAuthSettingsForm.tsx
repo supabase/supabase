@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { boolean, number, object, string } from 'yup'
 
@@ -24,6 +24,7 @@ import {
   Alert_Shadcn_,
   Button,
   Form,
+  Input,
   InputNumber,
   Toggle,
   WarningIcon,
@@ -42,11 +43,39 @@ const schema = object({
   EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean().required(),
   SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
   SITE_URL: string().required('Must have a Site URL'),
+  SECURITY_CAPTCHA_ENABLED: boolean().required(),
+  SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
+    is: true,
+    then: (schema) => schema.required('Must have a Captcha secret'),
+  }),
+  SECURITY_CAPTCHA_PROVIDER: string().when('SECURITY_CAPTCHA_ENABLED', {
+    is: true,
+    then: (schema) =>
+      schema
+        .oneOf(['hcaptcha', 'turnstile'])
+        .required('Captcha provider must be either hcaptcha or turnstile'),
+  }),
+  SESSIONS_TIMEBOX: number().min(0, 'Must be a positive number'),
+  SESSIONS_INACTIVITY_TIMEOUT: number().min(0, 'Must be a positive number'),
+  SESSIONS_SINGLE_PER_USER: boolean(),
+  PASSWORD_MIN_LENGTH: number().min(6, 'Must be greater or equal to 6.'),
+  PASSWORD_REQUIRED_CHARACTERS: string(),
+  PASSWORD_HIBP_ENABLED: boolean(),
 })
 
-const formId = 'auth-config-basic-settings'
+function HoursOrNeverText({ value }: { value: number }) {
+  if (value === 0) {
+    return 'never'
+  } else if (value === 1) {
+    return 'hour'
+  } else {
+    return 'hours'
+  }
+}
 
-const BasicAuthSettingsForm = () => {
+const formId = 'auth-config-protection-settings'
+
+const ProtectionAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -57,6 +86,7 @@ const BasicAuthSettingsForm = () => {
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
+  const [hidden, setHidden] = useState(true)
   const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
@@ -76,6 +106,16 @@ const BasicAuthSettingsForm = () => {
     EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED,
     SECURITY_MANUAL_LINKING_ENABLED: authConfig?.SECURITY_MANUAL_LINKING_ENABLED || false,
     SITE_URL: authConfig?.SITE_URL,
+    SECURITY_CAPTCHA_ENABLED: authConfig?.SECURITY_CAPTCHA_ENABLED || false,
+    SECURITY_CAPTCHA_SECRET: authConfig?.SECURITY_CAPTCHA_SECRET || '',
+    SECURITY_CAPTCHA_PROVIDER: authConfig?.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
+    SESSIONS_TIMEBOX: authConfig?.SESSIONS_TIMEBOX || 0,
+    SESSIONS_INACTIVITY_TIMEOUT: authConfig?.SESSIONS_INACTIVITY_TIMEOUT || 0,
+    SESSIONS_SINGLE_PER_USER: authConfig?.SESSIONS_SINGLE_PER_USER || false,
+    PASSWORD_MIN_LENGTH: authConfig?.PASSWORD_MIN_LENGTH || 6,
+    PASSWORD_REQUIRED_CHARACTERS:
+      authConfig?.PASSWORD_REQUIRED_CHARACTERS || NO_REQUIRED_CHARACTERS,
+    PASSWORD_HIBP_ENABLED: authConfig?.PASSWORD_HIBP_ENABLED || false,
   }
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -116,7 +156,10 @@ const BasicAuthSettingsForm = () => {
 
   return (
     <div>
-      <FormHeader title="General" />
+      <FormHeader
+        title="Bot and Abuse Protection"
+        description="Configure protection settings for your application."
+      />
 
       <Form
         id={formId}
@@ -153,84 +196,56 @@ const BasicAuthSettingsForm = () => {
                   </div>
                 }
               >
-                <FormSection header={<FormSectionLabel>User Signups</FormSectionLabel>}>
+                <FormSection header={<FormSectionLabel>Bot and Abuse Protection</FormSectionLabel>}>
                   <FormSectionContent loading={isLoading}>
                     <Toggle
-                      id="DISABLE_SIGNUP"
+                      id="SECURITY_CAPTCHA_ENABLED"
                       size="small"
-                      label="Allow new users to sign up"
+                      label="Enable Captcha protection"
                       layout="flex"
-                      descriptionText="If this is disabled, new users will not be able to sign up to your application."
+                      descriptionText="Protect authentication endpoints from bots and abuse."
                       disabled={!canUpdateConfig}
                     />
-                    <Toggle
-                      id="SECURITY_MANUAL_LINKING_ENABLED"
-                      size="small"
-                      label="Allow manual linking"
-                      layout="flex"
-                      descriptionText={
-                        <Markdown
-                          extLinks
-                          className="[&>p>a]:text-foreground-light [&>p>a]:transition-all [&>p>a]:hover:text-foreground [&>p>a]:hover:decoration-brand"
-                          content="Enable [manual linking APIs](https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta) for your project."
+                    {values.SECURITY_CAPTCHA_ENABLED && (
+                      <>
+                        <FormField
+                          name="SECURITY_CAPTCHA_PROVIDER"
+                          properties={{
+                            type: 'select',
+                            title: 'Choose Captcha Provider',
+                            description: '',
+                            enum: [
+                              {
+                                label: 'hCaptcha',
+                                value: 'hcaptcha',
+                                icon: 'hcaptcha-icon.png',
+                              },
+                              {
+                                label: 'Turnstile by Cloudflare',
+                                value: 'turnstile',
+                                icon: 'cloudflare-icon.png',
+                              },
+                            ],
+                          }}
+                          formValues={values}
+                          setFieldValue={setFieldValue}
                         />
-                      }
-                      disabled={!canUpdateConfig}
-                    />
-                    <Toggle
-                      id="EXTERNAL_ANONYMOUS_USERS_ENABLED"
-                      size="small"
-                      label="Allow anonymous sign-ins"
-                      layout="flex"
-                      descriptionText={
-                        <Markdown
-                          extLinks
-                          className="[&>p>a]:text-foreground-light [&>p>a]:transition-all [&>p>a]:hover:text-foreground [&>p>a]:hover:decoration-brand"
-                          content="Enable [anonymous sign-ins](https://supabase.com/docs/guides/auth/auth-anonymous) for your project."
+                        <Input
+                          id="SECURITY_CAPTCHA_SECRET"
+                          type={hidden ? 'password' : 'text'}
+                          size="small"
+                          label="Captcha secret"
+                          descriptionText="Obtain this secret from the provider."
+                          disabled={!canUpdateConfig}
+                          actions={
+                            <Button
+                              icon={hidden ? <Eye /> : <EyeOff />}
+                              type="default"
+                              onClick={() => setHidden(!hidden)}
+                            />
+                          }
                         />
-                      }
-                      disabled={!canUpdateConfig}
-                    />
-                    {values.EXTERNAL_ANONYMOUS_USERS_ENABLED && (
-                      <div className="flex flex-col gap-y-2">
-                        <Alert_Shadcn_
-                          className="flex w-full items-center justify-between"
-                          variant="warning"
-                        >
-                          <WarningIcon />
-                          <div>
-                            <AlertTitle_Shadcn_>
-                              Anonymous users will use the{' '}
-                              <code className="text-xs">authenticated</code> role when signing in
-                            </AlertTitle_Shadcn_>
-                            <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
-                              <p>
-                                As a result, anonymous users will be subjected to RLS policies that
-                                apply to the <code className="text-xs">public</code> and{' '}
-                                <code className="text-xs">authenticated</code> roles. We strongly
-                                advise{' '}
-                                <Link
-                                  href={`/project/${projectRef}/auth/policies`}
-                                  className="text-foreground underline"
-                                >
-                                  reviewing your RLS policies
-                                </Link>{' '}
-                                to ensure that access to your data is restricted where required.
-                              </p>
-                              <Button
-                                asChild
-                                type="default"
-                                className="w-min"
-                                icon={<ExternalLink />}
-                              >
-                                <Link href="https://supabase.com/docs/guides/auth/auth-anonymous#access-control">
-                                  View access control docs
-                                </Link>
-                              </Button>
-                            </AlertDescription_Shadcn_>
-                          </div>
-                        </Alert_Shadcn_>
-                      </div>
+                      </>
                     )}
                   </FormSectionContent>
                 </FormSection>
@@ -243,4 +258,4 @@ const BasicAuthSettingsForm = () => {
   )
 }
 
-export default BasicAuthSettingsForm
+export default ProtectionAuthSettingsForm

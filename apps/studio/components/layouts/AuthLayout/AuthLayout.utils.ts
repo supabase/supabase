@@ -19,9 +19,21 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
         ...(IS_PLATFORM
           ? [
               {
-                name: 'Providers',
+                name: 'Advanced',
+                key: 'advanced',
+                url: `/project/${ref}/auth/advanced`,
+                items: [],
+              },
+              {
+                name: 'Sign In / Up',
                 key: 'providers',
                 url: `/project/${ref}/auth/providers`,
+                items: [],
+              },
+              {
+                name: 'Sessions',
+                key: 'sessions',
+                url: `/project/${ref}/auth/sessions`,
                 items: [],
               },
               {
@@ -31,15 +43,27 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
                 items: [],
               },
               {
-                name: 'Email Templates',
+                name: 'Emails',
                 key: 'templates',
                 url: `/project/${ref}/auth/templates`,
+                items: [],
+              },
+              {
+                name: 'Multi-factor',
+                key: 'mfa',
+                url: `/project/${ref}/auth/mfa`,
                 items: [],
               },
               {
                 name: 'URL Configuration',
                 key: 'url-configuration',
                 url: `/project/${ref}/auth/url-configuration`,
+                items: [],
+              },
+              {
+                name: 'Attack Protection',
+                key: 'protection',
+                url: `/project/${ref}/auth/protection`,
                 items: [],
               },
               {

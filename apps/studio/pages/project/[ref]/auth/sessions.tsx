@@ -1,12 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import {
-  AdvancedAuthSettingsForm,
-  BasicAuthSettingsForm,
-  SmtpForm,
-  ThirdPartyAuthForm,
-} from 'components/interfaces/Auth'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { SessionsAuthSettingsForm, SmtpForm, ThirdPartyAuthForm } from 'components/interfaces/Auth'
+import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
@@ -38,10 +33,7 @@ const AuthSettings: NextPageWithLayout = () => {
           <NoPermission isFullPage resourceText="access your project's authentication settings" />
         ) : (
           <>
-            <BasicAuthSettingsForm />
-            <SmtpForm />
-            <AdvancedAuthSettingsForm />
-            <ThirdPartyAuthForm />
+            <SessionsAuthSettingsForm />
           </>
         )}
       </ScaffoldContainer>
@@ -49,5 +41,7 @@ const AuthSettings: NextPageWithLayout = () => {
   )
 }
 
-AuthSettings.getLayout = (page) => <SettingsLayout>{page}</SettingsLayout>
+AuthSettings.getLayout = (page) => {
+  return <AuthLayout>{page}</AuthLayout>
+}
 export default AuthSettings

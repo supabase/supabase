@@ -1,6 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { AuthProvidersForm } from 'components/interfaces/Auth'
+import {
+  AuthProvidersForm,
+  BasicAuthSettingsForm,
+  ThirdPartyAuthForm,
+} from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { FormsContainer } from 'components/ui/Forms/FormsContainer'
 import NoPermission from 'components/ui/NoPermission'
@@ -15,7 +19,8 @@ const PageLayout: NextPageWithLayout = () => {
     return <NoPermission isFullPage resourceText="access your project's auth provider settings" />
   } else {
     return (
-      <FormsContainer className="w-full">
+      <FormsContainer header="Sign in / up" className="w-full">
+        <BasicAuthSettingsForm />
         <AuthProvidersForm />
       </FormsContainer>
     )
