@@ -4,6 +4,7 @@ import { forwardRef, useRef } from 'react'
 import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
 import { memo } from 'react-tracked'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import { formatClipboardValue } from 'components/grid/utils/common'
 import { TableGridInnerLoadingState } from 'components/interfaces/TableGridEditor/LoadingState'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
@@ -11,6 +12,8 @@ import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/S
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { copyToClipboard } from 'lib/helpers'
 import { Button, cn } from 'ui'
@@ -18,9 +21,6 @@ import { useDispatch, useTrackedState } from '../../store/Store'
 import type { Filter, GridProps, SupaRow } from '../../types'
 import { useKeyboardShortcuts } from '../common/Hooks'
 import RowRenderer from './RowRenderer'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'common/telemetry-constants'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
@@ -233,7 +233,7 @@ export const Grid = memo(
                                       })
                                     }}
                                   >
-                                    Import data via CSV
+                                    Import data from CSV
                                   </Button>
                                 )}
                               </div>
