@@ -4,7 +4,7 @@ subtitle: 'Learn how to use Supabase Queues to add and read messages'
 ---
 
 {/* <!-- vale off --> */}
-This guide is an introduction to interacting with Supabase Queues via the Dashboard and official client library. Check out [Queues API Reference](/docs/guides/queues/api) for more details on our API.
+This guide is an introduction to interacting with Supabase Queues via the Dashboard. Check out [Queues SQL API Reference](/docs/guides/queues/pgmq) for more details on the SQL API.
 
 ## Concepts
 
@@ -83,29 +83,9 @@ A "Basic Queue" will create `pgmq.q_<queue_name>` and `pgmq.a_<queue_name>` tabl
 
 However, an "Unlogged Queue" will create `pgmq.q_<queue_name>` as an unlogged table for better performance while sacrificing durability. The `pgmq.a_<queue_name>` table will still be created as a logged table so your archived messages remain safe and secure.
 
-## Expose Queues to client-side consumers
-
-Queues, by default, are not exposed over Supabase Data API and are only accessible via Postgres clients.
-
-However, you may grant client-side consumers access to your Queues by enabling the Supabase Data API and granting permissions to the Queues API, which is a collection of database functions in the `pgmq_public` schema that wraps the database functions in the `pgmq` schema.
-
-This is to prevent direct access to the `pgmq` schema and its tables (RLS is not enabled by default on any tables) and database functions.
-
-To get started, navigate to the Queues [Settings page](/dashboard/project/_/integrations/queues/settings) and toggle on “Expose Queues via PostgREST”. Once enabled, Supabase creates and exposes a `pgmq_public` schema containing database function wrappers to a subset of `pgmq`'s database functions.
-
-<Image
-  alt="Screenshot of Queues settings with toggle to expose to PostgREST"
-  src={{
-    dark: '/docs/img/queues-quickstart-settings.png',
-    light: '/docs/img/queues-quickstart-settings.png',
-  }}
-/>
-
 ### Enable RLS on your tables in `pgmq` schema
 
-For security purposes, you must enable Row Level Security (RLS) on all Queue tables (all tables in `pgmq` schema that begin with `q_`) if the Data API is enabled.
-
-You’ll want to create RLS policies for any Queues you want your client-side consumers to interact with.
+For security purposes, you may want to enable Row Level Security (RLS) on Queue tables (all tables in `pgmq` schema that begin with `q_`).
 
 <Image
   alt="Screenshot of creating an RLS policy from the Queues settings"
@@ -115,93 +95,3 @@ You’ll want to create RLS policies for any Queues you want your client-side co
   }}
 />
 
-### Grant permissions to `pgmq_public` database functions
-
-On top of enabling RLS and writing RLS policies on the underlying Queue tables, you must grant the correct permissions to the `pgmq_public` database functions for each Data API role.
-
-The permissions required for each Queue API database function:
-
-| **Operations**      | **Permissions Required** |
-| ------------------- | ------------------------ |
-| `send` `send_batch` | `Select` `Insert`        |
-| `read` `pop`        | `Select` `Update`        |
-| `archive` `delete`  | `Select` `Delete`        |
-
-To manage your queue permissions, click on the Queue Settings button.
-
-<Image
-  alt="Screenshot of accessing queue settings"
-  src={{
-    dark: '/docs/img/queues-quickstart-queue-settings.png',
-    light: '/docs/img/queues-quickstart-queue-settings.png',
-  }}
-/>
-
-Then enable the required roles permissions.
-
-<Image
-  alt="Screenshot of configuring API access for roles from the Queues settings"
-  src={{
-    dark: '/docs/img/queues-quickstart-roles.png',
-    light: '/docs/img/queues-quickstart-roles-light.png',
-  }}
-/>
-
-<Admonition type="note">
-
-`postgres` and `service_role` roles should never be exposed client-side.
-
-</Admonition>
-
-### Enqueuing and dequeuing messages
-
-Once your Queue has been created, you can begin enqueuing and dequeuing Messages.
-
-Here's a TypeScript example using the official Supabase client library:
-
-```tsx
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = 'supabaseURL'
-const supabaseKey = 'supabaseKey'
-
-const supabase = createClient(supabaseUrl, supabaseKey)
-
-const QueuesTest: React.FC = () => {
-  //Add a Message
-  const sendToQueue = async () => {
-    const result = await supabase.schema('pgmq_public').rpc('send', {
-      queue_name: 'foo',
-      message: { hello: 'world' },
-      sleep_seconds: 30,
-    })
-    console.log(result)
-  }
-
-  //Dequeue Message
-  const popFromQueue = async () => {
-    const result = await supabase.schema('pgmq_public').rpc('pop', { queue_name: 'foo' })
-    console.log(result)
-  }
-
-  return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Queue Test Component</h2>
-      <button
-        onClick={sendToQueue}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-4"
-      >
-        Add Message
-      </button>
-      <button
-        onClick={popFromQueue}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-      >
-        Pop Message
-      </button>
-    </div>
-  )
-}
-
-export default QueuesTest
-```
