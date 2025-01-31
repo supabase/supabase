@@ -298,3 +298,25 @@ export const formatCurrency = (amount: number | undefined | null): string | null
     return currencyFormatterDefault.format(amount)
   }
 }
+
+/**
+ * This function takes a list of rows and returns a list of rows where the cells are
+ * formatted correctly if the value is a JSON object to prevent exporting it as '[object Object]'.
+ * when `wrapJsonObjects: false` the function will return the original stringified JSON. When
+ * `wrapJsonObjects: true` the function returns all JSON objects wrapped or escaped with double ""
+ */
+export const processResultsToExport = (results: any[], opts: { wrapJsonObjects: boolean}) => {
+  const { wrapJsonObjects } = opts
+
+  const columns = Object.keys(results[0])
+  return results.map(row => {
+    const newRow = { ...row }
+    columns.forEach(col => {
+      if (newRow[col] && typeof newRow[col] === 'object') {
+        const jsonString = JSON.stringify(newRow[col])
+        newRow[col] = wrapJsonObjects ? `""${jsonString.replace(/"/g, '""')}""` : jsonString
+      }
+    })
+    return newRow
+  })
+}
