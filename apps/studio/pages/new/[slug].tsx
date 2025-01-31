@@ -181,7 +181,7 @@ const Wizard: NextPageWithLayout = () => {
       (project) =>
         project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
     ) ?? []
-  const { data: defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
+  const { data: defaultRegion } = useDefaultRegionQuery(
     {
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
     },
@@ -189,6 +189,7 @@ const Wizard: NextPageWithLayout = () => {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchInterval: false,
+      refetchOnReconnect: false,
       onSuccess: (res) => {
         if (res) form.setValue('dbRegion', res)
       },
