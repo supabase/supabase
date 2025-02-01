@@ -4643,8 +4643,6 @@ functions:
           }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe(blockUntilSubscribed = true)
-
-          channel.broadcast(event = "message", Message("I joined!", "John"))
           ```
       - id: listen-to-presence-updates
         name: Listen to presence updates
@@ -4830,7 +4828,41 @@ functions:
           You have two methods you can use if you want to listen for updates on a specific database row:
           - `postgresSingleDataFlow` fetches the initial data matching the filter and then emits updates based on realtime events.
           - `postgresChangeFlow` emits the raw data received by realtime. To filter the realtime queries, use the `filter` method.
-
+  - id: broadcast-message
+    title: broadcastMessage()
+    description: |
+      Broadcast a message to all connected clients to a channel.
+    notes: |
+      - When using REST you don't need to subscribe to the channel
+    $ref: '@supabase/realtime-js.RealtimeChannel.send'
+    examples:
+      - id: send-a-message
+        name: Send a message via websocket
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val channel = supabase.channel("room1")
+          channel.subscribe(blockUntilSubscribed = true)
+          channel.broadcast("cursor-pos", message = buildJsonObject {
+            put("x", 10)
+            put("y", 20)
+          })
+          ```
+        response: |
+          ```
+          ok | timed out | error
+          ```
+      - id: send-a-message-via-rest
+        name: Send a message via REST
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val channel = supabase.channel("room1")
+          channel.broadcast("cursor-pos", message = buildJsonObject {
+            put("x", 10)
+            put("y", 20)
+          })
+          ```
   - id: remove-channel
     description: |
       Unsubscribes and removes Realtime channel from Realtime client.
