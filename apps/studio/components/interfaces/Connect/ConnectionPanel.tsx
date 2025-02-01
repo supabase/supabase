@@ -2,6 +2,7 @@ import { ChevronRight, FileCode, X } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
+import { UpcomingChangeBadge } from 'components/ui/UpcomingChangeBadge'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -127,8 +128,9 @@ export const ConnectionPanel = ({
             <Admonition
               showIcon={false}
               type="default"
+              className="[&>h5]:text-xs [&>div]:text-xs"
               title="Transaction pooler is unavailable as pool mode is set to Session"
-              description="If you'd like to use transaction mode, update your pool mode for the connection pooler in your project's Database Settings."
+              description="If you'd like to use transaction mode, update your pool mode to Transaction for the connection pooler in your project's Database Settings."
             >
               <Button asChild type="default" className="mt-2">
                 <Link
@@ -141,6 +143,25 @@ export const ConnectionPanel = ({
             </Admonition>
           ) : (
             <>
+              {type === 'session' && isSessionMode && (
+                <Admonition showIcon={false} type="default">
+                  <UpcomingChangeBadge title="Deprecating Session Mode on Port 6543" />
+                  <p className="mt-2 text-foreground-light text-xs">
+                    Please use port 5432 for Session Mode as Supavisor will be deprecating Session
+                    Mode on port 6543 on February 28, 2025.
+                  </p>
+                  <Button asChild type="default" className="mt-2">
+                    <a
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      href="https://github.com/orgs/supabase/discussions/32755"
+                      className="text-xs text-light hover:text-foreground"
+                    >
+                      Read the announcement
+                    </a>
+                  </Button>
+                </Admonition>
+              )}
               <CodeBlock
                 wrapperClassName={cn(
                   '[&_pre]:rounded-b-none [&_pre]:px-4 [&_pre]:py-3',
