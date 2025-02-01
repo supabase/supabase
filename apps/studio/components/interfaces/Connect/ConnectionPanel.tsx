@@ -2,7 +2,7 @@ import { ChevronRight, FileCode, X } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import { UpcomingChangeBadge } from 'components/ui/UpcomingChangeBadge'
+import Panel from 'components/ui/Panel'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -144,23 +144,14 @@ export const ConnectionPanel = ({
           ) : (
             <>
               {type === 'session' && isSessionMode && (
-                <Admonition showIcon={false} type="default">
-                  <UpcomingChangeBadge title="Deprecating Session Mode on Port 6543" />
-                  <p className="mt-2 text-foreground-light text-xs">
-                    Please use port 5432 for Session Mode as Supavisor will be deprecating Session
-                    Mode on port 6543 on February 28, 2025.
-                  </p>
-                  <Button asChild type="default" className="mt-2">
-                    <a
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      href="https://github.com/orgs/supabase/discussions/32755"
-                      className="text-xs text-light hover:text-foreground"
-                    >
-                      Read the announcement
-                    </a>
-                  </Button>
-                </Admonition>
+                <Panel.Notice
+                  layout="vertical"
+                  className="border rounded mb-2"
+                  title="Deprecating Session Mode on Port 6543"
+                  description="Please use port 5432 for Session Mode as Supavisor will be deprecating Session Mode on port 6543 on February 28, 2025."
+                  href="https://github.com/orgs/supabase/discussions/32755"
+                  buttonText="Read the announcement"
+                />
               )}
               <CodeBlock
                 wrapperClassName={cn(
