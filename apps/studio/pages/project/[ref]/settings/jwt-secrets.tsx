@@ -15,7 +15,6 @@ import type { NextPageWithLayout } from 'types'
 import PublishableAPIKeys from 'components/interfaces/APIKeys/PublishableAPIKeys'
 import SecretAPIKeys from 'components/interfaces/APIKeys/SecretAPIKeys'
 import LegacyAPIKeys from 'components/interfaces/APIKeys/LegacyAPIKeys'
-import { JWTSecretKeysTable } from 'components/interfaces/JwtSecrets/JWTSecretKeysTable'
 import JWTSecretKeysTablev2 from 'components/interfaces/JwtSecrets/JWTSecretKeysTablev2'
 
 const AuthSettings: NextPageWithLayout = () => {
