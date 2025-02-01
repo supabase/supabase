@@ -17,7 +17,7 @@ export type ResourceResponse = {
 export async function getResource({ projectRef, id }: ResourceVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  // @ts-expect-error
+  // @ts-ignore Just a sample here, TS lint will validate if the endpoint is valid
   const { data, error } = await get(`/platform/projects/{ref}/resources/{id}`, {
     params: { path: { ref: projectRef, id } },
     signal,
