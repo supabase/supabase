@@ -1,6 +1,9 @@
 import { ChevronRight, FileCode, X } from 'lucide-react'
 import Link from 'next/link'
 
+import { useParams } from 'common'
+import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
   cn,
@@ -11,6 +14,7 @@ import {
   CollapsibleTrigger_Shadcn_,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { ConnectionParameters } from './ConnectionParameters'
 import { DirectConnectionIcon, TransactionIcon } from './PoolerIcons'
 
@@ -105,6 +109,13 @@ export const ConnectionPanel = ({
   fileTitle,
   onCopyCallback,
 }: ConnectionPanelProps) => {
+  const { ref: projectRef } = useParams()
+  const state = useDatabaseSelectorStateSnapshot()
+
+  const { data: poolingInfo } = usePoolingConfigurationQuery({ projectRef })
+  const poolingConfiguration = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+  const isSessionMode = poolingConfiguration?.pool_mode === 'session'
+
   return (
     <div className="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:gap-20 w-full">
       <div className="flex flex-col">
@@ -112,27 +123,47 @@ export const ConnectionPanel = ({
         <p className="text-sm text-foreground-light mb-4">{description}</p>
         <div className="flex flex-col -space-y-px">
           {fileTitle && <CodeBlockFileHeader title={fileTitle} />}
-          <CodeBlock
-            wrapperClassName={cn(
-              '[&_pre]:rounded-b-none [&_pre]:px-4 [&_pre]:py-3',
-              fileTitle && '[&_pre]:rounded-t-none'
-            )}
-            language={lang}
-            value={connectionString}
-            className="[&_code]:text-[12px] [&_code]:text-foreground"
-            hideLineNumbers
-            onCopyCallback={onCopyCallback}
-          />
-          {notice && (
-            <div className="border px-4 py-1 w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-light">
-              {notice?.map((text: string) => (
-                <p key={text} className="text-xs text-foreground-lighter">
-                  {text}
-                </p>
-              ))}
-            </div>
+          {type === 'transaction' && isSessionMode ? (
+            <Admonition
+              showIcon={false}
+              type="default"
+              title="Transaction pooler is unavailable as pool mode is set to Session"
+              description="If you'd like to use transaction mode, update your pool mode for the connection pooler in your project's Database Settings."
+            >
+              <Button asChild type="default" className="mt-2">
+                <Link
+                  href={`/project/${projectRef}/settings/database#connection-pooler`}
+                  className="text-xs text-light hover:text-foreground"
+                >
+                  Database Settings
+                </Link>
+              </Button>
+            </Admonition>
+          ) : (
+            <>
+              <CodeBlock
+                wrapperClassName={cn(
+                  '[&_pre]:rounded-b-none [&_pre]:px-4 [&_pre]:py-3',
+                  fileTitle && '[&_pre]:rounded-t-none'
+                )}
+                language={lang}
+                value={connectionString}
+                className="[&_code]:text-[12px] [&_code]:text-foreground"
+                hideLineNumbers
+                onCopyCallback={onCopyCallback}
+              />
+              {notice && (
+                <div className="border px-4 py-1 w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-light">
+                  {notice?.map((text: string) => (
+                    <p key={text} className="text-xs text-foreground-lighter">
+                      {text}
+                    </p>
+                  ))}
+                </div>
+              )}
+              {parameters.length > 0 && <ConnectionParameters parameters={parameters} />}
+            </>
           )}
-          {parameters.length > 0 && <ConnectionParameters parameters={parameters} />}
         </div>
       </div>
       <div className="flex flex-col items-end">

@@ -83,7 +83,7 @@ export const ConnectionPooling = () => {
     isLoading,
     isError,
     isSuccess,
-  } = usePoolingConfigurationQuery({ projectRef: projectRef })
+  } = usePoolingConfigurationQuery({ projectRef })
 
   const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,
