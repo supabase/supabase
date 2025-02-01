@@ -35,6 +35,7 @@ import {
   Listbox,
   Separator,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 
@@ -271,17 +272,24 @@ export const ConnectionPooling = () => {
                             </FormDescription_Shadcn_>
                           ) : (
                             <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
-                              <Alert_Shadcn_>
-                                <AlertTitle_Shadcn_ className="text-foreground">
-                                  Set to transaction mode to use both pooling modes concurrently
-                                </AlertTitle_Shadcn_>
-                                <AlertDescription_Shadcn_>
-                                  Session mode can be used concurrently with transaction mode by
+                              {/* [Joshen] Can probably remove this after Feb 28 */}
+                              <Panel.Notice
+                                layout="vertical"
+                                className="border rounded-lg"
+                                title="Deprecating Session Mode on Port 6543"
+                                description="On February 28, 2025, Supavisor is deprecating Session Mode on port 6543. Please update your application/database clients to use port 5432 for Session Mode."
+                                href="https://github.com/orgs/supabase/discussions/32755"
+                                buttonText="Read the announcement"
+                              />
+                              <Admonition
+                                showIcon={false}
+                                type="default"
+                                title="Set to transaction mode to use both pooling modes concurrently"
+                                description="Session mode can be used concurrently with transaction mode by
                                   using 5432 for session and 6543 for transaction. However, by
                                   configuring the pooler mode to session here, you will not be able
-                                  to use transaction mode at the same time.
-                                </AlertDescription_Shadcn_>
-                              </Alert_Shadcn_>
+                                  to use transaction mode at the same time."
+                              />
                             </FormDescription_Shadcn_>
                           )}
                         </>

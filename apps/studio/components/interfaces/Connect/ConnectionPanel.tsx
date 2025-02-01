@@ -143,6 +143,7 @@ export const ConnectionPanel = ({
             </Admonition>
           ) : (
             <>
+              {/* [Joshen] Can probably remove this after Feb 28 */}
               {type === 'session' && isSessionMode && (
                 <Panel.Notice
                   layout="vertical"
