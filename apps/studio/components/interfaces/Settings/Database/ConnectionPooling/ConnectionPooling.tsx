@@ -260,15 +260,11 @@ export const ConnectionPooling = () => {
                         <>
                           {field.value === 'transaction' ? (
                             <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
-                              <Alert_Shadcn_>
-                                <AlertTitle_Shadcn_ className="text-foreground">
-                                  Pool mode will be set to transaction permanently on port 6543
-                                </AlertTitle_Shadcn_>
-                                <AlertDescription_Shadcn_>
-                                  This will take into effect once saved. You can use session mode by
-                                  pointing the pooler connection to use port 5432.
-                                </AlertDescription_Shadcn_>
-                              </Alert_Shadcn_>
+                              <Admonition
+                                type="warning"
+                                title="Pool mode will be set to transaction permanently on port 6543"
+                                description="This will take into effect once saved. If you are using Session mode with port 6543 in your applications, please update to use port 5432 instead before saving."
+                              />
                             </FormDescription_Shadcn_>
                           ) : (
                             <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
