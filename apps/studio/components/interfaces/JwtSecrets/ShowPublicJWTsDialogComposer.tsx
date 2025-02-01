@@ -1,53 +1,32 @@
-import { useState } from 'react'
-import { useAtom } from 'jotai'
-import { Button, Alert_Shadcn_, AlertTitle_Shadcn_, AlertDescription_Shadcn_ } from 'ui'
-import { WarningIcon } from 'ui'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from 'ui'
-import { DialogSection, DialogSectionSeparator } from 'ui/src/components/shadcn/ui/dialog'
 import { Key, RotateCw } from 'lucide-react'
-import { secretKeysAtom, SecretKey } from './JWTSecretKeysTablev2'
+import { useState } from 'react'
+import { useJwtSecrets } from 'state/jwt-secrets'
+import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+} from 'ui'
 
 const ShowPublicJWTsDialogComposer: React.FC = () => {
   const [showDialog, setShowDialog] = useState(false)
-  const [secretKeys, setSecretKeys] = useAtom(secretKeysAtom)
+  const { secretKeys, rotateKey } = useJwtSecrets()
   const [isRolling, setIsRolling] = useState(false)
 
-  const inUseKey = secretKeys.find((key: SecretKey) => key.status === 'IN_USE')
-
+  const inUseKey = secretKeys.find((key) => key.status === 'IN_USE')
   const algorithm = inUseKey?.algorithm || 'RS256'
   const jwksUrl = inUseKey?.jwksUrl || ''
 
   const rollToRS256 = async () => {
     setIsRolling(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    setSecretKeys((prevKeys: SecretKey[]) => {
-      const updatedKeys = prevKeys.map((key: SecretKey) => {
-        if (key.status === 'IN_USE') {
-          return {
-            ...key,
-            status: 'PREVIOUSLY_USED' as const,
-            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          }
-        }
-        return key
-      })
-
-      const newKey = {
-        id: Date.now().toString(),
-        status: 'IN_USE' as const,
-        keyId: Math.random().toString(36).substr(2, 8),
-        createdAt: new Date().toISOString(),
-        expiresAt: null,
-        algorithm: 'RS256' as const,
-        publicKey: `-----BEGIN PUBLIC KEY-----\nNEW_RS256_KEY_CONTENT\n-----END PUBLIC KEY-----`,
-        jwksUrl: `https://example.com/new-rs256-jwks.json`,
-      }
-
-      return [...updatedKeys, newKey]
-    })
-
+    await rotateKey('RS256')
     setIsRolling(false)
   }
 
@@ -74,7 +53,6 @@ const ShowPublicJWTsDialogComposer: React.FC = () => {
               </pre>
             ) : (
               <Alert_Shadcn_ variant="warning">
-                <WarningIcon />
                 <AlertTitle_Shadcn_>No JWKS URL Available</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   There is currently no JWKS URL set up for this project. This might be because no
@@ -86,7 +64,6 @@ const ShowPublicJWTsDialogComposer: React.FC = () => {
             {algorithm === 'HS256' && (
               <>
                 <Alert_Shadcn_ variant="warning" className="mt-4">
-                  <WarningIcon />
                   <AlertTitle_Shadcn_>HS256 Algorithm in Use</AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_>
                     The current JWT secret uses HS256 (Symmetric) algorithm. While the JWKS URL may

@@ -17,6 +17,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import React, { useMemo, useState } from 'react'
+import { useJwtSecrets } from 'state/jwt-secrets'
 import { Badge, Button, cn } from 'ui'
 import {
   Card,
@@ -163,9 +164,17 @@ ZptN9nnJAMh+auCW4vJ1uF/OjQaB66Jx9kMSLEjAYGXKKLhSbGkIamFiJB5HqQ==
 export const secretKeysAtom = atomWithStorage<SecretKey[]>('secretKeys', INITIAL_SECRET_KEYS)
 
 export default function JWTSecretKeysTablev2() {
-  const [secretKeys, setSecretKeys] = useAtom(secretKeysAtom)
+  const {
+    secretKeys,
+    actionInProgress,
+    addNewStandbyKey,
+    rotateKey,
+    deleteStandbyKey,
+    editStandbyKey,
+    revokeKey,
+  } = useJwtSecrets()
+
   const [selectedKey, setSelectedKey] = useState<SecretKey | null>(null)
-  const [actionInProgress, setActionInProgress] = useState<string | null>(null)
   const [showCreateKeyDialog, setShowCreateKeyDialog] = useState(false)
   const [showRotateKeyDialog, setShowRotateKeyDialog] = useState(false)
   const [showConfirmRotateDialog, setShowConfirmRotateDialog] = useState(false)
@@ -197,112 +206,29 @@ export default function JWTSecretKeysTablev2() {
     [sortedKeys]
   )
 
-  const createNewKey = (status: KeyStatus): SecretKey => ({
-    id: Date.now().toString(),
-    status: status,
-    keyId: Math.random().toString(36).substr(2, 8),
-    createdAt: new Date().toISOString(),
-    expiresAt:
-      status === 'PREVIOUSLY_USED'
-        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-        : null,
-    algorithm: newKeyAlgorithm,
-    publicKey: `-----BEGIN PUBLIC KEY-----
-NEW_KEY_CONTENT
------END PUBLIC KEY-----`,
-    jwksUrl: `https://example.com/new-${status.toLowerCase()}-key-jwks.json`,
-    ...(customSigningKey && { customSigningKey }),
-  })
-
-  const addNewStandbyKey = async () => {
-    setFormError('')
-    setActionInProgress('new')
-    await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API call
-    const newKey = createNewKey('STANDBY')
-    // @ts-expect-error
-    setSecretKeys((prevKeys) => {
-      const existingStandbyKey = prevKeys.find((key) => key.status === 'STANDBY')
-      if (existingStandbyKey) {
-        return prevKeys
-          .map((key) => (key.id === existingStandbyKey.id ? { ...key, status: 'REVOKED' } : key))
-          .concat(newKey)
-      }
-      return [...prevKeys, newKey]
-    })
-    setActionInProgress(null)
-    setShowCreateKeyDialog(false)
-    resetNewKeyForm()
-  }
-
-  const rotateKey = async () => {
-    setActionInProgress('rotate')
-    await new Promise((resolve) => setTimeout(resolve, 2000)) // Simulate API call
-
-    // @ts-expect-error
-    setSecretKeys((prevKeys) => {
-      const updatedKeys = prevKeys.map((key) => {
-        if (key.status === 'IN_USE') {
-          return {
-            ...key,
-            status: 'PREVIOUSLY_USED',
-            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
-          }
-        } else if (key.status === 'PREVIOUSLY_USED') {
-          return { ...key, status: 'REVOKED' }
-        } else if (key.status === 'STANDBY') {
-          return { ...key, status: 'IN_USE' }
-        }
-        return key
-      })
-
-      if (!standbyKey) {
-        const newInUseKey = createNewKey('IN_USE')
-        return [...updatedKeys, newInUseKey]
-      }
-
-      return updatedKeys
-    })
-
-    setActionInProgress(null)
-    setShowRotateKeyDialog(false)
-    setShowConfirmRotateDialog(false)
-  }
-
-  const deleteStandbyKey = async () => {
-    setActionInProgress('delete')
-    await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API call
-    setSecretKeys((prevKeys) => prevKeys.filter((key) => key.status !== 'STANDBY'))
-    setActionInProgress(null)
-  }
-
-  const editStandbyKey = async () => {
-    setActionInProgress('edit')
-    await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API call
-    setSecretKeys((prevKeys) =>
-      prevKeys.map((key) =>
-        key.status === 'STANDBY'
-          ? { ...key, algorithm: newKeyAlgorithm, customSigningKey: customSigningKey || undefined }
-          : key
-      )
-    )
-    setActionInProgress(null)
-    setShowEditStandbyKeyDialog(false)
-  }
-
-  const revokeKey = async (id: string) => {
-    setActionInProgress('revoke')
-    await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API call
-    setSecretKeys((prevKeys) =>
-      prevKeys.map((key) => (key.id === id ? { ...key, status: 'REVOKED' } : key))
-    )
-    setActionInProgress(null)
-  }
-
   const resetNewKeyForm = () => {
     setNewKeyAlgorithm('ES256')
     setNewKeyDescription('')
     setCustomSigningKey('')
     setFormError('')
+  }
+
+  const handleAddNewStandbyKey = async () => {
+    setFormError('')
+    await addNewStandbyKey(newKeyAlgorithm, customSigningKey)
+    setShowCreateKeyDialog(false)
+    resetNewKeyForm()
+  }
+
+  const handleRotateKey = async () => {
+    await rotateKey(newKeyAlgorithm)
+    setShowRotateKeyDialog(false)
+    setShowConfirmRotateDialog(false)
+  }
+
+  const handleEditStandbyKey = async () => {
+    await editStandbyKey(newKeyAlgorithm, customSigningKey)
+    setShowEditStandbyKeyDialog(false)
   }
 
   const MotionTableRow = motion(TableRow)
@@ -659,7 +585,7 @@ NEW_KEY_CONTENT
             {formError && <p className="text-sm text-red-500">{formError}</p>}
           </DialogSection>
           <DialogFooter>
-            <Button onClick={() => addNewStandbyKey()} disabled={actionInProgress === 'new'}>
+            <Button onClick={() => handleAddNewStandbyKey()} disabled={actionInProgress === 'new'}>
               {actionInProgress === 'new' ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -746,7 +672,7 @@ NEW_KEY_CONTENT
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => editStandbyKey()} disabled={actionInProgress === 'edit'}>
+            <Button onClick={() => handleEditStandbyKey()} disabled={actionInProgress === 'edit'}>
               {actionInProgress === 'edit' ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -771,7 +697,7 @@ NEW_KEY_CONTENT
             <Button type="outline" onClick={() => setShowConfirmRotateDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={() => rotateKey()}>Confirm Rotation</Button>
+            <Button onClick={() => handleRotateKey()}>Confirm Rotation</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
