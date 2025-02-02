@@ -4,25 +4,14 @@ import {
   ScaffoldHeader,
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
-import ApiKeysNotice from 'components/ui/ApiKeysNotice'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { Sparkles } from 'lucide-react'
 import { PropsWithChildren } from 'react'
 import {
-  Button,
   buttonVariants,
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
   cn,
-  Input_Shadcn_,
-  Label_Shadcn_,
   Separator,
   Tabs_Shadcn_,
-  TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
@@ -103,7 +92,6 @@ const ApiKeysLayout = ({ children }: PropsWithChildren) => {
             </TabsTrigger_Shadcn_>
           </TabsList_Shadcn_>
         </Tabs_Shadcn_> */}
-        {/* <ApiKeysNotice /> */}
       </ScaffoldContainer>
 
       <ScaffoldContainer className="flex flex-col gap-10 py-8" bottomPadding>

@@ -1,36 +1,26 @@
-import { TooltipContent } from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
+import { InputVariants } from '@ui/components/shadcn/ui/input'
+import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
-import { Eye, Loader2, MoreVertical, TrashIcon } from 'lucide-react'
+import { useAPIKeyIdQuery } from 'data/api-keys/[id]/api-key-id-query'
+import { APIKeysData } from 'data/api-keys/api-keys-query'
+import { apiKeysKeys } from 'data/api-keys/keys'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Eye, MoreVertical } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   TableCell,
   TableRow,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
   cn,
 } from 'ui'
-
-import { useParams } from 'common'
-import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
-import { APIKeysData } from 'data/api-keys/api-keys-query'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import api from 'pages/api/props/project/[ref]/api'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useAPIKeyIdQuery } from 'data/api-keys/[id]/api-key-id-query'
-import { QueryClient, useQueryClient } from '@tanstack/react-query'
-import { apiKeysKeys } from 'data/api-keys/keys'
-import { InputVariants } from '@ui/components/shadcn/ui/input'
-import { toast } from 'sonner'
 import APIKeyDeleteDialog from './APIKeyDeleteDialog'
 
 const APIKeyRow = ({
@@ -75,8 +65,8 @@ const APIKeyRow = ({
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="max-w-40" align="end">
-            {/* <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
+            {/* <Tooltip>
+              <TooltipTrigger asChild>
                 <DropdownMenuItem
                   className="flex gap-2 !pointer-events-auto"
                   onClick={async (e) => {
@@ -92,13 +82,13 @@ const APIKeyRow = ({
                   )}
                   {isDeletingAPIKey ? 'Deleting key..' : 'Delete API key'}
                 </DropdownMenuItem>
-              </TooltipTrigger_Shadcn_>
+              </TooltipTrigger>
               {!canDeleteAPIKeys && (
                 <TooltipContent side="left">
                   You need additional permissions to delete API keys
                 </TooltipContent>
               )}
-            </Tooltip_Shadcn_> */}
+            </Tooltip> */}
             <APIKeyDeleteDialog apiKey={apiKey} />
             <DropdownMenuSeparator />
             <APIKeyDeleteDialog apiKey={apiKey} />
