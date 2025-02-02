@@ -97,11 +97,15 @@ export function ComponentPreview({
       <>
         {/* <ThemeWrapper defaultTheme="zinc"> */}
         <div
-          className={cn('preview flex min-h-[350px] w-full justify-center p-10', {
-            'items-center': align === 'center',
-            'items-start': align === 'start',
-            'items-end': align === 'end',
-          })}
+          className={cn(
+            'preview flex min-h-[350px] w-full justify-center p-10',
+            {
+              'items-center': align === 'center',
+              'items-start': align === 'start',
+              'items-end': align === 'end',
+            },
+            className
+          )}
         >
           <React.Suspense
             fallback={
@@ -120,7 +124,7 @@ export function ComponentPreview({
     )
   }, [Preview, align])
 
-  const wideClasses = wide ? '2xl:-ml-12 2xl:-mr-12' : ''
+  const wideClasses = wide ? '3xl:-ml-24 3xl:-mr-24 2xl:-ml-16 2xl:-mr-16' : ''
 
   if (peekCode) {
     return (

@@ -19,6 +19,7 @@ const twBreakpointMap = {
   lg: 1023,
   xl: 1027,
   '2xl': 1535,
+  '3xl': 1920,
 }
 
 export function useBreakpoint(breakpoint: number | keyof typeof twBreakpointMap = 'lg') {

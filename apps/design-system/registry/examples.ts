@@ -1142,6 +1142,11 @@ export const examples: Registry = [
     files: ['example/modal-hide-footer.tsx'],
   },
   {
+    name: 'page-demo',
+    type: 'components:example',
+    files: ['example/page-demo.tsx'],
+  },
+  {
     name: 'assistant-chat-demo',
     type: 'components:example',
     files: ['example/assistant-chat-demo.tsx'],
