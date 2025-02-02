@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
+import JWTSecretKeysTable from 'components/interfaces/JwtSecrets/JWTSecretKeysTable'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,
@@ -11,11 +11,6 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
-
-import PublishableAPIKeys from 'components/interfaces/APIKeys/PublishableAPIKeys'
-import SecretAPIKeys from 'components/interfaces/APIKeys/SecretAPIKeys'
-import LegacyAPIKeys from 'components/interfaces/APIKeys/LegacyAPIKeys'
-import JWTSecretKeysTablev2 from 'components/interfaces/JwtSecrets/JWTSecretKeysTablev2'
 
 const AuthSettings: NextPageWithLayout = () => {
   const isPermissionsLoaded = usePermissionsLoaded()
@@ -38,13 +33,7 @@ const AuthSettings: NextPageWithLayout = () => {
         ) : !canReadAPIKeys ? (
           <NoPermission isFullPage resourceText="access your project's API keys" />
         ) : (
-          <>
-            {/* <PublishableAPIKeys />
-            <SecretAPIKeys />
-            <LegacyAPIKeys /> */}
-            <JWTSecretKeysTablev2 />
-            {/* <JWTSecretKeysTable /> */}
-          </>
+          <JWTSecretKeysTable />
         )}
       </ScaffoldContainer>
     </>

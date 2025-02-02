@@ -1,5 +1,5 @@
 import { AnimatePresence } from 'framer-motion'
-import APIKeyRow from './APIKeyRowv2'
+import APIKeyRow from './APIKeyRow'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
 // ... other imports
 

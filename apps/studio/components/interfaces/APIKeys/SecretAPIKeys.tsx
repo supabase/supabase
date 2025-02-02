@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
-import APIKeyRow from './APIKeyRowv2'
+import APIKeyRow from './APIKeyRow'
 import CreateSecretAPIKeyModal from './CreateSecretAPIKeyModal'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { PermissionAction } from '@supabase/shared-types/out/constants'

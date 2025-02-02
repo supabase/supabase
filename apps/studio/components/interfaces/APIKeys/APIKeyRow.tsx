@@ -28,7 +28,7 @@ const APIKeyRow = ({
 }: {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
 }) => {
-  const isSecret = apiKey.type === 'secret'
+  // const isSecret = apiKey.type === 'secret'
 
   const MotionTableRow = motion(TableRow)
 
