@@ -12,7 +12,7 @@ export const buildCronQuery = (name: string, schedule: string, command: string) 
 export const buildHttpRequestCommand = (
   method: 'GET' | 'POST',
   url: string,
-  headers: HTTPHeader[],
+  headers: HTTPHeader[] = [],
   body: string | undefined,
   timeout: number
 ) => {
