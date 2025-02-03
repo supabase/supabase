@@ -306,7 +306,7 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
                       className="px-1.5"
                     ></Button>
                     <span className="text-sm text-foreground-light">
-                      {dayjs(date).format('MMMM yyyy')}
+                      {dayjs(date).format('MMMM YYYY')}
                     </span>
                     <Button
                       onClick={increaseMonth}
