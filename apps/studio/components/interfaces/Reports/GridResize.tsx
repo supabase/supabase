@@ -29,6 +29,7 @@ interface GridResizeProps {
   interval: AnalyticsInterval
   editableReport: Dashboards.Content
   disableUpdate: boolean
+  isRefreshing: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
   onUpdateChart: (
     id: string,
@@ -46,6 +47,7 @@ export const GridResize = ({
   interval,
   editableReport,
   disableUpdate,
+  isRefreshing,
   onRemoveChart,
   onUpdateChart,
   setEditableReport,
@@ -167,6 +169,7 @@ export const GridResize = ({
               endDate={endDate}
               interval={interval}
               disableUpdate={disableUpdate}
+              isRefreshing={isRefreshing}
               onRemoveChart={onRemoveChart}
               onUpdateChart={(config) => onUpdateChart(item.id, config)}
             />

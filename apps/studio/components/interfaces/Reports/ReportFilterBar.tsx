@@ -1,8 +1,9 @@
-import { ChevronDown, Database, Plus, X } from 'lucide-react'
+import { ChevronDown, Database, Plus, RefreshCw, X } from 'lucide-react'
 import { ComponentProps, useState } from 'react'
 import SVG from 'react-inlinesvg'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Auth, Realtime, Storage } from 'icons'
@@ -25,8 +26,10 @@ import type { ReportFilterItem } from './Reports.types'
 
 interface ReportFilterBarProps {
   filters: ReportFilterItem[]
+  isLoading: boolean
   onAddFilter: (filter: ReportFilterItem) => void
   onRemoveFilters: (filters: ReportFilterItem[]) => void
+  onRefresh: () => void
   onDatepickerChange: ComponentProps<typeof LogsDatePicker>['onSubmit']
   datepickerTo?: string
   datepickerFrom?: string
@@ -78,9 +81,11 @@ const PRODUCT_FILTERS = [
 
 const ReportFilterBar = ({
   filters,
+  isLoading = false,
   onAddFilter,
   onDatepickerChange,
   onRemoveFilters,
+  onRefresh,
   datepickerHelpers,
 }: ReportFilterBarProps) => {
   const { ref } = useParams()
@@ -150,6 +155,14 @@ const ReportFilterBar = ({
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-row justify-start items-center flex-wrap gap-2">
+        <ButtonTooltip
+          type="default"
+          disabled={isLoading}
+          icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
+          className="w-7"
+          tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+          onClick={() => onRefresh()}
+        />
         <LogsDatePicker
           onSubmit={handleDatepickerChange}
           value={selectedRange}

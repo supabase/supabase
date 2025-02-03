@@ -7,7 +7,7 @@ import { organizationKeys } from './keys'
 
 export const FIXED_ROLE_ORDER = ['Owner', 'Administrator', 'Developer', 'Read-only']
 export type OrganizationRolesVariables = { slug?: string }
-export type OrganizationRolesResponse = components['schemas']['OrganizationRoleResponseV2']
+export type OrganizationRolesResponse = components['schemas']['OrganizationRoleResponse']
 export type OrganizationRole = components['schemas']['OrganizationRoleV2']
 
 export async function getOrganizationRoles(
@@ -18,7 +18,6 @@ export async function getOrganizationRoles(
 
   const { data, error } = await get('/platform/organizations/{slug}/roles', {
     params: { path: { slug } },
-    headers: { Version: '2' },
     signal,
   })
 
