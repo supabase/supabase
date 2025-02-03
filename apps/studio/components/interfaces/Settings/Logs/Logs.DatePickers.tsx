@@ -42,8 +42,8 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
     setOpen(false)
   }
 
-  const [startDate, setStartDate] = useState<Date | null>(null)
-  const [endDate, setEndDate] = useState<Date | null>(null)
+  const [startDate, setStartDate] = useState<Date | null>(value.from ? new Date(value.from) : null)
+  const [endDate, setEndDate] = useState<Date | null>(value.to ? new Date(value.to) : null)
 
   const [startTime, setStartTime] = useState({
     HH: startDate?.getHours().toString() || '0',
@@ -51,9 +51,9 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
     ss: startDate?.getSeconds().toString() || '0',
   })
   const [endTime, setEndTime] = useState({
-    HH: endDate?.getHours().toString() || '0',
-    mm: endDate?.getMinutes().toString() || '0',
-    ss: endDate?.getSeconds().toString() || '0',
+    HH: endDate?.getHours().toString() || '23',
+    mm: endDate?.getMinutes().toString() || '59',
+    ss: endDate?.getSeconds().toString() || '59',
   })
 
   function handleDatePickerChange(dates: [from: Date | null, to: Date | null]) {
@@ -181,9 +181,9 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button type="default" icon={<Clock size={12} />}>
-          {value.isHelper && !value.to
+          {value.isHelper
             ? value.text
-            : `${dayjs(value.from).format('MMM D, HH:mm')} - ${dayjs(value.to || new Date()).format('MMM D, HH:mm')}`}
+            : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ side="bottom" align="start" className="flex w-full p-0">
