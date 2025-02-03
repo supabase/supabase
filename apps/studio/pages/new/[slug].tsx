@@ -191,12 +191,6 @@ const Wizard: NextPageWithLayout = () => {
       refetchInterval: false,
       refetchOnReconnect: false,
       retry: false,
-      onSuccess: (res) => {
-        if (res) form.setValue('dbRegion', res)
-      },
-      onError: () => {
-        form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region.displayName)
-      },
     }
   )
 
@@ -375,6 +369,18 @@ const Wizard: NextPageWithLayout = () => {
       router.push(`/new/${organizations?.[0].slug}`)
     }
   }, [isInvalidSlug, isOrganizationsSuccess, organizations])
+
+  useEffect(() => {
+    if (form.getValues('dbRegion') === undefined && defaultRegion) {
+      form.setValue('dbRegion', defaultRegion)
+    }
+  }, [defaultRegion])
+
+  useEffect(() => {
+    if (defaultRegionError) {
+      form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region.displayName)
+    }
+  }, [defaultRegionError])
 
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
 
