@@ -2334,6 +2334,40 @@
         "security": [{ "bearer": [] }]
       }
     },
+    "/v1/projects/{ref}/functions/deploy": {
+      "post": {
+        "operationId": "v1-deploy-a-function",
+        "summary": "Deploy a function",
+        "description": "A new endpoint to deploy functions. It will create if function does not exist.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/FunctionResponse" } }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to deploy function" }
+        },
+        "tags": ["Edge Functions"],
+        "security": [{ "bearer": [] }]
+      }
+    },
     "/v1/projects/{ref}/functions/{function_slug}": {
       "get": {
         "operationId": "v1-get-a-function",
@@ -4537,7 +4571,23 @@
         "properties": {
           "databases": {
             "type": "array",
-            "items": { "type": "object", "properties": {}, "additionalProperties": true }
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "schemas": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": { "name": { "type": "string" } },
+                    "required": ["name"],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": ["name", "schemas"],
+              "additionalProperties": true
+            }
           }
         },
         "required": ["databases"]
