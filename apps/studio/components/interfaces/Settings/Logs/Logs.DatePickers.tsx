@@ -46,9 +46,9 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
   const [endDate, setEndDate] = useState<Date | null>(value.to ? new Date(value.to) : null)
 
   const [startTime, setStartTime] = useState({
-    HH: startDate?.getHours().toString() || '0',
-    mm: startDate?.getMinutes().toString() || '0',
-    ss: startDate?.getSeconds().toString() || '0',
+    HH: startDate?.getHours().toString() || '00',
+    mm: startDate?.getMinutes().toString() || '00',
+    ss: startDate?.getSeconds().toString() || '00',
   })
   const [endTime, setEndTime] = useState({
     HH: endDate?.getHours().toString() || '23',
@@ -194,14 +194,22 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
         >
           {helpers.map((helper) => (
             <Label
+              disabled={helper.disabled}
+              aria-disabled={helper.disabled}
               key={helper.text}
-              className="[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs"
+              className={cn(
+                '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs',
+                {
+                  'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
+                }
+              )}
             >
               <RadioGroupItem
                 hidden
                 key={helper.text}
                 value={helper.text}
                 disabled={helper.disabled}
+                aria-disabled={helper.disabled}
               ></RadioGroupItem>
               {helper.text}
             </Label>
