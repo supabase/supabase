@@ -473,7 +473,7 @@ export function ApiSchemaParamSubdetails({
         !('minLength' in schema || 'maxLength' in schema || 'pattern' in schema)) ||
       (schema.type === 'array' &&
         'type' in schema.items &&
-        ['boolean', 'number', 'integer', 'string'].includes(schema.items.type)))
+        ['boolean', 'number', 'integer', 'string', 'file'].includes(schema.items.type)))
   ) {
     return null
   }
