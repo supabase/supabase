@@ -725,12 +725,12 @@ const WizardForm = () => {
                                             <>
                                               {hasSpecialCharacters && (
                                                 <p className="mb-2">
-                                                  Note: Special symbols need to be{' '}
+                                                  Note: If using a connection string, you will need
+                                                  to{' '}
                                                   <InlineLink href="https://supabase.com/docs/guides/database/postgres/roles#special-symbols-in-passwords">
-                                                    percent-encoded
+                                                    percent-encode
                                                   </InlineLink>{' '}
-                                                  when using your password later in Postgres
-                                                  connection strings
+                                                  the special symbols in the password
                                                 </p>
                                               )}
                                               <PasswordStrengthBar
