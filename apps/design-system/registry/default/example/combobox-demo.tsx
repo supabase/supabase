@@ -28,7 +28,7 @@ const frameworks = [
   },
   {
     value: 'nuxt.js',
-    label: 'Nuxt',
+    label: 'Nuxt.js',
   },
   {
     value: 'remix',

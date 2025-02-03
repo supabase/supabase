@@ -1,5 +1,5 @@
 import { BracesIcon } from 'lucide-react'
-import { DataDog, Grafana } from 'icons'
+import { Datadog, Grafana } from 'icons'
 
 const iconProps = {
   height: 24,
@@ -16,9 +16,9 @@ export const LOG_DRAIN_TYPES = [
   },
   {
     value: 'datadog',
-    name: 'DataDog',
-    description: 'DataDog is a monitoring service for cloud-scale applications',
-    icon: <DataDog {...iconProps} fill="currentColor" strokeWidth={0} />,
+    name: 'Datadog',
+    description: 'Datadog is a monitoring service for cloud-scale applications',
+    icon: <Datadog {...iconProps} fill="currentColor" strokeWidth={0} />,
   },
   {
     value: 'loki',
@@ -64,7 +64,7 @@ export const DATADOG_REGIONS = [
   },
 ] as const
 
-export type LogDrainDataDogConfig = {
+export type LogDrainDatadogConfig = {
   api_key: string
   region: string
 }

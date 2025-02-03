@@ -365,7 +365,7 @@ export function LogDrainDestinationSheetForm({
                       formControl={form.control}
                       description={
                         <>
-                          The API Key obtained from the DataDog dashboard{' '}
+                          The API Key obtained from the Datadog dashboard{' '}
                           <a
                             target="_blank"
                             rel="noopener noreferrer"
@@ -386,7 +386,7 @@ export function LogDrainDestinationSheetForm({
                           label={'Region'}
                           description={
                             <p>
-                              The DataDog region to send logs to. Read more about DataDog regions{' '}
+                              The DataDog region to send logs to. Read more about Datadog regions{' '}
                               <a
                                 target="_blank"
                                 rel="noopener noreferrer"

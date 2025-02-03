@@ -129,9 +129,9 @@ export const EXAMPLE_PROJECTS = [
     url: 'https://github.com/supabase/supabase/tree/master/examples/auth/flutter-mfa',
   },
   {
-    framework: 'Nuxt',
-    title: 'Nuxt todo list app',
-    description: 'Nuxt todo app example',
+    framework: 'NuxtJS',
+    title: 'NuxtJS todo list app',
+    description: 'NuxtJS todo app example',
     url: 'https://github.com/nuxt-modules/supabase/tree/main/demo',
   },
 ]
