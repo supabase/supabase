@@ -43,6 +43,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Admonition } from 'ui-patterns/admonition'
+import { ResourceList, ResourceItem } from 'ui-patterns/ResourceList'
 
 const formSchema = z.object({
   isPublic: z.boolean().default(false),
@@ -228,32 +229,25 @@ export default function PageDemo() {
           </PageSection>
 
           <PageSection title="Providers" subtitle="Choose which authentication methods to support">
-            <Card>
-              <CardContent className="cursor-pointer hover:bg-surface-100 flex items-center justify-between flex items-center text-sm gap-4">
-                <div className="w-12 h-12 rounded bg-muted text-foreground-light flex items-center justify-center">
-                  <Mail strokeWidth={1.5} size={16} />
-                </div>
-                <div className="flex-1">
+            <ResourceList>
+              <ResourceItem
+                media={<Mail strokeWidth={1.5} size={16} />}
+                meta={<Badge variant="success">Enabled</Badge>}
+                onClick={() => console.log('clicked')}
+              >
+                <div>
                   <div className="text-foreground">Email and password</div>
                   <p className="text-foreground-light text-xs">
-                    Users can sign up and sign in via an email and password with an optional email
-                    confirmation
+                    Users can sign up and sign in via email and password
                   </p>
                 </div>
-                <Badge variant="success">Enabled</Badge>
-                <ChevronRight strokeWidth={1.5} size={16} />
-              </CardContent>
-              <CardContent className="cursor-pointer hover:bg-surface-100 flex items-center justify-between flex items-center text-sm gap-4">
-                <div className="w-12 h-12 rounded bg-muted text-foreground-light flex items-center justify-center">
-                  <IconGitHubSolid />
-                </div>
-                <div className="flex-1">
+              </ResourceItem>
+              <ResourceItem media={<IconGitHubSolid />} meta={<Badge>Disabled</Badge>}>
+                <div>
                   <div className="text-foreground">GitHub</div>
                 </div>
-                <Badge>Disabled</Badge>
-                <ChevronRight strokeWidth={1.5} size={16} />
-              </CardContent>
-            </Card>
+              </ResourceItem>
+            </ResourceList>
           </PageSection>
         </PageContent>
       </Page>
