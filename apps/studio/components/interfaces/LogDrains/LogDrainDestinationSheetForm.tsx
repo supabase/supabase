@@ -386,7 +386,7 @@ export function LogDrainDestinationSheetForm({
                           label={'Region'}
                           description={
                             <p>
-                              The DataDog region to send logs to. Read more about Datadog regions{' '}
+                              The Datadog region to send logs to. Read more about Datadog regions{' '}
                               <a
                                 target="_blank"
                                 rel="noopener noreferrer"
