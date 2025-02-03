@@ -181,7 +181,7 @@ const Wizard: NextPageWithLayout = () => {
       (project) =>
         project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
     ) ?? []
-  const { data: defaultRegion } = useDefaultRegionQuery(
+  const { data: defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
     },
