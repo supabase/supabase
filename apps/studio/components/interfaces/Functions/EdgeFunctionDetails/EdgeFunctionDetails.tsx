@@ -63,11 +63,11 @@ const EdgeFunctionDetails = () => {
       ? `https://${customDomainData.customDomain.hostname}/functions/v1/${selectedFunction?.slug}`
       : `${protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
 
-  const { managementCommands, secretCommands, invokeCommands } = generateCLICommands(
+  const { managementCommands, secretCommands, invokeCommands } = generateCLICommands({
     selectedFunction,
     functionUrl,
-    apiKey
-  )
+    anonKey: apiKey,
+  })
 
   const onUpdateFunction = async (values: any, { resetForm }: any) => {
     if (!projectRef) return console.error('Project ref is required')
