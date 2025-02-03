@@ -15,7 +15,7 @@ You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **h
 	* SUPABASE_URL
 	* SUPABASE_ANON_KEY
 	* SUPABASE_SERVICE_ROLE_KEY
-	* SUPABASE_DB_UR
+	* SUPABASE_DB_URL
 9. To set other environment variables (ie. secrets) users can put them in a env file and run the `supabase secrets set --env-file path/to/env-file`
 
 ## Example Templates
