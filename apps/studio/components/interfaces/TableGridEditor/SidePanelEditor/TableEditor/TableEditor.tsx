@@ -130,11 +130,21 @@ const TableEditor = ({
     (constraint) => constraint.type === CONSTRAINT_TYPE.PRIMARY_KEY_CONSTRAINT
   )
 
-  const { data: foreignKeyMeta } = useForeignKeyConstraintsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema: table?.schema,
-  })
+  const { data: foreignKeyMeta } = useForeignKeyConstraintsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: table?.schema,
+    },
+    {
+      onSuccess: (data) => {
+        const relevantForeignKeys = data.filter(
+          (fk) => fk.source_schema === table?.schema && fk.source_table === table?.name
+        )
+        setFkRelations(formatForeignKeys(relevantForeignKeys))
+      },
+    }
+  )
   const foreignKeys = (foreignKeyMeta ?? []).filter(
     (fk) => fk.source_schema === table?.schema && fk.source_table === table?.name
   )
