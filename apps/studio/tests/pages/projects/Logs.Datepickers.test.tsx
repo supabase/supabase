@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { prettyDOM, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { PREVIEWER_DATEPICKER_HELPERS } from 'components/interfaces/Settings/Logs/Logs.constants'
@@ -14,12 +14,12 @@ dayjs.extend(utc)
 const mockFn = vi.fn()
 
 test('renders warning', async () => {
-  const from = dayjs().subtract(60, 'days')
+  const from = dayjs().subtract(10, 'days')
   const to = dayjs()
 
   render(
     <LogsDatePicker
-      helpers={PREVIEWER_DATEPICKER_HELPERS}
+      helpers={[]}
       onSubmit={mockFn}
       value={{
         from: from.toISOString(),
@@ -28,8 +28,9 @@ test('renders warning', async () => {
     />
   )
   userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
+
   await screen.findByText(/memory errors/)
-  await screen.findByText(RegExp(from.format('MMMM YYYY')))
+  await screen.findByText(RegExp(from.format('DD MMM')))
 })
 
 test('renders dates in local time', async () => {
@@ -47,7 +48,7 @@ test('renders dates in local time', async () => {
   )
   // renders time locally
   userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
-  await screen.findByText(RegExp(from.format('MMMM YYYY')))
+  await screen.findByText(RegExp(from.format('DD MMM')))
 })
 
 test('renders datepicker selected dates in local time', async () => {
@@ -66,37 +67,40 @@ test('renders datepicker selected dates in local time', async () => {
   // renders time locally
   userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
   // inputs with local time
-  await screen.findAllByDisplayValue(from.format('HH'))
-  await screen.findAllByDisplayValue(from.format('mm'))
-  await screen.findAllByDisplayValue(to.format('HH'))
-  await screen.findAllByDisplayValue(to.format('mm'))
+  await screen.findByText(
+    `${from.format('DD MMM')}, ${from.format('HH:mm')} - ${to.format('DD MMM')}, ${to.format('HH:mm')}`
+  )
   // selected date should be in local time
   await screen.findByText('25', { selector: "*[class*='--selected'" })
   await screen.findByText('27', { selector: "*[class*='--range-end'" })
 })
 
-test('datepicker onChange will return ISO string of selected dates', async () => {
+test('datepicker onSubmit will return ISO string of selected dates', async () => {
   const mockFn = vi.fn()
+  const todayAt1300 = dayjs().hour(13).minute(0).second(0).millisecond(0).toISOString()
+  const todayAt2359 = dayjs().hour(23).minute(59).second(59).millisecond(0).toISOString()
+
   render(
     <LogsDatePicker
       helpers={PREVIEWER_DATEPICKER_HELPERS}
       value={{
-        from: '',
-        to: '',
+        from: todayAt1300,
+        to: todayAt2359,
       }}
       onSubmit={mockFn}
     />
   )
-  // inputs with local time
-  const toHH = await screen.findByDisplayValue('23')
-  userEvent.clear(toHH)
-  userEvent.type(toHH, '12')
+
+  // open the datepicker
+  userEvent.click(screen.getByText(/13:00/i))
+
+  // screen.logTestingPlaygroundURL()
 
   // Find and click on the date elements
-  const day20 = await screen.findByText('20')
+  const day20 = screen.getByText('23')
   userEvent.click(day20)
 
-  const day21 = await screen.findByText('21')
+  const day21 = screen.getByText('24')
   userEvent.click(day21)
 
   userEvent.click(await screen.findByText('Apply'))
@@ -105,7 +109,7 @@ test('datepicker onChange will return ISO string of selected dates', async () =>
   const call = mockFn.mock.calls[0][0]
 
   expect(call).toMatchObject({
-    from: dayjs().date(20).hour(0).minute(0).second(0).millisecond(0).toISOString(),
-    to: dayjs().date(21).hour(12).minute(59).second(59).millisecond(0).toISOString(),
+    from: dayjs().date(23).hour(13).minute(0).second(0).millisecond(0).toISOString(),
+    to: dayjs().date(24).hour(23).minute(59).second(59).millisecond(0).toISOString(),
   })
 })
