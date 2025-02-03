@@ -7,6 +7,7 @@ import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { expect, test, vi } from 'vitest'
 import { render } from '../../helpers'
+import { DatetimeHelper } from 'components/interfaces/Settings/Logs/Logs.types'
 
 dayjs.extend(timezone)
 dayjs.extend(utc)
@@ -115,18 +116,16 @@ test('datepicker onSubmit will return ISO string of selected dates', async () =>
 })
 
 test('disabled helpers are disabled', async () => {
-  const helpers = [
+  const helpers: DatetimeHelper[] = [
     {
       text: 'Last 7 days',
-      from: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
-      to: () => '',
-      isHelper: true,
+      calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
+      calcTo: () => '',
     },
     {
       text: 'Last 30 days',
-      from: () => dayjs().subtract(30, 'day').startOf('day').toISOString(),
-      to: () => '',
-      isHelper: true,
+      calcFrom: () => dayjs().subtract(30, 'day').startOf('day').toISOString(),
+      calcTo: () => '',
       disabled: true,
     },
   ]
@@ -179,12 +178,22 @@ test('passing a value prop shows the correct dates in the label', async () => {
 test('passing a helper as a value prop shows the helper text in the label', async () => {
   const helper = {
     text: 'Last 7 days',
-    from: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
-    to: () => '',
-    isHelper: true,
+    calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
+    calcTo: () => '',
   }
 
-  render(<LogsDatePicker helpers={[helper]} value={helper} onSubmit={mockFn} />)
+  render(
+    <LogsDatePicker
+      helpers={[helper]}
+      value={{
+        from: helper.calcFrom(),
+        to: helper.calcTo(),
+        isHelper: true,
+        text: helper.text,
+      }}
+      onSubmit={mockFn}
+    />
+  )
 
   await screen.findByText(helper.text)
 })
