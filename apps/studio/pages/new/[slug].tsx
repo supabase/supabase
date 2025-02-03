@@ -12,6 +12,7 @@ import { z } from 'zod'
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
 import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
@@ -28,6 +29,7 @@ import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToInci
 import Panel from 'components/ui/Panel'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
@@ -38,9 +40,9 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -81,8 +83,6 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -189,6 +189,8 @@ const Wizard: NextPageWithLayout = () => {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchInterval: false,
+      refetchOnReconnect: false,
+      retry: false,
     }
   )
 
