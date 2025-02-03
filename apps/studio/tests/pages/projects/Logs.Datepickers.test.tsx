@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { PREVIEWER_DATEPICKER_HELPERS } from 'components/interfaces/Settings/Logs/Logs.constants'
@@ -146,8 +146,13 @@ test('disabled helpers are disabled', async () => {
   // click the datepicker
   userEvent.click(screen.getByText('Last 7 days'))
 
-  const disabledHelper = el.getByText('Last 30 days')
-  expect(disabledHelper).toHaveAttribute('aria-disabled', 'true')
+  const disabledHelperContainer = await screen.findByText(/last 30 days/i)
+
+  const disabledButton = within(disabledHelperContainer).getByRole('radio', {
+    hidden: true,
+  })
+
+  expect(disabledButton.getAttribute('aria-disabled')).toBe('true')
 })
 
 test('passing a value prop shows the correct dates in the label', async () => {
