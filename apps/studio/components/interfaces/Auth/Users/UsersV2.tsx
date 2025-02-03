@@ -10,6 +10,7 @@ import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeatureP
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { authKeys } from 'data/auth/keys'
@@ -46,7 +47,6 @@ import AddUserDropdown from './AddUserDropdown'
 import { UserPanel } from './UserPanel'
 import { MAX_BULK_DELETE, PROVIDER_FILTER_OPTIONS } from './Users.constants'
 import { formatUserColumns, formatUsersData, isAtBottom } from './Users.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 export type UsersTableColumn = {
@@ -76,6 +76,7 @@ export const UsersV2 = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const gridRef = useRef<DataGridHandle>(null)
+  const xScroll = useRef<number>(0)
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const [columns, setColumns] = useState<Column<any>[]>([])
@@ -141,7 +142,20 @@ export const UsersV2 = () => {
   const selectedUserToDelete = users.find((u) => u.id === [...selectedUsers][0])
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
-    if (isLoading || !isAtBottom(event)) return
+    // [Joshen] Can we get this from the RQ? hasNextPage from the RQ returns true always somehow
+    const hasNextPage = users.length < totalUsers
+    const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
+    xScroll.current = event.currentTarget.scrollLeft
+
+    if (
+      isLoading ||
+      isFetchingNextPage ||
+      isScrollingHorizontally ||
+      !isAtBottom(event) ||
+      !hasNextPage
+    ) {
+      return
+    }
     fetchNextPage()
   }
 
@@ -484,7 +498,6 @@ export const UsersV2 = () => {
                     return (
                       <Row
                         {...props}
-                        key={props.row.id}
                         onClick={() => {
                           const idx = users.indexOf(users.find((u) => u.id === id) ?? {})
                           if (props.row.id) {
