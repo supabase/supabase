@@ -2171,6 +2171,10 @@ export const platform: NavMenuConstant = {
               name: 'Realtime Messages',
               url: '/guides/platform/manage-your-usage/realtime-messages',
             },
+            {
+              name: 'Realtime Peak Connections',
+              url: '/guides/platform/manage-your-usage/realtime-peak-connections',
+            },
           ],
         },
         {
