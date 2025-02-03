@@ -90,7 +90,7 @@ export default function PageDemo() {
           ],
         }}
       >
-        <PageContent size="small">
+        <PageContent size="small" className="pb-16">
           <PageSection
             title="General Settings"
             subtitle="Basic configuration options for your project"
@@ -120,7 +120,7 @@ export default function PageDemo() {
                         <FormItem_Shadcn_ className="grid grid-cols-12 gap-8 items-center">
                           <div className="col-span-6">
                             <FormLabel_Shadcn_>Project Name</FormLabel_Shadcn_>
-                            <FormDescription_Shadcn_ className="mt-1 text-xs">
+                            <FormDescription_Shadcn_ className="text-xs">
                               This is the name that will be displayed for your project.
                             </FormDescription_Shadcn_>
                           </div>
@@ -143,7 +143,7 @@ export default function PageDemo() {
                           <FormItem_Shadcn_ className="grid grid-cols-12 gap-8 items-start opacity-25">
                             <div className="col-span-6">
                               <FormLabel_Shadcn_>Description</FormLabel_Shadcn_>
-                              <FormDescription_Shadcn_ className="mt-1 text-xs">
+                              <FormDescription_Shadcn_ className="text-xs">
                                 A brief description of your project.
                               </FormDescription_Shadcn_>
                             </div>
@@ -183,7 +183,7 @@ export default function PageDemo() {
             </Form_Shadcn_>
           </PageSection>
 
-          <PageSection title="Team Members" subtitle="Manage who has access to this project">
+          <PageSection title="Project status">
             <Card>
               <CardContent className="flex items-center justify-between">
                 <div>
@@ -202,37 +202,6 @@ export default function PageDemo() {
                   </p>
                 </div>
                 <Button type="outline">Pause project</Button>
-              </CardContent>
-            </Card>
-          </PageSection>
-
-          <PageSection
-            title="API Keys"
-            subtitle="Manage API keys for accessing your project"
-            actions={
-              <Button icon={<Key size={16} />} type="outline" size="small">
-                Generate key
-              </Button>
-            }
-          >
-            <Card>
-              <CardContent className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-foreground">Production API Key</p>
-                  <p className="text-xs text-foreground-light">Created 2 months ago</p>
-                </div>
-                <Button icon={<Trash size={16} />} type="outline" size="small">
-                  Revoke
-                </Button>
-              </CardContent>
-              <CardContent className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-foreground">Development API Key</p>
-                  <p className="text-xs text-foreground-light">Created 5 days ago</p>
-                </div>
-                <Button type="outline" size="small">
-                  Revoke
-                </Button>
               </CardContent>
             </Card>
           </PageSection>

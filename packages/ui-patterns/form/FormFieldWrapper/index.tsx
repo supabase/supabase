@@ -39,9 +39,7 @@ export function FormFieldWrapper({
           <div className={orientation === 'horizontal' ? 'col-span-6' : ''}>
             <FormLabel_Shadcn_>{label}</FormLabel_Shadcn_>
             {description && (
-              <FormDescription_Shadcn_ className="mt-1 text-xs">
-                {description}
-              </FormDescription_Shadcn_>
+              <FormDescription_Shadcn_ className="text-xs">{description}</FormDescription_Shadcn_>
             )}
           </div>
           <div className={orientation === 'horizontal' ? 'col-span-6 flex justify-end' : ''}>
