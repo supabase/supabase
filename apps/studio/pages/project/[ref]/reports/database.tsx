@@ -178,76 +178,36 @@ const DatabaseUsage = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 gap-4">
-          {/* <ChartHandler
-            provider="infra-monitoring"
-            attribute="ram_usage"
-            label="Memory usage"
-            interval={dateRange.interval}
-            startDate={dateRange?.period_start?.date}
-            endDate={dateRange?.period_end?.date}
-            customDateFormat={handleCustomDateFormat}
-            updateDateRange={updateDateRange}
-          /> */}
           <ComposedChartHandler
             attributes={[
-              { attribute: 'ram_usage_applications', provider: 'infra-monitoring' },
               {
-                attribute: 'ram_usage_page_tables',
+                attribute: 'ram_available_max',
                 provider: 'infra-monitoring',
+                label: 'Available',
               },
               {
-                attribute: 'ram_usage_swap_cache',
+                attribute: 'ram_usage_used',
                 provider: 'infra-monitoring',
+                label: 'Used',
               },
               {
-                attribute: 'ram_usage_slab',
+                attribute: 'ram_usage_cache_and_buffers',
                 provider: 'infra-monitoring',
+                label: 'Cache + buffers',
               },
               {
-                attribute: 'ram_usage_cache',
+                attribute: 'ram_usage_free',
                 provider: 'infra-monitoring',
-              },
-              {
-                attribute: 'ram_usage_buffers',
-                provider: 'infra-monitoring',
-              },
-              {
-                attribute: 'ram_usage_unused',
-                provider: 'infra-monitoring',
+                label: 'Free',
               },
               {
                 attribute: 'ram_usage_swap',
                 provider: 'infra-monitoring',
+                label: 'Swap',
               },
-              { attribute: 'ram_available_max', provider: 'infra-monitoring' },
-              // {
-              //   attribute: 'ram_usage_hardware_corrupted',
-              //   provider: 'infra-monitoring',
-              // },
             ]}
-            label="Memory stack"
-            interval={dateRange.interval}
-            startDate={dateRange?.period_start?.date}
-            endDate={dateRange?.period_end?.date}
-            customDateFormat={handleCustomDateFormat}
-            updateDateRange={updateDateRange}
-          />
-
-          <ChartHandler
-            provider="infra-monitoring"
-            attribute="avg_cpu_usage"
-            label="Average CPU usage"
-            interval={dateRange.interval !== '15s' ? dateRange.interval : '1m'}
-            startDate={dateRange?.period_start?.date}
-            endDate={dateRange?.period_end?.date}
-            customDateFormat={handleCustomDateFormat}
-            updateDateRange={updateDateRange}
-          />
-
-          <ChartHandler
-            provider="infra-monitoring"
-            attribute="max_cpu_usage"
-            label="Max CPU usage"
+            label="RAM usage"
+            showTooltip
             interval={dateRange.interval}
             startDate={dateRange?.period_start?.date}
             endDate={dateRange?.period_end?.date}
@@ -263,15 +223,15 @@ const DatabaseUsage = () => {
                 provider: 'infra-monitoring',
               },
               {
+                attribute: 'client_connections_realtime',
+                provider: 'infra-monitoring',
+              },
+              {
                 attribute: 'client_connections_pgbouncer',
                 provider: 'infra-monitoring',
               },
               {
                 attribute: 'client_connections_pgbouncer_waiting',
-                provider: 'infra-monitoring',
-              },
-              {
-                attribute: 'client_connections_realtime',
                 provider: 'infra-monitoring',
               },
               {
@@ -302,7 +262,8 @@ const DatabaseUsage = () => {
             customDateFormat={handleCustomDateFormat}
             updateDateRange={updateDateRange}
           />
-          <ChartHandler
+
+          {/* <ChartHandler
             provider="infra-monitoring"
             attribute="disk_iops_usage"
             label="Disk IOps usage"
@@ -311,7 +272,7 @@ const DatabaseUsage = () => {
             endDate={dateRange?.period_end?.date}
             customDateFormat={handleCustomDateFormat}
             updateDateRange={updateDateRange}
-          />
+          /> */}
         </div>
 
         {dateRange && isReplicaSelected && (

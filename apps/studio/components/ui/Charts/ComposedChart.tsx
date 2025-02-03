@@ -24,6 +24,7 @@ import { useChartSize, numberFormatter } from './Charts.utils'
 import { ChartHighlight } from './useChartHighlight'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 import NoDataPlaceholder from './NoDataPlaceholder'
+import { MultiAttribute } from './ComposedChartHandler'
 
 interface CustomIconProps {
   color: string
@@ -137,6 +138,7 @@ const CustomLabel = ({ active, payload, label }: TooltipProps) => {
 }
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
+  attributes: MultiAttribute[]
   yAxisKey: string
   xAxisKey: string
   displayDateInUtc?: boolean
@@ -147,6 +149,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   XAxisProps?: ComponentProps<typeof XAxis>
   YAxisProps?: ComponentProps<typeof YAxis>
   showGrid?: boolean
+  showTooltip?: boolean
   chartHighlight?: ChartHighlight
   hideChartType?: boolean
   chartStyle?: string
@@ -156,6 +159,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
 
 export default function ComposedChart({
   data,
+  attributes,
   yAxisKey,
   xAxisKey,
   format,
@@ -175,6 +179,7 @@ export default function ComposedChart({
   XAxisProps,
   YAxisProps,
   showGrid = false,
+  showTooltip = false,
   chartHighlight,
   hideChartType,
   chartStyle,
@@ -238,7 +243,7 @@ export default function ComposedChart({
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
-  const attributes = data
+  const attributesValues = data
     ? Object.entries(data[0])
         .map(([key, value], index) => ({
           name: key,
@@ -248,7 +253,7 @@ export default function ComposedChart({
         .filter((att) => att.name !== 'timestamp')
     : []
 
-  const stackedAttributes = attributes.filter((att) => !att.name.includes('max'))
+  const stackedAttributes = attributesValues.filter((att) => !att.name.includes('max'))
 
   if (data.length === 0) {
     return (
@@ -272,7 +277,7 @@ export default function ComposedChart({
         highlightedValue={
           <CustomLabel
             active={!!resolvedHighlightedLabel}
-            payload={_activePayload || attributes}
+            payload={_activePayload || attributesValues}
             label={resolvedHighlightedValue}
           />
         }
@@ -328,15 +333,16 @@ export default function ComposedChart({
             tickLine={{ stroke: CHART_COLORS.AXIS }}
             key={xAxisKey}
           />
+          {/* <Tooltip content={(props) => (showTooltip ? <CustomLabel {...props} /> : null)} /> */}
           <Tooltip content={() => null} />
-          {attributes
+          {attributesValues
             .filter((attribute) => attribute.name.includes('max'))
             .map((attribute) => (
               <Line
                 key={attribute.name}
                 type="stepAfter"
                 dataKey={attribute.name}
-                stroke={STACKED_CHART_COLORS[0]}
+                stroke="#3ECF8E"
                 strokeWidth={2}
                 strokeDasharray="3 3"
                 dot={false}
@@ -350,7 +356,9 @@ export default function ComposedChart({
                   dataKey={attribute.name}
                   stackId="1"
                   fill={attribute.color}
-                  name={attribute.name}
+                  name={
+                    attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
+                  }
                 />
               ))
             : stackedAttributes.map((attribute) => (
@@ -360,7 +368,7 @@ export default function ComposedChart({
                   dataKey={attribute.name}
                   stackId="1"
                   fill={attribute.color}
-                  strokeOpacity={0.5}
+                  strokeOpacity={1}
                   stroke={attribute.color}
                   fillOpacity={0.25}
                   name={attribute.name}

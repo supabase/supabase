@@ -24,9 +24,13 @@ import ComposedChart from './ComposedChart'
 
 type Provider = 'infra-monitoring' | 'daily-stats'
 
-type MultiAttribute = {
+export type MultiAttribute = {
   attribute: string
   provider: Provider
+  label?: string
+  color?: string
+  description?: string
+  docsLink?: string
   type?: 'line' | 'area-bar'
 }
 
@@ -45,7 +49,7 @@ interface ChartHandlerProps {
   format?: string
   highlightedValue?: string | number
   className?: string
-  isStacked?: boolean
+  showTooltip?: boolean
   updateDateRange: UpdateDateRange
 }
 
@@ -73,7 +77,7 @@ const ChartHandler = ({
   format,
   highlightedValue,
   className,
-  isStacked = false,
+  showTooltip,
   updateDateRange,
 }: PropsWithChildren<ChartHandlerProps>) => {
   const router = useRouter()
@@ -212,23 +216,8 @@ const ChartHandler = ({
         >
           {children}
         </div>
-        {/* {label === 'Client Connections' ? (
-          <MockClientConnectionsChart
-            YAxisProps={{ width: 1 }}
-            data={combinedData}
-            format={format}
-            xAxisKey="period_start"
-            yAxisKey={attributes[0].attribute}
-            highlightedValue={_highlightedValue}
-            title={label}
-            customDateFormat={customDateFormat}
-            chartHighlight={chartHighlight}
-            chartStyle={chartStyle}
-            onChartStyleChange={setChartStyle}
-            updateDateRange={updateDateRange}
-          />
-        ) : label === 'Disk IOps' ? ( */}
         <ComposedChart
+          attributes={attributes}
           YAxisProps={{ width: 1 }}
           data={combinedData as DataPoint[]}
           format={format}
@@ -239,26 +228,10 @@ const ChartHandler = ({
           customDateFormat={customDateFormat}
           chartHighlight={chartHighlight}
           chartStyle={chartStyle}
+          showTooltip={showTooltip}
           onChartStyleChange={setChartStyle}
           updateDateRange={updateDateRange}
         />
-        {/* ) : (
-          <BarChart
-            YAxisProps={{ width: 1 }}
-            data={combinedData[attributes[0].attribute]}
-            format={format}
-            xAxisKey="period_start"
-            yAxisKey={attributes[0].attribute}
-            highlightedValue={_highlightedValue}
-            title={label}
-            customDateFormat={customDateFormat}
-            chartHighlight={chartHighlight}
-            hideChartType={hideChartType}
-            chartStyle={chartStyle}
-            onChartStyleChange={setChartStyle}
-            updateDateRange={updateDateRange}
-          />
-        )} */}
       </Panel.Content>
     </Panel>
   )
