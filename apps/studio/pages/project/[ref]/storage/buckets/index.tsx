@@ -1,4 +1,7 @@
 import { useParams } from 'common'
+import { StorageBucketList } from 'components/interfaces/Storage/storage-bucket-list'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
@@ -19,24 +22,32 @@ const PageLayout: NextPageWithLayout = () => {
 
   if (isError) <StorageBucketsError error={error as any} />
 
-  return (
-    <div className="storage-container flex flex-grow">
-      <ProductEmptyState
-        title="Storage"
-        infoButtonLabel="About storage"
-        infoButtonUrl="https://supabase.com/docs/guides/storage"
-      >
-        <p className="text-foreground-light text-sm">
-          Create buckets to store and serve any type of digital content.
-        </p>
-        <p className="text-foreground-light text-sm">
-          Make your buckets private or public depending on your security preference.
-        </p>
-      </ProductEmptyState>
-    </div>
-  )
+  // return (
+  //   <div className="storage-container flex flex-grow">
+  //     <ProductEmptyState
+  //       title="Storage"
+  //       infoButtonLabel="About storage"
+  //       infoButtonUrl="https://supabase.com/docs/guides/storage"
+  //     >
+  //       <p className="text-foreground-light text-sm">
+  //         Create buckets to store and serve any type of digital content.
+  //       </p>
+  //       <p className="text-foreground-light text-sm">
+  //         Make your buckets private or public depending on your security preference.
+  //       </p>
+  //     </ProductEmptyState>
+  //   </div>
+  // )
+
+  return <StorageBucketList />
 }
 
-PageLayout.getLayout = (page) => <StorageLayout title="Buckets">{page}</StorageLayout>
+PageLayout.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Buckets">
+      <StorageLayout title="Buckets">{page}</StorageLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default PageLayout

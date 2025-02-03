@@ -82,6 +82,8 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
@@ -959,6 +961,12 @@ const PageLayout = withAuth(({ children }: PropsWithChildren) => {
   )
 })
 
-Wizard.getLayout = (page) => <PageLayout>{page}</PageLayout>
+Wizard.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="New Project" headerTitle="New project">
+      <PageLayout>{page}</PageLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default Wizard

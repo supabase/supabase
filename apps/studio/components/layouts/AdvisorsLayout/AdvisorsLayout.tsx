@@ -6,6 +6,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateAdvisorsMenu } from './AdvisorsMenu.utils'
+import { ProjectPageNavigation } from '../AuthLayout/ProjectPageNavigation'
 
 export interface AdvisorsLayoutProps {
   title?: string
@@ -21,8 +22,9 @@ const AdvisorsLayout = ({ children }: PropsWithChildren<AdvisorsLayoutProps>) =>
     <ProjectLayout
       isLoading={false}
       product="Advisors"
-      productMenu={<ProductMenu page={page} menu={generateAdvisorsMenu(project)} />}
+      // productMenu={<ProductMenu page={page} menu={generateAdvisorsMenu(project)} />}
     >
+      <ProjectPageNavigation navKey="advisors">{children}</ProjectPageNavigation>
       {children}
     </ProjectLayout>
   )

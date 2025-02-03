@@ -1,4 +1,6 @@
 import { Usage } from 'components/interfaces/Organization'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { Loading } from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -12,6 +14,12 @@ const OrgUsage: NextPageWithLayout = () => {
   return <>{selectedOrganization === undefined && isLoadingPermissions ? <Loading /> : <Usage />}</>
 }
 
-OrgUsage.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+OrgUsage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout>
+      <OrganizationLayout>{page}</OrganizationLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default OrgUsage

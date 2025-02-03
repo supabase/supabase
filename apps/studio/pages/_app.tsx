@@ -121,23 +121,18 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       enableSystem
                       disableTransitionOnChange
                     >
-                      <AppBannerContextProvider>
-                        <CommandProvider>
-                          <AppBannerWrapper>
-                            <FeaturePreviewContextProvider>
-                              {getLayout(<Component {...pageProps} />)}
-                              <StudioCommandMenu />
-                              <GenerateSql />
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                          </AppBannerWrapper>
-                          <SonnerToaster position="top-right" />
-                        </CommandProvider>
-                      </AppBannerContextProvider>
+                      <CommandProvider>
+                        <FeaturePreviewContextProvider>
+                          {getLayout(<Component {...pageProps} />)}
+                          <StudioCommandMenu />
+                          <GenerateSql />
+                          <FeaturePreviewModal />
+                        </FeaturePreviewContextProvider>
+                        <SonnerToaster position="top-right" />
+                      </CommandProvider>
                     </ThemeProvider>
                   </RouteValidationWrapper>
                 </TooltipProvider>
-
                 <PageTelemetry
                   API_URL={API_URL}
                   hasAcceptedConsent={hasAcceptedConsent}

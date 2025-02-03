@@ -9,6 +9,8 @@ import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import CardButton from 'components/ui/CardButton'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import type { NextPageWithLayout } from 'types'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const LogsTemplatesPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
@@ -27,7 +29,13 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
   )
 }
 
-LogsTemplatesPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
+LogsTemplatesPage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Log templates">
+      <LogsLayout>{page}</LogsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default LogsTemplatesPage
 

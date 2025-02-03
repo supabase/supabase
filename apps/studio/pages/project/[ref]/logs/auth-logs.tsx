@@ -1,6 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoPermission from 'components/ui/NoPermission'
@@ -19,6 +21,12 @@ const LogsPage: NextPageWithLayout = () => {
   )
 }
 
-LogsPage.getLayout = (page) => <LogsLayout title="Auth Logs">{page}</LogsLayout>
+LogsPage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Auth logs">
+      <LogsLayout title="Auth Logs">{page}</LogsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default LogsPage

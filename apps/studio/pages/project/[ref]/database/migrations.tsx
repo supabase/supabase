@@ -12,6 +12,8 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { DocsButton } from 'components/ui/DocsButton'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const MigrationsPage: NextPageWithLayout = () => {
   return (
@@ -38,6 +40,12 @@ const MigrationsPage: NextPageWithLayout = () => {
   )
 }
 
-MigrationsPage.getLayout = (page) => <DatabaseLayout title="Migrations">{page}</DatabaseLayout>
+MigrationsPage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Migrations">
+      <DatabaseLayout title="Migrations">{page}</DatabaseLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default MigrationsPage

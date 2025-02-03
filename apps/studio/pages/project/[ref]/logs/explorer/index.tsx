@@ -34,6 +34,8 @@ import LogsQueryPanel, { SourceType } from 'components/interfaces/Settings/Logs/
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { createWarehouseQueryTemplates } from 'components/interfaces/Settings/Logs/Warehouse.utils'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
@@ -467,6 +469,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   )
 }
 
-LogsExplorerPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
+LogsExplorerPage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Explorer">
+      <LogsLayout>{page}</LogsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default LogsExplorerPage

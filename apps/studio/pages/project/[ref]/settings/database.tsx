@@ -7,6 +7,8 @@ import ResetDbPassword from 'components/interfaces/Settings/Database/DatabaseSet
 import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfiguration'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -48,6 +50,12 @@ const ProjectSettings: NextPageWithLayout = () => {
   )
 }
 
-ProjectSettings.getLayout = (page) => <SettingsLayout title="Database">{page}</SettingsLayout>
+ProjectSettings.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Database">
+      <SettingsLayout title="Database">{page}</SettingsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default ProjectSettings

@@ -9,6 +9,8 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { ProjectPageNavigation } from '../AuthLayout/ProjectPageNavigation'
+import { useParams } from 'common'
 
 export interface DatabaseLayoutProps {
   title?: string
@@ -34,7 +36,7 @@ const DatabaseProductMenu = () => {
     <>
       <ProductMenu
         page={page}
-        menu={generateDatabaseMenu(project, {
+        menu={generateDatabaseMenu(project?.ref as string, {
           pgNetExtensionExists,
           pitrEnabled,
           columnLevelPrivileges,
@@ -45,6 +47,7 @@ const DatabaseProductMenu = () => {
 }
 
 const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
+  const { ref } = useParams()
   return (
     <ProjectLayout product="Database" productMenu={<DatabaseProductMenu />} isBlocking={false}>
       {children}
