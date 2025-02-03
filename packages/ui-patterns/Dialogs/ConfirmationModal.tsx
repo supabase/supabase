@@ -12,12 +12,13 @@ import {
   cn,
 } from 'ui'
 import { Admonition } from './../admonition'
-import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
+import { DialogDescription, DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 
 export interface ConfirmationModalProps {
   loading?: boolean
   visible: boolean
   title: string | React.ReactNode
+  description?: string | React.ReactNode
   size?: React.ComponentProps<typeof DialogContent>['size']
   confirmLabel?: string
   confirmLabelLoading?: string
@@ -40,6 +41,7 @@ const ConfirmationModal = forwardRef<
   (
     {
       title,
+      description,
       size = 'small',
       visible,
       onCancel,
@@ -84,6 +86,7 @@ const ConfirmationModal = forwardRef<
         <DialogContent ref={ref} className="p-0 gap-0 pb-5 !block" size={size}>
           <DialogHeader className={cn('border-b')} padding={'small'}>
             <DialogTitle className="">{title}</DialogTitle>
+            {description && <DialogDescription>{description}</DialogDescription>}
           </DialogHeader>
           {alert && (
             <Admonition
