@@ -69,7 +69,7 @@ The following table shows a subset of available columns:
 | `query_plan` `text`                         | The sequence of steps used to execute a query. This parameter is only available when pgsm_enable_query_plan is enabled       |
 | `query` `text`                              | Text of a representative statement                                                                                           |
 | `plans` `bigint`                            | Number of times the statement was planned (if pg_stat_statements.track_planning is enabled, otherwise zero)                  |
-| `total_plan_time` `double` precision        | Total time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero)   |
+| `total_plan_time` `double precision`        | Total time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero)   |
 | `min_plan_time` `double precision`          | Minimum time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero) |
 
 A full list of statistics is available in the [pg_stat_monitor docs](https://docs.percona.com/pg-stat-monitor/reference.html#postgresql-15).
