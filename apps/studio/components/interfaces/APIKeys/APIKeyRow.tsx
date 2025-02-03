@@ -1,6 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { InputVariants } from '@ui/components/shadcn/ui/input'
+import { Eye, MoreVertical } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import { useAPIKeyIdQuery } from 'data/api-keys/[id]/api-key-id-query'
@@ -8,9 +12,6 @@ import { APIKeysData } from 'data/api-keys/api-keys-query'
 import { apiKeysKeys } from 'data/api-keys/keys'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Eye, MoreVertical } from 'lucide-react'
-import { useState } from 'react'
-import { toast } from 'sonner'
 import {
   Button,
   DropdownMenu,
@@ -21,15 +22,13 @@ import {
   TableRow,
   cn,
 } from 'ui'
-import APIKeyDeleteDialog from './APIKeyDeleteDialog'
+import { APIKeyDeleteDialog } from './APIKeyDeleteDialog'
 
-const APIKeyRow = ({
+export const APIKeyRow = ({
   apiKey,
 }: {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
 }) => {
-  // const isSecret = apiKey.type === 'secret'
-
   const MotionTableRow = motion(TableRow)
 
   return (
@@ -48,7 +47,6 @@ const APIKeyRow = ({
       <TableCell className="py-2">{apiKey.description || '/'}</TableCell>
       <TableCell className="py-2">
         <div className="flex flex-row gap-2">
-          {/* <Input_Shadcn_ apiKey={apiKey} /> */}
           <Input apiKey={apiKey} />
         </div>
       </TableCell>
@@ -65,30 +63,6 @@ const APIKeyRow = ({
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="max-w-40" align="end">
-            {/* <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuItem
-                  className="flex gap-2 !pointer-events-auto"
-                  onClick={async (e) => {
-                    if (canDeleteAPIKeys) {
-                      setDeleteDialogOpenState(true)
-                    }
-                  }}
-                >
-                  {isDeletingAPIKey ? (
-                    <Loader2 size="12" className="animate-spin" />
-                  ) : (
-                    <TrashIcon size="12" />
-                  )}
-                  {isDeletingAPIKey ? 'Deleting key..' : 'Delete API key'}
-                </DropdownMenuItem>
-              </TooltipTrigger>
-              {!canDeleteAPIKeys && (
-                <TooltipContent side="left">
-                  You need additional permissions to delete API keys
-                </TooltipContent>
-              )}
-            </Tooltip> */}
             <APIKeyDeleteDialog apiKey={apiKey} />
             <DropdownMenuSeparator />
             <APIKeyDeleteDialog apiKey={apiKey} />
@@ -104,11 +78,13 @@ function Input({
 }: {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
 }) {
-  // const [shown, setShown] = useState(false)
-  const [show, setShowState] = useState(false)
-  const { ref: projectRef } = useParams()
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
   const queryClient = useQueryClient()
+  const { ref: projectRef } = useParams()
+
+  const [show, setShowState] = useState(false)
+  const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
+
+  const isSecret = apiKey.type === 'secret'
 
   const {
     data,
@@ -161,10 +137,9 @@ function Input({
       console.error('Failed to fetch API key:', error)
     }
 
-    return apiKey.api_key // Fallback to the masked version
+    // Fallback to the masked version
+    return apiKey.api_key
   }
-
-  const isSecret = apiKey.type === 'secret'
 
   return (
     <>
@@ -216,5 +191,3 @@ function Input({
     </>
   )
 }
-
-export default APIKeyRow

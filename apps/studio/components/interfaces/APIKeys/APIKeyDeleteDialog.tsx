@@ -1,16 +1,17 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
+
 import { useParams } from 'common/hooks'
 import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
 import { DropdownMenuItem } from 'ui'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
-const APIKeyDeleteDialog = ({
-  apiKey,
-}: {
+interface APIKeyDeleteDialogProps {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
-}) => {
+}
+
+export const APIKeyDeleteDialog = ({ apiKey }: APIKeyDeleteDialogProps) => {
   const { ref: projectRef } = useParams()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -60,5 +61,3 @@ const APIKeyDeleteDialog = ({
     </>
   )
 }
-
-export default APIKeyDeleteDialog

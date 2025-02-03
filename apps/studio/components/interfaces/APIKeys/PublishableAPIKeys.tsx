@@ -14,7 +14,7 @@ import QuickKeyCopyWrapper from './QuickKeyCopy'
 // to add in later with follow up PR
 // import ShowPublicJWTsDialogComposer from '../JwtSecrets/ShowPublicJWTsDialogComposer'
 
-const PublishableAPIKeys = () => {
+export const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
   const {
     data: apiKeysData,
@@ -136,5 +136,3 @@ function ApiKeyInput() {
     />
   )
 }
-
-export default PublishableAPIKeys
