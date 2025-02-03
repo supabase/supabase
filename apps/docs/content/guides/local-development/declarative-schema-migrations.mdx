@@ -1,0 +1,137 @@
+---
+id: 'declaring-database-schemas'
+title: 'Declaring database schemas'
+description: 'Manage your database schemas in one place and generate versioned migrations.'
+subtitle: 'Manage your database schemas in one place and generate versioned migrations.'
+---
+
+## Overview
+
+Declarative schemas allow you to reduce code duplications in managing schema migrations. As your database schema evolves over time, declaring them in one place will help you iterate faster by referring to a single source of truth.
+
+## Schema migrations
+
+Schema migrations are SQL statements written in Data Definition Language. They are [versioned](/docs/guides/deployment/database-migrations) in your `supabase/migrations` directory to ensure schema consistency between local and remote environments.
+
+### Declaring your schema
+
+Create your schemas in `supabase/schemas/employees.sql` with the table below.
+
+```sql
+create table "employees" (
+	"id" integer not null,
+	"name" text
+);
+```
+
+Generate a migration file by diffing against your declared schema. This will create a new migration file under `supabase/migrations/<timestamp>_employees_table.sql`
+
+```sql
+supabase db diff -f employees_table
+```
+
+<Admonition type="tip">
+
+Make sure your local database is stopped before diffing your schema.
+
+</Admonition>
+
+The new migration file will be used when starting the database locally so you can easily validate your schema by running the following command.
+
+```sql
+supabase db start
+```
+
+### Updating your schema
+
+To add a new column to employees table, simply edit `supabase/schemas/employees.sql`
+
+```sql
+create table "employees" (
+	"id" integer not null,
+	"name" text,
+	"age" smallint not null
+);
+```
+
+<Admonition type="tip">
+
+Some entities like views and enums depend columns to be declared in a specific order. To avoid messy diffs, always add new columns to the end of the table.
+
+</Admonition>
+
+Generate a new migration file with `supabase diff -f add_age` . The generated file should contain a single incremental change.
+
+```sql
+alter table "public"."employees" add column "age" smallint not null;
+```
+
+Depending on the diff tool used, the generated migration may not be what you expect. In that case, feel free to edit the migration file manually and run `supabase db diff` to verify that your migrations match your declared schema.
+
+### Managing dependencies
+
+As your database schema evolves, you will probably start using more advanced entities like views and functions. These entities are notoriously verbose to manage using plain migrations because the entire body must be recreated whenever there is a change. Using declarative schema, you can now edit them in-place so it’s much easier to review.
+
+```sql
+create table "employees" (
+	"id" integer not null,
+	"name" text,
+	"age" smallint not null
+);
+
+create view "profiles" as
+    select id, name from "employees";
+
+create function "get_age"(employee_id integer) RETURNS smallint
+    LANGUAGE "sql"
+AS $$
+    select age
+    from employees
+    where id = employee_id;
+$$;
+```
+
+To enforce a specific order for creating such entities, you can name your schema files in lexicographic order. This is especially helpful if you create new tables with foreign keys pointing to their parent. For example, your `supabase` directory may end up with the following structure.
+
+```sql
+.
+└── supabase/
+    ├── schemas/
+    │   ├── employees.sql
+    │   └── managers.sql
+    └── migrations/
+        ├── 20241004112233_employees_table.sql
+        ├── 20241005112233_add_employee_age.sql
+        └── 20241006112233_add_managers_table.sql
+```
+
+## Data migrations
+
+Data migrations are SQL statements written in Data Manipulation Language.
+
+## Known caveats
+
+The `migra` diff tool used by default for generating schema diff isn’t perfect. To the best of our knowledge, it has trouble tracking changes to the following entities.
+
+### View ownership
+
+- [view owner and grants](https://github.com/djrobstep/migra/issues/160#issuecomment-1702983833)
+- [security invoker on views](https://github.com/djrobstep/migra/issues/234)
+- [materialized views](https://github.com/djrobstep/migra/issues/194)
+- doesn’t recreate views when altering column type
+
+### RLS policies
+
+- [alter policy statements](https://github.com/djrobstep/schemainspect/blob/master/schemainspect/pg/obj.py#L228)
+- [column privileges](https://github.com/djrobstep/schemainspect/pull/67)
+
+### Other entities
+
+- schema privileges are not tracked because each schema is diffed separately
+- [comments are not tracked](https://github.com/djrobstep/migra/issues/69)
+- [partitions are not tracked](https://github.com/djrobstep/migra/issues/186)
+- [`alter publication ... add table ...`](https://github.com/supabase/cli/issues/883)
+- [create domain statements are ignored](https://github.com/supabase/cli/issues/2137)
+- verbose to have grants from default privileges
+
+If you are trying to diff your way through views and RLS policies, be sure to review the generated migrations as `supabase db diff` may not report find all validation errors!

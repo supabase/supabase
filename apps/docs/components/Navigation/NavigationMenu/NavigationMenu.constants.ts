@@ -1908,6 +1908,10 @@ export const local_development: NavMenuConstant = {
           url: '/guides/local-development/managing-config',
         },
         {
+          name: 'Declaring database schemas',
+          url: '/guides/local-development/declaring-database-schemas',
+        },
+        {
           name: 'Seeding your database',
           url: '/guides/local-development/seeding-your-database',
         },
