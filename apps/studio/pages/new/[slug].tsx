@@ -22,11 +22,12 @@ import {
   PostgresVersionSelector,
   extractPostgresVersionDetails,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
+import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
-import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
@@ -779,9 +780,8 @@ const Wizard: NextPageWithLayout = () => {
                         control={form.control}
                         name="dbPass"
                         render={({ field }) => {
-                          const regex = /^[^@:\/]*$/
                           const hasSpecialCharacters =
-                            field.value.length > 0 && !field.value.match(regex)
+                            field.value.length > 0 && !field.value.match(SPECIAL_CHARS_REGEX)
 
                           return (
                             <FormItemLayout
@@ -789,15 +789,7 @@ const Wizard: NextPageWithLayout = () => {
                               layout="horizontal"
                               description={
                                 <>
-                                  {hasSpecialCharacters && (
-                                    <p className="mb-2">
-                                      Note: If using a connection string, you will need to{' '}
-                                      <InlineLink href="https://supabase.com/docs/guides/database/postgres/roles#special-symbols-in-passwords">
-                                        percent-encode
-                                      </InlineLink>{' '}
-                                      the special symbols in the password
-                                    </p>
-                                  )}
+                                  {hasSpecialCharacters && <SpecialSymbolsCallout />}
                                   <PasswordStrengthBar
                                     passwordStrengthScore={form.getValues('dbPassStrength')}
                                     password={field.value}

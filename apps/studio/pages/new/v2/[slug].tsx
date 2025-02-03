@@ -25,14 +25,15 @@ import {
   PostgresVersionSelector,
   extractPostgresVersionDetails,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { ProjectVisual } from 'components/interfaces/ProjectCreation/ProjectVisual'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SchemaGenerator } from 'components/interfaces/ProjectCreation/SchemaGenerator'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
+import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
 import { FeedbackDropdown } from 'components/layouts/ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from 'components/layouts/ProjectLayout/LayoutHeader/HelpPopover'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
-import { InlineLink } from 'components/ui/InlineLink'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { ScrollGradient } from 'components/ui/ScrollGradient'
@@ -714,25 +715,16 @@ const WizardForm = () => {
                                     control={form.control}
                                     name="dbPass"
                                     render={({ field }) => {
-                                      const regex = /^[^@:\/]*$/
                                       const hasSpecialCharacters =
-                                        field.value.length > 0 && !field.value.match(regex)
+                                        field.value.length > 0 &&
+                                        !field.value.match(SPECIAL_CHARS_REGEX)
 
                                       return (
                                         <FormItemLayout
                                           label="Database Password"
                                           description={
                                             <>
-                                              {hasSpecialCharacters && (
-                                                <p className="mb-2">
-                                                  Note: If using a connection string, you will need
-                                                  to{' '}
-                                                  <InlineLink href="https://supabase.com/docs/guides/database/postgres/roles#special-symbols-in-passwords">
-                                                    percent-encode
-                                                  </InlineLink>{' '}
-                                                  the special symbols in the password
-                                                </p>
-                                              )}
+                                              {hasSpecialCharacters && <SpecialSymbolsCallout />}
                                               <PasswordStrengthBar
                                                 passwordStrengthScore={form.getValues(
                                                   'dbPassStrength'
