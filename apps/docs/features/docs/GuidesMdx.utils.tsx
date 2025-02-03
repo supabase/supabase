@@ -42,7 +42,7 @@ const PUBLISHED_SECTIONS = [
   'storage',
 ] as const
 
-const getGuidesMarkdownInternal = async ({ slug }: { slug: string[] }) => {
+const getGuidesMarkdownInternal = async (slug: string[]) => {
   const relPath = slug.join(sep).replace(/\/$/, '')
   const fullPath = join(GUIDES_DIRECTORY, relPath + '.mdx')
   /**
@@ -60,6 +60,7 @@ const getGuidesMarkdownInternal = async ({ slug }: { slug: string[] }) => {
   try {
     mdx = await readFile(fullPath, 'utf-8')
   } catch {
+    console.error('Error reading Markdown at path: %s', fullPath)
     notFound()
   }
 
@@ -96,6 +97,9 @@ const genGuidesStaticParams = (directory?: string) => async () => {
     ? (await readdir(join(GUIDES_DIRECTORY, directory), { recursive: true }))
         .filter((file) => extname(file) === '.mdx' && !file.split(sep).at(-1).startsWith('_'))
         .map((file) => ({ slug: file.replace(/\.mdx$/, '').split(sep) }))
+        .concat(
+          (await existsFile(join(GUIDES_DIRECTORY, `${directory}.mdx`))) ? [{ slug: [] }] : []
+        )
     : PUBLISHED_SECTIONS.map(async (section) =>
         (await readdir(join(GUIDES_DIRECTORY, section), { recursive: true }))
           .filter((file) => extname(file) === '.mdx' && !file.split(sep).at(-1).startsWith('_'))

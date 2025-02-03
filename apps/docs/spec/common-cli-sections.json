@@ -840,6 +840,12 @@
         "title": "Update Postgres configurations",
         "slug": "supabase-postgres-config-update",
         "type": "cli-command"
+      },
+      {
+        "id": "supabase-postgres-config-delete",
+        "title": "Delete Postgres configurations",
+        "slug": "supabase-postgres-config-delete",
+        "type": "cli-command"
       }
     ]
   },

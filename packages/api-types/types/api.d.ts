@@ -11602,6 +11602,10 @@ export interface components {
       custom_properties: {
         [key: string]: unknown
       }
+      groups?: {
+        organization?: string
+        project?: string
+      }
       page_title: string
       page_url: string
       pathname: string

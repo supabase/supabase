@@ -12,11 +12,14 @@ const CHART_COLORS = {
   GREEN_2: 'hsl(var(--brand-500))',
   RED_1: 'hsl(var(--destructive-default))',
   RED_2: 'hsl(var(--destructive-500))',
+  YELLOW_1: 'hsl(var(--warning-default))',
+  YELLOW_2: 'hsl(var(--warning-500))',
 }
 type LogsBarChartDatum = {
   timestamp: string
   error_count: number
   ok_count: number
+  warning_count: number
 }
 export const LogsBarChart = ({
   data,
@@ -49,6 +52,9 @@ export const LogsBarChart = ({
             },
             ok_count: {
               label: 'Ok',
+            },
+            warning_count: {
+              label: 'Warnings',
             },
           } satisfies ChartConfig
         }
@@ -83,7 +89,7 @@ export const LogsBarChart = ({
           <ChartTooltip
             content={
               <ChartTooltipContent
-                className="text-foreground-light"
+                className="text-foreground-light -mt-5"
                 labelFormatter={(v) => dayjs(v).format(DateTimeFormat)}
               />
             }
@@ -99,6 +105,21 @@ export const LogsBarChart = ({
                   focusDataIndex === index || focusDataIndex === null
                     ? CHART_COLORS.RED_1
                     : CHART_COLORS.RED_2
+                }
+              />
+            ))}
+          </Bar>
+
+          {/* Warning bars */}
+          <Bar dataKey="warning_count" fill={CHART_COLORS.YELLOW_1} maxBarSize={24} stackId="stack">
+            {data?.map((_entry: LogsBarChartDatum, index: number) => (
+              <Cell
+                className="cursor-pointer transition-colors"
+                key={`warning-${index}`}
+                fill={
+                  focusDataIndex === index || focusDataIndex === null
+                    ? CHART_COLORS.YELLOW_1
+                    : CHART_COLORS.YELLOW_2
                 }
               />
             ))}

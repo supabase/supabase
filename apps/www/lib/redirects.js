@@ -2187,11 +2187,6 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/docs/guides/database/extensions/pgmq',
-    destination: '/docs/guides/database/extensions',
-  },
-  {
-    permanent: false,
     source: '/docs/guides/database/extensions/pg_partman',
     destination: '/docs/guides/database/extensions',
   },
@@ -2631,6 +2626,11 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/functions/functions-headers',
     destination: '/docs/functions/logging',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/import-maps',
+    destination: '/docs/guides/functions/dependencies',
   },
   {
     permanent: true,

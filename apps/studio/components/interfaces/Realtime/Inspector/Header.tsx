@@ -1,9 +1,11 @@
 import { PlayCircle, StopCircle } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
 
+import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { ChooseChannelPopover } from './ChooseChannelPopover'
 import { RealtimeFilterPopover } from './RealtimeFilterPopover'
 import { RealtimeTokensPopover } from './RealtimeTokensPopover'
@@ -16,6 +18,8 @@ interface HeaderProps {
 
 export const Header = ({ config, onChangeConfig }: HeaderProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
+  const { ref } = useParams()
+  const org = useSelectedOrganization()
 
   return (
     <div className="flex flex-row h-14 gap-2.5 items-center px-4">
@@ -32,7 +36,13 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
             onChangeConfig({ ...config, enabled: !config.enabled })
             if (!config.enabled) {
               // the user has clicked to start listening
-              sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED })
+              sendEvent({
+                action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED,
+                groups: {
+                  project: ref ?? 'Unknown',
+                  organization: org?.slug ?? 'Unknown',
+                },
+              })
             }
           }}
           tooltip={{
