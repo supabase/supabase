@@ -203,15 +203,22 @@ Sorting datasets from closest to farthest, sometimes called nearest-neighbor sor
 ```sql
 create or replace function nearby_restaurants(lat float, long float)
 returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE, lat float, long float, dist_meters float)
+set search_path = ''
 language sql
 as $$
-  select id, name, st_y(location::geometry) as lat, st_x(location::geometry) as long, st_distance(location, st_point(long, lat)::geography) as dist_meters
+  select id, name, gis.st_y(location::gis.geometry) as lat, gis.st_x(location::gis.geometry) as long, gis.st_distance(location, gis.st_point(long, lat)::gis.geography) as dist_meters
   from public.restaurants
-  order by location <-> st_point(long, lat)::geography;
+  order by location operator(gis.<->) gis.st_point(long, lat)::gis.geography;
 $$;
 ```
 
-You can call this function from your client using `rpc()` like this:
+Before being able to call this function from our client we need to grant access to our `gis` schema:
+
+```sql
+grant usage on schema gis to anon, authenticated;
+```
+
+Now you can call this function from your client using `rpc()` like this:
 
 <Tabs
   scrollable
@@ -321,11 +328,12 @@ When you are working on a map-based application where the user scrolls through y
 ```sql
 create or replace function restaurants_in_view(min_lat float, min_long float, max_lat float, max_long float)
 returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE, lat float, long float)
+set search_path to ''
 language sql
 as $$
-	select id, name, st_y(location::geometry) as lat, st_x(location::geometry) as long
+	select id, name, gis.st_y(location::gis.geometry) as lat, gis.st_x(location::gis.geometry) as long
 	from public.restaurants
-	where location && ST_SetSRID(ST_MakeBox2D(ST_Point(min_long, min_lat), ST_Point(max_long, max_lat)), 4326)
+	where location operator(gis.&&) gis.ST_SetSRID(gis.ST_MakeBox2D(gis.ST_Point(min_long, min_lat), gis.ST_Point(max_long, max_lat)), 4326)
 $$;
 ```
 

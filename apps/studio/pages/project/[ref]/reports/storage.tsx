@@ -11,10 +11,12 @@ import {
 import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useStorageReport } from 'data/reports/storage-report-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { RefreshCw } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -22,6 +24,8 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
   const organization = useSelectedOrganization()
+
+  const { isLoading, refresh } = report
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const plan = subscription?.plan
@@ -46,7 +50,15 @@ export const StorageReport: NextPageWithLayout = () => {
     <ReportPadding>
       <ReportHeader title="Storage" />
       <div className="w-full flex flex-col gap-1">
-        <div>
+        <div className="flex items-center gap-x-2">
+          <ButtonTooltip
+            type="default"
+            disabled={isLoading}
+            icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
+            className="w-7"
+            tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+            onClick={() => refresh()}
+          />
           <DatePickers
             onChange={handleDatepickerChange}
             to={report.params.cacheHitRate.iso_timestamp_end || ''}

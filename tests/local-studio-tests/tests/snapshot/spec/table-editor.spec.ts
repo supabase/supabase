@@ -23,11 +23,8 @@ test.describe('Table Editor page', () => {
 
     // The page has been loaded with the table data, we can now interact with the page
     await page
-      .getByRole('button')
-      .filter({
-        hasText: 'New table',
-      })
-      .or(page.getByRole('button', { name: 'New table' }))
+      .getByRole('button', { name: 'New table' })
+      .filter({ has: page.getByTitle('Create a new table') })
       .click()
     await page.getByTestId('table-name-input').waitFor({ state: 'visible' })
     await page.getByTestId('table-name-input').click()

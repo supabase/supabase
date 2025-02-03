@@ -14,7 +14,7 @@ subtitle: 'Debug slow-running queries using the Postgres execution planner.'
 {/* prettier-ignore */}
 ```sql
 -- enable explain
-alter role authenticator 
+alter role authenticator
 set pgrst.db_plan_enabled to 'true';
 
 -- reload the config
@@ -28,28 +28,28 @@ To get the execution plan of a query, you can chain the `explain()` method to a 
 {/* prettier-ignore */}
 ```ts
 const { data, error } = await supabase
-  .from('countries')
+  .from('instruments')
   .select()
   .explain()
 ```
 
 ### Example data
 
-To illustrate, consider the following setup of a `countries` table:
+To illustrate, consider the following setup of a `instruments` table:
 
 {/* prettier-ignore */}
 ```sql
-create table countries (
+create table instruments (
   id int8 primary key,
   name text
 );
 
-insert into countries
+insert into books
   (id, name)
 values
-  (1, 'Afghanistan'),
-  (2, 'Albania'),
-  (3, 'Algeria');
+  (1, 'violin'),
+  (2, 'viola'),
+  (3, 'cello');
 ```
 
 ### Expected response
@@ -60,7 +60,7 @@ The response would typically look like this:
 ```markdown
 Aggregate  (cost=33.34..33.36 rows=1 width=112)
   ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
-        ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+        ->  Seq Scan on instruments  (cost=0.00..22.00 rows=1200 width=40)
 ```
 
 By default, the execution plan is returned in TEXT format. However, you can also retrieve it as JSON by specifying the `format` parameter.
@@ -97,11 +97,11 @@ To disable the `explain()` method after use, execute the following SQL commands:
 {/* prettier-ignore */}
 ```sql
 -- disable explain
-alter role authenticator 
+alter role authenticator
 set pgrst.db_plan_enabled to 'false';
 
 -- if you used the above pre-request
-alter role authenticator 
+alter role authenticator
 set pgrst.db_pre_request to '';
 
 -- reload the config
