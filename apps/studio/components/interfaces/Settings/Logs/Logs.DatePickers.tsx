@@ -216,8 +216,6 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
         >
           {helpers.map((helper) => (
             <Label
-              disabled={helper.disabled}
-              aria-disabled={helper.disabled}
               key={helper.text}
               className={cn(
                 '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs',
