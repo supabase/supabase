@@ -5,7 +5,7 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import update from 'immutability-helper'
 import { isEqual } from 'lodash'
 import { ChevronDown, PlusCircle } from 'lucide-react'
-import { Fragment, useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -14,8 +14,8 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
-import SortRow from './SortRow'
 import RuleSetButtonText from '../rules-set-button-text'
+import SortRow from './SortRow'
 
 export interface SortPopoverProps {
   table: SupaTable
@@ -56,6 +56,7 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
           type={hasSorts ? 'default' : 'dashed'}
           icon={!hasSorts && <PlusCircle strokeWidth={1.5} />}
           className={cn('rounded-full', hasSorts && sorts.length <= 2 && 'pr-0.5')}
+          data-testid="table-editor-sort-button"
         >
           {btnText}
         </Button>
