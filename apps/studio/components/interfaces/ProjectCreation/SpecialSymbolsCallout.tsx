@@ -7,7 +7,7 @@ export const SpecialSymbolsCallout = () => {
       <InlineLink href="https://supabase.com/docs/guides/database/postgres/roles#special-symbols-in-passwords">
         percent-encode
       </InlineLink>{' '}
-      your password
+      the password
     </p>
   )
 }
