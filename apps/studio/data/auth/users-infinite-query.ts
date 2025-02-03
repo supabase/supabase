@@ -21,7 +21,7 @@ export type UsersVariables = {
 
 export const USERS_PAGE_LIMIT = 50
 export type User = components['schemas']['UserBody'] & {
-  providers: string[]
+  providers: readonly string[]
 }
 
 export const getUsersSQL = ({
