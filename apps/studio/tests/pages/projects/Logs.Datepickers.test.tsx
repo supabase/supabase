@@ -175,3 +175,16 @@ test('passing a value prop shows the correct dates in the label', async () => {
     `${from.format('DD MMM')}, ${from.format('HH:mm')} - ${to.format('DD MMM')}, ${to.format('HH:mm')}`
   )
 })
+
+test('passing a helper as a value prop shows the helper text in the label', async () => {
+  const helper = {
+    text: 'Last 7 days',
+    from: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
+    to: () => '',
+    isHelper: true,
+  }
+
+  render(<LogsDatePicker helpers={[helper]} value={helper} onSubmit={mockFn} />)
+
+  await screen.findByText(helper.text)
+})
