@@ -28,6 +28,29 @@ interface Props {
 export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) => {
   const [open, setOpen] = useState(false)
 
+  // Reset the state when the popover closes
+  useEffect(() => {
+    if (!open) {
+      setStartDate(value.from ? new Date(value.from) : null)
+      setEndDate(value.to ? new Date(value.to) : new Date())
+
+      const fromDate = value.from ? new Date(value.from) : null
+      const toDate = value.to ? new Date(value.to) : null
+
+      setStartTime({
+        HH: fromDate?.getHours().toString().padStart(2, '0') || '00',
+        mm: fromDate?.getMinutes().toString().padStart(2, '0') || '00',
+        ss: fromDate?.getSeconds().toString().padStart(2, '0') || '00',
+      })
+
+      setEndTime({
+        HH: toDate?.getHours().toString().padStart(2, '0') || '23',
+        mm: toDate?.getMinutes().toString().padStart(2, '0') || '59',
+        ss: toDate?.getSeconds().toString().padStart(2, '0') || '59',
+      })
+    }
+  }, [open, value])
+
   const handleHelperChange = (newValue: string) => {
     const selectedHelper = helpers.find((h) => h.text === newValue)
     if (onSubmit && selectedHelper) {
@@ -43,7 +66,7 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
   }
 
   const [startDate, setStartDate] = useState<Date | null>(value.from ? new Date(value.from) : null)
-  const [endDate, setEndDate] = useState<Date | null>(value.to ? new Date(value.to) : null)
+  const [endDate, setEndDate] = useState<Date | null>(value.to ? new Date(value.to) : new Date())
 
   const [startTime, setStartTime] = useState({
     HH: startDate?.getHours().toString() || '00',
@@ -264,7 +287,6 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
               }}
               dateFormat="MMMM d, yyyy h:mm aa"
               dayClassName={() => 'cursor-pointer'}
-              selected={startDate}
               startDate={startDate}
               endDate={endDate}
               renderCustomHeader={({
