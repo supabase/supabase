@@ -14,8 +14,19 @@ const SUPPORTED_CSP_AVATAR_URLS = [
   'https://lh3.googleusercontent.com',
 ]
 
-export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean => {
-  return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
+export const isCloseToBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean => {
+  const { scrollTop, scrollHeight, clientHeight } = currentTarget
+
+  // If the content doesn't overflow, it's not considered "close to bottom"
+  if (scrollHeight <= clientHeight) {
+    return false
+  }
+
+  // Check if we're within 100px of the bottom
+  const bottomThreshold = 100
+  const remainingScroll = scrollHeight - (scrollTop + clientHeight)
+
+  return remainingScroll <= bottomThreshold
 }
 
 export const formatUsersData = (users: User[]) => {
