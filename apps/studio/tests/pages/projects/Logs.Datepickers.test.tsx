@@ -113,3 +113,40 @@ test('datepicker onSubmit will return ISO string of selected dates', async () =>
     to: dayjs().date(24).hour(23).minute(59).second(59).millisecond(0).toISOString(),
   })
 })
+
+test('disabled helpers are disabled', async () => {
+  const helpers = [
+    {
+      text: 'Last 7 days',
+      from: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
+      to: () => '',
+      isHelper: true,
+    },
+    {
+      text: 'Last 30 days',
+      from: () => dayjs().subtract(30, 'day').startOf('day').toISOString(),
+      to: () => '',
+      isHelper: true,
+      disabled: true,
+    },
+  ]
+
+  const el = render(
+    <LogsDatePicker
+      helpers={helpers}
+      onSubmit={mockFn}
+      value={{
+        from: dayjs().subtract(7, 'day').startOf('day').toISOString(),
+        to: '',
+        isHelper: true,
+        text: 'Last 7 days',
+      }}
+    />
+  )
+
+  // click the datepicker
+  userEvent.click(screen.getByText('Last 7 days'))
+
+  const disabledHelper = el.getByText('Last 30 days')
+  expect(disabledHelper).toHaveAttribute('aria-disabled', 'true')
+})
