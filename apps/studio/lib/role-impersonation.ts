@@ -14,7 +14,7 @@ type PostgrestImpersonationRole =
       type: 'postgrest'
       role: 'authenticated'
       userType: 'native'
-      user?: User
+      user?: Omit<User, 'providers'>
       aal?: 'aal1' | 'aal2'
     }
   | {
