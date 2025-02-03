@@ -714,11 +714,6 @@ export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
     calcFrom: () => dayjs().subtract(5, 'day').startOf('day').toISOString(),
     calcTo: () => '',
   },
-  {
-    text: 'Last 7 days',
-    calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
-  },
 ]
 export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
