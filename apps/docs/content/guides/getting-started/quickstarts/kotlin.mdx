@@ -8,7 +8,7 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-  
+
       <QuickstartDbSetup />
 
   </StepHikeCompact.Step>
@@ -103,7 +103,7 @@ hideToc: true
 
   <StepHikeCompact.Step step={6}>
 
-    <StepHikeCompact.Details title="Create a data model for countries">
+    <StepHikeCompact.Details title="Create a data model for instruments">
       Create a serializable data class to represent the data from the database.
 
       Add the following below the `createSupabaseClient` function in the `MainActivity.kt` file.
@@ -112,7 +112,7 @@ hideToc: true
     <StepHikeCompact.Code>
       ```kotlin
       @Serializable
-      data class Country(
+      data class Instrument(
           val id: Int,
           val name: String,
       )
@@ -144,7 +144,7 @@ hideToc: true
                           modifier = Modifier.fillMaxSize(),
                           color = MaterialTheme.colorScheme.background
                       ) {
-                          CountriesList()
+                          InstrumentsList()
                       }
                   }
               }
@@ -152,21 +152,21 @@ hideToc: true
       }
 
       @Composable
-      fun CountriesList() {
-          var countries by remember { mutableStateOf<List<Country>>(listOf()) }
+      fun InstrumentsList() {
+          var instruments by remember { mutableStateOf<List<Instrument>>(listOf()) }
           LaunchedEffect(Unit) {
               withContext(Dispatchers.IO) {
-                  countries = supabase.from("countries")
-                                    .select().decodeList<Country>()
+                  instruments = supabase.from("instruments")
+                                    .select().decodeList<Instrument>()
               }
           }
           LazyColumn {
               items(
-                  countries,
-                  key = { country -> country.id },
-              ) { country ->
+                  instruments,
+                  key = { instrument -> instrument.id },
+              ) { instrument ->
                   Text(
-                      country.name,
+                      instrument.name,
                       modifier = Modifier.padding(8.dp),
                   )
               }

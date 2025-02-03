@@ -101,7 +101,7 @@ hideToc: true
         @override
         Widget build(BuildContext context) {
           return const MaterialApp(
-            title: 'Countries',
+            title: 'Instruments',
             home: HomePage(),
           );
         }
@@ -116,7 +116,7 @@ hideToc: true
 
       class _HomePageState extends State<HomePage> {
         final _future = Supabase.instance.client
-            .from('countries')
+            .from('instruments')
             .select();
 
         @override
@@ -128,13 +128,13 @@ hideToc: true
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                final countries = snapshot.data!;
+                final instruments = snapshot.data!;
                 return ListView.builder(
-                  itemCount: countries.length,
+                  itemCount: instruments.length,
                   itemBuilder: ((context, index) {
-                    final country = countries[index];
+                    final instrument = instruments[index];
                     return ListTile(
-                      title: Text(country['name']),
+                      title: Text(instrument['name']),
                     );
                   }),
                 );
