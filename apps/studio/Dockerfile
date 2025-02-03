@@ -11,6 +11,10 @@
 FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+
+# Workaround for https://github.com/nodejs/corepack/issues/612.
+RUN npm install -g corepack@0.31.0
+
 RUN corepack enable
 
 # Fixes issues with Sentry CLI and SSL certificates during build
