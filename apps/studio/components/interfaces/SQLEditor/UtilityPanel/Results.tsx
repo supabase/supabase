@@ -127,19 +127,27 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
 
   return (
     <>
-      <DataGrid
-        columns={columns}
-        rows={rows}
-        className="h-full flex-grow border-t-0"
-        rowClass={() => '[&>.rdg-cell]:items-center'}
-        onSelectedCellChange={setCellPosition}
-      />
-      <CellDetailPanel
-        column={cellPosition?.column.name ?? ''}
-        value={cellPosition?.row?.[cellPosition.column.name]}
-        visible={expandCell}
-        onClose={() => setExpandCell(false)}
-      />
+      {rows.length === 0 ? (
+        <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+          <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
+        </div>
+      ) : (
+        <>
+          <DataGrid
+            columns={columns}
+            rows={rows}
+            className="h-full flex-grow border-t-0"
+            rowClass={() => '[&>.rdg-cell]:items-center'}
+            onSelectedCellChange={setCellPosition}
+          />
+          <CellDetailPanel
+            column={cellPosition?.column.name ?? ''}
+            value={cellPosition?.row?.[cellPosition.column.name]}
+            visible={expandCell}
+            onClose={() => setExpandCell(false)}
+          />
+        </>
+      )}
     </>
   )
 }
