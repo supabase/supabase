@@ -15,8 +15,8 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
       <CardContent
         ref={ref}
         className={cn(
-          'cursor-pointer hover:bg-surface-100 flex items-center justify-between text-sm gap-4',
-          !onClick && 'cursor-default',
+          'flex items-center justify-between text-sm gap-4',
+          onClick && 'cursor-pointer hover:bg-surface-100',
           className
         )}
         onClick={onClick}
