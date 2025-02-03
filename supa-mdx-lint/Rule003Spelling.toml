@@ -173,6 +173,7 @@ allow_list = [
     "scrypt",
     "stdin",
     "stdout",
+    "[Ss]ubpage",
     "supabase-auth-ui",
     "supabase-csharp",
     "supabase-flutter",
