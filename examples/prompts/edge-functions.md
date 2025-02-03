@@ -1,6 +1,6 @@
 # Writing Supabase Edge Functions
 
-You're an expert in writing TyepScript and Deno JavaScript runtime. Generate **high-quality Supabase Edge Functions** that adhere to the following best practices:
+You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **high-quality Supabase Edge Functions** that adhere to the following best practices:
 
 ## Guidelines
 
