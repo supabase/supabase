@@ -1,15 +1,11 @@
 import { isEqual } from 'lodash'
 import { ChevronRight, XCircle } from 'lucide-react'
 import type { HTMLAttributes, PropsWithChildren } from 'react'
+import ReactMarkdown from 'react-markdown'
 
-import {
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  cn,
-  CodeBlock,
-} from 'ui'
+import { cn, Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_ } from 'ui'
 
+import ApiSchema from '~/components/ApiSchema'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import type {
@@ -23,8 +19,6 @@ import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 import { getTypeDisplayFromSchema, IApiEndPoint, type ISchema } from './Reference.api.utils'
 import { API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES } from './Reference.ui.shared'
-import ReactMarkdown from 'react-markdown'
-import ApiSchema from '~/components/ApiSchema'
 
 interface SectionProps extends PropsWithChildren {
   link: string
@@ -696,14 +690,14 @@ function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['
       }
       break
     case 'array':
-      if (parentType.type.elemType.type === 'union') {
+      if (parentType.type.elemType?.type === 'union') {
         subDetails = parentType.type.elemType.subTypes.map((subType, index) => ({
           name: `union option ${index + 1}`,
           type: { ...subType },
           isOptional: 'NA',
         }))
       }
-      if (parentType.type.elemType.type === 'object') {
+      if (parentType.type.elemType?.type === 'object') {
         subDetails = parentType.type.elemType.properties
       }
       break
