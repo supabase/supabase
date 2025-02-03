@@ -2136,6 +2136,10 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/manage-your-usage/disk-throughput',
             },
             {
+              name: 'Disk IOPS',
+              url: '/guides/platform/manage-your-usage/disk-iops',
+            },
+            {
               name: 'Edge Function Invocations',
               url: '/guides/platform/manage-your-usage/edge-function-invocations',
             },
