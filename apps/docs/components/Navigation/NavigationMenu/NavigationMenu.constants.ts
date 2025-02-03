@@ -1922,10 +1922,14 @@ export const local_development: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Getting started', url: '/guides/local-development/testing/overview' },
-        { name: 'Unit testing', url: '/guides/database/testing' },
         {
-          name: 'Integration testing',
-          url: '/guides/local-development/managing-config',
+          name: 'pgTAP advanced guide',
+          url: '/guides/local-development/testing/pgtap-extended',
+        },
+        { name: 'Database testing', url: '/guides/database/testing' },
+        {
+          name: 'RLS policies testing',
+          url: '/guides/database/extensions/pgtap#testing-rls-policies',
         },
       ],
     },

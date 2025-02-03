@@ -6,7 +6,18 @@ description: 'Learn how develop and test your database schema, tables, functions
 
 Testing is a critical part of database development, especially when working with features like Row Level Security (RLS) policies. This guide provides a comprehensive approach to testing your Supabase database.
 
-## Quick Start: Testing RLS in 15 Minutes
+## Testing Approaches
+
+### 1. Database Unit Testing with pgTAP
+
+[pgTAP](https://pgtap.org) is a unit testing framework for PostgreSQL that allows you to test:
+
+- Database structure (tables, columns, constraints)
+- Row Level Security (RLS) policies
+- Functions and procedures
+- Data integrity
+
+#### pgTAP: Testing RLS in 15 Minutes
 
 Let's walk through a complete example of setting up and testing RLS policies for a simple todo application:
 
@@ -34,69 +45,74 @@ using (auth.uid() = user_id);
 2. Set up your testing environment:
 
 ```bash
-# Create test directory
-mkdir -p ./supabase/tests/database
-
-# Enable pgTAP extension if not already enabled
-supabase sql 'create extension if not exists pgtap with schema extensions;'
-
-# Create test file
-touch ./supabase/tests/database/todos_rls.test.sql
+# Create a new test for our policies using supabase cli
+supabase test new todos_rls.test
 ```
 
 3. Write your RLS tests:
 
 ```sql
 begin;
+-- install tests utilities
+-- install pgtap extension for testing
+create extension if not exists pgtap with schema extensions;
+-- Start declare we'll have 6 test cases in our test suite
 select plan(6);
 
+-- Setup our testing data
+-- Set up auth.users entries
+insert into auth.users (id, email) values
+    ('123e4567-e89b-12d3-a456-426614174000', 'user1@test.com'),
+    ('987fcdeb-51a2-43d7-9012-345678901234', 'user2@test.com');
+
+-- Create test todos
+insert into public.todos (task, user_id) values
+    ('User 1 Task 1', '123e4567-e89b-12d3-a456-426614174000'),
+    ('User 1 Task 2', '123e4567-e89b-12d3-a456-426614174000'),
+    ('User 2 Task 1', '987fcdeb-51a2-43d7-9012-345678901234');
+
 -- Test 1: Verify RLS is enabled
-select has_row_level_security('public'::name, 'todos'::name);
+select results_eq(
+    $$SELECT relrowsecurity FROM pg_class WHERE relname = 'todos' AND relnamespace = 'public'::regnamespace$$,
+    ARRAY[true],
+    'Row Level Security should be enabled on todos table'
+);
 
 -- Test 2: Verify policy exists
 select policies_are('public', 'todos', ARRAY['Users can only access their own todos']);
 
--- Set up test data
-insert into auth.users (id, email) values
-  ('d0c2eb55-5c60-4415-93f9-8743b3b0743e', 'user1@test.com'),
-  ('51f0518c-0d3b-4937-b98f-2a50b8aa1997', 'user2@test.com');
-
-insert into public.todos (task, user_id) values
-  ('User 1 Task 1', 'd0c2eb55-5c60-4415-93f9-8743b3b0743e'),
-  ('User 1 Task 2', 'd0c2eb55-5c60-4415-93f9-8743b3b0743e'),
-  ('User 2 Task 1', '51f0518c-0d3b-4937-b98f-2a50b8aa1997');
-
--- Test as User 1
+-- as User 1
 set local role authenticated;
-set local "request.jwt.claims" to '{"sub": "d0c2eb55-5c60-4415-93f9-8743b3b0743e"}';
+set local request.jwt.claim.sub = '123e4567-e89b-12d3-a456-426614174000';
 
 -- Test 3: User 1 should only see their own todos
 select results_eq(
-  'select count(*) from todos',
-  ARRAY[2::bigint],
-  'User 1 should only see their 2 todos'
+    'select count(*) from todos',
+    ARRAY[2::bigint],
+    'User 1 should only see their 2 todos'
 );
 
 -- Test 4: User 1 can create their own todo
 select lives_ok(
-  $$insert into todos (task, user_id) values ('New Task', 'd0c2eb55-5c60-4415-93f9-8743b3b0743e')$$,
-  'User 1 can create their own todo'
+    $$insert into todos (task, user_id) values ('New Task', '123e4567-e89b-12d3-a456-426614174000'::uuid)$$,
+    'User 1 can create their own todo'
 );
 
--- Test as User 2
-set local "request.jwt.claims" to '{"sub": "51f0518c-0d3b-4937-b98f-2a50b8aa1997"}';
+-- as User 2
+set local request.jwt.claim.sub = '987fcdeb-51a2-43d7-9012-345678901234';
 
 -- Test 5: User 2 should only see their own todos
 select results_eq(
-  'select count(*) from todos',
-  ARRAY[1::bigint],
-  'User 2 should only see their 1 todo'
+    'select count(*) from todos',
+    ARRAY[1::bigint],
+    'User 2 should only see their 1 todo'
 );
 
 -- Test 6: User 2 cannot modify User 1's todo
-select throws_ok(
-  $$update todos set task = 'Hacked!' where user_id = 'd0c2eb55-5c60-4415-93f9-8743b3b0743e'$$,
-  'User 2 cannot modify User 1 todos'
+SELECT results_ne(
+    $$ update todos set task = 'Hacked!' where user_id = '123e4567-e89b-12d3-a456-426614174000'::uuid returning 1 $$,
+    $$ values(1) $$,
+    'User 2 cannot modify User 1 todos'
 );
 
 select * from finish();
@@ -107,112 +123,95 @@ rollback;
 
 ```bash
 supabase test db
-```
-
-## Testing Approaches
-
-### 1. Database Unit Testing with pgTAP
-
-[pgTAP](https://pgtap.org) is a unit testing framework for PostgreSQL that allows you to test:
-
-- Database structure (tables, columns, constraints)
-- Row Level Security (RLS) policies
-- Functions and procedures
-- Data integrity
-
-#### Common pgTAP Testing Patterns
-
-1. Testing Database Structure:
-
-```sql
-begin;
-select plan(4);
-
--- Test table existence
-select has_table('public', 'todos', 'Table todos should exist');
-
--- Test column existence
-select has_column('public', 'todos', 'task', 'Column task should exist');
-select has_column('public', 'todos', 'user_id', 'Column user_id should exist');
-
--- Test foreign key constraint
-select col_is_fk('public', 'todos', 'user_id', 'user_id should be a foreign key');
-
-select * from finish();
-rollback;
-```
-
-2. Testing RLS Policies with Different Roles:
-
-```sql
-begin;
-select plan(3);
-
--- Test anonymous access
-set local role anon;
-select results_eq(
-  'select count(*) from todos',
-  ARRAY[0::bigint],
-  'Anonymous users should see no todos'
-);
-
--- Test authenticated access with correct user
-set local role authenticated;
-set local "request.jwt.claims" to '{"sub": "user-id"}';
-select results_eq(
-  'select count(*) from todos where user_id = ''user-id''',
-  ARRAY[1::bigint],
-  'User should see their own todos'
-);
-
--- Test authenticated access with wrong user
-set local "request.jwt.claims" to '{"sub": "wrong-user"}';
-select results_eq(
-  'select count(*) from todos where user_id = ''user-id''',
-  ARRAY[0::bigint],
-  'User should not see other users todos'
-);
-
-select * from finish();
-rollback;
+psql:todos_rls.test.sql:4: NOTICE:  extension "pgtap" already exists, skipping
+./todos_rls.test.sql .. ok
+All tests successful.
+Files=1, Tests=6,  0 wallclock secs ( 0.01 usr +  0.00 sys =  0.01 CPU)
+Result: PASS
 ```
 
 ### 2. Application-Level Testing
 
-Testing through your application code provides end-to-end verification. Here's an example using TypeScript and Jest:
+Testing through your application code provides end-to-end verification. Here's an example using TypeScript and Jest that mirrors our pgTAP tests above:
 
 ```typescript
 import { createClient } from '@supabase/supabase-js'
+import { beforeAll, describe, expect, it } from '@jest/globals'
 
 describe('Todos RLS', () => {
   const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!)
 
-  it('should enforce RLS policies', async () => {
-    // Sign in as user 1
-    const {
-      data: { user: user1 },
-    } = await supabase.auth.signInWithPassword({
+  // Test users from our pgTAP example
+  const USER_1_ID = '123e4567-e89b-12d3-a456-426614174000'
+  const USER_2_ID = '987fcdeb-51a2-43d7-9012-345678901234'
+
+  beforeAll(async () => {
+    // Setup test data
+    const adminSupabase = createClient(process.env.SUPABASE_URL!, process.env.SERVICE_ROLE_KEY!)
+
+    // Create test users (using service role to bypass email verification)
+    await adminSupabase.auth.admin.createUser({
+      email: 'user1@test.com',
+      password: 'password123',
+      user_metadata: { id: USER_1_ID },
+    })
+    await adminSupabase.auth.admin.createUser({
+      email: 'user2@test.com',
+      password: 'password123',
+      user_metadata: { id: USER_2_ID },
+    })
+
+    // Create initial todos
+    await adminSupabase.from('todos').insert([
+      { task: 'User 1 Task 1', user_id: USER_1_ID },
+      { task: 'User 1 Task 2', user_id: USER_1_ID },
+      { task: 'User 2 Task 1', user_id: USER_2_ID },
+    ])
+  })
+
+  it('should allow User 1 to only see their own todos', async () => {
+    // Sign in as User 1
+    await supabase.auth.signInWithPassword({
       email: 'user1@test.com',
       password: 'password123',
     })
 
-    // Create a todo as user 1
-    const { data: todo } = await supabase
-      .from('todos')
-      .insert({ task: 'Test task', user_id: user1.id })
-      .select()
-      .single()
+    const { data: todos } = await supabase.from('todos').select('*')
+    expect(todos).toHaveLength(2)
+    todos?.forEach((todo) => {
+      expect(todo.user_id).toBe(USER_1_ID)
+    })
+  })
 
-    // Sign in as user 2
+  it('should allow User 1 to create their own todo', async () => {
+    // Still signed in as User 1
+    const { error } = await supabase.from('todos').insert({ task: 'New Task', user_id: USER_1_ID })
+
+    expect(error).toBeNull()
+  })
+
+  it('should allow User 2 to only see their own todos', async () => {
+    // Sign in as User 2
     await supabase.auth.signInWithPassword({
       email: 'user2@test.com',
       password: 'password123',
     })
 
-    // Try to access user 1's todo
-    const { data: user2Todos } = await supabase.from('todos').select().eq('id', todo.id)
+    const { data: todos } = await supabase.from('todos').select('*')
+    expect(todos).toHaveLength(1)
+    todos?.forEach((todo) => {
+      expect(todo.user_id).toBe(USER_2_ID)
+    })
+  })
 
-    expect(user2Todos).toHaveLength(0) // User 2 should not see User 1's todo
+  it('should prevent User 2 from modifying User 1 todos', async () => {
+    // Still signed in as User 2
+    const { error } = await supabase
+      .from('todos')
+      .update({ task: 'Hacked!' })
+      .eq('user_id', USER_1_ID)
+
+    expect(error).not.toBeNull()
   })
 })
 ```
@@ -274,6 +273,7 @@ jobs:
 For more complex, real-world examples of database testing, check out:
 
 - [Basejump's Database Tests](https://github.com/usebasejump/basejump/tree/main/supabase/tests/database) - A production-grade example of testing RLS policies
+- [RLS Guide and Best Practices](https://github.com/orgs/supabase/discussions/14576)
 
 ## Troubleshooting
 
@@ -294,3 +294,5 @@ Common issues and solutions:
 
 - [pgTAP Documentation](https://pgtap.org)
 - [Supabase CLI Reference](https://supabase.com/docs/reference/cli/supabase-test)
+- [pgTap supabase reference](https://supabase.com/docs/guides/database/extensions/pgtap?queryGroups=database-method&database-method=sql#testing-rls-policies)
+- [Database testing reference](https://supabase.com/docs/guides/database/testing)
