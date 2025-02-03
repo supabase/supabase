@@ -1,5 +1,25 @@
-import { Settings, Plus, Save, UserPlus, Database, Key, Trash } from 'lucide-react'
-import { Button, CardFooter } from 'ui'
+import {
+  Settings,
+  Plus,
+  Save,
+  UserPlus,
+  Database,
+  Key,
+  Trash,
+  Terminal,
+  ChevronRight,
+  Mail,
+} from 'lucide-react'
+import {
+  AlertTitle_Shadcn_,
+  AlertDescription_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  CardFooter,
+  WarningIcon,
+  Badge,
+  IconGitHubSolid,
+} from 'ui'
 import { Page, PageContent, PageSection } from 'ui-patterns/Page'
 import { FormFieldWrapper } from 'ui-patterns/form/FormFieldWrapper'
 import {
@@ -57,11 +77,11 @@ export default function PageDemo() {
         subtitle="Manage your project settings and configurations"
         className="bg-red"
         // icon={<Settings size={24} />}
-        breadcrumbs={[
-          { label: 'Projects', href: '#projects' },
-          { label: 'Example Project', href: '#example-project' },
-          { label: 'Settings' },
-        ]}
+        // breadcrumbs={[
+        //   { label: 'Projects', href: '#projects' },
+        //   { label: 'Example Project', href: '#example-project' },
+        //   { label: 'Settings' },
+        // ]}
         primaryActions={
           <Button icon={<Plus size={16} />} size="small">
             Create new
@@ -140,7 +160,7 @@ export default function PageDemo() {
                       name="description"
                       render={({ field }) => (
                         <>
-                          <FormItem_Shadcn_ className="grid grid-cols-12 gap-8 items-start opacity-25">
+                          <FormItem_Shadcn_ className="grid grid-cols-12 gap-8 items-start">
                             <div className="col-span-6">
                               <FormLabel_Shadcn_>Description</FormLabel_Shadcn_>
                               <FormDescription_Shadcn_ className="text-xs">
@@ -151,6 +171,7 @@ export default function PageDemo() {
                               <FormControl_Shadcn_>
                                 <TextArea_Shadcn_
                                   {...field}
+                                  className="opacity-25"
                                   placeholder="Enter project description"
                                   rows={3}
                                 />
@@ -158,21 +179,21 @@ export default function PageDemo() {
                               <FormMessage_Shadcn_ className="text-right" />
                             </div>
                           </FormItem_Shadcn_>
-                          <Admonition
-                            className="mt-4"
-                            type="note"
-                            title={'Upgrade to pro'}
-                            description={
-                              'Upgrade your plan to gain access to this wonderful feature'
-                            }
-                          >
-                            <Button type="outline" className="mt-2">
-                              Upgrade plan
-                            </Button>
-                          </Admonition>
                         </>
                       )}
                     />
+                    <Alert_Shadcn_ className="mt-4">
+                      <Terminal />
+                      <AlertTitle_Shadcn_>Upgrade to pro</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_ className="space-y-2">
+                        <p className="!leading-tight">
+                          Upgrade your plan to gain access to this wonderful feature
+                        </p>
+                        <Button type="outline" className="mt-2">
+                          Upgrade plan
+                        </Button>
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
                   </CardContent>
                   <CardFooter className="flex justify-end gap-2">
                     <Button type="outline">Cancel</Button>
@@ -202,6 +223,35 @@ export default function PageDemo() {
                   </p>
                 </div>
                 <Button type="outline">Pause project</Button>
+              </CardContent>
+            </Card>
+          </PageSection>
+
+          <PageSection title="Providers" subtitle="Choose which authentication methods to support">
+            <Card>
+              <CardContent className="cursor-pointer hover:bg-surface-100 flex items-center justify-between flex items-center text-sm gap-4">
+                <div className="w-12 h-12 rounded bg-muted text-foreground-light flex items-center justify-center">
+                  <Mail strokeWidth={1.5} size={16} />
+                </div>
+                <div className="flex-1">
+                  <div className="text-foreground">Email and password</div>
+                  <p className="text-foreground-light text-xs">
+                    Users can sign up and sign in via an email and password with an optional email
+                    confirmation
+                  </p>
+                </div>
+                <Badge variant="success">Enabled</Badge>
+                <ChevronRight strokeWidth={1.5} size={16} />
+              </CardContent>
+              <CardContent className="cursor-pointer hover:bg-surface-100 flex items-center justify-between flex items-center text-sm gap-4">
+                <div className="w-12 h-12 rounded bg-muted text-foreground-light flex items-center justify-center">
+                  <IconGitHubSolid />
+                </div>
+                <div className="flex-1">
+                  <div className="text-foreground">GitHub</div>
+                </div>
+                <Badge>Disabled</Badge>
+                <ChevronRight strokeWidth={1.5} size={16} />
               </CardContent>
             </Card>
           </PageSection>

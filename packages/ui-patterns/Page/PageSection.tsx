@@ -14,7 +14,7 @@ export function PageSection({ children, title, subtitle, actions, className }: P
     <section className={cn('pt-12', className)}>
       {(title || subtitle || actions) && (
         <div className="flex items-end justify-between gap-4 mb-6">
-          <div className="space-y-1">
+          <div>
             {title && <h2 className="text-lg text-foreground">{title}</h2>}
             {subtitle && <p className="text-sm text-foreground-light">{subtitle}</p>}
           </div>

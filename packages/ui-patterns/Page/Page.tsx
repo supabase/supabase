@@ -73,7 +73,7 @@ export function Page({
         {(breadcrumbs || (isCompact && (title || primaryActions || secondaryActions))) && (
           <div className={cn('flex items-center gap-4', isCompact ? 'justify-between' : 'mb-4')}>
             {breadcrumbs ? (
-              <Breadcrumb className={cn('text-foreground-light', isCompact && 'text-base')}>
+              <Breadcrumb className={cn('text-foreground-muted', isCompact && 'text-base')}>
                 <BreadcrumbList className={isCompact ? 'text-base' : 'text-xs'}>
                   {breadcrumbs.map((item, index) => (
                     <React.Fragment key={item.label}>
