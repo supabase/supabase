@@ -2132,6 +2132,10 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/manage-your-usage/disk-size',
             },
             {
+              name: 'Disk Throughput',
+              url: '/guides/platform/manage-your-usage/disk-throughput',
+            },
+            {
               name: 'Edge Function Invocations',
               url: '/guides/platform/manage-your-usage/edge-function-invocations',
             },
