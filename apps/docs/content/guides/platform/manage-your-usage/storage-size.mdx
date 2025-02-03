@@ -1,0 +1,74 @@
+---
+id: 'manage-usage-storage-size'
+title: 'Manage Storage size usage'
+---
+
+## What you are charged for
+You are charged for the total size of all assets in your buckets.
+
+## How charges are calculated
+Storage size is charged by Gigabyte-Hours (GB-Hrs). 1 GB-Hrs represents the use of 1 GB of storage for 1 hour.
+For example, storing 10 GB of data for 5 hours results in 50 GB-Hrs (10 GB × 5 hours).
+
+### Storage size usage on your invoice
+Storage size usage is shown as "Storage Size GB-Hrs" on your invoice.
+
+## Pricing
+1 GB-Hrs is $0.00002919. That is $0.021 per GB per month. You are only charged for usage exceeding your subscription plan's free quota.
+
+| Plan       | Free Quota in GB | Over-Usage per GB | Free Quota in GB-Hrs | Over-Usage per GB-Hrs |
+|------------|------------------|-------------------|----------------------|-----------------------|
+| Free       | 1 GB             | -                 | 744                  | -                     |
+| Pro        | 100 GB           | $0.021            | 74,400               | $0.00002919           |
+| Team       | 100 GB           | $0.021            | 74,400               | $0.00002919           |
+| Enterprise | Custom           | Custom            | Custom               | Custom                |
+
+## Billing examples
+### Within quota
+The organization's Storage size usage is within the free quota, so no charges for Storage size apply.
+
+| Line Item           | Units     | Costs   |
+|---------------------|-----------|---------|
+| Pro Plan            | 1         | $25     |
+| Compute Hours Micro | 744 hours | $10     |
+| Storage Size        | 85 GB     | $0      |
+| **Subtotal**        |           | **$35** |
+| Compute Credits     |           | -$10    |
+| **Total**           |           | **$25** |
+
+### Exceeding quota
+The organization's Storage size usage exceeds the free quota by 257 GB, incurring charges for this additional usage.
+
+| Line Item           | Units     | Costs     |
+|---------------------|-----------|-----------|
+| Pro Plan            | 1         | $25       |
+| Compute Hours Micro | 744 hours | $10       |
+| Storage Size        | 357 GB    | $5.4      |
+| **Subtotal**        |           | **$40.4** |
+| Compute Credits     |           | -$10      |
+| **Total**           |           | **$30.4** |
+
+## View Storage size usage
+You can view Storage size usage on the [organization's usage page](https://supabase.com/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
+<Image
+  alt="Usage page navigation bar"
+  src={{
+    light: '/docs/img/guides/platform/usage-navbar--light.png',
+    dark: '/docs/img/guides/platform/usage-navbar--dark.png',
+  }}
+  zoomable
+/>
+
+In the Storage size section, you can see how much storage your projects have used during the selected time period.
+<Image
+  alt="Usage page Compute Hours section"
+  src={{
+    light: '/docs/img/guides/platform/usage-storage-size--light.png',
+    dark: '/docs/img/guides/platform/usage-storage-size--dark.png',
+  }}
+  zoomable
+/>
+
+## Optimize Storage size usage
+- [Limit the upload size](/docs/guides/storage/production/scaling#limit-the-upload-size) for your buckets
+- [Delete assets](/docs/guides/storage/management/delete-objects) that are no longer in use
