@@ -1,0 +1,114 @@
+---
+id: 'manage-usage-egress'
+title: 'Manage Egress usage'
+---
+
+## What you are charged for
+You are charged for the network data transmitted out of the system to a connected client. Egress is incurred by all services - Database, Authentication, Storage, Edge Functions, Realtime, and Log Drains.
+
+## How charges are calculated
+Egress is charged by byte. Charges apply only for usage exceeding the subscription plan's free quota. This quota can be used across all services (Database, Authentication, Storage etc.), also referred to as Unified Egress.
+
+### Egress usage on your invoice
+Egress usage is shown as "Egress GB" on your invoice.
+
+## Pricing
+Usage beyond the free quota is charged at $0.09 per GB.
+
+| Plan       | Unified Egress Quota | Over-Usage   |
+|------------|----------------------|--------------|
+| Free       | 5 GB                 | -            |
+| Pro        | 250 GB               | $0.09 per GB |
+| Team       | 250 GB               | $0.09 per GB |
+| Enterprise | Custom               | Custom       |
+
+## Billing examples
+### Within quota
+The organization's Egress usage is within the free quota, so no charges for Egress apply.
+
+| Line Item           | Units     | Costs   |
+|---------------------|-----------|---------|
+| Pro Plan            | 1         | $25     |
+| Compute Hours Micro | 744 hours | $10     |
+| Egress              | 200 GB    | $0      |
+| **Subtotal**        |           | **$35** |
+| Compute Credits     |           | -$10    |
+| **Total**           |           | **$25** |
+
+### Exceeding quota
+The organization's Egress usage exceeds the free quota by 50 GB, incurring charges for this additional usage.
+
+| Line Item           | Units     | Costs     |
+|---------------------|-----------|-----------|
+| Pro Plan            | 1         | $25       |
+| Compute Hours Micro | 744 hours | $10       |
+| Egress              | 300 GB    | $4.5      |
+| **Subtotal**        |           | **$39.5** |
+| Compute Credits     |           | -$10      |
+| **Total**           |           | **$29.5** |
+
+## View Egress usage
+### Usage page
+You can view Egress usage on the [organization's usage page](https://supabase.com/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
+<Image
+  alt="Usage page navigation bar"
+  src={{
+    light: '/docs/img/guides/platform/usage-navbar--light.png',
+    dark: '/docs/img/guides/platform/usage-navbar--dark.png',
+  }}
+  zoomable
+/>
+
+In the Total Egress section, you can see the usage for the selected time period. Hover over a specific date to view a breakdown by service.
+<Image
+  alt="Unified Egress"
+  src={{
+    light: '/docs/img/guides/platform/unified-egress--light.png',
+    dark: '/docs/img/guides/platform/unified-egress.png',
+  }}
+/>
+
+### Custom report
+1. On the [reports page](https://supabase.com/dashboard/project/_/reports), click **New custom report** in the left navigation menu
+2. After creating a new report, add charts for one or more Supabase services by clicking **Add block**
+
+<Image
+  alt="Egress report"
+  src={{
+    light: '/docs/img/guides/platform/egress-report--light.png',
+    dark: '/docs/img/guides/platform/egress-report--dark.png',
+  }}
+  zoomable
+/>
+
+## Debug Egress usage
+To better understand your Egress usage, identify what’s driving the most traffic. Check the most frequent database queries, or analyze the most requested API paths to pinpoint high-bandwidth endpoints.
+
+### Frequent database queries
+On the Advisors [Query performance view](https://supabase.com/dashboard/project/_/database/query-performance?preset=most_frequent&sort=calls&order=desc) you can see the most frequent queries and the average number of rows returned.
+<Image
+  alt="Most frequent queries"
+  src={{
+    light: '/docs/img/guides/platform/advisor-most-frequent-queries--light.png',
+    dark: '/docs/img/guides/platform/advisor-most-frequent-queries--dark.png',
+  }}
+  zoomable
+/>
+
+### Most requested API endpoints
+In the [Logs Explorer](https://supabase.com/dashboard/project/_/logs/explorer) you can access Edge Logs, and review the top paths to identify heavily queried endpoints. These logs currently do not include response byte data. That data will be available in the future too.
+<Image
+  alt="Top paths"
+  src={{
+    light: '/docs/img/guides/platform/logs-top-paths--light.png',
+    dark: '/docs/img/guides/platform/logs-top-paths--dark.png',
+  }}
+  zoomable
+/>
+
+## Optimize Egress usage
+- Reduce the number of fields or entries selected when querying your database
+- Reduce the number of queries or calls by optimizing client code or using caches
+- For update or insert queries, configure your ORM or queries to not return the entire row if not needed
+- When running manual backups through Supavisor, remove unneeded tables and/or reduce the frequency
+- For Storage, [Smart CDN](/docs/guides/storage/cdn/smart-cdn) can help manage Egress usage. You can also use [Supabase Image Transformations](/docs/guides/storage/serving/image-transformations) to optimize images and reduce Egress.
