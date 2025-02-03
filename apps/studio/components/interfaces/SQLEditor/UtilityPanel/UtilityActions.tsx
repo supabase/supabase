@@ -13,7 +13,9 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -51,6 +53,9 @@ const UtilityActions = ({
   const os = detectOS()
   const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const org = useSelectedOrganization()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
@@ -191,7 +196,7 @@ const UtilityActions = ({
           />
           <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
           <Button
-            onClick={() => executeQuery()}
+            onClick={executeQuery}
             disabled={isDisabled || isExecuting}
             type="primary"
             size="tiny"

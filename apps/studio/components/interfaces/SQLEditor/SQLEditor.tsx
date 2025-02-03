@@ -316,6 +316,11 @@ export const SQLEditor = () => {
             throw error
           },
         })
+
+        sendEvent({
+          action: TelemetryActions.SQL_EDITOR_QUERY_RUN_BUTTON_CLICKED,
+          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        })
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
