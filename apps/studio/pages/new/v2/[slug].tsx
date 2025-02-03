@@ -32,6 +32,7 @@ import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityO
 import { FeedbackDropdown } from 'components/layouts/ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from 'components/layouts/ProjectLayout/LayoutHeader/HelpPopover'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
+import { InlineLink } from 'components/ui/InlineLink'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { ScrollGradient } from 'components/ui/ScrollGradient'
@@ -129,7 +130,6 @@ const FormSchema = z.object({
   dbPassStrength: z.number(),
   dbPass: z
     .string({ required_error: 'Please enter a database password.' })
-    .regex(/^[^@:\/]*$/, 'Passwords cannot include @, :, or / characters')
     .min(1, 'Password is required.'),
   instanceSize: z.string(),
   dataApi: z.boolean(),
@@ -713,40 +713,60 @@ const WizardForm = () => {
                                   <FormField_Shadcn_
                                     control={form.control}
                                     name="dbPass"
-                                    render={({ field }) => (
-                                      <FormItemLayout
-                                        label="Database Password"
-                                        description={
-                                          <PasswordStrengthBar
-                                            passwordStrengthScore={form.getValues('dbPassStrength')}
-                                            password={field.value}
-                                            passwordStrengthMessage={passwordStrengthMessage}
-                                            generateStrongPassword={generatePassword}
-                                          />
-                                        }
-                                      >
-                                        <FormControl_Shadcn_>
-                                          <Input
-                                            copy={field.value.length > 0}
-                                            type="password"
-                                            placeholder="Type in a strong password"
-                                            {...field}
-                                            autoComplete="off"
-                                            onChange={async (event) => {
-                                              field.onChange(event)
-                                              form.trigger('dbPassStrength')
-                                              const value = event.target.value
-                                              if (event.target.value === '') {
-                                                await form.setValue('dbPassStrength', 0)
-                                                await form.trigger('dbPass')
-                                              } else {
-                                                await delayedCheckPasswordStrength(value)
-                                              }
-                                            }}
-                                          />
-                                        </FormControl_Shadcn_>
-                                      </FormItemLayout>
-                                    )}
+                                    render={({ field }) => {
+                                      const regex = /^[^@:\/]*$/
+                                      const hasSpecialCharacters =
+                                        field.value.length > 0 && !field.value.match(regex)
+
+                                      return (
+                                        <FormItemLayout
+                                          label="Database Password"
+                                          description={
+                                            <>
+                                              {hasSpecialCharacters && (
+                                                <p className="mb-2">
+                                                  Note: Special symbols need to be{' '}
+                                                  <InlineLink href="https://supabase.com/docs/guides/database/postgres/roles#special-symbols-in-passwords">
+                                                    percent-encoded
+                                                  </InlineLink>{' '}
+                                                  when using your password later in Postgres
+                                                  connection strings
+                                                </p>
+                                              )}
+                                              <PasswordStrengthBar
+                                                passwordStrengthScore={form.getValues(
+                                                  'dbPassStrength'
+                                                )}
+                                                password={field.value}
+                                                passwordStrengthMessage={passwordStrengthMessage}
+                                                generateStrongPassword={generatePassword}
+                                              />
+                                            </>
+                                          }
+                                        >
+                                          <FormControl_Shadcn_>
+                                            <Input
+                                              copy={field.value.length > 0}
+                                              type="password"
+                                              placeholder="Type in a strong password"
+                                              {...field}
+                                              autoComplete="off"
+                                              onChange={async (event) => {
+                                                field.onChange(event)
+                                                form.trigger('dbPassStrength')
+                                                const value = event.target.value
+                                                if (event.target.value === '') {
+                                                  await form.setValue('dbPassStrength', 0)
+                                                  await form.trigger('dbPass')
+                                                } else {
+                                                  await delayedCheckPasswordStrength(value)
+                                                }
+                                              }}
+                                            />
+                                          </FormControl_Shadcn_>
+                                        </FormItemLayout>
+                                      )
+                                    }}
                                   />
                                 </div>
                                 <div className="py-5 border-t border-b">
