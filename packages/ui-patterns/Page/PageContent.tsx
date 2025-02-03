@@ -8,15 +8,15 @@ interface PageContentProps {
 }
 
 const sizeClasses = {
-  small: 'max-w-3xl',
-  medium: 'max-w-5xl',
-  large: 'max-w-7xl',
-  default: 'max-w-5xl',
+  small: 'max-w-3xl px-8',
+  medium: 'max-w-5xl px-8',
+  large: 'max-w-7xl px-8',
+  default: 'max-w-5xl px-8',
   full: 'w-full',
 }
 
 export function PageContent({ children, size = 'default', className }: PageContentProps) {
-  return <div className={cn('mx-auto w-full px-8', sizeClasses[size], className)}>{children}</div>
+  return <div className={cn('mx-auto w-full', sizeClasses[size], className)}>{children}</div>
 }
 
 export type { PageContentProps }

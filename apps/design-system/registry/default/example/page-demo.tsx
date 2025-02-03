@@ -1,121 +1,222 @@
 import { Settings, Plus, Save, UserPlus, Database, Key, Trash } from 'lucide-react'
-import { Button } from 'ui'
+import { Button, CardFooter } from 'ui'
 import { Page, PageContent, PageSection } from 'ui-patterns/Page'
+import { FormFieldWrapper } from 'ui-patterns/form/FormFieldWrapper'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Form_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormControl_Shadcn_,
+  FormMessage_Shadcn_,
+  FormDescription_Shadcn_,
+  Switch,
+  Input_Shadcn_,
+  TextArea_Shadcn_,
+} from 'ui'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Admonition } from 'ui-patterns/admonition'
+
+const formSchema = z.object({
+  isPublic: z.boolean().default(false),
+  projectName: z.string().min(2, {
+    message: 'Project name must be at least 2 characters.',
+  }),
+  description: z.string().optional(),
+})
+
+type FormValues = z.infer<typeof formSchema>
 
 export default function PageDemo() {
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      isPublic: false,
+      projectName: '',
+      description: '',
+    },
+  })
+
+  function onSubmit(data: FormValues) {
+    console.log(data)
+  }
+
   return (
-    <Page
-      // isCompact
-      size="small"
-      title="Project Settings"
-      subtitle="Manage your project settings and configurations"
-      // icon={<Settings size={24} />}
-      // breadcrumbs={[
-      //   { label: 'Projects', href: '#projects' },
-      //   { label: 'Example Project', href: '#example-project' },
-      //   { label: 'Settings' },
-      // ]}
-      primaryActions={
-        <Button icon={<Plus size={16} />} size="small">
-          Create new
-        </Button>
-      }
-      navigation={{
-        items: [
-          {
-            id: 'general',
-            label: 'General',
-            href: '#general',
-            icon: <Database size={16} />,
-          },
-          {
-            id: 'team',
-            label: 'Team Members',
-            href: '#team',
-            icon: <UserPlus size={16} />,
-          },
-          {
-            id: 'api',
-            label: 'API Keys',
-            href: '#api',
-            icon: <Key size={16} />,
-          },
-        ],
-      }}
-    >
-      <PageContent size="small">
-        <PageSection
-          title="General Settings"
-          subtitle="Basic configuration options for your project"
-          actions={
-            <Button icon={<Save size={16} />} type="outline" size="small">
-              Save changes
-            </Button>
-          }
-        >
-          <div className="rounded-md border border-default bg-surface-100 p-6">
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm text-foreground-light">Project Name</label>
-                <input
-                  type="text"
-                  className="mt-1 block w-full rounded-md border border-default bg-surface-100 px-3 py-2"
-                  placeholder="Enter project name"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-foreground-light">Description</label>
-                <textarea
-                  className="mt-1 block w-full rounded-md border border-default bg-surface-100 px-3 py-2"
-                  rows={3}
-                  placeholder="Enter project description"
-                />
-              </div>
-            </div>
-          </div>
-        </PageSection>
+    <div className="bg w-full">
+      <Page
+        // isCompact
+        size="small"
+        title="Project Settings"
+        subtitle="Manage your project settings and configurations"
+        className="bg-red"
+        // icon={<Settings size={24} />}
+        breadcrumbs={[
+          { label: 'Projects', href: '#projects' },
+          { label: 'Example Project', href: '#example-project' },
+          { label: 'Settings' },
+        ]}
+        primaryActions={
+          <Button icon={<Plus size={16} />} size="small">
+            Create new
+          </Button>
+        }
+        navigation={{
+          items: [
+            {
+              id: 'general',
+              label: 'General',
+              href: '#general',
+              icon: <Database size={16} />,
+            },
+            {
+              id: 'team',
+              label: 'Team Members',
+              href: '#team',
+              icon: <UserPlus size={16} />,
+            },
+            {
+              id: 'api',
+              label: 'API Keys',
+              href: '#api',
+              icon: <Key size={16} />,
+            },
+          ],
+        }}
+      >
+        <PageContent size="small">
+          <PageSection
+            title="General Settings"
+            subtitle="Basic configuration options for your project"
+          >
+            <Form_Shadcn_ {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Sub Section</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <FormFieldWrapper
+                      control={form.control}
+                      name="isPublic"
+                      label="Public Project"
+                      description="Allow this project to be viewed by anyone with the link."
+                      orientation="horizontal"
+                    >
+                      {(field) => <Switch checked={field.value} onCheckedChange={field.onChange} />}
+                    </FormFieldWrapper>
+                  </CardContent>
+                  <CardContent>
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="projectName"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="grid grid-cols-12 gap-8 items-center">
+                          <div className="col-span-6">
+                            <FormLabel_Shadcn_>Project Name</FormLabel_Shadcn_>
+                            <FormDescription_Shadcn_ className="mt-1 text-xs">
+                              This is the name that will be displayed for your project.
+                            </FormDescription_Shadcn_>
+                          </div>
+                          <div className="col-span-6">
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_ {...field} placeholder="Enter project name" />
+                            </FormControl_Shadcn_>
+                            <FormMessage_Shadcn_ />
+                          </div>
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                  </CardContent>
+                  <CardContent>
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <>
+                          <FormItem_Shadcn_ className="grid grid-cols-12 gap-8 items-start opacity-25">
+                            <div className="col-span-6">
+                              <FormLabel_Shadcn_>Description</FormLabel_Shadcn_>
+                              <FormDescription_Shadcn_ className="mt-1 text-xs">
+                                A brief description of your project.
+                              </FormDescription_Shadcn_>
+                            </div>
+                            <div className="col-span-6">
+                              <FormControl_Shadcn_>
+                                <TextArea_Shadcn_
+                                  {...field}
+                                  placeholder="Enter project description"
+                                  rows={3}
+                                />
+                              </FormControl_Shadcn_>
+                              <FormMessage_Shadcn_ className="text-right" />
+                            </div>
+                          </FormItem_Shadcn_>
+                          <Admonition
+                            className="mt-4"
+                            type="note"
+                            title={'Upgrade to pro'}
+                            description={
+                              'Upgrade your plan to gain access to this wonderful feature'
+                            }
+                          >
+                            <Button type="outline" className="mt-2">
+                              Upgrade plan
+                            </Button>
+                          </Admonition>
+                        </>
+                      )}
+                    />
+                  </CardContent>
+                  <CardFooter className="flex justify-end gap-2">
+                    <Button type="outline">Cancel</Button>
+                    <Button>Deploy</Button>
+                  </CardFooter>
+                </Card>
+              </form>
+            </Form_Shadcn_>
+          </PageSection>
 
-        <PageSection
-          title="Team Members"
-          subtitle="Manage who has access to this project"
-          actions={
-            <Button icon={<UserPlus size={16} />} type="outline" size="small">
-              Invite member
-            </Button>
-          }
-        >
-          <div className="rounded-md border border-default bg-surface-100 p-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between py-3 border-b border-default">
+          <PageSection title="Team Members" subtitle="Manage who has access to this project">
+            <Card>
+              <CardContent className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-foreground">Alice Johnson</p>
-                  <p className="text-xs text-foreground-light">alice@example.com</p>
+                  <p className="text-sm text-foreground">Restart project</p>
+                  <p className="text-xs text-foreground-light">
+                    Your project will not be available for a few minutes.
+                  </p>
                 </div>
-                <div className="text-xs text-foreground-light">Admin</div>
-              </div>
-              <div className="flex items-center justify-between py-3 border-b border-default">
+                <Button type="outline">Restart project</Button>
+              </CardContent>
+              <CardContent className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-foreground">Bob Smith</p>
-                  <p className="text-xs text-foreground-light">bob@example.com</p>
+                  <p className="text-sm text-foreground">Pause project</p>
+                  <p className="text-xs text-foreground-light">
+                    Your project will not be accessible while it is paused.
+                  </p>
                 </div>
-                <div className="text-xs text-foreground-light">Developer</div>
-              </div>
-            </div>
-          </div>
-        </PageSection>
+                <Button type="outline">Pause project</Button>
+              </CardContent>
+            </Card>
+          </PageSection>
 
-        <PageSection
-          title="API Keys"
-          subtitle="Manage API keys for accessing your project"
-          actions={
-            <Button icon={<Key size={16} />} type="outline" size="small">
-              Generate key
-            </Button>
-          }
-        >
-          <div className="rounded-md border border-default bg-surface-100 p-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between py-3 border-b border-default">
+          <PageSection
+            title="API Keys"
+            subtitle="Manage API keys for accessing your project"
+            actions={
+              <Button icon={<Key size={16} />} type="outline" size="small">
+                Generate key
+              </Button>
+            }
+          >
+            <Card>
+              <CardContent className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-foreground">Production API Key</p>
                   <p className="text-xs text-foreground-light">Created 2 months ago</p>
@@ -123,8 +224,8 @@ export default function PageDemo() {
                 <Button icon={<Trash size={16} />} type="outline" size="small">
                   Revoke
                 </Button>
-              </div>
-              <div className="flex items-center justify-between py-3 border-b border-default">
+              </CardContent>
+              <CardContent className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-foreground">Development API Key</p>
                   <p className="text-xs text-foreground-light">Created 5 days ago</p>
@@ -132,11 +233,11 @@ export default function PageDemo() {
                 <Button type="outline" size="small">
                   Revoke
                 </Button>
-              </div>
-            </div>
-          </div>
-        </PageSection>
-      </PageContent>
-    </Page>
+              </CardContent>
+            </Card>
+          </PageSection>
+        </PageContent>
+      </Page>
+    </div>
   )
 }

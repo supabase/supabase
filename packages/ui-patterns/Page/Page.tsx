@@ -65,7 +65,8 @@ export function Page({
           sizeClasses[size],
           size === 'full' && (isCompact ? 'px-6 border-b' : 'px-8 border-b'),
           isCompact ? 'pt-4' : 'pt-16',
-          !navigation && size === 'full' && (isCompact ? 'pb-4' : 'pb-8')
+          !navigation && size === 'full' && (isCompact ? 'pb-4' : 'pb-8'),
+          className
         )}
       >
         {/* Header section */}
