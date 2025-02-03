@@ -17,6 +17,7 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -43,6 +44,7 @@ import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 const TableEditorMenu = () => {
   const { id: _id } = useParams()
+  const router = useRouter()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
@@ -121,6 +123,7 @@ const TableEditorMenu = () => {
             onSelectSchema={(name: string) => {
               setSearchText('')
               setSelectedSchema(name)
+              router.push(`/project/${project?.ref}/editor`)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
           />
