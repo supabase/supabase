@@ -2,7 +2,6 @@
 import DatePicker from 'react-datepicker'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
-import { format } from 'date-fns'
 
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
 import type { DatetimeHelper } from './Logs.types'
@@ -307,7 +306,7 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
                       className="px-1.5"
                     ></Button>
                     <span className="text-sm text-foreground-light">
-                      {format(date, 'MMMM yyyy')}
+                      {dayjs(date).format('MMMM yyyy')}
                     </span>
                     <Button
                       onClick={increaseMonth}
