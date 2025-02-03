@@ -15,58 +15,152 @@ Schema migrations are SQL statements written in Data Definition Language. They a
 
 ### Declaring your schema
 
-Create your schemas in `supabase/schemas/employees.sql` with the table below.
+<StepHikeCompact>
 
-```sql
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Create your first schema file">
+      Create a SQL file in `supabase/schemas` directory that defines an `employees` table.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```sql supabase/schemas/employees.sql
 create table "employees" (
-	"id" integer not null,
-	"name" text
+  "id" integer not null,
+  "name" text
 );
 ```
 
-Generate a migration file by diffing against your declared schema. This will create a new migration file under `supabase/migrations/<timestamp>_employees_table.sql`
+    </StepHikeCompact.Code>
 
-```sql
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Generate a migration file">
+      Generate a migration file by diffing against your declared schema.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash Terminal
 supabase db diff -f employees_table
 ```
 
-<Admonition type="tip">
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+<Admonition type="info">
 
 Make sure your local database is stopped before diffing your schema.
 
 </Admonition>
 
-The new migration file will be used when starting the database locally so you can easily validate your schema by running the following command.
+<StepHikeCompact>
 
-```sql
-supabase db start
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Start the local database">
+      The new migration file will be used when starting the database locally so you can validate your schema using the local Dashboard.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash Terminal
+supabase start
 ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
 
 ### Updating your schema
 
-To add a new column to employees table, simply edit `supabase/schemas/employees.sql`
+<StepHikeCompact>
 
-```sql
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Stop the local database">
+      Before updating your schema files, stop the local development environment.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash Terminal
+supabase stop
+```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Add a new column">
+      Edit `supabase/schemas/employees.sql` file to add a new column to `employees` table.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```sql supabase/schemas/employees.sql
 create table "employees" (
-	"id" integer not null,
-	"name" text,
-	"age" smallint not null
+  "id" integer not null,
+  "name" text,
+  "age" smallint not null
 );
 ```
 
-<Admonition type="tip">
+    </StepHikeCompact.Code>
 
-Some entities like views and enums depend columns to be declared in a specific order. To avoid messy diffs, always add new columns to the end of the table.
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+<Admonition type="info">
+
+Some entities like views and enums depend columns to be declared in a specific order. To avoid messy diffs, always add new columns by appending to the end of the table.
 
 </Admonition>
 
-Generate a new migration file with `supabase diff -f add_age` . The generated file should contain a single incremental change.
+<StepHikeCompact>
 
-```sql
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Generate a new migration">
+      Diff existing migrations against your declared schema.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash Terminal
+supabase diff -f add_age
+```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Review the generated migration">
+      Verify that the generated migration contain a single incremental change.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```sql supabase/migrations/<timestamp>_add_age.sql
 alter table "public"."employees" add column "age" smallint not null;
 ```
 
-Depending on the diff tool used, the generated migration may not be what you expect. In that case, feel free to edit the migration file manually and run `supabase db diff` to verify that your migrations match your declared schema.
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
 
 ### Managing dependencies
 
@@ -80,18 +174,18 @@ create table "employees" (
 );
 
 create view "profiles" as
-    select id, name from "employees";
+  select id, name from "employees";
 
 create function "get_age"(employee_id integer) RETURNS smallint
-    LANGUAGE "sql"
+  LANGUAGE "sql"
 AS $$
-    select age
-    from employees
-    where id = employee_id;
+  select age
+  from employees
+  where id = employee_id;
 $$;
 ```
 
-To enforce a specific order for creating such entities, you can name your schema files in lexicographic order. This is especially helpful if you create new tables with foreign keys pointing to their parent. For example, your `supabase` directory may end up with the following structure.
+Your schema files are run in lexicographic order. If you need to declare foreign keys between multiple tables, remember to create the parent table first. For example, your `supabase` directory may end up with the following structure.
 
 ```sql
 .
@@ -105,13 +199,15 @@ To enforce a specific order for creating such entities, you can name your schema
         └── 20241006112233_add_managers_table.sql
 ```
 
-## Data migrations
-
-Data migrations are SQL statements written in Data Manipulation Language.
-
 ## Known caveats
 
-The `migra` diff tool used by default for generating schema diff isn’t perfect. To the best of our knowledge, it has trouble tracking changes to the following entities.
+The `migra` diff tool used for generating schema diff is capable of tracking most database changes. However, there are edge cases where it can fail.
+
+If you need to use any of the entities below, remember to add them through [versioned migrations](/docs/guides/deployment/database-migrations) instead.
+
+### Data manipulation language
+
+- DML statements such as `insert`, `update`, `delete`, etc., are not captured by schema diff
 
 ### View ownership
 
@@ -133,5 +229,3 @@ The `migra` diff tool used by default for generating schema diff isn’t perfect
 - [`alter publication ... add table ...`](https://github.com/supabase/cli/issues/883)
 - [create domain statements are ignored](https://github.com/supabase/cli/issues/2137)
 - verbose to have grants from default privileges
-
-If you are trying to diff your way through views and RLS policies, be sure to review the generated migrations as `supabase db diff` may not report find all validation errors!
