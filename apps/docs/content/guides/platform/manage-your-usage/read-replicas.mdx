@@ -31,7 +31,7 @@ Compute incurred by Read Replicas is shown as "Replica Compute Hours" on your in
 
 ## Billing examples
 ### No additional resources configured
-The project has no IPv4 and no additional Disk IOPS and Disk Throughput configured.
+The project has one Read Replica and no IPv4 and no additional Disk IOPS and Disk Throughput configured.
 
 | Line Item                     | Units     | Costs      |
 |-------------------------------|-----------|------------|
@@ -48,7 +48,7 @@ The project has no IPv4 and no additional Disk IOPS and Disk Throughput configur
 | **Total**                     |           | **$46.27** |
 
 ### Additional resources configured
-The project has IPv4 and additional Disk IOPS and Disk Throughput configured.
+The project two Read Replicas and IPv4 and additional Disk IOPS and Disk Throughput configured.
 
 | Line Item                     | Units     | Costs       |
 |-------------------------------|-----------|-------------|
@@ -60,15 +60,21 @@ The project has IPv4 and additional Disk IOPS and Disk Throughput configured.
 | Disk Throughput Project 1     | 200 MiB/s | $7.13       |
 | IPv4 Project 1                | 1         | $4          |
 |                               |           |             |
-| Compute Hours Large Replica   | 744 hours | $110        |
-| Disk Size Replica             | 10 GB     | $1.27       |
-| Disk IOPS Replica             | 3600      | $14.40      |
-| Disk Throughput Replica       | 200 MiB/s | $7.13       |
-| IPv4 Replica                  | 1         | $4          |
+| Compute Hours Large Replica 1 | 744 hours | $110        |
+| Disk Size Replica 1           | 10 GB     | $1.27       |
+| Disk IOPS Replica 1           | 3600      | $14.40      |
+| Disk Throughput Replica 1     | 200 MiB/s | $7.13       |
+| IPv4 Replica 1                | 1         | $4          |
 |                               |           |             |
-| **Subtotal**                  |           | **$297.33** |
+| Compute Hours Large Replica 2 | 744 hours | $110        |
+| Disk Size Replica 2           | 10 GB     | $1.27       |
+| Disk IOPS Replica 2           | 3600      | $14.40      |
+| Disk Throughput Replica 2     | 200 MiB/s | $7.13       |
+| IPv4 Replica 2                | 1         | $4          |
+|                               |           |             |
+| **Subtotal**                  |           | **$434.13** |
 | Compute Credits               |           | -$10        |
-| **Total**                     |           | **$287.33** |
+| **Total**                     |           | **$424.13** |
 
 ## Read Replica FAQ
 ### Do Compute Credits apply to Read Replica Compute?
