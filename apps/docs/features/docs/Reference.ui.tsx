@@ -624,7 +624,8 @@ function getTypeName(parameter: object): string {
     case 'array':
       // Needs an extra level of wrapping to fake the wrapping parameter
       // @ts-ignore
-      return `Array<${getTypeName({ type: type.elemType })}>`
+      const innerType = getTypeName({ type: type.elemType })
+      return innerType ? `Array<${innerType}>` : 'Array'
   }
 
   return ''
