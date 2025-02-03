@@ -7,10 +7,12 @@ import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { Link } from 'lucide-react'
 import { useMemo } from 'react'
-import { cn, EyeOffIcon, Input_Shadcn_, Separator, Skeleton, WarningIcon } from 'ui'
-import ShowPublicJWTsDialogComposer from '../JwtSecrets/ShowPublicJWTsDialogComposer'
+import { cn, EyeOffIcon, Input_Shadcn_, Skeleton, WarningIcon } from 'ui'
 import QuickKeyCopyWrapper from './QuickKeyCopy'
+// to add in later with follow up PR
 // import CreatePublishableAPIKeyModal from './CreatePublishableAPIKeyModal'
+// to add in later with follow up PR
+// import ShowPublicJWTsDialogComposer from '../JwtSecrets/ShowPublicJWTsDialogComposer'
 
 const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -67,8 +69,9 @@ const PublishableAPIKeys = () => {
           <div className="flex items-center gap-2 text-xs text-foreground-light hover:text-foreground cursor-pointer">
             <Link size={14} className="text-foreground-light" /> Show Supabase Url
           </div>
-          <Separator />
-          <ShowPublicJWTsDialogComposer />
+          {/* <Separator /> */}
+          {/* @mildtomato - To add in later with follow up PR */}
+          {/* <ShowPublicJWTsDialogComposer /> */}
         </div>
 
         {/* <CreatePublishableAPIKeyModal /> */}
