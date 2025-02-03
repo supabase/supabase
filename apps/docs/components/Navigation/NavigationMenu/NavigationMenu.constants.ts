@@ -2107,6 +2107,10 @@ export const platform: NavMenuConstant = {
               name: 'Compute',
               url: '/guides/platform/manage-your-usage/compute',
             },
+            {
+              name: 'Branching',
+              url: '/guides/platform/manage-your-usage/branching',
+            },
           ],
         },
         {
