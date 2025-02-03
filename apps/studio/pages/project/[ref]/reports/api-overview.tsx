@@ -10,7 +10,7 @@ import {
   TopApiRoutesRenderer,
   TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
-import { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
+import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useApiReport } from 'data/reports/api-report-query'
