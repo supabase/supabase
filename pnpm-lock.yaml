@@ -1449,6 +1449,9 @@ importers:
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
       tsx:
         specifier: ^4.7.0
         version: 4.7.0
