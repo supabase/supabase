@@ -1124,9 +1124,6 @@ importers:
       react-syntax-highlighter:
         specifier: ^15.5.0
         version: 15.5.0(react@18.2.0)
-      react-tooltip:
-        specifier: ^4.2.17
-        version: 4.5.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-transition-group:
         specifier: ^4.4.1
         version: 4.4.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
