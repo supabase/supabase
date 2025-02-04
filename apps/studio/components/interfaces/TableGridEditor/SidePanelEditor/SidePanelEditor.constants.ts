@@ -132,4 +132,9 @@ export const POSTGRES_DATA_TYPE_OPTIONS: PostgresDataTypeOption[] = [
     description: 'Logical boolean (true/false)',
     type: 'bool',
   },
+  {
+    name: 'bytea',
+    description: 'Variable-length binary string',
+    type: 'others',
+  },
 ]

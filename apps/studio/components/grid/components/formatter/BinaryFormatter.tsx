@@ -7,7 +7,7 @@ import { NullValue } from '../common/NullValue'
 
 export const BinaryFormatter = (p: PropsWithChildren<RenderCellProps<SupaRow, unknown>>) => {
   const value = p.row[p.column.key]
-  if (value === null) return <NullValue />
+  if (!value) return <NullValue />
   const binaryValue = convertByteaToHex(value)
   return <>{binaryValue}</>
 }
