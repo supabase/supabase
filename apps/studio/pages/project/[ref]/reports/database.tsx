@@ -89,37 +89,37 @@ const REPORT_ATTRIBUTES = [
       {
         attribute: 'cpu_usage_busy_system',
         provider: 'infra-monitoring',
-        label: 'Busy System',
+        label: 'System',
         format: 'percent',
       },
       {
         attribute: 'cpu_usage_busy_user',
         provider: 'infra-monitoring',
-        label: 'Busy User',
+        label: 'User',
         format: 'percent',
       },
       {
         attribute: 'cpu_usage_busy_iowait',
         provider: 'infra-monitoring',
-        label: 'Busy IOwait',
+        label: 'IOwait',
         format: 'percent',
       },
       {
         attribute: 'cpu_usage_busy_irqs',
         provider: 'infra-monitoring',
-        label: 'Busy IRQs',
+        label: 'IRQs',
         format: 'percent',
       },
       {
         attribute: 'cpu_usage_busy_other',
         provider: 'infra-monitoring',
-        label: 'Busy other',
+        label: 'other',
         format: 'percent',
       },
       {
         attribute: 'cpu_usage_busy_idle',
         provider: 'infra-monitoring',
-        label: 'Busy idle',
+        label: 'Idle',
         format: 'percent',
       },
     ],
@@ -164,11 +164,11 @@ const REPORT_ATTRIBUTES = [
     id: 'disk-iops',
     label: 'Disk IOps',
     attributes: [
-      { attribute: 'disk_iops_read', provider: 'infra-monitoring' },
       {
         attribute: 'disk_iops_write',
         provider: 'infra-monitoring',
       },
+      { attribute: 'disk_iops_read', provider: 'infra-monitoring' },
     ],
   },
 ]

@@ -59,7 +59,7 @@ const formatLargeNumber = (num: number, precision: number = 0) => {
   }
 }
 
-const CustomTooltip = ({ active, payload, label, attributes }: any) => {
+const CustomTooltip = ({ active, payload, label, attributes, isPercentage }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload
     const totalConnections = data.postgres + data.supavisor + data.realtime
@@ -90,9 +90,10 @@ const CustomTooltip = ({ active, payload, label, attributes }: any) => {
                 .replace('ram_usage_', '')}
           </span>
           <span className="ml-2.5">
-            {isRamChart ? formatLargeNumber(entry.value, 1) : numberFormatter(entry.value)}
+            {isRamChart ? formatLargeNumber(entry.value, 1) : numberFormatter(entry.value, 1)}
+            {isPercentage ? '%' : ''}
           </span>
-          {entry.name !== 'Max Connections' && (
+          {!isPercentage && entry.name !== 'Max Connections' && (
             <span className="ml-1">({((entry.value / maxConnections) * 100).toFixed(1)}%)</span>
           )}
         </p>
@@ -103,15 +104,10 @@ const CustomTooltip = ({ active, payload, label, attributes }: any) => {
       <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl">
         <p className="font-medium">{dayjs(label).format('DD MMM YYYY, HH:mm:ss')}</p>
         <div className="grid gap-0">
-          {payload.map((entry: any) => (
+          {payload.reverse().map((entry: any) => (
             <LabelItem key={entry.name} entry={entry} />
           ))}
         </div>
-        {active && (
-          <p className="text-foreground-lighter text-xs">
-            {dayjs(label).format('DD MMM YYYY, HH:mm:ss')}
-          </p>
-        )}
       </div>
     )
   }
@@ -411,6 +407,7 @@ export default function ComposedChart({
               true ? (
                 <CustomTooltip
                   {...props}
+                  isPercentage={isPercentage}
                   label={resolvedHighlightedValue}
                   attributes={attributes}
                 />
