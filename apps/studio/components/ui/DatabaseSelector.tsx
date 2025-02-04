@@ -3,14 +3,13 @@ import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
-import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
@@ -23,21 +22,22 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 
 interface DatabaseSelectorProps {
+  selectedDatabaseId?: string // To override initial state
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   additionalOptions?: { id: string; name: string }[]
-  onSelectId?: (id: string) => void // Optional callback
-
   buttonProps?: ButtonProps
+  onSelectId?: (id: string) => void // Optional callback
 }
 
 const DatabaseSelector = ({
+  selectedDatabaseId: _selectedDatabaseId,
   variant = 'regular',
   additionalOptions = [],
   onSelectId = noop,
@@ -48,9 +48,8 @@ const DatabaseSelector = ({
   const [open, setOpen] = useState(false)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
-  const appState = useAppStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
-  const selectedDatabaseId = state.selectedDatabaseId
+  const selectedDatabaseId = _selectedDatabaseId ?? state.selectedDatabaseId
 
   const { data, isLoading, isSuccess } = useReadReplicasQuery({ projectRef })
   const databases = data ?? []
@@ -63,6 +62,11 @@ const DatabaseSelector = ({
   const formattedDatabaseId = formatDatabaseID(selectedDatabaseId ?? '')
 
   const selectedAdditionalOption = additionalOptions.find((x) => x.id === selectedDatabaseId)
+
+  useEffect(() => {
+    if (_selectedDatabaseId) state.setSelectedDatabaseId(_selectedDatabaseId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [_selectedDatabaseId])
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -147,21 +151,21 @@ const DatabaseSelector = ({
                       : 'not healthy'
 
                     return (
-                      <Tooltip_Shadcn_ key={database.identifier}>
-                        <TooltipTrigger_Shadcn_ asChild>
+                      <Tooltip key={database.identifier}>
+                        <TooltipTrigger asChild>
                           <div className="px-2 py-1.5 w-full flex items-center justify-between">
                             <p className="text-xs text-foreground-lighter">
                               Read replica ({region} - {id})
                             </p>
                           </div>
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="right" className="w-80">
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="w-80">
                           <Markdown
                             className="text-xs text-foreground"
                             content={`Replica unable to accept requests as its ${status}. [View infrastructure settings](/project/${projectRef}/settings/infrastructure) for more information.`}
                           />
-                        </TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
+                        </TooltipContent>
+                      </Tooltip>
                     )
                   }
 

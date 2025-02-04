@@ -5,10 +5,13 @@ import { useBreakpoint } from 'common'
 
 import { Button } from 'ui'
 import Panel from './Panel'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
 
 function ExampleCard(props: any) {
   const isXs = useBreakpoint()
   const [mounted, setMounted] = useState(false)
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   useEffect(() => {
     setMounted(true)
@@ -17,7 +20,18 @@ function ExampleCard(props: any) {
   if (!mounted) return null
 
   return (
-    <Link href={props.repo_url} className="w-full h-full" target="_blank">
+    <Link
+      href={props.repo_url}
+      className="w-full h-full"
+      target="_blank"
+      onClick={() => {
+        if (props.inHomepage)
+          sendTelemetryEvent({
+            action: TelemetryActions.HOMEPAGE_PROJECT_TEMPLATE_CARD_CLICKED,
+            properties: { templateTitle: props.title },
+          })
+      }}
+    >
       <Panel outerClassName="h-full" innerClassName="bg-surface-75 group/panel" hasActiveOnHover>
         <div className="flex flex-col justify-between">
           {props.tags && (

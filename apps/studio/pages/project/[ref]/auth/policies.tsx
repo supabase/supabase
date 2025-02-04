@@ -108,21 +108,21 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   return (
     <div className="flex flex-col h-full">
       <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <SchemaSelector
-              className="w-[180px]"
-              size="tiny"
-              showError={false}
-              selectedSchemaName={schema}
-              onSelectSchema={(schema) => {
-                setParams({ ...params, search: undefined, schema })
-              }}
-            />
+        <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-2">
+          <SchemaSelector
+            className="w-full lg:w-[180px]"
+            size="tiny"
+            showError={false}
+            selectedSchemaName={schema}
+            onSelectSchema={(schema) => {
+              setParams({ ...params, search: undefined, schema })
+            }}
+          />
+          <div className="w-full flex-grow flex items-center justify-between gap-2 lg:gap-4">
             <Input
               size="tiny"
               placeholder="Filter tables and policies"
-              className="block w-52 text-sm placeholder-border-muted"
+              className="block w-full lg:w-52"
               value={searchString || ''}
               onChange={(e) => {
                 const str = e.target.value
@@ -130,8 +130,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               }}
               icon={<Search size={14} />}
             />
+            <DocsButton href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security" />
           </div>
-          <DocsButton href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security" />
         </div>
       </div>
 

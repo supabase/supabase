@@ -104,26 +104,6 @@ $$;
 comment on function ${QUEUES_SCHEMA}.archive(queue_name text, message_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
 
 
-create or replace function ${QUEUES_SCHEMA}.archive(
-    queue_name text,
-    message_id bigint
-)
-  returns boolean
-  language plpgsql
-  set search_path = ''
-as $$
-begin
-    return
-    pgmq.archive(
-        queue_name := queue_name,
-        msg_id := message_id
-    );
-end;
-$$;
-
-comment on function ${QUEUES_SCHEMA}.archive(queue_name text, message_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
-
-
 create or replace function ${QUEUES_SCHEMA}.delete(
     queue_name text,
     message_id bigint
@@ -192,6 +172,22 @@ grant all privileges on all tables in schema pgmq to postgres, service_role;
 alter default privileges in schema pgmq grant all privileges on tables to postgres, service_role;
 
 grant usage on schema pgmq to postgres, anon, authenticated, service_role;
+
+
+/*
+  Grant access to sequences to API roles by default. Existing table permissions
+  continue to enforce insert restrictions. This is necessary to accommodate the
+  on-backup hook that rebuild queue table primary keys to avoid a pg_dump segfault.
+  This can be removed once logical backups are completely retired.
+*/
+grant usage, select, update
+on all sequences in schema pgmq
+to anon, authenticated, service_role;
+
+alter default privileges in schema pgmq
+grant usage, select, update
+on sequences
+to anon, authenticated, service_role;
 `)
 
 const HIDE_QUEUES_FROM_POSTGREST_SQL = minify(/* SQL */ `

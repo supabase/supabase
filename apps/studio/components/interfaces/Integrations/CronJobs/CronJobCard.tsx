@@ -4,17 +4,17 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { SQLCodeBlock } from 'components/interfaces/Auth/ThirdPartyAuthForm/SqlCodeBlock'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useCronJobRunQuery } from 'data/database-cron-jobs/database-cron-jobs-run-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import {
   Badge,
   Button,
   cn,
+  CodeBlock,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -27,6 +27,7 @@ import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { convertCronToString, getNextRun } from './CronJobs.utils'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface CronJobCardProps {
   job: CronJob
@@ -36,6 +37,7 @@ interface CronJobCardProps {
 
 export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCardProps) => {
   const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { project: selectedProject } = useProjectContext()
 
   const [toggleConfirmationModalShown, showToggleConfirmationModal] = useState(false)
@@ -60,7 +62,14 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
         </div>
         <div className="flex flex-col flex-0 overflow-y-auto w-full">
           <div className="flex flex-row justify-between items-center">
-            <span className="text-base text-foreground">{job.jobname}</span>
+            <span
+              className={cn(
+                'text-base',
+                job.jobname === null ? 'text-foreground-lighter' : 'text-foreground'
+              )}
+            >
+              {job.jobname ?? 'No name provided'}
+            </span>
             <div className="flex items-center gap-x-2">
               {isLoading ? (
                 <Loader2 size={18} strokeWidth={2} className="animate-spin text-foreground-muted" />
@@ -86,10 +95,18 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 onClick={() => {
                   sendEvent({
                     action: TelemetryActions.CRON_JOB_HISTORY_CLICKED,
+                    groups: {
+                      project: selectedProject?.ref ?? 'Unknown',
+                      organization: org?.slug ?? 'Unknown',
+                    },
                   })
                 }}
               >
-                <Link href={`/project/${ref}/integrations/cron/jobs/${job.jobname}`}>History</Link>
+                <Link
+                  href={`/project/${ref}/integrations/cron/jobs/${encodeURIComponent(job.jobname)}`}
+                >
+                  History
+                </Link>
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -100,6 +117,10 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                     onClick={() => {
                       sendEvent({
                         action: TelemetryActions.CRON_JOB_UPDATE_CLICKED,
+                        groups: {
+                          project: selectedProject?.ref ?? 'Unknown',
+                          organization: org?.slug ?? 'Unknown',
+                        },
                       })
                       onEditCronJob(job)
                     }}
@@ -111,6 +132,10 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                     onClick={() => {
                       sendEvent({
                         action: TelemetryActions.CRON_JOB_DELETE_CLICKED,
+                        groups: {
+                          project: selectedProject?.ref ?? 'Unknown',
+                          organization: org?.slug ?? 'Unknown',
+                        },
                       })
                       onDeleteCronJob(job)
                     }}
@@ -184,7 +209,15 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
               <div className="grid grid-cols-10 gap-3">
                 <span className="text-foreground-light col-span-1">Command</span>
                 <div className="col-span-9">
-                  <SQLCodeBlock className="py-2">{[job.command.trim()]}</SQLCodeBlock>
+                  <CodeBlock
+                    hideLineNumbers
+                    value={job.command.trim()}
+                    language="sql"
+                    className={cn(
+                      'py-2 px-3.5 max-w-full prose dark:prose-dark',
+                      '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap min-h-11'
+                    )}
+                  />
                 </div>
               </div>
             </div>

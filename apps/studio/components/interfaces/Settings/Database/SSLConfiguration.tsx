@@ -15,14 +15,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
-  Alert,
-  Button,
-  Switch,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Alert, Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 const SSLConfiguration = () => {
   const { ref } = useParams()
@@ -127,8 +120,8 @@ const SSLConfiguration = () => {
                 <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
               )}
               {isSuccess && (
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
                     <div>
                       <Switch
@@ -143,17 +136,17 @@ const SSLConfiguration = () => {
                         onCheckedChange={toggleSSLEnforcement}
                       />
                     </div>
-                  </TooltipTrigger_Shadcn_>
+                  </TooltipTrigger>
                   {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
-                    <TooltipContent_Shadcn_ side="bottom" className="w-64 text-center">
+                    <TooltipContent side="bottom" className="w-64 text-center">
                       {!canUpdateSSLEnforcement
                         ? 'You need additional permissions to update SSL enforcement for your project'
                         : !hasAccessToSSLEnforcement
                           ? 'Your project does not have access to SSL enforcement'
                           : ''}
-                    </TooltipContent_Shadcn_>
+                    </TooltipContent>
                   )}
-                </Tooltip_Shadcn_>
+                </Tooltip>
               )}
             </div>
           </FormSectionContent>

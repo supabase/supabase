@@ -19,7 +19,7 @@ enum MenuId {
   Queues = 'queues',
   Platform = 'platform',
   Deployment = 'deployment',
-  MonitoringTroubleshooting = 'monitoring_troubleshooting',
+  Telemetry = 'telemetry',
   Resources = 'resources',
   SelfHosting = 'self_hosting',
   Integrations = 'integrations',
@@ -92,7 +92,7 @@ const menus: Menu[] = [
     type: 'guide',
   },
   {
-    id: MenuId.MonitoringTroubleshooting,
+    id: MenuId.Telemetry,
     type: 'guide',
   },
   {

@@ -84,9 +84,6 @@ export const S3Connection = () => {
   const hasStorageCreds = storageCreds?.data && storageCreds.data.length > 0
   const s3connectionUrl = getConnectionURL(projectRef ?? '', protocol, endpoint)
 
-  // [Joshen clean up]: Can remove this boolean check once storage changes are deployed
-  const hasS3ProtocolFeature = config?.features.s3Protocol !== undefined
-
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!config) return console.error('Storage config is required')
@@ -100,9 +97,8 @@ export const S3Connection = () => {
   }
 
   useEffect(() => {
-    if (hasS3ProtocolFeature) {
-      form.reset({ s3ConnectionEnabled: config?.features.s3Protocol.enabled })
-    }
+    form.reset({ s3ConnectionEnabled: config?.features.s3Protocol.enabled })
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccessStorageConfig])
 
@@ -119,42 +115,38 @@ export const S3Connection = () => {
             <GenericSkeletonLoader />
           ) : isProjectActive ? (
             <Panel className="!mb-0">
-              {hasS3ProtocolFeature && (
-                <>
-                  <FormField_Shadcn_
-                    name="s3ConnectionEnabled"
-                    control={form.control}
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="horizontal"
-                        className="px-8 py-8 [&>*>label]:text-foreground"
-                        label="Enable connection via S3 protocol"
-                        description="Allow clients to connect to Supabase Storage via the S3 protocol"
-                      >
-                        <FormControl_Shadcn_>
-                          <Switch
-                            size="large"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={!isSuccessStorageConfig || field.disabled}
-                          />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
-
-                  {isErrorStorageConfig && (
-                    <div className="px-8 pb-8">
-                      <AlertError
-                        subject="Failed to retrieve storage configuration"
-                        error={configError}
+              <FormField_Shadcn_
+                name="s3ConnectionEnabled"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="horizontal"
+                    className="px-8 py-8 [&>*>label]:text-foreground"
+                    label="Enable connection via S3 protocol"
+                    description="Allow clients to connect to Supabase Storage via the S3 protocol"
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        size="large"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={!isSuccessStorageConfig || field.disabled}
                       />
-                    </div>
-                  )}
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
 
-                  <Separator className="bg-border" />
-                </>
+              {isErrorStorageConfig && (
+                <div className="px-8 pb-8">
+                  <AlertError
+                    subject="Failed to retrieve storage configuration"
+                    error={configError}
+                  />
+                </div>
               )}
+
+              <Separator className="bg-border" />
 
               <div className="flex flex-col gap-y-4 py-8">
                 <FormItemLayout
@@ -177,43 +169,35 @@ export const S3Connection = () => {
                 )}
               </div>
 
-              {hasS3ProtocolFeature && (
-                <>
-                  <Separator />
+              <Separator />
 
-                  <div className="flex items-center justify-between w-full gap-2 px-8 py-4">
-                    {!canUpdateStorageSettings ? (
-                      <p className="text-sm text-foreground-light">
-                        You need additional permissions to update storage settings
-                      </p>
-                    ) : (
-                      <div />
-                    )}
-                    <div className="flex gap-2">
-                      <Button
-                        type="default"
-                        htmlType="reset"
-                        onClick={() => form.reset()}
-                        disabled={
-                          !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
-                        }
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        loading={isUpdating}
-                        disabled={
-                          !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
-                        }
-                      >
-                        Save
-                      </Button>
-                    </div>
-                  </div>
-                </>
-              )}
+              <div className="flex items-center justify-between w-full gap-2 px-8 py-4">
+                {!canUpdateStorageSettings ? (
+                  <p className="text-sm text-foreground-light">
+                    You need additional permissions to update storage settings
+                  </p>
+                ) : (
+                  <div />
+                )}
+                <div className="flex gap-2">
+                  <Button
+                    type="default"
+                    htmlType="reset"
+                    onClick={() => form.reset()}
+                    disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={isUpdating}
+                    disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
+                  >
+                    Save
+                  </Button>
+                </div>
+              </div>
             </Panel>
           ) : (
             <Alert_Shadcn_ variant="warning">

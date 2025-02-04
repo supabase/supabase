@@ -2,15 +2,14 @@ import { ArrowRight, Check, Minus, User, X } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { useState } from 'react'
 
-import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
+import Link from 'next/link'
 import {
   Badge,
   HoverCardContent_Shadcn_,
@@ -22,7 +21,6 @@ import {
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
-import Link from 'next/link'
 
 interface MemberRowProps {
   member: OrganizationMember
@@ -72,9 +70,9 @@ export const MemberRow = ({ member }: MemberRowProps) => {
     <Table.tr>
       <Table.td>
         <div className="flex items-center space-x-4">
-          <div>
+          <div className="w-[32px] h-[32px] md:w-[40px] md:h-[40px]">
             {isInvitedUser || isEmailUser || isFlyUser || hasInvalidImg ? (
-              <div className="w-[40px] h-[40px] bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center">
+              <div className="w-[32px] h-[32px] md:w-[40px] md:h-[40px] bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center">
                 <User size={20} strokeWidth={1.5} />
               </div>
             ) : (
@@ -83,7 +81,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                 src={`https://github.com/${member.username}.png?size=80`}
                 width="40"
                 height="40"
-                className="border rounded-full"
+                className="border rounded-full w-[32px] h-[32px] md:w-[40px] md:h-[40px]"
                 onError={() => {
                   setHasInvalidImg(true)
                 }}
@@ -119,6 +117,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             {isInviteExpired(member.invited_at) ? 'Expired' : 'Invited'}
           </Badge>
         )}
+        {member.is_sso_user && <Badge variant="default">SSO</Badge>}
       </Table.td>
 
       <Table.td>

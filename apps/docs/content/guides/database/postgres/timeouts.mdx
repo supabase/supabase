@@ -61,7 +61,7 @@ The default role timeouts are:
 
 - `anon`: 3s
 - `authenticated`: 8s
-- `service_role`: none (capped by API to be 60s)
+- `service_role`: none (defaults to the `authenticator` role's 8s timeout if unset)
 - `postgres`: none (capped by default global timeout to be 2min)
 
 Run the following query to change a role's timeout:

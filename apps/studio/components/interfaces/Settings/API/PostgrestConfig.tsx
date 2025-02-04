@@ -109,15 +109,18 @@ export const PostgrestConfig = () => {
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
 
+  const dbSchema = config?.db_schema ? config?.db_schema.replace(/ /g, '').split(',') : []
+  const defaultValues = {
+    dbSchema,
+    maxRows: config?.max_rows,
+    dbExtraSearchPath: config?.db_extra_search_path,
+    dbPool: config?.db_pool,
+  }
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
-    defaultValues: {
-      dbSchema: config?.db_schema ? config?.db_schema.replace(/ /g, '').split(',') : [],
-      maxRows: config?.max_rows,
-      dbExtraSearchPath: config?.db_extra_search_path,
-      dbPool: config?.db_pool,
-    },
+    defaultValues,
   })
 
   const schema =
@@ -135,27 +138,9 @@ export const PostgrestConfig = () => {
         }
       }) ?? []
 
-  function resetForm(values?: Partial<z.infer<typeof formSchema>>) {
-    const dbSchema =
-      config?.db_schema && config?.db_schema ? config.db_schema.replace(/ /g, '').split(',') : []
-
-    if (values?.enableDataApi && dbSchema.length === 0) {
-      dbSchema.push('public', 'storage')
-    }
-
-    const defaultValues = {
-      dbSchema: values?.dbSchema ?? dbSchema,
-      maxRows: values?.maxRows ?? config?.max_rows,
-      dbExtraSearchPath: values?.dbExtraSearchPath ?? config?.db_extra_search_path,
-      dbPool: values?.dbPool ?? config?.db_pool,
-      enableDataApi: values?.enableDataApi,
-    }
-
-    if (config) {
-      form.reset({
-        ...defaultValues,
-      })
-    }
+  function resetForm() {
+    const enableDataApi = config?.db_schema ? true : false
+    form.reset({ ...defaultValues, enableDataApi })
   }
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -176,14 +161,8 @@ export const PostgrestConfig = () => {
        * Checks if enableDataApi should be enabled or disabled
        * based on the db_schema value being empty string
        */
-      const enableDataApi = config.db_schema ? true : false
-      /**
-       * Reset the form to default values
-       */
-      resetForm({ enableDataApi })
+      resetForm()
     }
-    // ignore dep array warning, as cant have resetForm as a dependency
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config])
 
   const isDataApiEnabledInForm = form.getValues('enableDataApi')
@@ -225,22 +204,12 @@ export const PostgrestConfig = () => {
                               checked={field.value}
                               onCheckedChange={(value) => {
                                 field.onChange(value)
-
                                 if (!value) {
-                                  /**
-                                   * reset the form to default values
-                                   */
-                                  resetForm({ enableDataApi: false, dbSchema: [] })
-                                  /**
-                                   * remove all the schema values when disabling the Data API
-                                   */
+                                  form.setValue('enableDataApi', false)
+                                  form.setValue('dbSchema', [])
                                 } else {
-                                  /**
-                                   * reset the form to default values
-                                   * when disabled the Data API
-                                   */
-
-                                  resetForm({ enableDataApi: true })
+                                  form.setValue('enableDataApi', true)
+                                  form.setValue('dbSchema', dbSchema)
                                 }
                               }}
                             />

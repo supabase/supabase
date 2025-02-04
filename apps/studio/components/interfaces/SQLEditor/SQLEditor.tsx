@@ -1,5 +1,6 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useCompletion } from 'ai/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronUp, Command, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -7,17 +8,15 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useCompletion } from 'ai/react'
 import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { GridFooter } from 'components/ui/GridFooter'
-import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { constructHeaders } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { isError } from 'data/utils/error-check'
@@ -26,11 +25,10 @@ import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { formatSql } from 'lib/formatSql'
 import { detectOS, uuidv4 } from 'lib/helpers'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { format } from 'sql-formatter'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
@@ -45,9 +43,9 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
@@ -68,6 +66,7 @@ import {
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
+import { useAddDefinitions } from './useAddDefinitions'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 
 // Load the monaco editor client-side only (does not behave well server-side)
@@ -81,6 +80,7 @@ export const SQLEditor = () => {
   const os = detectOS()
   const router = useRouter()
   const { ref, id: urlId } = useParams()
+  const org = useSelectedOrganization()
   const { profile } = useProfile()
   const queryClient = useQueryClient()
   const project = useSelectedProject()
@@ -132,6 +132,8 @@ export const SQLEditor = () => {
   )
   const isLoading = urlId === 'new' ? false : snippetIsLoading
 
+  useAddDefinitions(id, monacoRef.current)
+
   /** React query data fetching  */
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -151,9 +153,7 @@ export const SQLEditor = () => {
   const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
 
   /* React query mutations */
-  const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
-  const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
@@ -229,29 +229,20 @@ export const SQLEditor = () => {
       const sql = snippet
         ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
         : selectedValue || editorRef.current?.getValue()
-      formatQuery(
-        {
-          projectRef: project.ref,
-          connectionString: project.connectionString,
-          sql,
-        },
-        {
-          onSuccess: (res) => {
-            const editorModel = editorRef?.current?.getModel()
-            if (editorRef.current && editorModel) {
-              editorRef.current.executeEdits('apply-prettify-edit', [
-                {
-                  text: res.result,
-                  range: editorModel.getFullModelRange(),
-                },
-              ])
-              snapV2.setSql(id, res.result)
-            }
+      const formattedSql = formatSql(sql)
+
+      const editorModel = editorRef?.current?.getModel()
+      if (editorRef.current && editorModel) {
+        editorRef.current.executeEdits('apply-prettify-edit', [
+          {
+            text: formattedSql,
+            range: editorModel.getFullModelRange(),
           },
-        }
-      )
+        ])
+        snapV2.setSql(id, formattedSql)
+      }
     }
-  }, [formatQuery, id, isDiffOpen, project, snapV2])
+  }, [id, isDiffOpen, project, snapV2])
 
   const executeQuery = useCallback(
     async (force: boolean = false) => {
@@ -320,9 +311,15 @@ export const SQLEditor = () => {
           }),
           autoLimit: appendAutoLimit ? limit : undefined,
           isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+          contextualInvalidation: true,
           handleError: (error) => {
             throw error
           },
+        })
+
+        sendEvent({
+          action: TelemetryActions.SQL_EDITOR_QUERY_RUN_BUTTON_CLICKED,
+          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
         })
       }
     },
@@ -389,7 +386,7 @@ export const SQLEditor = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debugSql, entityDefinitions, id, snapV2.results, snapV2.snippets])
+  }, [entityDefinitions, id, snapV2.results, snapV2.snippets])
 
   const acceptAiHandler = useCallback(async () => {
     try {
@@ -424,6 +421,7 @@ export const SQLEditor = () => {
       sendEvent({
         action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
         properties: { handlerAccepted: true },
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
 
       setSelectedDiffType(DiffType.Modification)
@@ -448,6 +446,7 @@ export const SQLEditor = () => {
     sendEvent({
       action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
       properties: { handlerAccepted: false },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
     resetPrompt()
     closeDiff()
@@ -597,18 +596,8 @@ export const SQLEditor = () => {
     const modified = promptState.beforeSelection + completion + promptState.afterSelection
 
     if (isCompletionLoading) {
-      let formattedModified = modified
-
       // Attempt to format the modified SQL in case the LLM left out indentation, etc
-      try {
-        formattedModified = format(
-          promptState.beforeSelection + completion + promptState.afterSelection,
-          {
-            language: 'postgresql',
-            keywordCase: 'lower',
-          }
-        )
-      } catch (error) {}
+      let formattedModified = formatSql(modified)
 
       setSourceSqlDiff({
         original,
@@ -805,7 +794,6 @@ export const SQLEditor = () => {
                   id={id}
                   isExecuting={isExecuting}
                   isDisabled={isDiffOpen}
-                  isDebugging={isDebugSqlLoading}
                   hasSelection={hasSelection}
                   prettifyQuery={prettifyQuery}
                   executeQuery={executeQuery}
@@ -817,8 +805,8 @@ export const SQLEditor = () => {
             <ResizablePanel maxSize={10} minSize={10} className="max-h-9">
               {results?.rows !== undefined && !isExecuting && (
                 <GridFooter className="flex items-center justify-between gap-2">
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_>
+                  <Tooltip>
+                    <TooltipTrigger>
                       <p className="text-xs">
                         <span className="text-foreground">
                           {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
@@ -828,8 +816,8 @@ export const SQLEditor = () => {
                             ` (Limited to only ${results.autoLimit} rows)`}
                         </span>
                       </p>
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_ className="max-w-xs">
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
                       <p className="flex flex-col gap-y-1">
                         <span>
                           Results are automatically limited to preserve browser performance, in
@@ -840,8 +828,8 @@ export const SQLEditor = () => {
                           You may change or remove this limit from the dropdown on the right
                         </span>
                       </p>
-                    </TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
+                    </TooltipContent>
+                  </Tooltip>
                   {results.autoLimit !== undefined && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

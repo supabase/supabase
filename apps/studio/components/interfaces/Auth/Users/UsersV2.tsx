@@ -10,6 +10,7 @@ import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeatureP
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { authKeys } from 'data/auth/keys'
@@ -46,7 +47,6 @@ import AddUserDropdown from './AddUserDropdown'
 import { UserPanel } from './UserPanel'
 import { MAX_BULK_DELETE, PROVIDER_FILTER_OPTIONS } from './Users.constants'
 import { formatUserColumns, formatUsersData, isAtBottom } from './Users.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 export type UsersTableColumn = {
@@ -242,7 +242,7 @@ export const UsersV2 = () => {
     <>
       <div className="h-full flex flex-col">
         <FormHeader className="py-4 px-6 !mb-0" title="Users" />
-        <div className="bg-surface-200 py-3 px-6 flex items-center justify-between border-t">
+        <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-center justify-between gap-2 border-t">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
               <Button type="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
@@ -258,7 +258,7 @@ export const UsersV2 = () => {
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-x-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Input
                   size="tiny"
                   className="w-52 pl-7 bg-transparent"
@@ -486,10 +486,13 @@ export const UsersV2 = () => {
                         {...props}
                         key={props.row.id}
                         onClick={() => {
-                          const idx = users.indexOf(users.find((u) => u.id === id) ?? {})
-                          if (props.row.id) {
-                            setSelectedUser(props.row.id)
-                            gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+                          const user = users.find((u) => u.id === id)
+                          if (user) {
+                            const idx = users.indexOf(user)
+                            if (props.row.id) {
+                              setSelectedUser(props.row.id)
+                              gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+                            }
                           }
                         }}
                       />
