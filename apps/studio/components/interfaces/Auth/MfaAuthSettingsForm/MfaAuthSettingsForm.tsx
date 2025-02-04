@@ -231,7 +231,7 @@ const MfaAuthSettingsForm = () => {
                   />
                 </FormSectionContent>
               </FormSection>
-              <FormSection header={<FormSectionLabel>Advanced MFA</FormSectionLabel>}>
+              <FormSection header={<FormSectionLabel>SMS MFA</FormSectionLabel>}>
                 <FormSectionContent loading={isLoading}>
                   {promptProPlanUpgrade && (
                     <UpgradeToPro

@@ -6,6 +6,8 @@ import {
   ThirdPartyAuthForm,
 } from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
+import { ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { FormsContainer } from 'components/ui/Forms/FormsContainer'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
@@ -19,9 +21,17 @@ const PageLayout: NextPageWithLayout = () => {
     return <NoPermission isFullPage resourceText="access your project's auth provider settings" />
   } else {
     return (
-      <FormsContainer header="Sign in / up" className="w-full">
-        <ProtectionAuthSettingsForm />
-      </FormsContainer>
+      <div>
+        <ScaffoldHeader className="pb-0">
+          <ScaffoldContainer id="auth-page-top">
+            <ScaffoldTitle>Attack Protection</ScaffoldTitle>
+          </ScaffoldContainer>
+        </ScaffoldHeader>
+
+        <ScaffoldContainer className="mt-8 space-y-8">
+          <ProtectionAuthSettingsForm />
+        </ScaffoldContainer>
+      </div>
     )
   }
 }

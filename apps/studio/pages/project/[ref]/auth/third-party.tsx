@@ -40,13 +40,16 @@ const PageLayout: NextPageWithLayout = () => {
 
   return (
     <>
-      <ScaffoldHeader>
-        <ScaffoldContainer>
+      <ScaffoldHeader className="pb-0">
+        <ScaffoldContainer id="auth-page-top">
           <ScaffoldTitle>Sign in / up</ScaffoldTitle>
           <ScaffoldDescription>
             Configure authentication providers and login methods for your users
           </ScaffoldDescription>
-          <NavMenu className="border-none" aria-label="Auth provider settings navigation">
+          <NavMenu
+            className="border-none max-w-full overflow-y-hidden overflow-x-auto mt-4"
+            aria-label="Auth provider settings navigation"
+          >
             {navMenuItems.map((item) => (
               <NavMenuItem key={item.label} active={currentPath === item.href}>
                 <Link href={item.href}>{item.label}</Link>
@@ -58,7 +61,7 @@ const PageLayout: NextPageWithLayout = () => {
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer className="mt-8">
         <ThirdPartyAuthForm />
       </ScaffoldContainer>
     </>

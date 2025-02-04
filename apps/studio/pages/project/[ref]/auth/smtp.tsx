@@ -39,14 +39,17 @@ const PageLayout: NextPageWithLayout = () => {
   }
 
   return (
-    <>
-      <ScaffoldHeader>
-        <ScaffoldContainer>
+    <div>
+      <ScaffoldHeader className="pb-0">
+        <ScaffoldContainer id="auth-page-top">
           <ScaffoldTitle>Email Settings</ScaffoldTitle>
           <ScaffoldDescription>
             Configure what emails your users receive and how they are sent
           </ScaffoldDescription>
-          <NavMenu className="border-none" aria-label="Auth email settings navigation">
+          <NavMenu
+            className="border-none max-w-full overflow-y-hidden overflow-x-auto mt-4"
+            aria-label="Auth email settings navigation"
+          >
             {navMenuItems.map((item) => (
               <NavMenuItem key={item.label} active={currentPath === item.href}>
                 <Link href={item.href}>{item.label}</Link>
@@ -58,10 +61,10 @@ const PageLayout: NextPageWithLayout = () => {
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer className="mt-8 space-y-8">
         <SmtpForm />
       </ScaffoldContainer>
-    </>
+    </div>
   )
 }
 
