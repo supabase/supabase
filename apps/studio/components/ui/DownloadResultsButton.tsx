@@ -4,7 +4,7 @@ import { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
 import { toast } from 'sonner'
 
-import { copyToClipboard } from 'lib/helpers'
+import { copyToClipboard, processResultsToExport } from 'lib/helpers'
 import {
   Button,
   DropdownMenu,
@@ -40,18 +40,24 @@ export const DownloadResultsButton = ({
     return undefined
   }, [results])
 
+  const processedResults = useMemo(() => {
+    return processResultsToExport(results, { wrapJsonObjects: true })
+  }, [results])
+
+  const markdownData = useMemo(() => {
+    if (results.length === 0) return ''
+
+    const processedRows = processResultsToExport(results, { wrapJsonObjects: false })
+    const columns = Object.keys(processedRows[0] || {})
+    const rows = processedRows.map((row) => {
+      return columns.map((col) => row[col])
+    })
+    return markdownTable([columns].concat(rows))
+  }, [results])
+
   const copyAsMarkdown = () => {
     if (navigator) {
-      if (results.length == 0) toast('Results are empty')
-
-      const columns = Object.keys(results[0])
-      const rows = results.map((x) => {
-        let temp: any[] = []
-        columns.forEach((col) => temp.push(x[col]))
-        return temp
-      })
-      const table = [columns].concat(rows)
-      const markdownData = markdownTable(table)
+      if (results.length === 0) toast('Results are empty')
 
       copyToClipboard(markdownData, () => {
         toast.success('Copied results to clipboard')
@@ -97,7 +103,7 @@ export const DownloadResultsButton = ({
         ref={csvRef}
         className="hidden"
         headers={headers}
-        data={results}
+        data={processedResults}
         filename={`${fileName}.csv`}
       />
     </>
