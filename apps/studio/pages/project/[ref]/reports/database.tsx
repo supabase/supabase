@@ -315,26 +315,82 @@ const DatabaseUsage = () => {
 
           <ComposedChartHandler
             attributes={[
-              { attribute: 'client_connections_postgres', provider: 'infra-monitoring' },
+              {
+                attribute: 'cpu_usage_busy_system',
+                provider: 'infra-monitoring',
+                label: 'Busy System',
+                format: 'percent',
+              },
+              {
+                attribute: 'cpu_usage_busy_user',
+                provider: 'infra-monitoring',
+                label: 'Busy User',
+                format: 'percent',
+              },
+              {
+                attribute: 'cpu_usage_busy_iowait',
+                provider: 'infra-monitoring',
+                label: 'Busy IOwait',
+                format: 'percent',
+              },
+              {
+                attribute: 'cpu_usage_busy_irqs',
+                provider: 'infra-monitoring',
+                label: 'Busy IRQs',
+                format: 'percent',
+              },
+              {
+                attribute: 'cpu_usage_busy_other',
+                provider: 'infra-monitoring',
+                label: 'Busy other',
+                format: 'percent',
+              },
+              {
+                attribute: 'cpu_usage_busy_idle',
+                provider: 'infra-monitoring',
+                label: 'Busy idle',
+                format: 'percent',
+              },
+            ]}
+            label="CPU Usage"
+            interval={dateRange.interval}
+            startDate={dateRange?.period_start?.date}
+            endDate={dateRange?.period_end?.date}
+            customDateFormat={handleCustomDateFormat}
+            updateDateRange={updateDateRange}
+          />
+
+          <ComposedChartHandler
+            attributes={[
+              {
+                attribute: 'client_connections_postgres',
+                provider: 'infra-monitoring',
+                label: 'postgres',
+              },
               {
                 attribute: 'client_connections_supavisor',
                 provider: 'infra-monitoring',
+                label: 'supavisor',
               },
               {
                 attribute: 'client_connections_realtime',
                 provider: 'infra-monitoring',
+                label: 'realtime',
               },
               {
                 attribute: 'client_connections_pgbouncer',
                 provider: 'infra-monitoring',
+                label: 'pgbouncer',
               },
               {
                 attribute: 'client_connections_pgbouncer_waiting',
                 provider: 'infra-monitoring',
+                label: 'pgbouncer waiting',
               },
               {
                 attribute: 'client_connections_max_limit',
                 provider: 'infra-monitoring',
+                label: 'max limit',
               },
             ]}
             label="Client Connections"

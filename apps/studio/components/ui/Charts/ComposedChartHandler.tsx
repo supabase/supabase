@@ -29,6 +29,7 @@ export type MultiAttribute = {
   provider: Provider
   label?: string
   color?: string
+  format?: 'percent' | 'number'
   description?: string
   docsLink?: string
   type?: 'line' | 'area-bar'
@@ -152,8 +153,6 @@ const ChartHandler = ({
     return combined as DataPoint[]
   }, [data, attributeQueries, attributes])
 
-  console.log('combinedData', combinedData)
-
   const loading = isLoading || attributeQueries.some((query) => query.isLoading)
 
   // Calculate highlighted value based on the first attribute's data
@@ -185,10 +184,18 @@ const ChartHandler = ({
 
   if (loading) {
     return (
-      <div className="flex h-52 w-full flex-col items-center justify-center gap-y-2">
+      <Panel
+        className={cn(
+          'flex min-h-[320px] w-full flex-col items-center justify-center gap-y-2',
+          className
+        )}
+        wrapWithLoading={false}
+        noMargin
+        noHideOverflow
+      >
         <Loader2 size={18} className="animate-spin text-border-strong" />
         <p className="text-xs text-foreground-lighter">Loading data for {label}</p>
-      </div>
+      </Panel>
     )
   }
 

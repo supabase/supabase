@@ -20870,6 +20870,12 @@ export interface operations {
       query: {
         attribute:
           | 'cpu_usage'
+          | 'cpu_usage_busy_system'
+          | 'cpu_usage_busy_user'
+          | 'cpu_usage_busy_iowait'
+          | 'cpu_usage_busy_irqs'
+          | 'cpu_usage_busy_other'
+          | 'cpu_usage_busy_idle'
           | 'max_cpu_usage'
           | 'avg_cpu_usage'
           | 'disk_io_budget'
@@ -29574,6 +29580,12 @@ export interface operations {
       query: {
         attribute:
           | 'cpu_usage'
+          | 'cpu_usage_busy_system'
+          | 'cpu_usage_busy_user'
+          | 'cpu_usage_busy_iowait'
+          | 'cpu_usage_busy_irqs'
+          | 'cpu_usage_busy_other'
+          | 'cpu_usage_busy_idle'
           | 'max_cpu_usage'
           | 'avg_cpu_usage'
           | 'disk_io_budget'

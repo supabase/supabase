@@ -46,6 +46,7 @@ interface TooltipProps {
   active?: boolean
   payload?: any[]
   label?: string | number
+  attributes?: MultiAttribute[]
 }
 
 const formatLargeNumber = (num: number, precision: number = 0) => {
@@ -58,9 +59,8 @@ const formatLargeNumber = (num: number, precision: number = 0) => {
   }
 }
 
-const CustomLabel = ({ active, payload, label }: TooltipProps) => {
+const CustomLabel = ({ active, payload, label, attributes }: TooltipProps) => {
   const items = payload ?? []
-  const stackedItems = payload?.filter((p: any) => !p.name.toLowerCase().includes('max')) ?? []
   const totalConnections = payload?.reduce((acc, curr) => acc + curr.value, 0)
   const maxConnections = payload?.find((p: any) => p.name.toLowerCase().includes('max'))
 
@@ -75,40 +75,43 @@ const CustomLabel = ({ active, payload, label }: TooltipProps) => {
     }
   }
 
+  const LabelItem = ({ entry }: { entry: any }) => {
+    const attribute = attributes?.find((a) => a.attribute === entry.name)
+
+    return (
+      <p key={entry.name} className="inline-flex md:flex-col gap-1 md:gap-0 w-fit text-foreground">
+        <div className="flex items-center gap-1">
+          {getIcon(entry.name, entry.color)}
+          <span className="text-nowrap text-foreground-lighter pr-2">
+            {attribute?.label ||
+              entry.name
+                .replace('client_connections_', '')
+                .replace('disk_iops_', '')
+                .replace('ram_usage_', '')}
+          </span>
+        </div>
+        <div className="ml-3.5 flex items-end gap-1">
+          {active && (
+            <span className="text-base">
+              {isRamChart ? formatLargeNumber(entry.value, 1) : numberFormatter(entry.value)}
+            </span>
+          )}
+          {active &&
+            !entry.name.toLowerCase().includes('max') &&
+            !isNaN(entry.value / maxConnections?.value) &&
+            isFinite(entry.value / maxConnections?.value) && (
+              <span className="text-[11px] text-foreground-light mb-0.5">
+                ({numberFormatter((entry.value / maxConnections?.value) * 100)}%)
+              </span>
+            )}
+        </div>
+      </p>
+    )
+  }
   return (
     <div className="flex flex-col gap-0 text-xs w-full h-20 mt-2">
       <div className="flex flex-col md:flex-wrap justify-start md:flex-row gap-0 md:gap-2">
-        {items?.map((entry) => (
-          <p
-            key={entry.name}
-            className="inline-flex md:flex-col gap-1 md:gap-0 w-fit text-foreground"
-          >
-            <div className="flex items-center gap-1">
-              {getIcon(entry.name, entry.color)}
-              <span className="text-nowrap text-foreground-lighter pr-2">
-                {entry.name
-                  .replace('client_connections_', '')
-                  .replace('disk_iops_', '')
-                  .replace('ram_usage_', '')}
-              </span>
-            </div>
-            <div className="ml-3.5 flex items-end gap-1">
-              {active && (
-                <span className="text-base">
-                  {isRamChart ? formatLargeNumber(entry.value, 1) : numberFormatter(entry.value)}
-                </span>
-              )}
-              {active &&
-                !entry.name.toLowerCase().includes('max') &&
-                !isNaN(entry.value / maxConnections?.value) &&
-                isFinite(entry.value / maxConnections?.value) && (
-                  <span className="text-[11px] text-foreground-light mb-0.5">
-                    ({numberFormatter((entry.value / maxConnections?.value) * 100)}%)
-                  </span>
-                )}
-            </div>
-          </p>
-        ))}
+        {items?.map((entry) => <LabelItem key={entry.name} entry={entry} />)}
         {active && (
           <p className="flex md:flex-col gap-1 md:gap-0 text-foreground font-semibold">
             <span className="flex-grow text-foreground-lighter">Total</span>
@@ -243,7 +246,7 @@ export default function ComposedChart({
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
-  const attributesValues = data
+  const defaultAttributes = data
     ? Object.entries(data[0])
         .map(([key, value], index) => ({
           name: key,
@@ -253,7 +256,7 @@ export default function ComposedChart({
         .filter((att) => att.name !== 'timestamp')
     : []
 
-  const stackedAttributes = attributesValues.filter((att) => !att.name.includes('max'))
+  const stackedAttributes = defaultAttributes.filter((att) => !att.name.includes('max'))
 
   if (data.length === 0) {
     return (
@@ -277,8 +280,9 @@ export default function ComposedChart({
         highlightedValue={
           <CustomLabel
             active={!!resolvedHighlightedLabel}
-            payload={_activePayload || attributesValues}
+            payload={_activePayload || defaultAttributes}
             label={resolvedHighlightedValue}
+            attributes={attributes}
           />
         }
         highlightedLabel={''}
@@ -335,7 +339,7 @@ export default function ComposedChart({
           />
           {/* <Tooltip content={(props) => (showTooltip ? <CustomLabel {...props} /> : null)} /> */}
           <Tooltip content={() => null} />
-          {attributesValues
+          {defaultAttributes
             .filter((attribute) => attribute.name.includes('max'))
             .map((attribute) => (
               <Line
@@ -371,7 +375,9 @@ export default function ComposedChart({
                   strokeOpacity={1}
                   stroke={attribute.color}
                   fillOpacity={0.25}
-                  name={attribute.name}
+                  name={
+                    attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
+                  }
                 />
               ))}
           {showHighlightActions && (
