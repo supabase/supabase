@@ -4,6 +4,8 @@ import Image from 'next/image'
 import { IS_PLATFORM } from 'common'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import Link from 'next/link'
 import {
   Button,
@@ -25,8 +27,6 @@ interface AddIntegrationDropdownProps {
   buttonText?: string
   onSelectIntegrationType: (type: INTEGRATION_TYPES) => void
 }
-
-const Providers: INTEGRATION_TYPES[] = ['firebase', 'auth0', 'awsCognito']
 
 const ProviderDropdownItem = ({
   disabled,
@@ -54,11 +54,18 @@ export const AddIntegrationDropdown = ({
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
   const organization = useSelectedOrganization()
+  const selectedProject = useSelectedProject()
 
   const { data: subscription } = useOrgSubscriptionQuery(
     { orgSlug: organization?.slug },
     { enabled: IS_PLATFORM }
   )
+
+  const isClerkTPAEnabledFlag = useFlag<string>('isClerkTPAEnabledOnProjects')
+  const isClerkTPAEnabled =
+    selectedProject?.ref &&
+    typeof isClerkTPAEnabledFlag === 'string' &&
+    isClerkTPAEnabledFlag.split(',').includes(selectedProject.ref)
 
   return (
     <DropdownMenu modal={false}>
@@ -72,6 +79,9 @@ export const AddIntegrationDropdown = ({
         <DropdownMenuSeparator />
 
         <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
+        {isClerkTPAEnabled && (
+          <ProviderDropdownItem type="clerkDev" onSelectIntegrationType={onSelectIntegrationType} />
+        )}
 
         {subscription?.plan.id === 'free' ? (
           <>
@@ -91,6 +101,13 @@ export const AddIntegrationDropdown = ({
                   to add the following providers to your project.
                 </p>
               </DropdownMenuLabel>
+              {isClerkTPAEnabled && (
+                <ProviderDropdownItem
+                  disabled
+                  type="clerkProd"
+                  onSelectIntegrationType={onSelectIntegrationType}
+                />
+              )}
               <ProviderDropdownItem
                 disabled
                 type="auth0"
@@ -105,6 +122,12 @@ export const AddIntegrationDropdown = ({
           </>
         ) : (
           <>
+            {isClerkTPAEnabled && (
+              <ProviderDropdownItem
+                type="clerkProd"
+                onSelectIntegrationType={onSelectIntegrationType}
+              />
+            )}
             <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
             <ProviderDropdownItem
               type="awsCognito"
