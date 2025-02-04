@@ -101,7 +101,9 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
                     ))}
                     {x.tags === 'service_role' && (
                       <>
-                        <code className="bg-red-900 text-xs text-white">secret</code>
+                        <code className="bg-red-900 text-xs text-white px-0.5 rounded-sm">
+                          secret
+                        </code>
                       </>
                     )}
                     {x.tags === 'anon' && <code className="text-xs text-code">public</code>}
