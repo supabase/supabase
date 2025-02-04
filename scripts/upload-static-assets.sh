@@ -9,6 +9,7 @@ fi
 # Configuration
 BUCKET_NAME="demo-sb-cdn-assets"
 STATIC_DIR=".next/static"
+PUBLIC_DIR="public"
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -35,7 +36,15 @@ fi
 echo -e "${YELLOW}Uploading static files to R2...${NC}"
 aws s3 sync "$STATIC_DIR" "s3://$BUCKET_NAME/$SITE_NAME/${VERCEL_GIT_COMMIT_SHA:0:12}/_next/static" \
     --endpoint-url "$ASSET_CDN_S3_ENDPOINT" \
-    --cache-control "public,max-age=31536000,immutable" \
+    --cache-control "public,max-age=604800,immutable" \
+    --region auto \
+    --only-show-errors
+
+# Some public files may be referenced through CSS
+echo -e "${YELLOW}Uploading public files to R2...${NC}"
+aws s3 sync "$PUBLIC_DIR" "s3://$BUCKET_NAME/$SITE_NAME/${VERCEL_GIT_COMMIT_SHA:0:12}" \
+    --endpoint-url "$ASSET_CDN_S3_ENDPOINT" \
+    --cache-control "public,max-age=604800,immutable" \
     --region auto \
     --only-show-errors
 
