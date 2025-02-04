@@ -17,9 +17,9 @@ Testing is a critical part of database development, especially when working with
 - Functions and procedures
 - Data integrity
 
-#### PgTAP: Testing RLS in 15 minutes
+#### Testing RLS policies in practice
 
-Let's walk through a complete example of setting up and testing RLS policies for a simple todo application:
+This example demonstrates setting up and testing RLS policies for a simple todo application:
 
 1. Create a test table with RLS enabled:
 
@@ -258,8 +258,8 @@ jobs:
 
 2. **RLS Policy Testing**
 
-   - Test all CRUD operations (SELECT, INSERT, UPDATE, DELETE)
-   - Test with different user roles (anonymous, authenticated)
+   - Test Create, Read, Update, Delete operations
+   - Test with different user roles: anonymous and authenticated
    - Test edge cases and potential security bypasses
    - Always test negative cases (what users shouldn't be able to do)
 
@@ -272,7 +272,7 @@ jobs:
 
 For more complex, real-world examples of database testing, check out:
 
-- [Basejump's Database Tests](https://github.com/usebasejump/basejump/tree/main/supabase/tests/database) - A production-grade example of testing RLS policies
+- [Database Tests Example Repository](https://github.com/usebasejump/basejump/tree/main/supabase/tests/database) - A production-grade example of testing RLS policies
 - [RLS Guide and Best Practices](https://github.com/orgs/supabase/discussions/14576)
 
 ## Troubleshooting

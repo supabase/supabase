@@ -4,11 +4,11 @@ title: 'Advanced pgTAP Testing'
 description: 'Learn how to leverage dbdev and test helpers for advanced database testing.'
 ---
 
-While basic pgTAP provides excellent testing capabilities, you can enhance your testing workflow using database development tools and helper packages. This guide covers advanced testing techniques using dbdev and community-maintained test helpers.
+While basic pgTAP provides excellent testing capabilities, you can enhance the testing workflow using database development tools and helper packages. This guide covers advanced testing techniques using database.dev and community-maintained test helpers.
 
-## Using database.dev (dbdev)
+## Using database.dev
 
-[Database.dev](https://database.dev) is a package manager for PostgreSQL that allows you to install and use community-maintained packages, including testing utilities.
+[Database.dev](https://database.dev) is a package manager for PostgreSQL that allows installation and use of community-maintained packages, including testing utilities.
 
 ### Setting up dbdev
 
@@ -70,7 +70,7 @@ The test helpers package provides several advantages over writing raw pgTAP test
    - Switch contexts with `tests.authenticate_as()`
    - Retrieve user IDs using `tests.get_supabase_uid()`
 
-2. **RLS Testing Utilities**
+2. **Row Level Security (RLS) Testing Utilities**
 
    - Verify RLS status with `tests.rls_enabled()`
    - Test policy enforcement
@@ -79,11 +79,11 @@ The test helpers package provides several advantages over writing raw pgTAP test
 3. **Reduced Boilerplate**
    - No need to manually insert auth.users
    - Simplified JWT claim management
-   - Cleaner test setup and teardown
+   - Clean test setup and cleanup
 
-## Schema-wide RLS testing
+## Schema-wide Row Level Security testing
 
-When working with Row Level Security, it's crucial to ensure that RLS is enabled on all tables that need it. You can create a simple test to verify RLS is enabled across an entire schema:
+When working with Row Level Security, it's crucial to ensure that RLS is enabled on all tables that need it. Create a simple test to verify RLS is enabled across an entire schema:
 
 ```sql
 begin;
@@ -251,7 +251,7 @@ rollback;
 
 ## Not another todo app: Testing complex organizations
 
-While todo apps are great for learning, let's explore testing a more realistic scenario: a multi-tenant content publishing platform. This example demonstrates how to test complex permissions, plan restrictions, and content management.
+Todo apps are great for learning, but this section explores testing a more realistic scenario: a multi-tenant content publishing platform. This example demonstrates testing complex permissions, plan restrictions, and content management.
 
 ### System overview
 
@@ -645,9 +645,9 @@ rollback;
 
 ## Additional resources
 
-- [Basejump Test Helpers Documentation](https://database.dev/basejump/supabase_test_helpers)
-- [Basejump Test Helpers Reference](https://github.com/usebasejump/supabase-test-helpers)
-- [Basejump RLS writing blog post](https://usebasejump.com/blog/testing-on-supabase-with-pgtap)
+- [Test Helpers Documentation](https://database.dev/basejump/supabase_test_helpers)
+- [Test Helpers Reference](https://github.com/usebasejump/supabase-test-helpers)
+- [Row Level Security Writing Guide](https://usebasejump.com/blog/testing-on-supabase-with-pgtap)
 - [Database.dev Package Registry](https://database.dev)
 - [pgTLE Documentation](https://github.com/aws/pg_tle)
-- [Supabase RLS Performances and Best Practices](https://github.com/orgs/supabase/discussions/14576)
+- [Row Level Security Performance and Best Practices](https://github.com/orgs/supabase/discussions/14576)
