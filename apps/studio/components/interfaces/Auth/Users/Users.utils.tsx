@@ -6,7 +6,7 @@ import { Column, useRowSelection } from 'react-data-grid'
 import { User } from 'data/auth/users-infinite-query'
 import { BASE_PATH } from 'lib/constants'
 import { Checkbox_Shadcn_, cn } from 'ui'
-import { HeaderCell, SelectHeaderCell } from './UsersGridComponents'
+import { HeaderCell } from './UsersGridComponents'
 import { ColumnConfiguration, USERS_TABLE_COLUMNS } from './UsersV2'
 
 const SUPPORTED_CSP_AVATAR_URLS = [
@@ -21,7 +21,7 @@ export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean 
 export const formatUsersData = (users: User[]) => {
   return users.map((user) => {
     const provider: string = user.raw_app_meta_data?.provider ?? ''
-    const providers: string[] = (user.raw_app_meta_data?.providers ?? []).map((x: string) => {
+    const providers: string[] = user.providers.map((x: string) => {
       if (x.startsWith('sso')) return 'SAML'
       return x
     })

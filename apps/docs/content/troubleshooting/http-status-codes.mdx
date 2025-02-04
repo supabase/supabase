@@ -1,7 +1,24 @@
 ---
-id: 'http-status-codes'
-title: 'HTTP Status Codes'
-description: 'HTTP Status Codes used by the Supabase platform'
+title = "HTTP status codes"
+topics = [ "platform" ]
+keywords = [ "HTTP" ]
+database_id = "b98c7288-8c38-4dc2-8591-d18ea9eb4cbc"
+
+[[errors]]
+http_status_code = 402
+message = "service restriction"
+
+[[errors]]
+http_status_code = 540
+message = "project paused"
+
+[[errors]]
+http_status_code = 544
+message = "project API gateway timeout"
+
+[[errors]]
+http_status_code = 546
+message = "Edge Functions resource limit"
 ---
 
 The Supabase platform offers several HTTP APIs for each project. These APIs can use the status codes to indicate the state of the project, and the request being processed. The status codes returned for requests can be access via the [logs explorer](../platform/logs#logs-explorer).

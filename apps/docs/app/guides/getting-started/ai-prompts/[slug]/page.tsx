@@ -23,7 +23,7 @@ ${content}
 
   return (
     <GuideTemplate
-      meta={{ title: `API Prompt: ${heading}` }}
+      meta={{ title: `AI Prompt: ${heading}` }}
       content={content}
       editLink={newEditLink(`supabase/supabase/blob/master/examples/prompts/${slug}.md`)}
     />

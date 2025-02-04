@@ -10,15 +10,15 @@ export const dynamicParams = false
 type Params = { slug?: string[] }
 
 const MonitoringTroubleshootingGuidePage = async ({ params }: { params: Params }) => {
-  const slug = ['monitoring-troubleshooting', ...(params.slug ?? [])]
+  const slug = ['telemetry', ...(params.slug ?? [])]
   const data = await getGuidesMarkdown(slug)
 
   return <GuideTemplate {...data!} />
 }
 
-const generateStaticParams = genGuidesStaticParams('monitoring-troubleshooting')
+const generateStaticParams = genGuidesStaticParams('telemetry')
 const generateMetadata = genGuideMeta((params: { slug?: string[] }) =>
-  getGuidesMarkdown(['monitoring-troubleshooting', ...(params.slug ?? [])])
+  getGuidesMarkdown(['telemetry', ...(params.slug ?? [])])
 )
 
 export default MonitoringTroubleshootingGuidePage

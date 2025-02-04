@@ -337,7 +337,9 @@ export const QueryBlock = ({
 
       {showSql && (
         <div
-          className="shrink-0 w-full max-h-96 overflow-y-auto"
+          className={cn('shrink-0 w-full max-h-96 overflow-y-auto', {
+            'border-b': queryResult !== undefined,
+          })}
           style={{ height: !!queryHeight ? `${queryHeight}px` : undefined }}
         >
           <CodeBlock
