@@ -65,7 +65,9 @@
         "LOGFLARE_API_KEY",
         "SENTRY_ORG",
         "SENTRY_PROJECT",
-        "SENTRY_AUTH_TOKEN"
+        "SENTRY_AUTH_TOKEN",
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY"
       ],
       "outputs": [".next/**", "!.next/cache/**"]
     },
