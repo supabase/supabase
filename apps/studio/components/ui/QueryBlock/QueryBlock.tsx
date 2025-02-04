@@ -82,6 +82,8 @@ interface QueryBlockProps {
   disableRunIfMutation?: boolean
   /** UI to render if there's no query results (Used in Reports) */
   noResultPlaceholder?: ReactNode
+  /** To trigger a refresh of the query */
+  isRefreshing?: boolean
   /** Optional callback whenever a chart configuration is updated (Used in Reports) */
   onUpdateChartConfig?: ({
     chart,
@@ -109,6 +111,7 @@ export const QueryBlock = ({
   runQuery = false,
   lockColumns = false,
   draggable = false,
+  isRefreshing = false,
   disableRunIfMutation = false,
   noResultPlaceholder = null,
   tooltip,
@@ -181,20 +184,25 @@ export const QueryBlock = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sql, isLoading, runQuery, project])
 
+  useEffect(() => {
+    if (isRefreshing) handleExecute()
+  }, [isRefreshing])
+
   return (
     <ReportBlockContainer
       draggable={draggable}
       showDragHandle={draggable}
       tooltip={tooltip}
+      loading={isExecuting}
       onDragStart={(e: DragEvent<Element>) => onDragStart?.(e)}
       icon={
         <SQL_ICON
+          size={18}
+          strokeWidth={1.5}
           className={cn(
             'transition-colors fill-foreground-muted group-aria-selected:fill-foreground',
             'w-5 h-5 shrink-0 grow-0 -ml-0.5'
           )}
-          size={16}
-          strokeWidth={1.5}
         />
       }
       label={label}

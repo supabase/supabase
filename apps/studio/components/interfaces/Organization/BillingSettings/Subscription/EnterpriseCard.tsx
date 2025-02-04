@@ -1,5 +1,9 @@
 import { Check } from 'lucide-react'
 
+import { TelemetryActions } from 'common/telemetry-constants'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PricingInformation } from 'shared-data'
 import { pickFeatures } from 'shared-data/plans'
 import { Button, cn } from 'ui'
@@ -10,8 +14,15 @@ export interface EnterpriseCardProps {
   billingPartner: 'fly' | 'aws' | 'vercel_marketplace' | undefined
 }
 
-const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardProps) => {
+export const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardProps) => {
+  const selectedOrganization = useSelectedOrganization()
+  const orgSlug = selectedOrganization?.slug
+
   const features = pickFeatures(plan, billingPartner)
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
+  const currentPlan = subscription?.plan.name
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   return (
     <div
@@ -37,11 +48,23 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardP
 
         <p className="text-sm mt-2 mb-4">{plan.description}</p>
 
-        <a href={plan.href} className="hidden md:block" target="_blank">
-          <Button block type="default" size="tiny">
+        <Button
+          block
+          asChild
+          type="default"
+          size="tiny"
+          onClick={() =>
+            sendEvent({
+              action: TelemetryActions.STUDIO_PRICING_PLAN_CTA_CLICKED,
+              properties: { selectedPlan: 'Enterprise', currentPlan },
+              groups: { organization: orgSlug ?? 'Unknown' },
+            })
+          }
+        >
+          <a href={plan.href} className="hidden md:block" target="_blank">
             {plan.cta}
-          </Button>
-        </a>
+          </a>
+        </Button>
       </div>
 
       <div className="flex flex-col justify-center col-span-2 px-4 md:px-0">
@@ -62,14 +85,24 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardP
           ))}
         </ul>
 
-        <a href={plan.href} className="visible md:hidden mt-8" target="_blank">
-          <Button block type="default" size="tiny">
+        <Button
+          block
+          asChild
+          type="default"
+          size="tiny"
+          onClick={() =>
+            sendEvent({
+              action: TelemetryActions.STUDIO_PRICING_PLAN_CTA_CLICKED,
+              properties: { selectedPlan: 'Enterprise', currentPlan },
+              groups: { organization: orgSlug ?? 'Unknown' },
+            })
+          }
+        >
+          <a href={plan.href} className="visible md:hidden mt-8" target="_blank">
             {plan.cta}
-          </Button>
-        </a>
+          </a>
+        </Button>
       </div>
     </div>
   )
 }
-
-export default EnterpriseCard

@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -22,6 +23,7 @@ import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import type { OrgPlan, SubscriptionTier } from 'data/subscriptions/types'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -31,7 +33,7 @@ import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-da
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Button, Modal, SidePanel, cn } from 'ui'
 import DowngradeModal from './DowngradeModal'
-import EnterpriseCard from './EnterpriseCard'
+import { EnterpriseCard } from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
@@ -41,6 +43,7 @@ const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const queryClient = useQueryClient()
   const originalPlanRef = useRef<string>()
@@ -260,7 +263,17 @@ const PlanUpdateSidePanel = () => {
                           hasOrioleProjects ||
                           !canUpdateSubscription
                         }
-                        onClick={() => setSelectedTier(plan.id as any)}
+                        onClick={() => {
+                          setSelectedTier(plan.id as any)
+                          sendEvent({
+                            action: TelemetryActions.STUDIO_PRICING_PLAN_CTA_CLICKED,
+                            properties: {
+                              selectedPlan: plan.name,
+                              currentPlan: subscription?.plan?.name,
+                            },
+                            groups: { organization: slug ?? 'Unknown' },
+                          })
+                        }}
                         tooltip={{
                           content: {
                             side: 'bottom',

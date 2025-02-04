@@ -119,10 +119,15 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'platform',
           },
           {
-            label: 'Monitoring & Troubleshooting',
+            label: 'Telemetry',
+            icon: 'telemetry',
+            href: '/guides/telemetry',
+            level: 'telemetry',
+          },
+          {
+            label: 'Troubleshooting',
             icon: 'troubleshooting',
-            href: '/guides/monitoring-troubleshooting',
-            level: 'troubleshooting',
+            href: '/guides/troubleshooting',
           },
         ],
       ],
@@ -212,12 +217,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       label: 'Resources',
       menuItems: [
         [
-          /*
-                     {
-            label: 'Troubleshooting',
-            icon: 'contributing',
-            href: '/guides/troubleshooting',
-          }, */
           {
             label: 'Glossary',
             icon: 'resources',
@@ -2096,71 +2095,35 @@ export const platform: NavMenuConstant = {
   ],
 }
 
-export const monitoring_troubleshooting: NavMenuConstant = {
-  icon: 'troubleshooting',
-  title: 'Monitor & Fix',
-  url: '/guides/monitoring-troubleshooting',
+export const telemetry: NavMenuConstant = {
+  icon: 'telemetry',
+  title: 'Telemetry',
+  url: '/guides/telemetry',
   items: [
-    { name: 'Overview', url: '/guides/monitoring-troubleshooting' },
+    { name: 'Overview', url: '/guides/telemetry' },
     {
       name: 'Logging & observability',
       url: undefined,
       items: [
         {
           name: 'Logging',
-          url: '/guides/monitoring-troubleshooting/logs',
+          url: '/guides/telemetry/logs',
         },
         {
           name: 'Advanced log filtering',
-          url: '/guides/monitoring-troubleshooting/advanced-log-filtering',
+          url: '/guides/telemetry/advanced-log-filtering',
         },
         {
           name: 'Log drains',
-          url: '/guides/monitoring-troubleshooting/log-drains',
+          url: '/guides/telemetry/log-drains',
         },
         {
           name: 'Metrics',
-          url: '/guides/monitoring-troubleshooting/metrics',
+          url: '/guides/telemetry/metrics',
         },
         {
           name: 'Sentry integration',
-          url: '/guides/monitoring-troubleshooting/sentry-monitoring',
-        },
-      ],
-    },
-    {
-      name: 'Troubleshooting',
-      url: undefined,
-      items: [
-        {
-          name: 'HTTP and project issues',
-          url: '/guides/monitoring-troubleshooting/troubleshooting',
-        },
-        {
-          name: 'High disk IO consumption',
-          url: '/guides/monitoring-troubleshooting/exhaust-disk-io',
-        },
-        {
-          name: 'High CPU usage',
-          url: '/guides/monitoring-troubleshooting/exhaust-cpu',
-        },
-        {
-          name: 'High RAM usage',
-          url: '/guides/monitoring-troubleshooting/exhaust-ram',
-        },
-        {
-          name: 'High swap usage',
-          url: '/guides/monitoring-troubleshooting/exhaust-swap',
-        },
-      ],
-    },
-    {
-      name: 'Status codes',
-      url: undefined,
-      items: [
-        {
-          name: 'HTTP status codes',
-          url: '/guides/monitoring-troubleshooting/http-status-codes',
+          url: '/guides/telemetry/sentry-monitoring',
         },
       ],
     },

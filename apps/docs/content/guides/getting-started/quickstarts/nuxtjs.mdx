@@ -68,21 +68,21 @@ hideToc: true
       <script setup>
       import { createClient } from '@supabase/supabase-js'
       const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
-      const countries = ref([])
+      const instruments = ref([])
 
-      async function getCountries() {
-        const { data } = await supabase.from('countries').select()
-        countries.value = data
+      async function getInstruments() {
+        const { data } = await supabase.from('instruments').select()
+        instruments.value = data
       }
 
       onMounted(() => {
-        getCountries()
+        getInstruments()
       })
       </script>
 
       <template>
         <ul>
-          <li v-for="country in countries" :key="country.id">{{ country.name }}</li>
+          <li v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
         </ul>
       </template>
       ```
@@ -94,7 +94,7 @@ hideToc: true
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Start the app">
 
-    Start the app, navigate to http://localhost:3000 in the browser, open the browser console, and you should see the list of countries.
+    Start the app, navigate to http://localhost:3000 in the browser, open the browser console, and you should see the list of instruments.
 
     </StepHikeCompact.Details>
 

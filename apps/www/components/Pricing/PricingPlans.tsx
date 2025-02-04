@@ -29,7 +29,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
 
             const sendPricingEvent = () => {
               sendTelemetryEvent({
-                action: TelemetryActions.PRICING_PLAN_CTA_CLICKED,
+                action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED,
                 properties: {
                   plan: plan.name,
                   showUpgradeText: isUpgradablePlan && hasExistingOrganizations ? true : false,
