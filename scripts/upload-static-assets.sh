@@ -38,8 +38,14 @@ echo -e "${YELLOW}Uploading static files to R2...${NC}"
 aws s3 sync "$STATIC_DIR" "s3://$BUCKET_NAME/$SITE_NAME/${VERCEL_GIT_COMMIT_SHA:0:12}/_next/static" \
     --endpoint-url "$ASSET_CDN_S3_ENDPOINT" \
     --cache-control "public,max-age=31536000,immutable" \
-    --region auto
+    --region auto \
+    --only-show-errors
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}Upload completed successfully!${NC}"
+    
+    # Clean up local static files so we prevent a double upload
+    echo -e "${YELLOW}Cleaning up local static files...${NC}"
+    rm -rf "$STATIC_DIR"/*
+    echo -e "${GREEN}Local static files cleaned up${NC}"
 fi
