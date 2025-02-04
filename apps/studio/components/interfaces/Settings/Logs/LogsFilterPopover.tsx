@@ -29,9 +29,12 @@ const LogsFilterPopover = ({
   const [values, setValues] = useState<Filters>(filters)
 
   const handleReset = () => {
-    setValues({})
-    onFiltersChange({})
-    setOpen(false)
+    const emptyFilters = { [filterKey]: {} }
+    setValues(emptyFilters)
+    onFiltersChange({
+      ...filters,
+      [filterKey]: {},
+    })
   }
 
   const handleToggle = () => setOpen(!open)
@@ -86,7 +89,7 @@ const LogsFilterPopover = ({
                 <Checkbox
                   value={options.key}
                   id={`${options.key}.${x.key}`}
-                  checked={(values?.[options.key] as Filters)?.[x.key] as boolean}
+                  checked={Boolean((values?.[options.key] as Filters)?.[x.key])}
                   onCheckedChange={(checked) => {
                     const newValues = {
                       ...values,
