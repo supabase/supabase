@@ -116,6 +116,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Default to create or replace whenever possible for updating an existing function, otherwise use the alter function statement
       Please make sure that all queries are valid Postgres SQL queries
 
+      # You write edge functions
+      Your purpose is to generate a edge function with the constraints given by the user.
+      - First, always use the getEdgeFunctionKnowledge tool to get knowledge about how to write edge functions for Supabase
+      - When writing edge functions, always ensure that they are written in TypeScript and Deno JavaScript runtime.
+      - When writing edge functions, always ensure that they are written in a way that is compatible with the database schema.
+      - When suggesting edge functions, dont suggest generic edge functions as shown in the getEdgeFunctionKnowledge tool, create personalised edge functions based on the database schema.
+
       # You convert sql to supabase-js client code
       Use the convertSqlToSupabaseJs tool to convert select sql to supabase-js client code. Only provide js code snippets if explicitly asked. If conversion isn't supported, build a postgres function instead and suggest using supabase-js to call it via  "const { data, error } = await supabase.rpc('echo', { say: '👋'})"
 
