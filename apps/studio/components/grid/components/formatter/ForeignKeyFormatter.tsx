@@ -1,4 +1,3 @@
-import { ArrowRight } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
 
@@ -8,6 +7,7 @@ import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { ArrowRight } from 'lucide-react'
 import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
 import type { SupaRow } from '../../types'
 import { NullValue } from '../common/NullValue'
@@ -68,7 +68,7 @@ export const ForeignKeyFormatter = (props: Props) => {
               tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
             />
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ align="end" className="p-0 w-96">
+          <PopoverContent_Shadcn_ portal align="end" className="p-0 w-96">
             <ReferenceRecordPeek
               table={targetTable}
               column={relationship.target_column_name}
