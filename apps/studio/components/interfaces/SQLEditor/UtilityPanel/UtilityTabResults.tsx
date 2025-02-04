@@ -59,7 +59,7 @@ const UtilityTabResults = ({
     )
 
     return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
         <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4">
           {isTimeout ? (
             <div className="flex flex-col gap-y-1">
@@ -155,7 +155,7 @@ const UtilityTabResults = ({
     )
   } else if (!result) {
     return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
         <p className="m-0 border-0 px-4 py-4 text-sm text-foreground-light">
           Click <code>Run</code> to execute your query.
         </p>
@@ -163,7 +163,7 @@ const UtilityTabResults = ({
     )
   } else if (result.rows.length <= 0) {
     return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
         <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
       </div>
     )

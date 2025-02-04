@@ -1,10 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import saveAs from 'file-saver'
 import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
+import Link from 'next/link'
 import Papa from 'papaparse'
 import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useDispatch, useTrackedState } from 'components/grid/store/Store'
 import type { Filter, Sort, SupaTable } from 'components/grid/types'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
@@ -12,7 +15,9 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import {
   useRoleImpersonationStateSnapshot,
@@ -30,7 +35,6 @@ import {
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
-import Link from 'next/link'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -105,6 +109,9 @@ type DefaultHeaderProps = {
   onImportData?: () => void
 }
 const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHeaderProps) => {
+  const { ref } = useParams()
+  const org = useSelectedOrganization()
+
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
   // [Joshen] Using this logic to block both column and row creation/update/delete
@@ -113,6 +120,8 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHe
   const [{ filter: filters, sort: sorts }, setParams] = useUrlState({
     arrayKeys: ['sort', 'filter'],
   })
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   return (
     <div className="flex items-center gap-4">
@@ -195,7 +204,17 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHe
                           <DropdownMenuItem
                             key="import-data"
                             className="group space-x-2"
-                            onClick={onImportData}
+                            onClick={() => {
+                              onImportData()
+                              sendEvent({
+                                action: TelemetryActions.IMPORT_DATA_BUTTON_CLICKED,
+                                properties: { tableType: 'Existing Table' },
+                                groups: {
+                                  project: ref ?? 'Unknown',
+                                  organization: org?.slug ?? 'Unknown',
+                                },
+                              })
+                            }}
                           >
                             <div className="relative -mt-2">
                               <FileText

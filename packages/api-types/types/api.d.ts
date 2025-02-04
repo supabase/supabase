@@ -4274,8 +4274,11 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Create a project */
-    post: operations['SystemProjectsController_createProject']
+    /**
+     * Create a project (deprecated)
+     * @deprecated
+     */
+    post: operations['SystemProjectsController_createProjectDeprecated']
     delete?: never
     options?: never
     head?: never
@@ -4503,6 +4506,26 @@ export interface paths {
      * @description Updates a function with the specified slug and project.
      */
     patch: operations['v1-update-a-function']
+    trace?: never
+  }
+  '/system/projects/{ref}/functions/deploy': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Deploy a function
+     * @description A new endpoint to deploy functions. It will create if function does not exist.
+     */
+    post: operations['v1-deploy-a-function']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
     trace?: never
   }
   '/system/projects/{ref}/ha-events': {
@@ -7482,6 +7505,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/functions/deploy': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Deploy a function
+     * @description A new endpoint to deploy functions. It will create if function does not exist.
+     */
+    post: operations['v1-deploy-a-function']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/health': {
     parameters: {
       query?: never
@@ -8482,7 +8525,7 @@ export interface components {
       }
       description?: string
       /** Format: uuid */
-      folder_id?: null | string
+      folder_id?: (null | (string | null)) | null
       id?: string
       name: string
       owner_id?: number
@@ -9149,6 +9192,16 @@ export interface components {
     }
     FormatQueryBody: {
       query: string
+    }
+    FunctionDeployBody: {
+      file: Record<string, never>[]
+      metadata: {
+        entrypoint_path?: string
+        import_map_path?: string
+        name?: string
+        static_patterns?: string[]
+        verify_jwt?: boolean
+      }
     }
     FunctionResponse: {
       compute_multiplier?: number
@@ -10940,18 +10993,7 @@ export interface components {
       id: number
       recovery_time_target: string
     }
-    RestoreProjectBodyDto: {
-      /**
-       * @description Postgres engine version. If not provided, the latest version from the given release channel will be used.
-       * @enum {string}
-       */
-      postgres_engine?: '15' | '17-oriole'
-      /**
-       * @description Release channel version. If not provided, GeneralAvailability will be used.
-       * @enum {string}
-       */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
-    }
+    RestoreProjectBodyDto: Record<string, never>
     RestrictionData: {
       grace_period_end?: string
       report_date?: string
@@ -12265,7 +12307,7 @@ export interface components {
       }
       description?: string
       /** Format: uuid */
-      folder_id?: null | string
+      folder_id?: (null | (string | null)) | null
       id: string
       name: string
       owner_id: number
@@ -12428,11 +12470,6 @@ export interface components {
        */
       plan?: 'free' | 'pro'
       /**
-       * @description Postgres engine version. If not provided, the latest version will be used.
-       * @enum {string}
-       */
-      postgres_engine?: '15' | '17-oriole'
-      /**
        * @description Region you want your server to reside in
        * @enum {string}
        */
@@ -12455,11 +12492,6 @@ export interface components {
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
-      /**
-       * @description Release channel. If not provided, GA will be used.
-       * @enum {string}
-       */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       /**
        * Format: uri
        * @description Template URL used to create the project from the CLI.
@@ -23648,7 +23680,7 @@ export interface operations {
       }
     }
   }
-  SystemProjectsController_createProject: {
+  SystemProjectsController_createProjectDeprecated: {
     parameters: {
       query?: never
       header?: never
@@ -23687,7 +23719,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['ProjectRefResponse']
+        }
       }
     }
   }
@@ -24275,6 +24309,47 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update function with given slug */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-deploy-a-function': {
+    parameters: {
+      query?: {
+        slug?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'multipart/form-data': components['schemas']['FunctionDeployBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['FunctionResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to deploy function */
       500: {
         headers: {
           [name: string]: unknown
@@ -32856,6 +32931,47 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve function body with given slug */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-deploy-a-function': {
+    parameters: {
+      query?: {
+        slug?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'multipart/form-data': components['schemas']['FunctionDeployBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['FunctionResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to deploy function */
       500: {
         headers: {
           [name: string]: unknown
