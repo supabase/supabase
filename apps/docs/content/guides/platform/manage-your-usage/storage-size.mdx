@@ -49,6 +49,7 @@ The organization's Storage size usage exceeds the free quota by 257 GB, incurrin
 | **Total**           |           | **$30.4** |
 
 ## View Storage size usage
+### Usage page
 You can view Storage size usage on the [organization's usage page](https://supabase.com/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
 <Image
   alt="Usage page navigation bar"
@@ -69,12 +70,10 @@ In the Storage size section, you can see how much storage your projects have use
   zoomable
 />
 
-## Debug Storage size usage
-Since we designed Storage to work as an integrated part of your Postgres database on Supabase, you can query information about your storage objects like any other table.
+### SQL Editor
+Since we designed Storage to work as an integrated part of your Postgres database on Supabase, you can query information about your Storage objects in the `storage` schema.
 
-### File size
 List files larger than 5 MB:
-
 ```sql
 select
     name,
@@ -96,9 +95,7 @@ where
 order by (metadata->>'size')::int desc
 ```
 
-### Bucket size
 List buckets with their total size:
-
 ```sql
 select
     bucket_id,
