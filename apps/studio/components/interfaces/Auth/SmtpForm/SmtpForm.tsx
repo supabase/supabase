@@ -228,22 +228,16 @@ const SmtpForm = () => {
                       </p>
                     }
                   />
-                  {enableSmtp ? (
-                    !isValidSmtpConfig && (
-                      <div className="">
-                        <Alert_Shadcn_ variant="warning">
-                          <AlertTriangle strokeWidth={2} />
-                          <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
-                            The following fields must be filled before custom SMTP can be properly
-                            enabled
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
-                      </div>
-                    )
-                  ) : (
+                  {enableSmtp && !isValidSmtpConfig && !isValidSmtpConfig && (
                     <div className="">
-                      <EmailRateLimitsAlert />
+                      <Alert_Shadcn_ variant="warning">
+                        <AlertTriangle strokeWidth={2} />
+                        <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          The following fields must be filled before custom SMTP can be properly
+                          enabled
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
                     </div>
                   )}
                 </FormSectionContent>
