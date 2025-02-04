@@ -33,9 +33,7 @@ import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
 
 export interface TableGridEditorProps {
-  /** Theme for the editor */
   theme?: 'dark' | 'light'
-
   isLoadingSelectedTable?: boolean
   selectedTable?: Entity
 }
