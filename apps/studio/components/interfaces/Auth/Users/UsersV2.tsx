@@ -124,6 +124,9 @@ export const UsersV2 = () => {
     },
     {
       keepPreviousData: Boolean(filterKeywords),
+      // [Joshen] This is to prevent the dashboard from invalidating when refocusing as it may create
+      // a barrage of requests to invalidate each page esp when the project has many many users.
+      staleTime: Infinity,
     }
   )
 
