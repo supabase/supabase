@@ -6,7 +6,7 @@ description: 'Learn how to leverage dbdev and test helpers for advanced database
 
 While basic pgTAP provides excellent testing capabilities, you can enhance your testing workflow using database development tools and helper packages. This guide covers advanced testing techniques using dbdev and community-maintained test helpers.
 
-## Using Database.dev (dbdev)
+## Using database.dev (dbdev)
 
 [Database.dev](https://database.dev) is a package manager for PostgreSQL that allows you to install and use community-maintained packages, including testing utilities.
 
@@ -51,7 +51,7 @@ drop extension if exists "supabase-dbdev";
 create extension "supabase-dbdev";
 ```
 
-### Installing Test Helpers
+### Installing test helpers
 
 The Basejump Supabase Test Helpers package provides utilities that simplify testing Supabase-specific features:
 
@@ -60,7 +60,7 @@ select dbdev.install('basejump-supabase_test_helpers');
 create extension if not exists "basejump-supabase_test_helpers" version '0.0.6';
 ```
 
-## Test Helper Benefits
+## Test helper benefits
 
 The test helpers package provides several advantages over writing raw pgTAP tests:
 
@@ -81,7 +81,7 @@ The test helpers package provides several advantages over writing raw pgTAP test
    - Simplified JWT claim management
    - Cleaner test setup and teardown
 
-## Schema-wide RLS Testing
+## Schema-wide RLS testing
 
 When working with Row Level Security, it's crucial to ensure that RLS is enabled on all tables that need it. You can create a simple test to verify RLS is enabled across an entire schema:
 
@@ -96,11 +96,11 @@ select * from finish();
 rollback;
 ```
 
-## Test File Organization
+## Test file organization
 
 When working with multiple test files that share common setup requirements, it's beneficial to create a single "pre-test" file that handles the global environment setup. This approach reduces duplication and ensures consistent test environments.
 
-### Creating a Pre-test Hook
+### Creating a pre-test hook
 
 Since pgTAP test files are executed in alphabetical order, you can create a setup file that runs first by using a naming convention like `000-setup-tests-hooks.sql`:
 
@@ -118,7 +118,7 @@ Here's an example setup file:
 
 ```sql
 -- install tests utilities
--- instal pgtap extension for testing
+-- install pgtap extension for testing
 create extension if not exists pgtap with schema extensions;
 /*
 ---------------------
@@ -185,7 +185,7 @@ This approach offers several advantages:
 
 Your subsequent test files (e.g., `001-auth-tests.sql`, `002-rls-tests.sql`) can focus solely on their specific test cases, knowing that the environment is properly configured.
 
-## Example: Advanced RLS Testing
+## Example: Advanced RLS testing
 
 Here's a complete example using test helpers to verify RLS policies putting it all together:
 
@@ -249,11 +249,11 @@ select * from finish();
 rollback;
 ```
 
-## Not Another Todo App: Testing Complex Organizations
+## Not another todo app: testing complex organizations
 
 While todo apps are great for learning, let's explore testing a more realistic scenario: a multi-tenant content publishing platform. This example demonstrates how to test complex permissions, plan restrictions, and content management.
 
-### System Overview
+### System overview
 
 Our platform implements:
 
@@ -263,7 +263,7 @@ Our platform implements:
 - Premium content restrictions
 - Plan-based limitations
 
-### What Makes This Complex?
+### What makes this complex?
 
 1. **Layered Permissions**
 
@@ -276,7 +276,7 @@ Our platform implements:
    - Premium content visibility
    - Cross-organization security
 
-### Testing Focus Areas
+### Testing focus areas
 
 When writing tests, we'll verify:
 
@@ -643,11 +643,11 @@ select * from finish();
 rollback;
 ```
 
-## Additional Resources
+## Additional resources
 
 - [Basejump Test Helpers Documentation](https://database.dev/basejump/supabase_test_helpers)
 - [Basejump Test Helpers Reference](https://github.com/usebasejump/supabase-test-helpers)
-- [Basejump RLS writting blog post](https://usebasejump.com/blog/testing-on-supabase-with-pgtap)
+- [Basejump RLS writing blog post](https://usebasejump.com/blog/testing-on-supabase-with-pgtap)
 - [Database.dev Package Registry](https://database.dev)
 - [pgTLE Documentation](https://github.com/aws/pg_tle)
 - [Supabase RLS Performances and Best Practices](https://github.com/orgs/supabase/discussions/14576)

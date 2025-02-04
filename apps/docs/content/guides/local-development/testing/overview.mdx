@@ -6,9 +6,9 @@ description: 'Learn how develop and test your database schema, tables, functions
 
 Testing is a critical part of database development, especially when working with features like Row Level Security (RLS) policies. This guide provides a comprehensive approach to testing your Supabase database.
 
-## Testing Approaches
+## Testing approaches
 
-### 1. Database Unit Testing with pgTAP
+### 1. Database unit testing with pgTAP
 
 [pgTAP](https://pgtap.org) is a unit testing framework for PostgreSQL that allows you to test:
 
@@ -17,7 +17,7 @@ Testing is a critical part of database development, especially when working with
 - Functions and procedures
 - Data integrity
 
-#### pgTAP: Testing RLS in 15 Minutes
+#### pgTAP: Testing RLS in 15 minutes
 
 Let's walk through a complete example of setting up and testing RLS policies for a simple todo application:
 
@@ -130,13 +130,13 @@ Files=1, Tests=6,  0 wallclock secs ( 0.01 usr +  0.00 sys =  0.01 CPU)
 Result: PASS
 ```
 
-### 2. Application-Level Testing
+### 2. Application-Level testing
 
-Testing through your application code provides end-to-end verification. Here's an example using TypeScript and Jest that mirrors our pgTAP tests above:
+Testing through your application code provides end-to-end verification. Here's an example using TypeScript and Vitest that mirrors our pgTAP tests above:
 
 ```typescript
 import { createClient } from '@supabase/supabase-js'
-import { beforeAll, describe, expect, it } from '@jest/globals'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 describe('Todos RLS', () => {
   const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!)
@@ -216,7 +216,7 @@ describe('Todos RLS', () => {
 })
 ```
 
-### 3. Continuous Integration (CI) Testing
+### 3. Continuous integration (CI) testing
 
 Set up automated database testing in your CI pipeline:
 
@@ -248,7 +248,7 @@ jobs:
         run: supabase test db
 ```
 
-## Best Practices
+## Best practices
 
 1. **Test Data Setup**
 
@@ -268,7 +268,7 @@ jobs:
    - Include database tests in your deployment pipeline
    - Keep test runs fast by using transactions
 
-## Real-World Examples
+## Real-World examples
 
 For more complex, real-world examples of database testing, check out:
 
@@ -290,7 +290,7 @@ Common issues and solutions:
    - Ensure database migrations are run before tests
    - Check for proper test isolation using transactions
 
-## Additional Resources
+## Additional resources
 
 - [pgTAP Documentation](https://pgtap.org)
 - [Supabase CLI Reference](https://supabase.com/docs/reference/cli/supabase-test)
