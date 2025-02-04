@@ -4,7 +4,7 @@ import { debounce } from 'lodash'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -12,6 +12,7 @@ import { z } from 'zod'
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
 import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
@@ -21,13 +22,16 @@ import {
   PostgresVersionSelector,
   extractPostgresVersionDetails,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
+import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
@@ -40,6 +44,7 @@ import {
 } from 'data/projects/project-create-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -80,7 +85,6 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -117,9 +121,7 @@ const FormSchema = z.object({
   }),
   dbPassStrength: z.number(),
   dbPass: z
-    .string({
-      required_error: 'Please enter a database password.',
-    })
+    .string({ required_error: 'Please enter a database password.' })
     .min(1, 'Password is required.'),
   instanceSize: z.string(),
   dataApi: z.boolean(),
@@ -134,6 +136,8 @@ const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
@@ -147,17 +151,29 @@ const Wizard: NextPageWithLayout = () => {
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
 
+  // TODO: Remove this after project creation experiment
+  const projectCreationExperimentGroup = useFlag<string>('projectCreationExperimentGroup')
+  useEffect(() => {
+    if (currentOrg && projectCreationExperimentGroup === 'group-b') {
+      router.replace(`/new/v2/${currentOrg.slug}`)
+    }
+  }, [currentOrg, projectCreationExperimentGroup, router])
+
   const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
 
+  const isNotOnTeamOrEnterprisePlan = useMemo(
+    () => !['team', 'enterprise'].includes(orgSubscription?.plan.id ?? ''),
+    [orgSubscription]
+  )
+
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled:
-      orgSubscription !== undefined &&
-      !['team', 'enterprise'].includes(orgSubscription?.plan.id ?? ''),
+    enabled: isNotOnTeamOrEnterprisePlan,
   })
+
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === currentOrg?.id
   )
-  const hasOutstandingInvoices = overdueInvoices.length > 0
+  const hasOutstandingInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
 
   const { data: allProjects } = useProjectsQuery({})
   const organizationProjects =
@@ -173,6 +189,8 @@ const Wizard: NextPageWithLayout = () => {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchInterval: false,
+      refetchOnReconnect: false,
+      retry: false,
     }
   )
 
@@ -182,6 +200,9 @@ const Wizard: NextPageWithLayout = () => {
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
+      sendEvent({
+        action: TelemetryActions.PROJECT_CREATION_SIMPLE_VERSION_SUBMITTED,
+      })
       router.push(`/project/${res.ref}/building`)
     },
   })
@@ -365,6 +386,15 @@ const Wizard: NextPageWithLayout = () => {
 
   const additionalMonthlySpend =
     instanceSizeSpecs[instanceSize as DbInstanceSize]!.priceMonthly - availableComputeCredits
+
+  // TODO: Remove this after project creation experiment as it delays rendering
+  if (
+    !currentOrg ||
+    !projectCreationExperimentGroup ||
+    projectCreationExperimentGroup === 'group-b'
+  ) {
+    return null
+  }
 
   return (
     <Form_Shadcn_ {...form}>
@@ -751,41 +781,49 @@ const Wizard: NextPageWithLayout = () => {
                       <FormField_Shadcn_
                         control={form.control}
                         name="dbPass"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            label="Database Password"
-                            layout="horizontal"
-                            description={
-                              <PasswordStrengthBar
-                                passwordStrengthScore={form.getValues('dbPassStrength')}
-                                password={field.value}
-                                passwordStrengthMessage={passwordStrengthMessage}
-                                generateStrongPassword={generatePassword}
-                              />
-                            }
-                          >
-                            <FormControl_Shadcn_>
-                              <Input
-                                copy={field.value.length > 0}
-                                type="password"
-                                placeholder="Type in a strong password"
-                                {...field}
-                                autoComplete="off"
-                                onChange={async (event) => {
-                                  field.onChange(event)
-                                  form.trigger('dbPassStrength')
-                                  const value = event.target.value
-                                  if (event.target.value === '') {
-                                    await form.setValue('dbPassStrength', 0)
-                                    await form.trigger('dbPass')
-                                  } else {
-                                    await delayedCheckPasswordStrength(value)
-                                  }
-                                }}
-                              />
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                        )}
+                        render={({ field }) => {
+                          const hasSpecialCharacters =
+                            field.value.length > 0 && !field.value.match(SPECIAL_CHARS_REGEX)
+
+                          return (
+                            <FormItemLayout
+                              label="Database Password"
+                              layout="horizontal"
+                              description={
+                                <>
+                                  {hasSpecialCharacters && <SpecialSymbolsCallout />}
+                                  <PasswordStrengthBar
+                                    passwordStrengthScore={form.getValues('dbPassStrength')}
+                                    password={field.value}
+                                    passwordStrengthMessage={passwordStrengthMessage}
+                                    generateStrongPassword={generatePassword}
+                                  />
+                                </>
+                              }
+                            >
+                              <FormControl_Shadcn_>
+                                <Input
+                                  copy={field.value.length > 0}
+                                  type="password"
+                                  placeholder="Type in a strong password"
+                                  {...field}
+                                  autoComplete="off"
+                                  onChange={async (event) => {
+                                    field.onChange(event)
+                                    form.trigger('dbPassStrength')
+                                    const value = event.target.value
+                                    if (event.target.value === '') {
+                                      await form.setValue('dbPassStrength', 0)
+                                      await form.trigger('dbPass')
+                                    } else {
+                                      await delayedCheckPasswordStrength(value)
+                                    }
+                                  }}
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )
+                        }}
                       />
                     </Panel.Content>
 

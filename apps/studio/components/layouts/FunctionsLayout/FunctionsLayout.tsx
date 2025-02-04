@@ -43,7 +43,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
     <ProjectLayout isLoading={isLoading} title={title || 'Edge Functions'} product="Edge Functions">
       {centered ? (
         <>
-          <div className="mx-auto max-w-5xl py-24 px-5">
+          <div className="mx-auto max-w-full md:max-w-5xl py-12 md:py-20 px-4 md:px-5">
             <div
               className="item-center
             flex

@@ -125,7 +125,7 @@ async function syncTroubleshootingEntries() {
     if (result.status === 'rejected') {
       console.error(
         `[ERROR] Failed to insert and/or update for ${troubleshootingEntries[index].filePath}:\n%O`,
-        result.reason
+        result.reason?.errors ?? result.reason
       )
       hasErrors = true
     }
@@ -169,7 +169,14 @@ function calculateChecksum(content) {
     extensions: [gfm(), mdxjs()],
     mdastExtensions: [gfmFromMarkdown(), mdxFromMarkdown()],
   })
-  const normalized = toMarkdown(mdast, { extensions: [gfmToMarkdown(), mdxToMarkdown()] })
+  const bodyNormalized = toMarkdown(mdast, { extensions: [gfmToMarkdown(), mdxToMarkdown()] })
+
+  const { data, content: body } = matter(bodyNormalized, {
+    language: 'toml',
+    engines: { toml: toml.parse.bind(toml) },
+  })
+  const newFrontmatter = stringify(data)
+  const normalized = `---\n${newFrontmatter}\n---\n${body}`
 
   return createHash('sha256').update(normalized).digest('base64')
 }
@@ -262,11 +269,24 @@ function addCanonicalUrl(entry) {
 }
 
 /**
+ * @param {string} str
+ */
+function escapeGraphQlString(str) {
+  return str
+    .replace(/\\/g, '\\\\')
+    .replace(/`/g, '\\`')
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t')
+}
+
+/**
  * @param {TroubleshootingEntry} entry
  */
 async function createGithubDiscussion(entry) {
   console.log(`[INFO] Creating GitHub discussion for ${entry.data.title}`)
-  const content = addCanonicalUrl(entry)
+  const content = escapeGraphQlString(addCanonicalUrl(entry))
 
   const mutation = `
     mutation {
@@ -364,7 +384,7 @@ async function updateGithubDiscussion(entry) {
     throw error
   }
 
-  const content = addCanonicalUrl(entry)
+  const content = escapeGraphQlString(addCanonicalUrl(entry))
   const mutation = `
     mutation {
       updateDiscussion(input: {

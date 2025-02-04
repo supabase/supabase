@@ -1,5 +1,6 @@
 /packages/shared-data/pricing.ts @roryw10 @kevcodez
 /packages/shared-data/plans.ts @roryw10 @kevcodez
+/packages/common/telemetry-constants.ts @4L3k51 @loong @pamelachia
 
 /apps/studio/ @supabase/Dashboard
 
@@ -17,5 +18,3 @@
 /apps/studio/components/interfaces/Organization/BillingSettings/    @supabase/security
 /apps/studio/components/interfaces/Organization/Documents/          @supabase/security
 /apps/studio/pages/new/index.tsx                                    @supabase/security
-
-/apps/studio/lib/constants/telemetry.ts @4L3k51 @loong @pamelachia

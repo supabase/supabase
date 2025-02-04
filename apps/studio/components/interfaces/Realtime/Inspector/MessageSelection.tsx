@@ -1,12 +1,14 @@
 import { X } from 'lucide-react'
 import { useMemo } from 'react'
 
+import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import CopyButton from 'components/ui/CopyButton'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Button, cn } from 'ui'
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
-import { TelemetryActions } from 'lib/constants/telemetry'
 
 export interface MessageSelectionProps {
   log: LogData | null
@@ -18,6 +20,8 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
     return JSON.stringify(log, null, 2)
   }, [log])
 
+  const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   return (
@@ -74,7 +78,10 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
                 type="default"
                 title="Copy log to clipboard"
                 onClick={() => {
-                  sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_COPY_MESSAGE_CLICKED })
+                  sendEvent({
+                    action: TelemetryActions.REALTIME_INSPECTOR_COPY_MESSAGE_CLICKED,
+                    groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                  })
                 }}
               />
             </div>

@@ -225,6 +225,35 @@ You can provide a callback for the `broadcast` channel to receive message. This 
     ```
 
   </TabPanel>
+  <TabPanel id="js-async" label="Async JavaScript">
+
+    We can send Broadcast messages using `channelB.send()`. Let's set up another client to send messages.
+
+    We can wrap the subscription in a promise to use async/await.
+
+    {/* prettier-ignore */}
+    ```js
+    // Join a room/topic. Can be anything except for 'realtime'.
+    const channelB = supabase.channel('room-1')
+
+    const channelSubscribed = await new Promise((resolve, reject) => {
+      channelB.subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          resolve(channel);
+        } else {
+          reject("Could not subscribe to channel");
+        }
+      })
+    });
+
+    channelSubscribed.send({
+        type: 'broadcast',
+        event: 'test',
+        payload: { message: 'hello, world' },
+    });
+    ```
+
+  </TabPanel>
   <TabPanel id="dart" label="Dart">
 
     We can send Broadcast messages using `channelB.sendBroadcastMessage()`. Let's set up another client to send messages.
@@ -642,7 +671,7 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
 
 <Admonition type="caution">
 
-This feature is currently in Private Alpha. The API and implementation may change. To request access, submit a Support Ticket.
+This feature is currently in Public Alpha. If you have any issues please [submit a support ticket](https://supabase.help).
 
 </Admonition>
 
@@ -650,7 +679,7 @@ This feature is currently in Private Alpha. The API and implementation may chang
 
 Broadcast Changes allows you to trigger messages from your database. To achieve it Realtime is directly reading your WAL (Write Append Log) file using a publication against the `realtime.messages` table so whenever a new insert happens a message is sent to connected users.
 
-It uses partitioned tables per day which allows the deletion your previous images in a performant way by dropping the physical tables of this partitioned table. Tables older than 3 days old are deleted.
+It uses partitioned tables per day which allows the deletion your previous messages in a performant way by dropping the physical tables of this partitioned table. Tables older than 3 days old are deleted.
 
 Broadcasting from the database works like a client-side broadcast, using WebSockets to send JSON packages. [Realtime Authorization](/docs/guides/realtime/authorization) is required and enabled by default to protect your data.
 

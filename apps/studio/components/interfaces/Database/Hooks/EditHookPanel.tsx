@@ -100,21 +100,38 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       setIsEdited(false)
       setIsClosingPanel(false)
 
-      // Reset form fields outside of the Form context
       if (selectedHook !== undefined) {
         setEvents(selectedHook.events)
 
         const [url, method, headers, parameters] = selectedHook.function_args
-        const formattedHeaders = tryParseJson(headers) || {}
+
+        let parsedParameters: Record<string, string> = {}
+
+        // Try to parse the parameters with escaped quotes
+        try {
+          parsedParameters = JSON.parse(parameters.replace(/\\"/g, '"'))
+        } catch (e) {
+          // If parsing still fails, fallback to an empty object
+          parsedParameters = {}
+        }
+
+        let parsedHeaders: Record<string, string> = {}
+        try {
+          parsedHeaders = JSON.parse(headers.replace(/\\"/g, '"'))
+        } catch (e) {
+          // If parsing still fails, fallback to an empty object
+          parsedHeaders = {}
+        }
+
         setHttpHeaders(
-          Object.keys(formattedHeaders).map((key) => {
-            return { id: uuidv4(), name: key, value: formattedHeaders[key] }
+          Object.keys(parsedHeaders).map((key) => {
+            return { id: uuidv4(), name: key, value: parsedHeaders[key] }
           })
         )
-        const formattedParameters = tryParseJson(parameters) || {}
+
         setHttpParameters(
-          Object.keys(formattedParameters).map((key) => {
-            return { id: uuidv4(), name: key, value: formattedParameters[key] }
+          Object.keys(parsedParameters).map((key) => {
+            return { id: uuidv4(), name: key, value: parsedParameters[key] }
           })
         )
       } else {
@@ -205,6 +222,15 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         return a
       }, {})
 
+    // replacer function with JSON.stringify to handle quotes properly
+    const stringifiedParameters = JSON.stringify(parameters, (key, value) => {
+      if (typeof value === 'string') {
+        // Return the raw string without any additional escaping
+        return value
+      }
+      return value
+    })
+
     const payload: any = {
       events,
       activation: 'AFTER',
@@ -220,7 +246,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         values.http_url,
         values.http_method,
         JSON.stringify(headers),
-        JSON.stringify(parameters),
+        stringifiedParameters,
         values.timeout_ms.toString(),
       ],
     }

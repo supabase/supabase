@@ -119,10 +119,15 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'platform',
           },
           {
-            label: 'Monitoring & Troubleshooting',
+            label: 'Telemetry',
+            icon: 'telemetry',
+            href: '/guides/telemetry',
+            level: 'telemetry',
+          },
+          {
+            label: 'Troubleshooting',
             icon: 'troubleshooting',
-            href: '/guides/monitoring-troubleshooting',
-            level: 'troubleshooting',
+            href: '/guides/troubleshooting',
           },
         ],
       ],
@@ -212,11 +217,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       label: 'Resources',
       menuItems: [
         [
-          /*           {
-            label: 'Troubleshooting',
-            icon: 'contributing',
-            href: '/guides/troubleshooting',
-          }, */
           {
             label: 'Glossary',
             icon: 'resources',
@@ -260,6 +260,7 @@ export const gettingstarted: NavMenuConstant = {
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
         { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
+        { name: 'Hono', url: '/guides/getting-started/quickstarts/hono' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
         { name: 'iOS SwiftUI', url: '/guides/getting-started/quickstarts/ios-swiftui' },
         {
@@ -771,6 +772,10 @@ const guiQuickstarts: NavMenuSection = {
       name: 'Metabase',
       url: '/guides/database/metabase',
     },
+    {
+      name: 'Beekeeper Studio',
+      url: '/guides/database/beekeeper-studio',
+    },
   ],
 }
 
@@ -1019,6 +1024,10 @@ export const database: NavMenuConstant = {
         {
           name: 'pg_stat_statements: SQL Planning and Execution Statistics',
           url: '/guides/database/extensions/pg_stat_statements',
+        },
+        {
+          name: 'pg_repack: Storage Optimization',
+          url: '/guides/database/extensions/pg_repack',
         },
         {
           name: 'PostGIS: Geo queries',
@@ -1313,7 +1322,7 @@ export const functions: NavMenuConstant = {
       name: 'Guides',
       url: undefined,
       items: [
-        { name: 'Managing dependencies', url: '/guides/functions/import-maps' },
+        { name: 'Managing dependencies', url: '/guides/functions/dependencies' },
         {
           name: 'Managing environment variables',
           url: '/guides/functions/secrets',
@@ -1349,6 +1358,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Running AI Models',
           url: '/guides/functions/ai-models',
+        },
+        {
+          name: 'Wasm modules',
+          url: '/guides/functions/wasm',
         },
         {
           name: 'Deploying with CI / CD pipelines',
@@ -1890,12 +1903,16 @@ export const local_development: NavMenuConstant = {
       items: [
         { name: 'Getting started', url: '/guides/local-development/overview' },
         {
-          name: 'Managing config and secrets',
-          url: '/guides/local-development/managing-config',
+          name: 'Declarative database schemas',
+          url: '/guides/local-development/declarative-database-schemas',
         },
         {
           name: 'Seeding your database',
           url: '/guides/local-development/seeding-your-database',
+        },
+        {
+          name: 'Managing config and secrets',
+          url: '/guides/local-development/managing-config',
         },
         {
           name: 'Customizing email templates',
@@ -1995,6 +2012,16 @@ export const platform: NavMenuConstant = {
         {
           name: 'Migrating within Supabase',
           url: '/guides/platform/migrating-within-supabase',
+          items: [
+            {
+              name: 'Restore Dashboard backup',
+              url: '/guides/platform/migrating-within-supabase/dashboard-restore',
+            },
+            {
+              name: 'Backup and restore using CLI',
+              url: '/guides/platform/migrating-within-supabase/backup-restore',
+            },
+          ],
         },
         {
           name: 'Migrating to Supabase',
@@ -2072,71 +2099,35 @@ export const platform: NavMenuConstant = {
   ],
 }
 
-export const monitoring_troubleshooting: NavMenuConstant = {
-  icon: 'troubleshooting',
-  title: 'Monitor & Fix',
-  url: '/guides/monitoring-troubleshooting',
+export const telemetry: NavMenuConstant = {
+  icon: 'telemetry',
+  title: 'Telemetry',
+  url: '/guides/telemetry',
   items: [
-    { name: 'Overview', url: '/guides/monitoring-troubleshooting' },
+    { name: 'Overview', url: '/guides/telemetry' },
     {
       name: 'Logging & observability',
       url: undefined,
       items: [
         {
           name: 'Logging',
-          url: '/guides/monitoring-troubleshooting/logs',
+          url: '/guides/telemetry/logs',
         },
         {
           name: 'Advanced log filtering',
-          url: '/guides/monitoring-troubleshooting/advanced-log-filtering',
+          url: '/guides/telemetry/advanced-log-filtering',
         },
         {
           name: 'Log drains',
-          url: '/guides/monitoring-troubleshooting/log-drains',
+          url: '/guides/telemetry/log-drains',
         },
         {
           name: 'Metrics',
-          url: '/guides/monitoring-troubleshooting/metrics',
+          url: '/guides/telemetry/metrics',
         },
         {
           name: 'Sentry integration',
-          url: '/guides/monitoring-troubleshooting/sentry-monitoring',
-        },
-      ],
-    },
-    {
-      name: 'Troubleshooting',
-      url: undefined,
-      items: [
-        {
-          name: 'HTTP and project issues',
-          url: '/guides/monitoring-troubleshooting/troubleshooting',
-        },
-        {
-          name: 'High disk IO consumption',
-          url: '/guides/monitoring-troubleshooting/exhaust-disk-io',
-        },
-        {
-          name: 'High CPU usage',
-          url: '/guides/monitoring-troubleshooting/exhaust-cpu',
-        },
-        {
-          name: 'High RAM usage',
-          url: '/guides/monitoring-troubleshooting/exhaust-ram',
-        },
-        {
-          name: 'High swap usage',
-          url: '/guides/monitoring-troubleshooting/exhaust-swap',
-        },
-      ],
-    },
-    {
-      name: 'Status codes',
-      url: undefined,
-      items: [
-        {
-          name: 'HTTP status codes',
-          url: '/guides/monitoring-troubleshooting/http-status-codes',
+          url: '/guides/telemetry/sentry-monitoring',
         },
       ],
     },

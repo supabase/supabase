@@ -1,6 +1,4 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import dayjs from 'dayjs'
 import {
   ArrowRight,
@@ -18,6 +16,8 @@ import { PropsWithChildren, ReactNode, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBranchQuery } from 'data/branches/branch-query'
 import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
@@ -31,9 +31,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
@@ -161,44 +161,31 @@ export const BranchRow = ({
   return (
     <div className="w-full flex items-center justify-between px-6 py-2.5" ref={ref}>
       <div className="flex items-center gap-x-4">
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
-            <Button
-              asChild
-              type="default"
-              className="max-w-[300px]"
-              icon={
-                isMain ? (
-                  <Shield strokeWidth={2} className="text-amber-900" />
-                ) : branch.persistent ? (
-                  <Infinity size={16} />
-                ) : null
-              }
-            >
-              <Link href={`/project/${branch.project_ref}/branches`} title={branch.name}>
-                {branch.name}
-              </Link>
-            </Button>
-          </Tooltip.Trigger>
-          {branch.persistent && (
-            <Tooltip.Portal>
-              <Tooltip.Content side="top">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">
-                    {branch.name} is a persistent branch and will remain active even after the
-                    underlying PR is closed
-                  </span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          )}
-        </Tooltip.Root>
+        <ButtonTooltip
+          asChild
+          type="default"
+          className="max-w-[300px]"
+          icon={
+            isMain ? (
+              <Shield strokeWidth={2} className="text-amber-900" />
+            ) : branch.persistent ? (
+              <Infinity size={16} />
+            ) : null
+          }
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: branch.persistent
+                ? `${branch.name} is a persistent branch and will remain active even after the
+                    underlying PR is closed`
+                : undefined,
+            },
+          }}
+        >
+          <Link href={`/project/${branch.project_ref}/branches`} title={branch.name}>
+            {branch.name}
+          </Link>
+        </ButtonTooltip>
 
         {isActive && <Badge>Current</Badge>}
         <BranchStatusBadge
@@ -278,8 +265,8 @@ export const BranchRow = ({
                 <Button type="text" icon={<MoreVertical />} className="px-1" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" side="bottom" align="end">
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild={isBranchActiveHealthy} className="w-full">
+                <Tooltip>
+                  <TooltipTrigger asChild={isBranchActiveHealthy} className="w-full">
                     <DropdownMenuItem
                       className="gap-x-2"
                       onSelect={() => setShowConfirmResetModal(true)}
@@ -289,17 +276,17 @@ export const BranchRow = ({
                       <RefreshCw size={14} />
                       Reset Branch
                     </DropdownMenuItem>
-                  </TooltipTrigger_Shadcn_>
+                  </TooltipTrigger>
                   {!isBranchActiveHealthy && (
-                    <TooltipContent_Shadcn_ side="left">
+                    <TooltipContent side="left">
                       Branch is still initializing. Please wait for the branch to become healthy
                       before resetting
-                    </TooltipContent_Shadcn_>
+                    </TooltipContent>
                   )}
-                </Tooltip_Shadcn_>
+                </Tooltip>
 
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild={isBranchActiveHealthy} className="w-full">
+                <Tooltip>
+                  <TooltipTrigger asChild={isBranchActiveHealthy} className="w-full">
                     <DropdownMenuItem
                       className="gap-x-2"
                       onSelect={() => setShowBranchModeSwitch(true)}
@@ -316,17 +303,17 @@ export const BranchRow = ({
                         </>
                       )}
                     </DropdownMenuItem>
-                  </TooltipTrigger_Shadcn_>
+                  </TooltipTrigger>
                   {!isBranchActiveHealthy && (
-                    <TooltipContent_Shadcn_ side="left">
+                    <TooltipContent side="left">
                       Branch is still initializing. Please wait for the branch to become healthy
                       before switching modes
-                    </TooltipContent_Shadcn_>
+                    </TooltipContent>
                   )}
-                </Tooltip_Shadcn_>
+                </Tooltip>
 
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild={canDeleteBranches} className="w-full">
+                <Tooltip>
+                  <TooltipTrigger asChild={canDeleteBranches} className="w-full">
                     <DropdownMenuItem
                       className="gap-x-2"
                       disabled={!canDeleteBranches}
@@ -336,13 +323,13 @@ export const BranchRow = ({
                       <Trash2 size={14} />
                       Delete branch
                     </DropdownMenuItem>
-                  </TooltipTrigger_Shadcn_>
+                  </TooltipTrigger>
                   {!canDeleteBranches && (
-                    <TooltipContent_Shadcn_ side="left">
+                    <TooltipContent side="left">
                       You need additional permissions to delete branches
-                    </TooltipContent_Shadcn_>
+                    </TooltipContent>
                   )}
-                </Tooltip_Shadcn_>
+                </Tooltip>
               </DropdownMenuContent>
             </DropdownMenu>
 

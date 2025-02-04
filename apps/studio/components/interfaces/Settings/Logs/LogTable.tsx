@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 import { isEqual } from 'lodash'
 import { ChevronDown, Clipboard, Download, Eye, EyeOff, Play } from 'lucide-react'
+import Papa from 'papaparse'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { toast } from 'sonner'
@@ -13,6 +14,7 @@ import { copyToClipboard } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { Item, Menu, useContextMenu } from 'react-contexify'
 import { createPortal } from 'react-dom'
+import { ResponseError } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -36,13 +38,13 @@ import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
-import { ResponseError } from 'types'
 
 interface Props {
   data?: LogData[]
   onHistogramToggle?: () => void
   isHistogramShowing?: boolean
   isLoading?: boolean
+  isSaving?: boolean
   error?: LogQueryError | null
   showDownload?: boolean
   queryType?: QueryType
@@ -74,6 +76,7 @@ const LogTable = ({
   onHistogramToggle,
   isHistogramShowing,
   isLoading,
+  isSaving,
   error,
   projectRef,
   onRun,
@@ -258,6 +261,18 @@ const LogTable = ({
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => {
+                const csvData = Papa.unparse(data)
+                copyToClipboard(csvData, () => {
+                  toast.success('Results copied to clipboard')
+                })
+              }}
+              className="space-x-2"
+            >
+              <Clipboard size={14} />
+              <div>Copy as CSV</div>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
                 copyToClipboard(stringData, () => {
                   toast.success('Results copied to clipboard')
                 })
@@ -265,7 +280,7 @@ const LogTable = ({
               className="space-x-2"
             >
               <Clipboard size={14} />
-              <div>Copy to clipboard</div>
+              <div>Copy as JSON</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -295,6 +310,7 @@ const LogTable = ({
           <ButtonTooltip
             type="default"
             onClick={onSave}
+            loading={isSaving}
             disabled={!canCreateLogQuery || !hasEditorValue}
             tooltip={{
               content: {
@@ -338,7 +354,7 @@ const LogTable = ({
     }
 
     return (
-      <div className="text-foreground flex gap-2 font-mono px-6">
+      <div className="text-foreground flex gap-2 font-mono p-4">
         <DefaultErrorRenderer {...childProps} />
       </div>
     )

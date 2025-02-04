@@ -30,7 +30,7 @@ WORKDIR /app
 FROM base AS turbo
 COPY . .
 
-RUN pnpm dlx turbo@2.0.4 prune studio --docker
+RUN pnpm dlx turbo@2.3.3 prune studio --docker
 
 # Install dev dependencies (only if needed)
 FROM base AS deps
@@ -50,7 +50,7 @@ CMD ["pnpm", "dev:studio"]
 # Compile Next.js
 FROM dev AS builder
 
-RUN pnpm dlx turbo@2.0.4 run build --filter studio -- --no-lint
+RUN pnpm dlx turbo@2.3.3 run build --filter studio -- --no-lint
 
 # Copy only compiled code and dependencies
 FROM base AS production
@@ -59,5 +59,5 @@ COPY --from=builder /app/apps/studio/.next/standalone ./
 COPY --from=builder /app/apps/studio/.next/static ./apps/studio/.next/static
 EXPOSE 3000
 ENTRYPOINT ["docker-entrypoint.sh"]
-HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD node -e "fetch('http://localhost:3000/api/profile').then((r) => {if (r.status !== 200) throw new Error(r.status)})"
+HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD node -e "fetch('http://localhost:3000/api/platform/profile').then((r) => {if (r.status !== 200) throw new Error(r.status)})"
 CMD ["node", "apps/studio/server.js"]

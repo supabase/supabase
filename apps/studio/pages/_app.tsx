@@ -18,22 +18,19 @@ import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
-import { TooltipProvider } from '@radix-ui/react-tooltip'
 import * as Sentry from '@sentry/nextjs'
-import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { createClient } from '@supabase/supabase-js'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ThemeProvider, useThemeSandbox } from 'common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
-import { ErrorInfo, useMemo, useState } from 'react'
+import { ErrorInfo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
+import { FeatureFlagProvider, PageTelemetry, ThemeProvider, useThemeSandbox } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import { AppBannerWrapper, RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
@@ -42,16 +39,17 @@ import { FeaturePreviewContextProvider } from 'components/interfaces/App/Feature
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
 import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
-import FlagProvider from 'components/ui/Flag/FlagProvider'
-import PageTelemetry from 'components/ui/PageTelemetry'
+import GroupsTelemetry from 'components/ui/GroupsTelemetry'
 import { useRootQueryClient } from 'data/query-client'
 import { AuthProvider } from 'lib/auth'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { getFlags as getConfigCatFlags } from 'lib/configcat'
+import { API_URL, BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
-import { SonnerToaster } from 'ui'
+import { SonnerToaster, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
+import { useConsent } from 'ui-patterns/ConsentToast'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -79,39 +77,7 @@ loader.config({
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const queryClient = useRootQueryClient()
 
-  // [Joshen] Some issues with using createBrowserSupabaseClient
-  const [supabase] = useState(() =>
-    IS_PLATFORM
-      ? createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-        )
-      : undefined
-  )
-
   const getLayout = Component.getLayout ?? ((page) => page)
-
-  const AuthContainer = useMemo(
-    // eslint-disable-next-line react/display-name
-    () => (props: any) => {
-      return IS_PLATFORM ? (
-        <SessionContextProvider supabaseClient={supabase as any}>
-          <AuthProvider>{props.children}</AuthProvider>
-        </SessionContextProvider>
-      ) : (
-        <AuthProvider>{props.children}</AuthProvider>
-      )
-    },
-    [supabase]
-  )
-
-  const TelemetryContainer = useMemo(
-    // eslint-disable-next-line react/display-name
-    () => (props: any) => {
-      return IS_PLATFORM ? <PageTelemetry>{props.children}</PageTelemetry> : <>{props.children}</>
-    },
-    []
-  )
 
   const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
     Sentry.withScope(function (scope) {
@@ -124,52 +90,65 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   useThemeSandbox()
 
+  // Although this is "technically" breaking the rules of hooks
+  // IS_PLATFORM never changes within a session, so this won't cause any issues
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { hasAcceptedConsent } = IS_PLATFORM ? useConsent() : { hasAcceptedConsent: true }
+
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   return (
     <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
       <QueryClientProvider client={queryClient}>
         <Hydrate state={pageProps.dehydratedState}>
-          <AuthContainer>
-            <FlagProvider>
+          <AuthProvider>
+            <FeatureFlagProvider
+              API_URL={API_URL}
+              enabled={IS_PLATFORM}
+              getConfigCatFlags={getConfigCatFlags}
+            >
               <ProfileProvider>
                 <Head>
                   <title>Supabase</title>
                   <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                 </Head>
                 <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
-                <TelemetryContainer>
-                  <TooltipProvider>
-                    <RouteValidationWrapper>
-                      <ThemeProvider
-                        defaultTheme="system"
-                        themes={['dark', 'light', 'classic-dark']}
-                        enableSystem
-                        disableTransitionOnChange
-                      >
-                        <AppBannerContextProvider>
-                          <CommandProvider>
-                            <AppBannerWrapper>
-                              <FeaturePreviewContextProvider>
-                                {getLayout(<Component {...pageProps} />)}
-                                <StudioCommandMenu />
-                                <GenerateSql />
-                                <FeaturePreviewModal />
-                              </FeaturePreviewContextProvider>
-                            </AppBannerWrapper>
-                            <SonnerToaster position="top-right" />
-                          </CommandProvider>
-                        </AppBannerContextProvider>
-                      </ThemeProvider>
-                    </RouteValidationWrapper>
-                  </TooltipProvider>
-                </TelemetryContainer>
+                <TooltipProvider delayDuration={0}>
+                  <RouteValidationWrapper>
+                    <ThemeProvider
+                      defaultTheme="system"
+                      themes={['dark', 'light', 'classic-dark']}
+                      enableSystem
+                      disableTransitionOnChange
+                    >
+                      <AppBannerContextProvider>
+                        <CommandProvider>
+                          <AppBannerWrapper>
+                            <FeaturePreviewContextProvider>
+                              {getLayout(<Component {...pageProps} />)}
+                              <StudioCommandMenu />
+                              <GenerateSql />
+                              <FeaturePreviewModal />
+                            </FeaturePreviewContextProvider>
+                          </AppBannerWrapper>
+                          <SonnerToaster position="top-right" />
+                        </CommandProvider>
+                      </AppBannerContextProvider>
+                    </ThemeProvider>
+                  </RouteValidationWrapper>
+                </TooltipProvider>
 
+                <PageTelemetry
+                  API_URL={API_URL}
+                  hasAcceptedConsent={hasAcceptedConsent}
+                  enabled={IS_PLATFORM}
+                />
+                <GroupsTelemetry hasAcceptedConsent={hasAcceptedConsent} />
                 {!isTestEnv && <HCaptchaLoadedStore />}
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </ProfileProvider>
-            </FlagProvider>
-          </AuthContainer>
+            </FeatureFlagProvider>
+          </AuthProvider>
         </Hydrate>
       </QueryClientProvider>
     </ErrorBoundary>

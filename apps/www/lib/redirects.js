@@ -2187,11 +2187,6 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/docs/guides/database/extensions/pgmq',
-    destination: '/docs/guides/database/extensions',
-  },
-  {
-    permanent: false,
     source: '/docs/guides/database/extensions/pg_partman',
     destination: '/docs/guides/database/extensions',
   },
@@ -2634,6 +2629,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/import-maps',
+    destination: '/docs/guides/functions/dependencies',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/phone-login/messagebird',
     destination: '/docs/guides/auth/phone-login?showSmsProvider=MessageBird',
   },
@@ -2836,6 +2836,41 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/:path*',
+    destination: '/docs/guides/telemetry/:path*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/troubleshooting',
+    destination: '/docs/guides/troubleshooting/http-api-issues',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/exhaust-disk-io',
+    destination: '/docs/guides/troubleshooting/exhaust-disk-io',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/exhaust-ram',
+    destination: '/docs/guides/troubleshooting/exhaust-ram',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/exhaust-swap',
+    destination: '/docs/guides/troubleshooting/exhaust-swap',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/exhaust-cpu',
+    destination: '/docs/guides/troubleshooting/high-cpu-usage',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/http-status-codes',
+    destination: '/docs/guides/troubleshooting/http-status-codes',
+  },
+  {
+    permanent: true,
     source: '/partners/experts',
     destination: '/partners',
   },
@@ -2858,5 +2893,10 @@ module.exports = [
     permanent: true,
     source: '/features/ai-query-assistance',
     destination: '/features/ai-assistant',
+  },
+  {
+    permanent: true,
+    source: '/features/fly-postgres',
+    destination: '/features/postgres-database',
   },
 ]

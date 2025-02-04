@@ -1,16 +1,14 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import { plans } from 'shared-data/plans'
 import { pricing } from 'shared-data/pricing'
 import { Button, Select, cn } from 'ui'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
-import { Organization } from '~/data/organizations'
 import Solutions from '~/data/MainProducts'
-import gaEvents from '~/lib/gaEvents'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import { Organization } from '~/data/organizations'
+import { TelemetryActions } from 'common/telemetry-constants'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import UpgradePlan from './UpgradePlan'
 
 const MobileHeader = ({
@@ -32,11 +30,7 @@ const MobileHeader = ({
   organizations?: Organization[]
   hasExistingOrganizations?: boolean
 }) => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   const selectedPlan = plans.find((p) => p.name === plan)!
   const isUpgradablePlan = selectedPlan.name === 'Pro' || selectedPlan.name === 'Team'
@@ -62,9 +56,15 @@ const MobileHeader = ({
         <UpgradePlan
           organizations={organizations}
           onClick={() =>
-            sendTelemetryEvent(
-              gaEvents[`www_pricing_comparison_${plan.toLowerCase()}_mobile_upgrade`]
-            )
+            sendTelemetryEvent({
+              action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED,
+              properties: {
+                plan,
+                showUpgradeText: true,
+                section: 'comparison_table',
+                tableMode: 'mobile',
+              },
+            })
           }
           size="medium"
         />
@@ -73,7 +73,15 @@ const MobileHeader = ({
           <Link
             href={selectedPlan.href}
             onClick={() =>
-              sendTelemetryEvent(gaEvents[`www_pricing_comparison_${plan.toLowerCase()}_mobile`])
+              sendTelemetryEvent({
+                action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED,
+                properties: {
+                  plan,
+                  showUpgradeText: false,
+                  section: 'comparison_table',
+                  tableMode: 'mobile',
+                },
+              })
             }
           >
             {selectedPlan.cta}
@@ -93,13 +101,9 @@ const PricingComparisonTable = ({
   organizations,
   hasExistingOrganizations,
 }: PricingComparisonTableProps) => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
 
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <div
@@ -398,11 +402,15 @@ const PricingComparisonTable = ({
                           <UpgradePlan
                             organizations={organizations}
                             onClick={() =>
-                              sendTelemetryEvent(
-                                gaEvents[
-                                  `www_pricing_comparison_${plan.name.toLowerCase()}_upgrade`
-                                ]
-                              )
+                              sendTelemetryEvent({
+                                action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED,
+                                properties: {
+                                  plan: plan.name,
+                                  showUpgradeText: true,
+                                  section: 'comparison_table',
+                                  tableMode: 'desktop',
+                                },
+                              })
                             }
                             size="tiny"
                           />
@@ -416,9 +424,15 @@ const PricingComparisonTable = ({
                             <Link
                               href={plan.href}
                               onClick={() =>
-                                sendTelemetryEvent(
-                                  gaEvents[`www_pricing_comparison_${plan.name.toLowerCase()}`]
-                                )
+                                sendTelemetryEvent({
+                                  action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED,
+                                  properties: {
+                                    plan: plan.name,
+                                    showUpgradeText: false,
+                                    section: 'comparison_table',
+                                    tableMode: 'desktop',
+                                  },
+                                })
                               }
                             >
                               {plan.cta}

@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query'
 import {
   AlignLeft,
   Check,
@@ -11,10 +10,12 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -25,9 +26,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import SavingIndicator from './SavingIndicator'
@@ -50,14 +51,20 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
-  const client = useQueryClient()
-  const { project } = useProjectContext()
+  const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const org = useSelectedOrganization()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
+  )
+  const [lastSelectedDb, setLastSelectedDb] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_LAST_SELECTED_DB(ref as string),
+    ''
   )
 
   const snippet = snapV2.snippets[id]
@@ -70,12 +77,13 @@ const UtilityActions = ({
     )
   }
 
-  const addFavorite = async () => {
-    snapV2.addFavorite(id)
-  }
+  const addFavorite = () => snapV2.addFavorite(id)
 
-  const removeFavorite = async () => {
-    snapV2.removeFavorite(id)
+  const removeFavorite = () => snapV2.removeFavorite(id)
+
+  const onSelectDatabase = (databaseId: string) => {
+    snapV2.resetResult(id)
+    setLastSelectedDb(databaseId)
   }
 
   return (
@@ -140,8 +148,8 @@ const UtilityActions = ({
         </DropdownMenu>
 
         {IS_PLATFORM && (
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
+          <Tooltip>
+            <TooltipTrigger asChild>
               {isFavorite ? (
                 <Button
                   type="text"
@@ -159,35 +167,36 @@ const UtilityActions = ({
                   icon={<Heart className="fill-none stroke-foreground-light" />}
                 />
               )}
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom">
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
               {isFavorite ? 'Remove from' : 'Add to'} favorites
-            </TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
+            </TooltipContent>
+          </Tooltip>
         )}
 
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <Button
               type="text"
               onClick={prettifyQuery}
               className="px-1"
               icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
             />
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">Prettify SQL</TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Prettify SQL</TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="flex items-center justify-between gap-x-2">
         <div className="flex items-center">
           <DatabaseSelector
+            selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
             variant="connected-on-right"
-            onSelectId={() => snapV2.resetResult(id)}
+            onSelectId={onSelectDatabase}
           />
           <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
           <Button
-            onClick={() => executeQuery()}
+            onClick={executeQuery}
             disabled={isDisabled || isExecuting}
             type="primary"
             size="tiny"

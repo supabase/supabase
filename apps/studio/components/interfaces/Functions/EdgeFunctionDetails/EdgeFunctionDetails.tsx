@@ -63,11 +63,11 @@ const EdgeFunctionDetails = () => {
       ? `https://${customDomainData.customDomain.hostname}/functions/v1/${selectedFunction?.slug}`
       : `${protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
 
-  const { managementCommands, secretCommands, invokeCommands } = generateCLICommands(
+  const { managementCommands, secretCommands, invokeCommands } = generateCLICommands({
     selectedFunction,
     functionUrl,
-    apiKey
-  )
+    anonKey: apiKey,
+  })
 
   const onUpdateFunction = async (values: any, { resetForm }: any) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -194,7 +194,7 @@ const EdgeFunctionDetails = () => {
                         <div className="!mt-4">
                           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                             <Link
-                              href="https://supabase.com/docs/guides/functions/import-maps"
+                              href="https://supabase.com/docs/guides/functions/dependencies"
                               target="_blank"
                               rel="noreferrer"
                             >
