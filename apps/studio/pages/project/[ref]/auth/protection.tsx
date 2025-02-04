@@ -6,9 +6,7 @@ import {
   ThirdPartyAuthForm,
 } from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import { ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import { FormsContainer } from 'components/ui/Forms/FormsContainer'
+import { ScaffoldHeader, ScaffoldContainer, ScaffoldTitle } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'

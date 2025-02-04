@@ -2,12 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { SessionsAuthSettingsForm, SmtpForm, ThirdPartyAuthForm } from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'

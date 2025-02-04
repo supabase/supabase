@@ -2,10 +2,13 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import RateLimits from 'components/interfaces/Auth/RateLimits/RateLimits'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import { ScaffoldContainer, ScaffoldDescription, ScaffoldTitle } from 'components/layouts/Scaffold'
-import { ScaffoldHeader } from 'components/layouts/Scaffold'
+import {
+  ScaffoldHeader,
+  ScaffoldContainer,
+  ScaffoldDescription,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
-import { FormsContainer } from 'components/ui/Forms/FormsContainer'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
