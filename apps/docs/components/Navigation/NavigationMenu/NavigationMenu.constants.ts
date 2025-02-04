@@ -1904,8 +1904,8 @@ export const local_development: NavMenuConstant = {
       items: [
         { name: 'Getting started', url: '/guides/local-development/overview' },
         {
-          name: 'Declaring database schemas',
-          url: '/guides/local-development/declaring-database-schemas',
+          name: 'Declarative database schemas',
+          url: '/guides/local-development/declarative-database-schemas',
         },
         {
           name: 'Seeding your database',
