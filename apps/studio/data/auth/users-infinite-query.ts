@@ -118,7 +118,7 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
       enabled: enabled && typeof projectRef !== 'undefined' && isActive,
       getNextPageParam(lastPage, pages) {
         const page = pages.length
-        const hasNextPage = lastPage.result.length <= USERS_PAGE_LIMIT
+        const hasNextPage = lastPage.result.length >= USERS_PAGE_LIMIT
         if (!hasNextPage) return undefined
         return page
       },
