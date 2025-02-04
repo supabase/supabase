@@ -107,7 +107,7 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
   return (
     <Panel>
       <Panel.Content className="grid gap-4">
-        <h2 className="text-sm">Add new environment variables</h2>
+        <h2 className="text-sm">Add new secrets</h2>
         <Form_Shadcn_ {...form}>
           <form id="create-secret-form" className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
             {fields.map((field, index) => (
@@ -141,7 +141,7 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
                           actions={
                             <div className="mr-1">
                               <Button
-                                type="default"
+                                type="text"
                                 className="px-1"
                                 icon={showSecretValue ? <EyeOff /> : <Eye />}
                                 onClick={() => setShowSecretValue(!showSecretValue)}

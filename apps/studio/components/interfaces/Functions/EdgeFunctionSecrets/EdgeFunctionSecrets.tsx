@@ -134,8 +134,8 @@ const EdgeFunctionSecrets = () => {
         }}
       >
         <p className="text-sm">
-          Before removing this environment variable, ensure none of your Edge Functions are actively
-          using it. This action cannot be undone.
+          Before removing this secret, ensure none of your Edge Functions are actively using it.
+          This action cannot be undone.
         </p>
       </ConfirmationModal>
     </>

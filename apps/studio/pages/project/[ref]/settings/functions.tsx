@@ -15,9 +15,9 @@ const PageLayout: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldHeader className="flex flex-row justify-between">
           <div>
-            <ScaffoldTitle>Edge Function Environment Variables</ScaffoldTitle>
+            <ScaffoldTitle>Edge Function Secrets</ScaffoldTitle>
             <ScaffoldDescription>
-              Manage the environment variables (secrets) for your project's edge functions
+              Manage the secrets (environment variables) for your project's Edge Functions
             </ScaffoldDescription>
           </div>
           <div className="flex items-center space-x-2">
