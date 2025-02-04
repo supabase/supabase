@@ -22,6 +22,18 @@
 
 #######
 
+# If asset CDN is specifically disabled (i.e. studio self-hosted), we skip
+if [[ "$FORCE_ASSET_CDN" != "-1" ]]; then
+    echo "Skipping asset upload. Set FORCE_ASSET_CDN=1 or VERCEL_ENV=production to execute."
+    exit 0
+fi
+
+
+if [[ "$FORCE_ASSET_CDN" != "1" ]] && [[ "$VERCEL_ENV" != "production" ]]; then
+    echo "Skipping asset upload. Set FORCE_ASSET_CDN=1 or VERCEL_ENV=production to execute."
+    exit 0
+fi
+
 # Check for force env var or production environment
 if [[ "$FORCE_ASSET_CDN" != "1" ]] && [[ "$VERCEL_ENV" != "production" ]]; then
     echo "Skipping asset upload. Set FORCE_ASSET_CDN=1 or VERCEL_ENV=production to execute."
