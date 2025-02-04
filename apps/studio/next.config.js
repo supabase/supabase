@@ -1,5 +1,4 @@
 const { withSentryConfig } = require('@sentry/nextjs')
-const { processDataProtocolResponse } = require('ai')
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
