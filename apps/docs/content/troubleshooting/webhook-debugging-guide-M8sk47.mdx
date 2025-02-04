@@ -12,7 +12,7 @@ database_id = "a5524182-9dc4-4470-86fe-45ace109a53a"
 **Debugging Steps**
 
 **1. Test if webhooks are active:**
-Webhooks are run in a Postgresql background worker. The first debugging step is to see if the worker is active. Run the following SQL code:
+Webhooks are run in a Postgres background worker. The first debugging step is to see if the worker is active. Run the following SQL code:
 
 ```sql
 select pid from pg_stat_activity where backend_type ilike '%pg_net%';
@@ -85,4 +85,4 @@ If none of the above suggestions uncovered the cause of the error, for debugging
 
 **Conclusion:**
 
-If your issue still persists, please document it as an issue in the [PG_NET Github Repo](https://github.com/supabase/pg_net/issues). You are also welcome to contact Supabase Support from your project's [Dashboard](https://supabase.com/dashboard/project/_/) for more guidance.
+If your issue still persists, please document it as an issue in the [PG_NET GitHub Repo](https://github.com/supabase/pg_net/issues). You are also welcome to contact Supabase Support from your project's [Dashboard](https://supabase.com/dashboard/project/_/) for more guidance.

@@ -14,7 +14,7 @@
     "postbuild": "pnpm run build:sitemap",
     "start": "next start",
     "lint": "next lint",
-    "lint:mdx": "supa-mdx-lint content/guides --config ../../supa-mdx-lint.config.toml",
+    "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
     "typecheck": "tsc --noEmit",
     "pretest": "pnpm run codegen:examples",
     "test": "vitest --exclude \"**/*.smoke.test.ts\"",
