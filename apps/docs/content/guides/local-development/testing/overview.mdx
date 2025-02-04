@@ -1,19 +1,19 @@
 ---
 id: 'local-development-testing-overview'
 title: 'Testing Overview'
-description: 'Learn how develop and test database schema, tables, functions, and Row Level Security (RLS) policies.'
+description: 'Learn how develop and test database schema, tables, functions, and Row Level Security RLS policies.'
 ---
 
-Testing is a critical part of database development, especially when working with features like Row Level Security (RLS) policies. This guide provides a comprehensive approach to testing your Supabase database.
+Testing is a critical part of database development, especially when working with features like Row Level Security RLS policies. This guide provides a comprehensive approach to testing your Supabase database.
 
 ## Testing approaches
 
 ### 1. Database unit testing with pgTAP
 
-[pgTAP](https://pgtap.org) is a unit testing framework for PostgreSQL that allows you to test:
+[pgTAP](https://pgtap.org) is a unit testing framework for PostgreSQL that allows testing:
 
-- Database structure (tables, columns, constraints)
-- Row Level Security (RLS) policies
+- Database structure: tables, columns, constraints
+- Row Level Security RLS policies
 - Functions and procedures
 - Data integrity
 
@@ -216,11 +216,11 @@ describe('Todos RLS', () => {
 })
 ```
 
-### 3. Continuous integration (CI) testing
+### 3. Continuous integration testing
 
 Set up automated database testing in your CI pipeline:
 
-1. Create a GitHub Actions workflow (`.github/workflows/db-tests.yml`):
+1. Create a GitHub Actions workflow `.github/workflows/db-tests.yml`:
 
 ```yaml
 name: Database Tests
@@ -252,21 +252,21 @@ jobs:
 
 1. **Test Data Setup**
 
-   - Use `begin;` and `rollback;` to ensure test isolation
+   - Use begin and rollback to ensure test isolation
    - Create realistic test data that covers edge cases
-   - Use different user roles and permissions in your tests
+   - Use different user roles and permissions in tests
 
 2. **RLS Policy Testing**
 
    - Test Create, Read, Update, Delete operations
    - Test with different user roles: anonymous and authenticated
    - Test edge cases and potential security bypasses
-   - Always test negative cases (what users shouldn't be able to do)
+   - Always test negative cases: what users should not be able to do
 
 3. **CI/CD Integration**
    - Run tests automatically on every pull request
-   - Include database tests in your deployment pipeline
-   - Keep test runs fast by using transactions
+   - Include database tests in deployment pipeline
+   - Keep test runs fast using transactions
 
 ## Real-World examples
 
