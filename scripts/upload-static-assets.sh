@@ -20,7 +20,7 @@ NC='\033[0m' # No Color
 # Install AWS CLI if not present
 if ! command -v aws &> /dev/null; then
     echo -e "${YELLOW}Setting up AWS CLI...${NC}"
-    curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.22.35.zip" -o "awscliv2.zip"
     unzip -q awscliv2.zip
     export PATH=$PWD/aws/dist:$PATH
     rm awscliv2.zip
