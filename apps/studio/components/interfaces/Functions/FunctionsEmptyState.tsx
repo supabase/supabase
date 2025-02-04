@@ -1,10 +1,13 @@
-import { ExternalLink } from 'lucide-react'
-
 import { DocsButton } from 'components/ui/DocsButton'
-import { Button } from 'ui'
+import { ExternalLink, Plus } from 'lucide-react'
+import { useState } from 'react'
+import { Button, Sheet, SheetContent, SheetTrigger } from 'ui'
+import { DeployAiCompletionFunctionSheet } from './deployAiCompletionFunctionSheet'
 import TerminalInstructions from './TerminalInstructions'
 
 const FunctionsEmptyState = () => {
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
+
   return (
     <>
       <div className="flex flex-col gap-8 w-full">
@@ -28,6 +31,16 @@ const FunctionsEmptyState = () => {
                 Examples
               </a>
             </Button>
+            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+              <SheetTrigger asChild>
+                <Button type="default" icon={<Plus />}>
+                  New AI Completion function
+                </Button>
+              </SheetTrigger>
+              <SheetContent size="default" showClose={false} className="flex flex-col gap-0">
+                <DeployAiCompletionFunctionSheet onClose={() => setIsSheetOpen(false)} />
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
         <div className="col-span-8 bg-surface-100 px-5 py-4 border rounded-md">
