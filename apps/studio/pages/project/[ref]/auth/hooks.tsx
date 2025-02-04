@@ -27,7 +27,7 @@ const Hooks: NextPageWithLayout = () => {
           </ScaffoldContainer>
         </ScaffoldHeader>
 
-        <ScaffoldContainer className="mt-8 space-y-8">
+        <ScaffoldContainer className="my-8 space-y-8">
           <HooksListing />
         </ScaffoldContainer>
       </div>

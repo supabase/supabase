@@ -60,7 +60,7 @@ const PageLayout: NextPageWithLayout = () => {
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer className="mt-8 space-y-8">
+      <ScaffoldContainer className="my-8 space-y-8">
         <EmailTemplates />
       </ScaffoldContainer>
     </div>

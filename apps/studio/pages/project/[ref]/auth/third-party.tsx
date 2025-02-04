@@ -61,7 +61,7 @@ const PageLayout: NextPageWithLayout = () => {
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer className="mt-8">
+      <ScaffoldContainer className="my-8">
         <ThirdPartyAuthForm />
       </ScaffoldContainer>
     </>
