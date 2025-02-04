@@ -82,7 +82,9 @@ function Input({
   const { ref: projectRef } = useParams()
 
   const [show, setShowState] = useState(false)
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
+
+  // to do
+  // const canReadAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
 
   const isSecret = apiKey.type === 'secret'
 
