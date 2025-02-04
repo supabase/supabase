@@ -35,7 +35,7 @@ export type MultiAttribute = {
   type?: 'line' | 'area-bar'
 }
 
-interface ChartHandlerProps {
+interface ComposedChartHandlerProps {
   id?: string
   label: string
   attributes: MultiAttribute[]
@@ -63,7 +63,7 @@ interface ChartHandlerProps {
  *
  * Provided data must be in the expected chart format.
  */
-const ChartHandler = ({
+const ComposedChartHandler = ({
   label,
   attributes,
   startDate,
@@ -80,7 +80,7 @@ const ChartHandler = ({
   className,
   showTooltip,
   updateDateRange,
-}: PropsWithChildren<ChartHandlerProps>) => {
+}: PropsWithChildren<ComposedChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
 
@@ -238,10 +238,11 @@ const ChartHandler = ({
           showTooltip={showTooltip}
           onChartStyleChange={setChartStyle}
           updateDateRange={updateDateRange}
+          maxHeight={176}
         />
       </Panel.Content>
     </Panel>
   )
 }
 
-export default ChartHandler
+export default ComposedChartHandler

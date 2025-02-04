@@ -35,17 +35,17 @@ const ChartHeader = ({
   )
 
   const highlighted = (
-    <h5
+    <h4
       className={`text-foreground text-xl font-normal ${minimalHeader ? 'text-base' : 'text-2xl'}`}
     >
       {highlightedValue !== undefined && highlightedValue}
       {format === 'seconds' ? ' ' : ''}
-      <span className="text-lg">
+      {/* <span className="text-lg">
         {typeof format === 'function' ? format(highlightedValue) : format}
-      </span>
-    </h5>
+      </span> */}
+    </h4>
   )
-  const label = <h5 className="text-foreground-lighter text-xs">{highlightedLabel}</h5>
+  const label = <h4 className="text-foreground-lighter text-xs">{highlightedLabel}</h4>
 
   if (minimalHeader) {
     return (
@@ -60,50 +60,13 @@ const ChartHeader = ({
   }
 
   return (
-    <div className="min-h-16 flex-grow flex justify-between items-start">
+    <div className="flex-grow flex justify-between items-start">
       <div className="flex flex-col">
         {title && chartTitle}
         {highlightedValue !== undefined && highlighted}
         {label}
       </div>
       <div className="flex items-center gap-2">
-        {/* {selectedRangeStart && selectedRangeStart && !isSelecting && (
-          <>
-            <Button
-              type="text"
-              className="px-1.5 -mr-1 text-foreground-lighter"
-              onClick={() => chartHighlight?.clearHighlight()}
-            >
-              <XIcon size={12} />
-            </Button>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="outline"
-                    className="[&_span]:flex [&_span]:items-center [&_span]:gap-0.5 border-dashed relative pl-1 pr-2"
-                    asChild
-                  >
-                    <Link
-                      className="flex items-center gap-0.5 text-foreground-light"
-                      href={`/project/${ref}/logs/postgres-logs?iso_timestamp_start=${selectedRangeStart}&iso_timestamp_end=${selectedRangeEnd}`}
-                    >
-                      <div className="h-5 w-5 mr-0.5 flex items-center justify-center rounded border bg-alternative">
-                        <LogsIcon size={12} />
-                      </div>
-                      <span>{dayjs(selectedRangeStart).format('MMM D, H:mm')}</span>
-                      <ArrowRight size={10} />
-                      <span>{dayjs(selectedRangeEnd).format('MMM D, H:mm')}</span>
-                    </Link>
-                  </Button>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="left" align="center">
-                Open range in Logs Explorer
-              </TooltipContent>
-            </Tooltip>
-          </>
-        )} */}
         {!hideChartType && onChartStyleChange && (
           <Tooltip>
             <TooltipTrigger asChild>

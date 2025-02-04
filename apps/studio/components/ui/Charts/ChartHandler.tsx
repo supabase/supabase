@@ -176,55 +176,21 @@ const ChartHandler = ({
         >
           {children}
         </div>
-        {label.includes('Client Connections') ? (
-          <MockClientConnectionsChart
-            YAxisProps={{ width: 1 }}
-            data={(chartData?.data ?? []) as any}
-            format={format || chartData?.format}
-            xAxisKey={'period_start'}
-            yAxisKey={attribute}
-            highlightedValue={_highlightedValue}
-            title={label}
-            customDateFormat={customDateFormat}
-            chartHighlight={chartHighlight}
-            // hideChartType={hideChartType}
-            chartStyle={chartStyle}
-            onChartStyleChange={setChartStyle}
-            updateDateRange={updateDateRange}
-          />
-        ) : label === 'Disk IOps' ? (
-          <MockDiskSpaceUsedChart
-            YAxisProps={{ width: 1 }}
-            data={(chartData?.data ?? []) as any}
-            format={format || chartData?.format}
-            xAxisKey={'period_start'}
-            yAxisKey={attribute}
-            highlightedValue={_highlightedValue}
-            title={label}
-            customDateFormat={customDateFormat}
-            chartHighlight={chartHighlight}
-            // hideChartType={hideChartType}
-            chartStyle={chartStyle}
-            onChartStyleChange={setChartStyle}
-            updateDateRange={updateDateRange}
-          />
-        ) : (
-          <BarChart
-            YAxisProps={{ width: 1 }}
-            data={(chartData?.data ?? []) as any}
-            format={format || chartData?.format}
-            xAxisKey={'period_start'}
-            yAxisKey={attribute}
-            highlightedValue={_highlightedValue}
-            title={label}
-            customDateFormat={customDateFormat}
-            chartHighlight={chartHighlight}
-            hideChartType={hideChartType}
-            chartStyle={chartStyle}
-            onChartStyleChange={setChartStyle}
-            updateDateRange={updateDateRange}
-          />
-        )}
+        <BarChart
+          YAxisProps={{ width: 1 }}
+          data={(chartData?.data ?? []) as any}
+          format={format || chartData?.format}
+          xAxisKey={'period_start'}
+          yAxisKey={attribute}
+          highlightedValue={_highlightedValue}
+          title={label}
+          customDateFormat={customDateFormat}
+          chartHighlight={chartHighlight}
+          hideChartType={hideChartType}
+          chartStyle={chartStyle}
+          onChartStyleChange={setChartStyle}
+          updateDateRange={updateDateRange}
+        />
       </Panel.Content>
     </Panel>
   )

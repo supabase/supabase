@@ -1,10 +1,10 @@
-import { useParams } from 'common'
+import React, { useEffect, useState } from 'react'
+// import { useParams } from 'common'
+// import Link from 'next/link'
 import dayjs from 'dayjs'
 import { ArrowRight, ChevronRightIcon, LogsIcon, SearchIcon } from 'lucide-react'
-import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
 import {
-  Button,
+  // Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +23,7 @@ const ChartHighlightActions = ({
   chartHighlight?: ChartHighlight
   updateDateRange: UpdateDateRange
 }) => {
-  const { ref } = useParams()
+  // const { ref } = useParams()
   const { left: selectedRangeStart, right: selectedRangeEnd, clearHighlight } = chartHighlight ?? {}
   const [isOpen, setIsOpen] = useState(!!chartHighlight?.popoverPosition)
 
@@ -31,7 +31,7 @@ const ChartHighlightActions = ({
     setIsOpen(!!chartHighlight?.popoverPosition && selectedRangeStart !== selectedRangeEnd)
   }, [chartHighlight?.popoverPosition])
 
-  const logsRangeUrl = `/project/${ref}/logs/postgres-logs?iso_timestamp_start=${selectedRangeStart}&iso_timestamp_end=${selectedRangeEnd}&its=${selectedRangeStart}&ite=&project=${ref}`
+  // const logsRangeUrl = `/project/${ref}/logs/postgres-logs?iso_timestamp_start=${selectedRangeStart}&iso_timestamp_end=${selectedRangeEnd}&its=${selectedRangeStart}&ite=&project=${ref}`
   const disableZoomIn = dayjs(selectedRangeEnd).diff(dayjs(selectedRangeStart), 'minutes') < 10
   const handleZoomIn = () => {
     if (disableZoomIn) return
@@ -56,13 +56,13 @@ const ChartHighlightActions = ({
           <span>{dayjs(selectedRangeEnd).format('MMM D, H:mm')}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="my-0" />
-        <DropdownMenuItem>
+        {/* <DropdownMenuItem>
           <Link href={logsRangeUrl} className="w-full flex items-center gap-1.5">
             <LogsIcon className="text-foreground-lighter" size={12} />
             <span className="flex-grow text-left">Open in Logs Explorer</span>
             <ChevronRightIcon className="text-foreground-lighter ml-2" size={12} />
           </Link>
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
         <DropdownMenuItem
           disabled={disableZoomIn}
           className={cn('group', disableZoomIn && '!bg-transparent')}

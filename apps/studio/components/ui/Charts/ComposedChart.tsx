@@ -15,7 +15,7 @@ import {
   Tooltip,
 } from 'recharts'
 import { CategoricalChartState } from 'recharts/types/chart/types'
-import { cn } from 'ui'
+import { ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 import ChartHeader from './ChartHeader'
 import ChartHighlightActions from './ChartHighlightActions'
 import { CHART_COLORS, DateTimeFormats, STACKED_CHART_COLORS } from './Charts.constants'
@@ -57,6 +57,66 @@ const formatLargeNumber = (num: number, precision: number = 0) => {
   } else {
     return num.toString()
   }
+}
+
+const CustomTooltip = ({ active, payload, label, attributes }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload
+    const totalConnections = data.postgres + data.supavisor + data.realtime
+    const maxConnections = data.maxConnections
+
+    const getIcon = (name: string, color: string) => {
+      switch (name.toLowerCase().includes('max')) {
+        case false:
+          return <CustomIcon color={color} />
+        default:
+          return <MaxConnectionsIcon />
+      }
+    }
+
+    const isRamChart = payload?.some((p: any) => p.name.toLowerCase().includes('ram_'))
+
+    const LabelItem = ({ entry }: { entry: any }) => {
+      const attribute = attributes?.find((a: MultiAttribute) => a.attribute === entry.name)
+
+      return (
+        <p key={entry.name} className="flex items-center w-full">
+          {getIcon(entry.name, entry.color)}
+          <span className="text-foreground-lighter ml-1 flex-grow">
+            {attribute?.label ||
+              entry.name
+                .replace('client_connections_', '')
+                .replace('disk_iops_', '')
+                .replace('ram_usage_', '')}
+          </span>
+          <span className="ml-2.5">
+            {isRamChart ? formatLargeNumber(entry.value, 1) : numberFormatter(entry.value)}
+          </span>
+          {entry.name !== 'Max Connections' && (
+            <span className="ml-1">({((entry.value / maxConnections) * 100).toFixed(1)}%)</span>
+          )}
+        </p>
+      )
+    }
+
+    return (
+      <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl">
+        <p className="font-medium">{dayjs(label).format('DD MMM YYYY, HH:mm:ss')}</p>
+        <div className="grid gap-0">
+          {payload.map((entry: any) => (
+            <LabelItem key={entry.name} entry={entry} />
+          ))}
+        </div>
+        {active && (
+          <p className="text-foreground-lighter text-xs">
+            {dayjs(label).format('DD MMM YYYY, HH:mm:ss')}
+          </p>
+        )}
+      </div>
+    )
+  }
+
+  return null
 }
 
 const CustomLabel = ({ active, payload, label, attributes }: TooltipProps) => {
@@ -108,8 +168,9 @@ const CustomLabel = ({ active, payload, label, attributes }: TooltipProps) => {
       </p>
     )
   }
+
   return (
-    <div className="flex flex-col gap-0 text-xs w-full h-20 mt-2">
+    <div className="flex flex-col gap-1 text-xs w-full min-h-16 mt-2">
       <div className="flex flex-col md:flex-wrap justify-start md:flex-row gap-0 md:gap-2">
         {items?.map((entry) => <LabelItem key={entry.name} entry={entry} />)}
         {active && (
@@ -132,9 +193,9 @@ const CustomLabel = ({ active, payload, label, attributes }: TooltipProps) => {
         )}
       </div>
       {active && (
-        <h5 className="text-foreground-lighter text-xs mt-2">
+        <p className="text-foreground-lighter text-xs">
           {dayjs(label).format('DD MMM YYYY, HH:mm:ss')}
-        </h5>
+        </p>
       )}
     </div>
   )
@@ -158,6 +219,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
   updateDateRange: UpdateDateRange
+  maxHeight?: number
 }
 
 export default function ComposedChart({
@@ -188,6 +250,7 @@ export default function ComposedChart({
   chartStyle,
   onChartStyleChange,
   updateDateRange,
+  maxHeight,
 }: BarChartProps) {
   const [_activePayload, setActivePayload] = useState<any>(null)
   const { Container } = useChartSize(size)
@@ -257,6 +320,7 @@ export default function ComposedChart({
     : []
 
   const stackedAttributes = defaultAttributes.filter((att) => !att.name.includes('max'))
+  const isPercentage = format === 'percentage'
 
   if (data.length === 0) {
     return (
@@ -293,7 +357,6 @@ export default function ComposedChart({
       />
       <Container className="relative">
         <RechartComposedChart
-          className="overflow-visible"
           data={data}
           onMouseMove={(e: any) => {
             if (e.activeTooltipIndex !== focusDataIndex) {
@@ -327,32 +390,33 @@ export default function ComposedChart({
           {showGrid && <CartesianGrid stroke={CHART_COLORS.AXIS} />}
           <YAxis
             {..._YAxisProps}
-            axisLine={{ stroke: CHART_COLORS.AXIS }}
-            tickLine={{ stroke: CHART_COLORS.AXIS }}
+            // axisLine={{ stroke: CHART_COLORS.AXIS }}
+            // tickLine={{ stroke: CHART_COLORS.AXIS }}
+            hide
+            domain={isPercentage ? [0, 100] : undefined}
             key={yAxisKey}
           />
           <XAxis
             {..._XAxisProps}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
+            // tickLine={false}
+            // axisLine={false}
+            tickMargin={8}
+            minTickGap={3}
             key={xAxisKey}
           />
-          {/* <Tooltip content={(props) => (showTooltip ? <CustomLabel {...props} /> : null)} /> */}
-          <Tooltip content={() => null} />
-          {defaultAttributes
-            .filter((attribute) => attribute.name.includes('max'))
-            .map((attribute) => (
-              <Line
-                key={attribute.name}
-                type="stepAfter"
-                dataKey={attribute.name}
-                stroke="#3ECF8E"
-                strokeWidth={2}
-                strokeDasharray="3 3"
-                dot={false}
-                name={attribute.name}
-              />
-            ))}
+          <Tooltip
+            content={(props) =>
+              true ? (
+                <CustomTooltip
+                  {...props}
+                  label={resolvedHighlightedValue}
+                  attributes={attributes}
+                />
+              ) : null
+            }
+          />
           {chartStyle === 'bar'
             ? stackedAttributes.map((attribute) => (
                 <Bar
@@ -380,6 +444,20 @@ export default function ComposedChart({
                   }
                 />
               ))}
+          {defaultAttributes
+            .filter((attribute) => attribute.name.includes('max'))
+            .map((attribute) => (
+              <Line
+                key={attribute.name}
+                type="stepAfter"
+                dataKey={attribute.name}
+                stroke="#3ECF8E"
+                strokeWidth={2}
+                strokeDasharray="3 3"
+                dot={false}
+                name={attribute.name}
+              />
+            ))}
           {showHighlightActions && (
             <ReferenceArea
               x1={chartHighlight?.coordinates.left}

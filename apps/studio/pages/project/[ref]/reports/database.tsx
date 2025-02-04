@@ -32,7 +32,7 @@ import type { NextPageWithLayout } from 'types'
 import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import ComposedChartHandler from '../../../../components/ui/Charts/ComposedChartHandler'
+import ComposedChartHandler, { MultiAttribute } from 'components/ui/Charts/ComposedChartHandler'
 
 export type UpdateDateRange = (from: string, to: string) => void
 
@@ -49,11 +49,128 @@ DatabaseReport.getLayout = (page) => <ReportsLayout title="Database">{page}</Rep
 export default DatabaseReport
 
 const REPORT_ATTRIBUTES = [
-  { id: 'ram_usage', label: 'Memory usage' },
-  { id: 'avg_cpu_usage', label: 'Average CPU usage' },
-  { id: 'max_cpu_usage', label: 'Max CPU usage' },
-  { id: 'disk_io_consumption', label: 'Disk IO consumed' },
-  { id: 'pg_stat_database_num_backends', label: 'Number of database connections' },
+  {
+    id: 'ram-usage',
+    label: 'Memory usage',
+    attributes: [
+      {
+        attribute: 'ram_available_max',
+        provider: 'infra-monitoring',
+        label: 'Max RAM Available',
+      },
+      {
+        attribute: 'ram_usage_used',
+        provider: 'infra-monitoring',
+        label: 'Used',
+      },
+      {
+        attribute: 'ram_usage_cache_and_buffers',
+        provider: 'infra-monitoring',
+        label: 'Cache + buffers',
+      },
+      {
+        attribute: 'ram_usage_free',
+        provider: 'infra-monitoring',
+        label: 'Free',
+      },
+      {
+        attribute: 'ram_usage_swap',
+        provider: 'infra-monitoring',
+        label: 'Swap',
+      },
+    ],
+    showTooltip: true,
+  },
+  {
+    id: 'cpu-usage',
+    label: 'CPU usage',
+    format: 'percentage',
+    attributes: [
+      {
+        attribute: 'cpu_usage_busy_system',
+        provider: 'infra-monitoring',
+        label: 'Busy System',
+        format: 'percent',
+      },
+      {
+        attribute: 'cpu_usage_busy_user',
+        provider: 'infra-monitoring',
+        label: 'Busy User',
+        format: 'percent',
+      },
+      {
+        attribute: 'cpu_usage_busy_iowait',
+        provider: 'infra-monitoring',
+        label: 'Busy IOwait',
+        format: 'percent',
+      },
+      {
+        attribute: 'cpu_usage_busy_irqs',
+        provider: 'infra-monitoring',
+        label: 'Busy IRQs',
+        format: 'percent',
+      },
+      {
+        attribute: 'cpu_usage_busy_other',
+        provider: 'infra-monitoring',
+        label: 'Busy other',
+        format: 'percent',
+      },
+      {
+        attribute: 'cpu_usage_busy_idle',
+        provider: 'infra-monitoring',
+        label: 'Busy idle',
+        format: 'percent',
+      },
+    ],
+  },
+  {
+    id: 'client-connections',
+    label: 'Client connections',
+    attributes: [
+      {
+        attribute: 'client_connections_postgres',
+        provider: 'infra-monitoring',
+        label: 'postgres',
+      },
+      {
+        attribute: 'client_connections_supavisor',
+        provider: 'infra-monitoring',
+        label: 'supavisor',
+      },
+      {
+        attribute: 'client_connections_realtime',
+        provider: 'infra-monitoring',
+        label: 'realtime',
+      },
+      {
+        attribute: 'client_connections_pgbouncer',
+        provider: 'infra-monitoring',
+        label: 'pgbouncer',
+      },
+      {
+        attribute: 'client_connections_pgbouncer_waiting',
+        provider: 'infra-monitoring',
+        label: 'pgbouncer waiting',
+      },
+      {
+        attribute: 'client_connections_max_limit',
+        provider: 'infra-monitoring',
+        label: 'max limit',
+      },
+    ],
+  },
+  {
+    id: 'disk-iops',
+    label: 'Disk IOps',
+    attributes: [
+      { attribute: 'disk_iops_read', provider: 'infra-monitoring' },
+      {
+        attribute: 'disk_iops_write',
+        provider: 'infra-monitoring',
+      },
+    ],
+  },
 ]
 
 const DatabaseUsage = () => {
@@ -198,7 +315,7 @@ const DatabaseUsage = () => {
           <ShimmerLine active={report.isLoading} />
         </div>
       </div>
-      <section>
+      <section className="relative pt-16 -mt-4">
         <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
           <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center justify-between space-x-3 pointer-events-auto">
             <DatePickers
@@ -210,22 +327,20 @@ const DatabaseUsage = () => {
                 disabled: (index > 4 && plan?.id === 'free') || (index > 5 && plan?.id !== 'pro'),
               }))}
             />
-            {dateRange && (
-              <div className="flex items-center gap-x-2 text-xs">
-                <p className="text-foreground-light">
-                  {dayjs(dateRange.period_start.date).format('MMM D, h:mma')}
-                </p>
-                <p className="text-foreground-light">
-                  <ArrowRight size={12} />
-                </p>
-                <p className="text-foreground-light">
-                  {dayjs(dateRange.period_end.date).format('MMM D, h:mma')}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-            <div className="mb-4 flex items-center gap-x-2">
+            <div className="flex items-center gap-2">
+              {dateRange && (
+                <div className="flex items-center gap-x-2 text-xs">
+                  <p className="text-foreground-light">
+                    {dayjs(dateRange.period_start.date).format('MMM D, h:mma')}
+                  </p>
+                  <p className="text-foreground-light">
+                    <ArrowRight size={12} />
+                  </p>
+                  <p className="text-foreground-light">
+                    {dayjs(dateRange.period_end.date).format('MMM D, h:mma')}
+                  </p>
+                </div>
+              )}
               <ButtonTooltip
                 type="default"
                 disabled={isRefreshing}
@@ -234,199 +349,22 @@ const DatabaseUsage = () => {
                 tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
                 onClick={onRefreshReport}
               />
-              <div className="flex items-center gap-x-3">
-                <DateRangePicker
-                  loading={false}
-                  value={'7d'}
-                  options={TIME_PERIODS_INFRA}
-                  currentBillingPeriodStart={undefined}
-                  onChange={(values) => {
-                    if (values.interval === '1d') {
-                      setDateRange({ ...values, interval: '1h' })
-                    } else {
-                      setDateRange(values)
-                    }
-                  }}
-                />
-                {dateRange && (
-                  <div className="flex items-center gap-x-2">
-                    <p className="text-foreground-light">
-                      {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
-                    </p>
-                    <p className="text-foreground-light">
-                      <ArrowRight size={12} />
-                    </p>
-                    <p className="text-foreground-light">
-                      {dayjs(dateRange.period_end.date).format('MMMM D, hh:mma')}
-                    </p>
-                  </div>
-                )}
-              </div>
             </div>
-            <div className="grid grid-cols-1 gap-4">
-              {dateRange &&
-                REPORT_ATTRIBUTES.map((attr) => (
-                  <ChartHandler
-                    key={attr.id}
-                    provider="infra-monitoring"
-                    attribute={attr.id}
-                    label={attr.label}
-                    interval={dateRange.interval}
-                    startDate={dateRange?.period_start?.date}
-                    endDate={dateRange?.period_end?.date}
-                  />
-                ))}
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-4">
+          {dateRange &&
+            REPORT_ATTRIBUTES.map((attr) => (
               <ComposedChartHandler
-            attributes={[
-              {
-                attribute: 'ram_available_max',
-                provider: 'infra-monitoring',
-                label: 'Available',
-              },
-              {
-                attribute: 'ram_usage_used',
-                provider: 'infra-monitoring',
-                label: 'Used',
-              },
-              {
-                attribute: 'ram_usage_cache_and_buffers',
-                provider: 'infra-monitoring',
-                label: 'Cache + buffers',
-              },
-              {
-                attribute: 'ram_usage_free',
-                provider: 'infra-monitoring',
-                label: 'Free',
-              },
-              {
-                attribute: 'ram_usage_swap',
-                provider: 'infra-monitoring',
-                label: 'Swap',
-              },
-            ]}
-            label="RAM usage"
-            showTooltip
-            interval={dateRange.interval}
-            startDate={dateRange?.period_start?.date}
-            endDate={dateRange?.period_end?.date}
-            customDateFormat={handleCustomDateFormat}
-            updateDateRange={updateDateRange}
-          />
-
-          <ComposedChartHandler
-            attributes={[
-              {
-                attribute: 'cpu_usage_busy_system',
-                provider: 'infra-monitoring',
-                label: 'Busy System',
-                format: 'percent',
-              },
-              {
-                attribute: 'cpu_usage_busy_user',
-                provider: 'infra-monitoring',
-                label: 'Busy User',
-                format: 'percent',
-              },
-              {
-                attribute: 'cpu_usage_busy_iowait',
-                provider: 'infra-monitoring',
-                label: 'Busy IOwait',
-                format: 'percent',
-              },
-              {
-                attribute: 'cpu_usage_busy_irqs',
-                provider: 'infra-monitoring',
-                label: 'Busy IRQs',
-                format: 'percent',
-              },
-              {
-                attribute: 'cpu_usage_busy_other',
-                provider: 'infra-monitoring',
-                label: 'Busy other',
-                format: 'percent',
-              },
-              {
-                attribute: 'cpu_usage_busy_idle',
-                provider: 'infra-monitoring',
-                label: 'Busy idle',
-                format: 'percent',
-              },
-            ]}
-            label="CPU Usage"
-            interval={dateRange.interval}
-            startDate={dateRange?.period_start?.date}
-            endDate={dateRange?.period_end?.date}
-            customDateFormat={handleCustomDateFormat}
-            updateDateRange={updateDateRange}
-          />
-
-          <ComposedChartHandler
-            attributes={[
-              {
-                attribute: 'client_connections_postgres',
-                provider: 'infra-monitoring',
-                label: 'postgres',
-              },
-              {
-                attribute: 'client_connections_supavisor',
-                provider: 'infra-monitoring',
-                label: 'supavisor',
-              },
-              {
-                attribute: 'client_connections_realtime',
-                provider: 'infra-monitoring',
-                label: 'realtime',
-              },
-              {
-                attribute: 'client_connections_pgbouncer',
-                provider: 'infra-monitoring',
-                label: 'pgbouncer',
-              },
-              {
-                attribute: 'client_connections_pgbouncer_waiting',
-                provider: 'infra-monitoring',
-                label: 'pgbouncer waiting',
-              },
-              {
-                attribute: 'client_connections_max_limit',
-                provider: 'infra-monitoring',
-                label: 'max limit',
-              },
-            ]}
-            label="Client Connections"
-            interval={dateRange.interval}
-            startDate={dateRange?.period_start?.date}
-            endDate={dateRange?.period_end?.date}
-            customDateFormat={handleCustomDateFormat}
-            updateDateRange={updateDateRange}
-          />
-
-          <ComposedChartHandler
-            attributes={[
-              { attribute: 'disk_iops_read', provider: 'infra-monitoring' },
-              {
-                attribute: 'disk_iops_write',
-                provider: 'infra-monitoring',
-              },
-            ]}
-            label="Disk IOps"
-            interval={dateRange.interval}
-            startDate={dateRange?.period_start?.date}
-            endDate={dateRange?.period_end?.date}
-            customDateFormat={handleCustomDateFormat}
-            updateDateRange={updateDateRange}
-          />
-
-          {/* <ChartHandler
-            provider="infra-monitoring"
-            attribute="disk_iops_usage"
-            label="Disk IOps usage"
-            interval={dateRange.interval}
-            startDate={dateRange?.period_start?.date}
-            endDate={dateRange?.period_end?.date}
-            customDateFormat={handleCustomDateFormat}
-            updateDateRange={updateDateRange}
-          /> */}
+                key={attr.id}
+                {...attr}
+                attributes={attr.attributes as MultiAttribute[]}
+                interval={dateRange.interval}
+                startDate={dateRange?.period_start?.date}
+                endDate={dateRange?.period_end?.date}
+                updateDateRange={updateDateRange}
+              />
+            ))}
         </div>
 
         {dateRange && isReplicaSelected && (
