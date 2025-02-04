@@ -1,4 +1,4 @@
-import { GripHorizontal } from 'lucide-react'
+import { GripHorizontal, Loader2 } from 'lucide-react'
 import { DragEvent, PropsWithChildren, ReactNode } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -6,6 +6,7 @@ interface ReportBlockContainerProps {
   icon: ReactNode
   label: string
   actions: ReactNode
+  loading?: boolean
   draggable?: boolean
   showDragHandle?: boolean
   tooltip?: ReactNode
@@ -16,6 +17,7 @@ export const ReportBlockContainer = ({
   icon,
   label,
   actions,
+  loading = false,
   draggable = false,
   showDragHandle = false,
   tooltip,
@@ -46,7 +48,14 @@ export const ReportBlockContainer = ({
                 showDragHandle && 'transition-opacity opacity-100 group-hover:opacity-0'
               )}
             >
-              {icon}
+              {loading ? (
+                <Loader2
+                  size={(icon as any)?.props?.size ?? 16}
+                  className="text-foreground-lighter animate-spin"
+                />
+              ) : (
+                icon
+              )}
             </div>
             {showDragHandle && (
               <div className="absolute left-3 top-2.5 z-10 opacity-0 transition-opacity group-hover:opacity-100">

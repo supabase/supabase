@@ -8,7 +8,7 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    
+
     <QuickstartDbSetup />
 
   </StepHikeCompact.Step>
@@ -86,21 +86,21 @@ hideToc: true
         import { ref, onMounted } from 'vue'
         import { supabase } from './lib/supabaseClient'
 
-        const countries = ref([])
+        const instruments = ref([])
 
-        async function getCountries() {
-          const { data } = await supabase.from('countries').select()
-          countries.value = data
+        async function getInstruments() {
+          const { data } = await supabase.from('instruments').select()
+          instruments.value = data
         }
 
         onMounted(() => {
-          getCountries()
+          getInstruments()
         })
         </script>
 
         <template>
           <ul>
-            <li v-for="country in countries" :key="country.id">{{ country.name }}</li>
+            <li v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
           </ul>
         </template>
       ```
@@ -112,7 +112,7 @@ hideToc: true
   <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Start the app">
 
-    Start the app and go to http://localhost:5173 in a browser and you should see the list of countries.
+    Start the app and go to http://localhost:5173 in a browser and you should see the list of instruments.
 
     </StepHikeCompact.Details>
 
