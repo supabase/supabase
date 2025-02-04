@@ -14,14 +14,14 @@ database_id = "43b62743-252c-4069-a719-0c0737839fd9"
 - System prioritizes keeping actively used data in RAM
 - Data is temporarily cached in memory for quick access
 - Swap is used for less frequently accessed or non-critical data
-- Default swapiness value of 60 indicates the system's preference to fill up swap for performance benefits
+- Default swappiness value of 60 indicates the system's preference to fill up swap for performance benefits
 
 ## Compute instance configuration
 
-- Default swapiness: 60 (out of 100)
+- Default swappiness: 60 (out of 100)
   - Determines how aggressively the system moves data from RAM to swap
   - Default value in Linux distributions
-  - Changing the swapiness value significantly impacts system behavior, as it is a non-linear value. A small adjustment of 10 can result in a very different system behavior
+  - Changing the swappiness value significantly impacts system behavior, as it is a non-linear value. A small adjustment of 10 can result in a very different system behavior
 - Swap provision: 1024MB on every compute instance
 
 ## Issues with high swap usage
@@ -45,7 +45,7 @@ database_id = "43b62743-252c-4069-a719-0c0737839fd9"
 
 - Monitor memory usage:
   - If usage is over 85% and swap usage is over 90% for an extended period, optimize database access or add more resources
-- Monitor CPU iowait usage and disk IO metrics:
+- Monitor CPU IOWait usage and disk IO metrics:
   - Exported metrics here: **https://github.com/supabase/grafana-agent-fly-example/blob/main/metrics.md**
   - Key metrics to track excessive disk IO usage include:
     - `node_disk_reads_completed_total`: Tracks the total number of completed disk reads.
