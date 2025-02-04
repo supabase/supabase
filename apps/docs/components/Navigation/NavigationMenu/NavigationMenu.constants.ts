@@ -258,7 +258,7 @@ export const gettingstarted: NavMenuConstant = {
       items: [
         { name: 'Next.js', url: '/guides/getting-started/quickstarts/nextjs' },
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
-        { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
+        { name: 'Nuxt', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
         { name: 'Hono', url: '/guides/getting-started/quickstarts/hono' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },

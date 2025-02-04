@@ -132,9 +132,11 @@ supabase.from_('arraytest').insert(
 
 You should see:
 
+```
 | id  | textarray               |
 | --- | ----------------------- |
 | 1   | ["Harry","Larry","Moe"] |
+```
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -145,9 +147,11 @@ select * from arraytest;
 
 You should see:
 
+```
 | id  | textarray               |
 | --- | ----------------------- |
 | 1   | ["Harry","Larry","Moe"] |
+```
 
 </TabPanel>
 </Tabs>
@@ -173,9 +177,11 @@ SELECT textarray[1], array_length(textarray, 1) FROM arraytest;
 
 returns:
 
+```
 | textarray | array_length |
 | --------- | ------------ |
 | Harry     | 3            |
+```
 
 </TabPanel>
 <TabPanel id="js" label="JavaScript">

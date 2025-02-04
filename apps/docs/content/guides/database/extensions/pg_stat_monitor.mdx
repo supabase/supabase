@@ -56,21 +56,21 @@ select * from extensions.pg_stat_monitor;
 
 The following table shows a subset of available columns:
 
-| Column Type                           | Description                                                                                                                  |
-| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| bucket bigint                         | Data collection unit. The number shows what bucket in a chain a record belongs to                                            |
-| bucket_start_time timestampz          | The start time of the bucket                                                                                                 |
-| userid oid (references pg_authid.oid) | OID of user who executed the statement                                                                                       |
-| dbid oid (references pg_database.oid) | OID of database in which the statement was executed                                                                          |
-| toplevel bool                         | True if the query was executed as a top-level statement (always true if pg_stat_statements.track is set to top)              |
-| client_ip inet                        | The IP address of a client that ran the query                                                                                |
-| queryid bigint                        | Hash code to identify identical normalized queries.                                                                          |
-| planid text                           | An internally generated ID of a query plan                                                                                   |
-| query_plan text                       | The sequence of steps used to execute a query. This parameter is only available when pgsm_enable_query_plan is enabled       |
-| query text                            | Text of a representative statement                                                                                           |
-| plans bigint                          | Number of times the statement was planned (if pg_stat_statements.track_planning is enabled, otherwise zero)                  |
-| total_plan_time double precision      | Total time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero)   |
-| min_plan_time double precision        | Minimum time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero) |
+| Column Type                                 | Description                                                                                                                  |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `bucket` `bigint`                           | Data collection unit. The number shows what bucket in a chain a record belongs to                                            |
+| `bucket_start_time` `timestampz`            | The start time of the bucket                                                                                                 |
+| `userid` `oid` (references `pg_authid.oid`) | OID of user who executed the statement                                                                                       |
+| `dbid` `oid` (references `pg_database.oid`) | OID of database in which the statement was executed                                                                          |
+| `toplevel` `bool`                           | True if the query was executed as a top-level statement (always true if pg_stat_statements.track is set to top)              |
+| `client_ip` `inet`                          | The IP address of a client that ran the query                                                                                |
+| `queryid` `bigint`                          | Hash code to identify identical normalized queries.                                                                          |
+| `planid` `text`                             | An internally generated ID of a query plan                                                                                   |
+| `query_plan` `text`                         | The sequence of steps used to execute a query. This parameter is only available when pgsm_enable_query_plan is enabled       |
+| `query` `text`                              | Text of a representative statement                                                                                           |
+| `plans` `bigint`                            | Number of times the statement was planned (if pg_stat_statements.track_planning is enabled, otherwise zero)                  |
+| `total_plan_time` `double precision`        | Total time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero)   |
+| `min_plan_time` `double precision`          | Minimum time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero) |
 
 A full list of statistics is available in the [pg_stat_monitor docs](https://docs.percona.com/pg-stat-monitor/reference.html#postgresql-15).
 
