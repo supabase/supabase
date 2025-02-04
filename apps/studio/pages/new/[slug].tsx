@@ -22,8 +22,10 @@ import {
   PostgresVersionSelector,
   extractPostgresVersionDetails,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
+import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
@@ -119,9 +121,7 @@ const FormSchema = z.object({
   }),
   dbPassStrength: z.number(),
   dbPass: z
-    .string({
-      required_error: 'Please enter a database password.',
-    })
+    .string({ required_error: 'Please enter a database password.' })
     .min(1, 'Password is required.'),
   instanceSize: z.string(),
   dataApi: z.boolean(),
@@ -781,41 +781,49 @@ const Wizard: NextPageWithLayout = () => {
                       <FormField_Shadcn_
                         control={form.control}
                         name="dbPass"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            label="Database Password"
-                            layout="horizontal"
-                            description={
-                              <PasswordStrengthBar
-                                passwordStrengthScore={form.getValues('dbPassStrength')}
-                                password={field.value}
-                                passwordStrengthMessage={passwordStrengthMessage}
-                                generateStrongPassword={generatePassword}
-                              />
-                            }
-                          >
-                            <FormControl_Shadcn_>
-                              <Input
-                                copy={field.value.length > 0}
-                                type="password"
-                                placeholder="Type in a strong password"
-                                {...field}
-                                autoComplete="off"
-                                onChange={async (event) => {
-                                  field.onChange(event)
-                                  form.trigger('dbPassStrength')
-                                  const value = event.target.value
-                                  if (event.target.value === '') {
-                                    await form.setValue('dbPassStrength', 0)
-                                    await form.trigger('dbPass')
-                                  } else {
-                                    await delayedCheckPasswordStrength(value)
-                                  }
-                                }}
-                              />
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                        )}
+                        render={({ field }) => {
+                          const hasSpecialCharacters =
+                            field.value.length > 0 && !field.value.match(SPECIAL_CHARS_REGEX)
+
+                          return (
+                            <FormItemLayout
+                              label="Database Password"
+                              layout="horizontal"
+                              description={
+                                <>
+                                  {hasSpecialCharacters && <SpecialSymbolsCallout />}
+                                  <PasswordStrengthBar
+                                    passwordStrengthScore={form.getValues('dbPassStrength')}
+                                    password={field.value}
+                                    passwordStrengthMessage={passwordStrengthMessage}
+                                    generateStrongPassword={generatePassword}
+                                  />
+                                </>
+                              }
+                            >
+                              <FormControl_Shadcn_>
+                                <Input
+                                  copy={field.value.length > 0}
+                                  type="password"
+                                  placeholder="Type in a strong password"
+                                  {...field}
+                                  autoComplete="off"
+                                  onChange={async (event) => {
+                                    field.onChange(event)
+                                    form.trigger('dbPassStrength')
+                                    const value = event.target.value
+                                    if (event.target.value === '') {
+                                      await form.setValue('dbPassStrength', 0)
+                                      await form.trigger('dbPass')
+                                    } else {
+                                      await delayedCheckPasswordStrength(value)
+                                    }
+                                  }}
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )
+                        }}
                       />
                     </Panel.Content>
 

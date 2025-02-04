@@ -15,8 +15,11 @@ You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **h
 	* SUPABASE_URL
 	* SUPABASE_ANON_KEY
 	* SUPABASE_SERVICE_ROLE_KEY
-	* SUPABASE_DB_UR
+	* SUPABASE_DB_URL
 9. To set other environment variables (ie. secrets) users can put them in a env file and run the `supabase secrets set --env-file path/to/env-file`
+10. A single Edge Function can handle multiple routes. It is recommended to use a library like Express or Hono to handle the routes as it's easier for developer to understand and maintain. Each route must be prefixed with `/function-name` so they are routed correctly.
+11. File write operations are ONLY permitted on `/tmp` directory. You can use either Deno or Node File APIs.
+12. Use `EdgeRuntime.waitUntil(promise)` static method to run long-running tasks in the background without blocking response to a request. Do NOT assume it is available in the request / execution context.
 
 ## Example Templates
 

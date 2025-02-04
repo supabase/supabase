@@ -2573,11 +2573,10 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('products')
+            .from('orchestral_sections')
             .select('''
-              id,
-              supplier:supplier_id ( name ),
-              purchaser:purchaser_id ( name )
+              name,
+              instruments ( name )
             ''');
           ```
         data:
