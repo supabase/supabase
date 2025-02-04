@@ -51,7 +51,9 @@ interface ComposedChartHandlerProps {
   highlightedValue?: string | number
   className?: string
   showTooltip?: boolean
+  showLegend?: boolean
   updateDateRange: UpdateDateRange
+  valuePrecision?: number
 }
 
 /**
@@ -79,7 +81,9 @@ const ComposedChartHandler = ({
   highlightedValue,
   className,
   showTooltip,
+  showLegend,
   updateDateRange,
+  valuePrecision,
 }: PropsWithChildren<ComposedChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
@@ -236,9 +240,11 @@ const ComposedChartHandler = ({
           chartHighlight={chartHighlight}
           chartStyle={chartStyle}
           showTooltip={showTooltip}
+          showLegend={showLegend}
           onChartStyleChange={setChartStyle}
           updateDateRange={updateDateRange}
-          maxHeight={176}
+          valuePrecision={valuePrecision}
+          hideChartType={hideChartType}
         />
       </Panel.Content>
     </Panel>

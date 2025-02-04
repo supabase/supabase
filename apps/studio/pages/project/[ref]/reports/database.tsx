@@ -52,6 +52,10 @@ const REPORT_ATTRIBUTES = [
   {
     id: 'ram-usage',
     label: 'Memory usage',
+    showTooltip: true,
+    showLegend: true,
+    hideChartType: true,
+    defaultChartStyle: 'line',
     attributes: [
       {
         attribute: 'ram_available_max',
@@ -79,12 +83,16 @@ const REPORT_ATTRIBUTES = [
         label: 'Swap',
       },
     ],
-    showTooltip: true,
   },
   {
     id: 'cpu-usage',
     label: 'CPU usage',
-    format: 'percentage',
+    format: '%',
+    valuePrecision: 2,
+    showTooltip: true,
+    showLegend: true,
+    hideChartType: true,
+    defaultChartStyle: 'line',
     attributes: [
       {
         attribute: 'cpu_usage_busy_system',
@@ -127,6 +135,11 @@ const REPORT_ATTRIBUTES = [
   {
     id: 'client-connections',
     label: 'Client connections',
+    valuePrecision: 0,
+    showTooltip: true,
+    showLegend: true,
+    hideChartType: true,
+    defaultChartStyle: 'line',
     attributes: [
       {
         attribute: 'client_connections_postgres',
@@ -163,12 +176,17 @@ const REPORT_ATTRIBUTES = [
   {
     id: 'disk-iops',
     label: 'Disk IOps',
+    showTooltip: true,
+    showLegend: true,
+    hideChartType: true,
+    defaultChartStyle: 'line',
     attributes: [
       {
         attribute: 'disk_iops_write',
         provider: 'infra-monitoring',
+        label: 'IOps write',
       },
-      { attribute: 'disk_iops_read', provider: 'infra-monitoring' },
+      { attribute: 'disk_iops_read', provider: 'infra-monitoring', label: 'IOps read' },
     ],
   },
 ]
@@ -327,7 +345,7 @@ const DatabaseUsage = () => {
                 disabled: (index > 4 && plan?.id === 'free') || (index > 5 && plan?.id !== 'pro'),
               }))}
             />
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               {dateRange && (
                 <div className="flex items-center gap-x-2 text-xs">
                   <p className="text-foreground-light">
@@ -363,6 +381,7 @@ const DatabaseUsage = () => {
                 startDate={dateRange?.period_start?.date}
                 endDate={dateRange?.period_end?.date}
                 updateDateRange={updateDateRange}
+                defaultChartStyle={attr.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
               />
             ))}
         </div>

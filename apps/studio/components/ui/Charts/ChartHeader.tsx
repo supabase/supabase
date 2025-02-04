@@ -40,9 +40,9 @@ const ChartHeader = ({
     >
       {highlightedValue !== undefined && highlightedValue}
       {format === 'seconds' ? ' ' : ''}
-      {/* <span className="text-lg">
+      <span className="text-lg">
         {typeof format === 'function' ? format(highlightedValue) : format}
-      </span> */}
+      </span>
     </h4>
   )
   const label = <h4 className="text-foreground-lighter text-xs">{highlightedLabel}</h4>
@@ -60,7 +60,7 @@ const ChartHeader = ({
   }
 
   return (
-    <div className="flex-grow flex justify-between items-start">
+    <div className="flex-grow flex justify-between items-start min-h-16">
       <div className="flex flex-col">
         {title && chartTitle}
         {highlightedValue !== undefined && highlighted}

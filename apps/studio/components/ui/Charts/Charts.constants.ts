@@ -11,35 +11,15 @@ export const CHART_COLORS = {
   RED_2: 'hsl(var(--destructive-500))',
 }
 
-// export const STACKED_CHART_COLORS = [
-//   '#3ECF8E',
-//   '#6929c4',
-//   '#39A878',
-//   '#1192e8',
-//   '#9f1853',
-//   '#fa4d56',
-//   '#198038',
-//   '#570408',
-//   '#8FE4BE',
-//   '#ee538b',
-//   '#b28600',
-//   '#009d9a',
-//   '#AAEACD',
-//   '#8a3800',
-//   '#a56eff',
-// ]
 export const STACKED_CHART_COLORS = [
   '#3ECF8E',
-  '#AAEACD',
-  '#28604A',
-  '#8FE4BE',
-  '#1D3F32',
-  '#C5F1DD',
-  '#318362',
-  '#74DDAE',
-  '#39A878',
-  '#E0F8ED',
-  '#59D69E',
+  '#A3FFC2',
+  '#DA760B',
+  '#EDD35E',
+  '#65BCD9',
+  '#0063E8',
+  '#DB8DF9',
+  '#B616A6',
 ]
 
 // refer to packages/ui/radix-colors.js for full list of colors
@@ -77,6 +57,16 @@ export const DEFAULT_STACK_COLORS: ValidStackColor[] = [
   'blue',
   'yellow',
   'indigo',
+  'tomato',
+]
+
+export const MONOTONE_STACK_COLORS: ValidStackColor[] = [
+  'brand',
+  'slate',
+  'blue',
+  'yellow',
+  'indigo',
+  'tomato',
 ]
 
 export enum DateTimeFormats {
