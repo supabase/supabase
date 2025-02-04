@@ -111,9 +111,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button asChild type="default">
-                      <Link href={`/project/${ref}/settings/functions`}>
-                        Manage environment variables
-                      </Link>
+                      <Link href={`/project/${ref}/settings/functions`}>Manage secrets</Link>
                     </Button>
                     {isNewAPIDocsEnabled && (
                       <APIDocsButton

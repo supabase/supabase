@@ -220,7 +220,7 @@ const EdgeFunctionDetails = () => {
               <div className="flex h-8 w-8 items-center justify-center rounded border bg-foreground p-2 text-background">
                 <Terminal size={18} strokeWidth={2} />
               </div>
-              <h4>Deploy, invoke and manage secrets (environment variables)</h4>
+              <h4>Deploy, invoke and manage secrets</h4>
             </div>
             <div className="cursor-pointer" onClick={() => setShowInstructions(!showInstructions)}>
               {showInstructions ? (
