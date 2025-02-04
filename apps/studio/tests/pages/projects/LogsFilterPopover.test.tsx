@@ -103,11 +103,8 @@ describe('LogsFilterPopover', () => {
     fireEvent.click(screen.getByText('Severity'))
 
     await waitFor(() => {
-      // Find the warning checkbox button by its ID
       const warningButton = screen.getByText('Warning')
-      // Click the warning button to toggle it
       fireEvent.click(warningButton)
-      // Click the Apply button
       fireEvent.click(screen.getByRole('button', { name: 'Apply' }))
     })
 
