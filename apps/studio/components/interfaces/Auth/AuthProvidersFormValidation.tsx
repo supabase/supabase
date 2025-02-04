@@ -36,6 +36,12 @@ const PROVIDER_EMAIL = {
       If disabled, a user can change their password at any time.`,
       type: 'boolean',
     },
+    PASSWORD_HIBP_ENABLED: {
+      title: 'Prevent use of leaked passwords',
+      description:
+        'Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API.',
+      type: 'boolean',
+    },
     PASSWORD_MIN_LENGTH: {
       title: 'Minimum password length',
       type: 'number',
@@ -67,12 +73,7 @@ const PROVIDER_EMAIL = {
         },
       ],
     },
-    PASSWORD_HIBP_ENABLED: {
-      title: 'Prevent use of leaked passwords',
-      description:
-        'Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API.',
-      type: 'boolean',
-    },
+
     MAILER_OTP_EXP: {
       title: 'Email OTP Expiration',
       type: 'number',
