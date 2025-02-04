@@ -88,6 +88,7 @@ const csp = [
   `object-src 'none';`,
   `base-uri 'self';`,
   `form-action 'self';`,
+  // TODO(alaister): update this with the real domains
   `frame-ancestors http://localhost:5173;`,
   `block-all-mixed-content;`,
   ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
