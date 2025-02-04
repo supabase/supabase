@@ -55,18 +55,18 @@ JOIN pg_stat_activity
 
 Interpreting the query:
 
-| Column           | Description                                       |
-| ---------------- | ------------------------------------------------- |
-| pid              | connection id                                     |
-| ssl              | Indicates if SSL is in use                        |
-| datname          | Name of the connected database (usually postgres) |
-| usename          | Role of the connected user                        |
-| application_name | Name of the connecting application                |
-| client_addr      | IP address of the connecting server               |
-| query            | Last query executed by the connection             |
-| query_start      | Time when the last query was executed             |
-| state            | Querying state: active or idle                    |
-| backend_start    | Timestamp of the connection's establishment       |
+| Column             | Description                                         |
+| ------------------ | --------------------------------------------------- |
+| `pid`              | connection id                                       |
+| `ssl`              | Indicates if SSL is in use                          |
+| `datname`          | Name of the connected database (usually `postgres`) |
+| `usename`          | Role of the connected user                          |
+| `application_name` | Name of the connecting application                  |
+| `client_addr`      | IP address of the connecting server                 |
+| `query`            | Last query executed by the connection               |
+| `query_start`      | Time when the last query was executed               |
+| `state`            | Querying state: active or idle                      |
+| `backend_start`    | Timestamp of the connection's establishment         |
 
 - Note: If you are unfamiliar with the Supabase database roles, check this [reference](https://gist.github.com/TheOtherBrian1/d6e862a65e03049eb4f102f6ca809401)
 
