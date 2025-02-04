@@ -1,5 +1,18 @@
 #!/bin/bash
 
+#######
+
+# This script is used to upload static build assets (JS, CSS, ...) and public static files (public folder) to a CDN.
+# We're using Cloudflare R2 as CDN.
+# By using a CDN, we can serve static assets extremely fast while saving big time on egress costs.
+# An alternative is proxying via CF, but that comes with Orange-To-Orange issues (Cloudflare having issues with Cloudflare) and increased latency as there is a double TLS termination.
+# The script is only supposed to run on production deployments and is not run on any previews.
+
+# By using a dynamic path including the env, app and commit hash, we can ensure that there are no conflicts.
+# Static assets from previous deployments stick around for a while to ensure there are no "downtimes".
+
+#######
+
 # Check for force env var or production environment
 if [[ "$FORCE_ASSET_CDN" != "1" ]] && [[ "$VERCEL_ENV" != "production" ]]; then
     echo "Skipping asset upload. Set FORCE_ASSET_CDN=1 or VERCEL_ENV=production to execute."
