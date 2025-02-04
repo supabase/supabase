@@ -98,7 +98,7 @@ const csp = [
 ].join(' ')
 
 function getAssetPrefix() {
-  if (process.env.FORCE_ASSET_CDN !== '1' || process.env.VERCEL_ENV !== 'production') {
+  if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
     return undefined
   }
 
