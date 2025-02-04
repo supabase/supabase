@@ -214,4 +214,4 @@ may_uppercase = [
 
 # Words that may be lowercased even if they are the first word in the sentence.
 # Can also specify a regex that is compatible with the [Rust regex crate](https://docs.rs/regex/latest/regex/).
-may_lowercase = ["asyncpg", "iOS"]
+may_lowercase = ["asyncpg", "iOS", "imgproxy"]

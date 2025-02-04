@@ -33,7 +33,7 @@ functions:
 
       *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your E-Mail. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
 
-      **On Android, IOS & MacOS**, it uses deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you could use Native Google Auth or a WebView for OAuth. Refer to our [demo](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login) to learn more.
+      **On Android, IOS & macOS**, it uses deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you could use Native Google Auth or a WebView for OAuth. Refer to our [demo](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login) to learn more.
       **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically.
       **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR.
 
@@ -42,10 +42,10 @@ functions:
 
       ### Configure deeplink callbacks for Authentication
 
-      Deeplinks are supported on Android, IOS and MacOS.
+      Deeplinks are supported on Android, IOS and macOS.
       1. **Setup a deeplink for you app** \
       On Android you may setup a [deeplink](https://developer.android.com/training/app-links/deep-linking) in your Android manifest. \
-      On IOS & MacOS you may setup a [url scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app).
+      On IOS & macOS you may setup a [url scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app).
       2. **Add your deeplink to the [redirect URLs](https://supabase.com/dashboard/project/_/auth/url-configuration)** \
       **Pattern**: scheme://host
       3. **Configure the GoTrue plugin**
@@ -61,7 +61,7 @@ functions:
           ```
       4. **Call platform specific function on startup** \
       On Android: `supabase.handleDeeplinks(intent)` \
-      On IOS/MacOS: `supabase.handleDeeplinks(url)`
+      On IOS/macOS: `supabase.handleDeeplinks(url)`
 
       Then you can just login using OAuth:
       ```kotlin
