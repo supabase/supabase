@@ -279,7 +279,7 @@ div[data-radix-portal]:not(.portal--toast) {
 }
 
 .react-grid-item > .react-resizable-handle::after {
-  content: "";
+  content: '';
   position: absolute;
   right: 3px !important;
   bottom: 3px !important;
