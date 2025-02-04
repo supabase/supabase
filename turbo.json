@@ -68,7 +68,8 @@
         "SENTRY_AUTH_TOKEN",
         "AWS_ACCESS_KEY_ID",
         "AWS_SECRET_ACCESS_KEY",
-        "FORCE_ASSET_CDN"
+        "FORCE_ASSET_CDN",
+        "ASSET_CDN_S3_ENDPOINT"
       ],
       "outputs": [".next/**", "!.next/cache/**"]
     },

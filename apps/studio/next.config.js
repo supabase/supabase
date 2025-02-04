@@ -1,4 +1,5 @@
 const { withSentryConfig } = require('@sentry/nextjs')
+const { processDataProtocolResponse } = require('ai')
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
@@ -51,7 +52,10 @@ const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
 const VERCEL_LIVE_URL = 'https://vercel.live'
 const SENTRY_URL =
   'https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io'
-const SUPABASE_ASSETS_URL = 'https://demo-sb-cdn-assets.alaister.dev'
+const SUPABASE_ASSETS_URL =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+    ? 'https://frontend-assets.supabase.green'
+    : 'https://frontend-assets.supabase.com'
 
 // used by vercel live preview
 const PUSHER_URL = 'https://*.pusher.com'

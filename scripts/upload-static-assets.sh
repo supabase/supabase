@@ -6,8 +6,13 @@ if [[ "$FORCE_ASSET_CDN" != "1" ]] && [[ "$VERCEL_ENV" != "production" ]]; then
     exit 0
 fi
 
-# Configuration
-BUCKET_NAME="demo-sb-cdn-assets"
+# Set the cdnBucket variable based on NEXT_PUBLIC_ENVIRONMENT
+if [[ "$NEXT_PUBLIC_ENVIRONMENT" == "staging" ]]; then
+  BUCKET_NAME="frontend-assets-staging"
+else
+  BUCKET_NAME="frontend-assets-prod"
+fi
+
 STATIC_DIR=".next/static"
 PUBLIC_DIR="public"
 
