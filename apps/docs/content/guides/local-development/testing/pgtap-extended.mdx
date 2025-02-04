@@ -12,7 +12,7 @@ While basic pgTAP provides excellent testing capabilities, you can enhance the t
 
 ### Setting up dbdev
 
-To use dbdev and its packages, you'll need to install some prerequisites:
+To use database development tools and packages, install some prerequisites:
 
 ```sql
 create extension if not exists http with schema extensions;
@@ -53,7 +53,7 @@ create extension "supabase-dbdev";
 
 ### Installing test helpers
 
-The Basejump Supabase Test Helpers package provides utilities that simplify testing Supabase-specific features:
+The Test Helpers package provides utilities that simplify testing Supabase-specific features:
 
 ```sql
 select dbdev.install('basejump-supabase_test_helpers');
@@ -102,7 +102,7 @@ When working with multiple test files that share common setup requirements, it's
 
 ### Creating a pre-test hook
 
-Since pgTAP test files are executed in alphabetical order, you can create a setup file that runs first by using a naming convention like `000-setup-tests-hooks.sql`:
+Since pgTAP test files are executed in alphabetical order, create a setup file that runs first by using a naming convention like `000-setup-tests-hooks.sql`:
 
 ```bash
 supabase test new 000-setup-tests-hooks
@@ -278,7 +278,7 @@ Our platform implements:
 
 ### Testing focus areas
 
-When writing tests, we'll verify:
+When writing tests, verify:
 
 - Organization member access control
 - Content visibility across roles
@@ -287,7 +287,7 @@ When writing tests, we'll verify:
 
 #### 1. App schema definitions
 
-Or app schema tables will be defined like so:
+The app schema tables are defined like this:
 
 ```sql
 create table public.profiles (

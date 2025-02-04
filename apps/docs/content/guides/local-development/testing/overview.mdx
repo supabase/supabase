@@ -1,7 +1,7 @@
 ---
 id: 'local-development-testing-overview'
 title: 'Testing Overview'
-description: 'Learn how develop and test your database schema, tables, functions, and Row Level Security (RLS) policies.'
+description: 'Learn how develop and test database schema, tables, functions, and Row Level Security (RLS) policies.'
 ---
 
 Testing is a critical part of database development, especially when working with features like Row Level Security (RLS) policies. This guide provides a comprehensive approach to testing your Supabase database.
@@ -132,7 +132,7 @@ Result: PASS
 
 ### 2. Application-Level testing
 
-Testing through your application code provides end-to-end verification. Here's an example using TypeScript and Vitest that mirrors our pgTAP tests above:
+Testing through application code provides end-to-end verification. Here's an example using TypeScript that mirrors the pgTAP tests above:
 
 ```typescript
 import { createClient } from '@supabase/supabase-js'
@@ -141,7 +141,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 describe('Todos RLS', () => {
   const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!)
 
-  // Test users from our pgTAP example
+  // Test users from the pgTAP example
   const USER_1_ID = '123e4567-e89b-12d3-a456-426614174000'
   const USER_2_ID = '987fcdeb-51a2-43d7-9012-345678901234'
 
@@ -149,7 +149,7 @@ describe('Todos RLS', () => {
     // Setup test data
     const adminSupabase = createClient(process.env.SUPABASE_URL!, process.env.SERVICE_ROLE_KEY!)
 
-    // Create test users (using service role to bypass email verification)
+    // Create test users using service role to bypass email verification
     await adminSupabase.auth.admin.createUser({
       email: 'user1@test.com',
       password: 'password123',
@@ -294,5 +294,5 @@ Common issues and solutions:
 
 - [pgTAP Documentation](https://pgtap.org)
 - [Supabase CLI Reference](https://supabase.com/docs/reference/cli/supabase-test)
-- [pgTap supabase reference](https://supabase.com/docs/guides/database/extensions/pgtap?queryGroups=database-method&database-method=sql#testing-rls-policies)
+- [pgTAP Supabase reference](https://supabase.com/docs/guides/database/extensions/pgtap?queryGroups=database-method&database-method=sql#testing-rls-policies)
 - [Database testing reference](https://supabase.com/docs/guides/database/testing)
