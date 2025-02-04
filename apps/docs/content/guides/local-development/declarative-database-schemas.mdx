@@ -7,11 +7,11 @@ subtitle: 'Manage your database schemas in one place and generate versioned migr
 
 ## Overview
 
-Declarative schemas allow you to reduce code duplications in managing schema migrations. As your database schema evolves over time, declaring it in one place will help you iterate faster by referring to a single source of truth.
+Declarative schemas allow you to reduce code duplications in managing [schema migrations](/docs/guides/local-development/overview#database-migrations). As your database schema evolves over time, declaring it in one place will help you iterate faster by referring to a single source of truth.
 
 ## Schema migrations
 
-Schema migrations are SQL statements written in Data Definition Language. They are [versioned](/docs/guides/deployment/database-migrations) in your `supabase/migrations` directory to ensure schema consistency between local and remote environments.
+Schema migrations are SQL statements written in Data Definition Language. They are versioned in your `supabase/migrations` directory to ensure schema consistency between local and remote environments.
 
 ### Declaring your schema
 
@@ -122,7 +122,7 @@ create table "employees" (
 
 <Admonition type="tip">
 
-Some entities like views and enums expect columns to be declared in a specific order. To avoid messy diffs, always add new columns by appending to the end of the table.
+Some entities like views and enums expect columns to be declared in a specific order. To avoid messy diffs, always append new columns to the end of the table.
 
 </Admonition>
 
