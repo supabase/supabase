@@ -11,6 +11,15 @@
 # By using a dynamic path including the env, app and commit hash, we can ensure that there are no conflicts.
 # Static assets from previous deployments stick around for a while to ensure there are no "downtimes".
 
+# Advantages of the CDN approach we're using:
+
+# Get rid of egress costs for static assets across our apps on Vercel
+# Disable CF proxying and get around these odd timeouts issues
+# Save ~20ms or so for asset requests, as there is no additional CF proxying and we avoid terminating SSL twice
+# Always hits the CDN, gonna be super quick
+# Does not run on local or preview environments, only on staging/prod deployments
+# There are no other disadvantages - you don't have to consider it when developing locally, previews still work, everything on Vercel works as we're used to
+
 #######
 
 # Check for force env var or production environment
@@ -58,7 +67,8 @@ aws s3 sync "$STATIC_DIR" "s3://$BUCKET_NAME/$SITE_NAME/${VERCEL_GIT_COMMIT_SHA:
     --region auto \
     --only-show-errors
 
-# Some public files may be referenced through CSS
+# Some public files may be referenced through CSS (relative path) and therefore they would be requested via the CDN url
+# To ensure we don't run into some nasty debugging issues, we upload the public files to the CDN as well 
 echo -e "${YELLOW}Uploading public files to R2...${NC}"
 aws s3 sync "$PUBLIC_DIR" "s3://$BUCKET_NAME/$SITE_NAME/${VERCEL_GIT_COMMIT_SHA:0:12}" \
     --endpoint-url "$ASSET_CDN_S3_ENDPOINT" \
@@ -73,4 +83,6 @@ if [ $? -eq 0 ]; then
     echo -e "${YELLOW}Cleaning up local static files...${NC}"
     rm -rf "$STATIC_DIR"/*
     echo -e "${GREEN}Local static files cleaned up${NC}"
+
+    # We still keep the public dir, as Next.js does not officially support serving the public files via CDN
 fi
