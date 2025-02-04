@@ -102,7 +102,7 @@ function getAssetPrefix() {
     return undefined
   }
 
-  return `https://demo-sb-cdn-assets.alaister.dev/studio/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
+  return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
 }
 
 /**

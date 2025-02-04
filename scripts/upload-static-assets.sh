@@ -9,8 +9,6 @@ fi
 # Configuration
 BUCKET_NAME="demo-sb-cdn-assets"
 STATIC_DIR=".next/static"
-ASSET_CDN_S3_ENDPOINT="https://f72ed0aa3309c7d4cd6da49161ff9353.r2.cloudflarestorage.com"
-SITE_NAME="studio"
 
 # Colors for output
 GREEN='\033[0;32m'
