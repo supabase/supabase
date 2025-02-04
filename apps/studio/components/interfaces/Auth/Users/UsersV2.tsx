@@ -110,6 +110,7 @@ export const UsersV2 = () => {
     isError,
     isFetchingNextPage,
     refetch,
+    hasNextPage,
     fetchNextPage,
   } = useUsersInfiniteQuery(
     {
@@ -142,8 +143,6 @@ export const UsersV2 = () => {
   const selectedUserToDelete = users.find((u) => u.id === [...selectedUsers][0])
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
-    // [Joshen] Can we get this from the RQ? hasNextPage from the RQ returns true always somehow
-    const hasNextPage = users.length < totalUsers
     const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
     xScroll.current = event.currentTarget.scrollLeft
 
