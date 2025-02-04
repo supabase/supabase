@@ -69,6 +69,48 @@ In the Storage size section, you can see how much storage your projects have use
   zoomable
 />
 
+## Debug Storage size usage
+Since we designed Storage to work as an integrated part of your Postgres database on Supabase, you can query information about your storage objects like any other table.
+
+### File size
+List files larger than 5 MB:
+
+```sql
+select
+    name,
+    bucket_id as bucket,
+    case
+        when (metadata->>'size')::int >= 1073741824 then
+            ((metadata->>'size')::int / 1073741824.0)::numeric(10, 2) || ' GB'
+        when (metadata->>'size')::int >= 1048576 then
+            ((metadata->>'size')::int / 1048576.0)::numeric(10, 2) || ' MB'
+        when (metadata->>'size')::int >= 1024 then
+            ((metadata->>'size')::int / 1024.0)::numeric(10, 2) || ' KB'
+        else
+            (metadata->>'size')::int || ' bytes'
+        end as size
+from
+    storage.objects
+where
+    (metadata->>'size')::int > 1048576 * 5
+order by (metadata->>'size')::int desc
+```
+
+### Bucket size
+List buckets with their total size:
+
+```sql
+select
+    bucket_id,
+    (sum((metadata->>'size')::int) / 1048576.0)::numeric(10, 2) as total_size_megabyte
+from
+    storage.objects
+group by
+    bucket_id
+order by
+    total_size_megabyte desc;
+```
+
 ## Optimize Storage size usage
 - [Limit the upload size](/docs/guides/storage/production/scaling#limit-the-upload-size) for your buckets
 - [Delete assets](/docs/guides/storage/management/delete-objects) that are no longer in use
