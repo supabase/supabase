@@ -51,16 +51,17 @@ const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
 const VERCEL_LIVE_URL = 'https://vercel.live'
 const SENTRY_URL =
   'https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io'
+const SUPABASE_ASSETS_URL = 'https://demo-sb-cdn-assets.alaister.dev'
 
 // used by vercel live preview
 const PUSHER_URL = 'https://*.pusher.com'
 const PUSHER_URL_WS = 'wss://*.pusher.com'
 
-const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_LOCAL_PROJECTS_URL_WS} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL}`
-const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL}`
+const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_LOCAL_PROJECTS_URL_WS} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL} ${SUPABASE_ASSETS_URL}`
+const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL} ${SUPABASE_ASSETS_URL}`
 const FRAME_SRC_URLS = `${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL}`
 const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL} ${GITHUB_USER_AVATAR_URL} ${GOOGLE_USER_AVATAR_URL}`
-const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
+const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${SUPABASE_ASSETS_URL}`
 const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
 
 const csp = [
@@ -96,11 +97,20 @@ const csp = [
     : []),
 ].join(' ')
 
+function getAssetPrefix() {
+  if (process.env.FORCE_ASSET_CDN !== '1' || process.env.VERCEL_ENV !== 'production') {
+    return undefined
+  }
+
+  return `https://demo-sb-cdn-assets.alaister.dev/studio/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
+}
+
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
+  assetPrefix: getAssetPrefix(),
   output: 'standalone',
   experimental: {
     webpackBuildWorker: true,
