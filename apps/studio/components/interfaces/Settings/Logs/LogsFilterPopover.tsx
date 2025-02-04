@@ -23,7 +23,6 @@ const LogsFilterPopover = ({
   align = 'start',
   isLoading = false,
 }: LogsFilterPopoverProps) => {
-  console.log({ filters, options })
   const filterKey = options.key
   const [open, setOpen] = useState(false)
   const [values, setValues] = useState<Filters>(filters)
