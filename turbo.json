@@ -18,13 +18,7 @@
         "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
         "NEXT_PUBLIC_GOTRUE_URL",
-        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-        // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
-        "AWS_ACCESS_KEY_ID",
-        "AWS_SECRET_ACCESS_KEY",
-        "FORCE_ASSET_CDN",
-        "ASSET_CDN_S3_ENDPOINT",
-        "SITE_NAME"
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
