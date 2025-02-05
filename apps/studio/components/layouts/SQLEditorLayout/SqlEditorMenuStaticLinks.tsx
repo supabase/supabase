@@ -1,15 +1,15 @@
-import { useParams, usePathname } from 'next/navigation'
+import { useParams } from 'common'
+import { useRouter } from 'next/router'
 import { InnerSideMenuDataItem } from 'ui-patterns/InnerSideMenu'
 
 const OPTIONS = ['templates', 'quickstarts'] as const
 
 export function SqlEditorMenuStaticLinks() {
-  const pathname = usePathname()
-
-  const { ref } = useParams<{ ref: string }>()
+  const { ref } = useParams()
+  const router = useRouter()
 
   function isPageActive(key: string): boolean {
-    return pathname === `/project/${ref}/sql/${key}`
+    return router.asPath === `/project/${ref}/sql/${key}`
   }
 
   return (
