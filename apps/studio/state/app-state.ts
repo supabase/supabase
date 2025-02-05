@@ -68,6 +68,7 @@ const getInitialState = () => {
       showGenerateSqlModal: false,
       navigationPanelOpen: false,
       navigationPanelJustClosed: false,
+      ongoingQueriesPanelOpen: false,
     }
   }
 
@@ -111,6 +112,7 @@ const getInitialState = () => {
     showGenerateSqlModal: false,
     navigationPanelOpen: false,
     navigationPanelJustClosed: false,
+    ongoingQueriesPanelOpen: false,
   }
 }
 
@@ -216,6 +218,11 @@ export const appState = proxy({
       ...appState.aiAssistantPanel,
       messages: [...appState.aiAssistantPanel.messages, message],
     }
+  },
+
+  showOngoingQueriesPanelOpen: false,
+  setOnGoingQueriesPanelOpen: (value: boolean) => {
+    appState.ongoingQueriesPanelOpen = value
   },
 })
 
