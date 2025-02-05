@@ -10,12 +10,15 @@ const CHART_COLORS = {
   AXIS: 'hsl(var(--background-overlay-hover))',
   GREEN_1: 'hsl(var(--brand-default))',
   GREEN_2: 'hsl(var(--brand-500))',
+  YELLOW_1: 'hsl(var(--warning-default))',
+  YELLOW_2: 'hsl(var(--warning-500))',
   RED_1: 'hsl(var(--destructive-default))',
   RED_2: 'hsl(var(--destructive-500))',
 }
 type LogsBarChartDatum = {
   timestamp: string
   error_count: number
+  warning_count: number
   ok_count: number
 }
 export const LogsBarChart = ({
@@ -46,6 +49,9 @@ export const LogsBarChart = ({
           {
             error_count: {
               label: 'Errors',
+            },
+            warning_count: {
+              label: 'Warnings',
             },
             ok_count: {
               label: 'Ok',
@@ -99,6 +105,21 @@ export const LogsBarChart = ({
                   focusDataIndex === index || focusDataIndex === null
                     ? CHART_COLORS.RED_1
                     : CHART_COLORS.RED_2
+                }
+              />
+            ))}
+          </Bar>
+
+          {/* Warning bars */}
+          <Bar dataKey="warning_count" fill={CHART_COLORS.YELLOW_1} maxBarSize={24} stackId="stack">
+            {data?.map((_entry: LogsBarChartDatum, index: number) => (
+              <Cell
+                className="cursor-pointer transition-colors"
+                key={`warning-${index}`}
+                fill={
+                  focusDataIndex === index || focusDataIndex === null
+                    ? CHART_COLORS.YELLOW_1
+                    : CHART_COLORS.YELLOW_2
                 }
               />
             ))}
