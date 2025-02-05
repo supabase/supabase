@@ -68,7 +68,6 @@ const getInitialState = () => {
       showGenerateSqlModal: false,
       navigationPanelOpen: false,
       navigationPanelJustClosed: false,
-      showConnectDialog: false,
       ongoingQueriesPanelOpen: false,
     }
   }
@@ -113,7 +112,6 @@ const getInitialState = () => {
     showGenerateSqlModal: false,
     navigationPanelOpen: false,
     navigationPanelJustClosed: false,
-    showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
   }
 }
