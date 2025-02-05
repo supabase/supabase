@@ -126,6 +126,13 @@ const PlanUpdateSidePanel = () => {
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
+      sendEvent({
+        action: TelemetryActions.STUDIO_PRICING_SIDE_PANEL_OPENED,
+        properties: {
+          currentPlan: subscription?.plan?.name,
+        },
+        groups: { organization: slug ?? 'Unknown' },
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
