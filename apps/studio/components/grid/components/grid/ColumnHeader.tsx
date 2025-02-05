@@ -140,7 +140,10 @@ export function ColumnHeader<R>({
           <span className="sb-grid-column-header__inner__name" title={hoverValue}>
             {column.name}
           </span>
-          <span className="sb-grid-column-header__inner__format">{columnFormat}</span>
+          <span className="sb-grid-column-header__inner__format">
+            {columnFormat}
+            {columnFormat === 'bytea' ? ` (hex)` : ''}
+          </span>
           {isEncrypted && (
             <Tooltip>
               <TooltipTrigger>
