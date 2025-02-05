@@ -40,7 +40,12 @@
         "DOCS_REVALIDATION_KEYS",
         "DOCS_REVALIDATION_OVERRIDE_KEYS",
         "SUPABASE_SECRET_KEY",
-        "OPENAI_API_KEY"
+        "OPENAI_API_KEY",
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY",
+        "FORCE_ASSET_CDN",
+        "ASSET_CDN_S3_ENDPOINT",
+        "SITE_NAME"
       ],
       "inputs": ["$TURBO_DEFAULT$"],
       "outputs": [".next/**", "!.next/cache/**"]
