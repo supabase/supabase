@@ -17,7 +17,7 @@ export async function AiPromptsIndex() {
         >
           <GlassPanel
             key={prompt.filename}
-            title={prompt.filename.replaceAll('-', ' ')}
+            title={prompt.heading ?? prompt.filename.replaceAll('-', ' ')}
           />
         </Link>
       ))}
