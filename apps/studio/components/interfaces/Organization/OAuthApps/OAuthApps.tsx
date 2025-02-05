@@ -12,13 +12,14 @@ import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-app
 import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Alert, Button, Input } from 'ui'
+import { Button, Input } from 'ui'
 import AuthorizedAppRow from './AuthorizedAppRow'
 import DeleteAppModal from './DeleteAppModal'
 import OAuthAppRow from './OAuthAppRow'
 import PublishAppModal from './PublishAppSidePanel'
 import RevokeAppModal from './RevokeAppModal'
 import { X } from 'lucide-react'
+import { Admonition } from 'ui-patterns'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs
@@ -111,8 +112,8 @@ const OAuthApps = () => {
           )}
 
           {createdApp !== undefined && (
-            <Alert withIcon variant="success" title="Successfully published a new application!">
-              <div className="absolute top-4 right-4">
+           <Admonition type="default" title="Successfully published a new application!">
+            <div className="absolute top-4 right-4">
                 <Button
                   type="text"
                   icon={<X size={18} />}
@@ -146,7 +147,7 @@ const OAuthApps = () => {
                   />
                 </div>
               </div>
-            </Alert>
+            </Admonition>
           )}
 
           {isSuccessPublishedApps && (
