@@ -232,7 +232,12 @@ export function getAvatarUrl(user: User): string | undefined {
 
   if (typeof url !== 'string') return undefined
   const isSupported = SUPPORTED_CSP_AVATAR_URLS.some((x) => url.startsWith(x))
-  return isSupported ? (url.startsWith(GITHUB_AVATAR_URL) ? `${url}&s=24` : url) : undefined
+
+  // [Joshen] Only for GH, not entirely sure whats the image transformation equiv for Google
+  const _url = new URL(url)
+  _url.searchParams.set('s', '24')
+
+  return isSupported ? (url.startsWith(GITHUB_AVATAR_URL) ? _url.href : url) : undefined
 }
 
 export const formatUserColumns = ({
