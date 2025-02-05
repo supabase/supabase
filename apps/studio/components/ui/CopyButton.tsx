@@ -44,11 +44,7 @@ const CopyButton = ({
   return (
     <Button
       onClick={async (e) => {
-        let textToCopy = text
-        if (asyncText) {
-          textToCopy = await asyncText()
-        }
-        console.log('text', textToCopy)
+        const textToCopy = asyncText ? await asyncText() : text
         setShowCopied(true)
         await copyToClipboard(textToCopy!)
         onClick?.(e)

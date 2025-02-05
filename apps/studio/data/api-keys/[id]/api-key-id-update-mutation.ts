@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { handleError, put } from 'data/fetchers'
+import { handleError, patch } from 'data/fetchers'
 import { toast } from 'sonner'
 import { ResponseError } from 'types'
 import { apiKeysKeys } from '../keys'
@@ -17,10 +17,10 @@ export async function updateAPIKeysById(
   if (typeof projectRef === 'undefined') throw new Error('projectRef is required')
   if (typeof id === 'undefined') throw new Error('API key ID is required')
 
-  // @ts-ignore Just a sample here, TS lint will validate if the endpoint is valid
-  const { data, error } = await put('/v1/projects/{ref}/api-keys/{id}', {
+  const { data, error } = await patch('/v1/projects/{ref}/api-keys/{id}', {
     params: {
       path: { ref: projectRef, id },
+      query: { reveal: false },
     },
     body: {
       description: description,
@@ -53,7 +53,7 @@ export const useResourceUpdateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef, id } = variables
 
-        await Promise.all([queryClient.invalidateQueries(apiKeysKeys.list(projectRef))])
+        await queryClient.invalidateQueries(apiKeysKeys.list(projectRef))
 
         await onSuccess?.(data, variables, context)
       },

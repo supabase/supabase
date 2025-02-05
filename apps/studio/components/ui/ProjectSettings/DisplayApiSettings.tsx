@@ -34,8 +34,6 @@ const DisplayApiSettings = ({
 
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
 
-  console.log('old canReadAPIKeys', canReadAPIKeys)
-
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
   const apiKeys = settings?.service_api_keys ?? []
@@ -55,15 +53,6 @@ const DisplayApiSettings = ({
                 <br />
                 You can use the keys below in the Supabase client libraries.
                 <br />
-                {/* <a
-                  href="https://supabase.com/docs#client-libraries"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <Button icon={<BookOpen />} type="default" className="mt-4">
-                    Client Docs
-                  </Button>
-                </a> */}
               </p>
             </div>
           )

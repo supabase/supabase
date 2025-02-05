@@ -11,7 +11,7 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Separator } from 'ui'
 
-const AuthSettings: NextPageWithLayout = () => {
+const ApiKeysSettings: NextPageWithLayout = () => {
   const [apiKeysView] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.API_KEYS_VIEW, undefined)
 
   // const isPermissionsLoaded = usePermissionsLoaded()
@@ -33,10 +33,10 @@ const AuthSettings: NextPageWithLayout = () => {
   )
 }
 
-AuthSettings.getLayout = (page) => (
+ApiKeysSettings.getLayout = (page) => (
   <SettingsLayout>
     <ApiKeysLayout>{page}</ApiKeysLayout>
   </SettingsLayout>
 )
 
-export default AuthSettings
+export default ApiKeysSettings

@@ -76,22 +76,6 @@ const ApiKeysLayout = ({ children }: PropsWithChildren) => {
             </TabsList_Shadcn_>
           </div>
         </Tabs_Shadcn_>
-
-        {/* <Tabs_Shadcn_ defaultValue="account" className="">
-          <TabsList_Shadcn_ className="w-full gap-4">
-            <TabsTrigger_Shadcn_ value="account" className="flex gap-2 items-center">
-              <Sparkles
-                className="text-foreground-lighter group-data-[state=active]:text-foreground group-hover:text-foreground transition-all "
-                size={13}
-                strokeWidth={1}
-              />{' '}
-              <span>New Keys</span>
-            </TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_ value="password">
-              <span>Legacy Keys</span>
-            </TabsTrigger_Shadcn_>
-          </TabsList_Shadcn_>
-        </Tabs_Shadcn_> */}
       </ScaffoldContainer>
 
       <ScaffoldContainer className="flex flex-col gap-10 py-8" bottomPadding>
