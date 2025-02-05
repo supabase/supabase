@@ -38,7 +38,7 @@ export const EntityTypeIcon = ({
         strokeWidth={strokeWidth}
         className={cn(
           'text-foreground-muted group-hover:text-foreground-lighter group-aria-selected:text-foreground',
-          isActive && 'text-foreground-lighter',
+          isActive && 'text-foreground-light',
           'transition-colors'
         )}
       />
