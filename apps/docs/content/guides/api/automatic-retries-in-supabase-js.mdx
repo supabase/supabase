@@ -43,9 +43,13 @@ Here is an example with custom retry options:
 const fetchWithRetry = fetchRetry(fetch, {
   retries: 3, // Number of retry attempts
   retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000), // Exponential backoff
-  retryOn: [500, 502, 503, 504], // Retry on server errors
+  retryOn: [520], // Retry only on Cloudflare errors
 })
 ```
+
+<Admonition type="danger" title="Important: Only Retry 520 Errors by Default">
+In most cases, 520 errors (Cloudflare origin errors) indicate temporary network failures, making them safe to retry.
+</Admonition>
 
 In this example, the `retryDelay` function implements an exponential backoff strategy, and retries are triggered only for specific HTTP status codes.
 
@@ -79,7 +83,7 @@ const fetchWithRetry = fetchRetry(fetch, {
       = (attempt: number, error: Error | null, response: Response | null) =>
         attempt < 3
           && response
-          && response.status >= 500
+          && response.status == 520 // Cloudflare errors
           && response.url.includes('rpc/your_stored_procedure')
 
     if (shouldRetry(attempt, error, response)) {
