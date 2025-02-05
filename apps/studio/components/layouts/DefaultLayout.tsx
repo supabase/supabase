@@ -42,7 +42,6 @@ const DefaultLayout = ({
           <div className="flex flex-1 w-full overflow-y-hidden">
             {/* Sidebar */}
             <NavigationBar />
-            {/* <AppDefaultNavigation /> */}
             {/* Main Content */}
             <div className="flex-grow h-full overflow-y-auto">{children}</div>
           </div>
