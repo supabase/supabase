@@ -1,0 +1,141 @@
+---
+title: Sharding
+subtitle: 'Using postgres_fdw to treat many databases as one'
+---
+
+Sharding is the process of splitting a large database into smaller, more manageable pieces, called shards. Each shard is a separate database that contains a subset of the data. Sharding can help improve performance and scalability by distributing the load across multiple databases.
+
+For more in-depth information, see the [PostgreSQL documentation on sharding](https://www.postgresql.org/docs/current/postgres-fdw.html).
+
+## What is a shard?
+
+A shard can be seen as a single Supabase project (or Postgresql database). If you have 3 shards, then you would have 3 Supabase projects.
+
+Each shard should have the connection details for every other shard configured, as well as the database role to connect with. You can use the default `postgres` user or you may want to create a more secure [custom role](/docs/guides/database/postgres/roles) with limited permissions
+
+![Supabase sharding architectural diagram](/docs/img/database/sharding)
+
+## Schema management and foreign tables
+
+A foreign table is a table that is treated like a local table but it exists on a different shard. One important thing to note with foreign tables is that it creates a pointer to an existing table on the shard that is specified, the source table **must** exist as well.
+
+When working with foreign tables, there are 2 ways to manage them:
+
+### 1. Create foreign tables
+
+This method allows you to create a single foreign table to map to a table on a different shard. Using this approach also allows you to specify options, such as setting the name of the table to be something different than its original name.
+
+```sql
+CREATE FOREIGN TABLE orders (id INT, data TEXT) SERVER shard02 OPTIONS (table_name 'orders');
+```
+
+### 2. Import foreign schema
+
+This method imports an entire schema and is useful when dealing with many tables. You can also specify specific tables or ones to exclude.
+
+```sql
+IMPORT FOREIGN SCHEMA public
+  LIMIT TO (orders, stock)
+  FROM SERVER shard02 INTO public;
+```
+
+```sql
+IMPORT FOREIGN SCHEMA public
+  EXCEPT (customers)
+  FROM SERVER shard01 INTO public;
+```
+
+## Example of sharding in postgresql
+
+In this example, you have a shipping company that has a client website, as well as orders that are fulfilled by an automated warehouse.
+
+There are 3 shards (using random project references):
+
+1. `tbqapicsffzqqyoczviy` - `shard01`
+2. `nadzrbgepigdivnxdcur` - `shard02`
+3. `uywjiphfeyvdqzvdzgyk` - `shard03`
+
+We will be using `tbqapicsffzqqyoczviy` as our "primary" shard. This means that all of our clients will connect to this project and we will only use `shard02` and `shard03` for storing orders and stock data.
+The client website will use `tbqapicsffzqqyoczviy` to query and insert data for clients and our warehouse will connect to `nadzrbgepigdivnxdcur` and `uywjiphfeyvdqzvdzgyk` to update order progress.
+
+For each project, you will need to:
+
+1. Enable the `postgres_fdw` extension
+2. Add the connection details for each other project
+3. Add database user credentials for the connection details
+4. Import the required tables (or the entire schema)
+
+The steps outlined below are for `shard01` and would be repeated on each shard, replacing the shard names.
+
+### Example
+
+1. **Install the `postgres_fdw` extension**:
+
+   ```sql
+   CREATE EXTENSION IF NOT EXISTS postgres_fdw;
+   ```
+
+2. **Create foreign servers for each shard**:
+
+   ```sql
+   CREATE SERVER shard02 FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'db.nadzrbgepigdivnxdcur.supabase.co', dbname 'postgres', port '5432');
+   CREATE SERVER shard03 FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'db.uywjiphfeyvdqzvdzgyk.supabase.co', dbname 'postgres', port '5432');
+   ```
+
+3. **Create user mappings for each shard**:
+
+   ```sql
+   CREATE USER MAPPING FOR current_user SERVER shard02 OPTIONS (user 'shard_user', password 'shard_password');
+   CREATE USER MAPPING FOR current_user SERVER shard03 OPTIONS (user 'shard_user', password 'shard_password');
+   ```
+
+4. \*\*Create the tables:
+
+   ```sql
+    CREATE FOREIGN TABLE orders (
+        id INT,
+        customer_id INT,
+        order_date TIMESTAMP,
+        total_amount DECIMAL
+    ) SERVER shard02 OPTIONS (table_name 'orders');
+
+    CREATE FOREIGN TABLE stock (
+        id INT,
+        product_name VARCHAR,
+        quantity INT,
+        price DECIMAL
+    ) SERVER shard03 OPTIONS (table_name 'stock');
+   ```
+
+5. **Query the shards as if they were a single table**:
+
+   ```sql
+   select customers.name, orders.total_amount
+   from
+     customers
+     join orders on customers.id = orders.customer_id;
+   ```
+
+By following these steps, you can distribute your data across multiple Postgres databases and query them as if they were a single database, improving performance and scalability.
+
+## Use cases
+
+Sharding can be particularly useful in the following scenarios:
+
+- **High Traffic Applications**
+  <br />
+  Applications with a high volume of read and write operations can benefit from sharding by
+  distributing the load across multiple databases.
+- **Geographically Distributed Data**
+  <br />
+  Use our [read-replicas](/docs/guides/platform/read-replicas) if you want to distribute your
+  database globally. If you also need the capability to write in different regions, sharding can
+  solve this.
+- **Large Datasets**
+  <br />
+  Applications with large datasets that exceed the storage capacity of a single database can use
+  sharding to split the data across multiple databases.
+- **Multi-Tenant Applications**
+  <br />
+  In multi-tenant applications, sharding can be used to isolate data for different tenants,
+  improving security and performance.
