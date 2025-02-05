@@ -11,7 +11,6 @@ const BuiltWithSupabase = dynamic(() => import('components/BuiltWithSupabase'))
 const DashboardFeatures = dynamic(() => import('~/components/DashboardFeatures'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
 const CTABanner = dynamic(() => import('components/CTABanner/index'))
-const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
 
 const Index = () => {
   return (
@@ -25,14 +24,6 @@ const Index = () => {
       <DashboardFeatures {...content.dashboardFeatures} />
       <TwitterSocialSection />
       <CTABanner className="border-none" />
-      <ReactTooltip
-        effect="solid"
-        place="bottom"
-        backgroundColor="hsl(var(--background-alternative-default))"
-        textColor="hsl(var(--foreground-light))"
-        className="!max-w-[320px] !px-3 whitespace-pre-line"
-        uuid="homepage-tt"
-      />
     </Layout>
   )
 }

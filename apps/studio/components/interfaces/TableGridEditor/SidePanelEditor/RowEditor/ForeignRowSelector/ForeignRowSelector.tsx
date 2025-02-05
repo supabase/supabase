@@ -19,6 +19,7 @@ import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-stat
 import { Button, SidePanel } from 'ui'
 import ActionBar from '../../ActionBar'
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
+import { convertByteaToHex } from '../RowEditor.utils'
 import Pagination from './Pagination'
 import SelectorGrid from './SelectorGrid'
 
@@ -176,7 +177,12 @@ const ForeignRowSelector = ({
                   rows={data.rows}
                   onRowSelect={(row) => {
                     const value = columns?.reduce((a, b) => {
-                      return { ...a, [b.source]: row[b.target] }
+                      const targetColumn = selectedTable?.columns.find((x) => x.name === b.target)
+                      const value =
+                        targetColumn?.format === 'bytea'
+                          ? convertByteaToHex(row[b.target])
+                          : row[b.target]
+                      return { ...a, [b.source]: value }
                     }, {})
                     onSelect(value)
                   }}

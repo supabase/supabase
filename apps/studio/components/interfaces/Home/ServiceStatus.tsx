@@ -39,7 +39,7 @@ const StatusMessage = ({
   if (status === 'COMING_UP') return 'Coming up...'
   if (status === 'ACTIVE_HEALTHY') return 'Healthy'
   if (isProjectNew) return 'Coming up...'
-  if (isSuccess) return 'No issues'
+  if (isSuccess) return 'Healthy'
   return 'Unable to connect'
 }
 

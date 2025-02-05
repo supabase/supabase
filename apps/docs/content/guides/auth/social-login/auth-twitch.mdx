@@ -41,7 +41,7 @@ Setting up Twitch logins for your application consists of 3 parts:
 - Enter the name of your application.
 - Type or paste your `OAuth Redirect URL` (the callback URL from the previous step.)
 - Select a category for your app.
-- Check the Captcha box and click `Create`.
+- Check the CAPTCHA box and click `Create`.
 
 ## Retrieve your Twitch OAuth client ID and client secret
 
@@ -72,7 +72,7 @@ Setting up Twitch logins for your application consists of 3 parts:
 
 <CreateClientSnippet />
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `twitch` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `twitch` as the `provider`:
 
 ```js
 async function signInWithTwitch() {
@@ -85,7 +85,7 @@ async function signInWithTwitch() {
 </TabPanel>
 <TabPanel id="flutter" label="Flutter">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `twitch` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `twitch` as the `provider`:
 
 ```dart
 Future<void> signInWithTwitch() async {

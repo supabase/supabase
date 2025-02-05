@@ -52,7 +52,7 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 
 - Go to `Product settings` > `Kakao Login` > `Security`.
 - Click on the `Kakao Login` switch to enable Kakao Login.
-- Click on `generate code` at the bottom to generate the `Client secret code` -- this will serve as a `client_secret` for your supabase project.
+- Click on `generate code` at the bottom to generate the `Client secret code` -- this will serve as a `client_secret` for your Supabase project.
 - Make sure you enabled `Client secret code` by selecting `enable` from the `Activation state` section.
 
 ## Additional configurations on Kakao Developers portal
@@ -79,7 +79,7 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 
 <CreateClientSnippet />
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `kakao` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `kakao` as the `provider`:
 
 ```js
 async function signInWithKakao() {
@@ -92,7 +92,7 @@ async function signInWithKakao() {
 </TabPanel>
 <TabPanel id="flutter" label="Flutter">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `kakao` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `kakao` as the `provider`:
 
 ```dart
 Future<void> signInWithKakao() async {

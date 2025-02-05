@@ -42,6 +42,7 @@ const withBundleAnalyzer = bundleAnalyzer({
  */
 const nextConfig = {
   basePath: '',
+  assetPrefix: getAssetPrefix(),
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   trailingSlash: false,
   transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'icons', 'api-types'],
@@ -102,4 +103,18 @@ const nextConfig = {
 export default () => {
   const plugins = [withContentlayer, withMDX, withBundleAnalyzer]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
+}
+
+function getAssetPrefix() {
+  // If not force enabled, but not production env, disable CDN
+  if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
+    return undefined
+  }
+
+  // Force disable CDN
+  if (process.env.FORCE_ASSET_CDN === '-1') {
+    return undefined
+  }
+
+  return `https://frontend-assets.supabase.com/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
 }

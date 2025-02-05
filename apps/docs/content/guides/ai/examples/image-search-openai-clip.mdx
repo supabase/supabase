@@ -8,9 +8,9 @@ subtitle: 'Implement image search with the OpenAI CLIP Model and Supabase Vector
 The [OpenAI CLIP Model](https://github.com/openai/CLIP) was trained on a variety of (image, text)-pairs. You can use the CLIP model for:
 
 - Text-to-Image / Image-To-Text / Image-to-Image / Text-to-Text Search
-- You can fine-tune it on your own image and text data with the regular SentenceTransformers training code.
+- You can fine-tune it on your own image and text data with the regular `SentenceTransformers` training code.
 
-[SentenceTransformers](https://www.sbert.net/examples/applications/image-search/README.html) provides models that allow you to embed images and text into the same vector space. You can use this to find similar images as well as to implement image search.
+[`SentenceTransformers`](https://www.sbert.net/examples/applications/image-search/README.html) provides models that allow you to embed images and text into the same vector space. You can use this to find similar images as well as to implement image search.
 
 You can find the full application code as a Python Poetry project on [GitHub](https://github.com/supabase/supabase/tree/master/examples/ai/image_search#image-search-with-supabase-vector).
 
@@ -72,7 +72,7 @@ DB_CONNECTION = "postgresql://postgres:postgres@localhost:54322/postgres"
 
 ## Create embeddings for your images
 
-In the root of your project, create a new folder called `images` and add some images. You can use the images from the example project on [GitHub](https://github.com/supabase/supabase/tree/master/examples/ai/image_search/images) or you can find license free images on [unsplash](https://unsplash.com).
+In the root of your project, create a new folder called `images` and add some images. You can use the images from the example project on [GitHub](https://github.com/supabase/supabase/tree/master/examples/ai/image_search/images) or you can find license free images on [Unsplash](https://unsplash.com).
 
 Next, create a `seed` method, which will create a new Supabase Vector Collection, generate embeddings for your images, and upsert the embeddings into your database:
 
@@ -130,7 +130,7 @@ seed = "image_search.main:seed"
 search = "image_search.main:search"
 ```
 
-After activating the virtual environtment with `poetry shell` you can now run your seed script via `poetry run seed`. You can inspect the generated embeddings in your local database by visiting the local Supabase dashboard at [localhost:54323](http://localhost:54323/project/default/editor), selecting the `vecs` schema, and the `image_vectors` database.
+After activating the virtual environment with `poetry shell` you can now run your seed script via `poetry run seed`. You can inspect the generated embeddings in your local database by visiting the local Supabase dashboard at [localhost:54323](http://localhost:54323/project/default/editor), selecting the `vecs` schema, and the `image_vectors` database.
 
 ## Perform an image search from a text query
 

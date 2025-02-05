@@ -354,7 +354,7 @@ const LogTable = ({
     }
 
     return (
-      <div className="text-foreground flex gap-2 font-mono px-6">
+      <div className="text-foreground flex gap-2 font-mono p-4">
         <DefaultErrorRenderer {...childProps} />
       </div>
     )

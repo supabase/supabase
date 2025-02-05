@@ -82,7 +82,7 @@ select hello_world();
 const { data, error } = await supabase.rpc('hello_world')
 ```
 
-Reference: [rpc()](../../reference/javascript/rpc)
+Reference: [`rpc()`](../../reference/javascript/rpc)
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
@@ -92,7 +92,7 @@ final data = await supabase
   .rpc('hello_world');
 ```
 
-Reference: [rpc()](../../reference/dart/rpc)
+Reference: [`rpc()`](../../reference/dart/rpc)
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
@@ -101,7 +101,7 @@ Reference: [rpc()](../../reference/dart/rpc)
 try await supabase.rpc("hello_world").execute()
 ```
 
-Reference: [rpc()](../../reference/swift/rpc)
+Reference: [`rpc()`](../../reference/swift/rpc)
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
@@ -110,7 +110,7 @@ Reference: [rpc()](../../reference/swift/rpc)
 val data = supabase.postgrest.rpc("hello_world")
 ```
 
-Reference: [rpc()](../../reference/kotlin/rpc)
+Reference: [`rpc()`](../../reference/kotlin/rpc)
 
 </TabPanel>
 <TabPanel id="python" label="Python">
@@ -119,7 +119,7 @@ Reference: [rpc()](../../reference/kotlin/rpc)
 data = supabase.rpc('hello_world').execute()
 ```
 
-Reference: [rpc()](../../reference/python/rpc)
+Reference: [`rpc()`](../../reference/python/rpc)
 
 </TabPanel>
 </Tabs>
@@ -141,20 +141,24 @@ For example, if we had a database with some Star Wars data inside:
 
 <h4>Planets</h4>
 
+```
 | id  | name     |
 | --- | -------- |
 | 1   | Tatooine |
 | 2   | Alderaan |
 | 3   | Kashyyyk |
+```
 
 <h4>People</h4>
 
+```
 | id  | name             | planet_id |
 | --- | ---------------- | --------- |
 | 1   | Anakin Skywalker | 1         |
 | 2   | Luke Skywalker   | 1         |
 | 3   | Princess Leia    | 2         |
 | 4   | Chewbacca        | 3         |
+```
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
