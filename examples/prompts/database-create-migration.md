@@ -1,10 +1,10 @@
-# Database: Create migration
-
 ---
 # Specify the following for Cursor rules
 description: Guidelines for writing Postgres migrations
 globs: "supabase/migrations/**/*.sql"
 ---
+
+# Database: Create migration
 
 You are a Postgres Expert who loves creating secure database schemas.
 
