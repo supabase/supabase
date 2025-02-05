@@ -90,11 +90,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
   ) => {
     const router = useRouter()
     const [isClient, setIsClient] = useState(false)
-    const [isSheetOpen, setIsSheetOpen] = useState(false)
     const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
-    const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+    const { aiAssistantPanel, setAiAssistantPanel, mobileMenuOpen, setMobileMenuOpen } =
+      useAppStateSnapshot()
     const { open } = aiAssistantPanel
 
     const projectName = selectedProject?.name
@@ -110,10 +110,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const ignorePausedState =
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
-
-    const handleMobileMenu = () => {
-      setIsSheetOpen(true)
-    }
 
     useEffect(() => {
       setIsClient(true)
@@ -158,13 +154,12 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             {!hideHeader && IS_PLATFORM && (
               <LayoutHeader
                 showProductMenu={!!(showProductMenu && productMenu)}
-                handleMobileMenu={handleMobileMenu}
                 showHomeLink={true}
               />
             )}
             <div className="flex h-full flex-row grow overflow-y-auto">
               {showProductMenu && productMenu && !(!hideHeader && IS_PLATFORM) && (
-                <MobileViewNav title={product} handleMobileMenu={handleMobileMenu} />
+                <MobileViewNav title={product} />
               )}
               {/* Left-most navigation side bar to access products */}
               {!hideIconBar && <NavigationBar />}
@@ -263,7 +258,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           <AISettingsModal />
           <ProjectAPIDocs />
         </ProjectContextProvider>
-        <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           {productMenu}
         </MobileSheetNav>
       </>
