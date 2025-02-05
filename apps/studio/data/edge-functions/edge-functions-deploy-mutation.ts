@@ -27,6 +27,7 @@ export async function deployEdgeFunction({
   const { data, error } = await post(`/v1/projects/{ref}/functions/deploy`, {
     params: {
       path: { ref: projectRef },
+      slug: metadata.name,
     },
     body: {
       file: files as any,
