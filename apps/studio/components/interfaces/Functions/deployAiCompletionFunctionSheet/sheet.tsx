@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common/hooks/useParams'
-import console from 'console'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
 import {
