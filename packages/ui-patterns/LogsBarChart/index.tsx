@@ -1,10 +1,18 @@
 'use client'
+
+/**
+ * External dependencies for date handling, React core, and charting
+ */
 import dayjs from 'dayjs'
 import { ReactNode, useState } from 'react'
 import { Bar, Cell, BarChart as RechartBarChart, XAxis, YAxis } from 'recharts'
 import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
+/**
+ * Color constants for the chart elements using CSS variables
+ * Includes colors for ticks, axes, and different states (success, warning, error)
+ */
 const CHART_COLORS = {
   TICK: 'hsl(var(--background-overlay-hover))',
   AXIS: 'hsl(var(--background-overlay-hover))',
@@ -15,12 +23,29 @@ const CHART_COLORS = {
   RED_1: 'hsl(var(--destructive-default))',
   RED_2: 'hsl(var(--destructive-500))',
 }
+/**
+ * Type definition for a single data point in the logs chart
+ * @property timestamp - The time when the log entry was recorded
+ * @property error_count - Number of error logs
+ * @property warning_count - Number of warning logs
+ * @property ok_count - Number of successful logs
+ */
 type LogsBarChartDatum = {
   timestamp: string
   error_count: number
   warning_count: number
   ok_count: number
 }
+/**
+ * LogsBarChart Component
+ * Renders a stacked bar chart showing the distribution of log types (error, warning, ok)
+ * over time. Supports hover interactions and click events on bars.
+ *
+ * @param data - Array of log data points to display
+ * @param onBarClick - Optional callback function when a bar is clicked
+ * @param EmptyState - Optional component to render when there's no data
+ * @param DateTimeFormat - Optional date format string (default: 'MMM D, YYYY, hh:mma')
+ */
 export const LogsBarChart = ({
   data,
   onBarClick,
@@ -32,18 +57,21 @@ export const LogsBarChart = ({
   EmptyState?: ReactNode
   DateTimeFormat?: string
 }) => {
-  const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
+  // Track the currently focused bar index for hover effects
+const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
   if (data.length === 0) {
     if (EmptyState) return EmptyState
     return null
   }
 
-  const startDate = dayjs(data[0]['timestamp']).format(DateTimeFormat)
-  const endDate = dayjs(data[data?.length - 1]?.['timestamp']).format(DateTimeFormat)
+  // Format the start and end dates for the x-axis labels
+const startDate = dayjs(data[0]['timestamp']).format(DateTimeFormat)
+const endDate = dayjs(data[data?.length - 1]?.['timestamp']).format(DateTimeFormat)
 
   return (
     <div className={cn('flex flex-col gap-y-3')}>
+      {/* Chart container with configuration for different log types */}
       <ChartContainer
         config={
           {
@@ -60,6 +88,7 @@ export const LogsBarChart = ({
         }
         className="h-[80px]"
       >
+        {/* Main bar chart component with mouse interaction handlers */}
         <RechartBarChart
           data={data}
           onMouseMove={(e: any) => {
@@ -73,12 +102,14 @@ export const LogsBarChart = ({
             if (onBarClick) onBarClick(datum, tooltipData)
           }}
         >
+          {/* Y-axis configuration - hidden ticks for cleaner look */}
           <YAxis
             tick={false}
             width={0}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
+          {/* X-axis configuration - shows timeline of logs */}
           <XAxis
             dataKey="timestamp"
             interval={data.length - 2}
@@ -86,6 +117,7 @@ export const LogsBarChart = ({
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
+          {/* Custom tooltip showing detailed information on hover */}
           <ChartTooltip
             content={
               <ChartTooltipContent
@@ -95,7 +127,7 @@ export const LogsBarChart = ({
             }
           />
 
-          {/* Error bars */}
+          {/* Error bars - Stacked bar section showing error logs */}
           <Bar dataKey="error_count" fill={CHART_COLORS.RED_1} maxBarSize={24} stackId="stack">
             {data?.map((_entry: LogsBarChartDatum, index: number) => (
               <Cell
@@ -110,7 +142,7 @@ export const LogsBarChart = ({
             ))}
           </Bar>
 
-          {/* Warning bars */}
+          {/* Warning bars - Stacked bar section showing warning logs */}
           <Bar dataKey="warning_count" fill={CHART_COLORS.YELLOW_1} maxBarSize={24} stackId="stack">
             {data?.map((_entry: LogsBarChartDatum, index: number) => (
               <Cell
@@ -125,7 +157,7 @@ export const LogsBarChart = ({
             ))}
           </Bar>
 
-          {/* Success bars */}
+          {/* Success bars - Stacked bar section showing successful logs */}
           <Bar dataKey="ok_count" fill={CHART_COLORS.GREEN_1} maxBarSize={24} stackId="stack">
             {data?.map((_entry: LogsBarChartDatum, index: number) => (
               <Cell
@@ -141,6 +173,7 @@ export const LogsBarChart = ({
           </Bar>
         </RechartBarChart>
       </ChartContainer>
+      {/* Time range display showing start and end dates */}
       {data && (
         <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">
           <span>{startDate}</span>
