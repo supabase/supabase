@@ -8,7 +8,7 @@ export default (inputEntry, outputDirectory, iconNodes, iconFileExtension = '') 
   // Reset file
   resetFile(fileName, outputDirectory)
 
-  const icons = Object.keys(iconNodes)
+  const icons = Object.keys(iconNodes).sort((a, b) => a.localeCompare(b))
 
   // Generate Import for Icon VNodes
   icons.forEach((iconName) => {

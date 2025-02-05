@@ -5,9 +5,7 @@ export * from './src/lib/Markdown'
 // GENERAL
 
 export * from './src/components/Button'
-export * from './src/components/Icon'
-export * from './src/components/Icon/IconContext'
-export * from './src/components/Icon/IconBackground'
+export * from './src/components/IconBackground'
 export * from './src/components/Image'
 
 // DISPLAYS
@@ -266,27 +264,6 @@ export * from './src/components/StatusIcon'
 // AUTH
 
 // export * from './src/components/Auth'
-
-// ICONS
-// export icons
-export * from './src/components/Icon/icons/IconBriefcase2'
-export * from './src/components/Icon/icons/IconBroadcast'
-export * from './src/components/Icon/icons/IconChangelog'
-export * from './src/components/Icon/icons/IconDatabaseChanges'
-export * from './src/components/Icon/icons/IconDiscord'
-export * from './src/components/Icon/icons/IconDiscussions'
-export * from './src/components/Icon/icons/IconDocumentation'
-export * from './src/components/Icon/icons/IconGitHubSolid'
-export * from './src/components/Icon/icons/IconIntegrations'
-export * from './src/components/Icon/icons/IconLifeBuoy2'
-export * from './src/components/Icon/icons/IconLinkedinSolid'
-export * from './src/components/Icon/icons/IconMicSolid'
-export * from './src/components/Icon/icons/IconPartners'
-export * from './src/components/Icon/icons/IconPresence'
-export * from './src/components/Icon/icons/IconProductHunt'
-export * from './src/components/Icon/icons/IconTwitterX'
-export * from './src/components/Icon/icons/IconYCombinator'
-export * from './src/components/Icon/icons/IconYoutubeSolid'
 
 // Export hooks
 export * from './src/lib/Hooks'
