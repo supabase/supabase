@@ -10,6 +10,7 @@ export const generateSettingsMenu = (
   project?: Project,
   organization?: Organization,
   features?: {
+    auth?: boolean
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
@@ -18,6 +19,8 @@ export const generateSettingsMenu = (
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
+
+  const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
   const newDiskComputeEnabled = features?.diskAndCompute ?? false
@@ -89,6 +92,16 @@ export const generateSettingsMenu = (
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
           items: [],
         },
+        ...(IS_PLATFORM && authEnabled
+          ? [
+              {
+                name: 'Authentication',
+                key: 'auth',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
+                items: [],
+              },
+            ]
+          : []),
         ...(IS_PLATFORM && storageEnabled
           ? [
               {

@@ -35,14 +35,21 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     : router.pathname.split('/')[4]
 
   const {
+    projectAuthAll: authEnabled,
     projectEdgeFunctionAll: edgeFunctionsEnabled,
     projectStorageAll: storageEnabled,
     billingInvoices: invoicesEnabled,
-  } = useIsFeatureEnabled(['project_edge_function:all', 'project_storage:all', 'billing:invoices'])
+  } = useIsFeatureEnabled([
+    'project_auth:all',
+    'project_edge_function:all',
+    'project_storage:all',
+    'billing:invoices',
+  ])
 
   const diskAndComputeEnabled = useFlag('diskAndComputeForm')
 
   const menuRoutes = generateSettingsMenu(ref, project, organization, {
+    auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     invoices: invoicesEnabled,
