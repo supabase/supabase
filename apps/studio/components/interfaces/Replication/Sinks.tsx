@@ -21,7 +21,7 @@ export const ReplicationSinks = () => {
   const [sinkIdToDelete, setSinkIdToDelete] = useState(-1)
   const [sinkNameToDelete, setSinkNameToDelete] = useState('')
 
-  const sinks = sinks_data ?? []
+  const sinks = sinks_data ? sinks_data.sinks : []
 
   return (
     <>

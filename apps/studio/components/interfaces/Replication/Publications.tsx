@@ -21,7 +21,7 @@ export const ReplicationPublications = () => {
   const [showDeletePublicationModal, setShowDeletePublicationModal] = useState(false)
   const [publicationToDelete, setPublicationToDelete] = useState('')
 
-  const sources = sources_data ?? []
+  const sources = sources_data ? sources_data.sources : []
   const thisProjectSource = sources.find((s) => s.name === ref)
 
   const { data: pub_data } = useReplicationPublicationsQuery({

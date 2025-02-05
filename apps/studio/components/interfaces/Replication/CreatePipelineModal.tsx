@@ -23,7 +23,7 @@ const CreatePipelineModal = ({ visible, onClose }: CreatePipelineModalProps) => 
     projectRef: ref,
   })
 
-  let thisProjectSource = data?.find((s) => s.name === ref)
+  let thisProjectSource = data?.sources?.find((s) => s.name === ref)
 
   if (!thisProjectSource) {
     toast.error("Failed to find this project's source")
@@ -32,7 +32,7 @@ const CreatePipelineModal = ({ visible, onClose }: CreatePipelineModalProps) => 
   const { data: sinks_data } = useReplicationSinksQuery({
     projectRef: ref,
   })
-  const sinks = sinks_data ?? []
+  const sinks = sinks_data ? sinks_data.sinks : []
 
   const { data: pub_data } = useReplicationPublicationsQuery({
     projectRef: ref,
