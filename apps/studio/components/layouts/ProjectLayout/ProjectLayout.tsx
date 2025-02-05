@@ -164,6 +164,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           </Head>
 
           <div className="flex flex-col h-screen w-screen">
+            {/* Top Nav to access products from mobile */}
+            {!hideIconBar && <MobileNavigationBar />}
             {!hideHeader && IS_PLATFORM && (
               <LayoutHeader
                 showProductMenu={!!(showProductMenu && productMenu)}
@@ -171,16 +173,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 showHomeLink={true}
               />
             )}
-            {/* <div className="flex h-full flex-row grow overflow-y-auto"></div> */}
-
-            {/* Left-most navigation side bar to access products */}
-            {/* Top Nav to access products from mobile */}
-            {!hideIconBar && <MobileNavigationBar />}
             <div className="flex h-full flex-row grow overflow-y-auto">
               {showProductMenu && productMenu && !(!hideHeader && IS_PLATFORM) && (
                 <MobileViewNav title={product} handleMobileMenu={handleMobileMenu} />
               )}
-
+              {/* Left-most navigation side bar to access products */}
               {!hideIconBar && <NavigationBar />}
               {/* Product menu bar */}
               <ResizablePanelGroup
@@ -194,6 +191,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                     order={1}
                     id="panel-left"
                     className={cn(
+                      'hidden md:flex',
                       'transition-all duration-[120ms]',
                       sideBarIsOpen
                         ? resizableSidebar
@@ -257,8 +255,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                         <ResizablePanel
                           id="panel-assistant"
                           className={cn(
-                            'bg absolute right-0 top-[48px] bottom-0 xl:relative xl:top-0',
-                            'min-w-[400px] max-w-[500px]',
+                            'bg fixed z-40 md:absolute right-0 top-0 md:top-[48px] bottom-0 xl:relative xl:top-0',
+                            'w-screen h-[100dvh] md:h-auto md:w-auto md:min-w-[400px] max-w-[500px]',
                             '2xl:min-w-[500px] 2xl:max-w-[600px]'
                           )}
                         >
