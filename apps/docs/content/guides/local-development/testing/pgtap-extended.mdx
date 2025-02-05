@@ -193,7 +193,7 @@ Here's a complete example using test helpers to verify RLS policies putting it a
 
 ```sql
 begin;
--- Assuming we already have our: 000-setup-tests-hooks.sql file we can use tests helpers
+-- Assuming 000-setup-tests-hooks.sql file is present to use tests helpers
 select plan(4);
 
 -- Set up test data
@@ -341,7 +341,7 @@ create table public.comments (
 
 #### 2. RLS policies declaration
 
-Now we want to setup the RLS policies for each of our tables:
+Now to setup the RLS policies for each of our tables:
 
 ```sql
 -- Create a private schema to store all security definer functions utils
@@ -457,7 +457,7 @@ create policy "Comments on published posts are viewable by everyone"
     and not is_deleted
   );
 
-Now we have everything we need, let's write our RLS test cases, note that each section could be in its own test:
+create policy "Authenticated users can create comments"
   on public.comments for insert with check ((select auth.uid()) = author_id);
 
 create policy "Users can update their own comments"
@@ -466,7 +466,7 @@ create policy "Users can update their own comments"
 
 #### 3. Test cases:
 
-Now we have everything we need, let's write our RLS test cases, note that each section could be in its own test:
+Now everything is setup, let's write our RLS test cases, note that each section could be in its own test:
 
 ```sql
 -- Assuming we already have our: 000-setup-tests-hooks.sql file we can use tests helpers
