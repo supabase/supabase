@@ -13,7 +13,7 @@ export type UserResetPasswordVariables = {
 export async function resetPassword({ projectRef, user }: UserResetPasswordVariables) {
   const { data, error } = await post('/platform/auth/{ref}/recover', {
     params: { path: { ref: projectRef } },
-    body: user,
+    body: { email: user.email },
   })
 
   if (error) handleError(error)
