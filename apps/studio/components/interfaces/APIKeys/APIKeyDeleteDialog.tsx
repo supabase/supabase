@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common/hooks'
 import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DropdownMenuItem } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
@@ -14,6 +16,8 @@ interface APIKeyDeleteDialogProps {
 export const APIKeyDeleteDialog = ({ apiKey }: APIKeyDeleteDialogProps) => {
   const { ref: projectRef } = useParams()
   const [isOpen, setIsOpen] = useState(false)
+
+  const canDeleteAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
 
   const { mutate: deleteAPIKey, isLoading: isDeletingAPIKey } = useAPIKeyDeleteMutation({
     onSuccess: () => {
@@ -26,8 +30,6 @@ export const APIKeyDeleteDialog = ({ apiKey }: APIKeyDeleteDialogProps) => {
     if (!projectRef) return console.error('Project ref is required')
     deleteAPIKey({ projectRef, id: apiKey.id })
   }
-
-  const canDeleteAPIKeys = true // todo
 
   return (
     <>
