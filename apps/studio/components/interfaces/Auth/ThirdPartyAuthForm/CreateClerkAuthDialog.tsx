@@ -22,6 +22,7 @@ import {
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { values } from 'mobx'
 
 interface CreateClerkAuthIntegrationProps {
   visible: boolean
@@ -33,25 +34,35 @@ interface CreateClerkAuthIntegrationProps {
 
 const FORM_ID = 'create-firebase-auth-integration-form'
 
-const FormSchemaProd = z.object({
-  enabled: z.boolean(),
-  domain: z
-    .string()
-    .regex(
-      /https:\/\/clerk([.][a-z0-9-]+){2,}\/?/,
-      'Production Clerk domains use HTTPS and start with the clerk subdomain (https://clerk.example.com)'
-    ),
-})
-
-const FormSchemaDev = z.object({
-  enabled: z.boolean(),
-  domain: z
-    .string()
-    .regex(
-      /https:\/\/[a-z0-9-]+[.]clerk[.]accounts[.]dev\/?$/,
-      'Development Clerk domains use HTTPS and end with .clerk.accounts.dev (https://example.clerk.accounts.dev)'
-    ),
-})
+const FormSchema = z
+  .object({
+    enabled: z.boolean(),
+    productionDomain: z.boolean().default(false),
+    domain: z.string(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.productionDomain) {
+      if (!val.domain.match(/https:\/\/clerk([.][a-z0-9-]+){2,}\/?/)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.invalid_string,
+          path: ['domain'],
+          message:
+            'Production Clerk domains use HTTPS and start with the clerk subdomain (https://clerk.example.com)',
+          validation: 'regex',
+        })
+      }
+    } else {
+      if (!val.domain.match(/https:\/\/[a-z0-9-]+[.]clerk[.]accounts[.]dev\/?$/)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.invalid_string,
+          path: ['domain'],
+          message:
+            'Development Clerk domains use HTTPS and end with .clerk.accounts.dev (https://example.clerk.accounts.dev)',
+          validation: 'regex',
+        })
+      }
+    }
+  })
 
 export const CreateClerkAuthIntegrationDialog = ({
   prod,
@@ -70,27 +81,21 @@ export const CreateClerkAuthIntegrationDialog = ({
     },
   })
 
-  const form = prod
-    ? useForm<z.infer<typeof FormSchemaProd>>({
-        resolver: zodResolver(FormSchemaProd),
-        defaultValues: {
-          enabled: true,
-          domain: '',
-        },
-      })
-    : useForm<z.infer<typeof FormSchemaDev>>({
-        resolver: zodResolver(FormSchemaDev),
-        defaultValues: {
-          enabled: true,
-          domain: '',
-        },
-      })
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      enabled: true,
+      domain: '',
+      productionDomain: prod,
+    },
+  })
 
   useEffect(() => {
     if (visible) {
       form.reset({
         enabled: true,
         domain: '',
+        productionDomain: prod,
       })
       // the form input doesn't exist when the form is reset
       setTimeout(() => {
@@ -99,9 +104,7 @@ export const CreateClerkAuthIntegrationDialog = ({
     }
   }, [visible])
 
-  const onSubmit: SubmitHandler<
-    z.infer<typeof FormSchemaProd> | z.infer<typeof FormSchemaDev>
-  > = async (values) => {
+  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     createAuthIntegration({
       projectRef: projectRef!,
       oidcIssuerUrl: values.domain,

@@ -63,7 +63,7 @@ export const getIntegrationTypeIcon = (type: INTEGRATION_TYPES) => {
       return `${BASE_PATH}/img/icons/cognito-icon.svg`
     case 'clerkDev':
     case 'clerkProd':
-      return `${BASE_PATH}/img/icons/clerk.svg`
+      return `${BASE_PATH}/img/icons/clerk-icon.svg`
 
     case 'custom':
     default:
