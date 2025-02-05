@@ -109,23 +109,22 @@ const Subscription = () => {
                     </ProjectUpdateDisabledTooltip>
                     {!canChangeTier &&
                       (projectUpdateDisabled ? (
-                        <Alert
+                        <Admonition
                           className="mt-2"
-                          withIcon
-                          variant="info"
+                          type="default"
                           title={`Unable to update plan from ${planName}`}
                         >
                           We have temporarily disabled project and subscription changes - our
                           engineers are working on a fix.
-                        </Alert>
+                        </Admonition>
                       ) : (
-                        <Alert
-                          withIcon
+                        <Admonition
                           className="mt-2"
-                          variant="info"
+                          type="default"
                           title={`Unable to update plan from ${planName}`}
-                          actions={[
-                            <div key="contact-support">
+                        >
+                          <p className='mb-2'>Please contact us if you'd like to change your plan.</p>
+                          <div key="contact-support">
                               <Button asChild type="default">
                                 <Link
                                   href={`/support/new?category=sales&subject=Change%20plan%20away%20from%20${planName}`}
@@ -133,11 +132,8 @@ const Subscription = () => {
                                   Contact support
                                 </Link>
                               </Button>
-                            </div>,
-                          ]}
-                        >
-                          Please contact us if you'd like to change your plan.
-                        </Alert>
+                            </div>
+                        </Admonition>
                       ))}
                   </div>
 
