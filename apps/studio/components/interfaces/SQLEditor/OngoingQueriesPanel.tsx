@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { RefreshCw, StopCircle } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
@@ -28,6 +28,7 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useParams } from 'common'
 
 interface OngoingQueriesPanel {
   onClose: () => void
@@ -35,6 +36,7 @@ interface OngoingQueriesPanel {
 
 export const OngoingQueriesPanel = () => {
   const [_, setParams] = useUrlState({ replace: true })
+  const { viewOngoingQueries } = useParams()
   const project = useSelectedProject()
   const state = useDatabaseSelectorStateSnapshot()
   const appState = useAppStateSnapshot()
@@ -61,6 +63,13 @@ export const OngoingQueriesPanel = () => {
     }
   )
   const queries = data ?? []
+
+  useEffect(() => {
+    if (viewOngoingQueries) {
+      appState.setOnGoingQueriesPanelOpen(true)
+      setParams({ viewOngoingQueries: undefined })
+    }
+  }, [viewOngoingQueries])
 
   const { mutate: abortQuery, isLoading } = useQueryAbortMutation({
     onSuccess: () => {

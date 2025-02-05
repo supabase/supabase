@@ -33,11 +33,7 @@ import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
 import { SearchList } from './SQLEditorNavV2/SearchList'
 import { getAppStateSnapshot } from 'state/app-state'
 
-interface SQLEditorMenuProps {
-  onViewOngoingQueries: () => void
-}
-
-export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
+export const SQLEditorMenu = () => {
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
