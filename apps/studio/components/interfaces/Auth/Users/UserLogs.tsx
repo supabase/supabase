@@ -101,7 +101,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
           />
         ) : (
           <div>
-            <div className="border border-b-0 rounded-t divide-y">
+            <div className="border border-b-0 rounded-t-md divide-y overflow-hidden">
               {authLogs.map((log) => {
                 const status = ((log.status ?? '-') as any).toString()
                 const is400 = status.startsWith('4')
