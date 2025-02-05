@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { RefreshCw } from 'lucide-react'
+import { ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 
@@ -12,6 +12,7 @@ import { Button, cn, CriticalIcon, Separator } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
 import { UserHeader } from './UserHeader'
 import { PANEL_PADDING } from './UserPanel'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface UserLogsProps {
   user: User
@@ -135,7 +136,20 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                         {status}
                       </div>
                     </div>
-                    <p className="text-xs text-foreground-light px-2 truncate">{`${log.path} | ${log.msg}`}</p>
+                    <p className="group relative flex items-center py-1.5 text-xs text-foreground-light px-2 truncate w-full">
+                      {`${log.path} | ${log.msg}`}
+
+                      <ButtonTooltip
+                        type="outline"
+                        asChild
+                        tooltip={{ content: { text: 'Open in logs' } }}
+                        className="px-1.5 absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition bg-background"
+                      >
+                        <Link href={`/project/${ref}/logs/auth-logs?log=${log.id}`}>
+                          <ExternalLink size="12" className="text-foreground-light" />
+                        </Link>
+                      </ButtonTooltip>
+                    </p>
                   </div>
                 )
               })}
