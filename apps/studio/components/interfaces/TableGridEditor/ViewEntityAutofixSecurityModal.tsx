@@ -40,7 +40,7 @@ export default function ViewEntityAutofixSecurityModal({
 
   function handleConfirm() {
     const sql = `
-	ALTER VIEW ${table.schema}.${table.name} SET (security_invoker = on);
+	ALTER VIEW "${table.schema}"."${table.name}" SET (security_invoker = on);
 	`
     execute({
       projectRef: project?.ref,
