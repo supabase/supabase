@@ -156,13 +156,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
         </div>
 
         {showSearch ? (
-          <SearchList
-            search={debouncedSearch}
-            onSelectSnippet={() => {
-              setSearch('')
-              setShowSearch(false)
-            }}
-          />
+          <SearchList search={debouncedSearch} />
         ) : (
           <>
             <div className="px-2">
