@@ -13,7 +13,8 @@ const ProjectSettings: NextPageWithLayout = () => {
     <ProductEmptyState title="Authentication settings have moved">
       <div className="text-sm">
         <p className="text-foreground-light mb-4">
-          We have moved all settings under configuration within the Authentication page.
+          All settings are now under configuration within the Authentication page. All other product
+          settings will follow in the coming weeks.
         </p>
         <Link
           href={`/project/${ref}/auth/providers`}
