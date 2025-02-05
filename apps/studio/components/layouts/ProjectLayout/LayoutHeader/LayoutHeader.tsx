@@ -25,7 +25,7 @@ import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
 
 const LayoutHeaderDivider = () => (
-  <span className="text-border-stronger pr-2">
+  <span className="text-border-stronger pr-0.5">
     <svg
       viewBox="0 0 24 24"
       width="16"
@@ -91,7 +91,11 @@ const LayoutHeader = ({
   return (
     <>
       <header className={cn('flex h-12 items-center flex-shrink-0 border-b')}>
-        <div className={cn('flex items-center justify-between py-2 pl-4 pr-3 flex-1')}>
+        <div
+          className={cn('flex items-center justify-between py-2 pl-5 pr-3 flex-1', {
+            'pl-3': !projectRef,
+          })}
+        >
           {hasProductMenu && (
             <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
               <button
@@ -107,21 +111,23 @@ const LayoutHeader = ({
             </div>
           )}
           <div className="flex items-center text-sm">
-            <Link
-              href={IS_PLATFORM ? `/projects` : `/project/${projectRef}`}
-              className="flex items-center justify-center"
-            >
-              <Image
-                alt="Supabase"
-                src={`${router.basePath}/img/supabase-logo.svg`}
-                width={18}
-                height={18}
-                className="w-[18px] h-[18px]"
-              />
-            </Link>
+            {projectRef && (
+              <Link
+                href={IS_PLATFORM ? `/projects` : `/project/${projectRef}`}
+                className="flex items-center justify-center"
+              >
+                <Image
+                  alt="Supabase"
+                  src={`${router.basePath}/img/supabase-logo.svg`}
+                  width={18}
+                  height={18}
+                  className="w-[18px] h-[18px]"
+                />
+              </Link>
+            )}
 
             <>
-              <div className="flex items-center pl-2">
+              <div className={cn('flex items-center pl-2', { 'pl-0': !projectRef })}>
                 {showOrgSelection && (
                   <>
                     <LayoutHeaderDivider />
