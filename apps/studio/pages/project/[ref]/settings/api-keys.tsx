@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 
 import LegacyAPIKeys from 'components/interfaces/APIKeys/LegacyAPIKeys'
 import { PublishableAPIKeys } from 'components/interfaces/APIKeys/PublishableAPIKeys'
@@ -12,7 +13,11 @@ import type { NextPageWithLayout } from 'types'
 import { Separator } from 'ui'
 
 const ApiKeysSettings: NextPageWithLayout = () => {
-  const [apiKeysView] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.API_KEYS_VIEW, undefined)
+  const { ref: projectRef } = useParams()
+  const [apiKeysView] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.API_KEYS_VIEW(projectRef ?? ''),
+    undefined
+  )
 
   // const isPermissionsLoaded = usePermissionsLoaded()
   // TODO: check if these permissions cover third party auth as well

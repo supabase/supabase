@@ -17,10 +17,12 @@ import {
 } from 'ui'
 
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useParams } from 'common'
 
 const ApiKeysLayout = ({ children }: PropsWithChildren) => {
+  const { ref: projectRef } = useParams()
   const [apiKeysView, setApiKeysViewState] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.API_KEYS_VIEW,
+    LOCAL_STORAGE_KEYS.API_KEYS_VIEW(projectRef ?? ''),
     'new-keys'
   )
 
