@@ -11,7 +11,7 @@ tocVideo: 'agFsGDJxjwA'
 
 While you may be able to store simple lat/long geographic coordinates as a set of decimals, it does not scale very well when you try to query through a large data set. PostGIS comes with special data types that are efficient, and indexable for high scalability.
 
-The additional data types that PostGIS provides include [Point](https://postgis.net/docs/using_postgis_dbmanagement.html#Point), [Polygon](https://postgis.net/docs/using_postgis_dbmanagement.html#Polygon), [Linestring](https://postgis.net/docs/using_postgis_dbmanagement.html#LineString), and many more to represent different types of geographical data. In this guide, we will mainly focus on how to interact with `Point` type, which represents a single set of latitude and longitude. If you are interested in digging deeper, you can learn more about different data types on the [data management section of PostGIS docs](https://postgis.net/docs/using_postgis_dbmanagement.html).
+The additional data types that PostGIS provides include [Point](https://postgis.net/docs/using_postgis_dbmanagement.html#Point), [Polygon](https://postgis.net/docs/using_postgis_dbmanagement.html#Polygon), [LineString](https://postgis.net/docs/using_postgis_dbmanagement.html#LineString), and many more to represent different types of geographical data. In this guide, we will mainly focus on how to interact with `Point` type, which represents a single set of latitude and longitude. If you are interested in digging deeper, you can learn more about different data types on the [data management section of PostGIS docs](https://postgis.net/docs/using_postgis_dbmanagement.html).
 
 ## Enable the extension
 
@@ -28,7 +28,7 @@ You can get started with PostGIS by enabling the PostGIS extension in your Supab
 
 1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
-3. Search for "postgis" and enable the extension.
+3. Search for `postgis` and enable the extension.
 4. In the confirmation prompt select "Create a new schema" and name it `gis` for example.
 
 </TabPanel>
@@ -85,11 +85,15 @@ You can insert geographical data through SQL or through our API.
 
 <h4>Restaurants</h4>
 
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
 | id  | name        | location                         |
 | --- | ----------- | -------------------------------- |
 | 1   | Supa Burger | lat: 40.807416, long: -73.946823 |
 | 2   | Supa Pizza  | lat: 40.807475, long: -73.94581  |
 | 3   | Supa Taco   | lat: 40.80629, long: -73.945826  |
+
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -203,15 +207,22 @@ Sorting datasets from closest to farthest, sometimes called nearest-neighbor sor
 ```sql
 create or replace function nearby_restaurants(lat float, long float)
 returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE, lat float, long float, dist_meters float)
+set search_path = ''
 language sql
 as $$
-  select id, name, st_y(location::geometry) as lat, st_x(location::geometry) as long, st_distance(location, st_point(long, lat)::geography) as dist_meters
+  select id, name, gis.st_y(location::gis.geometry) as lat, gis.st_x(location::gis.geometry) as long, gis.st_distance(location, gis.st_point(long, lat)::gis.geography) as dist_meters
   from public.restaurants
-  order by location <-> st_point(long, lat)::geography;
+  order by location operator(gis.<->) gis.st_point(long, lat)::gis.geography;
 $$;
 ```
 
-You can call this function from your client using `rpc()` like this:
+Before being able to call this function from our client we need to grant access to our `gis` schema:
+
+```sql
+grant usage on schema gis to anon, authenticated;
+```
+
+Now you can call this function from your client using `rpc()` like this:
 
 <Tabs
   scrollable
@@ -321,11 +332,12 @@ When you are working on a map-based application where the user scrolls through y
 ```sql
 create or replace function restaurants_in_view(min_lat float, min_long float, max_lat float, max_long float)
 returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE, lat float, long float)
+set search_path to ''
 language sql
 as $$
-	select id, name, st_y(location::geometry) as lat, st_x(location::geometry) as long
+	select id, name, gis.st_y(location::gis.geometry) as lat, gis.st_x(location::gis.geometry) as long
 	from public.restaurants
-	where location && ST_SetSRID(ST_MakeBox2D(ST_Point(min_long, min_lat), ST_Point(max_long, max_lat)), 4326)
+	where location operator(gis.&&) gis.ST_SetSRID(gis.ST_MakeBox2D(gis.ST_Point(min_long, min_lat), gis.ST_Point(max_long, max_lat)), 4326)
 $$;
 ```
 
@@ -430,7 +442,7 @@ The [official PostGIS documentation](https://postgis.net/documentation/tips/tip-
 
 </Admonition>
 
-As of PostGIS 2.3 or newer, the PostGIS extension is no longer relocatable from one schema to another. If you need to move it from one schema to another for any reason (Eg. from the public schema to the extensions schema for security reasons), you would normally run a ALTER EXTENSION to relocate the schema. However, you will now to do the following steps:
+As of PostGIS 2.3 or newer, the PostGIS extension is no longer relocatable from one schema to another. If you need to move it from one schema to another for any reason (e.g. from the public schema to the extensions schema for security reasons), you would normally run a ALTER EXTENSION to relocate the schema. However, you will now to do the following steps:
 
 1. Backup your Database to prevent data loss - You can do this through the [CLI](https://supabase.com/docs/reference/cli/supabase-db-dump) or Postgres backup tools such as [pg_dumpall](https://www.postgresql.org/docs/current/backup-dump.html#BACKUP-DUMP-ALL)
 

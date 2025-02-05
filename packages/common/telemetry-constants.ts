@@ -50,8 +50,7 @@ export enum TelemetryActions {
   HOMEPAGE_HERO_REQUEST_DEMO_CLICKED = 'homepage_hero_request_demo_clicked',
   HOMEPAGE_FRAMEWORK_QUICKSTART_CLICKED = 'homepage_framework_quickstart_clicked',
   HOMEPAGE_PRODUCT_CARD_CLICKED = 'homepage_product_card_clicked',
-  PRICING_PLAN_CTA_CLICKED = 'pricing_plan_cta_clicked',
-  PRICING_COMPARISON_PLAN_CLICKED = 'pricing_comparison_plan_clicked',
+  WWW_PRICING_PLAN_CTA_CLICKED = 'www_pricing_plan_cta_clicked',
   EVENT_PAGE_CTA_CLICKED = 'event_page_cta_clicked',
   HOMEPAGE_GITHUB_BUTTON_CLICKED = 'homepage_github_button_clicked',
   HOMEPAGE_GITHUB_DISCUSSIONS_BUTTON_CLICKED = 'homepage_github_discussions_button_clicked',
@@ -63,6 +62,14 @@ export enum TelemetryActions {
   SEE_DOCUMENTATION_BUTTON_CLICKED = 'see_documentation_button_clicked',
   REQUEST_DEMO_BUTTON_CLICKED = 'request_demo_button_clicked',
   SIGN_IN_BUTTON_CLICKED = 'sign_in_button_clicked',
+
+  HELP_BUTTON_CLICKED = 'help_button_clicked',
+  SEND_FEEDBACK_BUTTON_CLICKED = 'send_feedback_button_clicked',
+  EXAMPLE_PROJECT_CARD_CLICKED = 'example_project_card_clicked',
+  IMPORT_DATA_BUTTON_CLICKED = 'import_data_button_clicked',
+  IMPORT_DATA_ADDED = 'import_data_added',
+  SQL_EDITOR_QUERY_RUN_BUTTON_CLICKED = 'sql_editor_query_run_button_clicked',
+  STUDIO_PRICING_PLAN_CTA_CLICKED = 'studio_pricing_plan_cta_clicked',
 }
 
 /**
@@ -734,14 +741,14 @@ export interface HomepageProductCardClickedEvent {
 }
 
 /**
- * User clicked the green button on a plan in the pricing page.
+ * User clicked on the CTA button on a plan in the pricing page.
  *
  * @group Events
  * @source www
  * @page /pricing
  */
-export interface PricingPlanCtaClickedEvent {
-  action: TelemetryActions.PRICING_PLAN_CTA_CLICKED
+export interface WwwPricingPlanCtaClickedEvent {
+  action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED
   properties: {
     /**
      * The plan type that was clicked.
@@ -758,24 +765,6 @@ export interface PricingPlanCtaClickedEvent {
      */
     section: 'main' | 'comparison_table'
     tableMode?: 'mobile' | 'desktop'
-  }
-}
-
-/**
- * User clicked the plan in the pricing comparison section.
- *
- * @group Events
- * @source www
- * @page /pricing
- */
-export interface PricingComparisonPlanClickedEvent {
-  action: TelemetryActions.PRICING_COMPARISON_PLAN_CLICKED
-  properties: {
-    category: 'pricing_comparison'
-    /**
-     * The plan type that was clicked.
-     */
-    plan: 'free' | 'pro' | 'team' | 'enterprise'
   }
 }
 
@@ -946,6 +935,130 @@ export interface SignInButtonClickedEvent {
   }
 }
 
+/**
+ * User clicked the "Help" button in the top right corner of the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HelpButtonClickedEvent {
+  action: TelemetryActions.HELP_BUTTON_CLICKED
+  groups: {
+    project?: string
+    organization?: string
+  }
+}
+
+/**
+ * User clicked the "Send Feedback" button in the top right corner of the page header.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface SendFeedbackButtonClickedEvent {
+  action: TelemetryActions.SEND_FEEDBACK_BUTTON_CLICKED
+  groups: {
+    project?: string
+    organization?: string
+  }
+}
+
+/**
+ * User clicked on an example project card.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface ExampleProjectCardClickedEvent {
+  action: TelemetryActions.EXAMPLE_PROJECT_CARD_CLICKED
+  properties: {
+    /**
+     * The title of the example project card clicked.
+     */
+    cardTitle: string
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User clicked the "Import Data" button.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface ImportDataButtonClickedEvent {
+  action: TelemetryActions.IMPORT_DATA_BUTTON_CLICKED
+  properties: {
+    /**
+     * The type of table the data is imported to.
+     * New Table means added when creating new table by clicking from New table sidebar,
+     * Existing Table means added to an existing table by going to the table and clicking from the green Insert button..
+     */
+    tableType: 'New Table' | 'Existing Table'
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User added data from the import data via CSV/spreadsheet successfully.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface ImportDataAddedEvent {
+  action: TelemetryActions.IMPORT_DATA_ADDED
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User clicked the run query button in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorQueryRunButtonClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_QUERY_RUN_BUTTON_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User clicked on the CTA button on a plan in the pricing side panel in studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingPlanCtaClickedEvent {
+  action: TelemetryActions.STUDIO_PRICING_PLAN_CTA_CLICKED
+  properties: {
+    /**
+     * The plan type that was clicked.
+     */
+    selectedPlan: string
+    /**
+     * The plan type the org is currently on.
+     */
+    currentPlan?: string
+  }
+  groups: { organization: string }
+}
+
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
@@ -985,8 +1098,7 @@ export type TelemetryEvent =
   | HomepageHeroRequestDemoClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
-  | PricingPlanCtaClickedEvent
-  | PricingComparisonPlanClickedEvent
+  | WwwPricingPlanCtaClickedEvent
   | EventPageCtaClickedEvent
   | HomepageGitHubButtonClickedEvent
   | HomepageGitHubDiscussionsButtonClickedEvent
@@ -1000,3 +1112,10 @@ export type TelemetryEvent =
   | SeeDocumentationButtonClickedEvent
   | RequestDemoButtonClickedEvent
   | SignInButtonClickedEvent
+  | HelpButtonClickedEvent
+  | ExampleProjectCardClickedEvent
+  | ImportDataButtonClickedEvent
+  | ImportDataAddedEvent
+  | SendFeedbackButtonClickedEvent
+  | SqlEditorQueryRunButtonClickedEvent
+  | StudioPricingPlanCtaClickedEvent

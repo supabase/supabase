@@ -1,6 +1,6 @@
 ---
-title: 'Use Supabase with NuxtJS'
-subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a NuxtJS app.'
+title: 'Use Supabase with Nuxt'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Nuxt app.'
 breadcrumb: 'Framework Quickstarts'
 hideToc: true
 ---
@@ -8,16 +8,16 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    
+
     <QuickstartDbSetup />
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={2}>
 
-    <StepHikeCompact.Details title="Create a NuxtJS app">
+    <StepHikeCompact.Details title="Create a Nuxt app">
 
-    Create a Nuxt.js app using the `npx nuxi` command.
+    Create a Nuxt app using the `npx nuxi` command.
 
     </StepHikeCompact.Details>
 
@@ -34,9 +34,9 @@ hideToc: true
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Install the Supabase client library">
 
-      The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a NuxtJS app.
+      The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a Nuxt app.
 
-      Navigate to the NuxtJS app and install `supabase-js`.
+      Navigate to the Nuxt app and install `supabase-js`.
 
     </StepHikeCompact.Details>
 
@@ -68,21 +68,21 @@ hideToc: true
       <script setup>
       import { createClient } from '@supabase/supabase-js'
       const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
-      const countries = ref([])
+      const instruments = ref([])
 
-      async function getCountries() {
-        const { data } = await supabase.from('countries').select()
-        countries.value = data
+      async function getInstruments() {
+        const { data } = await supabase.from('instruments').select()
+        instruments.value = data
       }
 
       onMounted(() => {
-        getCountries()
+        getInstruments()
       })
       </script>
 
       <template>
         <ul>
-          <li v-for="country in countries" :key="country.id">{{ country.name }}</li>
+          <li v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
         </ul>
       </template>
       ```
@@ -94,7 +94,7 @@ hideToc: true
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Start the app">
 
-    Start the app, navigate to http://localhost:3000 in the browser, open the browser console, and you should see the list of countries.
+    Start the app, navigate to http://localhost:3000 in the browser, open the browser console, and you should see the list of instruments.
 
     </StepHikeCompact.Details>
 

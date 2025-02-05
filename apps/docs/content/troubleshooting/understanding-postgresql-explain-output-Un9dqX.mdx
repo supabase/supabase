@@ -142,7 +142,7 @@ On top of that, you have to multiply the cost and the time with the number of â€
 | **Index Only Scan**   | Retrieves all needed data from the index itself, without visiting the table. |
 | **Bitmap Heap Scan**  | Uses a bitmap of row locations to efficiently retrieve rows from the table.  |
 | **Bitmap Index Scan** | Builds a bitmap by scanning the index to efficiently locate rows.            |
-| **Tid Scan**          | Fetches rows directly using tuple identifiers, used in sub-selects.          |
+| **`Tid` Scan**        | Fetches rows directly using tuple identifiers, used in sub-selects.          |
 | **Nested Loop**       | Joins two tables by scanning the first and then the second for each row.     |
 | **Merge Join**        | Joins two pre-sorted tables, efficient for large datasets.                   |
 | **Hash Join**         | Uses a hash table to perform joins, often faster for larger datasets.        |

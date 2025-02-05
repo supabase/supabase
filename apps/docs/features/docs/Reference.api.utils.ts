@@ -32,6 +32,7 @@ export type ISchema =
   | ISchemaEnum
   | ISchemaBoolean
   | ISchemaNumber
+  | ISchemaFile
   | ISchemaArray
   | ISchemaAllOf
   | ISchemaAnyOf
@@ -65,6 +66,11 @@ interface ISchemaString extends ISchemaBase {
   minLength?: number
   maxLength?: number
   pattern?: string
+}
+
+interface ISchemaFile extends ISchemaBase {
+  type: 'file'
+  format?: 'binary'
 }
 
 interface ISchemaObject extends ISchemaBase {
@@ -164,6 +170,10 @@ export function getTypeDisplayFromSchema(schema: ISchema) {
   } else if (schema.type === 'string') {
     return {
       displayName: 'string',
+    }
+  } else if (schema.type === 'file') {
+    return {
+      displayName: 'file',
     }
   } else if (schema.type === 'array') {
     return {

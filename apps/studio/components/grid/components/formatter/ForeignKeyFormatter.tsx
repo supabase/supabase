@@ -7,22 +7,19 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
 import type { SupaRow } from '../../types'
 import { NullValue } from '../common/NullValue'
 import { ReferenceRecordPeek } from './ReferenceRecordPeek'
 
 interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
-  projectRef?: string
   tableId?: string
 }
 
 export const ForeignKeyFormatter = (props: Props) => {
   const { project } = useProjectContext()
-  const { selectedSchema } = useQuerySchemaState()
 
-  const { projectRef, tableId, row, column } = props
+  const { tableId, row, column } = props
   const id = tableId ? Number(tableId) : undefined
 
   const { data } = useTableEditorQuery({
@@ -68,7 +65,7 @@ export const ForeignKeyFormatter = (props: Props) => {
               tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
             />
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ align="end" className="p-0 w-96">
+          <PopoverContent_Shadcn_ portal align="end" className="p-0 w-96">
             <ReferenceRecordPeek
               table={targetTable}
               column={relationship.target_column_name}
