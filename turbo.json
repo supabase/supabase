@@ -110,7 +110,12 @@
         "HUBSPOT_ENTERPRISE_FORM_GUID",
         "OPENAI_API_KEY",
         "EMAIL_REPORT_SLACK_WEBHOOK",
-        "npm_lifecycle_event"
+        "npm_lifecycle_event",
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY",
+        "FORCE_ASSET_CDN",
+        "ASSET_CDN_S3_ENDPOINT",
+        "SITE_NAME"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
