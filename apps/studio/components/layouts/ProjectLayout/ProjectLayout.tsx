@@ -160,7 +160,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                   )}
                 >
                   {sideBarIsOpen && (
-                    <AnimatePresence>
+                    <AnimatePresence initial={false}>
                       <motion.div
                         initial={{ width: 0, opacity: 0, height: '100%' }}
                         animate={{ width: 'auto', opacity: 1, height: '100%' }}
