@@ -15,6 +15,7 @@ export const generateSettingsMenu = (
     storage?: boolean
     invoices?: boolean
     diskAndCompute?: boolean
+    newApiKeys?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -59,6 +60,17 @@ export const generateSettingsMenu = (
                 url: `/project/${ref}/settings/integrations`,
                 items: [],
               },
+              ...(features?.newApiKeys
+                ? [
+                    {
+                      name: 'API Keys',
+                      key: 'api-keys',
+                      url: `/project/${ref}/settings/api-keys`,
+                      items: [],
+                      label: 'NEW',
+                    },
+                  ]
+                : []),
             ]
           : []),
         {
@@ -87,7 +99,7 @@ export const generateSettingsMenu = (
           items: [],
         },
         {
-          name: 'API',
+          name: 'Data API',
           key: 'api',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
           items: [],
