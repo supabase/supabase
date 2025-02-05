@@ -29,8 +29,8 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface OngoingQueriesPanel {
-  visible: boolean
-  onClose: () => void
+  visible?: boolean
+  onClose?: () => void
 }
 
 export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) => {
