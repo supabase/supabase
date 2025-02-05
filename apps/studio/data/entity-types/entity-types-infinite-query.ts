@@ -2,6 +2,13 @@ import { QueryClient, useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstac
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
 import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
+import {
+  getRecentItemsStore,
+  RecentItem,
+  removeRecentItem,
+  removeRecentItems,
+} from 'state/recent-items'
+import { getTabsStore, removeTabs } from 'state/tabs'
 
 export type EntityTypesVariables = {
   projectRef?: string
@@ -109,6 +116,70 @@ export async function getEntityTypes(
     },
     signal
   )
+
+  /**
+   * START localstorage state cleanup
+   **/
+
+  // all entities returned in ID format of state localstorage
+  // ie: [type]-[schema]-[id]: string
+  const entitiesById: string[] = result[0].data.entities.map((x: Entity) => {
+    const id = `${x.type}-${x.schema}-${x.name}`
+    return id
+  })
+
+  // handle recent-items
+  // recent items store
+  const recentItemsStore = getRecentItemsStore(projectRef)
+
+  // items in recent-items store that match response
+  const recentItemsFilteredToSchemas: string[] = []
+  for (const schema of schemas) {
+    recentItemsFilteredToSchemas.push(
+      ...recentItemsStore?.items
+        ?.filter((x: RecentItem) => x.metadata?.schema === schema)
+        .map((x) => x.id)
+    )
+  }
+
+  // find recent items that are no longer in request response
+  const recentItemsToRemove = [
+    ...recentItemsFilteredToSchemas.filter((entityId) => {
+      return !entitiesById.includes(entityId)
+    }),
+  ]
+
+  // // perform recent items cleanup
+  removeRecentItems(projectRef, recentItemsToRemove)
+
+  // // handle tabs
+  // // tabs store
+  const tabsStore = getTabsStore(projectRef)
+
+  // // find all tabs that match schemas in this react query
+  const tabsFilteredToSchemas: string[] = []
+  for (const schema of schemas) {
+    tabsFilteredToSchemas.push(
+      ...tabsStore?.openTabs?.filter((tabId) => {
+        const tab = tabsStore.tabsMap[tabId]
+        return tab.metadata?.schema === schema
+      })
+    )
+  }
+
+  // // find tabs to remove that are no longer in request response
+  const tabsToRemove = [
+    ...tabsFilteredToSchemas.filter((entityId) => {
+      return !entitiesById.includes(entityId)
+    }),
+  ]
+
+  // // perform tabs cleanup
+  removeTabs(projectRef, tabsToRemove)
+
+  /**
+   * END localstorage state cleanup
+   **/
 
   return result[0] as EntityTypesResponse
 }

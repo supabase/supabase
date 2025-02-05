@@ -2,6 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
+import { createTabId, removeTabs } from 'state/tabs'
 import type { ResponseError } from 'types'
 import { contentKeys } from './keys'
 
@@ -42,6 +43,13 @@ export const useContentDeleteMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
+
+        // Update Tabs state
+        // currently unknown how to differentiate between sql and non-sql content
+        // so we're just deleting all tabs for with matching IDs
+        const tabIds = data.map((id) => createTabId('sql', { id }))
+        removeTabs(projectRef, tabIds)
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

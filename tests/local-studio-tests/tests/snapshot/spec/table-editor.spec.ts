@@ -23,6 +23,7 @@ test.describe('Table Editor page', () => {
 
     // The page has been loaded with the table data, we can now interact with the page
     await page.getByRole('button', { name: 'New table', exact: true }).click()
+
     await page.getByTestId('table-name-input').waitFor({ state: 'visible' })
     await page.getByTestId('table-name-input').click()
     await page.getByTestId('table-name-input').fill(tableName)
@@ -85,7 +86,7 @@ test.describe('Table Editor page', () => {
     await expect(page.locator('div.rdg-row:nth-child(2)')).toContainText('2')
     await expect(page.locator('div.rdg-row:nth-child(3)')).toContainText('100')
     // remove the sorting
-    await page.getByRole('button', { name: 'Sorted by 1 rule' }).click()
+    await page.getByTestId('table-editor-sort-button').click()
     await page.getByRole('dialog').getByRole('button').nth(1).click()
 
     // filter by a column
@@ -108,7 +109,7 @@ test.describe('Table Editor page', () => {
       { timeout: 0 }
     )
 
-    await page.getByRole('button', { name: 'schema: public' }).click()
+    await page.getByTestId('schema-selector').click()
     await page.getByRole('option', { name: 'auth' }).click()
 
     // wait for the table data to load for the auth schema

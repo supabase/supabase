@@ -28,6 +28,7 @@ export async function getTables(
   }: TablesVariables,
   signal?: AbortSignal
 ) {
+  console.log('RAN TABLES REQUEST')
   if (!projectRef) {
     throw new Error('projectRef is required')
   }
@@ -59,6 +60,7 @@ export async function getTables(
   if (Array.isArray(data) && sortByProperty) {
     return sortBy(data, (t) => t[sortByProperty]) as PostgresTable[]
   }
+
   return data as Omit<PostgresTable, 'columns'>[]
 }
 

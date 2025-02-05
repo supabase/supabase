@@ -14,7 +14,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useSignOut } from 'lib/auth'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -97,6 +97,8 @@ export const NavContent = () => {
   const setCommandMenuOpen = useSetCommandMenuOpen()
   const snap = useAppStateSnapshot()
 
+  const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewTabsSqlEditor')
+
   const signOut = useSignOut()
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
@@ -129,7 +131,9 @@ export const NavContent = () => {
   const errorLints = securityLints.filter((lint) => lint.level === 'ERROR')
 
   const activeRoute = router.pathname.split('/')[3]
-  const toolRoutes = generateToolRoutes(projectRef, project)
+  const toolRoutes = generateToolRoutes(projectRef, project, {
+    sqlEditorTabs: isFeaturePreviewTabsSqlEditorFlag,
+  })
   const productRoutes = generateProductRoutes(projectRef, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
@@ -231,17 +235,6 @@ export const NavContent = () => {
   return (
     <>
       <ul className="flex flex-col gap-y-1 justify-start px-2 relative">
-        <Link
-          href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
-          className="mx-2 hidden md:flex items-center w-[40px] h-[40px]"
-          onClick={onCloseNavigationIconLink}
-        >
-          <img
-            alt="Supabase"
-            src={`${router.basePath}/img/supabase-logo.svg`}
-            className="absolute h-[40px] w-6 cursor-pointer rounded"
-          />
-        </Link>
         <NavigationIconLink
           isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
           route={{

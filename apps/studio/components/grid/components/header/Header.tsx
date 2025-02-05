@@ -77,7 +77,7 @@ const Header = ({
 
   return (
     <div>
-      <div className="flex h-10 items-center justify-between bg-dash-sidebar px-1.5 py-1.5 gap-2 overflow-x-auto">
+      <div className="flex h-10 items-center justify-between bg-dash-sidebar dark:bg-surface-100 px-1.5 py-1.5 gap-2 overflow-x-auto ">
         {customHeader ? (
           <>{customHeader}</>
         ) : (

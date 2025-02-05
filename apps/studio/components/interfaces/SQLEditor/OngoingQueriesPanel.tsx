@@ -27,16 +27,18 @@ import {
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useAppStateSnapshot } from 'state/app-state'
 
 interface OngoingQueriesPanel {
   visible: boolean
   onClose: () => void
 }
 
-export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) => {
+export const OngoingQueriesPanel = () => {
   const [_, setParams] = useUrlState({ replace: true })
   const project = useSelectedProject()
   const state = useDatabaseSelectorStateSnapshot()
+  const appState = useAppStateSnapshot()
   const [selectedId, setSelectedId] = useState<number>()
 
   const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
@@ -70,12 +72,12 @@ export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) =
 
   const closePanel = () => {
     setParams({ viewOngoingQueries: undefined })
-    onClose()
+    appState.setOnGoingQueriesPanelOpen(false)
   }
 
   return (
     <>
-      <Sheet open={visible} onOpenChange={() => closePanel()}>
+      <Sheet open={appState.ongoingQueriesPanelOpen} onOpenChange={() => closePanel()}>
         <SheetContent size="lg">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-x-2">
