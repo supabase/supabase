@@ -21,102 +21,102 @@ This example demonstrates setting up and testing RLS policies for a simple todo 
 
 1. Create a test table with RLS enabled:
 
-	```sql
-	-- Create a simple todos table
-	create table todos (
-	id uuid primary key default gen_random_uuid(),
-	task text not null,
-	user_id uuid references auth.users not null,
-	completed boolean default false
-	);
+   ```sql
+   -- Create a simple todos table
+   create table todos (
+   id uuid primary key default gen_random_uuid(),
+   task text not null,
+   user_id uuid references auth.users not null,
+   completed boolean default false
+   );
 
-	-- Enable RLS
-	alter table todos enable row level security;
+   -- Enable RLS
+   alter table todos enable row level security;
 
-	-- Create a policy
-	create policy "Users can only access their own todos"
-	on todos for all -- this policy applies to all operations
-	to authenticated
-	using ((select auth.uid()) = user_id);
-	```
+   -- Create a policy
+   create policy "Users can only access their own todos"
+   on todos for all -- this policy applies to all operations
+   to authenticated
+   using ((select auth.uid()) = user_id);
+   ```
 
 2. Set up your testing environment:
 
-	```bash
-	# Create a new test for our policies using supabase cli
-	supabase test new todos_rls.test
-	```
+   ```bash
+   # Create a new test for our policies using supabase cli
+   supabase test new todos_rls.test
+   ```
 
 3. Write your RLS tests:
 
-	```sql
-	begin;
-	-- install tests utilities
-	-- install pgtap extension for testing
-	create extension if not exists pgtap with schema extensions;
-	-- Start declare we'll have 6 test cases in our test suite
-	select plan(4);
+   ```sql
+   begin;
+   -- install tests utilities
+   -- install pgtap extension for testing
+   create extension if not exists pgtap with schema extensions;
+   -- Start declare we'll have 6 test cases in our test suite
+   select plan(4);
 
-	-- Setup our testing data
-	-- Set up auth.users entries
-	insert into auth.users (id, email) values
-		('123e4567-e89b-12d3-a456-426614174000', 'user1@test.com'),
-		('987fcdeb-51a2-43d7-9012-345678901234', 'user2@test.com');
+   -- Setup our testing data
+   -- Set up auth.users entries
+   insert into auth.users (id, email) values
+   	('123e4567-e89b-12d3-a456-426614174000', 'user1@test.com'),
+   	('987fcdeb-51a2-43d7-9012-345678901234', 'user2@test.com');
 
-	-- Create test todos
-	insert into public.todos (task, user_id) values
-		('User 1 Task 1', '123e4567-e89b-12d3-a456-426614174000'),
-		('User 1 Task 2', '123e4567-e89b-12d3-a456-426614174000'),
-		('User 2 Task 1', '987fcdeb-51a2-43d7-9012-345678901234');
+   -- Create test todos
+   insert into public.todos (task, user_id) values
+   	('User 1 Task 1', '123e4567-e89b-12d3-a456-426614174000'),
+   	('User 1 Task 2', '123e4567-e89b-12d3-a456-426614174000'),
+   	('User 2 Task 1', '987fcdeb-51a2-43d7-9012-345678901234');
 
-	-- as User 1
-	set local role authenticated;
-	set local request.jwt.claim.sub = '123e4567-e89b-12d3-a456-426614174000';
+   -- as User 1
+   set local role authenticated;
+   set local request.jwt.claim.sub = '123e4567-e89b-12d3-a456-426614174000';
 
-	-- Test 1: User 1 should only see their own todos
-	select results_eq(
-		'select count(*) from todos',
-		ARRAY[2::bigint],
-		'User 1 should only see their 2 todos'
-	);
+   -- Test 1: User 1 should only see their own todos
+   select results_eq(
+   	'select count(*) from todos',
+   	ARRAY[2::bigint],
+   	'User 1 should only see their 2 todos'
+   );
 
-	-- Test 2: User 1 can create their own todo
-	select lives_ok(
-		$$insert into todos (task, user_id) values ('New Task', '123e4567-e89b-12d3-a456-426614174000'::uuid)$$,
-		'User 1 can create their own todo'
-	);
+   -- Test 2: User 1 can create their own todo
+   select lives_ok(
+   	$$insert into todos (task, user_id) values ('New Task', '123e4567-e89b-12d3-a456-426614174000'::uuid)$$,
+   	'User 1 can create their own todo'
+   );
 
-	-- as User 2
-	set local request.jwt.claim.sub = '987fcdeb-51a2-43d7-9012-345678901234';
+   -- as User 2
+   set local request.jwt.claim.sub = '987fcdeb-51a2-43d7-9012-345678901234';
 
-	-- Test 3: User 2 should only see their own todos
-	select results_eq(
-		'select count(*) from todos',
-		ARRAY[1::bigint],
-		'User 2 should only see their 1 todo'
-	);
+   -- Test 3: User 2 should only see their own todos
+   select results_eq(
+   	'select count(*) from todos',
+   	ARRAY[1::bigint],
+   	'User 2 should only see their 1 todo'
+   );
 
-	-- Test 4: User 2 cannot modify User 1's todo
-	SELECT results_ne(
-		$$ update todos set task = 'Hacked!' where user_id = '123e4567-e89b-12d3-a456-426614174000'::uuid returning 1 $$,
-		$$ values(1) $$,
-		'User 2 cannot modify User 1 todos'
-	);
+   -- Test 4: User 2 cannot modify User 1's todo
+   SELECT results_ne(
+   	$$ update todos set task = 'Hacked!' where user_id = '123e4567-e89b-12d3-a456-426614174000'::uuid returning 1 $$,
+   	$$ values(1) $$,
+   	'User 2 cannot modify User 1 todos'
+   );
 
-	select * from finish();
-	rollback;
-	```
+   select * from finish();
+   rollback;
+   ```
 
 4. Run the tests:
 
-	```bash
-	supabase test db
-	psql:todos_rls.test.sql:4: NOTICE:  extension "pgtap" already exists, skipping
-	./todos_rls.test.sql .. ok
-	All tests successful.
-	Files=1, Tests=6,  0 wallclock secs ( 0.01 usr +  0.00 sys =  0.01 CPU)
-	Result: PASS
-	```
+   ```bash
+   supabase test db
+   psql:todos_rls.test.sql:4: NOTICE:  extension "pgtap" already exists, skipping
+   ./todos_rls.test.sql .. ok
+   All tests successful.
+   Files=1, Tests=6,  0 wallclock secs ( 0.01 usr +  0.00 sys =  0.01 CPU)
+   Result: PASS
+   ```
 
 ### Application-Level testing
 
