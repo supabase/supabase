@@ -50,7 +50,8 @@ export const ForeignKeyFormatter = (props: Props) => {
   )
 
   const value = row[column.key]
-  const formattedValue = foreignKeyColumn?.format === 'bytea' ? convertByteaToHex(value) : value
+  const formattedValue =
+    foreignKeyColumn?.format === 'bytea' && !!value ? convertByteaToHex(value) : value
 
   return (
     <div className="sb-grid-foreign-key-formatter flex justify-between">
