@@ -91,7 +91,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
   ) => {
     const router = useRouter()
     const [isClient, setIsClient] = useState(false)
-    const [isSheetOpen, setIsSheetOpen] = useState(false)
     const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
@@ -239,10 +238,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           <AISettingsModal />
           <ProjectAPIDocs />
         </ProjectContextProvider>
-        <MobileSheetNav
-          open={mobileMenuOpen}
-          onOpenChange={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
+        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           {productMenu}
         </MobileSheetNav>
       </AppLayout>
