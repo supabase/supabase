@@ -11,6 +11,7 @@ import { usePoolingConfigurationQuery } from 'data/database/pooling-configuratio
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -36,7 +37,6 @@ import {
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings } from './DatabaseSettings.utils'
 import examples, { Example } from './DirectConnectionExamples'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const StepLabel = ({
   number,
