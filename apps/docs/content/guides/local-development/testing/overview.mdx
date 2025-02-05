@@ -122,11 +122,12 @@ Result: PASS
 
 ### 2. Application-Level testing
 
-Testing through application code provides end-to-end verification. Unlike database-level testing with pgTAP, application-level tests cannot easily use transactions for isolation.
+Testing through application code provides end-to-end verification. Unlike database-level testing with pgTAP, application-level tests cannot use transactions for isolation.
 
 <Admonition type="caution">
 
-Application-level tests should not rely on a clean database state, as resetting the database before each test can be slow and makes tests difficult to parallelize. Instead, design your tests to be independent by using unique identifiers (e.g., different user IDs) for each test case.
+Application-level tests should not rely on a clean database state, as resetting the database before each test can be slow and makes tests difficult to parallelize.
+Instead, design your tests to be independent by using unique user IDs for each test case.
 
 </Admonition>
 
