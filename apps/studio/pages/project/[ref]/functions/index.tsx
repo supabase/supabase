@@ -6,6 +6,7 @@ import {
   FunctionsEmptyState,
   TerminalInstructions,
 } from 'components/interfaces/Functions'
+import { DeployAiCompletionFunctionSheet } from 'components/interfaces/Functions/deployAiCompletionFunctionSheet'
 import FunctionsLayout from 'components/layouts/FunctionsLayout/FunctionsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -41,16 +42,19 @@ const PageLayout: NextPageWithLayout = () => {
                   <span className="text-sm text-foreground-lighter">{`${functions.length} function${
                     functions.length > 1 ? 's' : ''
                   } deployed`}</span>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button type="primary">Deploy a new function</Button>
-                    </DialogTrigger>
-                    <DialogContent size={'large'}>
-                      <DialogSection padding="small">
-                        <TerminalInstructions />
-                      </DialogSection>
-                    </DialogContent>
-                  </Dialog>
+                  <div className="flex gap-x-2 items-center">
+                    <DeployAiCompletionFunctionSheet />
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button type="primary">Deploy a new function</Button>
+                      </DialogTrigger>
+                      <DialogContent size={'large'}>
+                        <DialogSection padding="small">
+                          <TerminalInstructions />
+                        </DialogSection>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </div>
                 <Table
                   head={
