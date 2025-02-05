@@ -28,9 +28,9 @@ I'm also gonna include some screenshots below on what those steps look like:
 
 A lot of this was figured out through trial and error - i don't have explanations as to why only port 465 works with `smtp-relay.gmail.com` and / or why the TLS encryption option has no effect on SMTP.
 
-As to whether this is a Supabase Auth bug, i highly doubt that it is because we use the [native golang smtp library ](https://pkg.go.dev/net/smtp). If anyone still has issues getting google SMTP to work, i would recommend to switch to one of these SMTP providers:
+As to whether this is a Supabase Auth bug, i highly doubt that it is because we use the [native Golang SMTP library ](https://pkg.go.dev/net/smtp). If anyone still has issues getting google SMTP to work, i would recommend to switch to one of these SMTP providers:
 
 - [Resend](https://resend.com/blog/how-to-configure-supabase-to-send-emails-from-your-domain)
-- [Sendgrid](https://sendgrid.com/en-us)
+- [SendGrid](https://sendgrid.com/en-us)
 - [Mailgun](https://www.mailgun.com/)
 - AWS SES SMTP

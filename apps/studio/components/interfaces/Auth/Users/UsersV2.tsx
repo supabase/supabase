@@ -76,6 +76,7 @@ export const UsersV2 = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const gridRef = useRef<DataGridHandle>(null)
+  const xScroll = useRef<number>(0)
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const [columns, setColumns] = useState<Column<any>[]>([])
@@ -109,6 +110,7 @@ export const UsersV2 = () => {
     isError,
     isFetchingNextPage,
     refetch,
+    hasNextPage,
     fetchNextPage,
   } = useUsersInfiniteQuery(
     {
@@ -122,6 +124,9 @@ export const UsersV2 = () => {
     },
     {
       keepPreviousData: Boolean(filterKeywords),
+      // [Joshen] This is to prevent the dashboard from invalidating when refocusing as it may create
+      // a barrage of requests to invalidate each page esp when the project has many many users.
+      staleTime: Infinity,
     }
   )
 
@@ -141,7 +146,18 @@ export const UsersV2 = () => {
   const selectedUserToDelete = users.find((u) => u.id === [...selectedUsers][0])
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
-    if (isLoading || !isAtBottom(event)) return
+    const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
+    xScroll.current = event.currentTarget.scrollLeft
+
+    if (
+      isLoading ||
+      isFetchingNextPage ||
+      isScrollingHorizontally ||
+      !isAtBottom(event) ||
+      !hasNextPage
+    ) {
+      return
+    }
     fetchNextPage()
   }
 
@@ -484,7 +500,6 @@ export const UsersV2 = () => {
                     return (
                       <Row
                         {...props}
-                        key={props.row.id}
                         onClick={() => {
                           const user = users.find((u) => u.id === id)
                           if (user) {

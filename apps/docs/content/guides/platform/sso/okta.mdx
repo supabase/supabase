@@ -3,13 +3,13 @@ title: 'Set Up SSO with Okta'
 description: 'Configure single sign-on with Okta.'
 ---
 
-<Admonition>
+<Admonition type="note">
 
 This feature is only available on the Team and Enterprise Plans. Please contact [Sales](https://forms.supabase.com/enterprise) before doing these steps.
 
 </Admonition>
 
-<Admonition>
+<Admonition type="tip">
 
 Looking for docs on how to add Single Sign-On support in your Supabase project? Head on over to [Single Sign-On with SAML 2.0 for Projects](/docs/guides/auth/enterprise-sso/auth-sso-saml).
 
@@ -44,8 +44,8 @@ These settings let Supabase use SAML 2.0 properly with your Okta application. Ma
 | Single sign-on URL                             | `https://alt.supabase.io/auth/v1/sso/saml/acs`      |
 | Use this for Recipient URL and Destination URL | ✔️                                                  |
 | Audience URI (SP Entity ID)                    | `https://alt.supabase.io/auth/v1/sso/saml/metadata` |
-| Default RelayState                             | `https://supabase.com/dashboard`                    |
-| Name ID format                                 | EmailAddress                                        |
+| Default `RelayState`                           | `https://supabase.com/dashboard`                    |
+| Name ID format                                 | `EmailAddress`                                      |
 | Application username                           | Email                                               |
 | Update application username on                 | Create and update                                   |
 
