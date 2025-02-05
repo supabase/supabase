@@ -48,9 +48,6 @@ export async function deployEdgeFunction({
 
       return formData
     },
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
   })
 
   if (error) handleError(error)
