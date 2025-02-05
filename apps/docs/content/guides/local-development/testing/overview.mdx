@@ -1,10 +1,10 @@
 ---
 id: 'local-development-testing-overview'
 title: 'Testing Overview'
-description: 'Learn how develop and test database schema, tables, functions, and Row Level Security RLS policies.'
+description: 'Learn how to develop and test database schemas, tables, functions, and Row Level Security (RLS) policies.'
 ---
 
-Testing is a critical part of database development, especially when working with features like Row Level Security RLS policies. This guide provides a comprehensive approach to testing your Supabase database.
+Testing is a critical part of database development, especially when working with features like Row Level Security (RLS) policies. This guide provides a comprehensive approach to testing your Supabase database.
 
 ## Testing approaches
 
@@ -13,7 +13,7 @@ Testing is a critical part of database development, especially when working with
 [pgTAP](https://pgtap.org) is a unit testing framework for PostgreSQL that allows testing:
 
 - Database structure: tables, columns, constraints
-- Row Level Security RLS policies
+- Row Level Security (RLS) policies
 - Functions and procedures
 - Data integrity
 
@@ -39,7 +39,7 @@ alter table todos enable row level security;
 create policy "Users can only access their own todos"
 on todos for all -- this policy applies to all operations
 to authenticated
-using (auth.uid() = user_id);
+using ((select auth.uid()) = user_id);
 ```
 
 2. Set up your testing environment:
@@ -57,7 +57,7 @@ begin;
 -- install pgtap extension for testing
 create extension if not exists pgtap with schema extensions;
 -- Start declare we'll have 6 test cases in our test suite
-select plan(6);
+select plan(4);
 
 -- Setup our testing data
 -- Set up auth.users entries
@@ -71,28 +71,18 @@ insert into public.todos (task, user_id) values
     ('User 1 Task 2', '123e4567-e89b-12d3-a456-426614174000'),
     ('User 2 Task 1', '987fcdeb-51a2-43d7-9012-345678901234');
 
--- Test 1: Verify RLS is enabled
-select results_eq(
-    $$SELECT relrowsecurity FROM pg_class WHERE relname = 'todos' AND relnamespace = 'public'::regnamespace$$,
-    ARRAY[true],
-    'Row Level Security should be enabled on todos table'
-);
-
--- Test 2: Verify policy exists
-select policies_are('public', 'todos', ARRAY['Users can only access their own todos']);
-
 -- as User 1
 set local role authenticated;
 set local request.jwt.claim.sub = '123e4567-e89b-12d3-a456-426614174000';
 
--- Test 3: User 1 should only see their own todos
+-- Test 1: User 1 should only see their own todos
 select results_eq(
     'select count(*) from todos',
     ARRAY[2::bigint],
     'User 1 should only see their 2 todos'
 );
 
--- Test 4: User 1 can create their own todo
+-- Test 2: User 1 can create their own todo
 select lives_ok(
     $$insert into todos (task, user_id) values ('New Task', '123e4567-e89b-12d3-a456-426614174000'::uuid)$$,
     'User 1 can create their own todo'
@@ -101,14 +91,14 @@ select lives_ok(
 -- as User 2
 set local request.jwt.claim.sub = '987fcdeb-51a2-43d7-9012-345678901234';
 
--- Test 5: User 2 should only see their own todos
+-- Test 3: User 2 should only see their own todos
 select results_eq(
     'select count(*) from todos',
     ARRAY[1::bigint],
     'User 2 should only see their 1 todo'
 );
 
--- Test 6: User 2 cannot modify User 1's todo
+-- Test 4: User 2 cannot modify User 1's todo
 SELECT results_ne(
     $$ update todos set task = 'Hacked!' where user_id = '123e4567-e89b-12d3-a456-426614174000'::uuid returning 1 $$,
     $$ values(1) $$,
@@ -132,33 +122,45 @@ Result: PASS
 
 ### 2. Application-Level testing
 
-Testing through application code provides end-to-end verification. Here's an example using TypeScript that mirrors the pgTAP tests above:
+Testing through application code provides end-to-end verification. Unlike database-level testing with pgTAP, application-level tests cannot easily use transactions for isolation.
+
+<Admonition type="caution">
+
+Application-level tests should not rely on a clean database state, as resetting the database before each test can be slow and makes tests difficult to parallelize. Instead, design your tests to be independent by using unique identifiers (e.g., different user IDs) for each test case.
+
+</Admonition>
+
+Here's an example using TypeScript that mirrors the pgTAP tests above:
 
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 import { beforeAll, describe, expect, it } from 'vitest'
+import crypto from 'crypto'
 
 describe('Todos RLS', () => {
+  // Generate unique IDs for this test suite to avoid conflicts with other tests
+  const USER_1_ID = crypto.randomUUID()
+  const USER_2_ID = crypto.randomUUID()
+
   const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!)
 
-  // Test users from the pgTAP example
-  const USER_1_ID = '123e4567-e89b-12d3-a456-426614174000'
-  const USER_2_ID = '987fcdeb-51a2-43d7-9012-345678901234'
-
   beforeAll(async () => {
-    // Setup test data
+    // Setup test data specific to this test suite
     const adminSupabase = createClient(process.env.SUPABASE_URL!, process.env.SERVICE_ROLE_KEY!)
 
-    // Create test users using service role to bypass email verification
+    // Create test users with unique IDs
     await adminSupabase.auth.admin.createUser({
-      email: 'user1@test.com',
+      id: USER_1_ID,
+      email: `user1-${USER_1_ID}@test.com`,
       password: 'password123',
-      user_metadata: { id: USER_1_ID },
+      // We want the user to be usable right away without email confirmation
+      email_confirm: true,
     })
     await adminSupabase.auth.admin.createUser({
-      email: 'user2@test.com',
+      id: USER_2_ID,
+      email: `user2-${USER_2_ID}@test.com`,
       password: 'password123',
-      user_metadata: { id: USER_2_ID },
+      email_confirm: true,
     })
 
     // Create initial todos
@@ -172,11 +174,12 @@ describe('Todos RLS', () => {
   it('should allow User 1 to only see their own todos', async () => {
     // Sign in as User 1
     await supabase.auth.signInWithPassword({
-      email: 'user1@test.com',
+      email: `user1-${USER_1_ID}@test.com`,
       password: 'password123',
     })
 
     const { data: todos } = await supabase.from('todos').select('*')
+
     expect(todos).toHaveLength(2)
     todos?.forEach((todo) => {
       expect(todo.user_id).toBe(USER_1_ID)
@@ -184,7 +187,11 @@ describe('Todos RLS', () => {
   })
 
   it('should allow User 1 to create their own todo', async () => {
-    // Still signed in as User 1
+    await supabase.auth.signInWithPassword({
+      email: `user1-${USER_1_ID}@test.com`,
+      password: 'password123',
+    })
+
     const { error } = await supabase.from('todos').insert({ task: 'New Task', user_id: USER_1_ID })
 
     expect(error).toBeNull()
@@ -193,7 +200,7 @@ describe('Todos RLS', () => {
   it('should allow User 2 to only see their own todos', async () => {
     // Sign in as User 2
     await supabase.auth.signInWithPassword({
-      email: 'user2@test.com',
+      email: `user2-${USER_2_ID}@test.com`,
       password: 'password123',
     })
 
@@ -205,16 +212,40 @@ describe('Todos RLS', () => {
   })
 
   it('should prevent User 2 from modifying User 1 todos', async () => {
-    // Still signed in as User 2
-    const { error } = await supabase
-      .from('todos')
-      .update({ task: 'Hacked!' })
-      .eq('user_id', USER_1_ID)
+    await supabase.auth.signInWithPassword({
+      email: `user2-${USER_2_ID}@test.com`,
+      password: 'password123',
+    })
 
-    expect(error).not.toBeNull()
+    // Attempt to update the todos we shouldn't have access to
+    // result will be a no-op
+    await supabase.from('todos').update({ task: 'Hacked!' }).eq('user_id', USER_1_ID)
+
+    // Log back in as User 1 to verify their todos weren't changed
+    await supabase.auth.signInWithPassword({
+      email: `user1-${USER_1_ID}@test.com`,
+      password: 'password123',
+    })
+
+    // Fetch User 1's todos
+    const { data: todos } = await supabase.from('todos').select('*')
+
+    // Verify that none of the todos were changed to "Hacked!"
+    expect(todos).toBeDefined()
+    todos?.forEach((todo) => {
+      expect(todo.task).not.toBe('Hacked!')
+    })
   })
 })
 ```
+
+#### Test Isolation Strategies
+
+For application-level testing, consider these approaches for test isolation:
+
+1. **Unique Identifiers**: Generate unique IDs for each test suite to prevent data conflicts
+2. **Cleanup After Tests**: If necessary, clean up created data in an `afterAll` or `afterEach` hook
+3. **Isolated Data Sets**: Use prefixes or namespaces in data to separate test cases
 
 ### 3. Continuous integration testing
 

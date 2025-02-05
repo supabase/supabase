@@ -47,6 +47,8 @@ lateral (
 ) resp(contents);
 create extension "supabase-dbdev";
 select dbdev.install('supabase-dbdev');
+
+-- Drop and recreate the extension to ensure a clean installation
 drop extension if exists "supabase-dbdev";
 create extension "supabase-dbdev";
 ```
@@ -192,7 +194,7 @@ Here's a complete example using test helpers to verify RLS policies putting it a
 ```sql
 begin;
 -- Assuming we already have our: 000-setup-tests-hooks.sql file we can use tests helpers
-select plan(6);
+select plan(4);
 
 -- Set up test data
 
@@ -206,23 +208,17 @@ insert into public.todos (task, user_id) values
   ('User 1 Task 2', tests.get_supabase_uid('user1@test.com')),
   ('User 2 Task 1', tests.get_supabase_uid('user2@test.com'));
 
--- Test 1: Verify RLS is enabled
-select tests.rls_enabled('public', 'todos');
-
--- Test 2: Verify policy exists
-select policies_are('public', 'todos', ARRAY['Users can only access their own todos']);
-
 -- Test as User 1
 select tests.authenticate_as('user1@test.com');
 
--- Test 3: User 1 should only see their own todos
+-- Test 1: User 1 should only see their own todos
 select results_eq(
   'select count(*) from todos',
   ARRAY[2::bigint],
   'User 1 should only see their 2 todos'
 );
 
--- Test 4: User 1 can create their own todo
+-- Test 2: User 1 can create their own todo
 select lives_ok(
   $$insert into todos (task, user_id) values ('New Task', tests.get_supabase_uid('user1@test.com'))$$,
   'User 1 can create their own todo'
@@ -231,14 +227,14 @@ select lives_ok(
 -- Test as User 2
 select tests.authenticate_as('user2@test.com');
 
--- Test 5: User 2 should only see their own todos
+-- Test 3: User 2 should only see their own todos
 select results_eq(
   'select count(*) from todos',
   ARRAY[1::bigint],
   'User 2 should only see their 1 todo'
 );
 
--- Test 6: User 2 cannot modify User 1's todo
+-- Test 4: User 2 cannot modify User 1's todo
 SELECT results_ne(
     $$ update todos set task = 'Hacked!' where user_id = tests.get_supabase_uid('user1@test.com') returning 1 $$,
     $$ values(1) $$,
@@ -348,14 +344,27 @@ create table public.comments (
 Now we want to setup the RLS policies for each of our tables:
 
 ```sql
+-- Create a private schema to store all security definer functions utils
+-- As such functions should never be in a API exposed schema
+create schema if not exists private;
 -- Helper function for role checks
-create or replace function public.get_user_org_role(org_id bigint, user_id uuid)
+create or replace function private.get_user_org_role(org_id bigint, user_id uuid)
 returns text as $$
-  select role from org_members
+  select role from public.org_members
   where org_id = $1 and user_id = $2;
 -- Note the use of security definer to avoid RLS checking recursion issue
 -- see: https://supabase.com/docs/guides/database/postgres/row-level-security#use-security-definer-functions
 $$ language sql security definer;
+-- Helper utils to check if an org is below the max post limit
+create or replace function private.can_add_post(org_id bigint)
+returns boolean as $$
+  select (select count(*)
+          from posts p
+          where p.org_id = $1) < o.max_posts
+  from organizations o
+  where o.id = $1
+$$ language sql security definer;
+
 
 -- Enable RLS for all tables
 alter table public.profiles enable row level security;
@@ -369,11 +378,11 @@ create policy "Public profiles are viewable by everyone"
   on public.profiles for select using (true);
 
 create policy "Users can insert their own profile"
-  on public.profiles for insert with check (auth.uid() = id);
+  on public.profiles for insert with check ((select auth.uid()) = id);
 
 create policy "Users can update their own profile"
-  on public.profiles for update using (auth.uid() = id)
-  with check (auth.uid() = id);
+  on public.profiles for update using ((select auth.uid()) = id)
+  with check ((select auth.uid()) = id);
 
 -- Organizations policies
 create policy "Public org info visible to all"
@@ -381,20 +390,19 @@ create policy "Public org info visible to all"
 
 create policy "Org management restricted to owners"
   on public.organizations for all using (
-    public.get_user_org_role(id, auth.uid()) = 'owner'
+    private.get_user_org_role(id, (select auth.uid())) = 'owner'
   );
 
 -- Org Members policies
 create policy "Members visible to org members"
   on public.org_members for select using (
-    public.get_user_org_role(org_id, auth.uid()) is not null
+    private.get_user_org_role(org_id, (select auth.uid())) is not null
   );
 
 create policy "Member management restricted to admins and owners"
   on public.org_members for all using (
-    public.get_user_org_role(org_id, auth.uid()) in ('owner', 'admin')
+    private.get_user_org_role(org_id, (select auth.uid())) in ('owner', 'admin')
   );
-
 
 -- Posts policies
 create policy "Complex post visibility"
@@ -404,23 +412,24 @@ create policy "Complex post visibility"
     or
     -- Premium posts visible to org members only
     (status = 'published' and is_premium and
-     public.get_user_org_role(org_id, auth.uid()) is not null)
+    private.get_user_org_role(org_id, (select auth.uid())) is not null)
     or
     -- All posts visible to editors and above
-    public.get_user_org_role(org_id, auth.uid()) in ('owner', 'admin', 'editor')
+    private.get_user_org_role(org_id, (select auth.uid())) in ('owner', 'admin', 'editor')
   );
 
 create policy "Post creation rules"
   on public.posts for insert with check (
     -- Must be org member with appropriate role
-    public.get_user_org_role(org_id, auth.uid()) in ('owner', 'admin', 'editor')
+    private.get_user_org_role(org_id, (select auth.uid())) in ('owner', 'admin', 'editor')
     and
     -- Check org post limits for free plans
     (
-      select plan_type = 'free' and
-      (select count(*) from posts p where p.org_id = posts.org_id) < max_posts
-      from organizations
-      where id = posts.org_id
+      (select o.plan_type != 'free'
+      from organizations o
+      where o.id = org_id)
+      or
+      (select private.can_add_post(org_id))
     )
   );
 
@@ -430,10 +439,10 @@ create policy "Post update rules"
       select 1
       where
         -- Editors can update non-published posts
-        (public.get_user_org_role(org_id, auth.uid()) = 'editor' and status != 'published')
+        (private.get_user_org_role(org_id, (select auth.uid())) = 'editor' and status != 'published')
         or
         -- Admins and owners can update any post
-        public.get_user_org_role(org_id, auth.uid()) in ('owner', 'admin')
+        private.get_user_org_role(org_id, (select auth.uid())) in ('owner', 'admin')
     )
   );
 
@@ -448,16 +457,16 @@ create policy "Comments on published posts are viewable by everyone"
     and not is_deleted
   );
 
-create policy "Authenticated users can create comments"
-  on public.comments for insert with check (auth.uid() = author_id);
+Now we have everything we need, let's write our RLS test cases, note that each section could be in its own test:
+  on public.comments for insert with check ((select auth.uid()) = author_id);
 
 create policy "Users can update their own comments"
-  on public.comments for update using (author_id = auth.uid());
+  on public.comments for update using (author_id = (select auth.uid()));
 ```
 
 #### 3. Test cases:
 
-Now we have everything we need, let's write our RLS test cases, note that each section could be in it's own test:
+Now we have everything we need, let's write our RLS test cases, note that each section could be in its own test:
 
 ```sql
 -- Assuming we already have our: 000-setup-tests-hooks.sql file we can use tests helpers
