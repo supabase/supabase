@@ -32,6 +32,7 @@ export type MultiAttribute = {
   format?: 'percent' | 'number'
   description?: string
   docsLink?: string
+  isMaxValue?: boolean
   type?: 'line' | 'area-bar'
 }
 

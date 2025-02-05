@@ -61,6 +61,7 @@ const REPORT_ATTRIBUTES = [
         attribute: 'ram_available_max',
         provider: 'infra-monitoring',
         label: 'Max RAM Available',
+        isMaxValue: true,
       },
       {
         attribute: 'ram_usage_used',
@@ -170,6 +171,7 @@ const REPORT_ATTRIBUTES = [
         attribute: 'client_connections_max_limit',
         provider: 'infra-monitoring',
         label: 'max limit',
+        isMaxValue: true,
       },
     ],
   },
@@ -187,6 +189,12 @@ const REPORT_ATTRIBUTES = [
         label: 'IOps write',
       },
       { attribute: 'disk_iops_read', provider: 'infra-monitoring', label: 'IOps read' },
+      {
+        attribute: 'disk_iops_max',
+        provider: 'infra-monitoring',
+        label: 'IOps Max',
+        isMaxValue: true,
+      },
     ],
   },
 ]

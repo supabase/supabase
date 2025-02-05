@@ -9,7 +9,6 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Legend,
   Line,
   ReferenceArea,
   Tooltip,
@@ -18,215 +17,14 @@ import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
 import ChartHeader from './ChartHeader'
 import ChartHighlightActions from './ChartHighlightActions'
-import {
-  CHART_COLORS,
-  DateTimeFormats,
-  DEFAULT_STACK_COLORS,
-  genStackColorScales,
-  STACKED_CHART_COLORS,
-} from './Charts.constants'
+import { CHART_COLORS, DateTimeFormats, STACKED_CHART_COLORS } from './Charts.constants'
 import { Datum, CommonChartProps } from './Charts.types'
 import { useChartSize, numberFormatter } from './Charts.utils'
 import { ChartHighlight } from './useChartHighlight'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { MultiAttribute } from './ComposedChartHandler'
-
-interface CustomIconProps {
-  color: string
-}
-
-const CustomIcon = ({ color }: CustomIconProps) => (
-  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="5" cy="5" r="3" fill={color} />
-  </svg>
-)
-
-const MaxConnectionsIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <line x1="2" y1="6" x2="12" y2="6" stroke="#3ECF8E" strokeWidth="2" strokeDasharray="2 2" />
-  </svg>
-)
-
-interface TooltipProps {
-  active?: boolean
-  payload?: any[]
-  label?: string | number
-  attributes?: MultiAttribute[]
-  isPercentage?: boolean
-  valuePrecision?: number
-}
-
-const formatLargeNumber = (num: number, precision: number = 0) => {
-  if (num >= 1000000) {
-    return `${(num / 1000000).toFixed(precision)}MiB`
-  } else if (num >= 1000) {
-    return `${(num / 1000).toFixed(precision)}KiB`
-  } else {
-    return num.toString()
-  }
-}
-
-const CustomTooltip = ({
-  active,
-  payload,
-  label,
-  attributes,
-  isPercentage,
-  valuePrecision,
-}: TooltipProps) => {
-  if (active && payload && payload.length) {
-    const totalConnections = payload?.reduce((acc, curr) => acc + curr.value, 0)
-    const maxConnections = payload?.find((p: any) => p.name.toLowerCase().includes('max'))
-
-    const isRamChart = payload?.some((p: any) => p.name.toLowerCase().includes('ram_'))
-
-    const getIcon = (name: string, color: string) => {
-      switch (name.toLowerCase().includes('max')) {
-        case false:
-          return <CustomIcon color={color} />
-        default:
-          return <MaxConnectionsIcon />
-      }
-    }
-
-    const LabelItem = ({ entry }: { entry: any }) => {
-      const attribute = attributes?.find((a: MultiAttribute) => a.attribute === entry.name)
-
-      return (
-        <div key={entry.name} className="flex items-center w-full">
-          {getIcon(entry.name, entry.color)}
-          <span className="text-foreground-lighter ml-1 flex-grow">
-            {attribute?.label || entry.name}
-          </span>
-          <span className="ml-3.5 flex items-end gap-1">
-            {isRamChart
-              ? formatLargeNumber(entry.value, valuePrecision)
-              : numberFormatter(entry.value, valuePrecision)}
-            {isPercentage ? '%' : ''}
-            {active &&
-              !entry.name.toLowerCase().includes('max') &&
-              !isNaN(entry.value / maxConnections?.value) &&
-              isFinite(entry.value / maxConnections?.value) && (
-                <span className="text-[11px] text-foreground-light mb-0.5">
-                  ({numberFormatter((entry.value / maxConnections?.value) * 100)}%)
-                </span>
-              )}
-          </span>
-        </div>
-      )
-    }
-
-    return (
-      <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl">
-        <p className="font-medium">{dayjs(label).format('DD MMM YYYY, HH:mm:ss')}</p>
-        <div className="grid gap-0">
-          {payload.reverse().map((entry: any) => (
-            <LabelItem key={entry.name} entry={entry} />
-          ))}
-          {active && (
-            <div className="flex md:flex-col gap-1 md:gap-0 text-foreground font-semibold">
-              <span className="flex-grow text-foreground-lighter">Total</span>
-              <div className="flex items-end gap-1">
-                <span className="text-base">
-                  {isRamChart
-                    ? formatLargeNumber(totalConnections, 1)
-                    : numberFormatter(totalConnections)}
-                </span>
-                {!isNaN(totalConnections / maxConnections?.value) &&
-                  isFinite(totalConnections / maxConnections?.value) && (
-                    <span className="text-[11px] text-foreground-light mb-0.5">
-                      ({numberFormatter((totalConnections / maxConnections?.value) * 100)}%)
-                    </span>
-                  )}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }
-
-  return null
-}
-
-const CustomLabel = ({ active, payload, label, attributes }: TooltipProps) => {
-  const items = payload ?? []
-  const totalConnections = payload?.reduce((acc, curr) => acc + curr.value, 0)
-  const maxConnections = payload?.find((p: any) => p.name.toLowerCase().includes('max'))
-
-  const isRamChart = payload?.some((p: any) => p.name.toLowerCase().includes('ram_'))
-
-  const getIcon = (name: string, color: string) => {
-    switch (name.toLowerCase().includes('max')) {
-      case false:
-        return <CustomIcon color={color} />
-      default:
-        return <MaxConnectionsIcon />
-    }
-  }
-
-  const LabelItem = ({ entry }: { entry: any }) => {
-    const attribute = attributes?.find((a) => a.attribute === entry.name)
-
-    return (
-      <p key={entry.name} className="inline-flex md:flex-col gap-1 md:gap-0 w-fit text-foreground">
-        <div className="flex items-center gap-1">
-          {getIcon(entry.name, entry.color)}
-          <span className="text-nowrap text-foreground-lighter pr-2">
-            {attribute?.label || entry.name}
-          </span>
-        </div>
-        <div className="ml-3.5 flex items-end gap-1">
-          {active && (
-            <span className="text-base">
-              {isRamChart ? formatLargeNumber(entry.value, 1) : numberFormatter(entry.value)}
-            </span>
-          )}
-          {active &&
-            !entry.name.toLowerCase().includes('max') &&
-            !isNaN(entry.value / maxConnections?.value) &&
-            isFinite(entry.value / maxConnections?.value) && (
-              <span className="text-[11px] text-foreground-light mb-0.5">
-                ({numberFormatter((entry.value / maxConnections?.value) * 100)}%)
-              </span>
-            )}
-        </div>
-      </p>
-    )
-  }
-
-  return (
-    <div className="absolute left-0 right-0 mx-auto -bottom-4 top-auto flex flex-col items-center gap-1 text-xs w-full min-h-16">
-      <div className="flex flex-col sm:flex-wrap justify-start sm:flex-row gap-0 md:gap-2">
-        {items?.map((entry) => <LabelItem key={entry.name} entry={entry} />)}
-        {active && (
-          <p className="flex sm:flex-col gap-1 sm:gap-0 text-foreground font-semibold">
-            <span className="flex-grow text-foreground-lighter">Total</span>
-            <div className="flex items-end gap-1">
-              <span className="text-base">
-                {isRamChart
-                  ? formatLargeNumber(totalConnections, 1)
-                  : numberFormatter(totalConnections)}
-              </span>
-              {!isNaN(totalConnections / maxConnections?.value) &&
-                isFinite(totalConnections / maxConnections?.value) && (
-                  <span className="text-[11px] text-foreground-light mb-0.5">
-                    ({numberFormatter((totalConnections / maxConnections?.value) * 100)}%)
-                  </span>
-                )}
-            </div>
-          </p>
-        )}
-      </div>
-      {active && (
-        <p className="text-foreground-lighter text-xs">
-          {dayjs(label).format('DD MMM YYYY, HH:mm:ss')}
-        </p>
-      )}
-    </div>
-  )
-}
+import { CustomLabel, CustomTooltip } from './ComposedChart.utils'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
@@ -279,21 +77,7 @@ export default function ComposedChart({
 }: BarChartProps) {
   const [_activePayload, setActivePayload] = useState<any>(null)
   const { Container } = useChartSize(size)
-
-  const getAxisYDomain = (from: number, to: number) => {
-    const refData = data.slice(from, to)
-    let [bottom, top] = [0, 0]
-
-    refData.forEach((d) => {
-      // const total = d.read + d.write
-      const total = 0
-      if (total > top) top = total
-      if (total < bottom) bottom = total
-    })
-
-    return [bottom, Math.max(top, 70)]
-  }
-
+  const [showMaxValue, setShowMaxValue] = useState(true)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
   // Default props
@@ -334,17 +118,15 @@ export default function ComposedChart({
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
-  // const stackColorScales = genStackColorScales(DEFAULT_STACK_COLORS)
-
+  const maxValueAttribute = attributes.find((a) => a.isMaxValue)
   const defaultAttributes = data
     ? Object.entries(data[0])
         .map(([key, value], index) => ({
           name: key,
           value: value,
           color: STACKED_CHART_COLORS[index - (1 % STACKED_CHART_COLORS.length)],
-          // color: stackColorScales[index % stackColorScales.length]?.base,
         }))
-        .filter((att) => att.name !== 'timestamp')
+        .filter((att) => att.name !== 'timestamp' && att.name !== maxValueAttribute?.attribute)
     : []
 
   const stackedAttributes = defaultAttributes.filter((att) => !att.name.includes('max'))
@@ -369,15 +151,6 @@ export default function ComposedChart({
         title={title}
         format={format}
         customDateFormat={customDateFormat}
-        // highlightedValue={
-        //   <CustomLabel
-        //     active={!!resolvedHighlightedLabel}
-        //     payload={_activePayload || defaultAttributes}
-        //     label={resolvedHighlightedValue}
-        //     attributes={attributes}
-        //   />
-        // }
-        // highlightedLabel={''}
         highlightedValue={
           typeof resolvedHighlightedValue === 'number'
             ? numberFormatter(resolvedHighlightedValue, valuePrecision)
@@ -388,6 +161,8 @@ export default function ComposedChart({
         hideChartType={hideChartType}
         chartStyle={chartStyle}
         onChartStyleChange={onChartStyleChange}
+        showMaxValue={showMaxValue}
+        setShowMaxValue={maxValueAttribute ? setShowMaxValue : undefined}
       />
       <Container className="relative">
         <RechartComposedChart
@@ -420,12 +195,9 @@ export default function ComposedChart({
             if (onBarClick) onBarClick(datum, tooltipData)
           }}
         >
-          {/* {showLegend && <Legend />} */}
           {showGrid && <CartesianGrid stroke={CHART_COLORS.AXIS} />}
           <YAxis
             {..._YAxisProps}
-            // axisLine={{ stroke: CHART_COLORS.AXIS }}
-            // tickLine={{ stroke: CHART_COLORS.AXIS }}
             hide
             domain={isPercentage ? [0, 100] : undefined}
             key={yAxisKey}
@@ -434,8 +206,6 @@ export default function ComposedChart({
             {..._XAxisProps}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
-            // tickLine={false}
-            // axisLine={false}
             tickMargin={8}
             minTickGap={3}
             key={xAxisKey}
@@ -446,7 +216,7 @@ export default function ComposedChart({
                 <CustomTooltip
                   {...props}
                   isPercentage={isPercentage}
-                  label={resolvedHighlightedValue}
+                  label={resolvedHighlightedLabel}
                   attributes={attributes}
                   valuePrecision={valuePrecision}
                 />
@@ -482,20 +252,20 @@ export default function ComposedChart({
                   }
                 />
               ))}
-          {defaultAttributes
-            .filter((attribute) => attribute.name.includes('max'))
-            .map((attribute) => (
-              <Line
-                key={attribute.name}
-                type="stepAfter"
-                dataKey={attribute.name}
-                stroke="#3ECF8E"
-                strokeWidth={2}
-                strokeDasharray="3 3"
-                dot={false}
-                name={attribute.name}
-              />
-            ))}
+          {/* Max value, if available */}
+          {maxValueAttribute && showMaxValue && (
+            <Line
+              key={maxValueAttribute.attribute}
+              type="stepAfter"
+              dataKey={maxValueAttribute.attribute}
+              stroke="#3ECF8E"
+              strokeWidth={2}
+              strokeDasharray="3 3"
+              dot={false}
+              name={maxValueAttribute.label}
+            />
+          )}
+          {/* Selection highlight */}
           {showHighlightActions && (
             <ReferenceArea
               x1={chartHighlight?.coordinates.left}
@@ -521,14 +291,7 @@ export default function ComposedChart({
           </span>
         </div>
       )}
-      {showLegend && (
-        <CustomLabel
-          // active={!!resolvedHighlightedLabel}
-          payload={defaultAttributes}
-          // label={resolvedHighlightedValue}
-          attributes={attributes}
-        />
-      )}
+      {showLegend && <CustomLabel payload={defaultAttributes} attributes={attributes} />}
     </div>
   )
 }

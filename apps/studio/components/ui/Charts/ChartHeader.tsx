@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { ChartHighlight } from './useChartHighlight'
 import Link from 'next/link'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { ArrowRight, Activity, BarChartIcon, LogsIcon, XIcon } from 'lucide-react'
+import { ArrowRight, Activity, BarChartIcon, LogsIcon, XIcon, Maximize2 } from 'lucide-react'
 import { useParams } from 'common'
 
 export interface ChartHeaderProps {
@@ -16,6 +16,8 @@ export interface ChartHeaderProps {
   hideChartType?: boolean
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
+  showMaxValue?: boolean
+  setShowMaxValue?: (value: boolean) => void
 }
 
 const ChartHeader = ({
@@ -27,6 +29,8 @@ const ChartHeader = ({
   hideChartType = false,
   chartStyle = 'bar',
   onChartStyleChange,
+  showMaxValue = false,
+  setShowMaxValue,
 }: ChartHeaderProps) => {
   const chartTitle = (
     <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
@@ -81,6 +85,14 @@ const ChartHeader = ({
               View as {chartStyle === 'bar' ? 'line chart' : 'bar chart'}
             </TooltipContent>
           </Tooltip>
+        )}
+        {setShowMaxValue && (
+          <Button
+            type="default"
+            className="px-1.5"
+            icon={<Maximize2 />}
+            onClick={() => setShowMaxValue(!showMaxValue)}
+          />
         )}
       </div>
     </div>
