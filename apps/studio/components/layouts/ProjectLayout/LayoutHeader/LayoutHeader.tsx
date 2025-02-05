@@ -19,6 +19,7 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
+import { useAppStateSnapshot } from 'state/app-state'
 
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger">
@@ -44,7 +45,6 @@ interface LayoutHeaderProps {
   headerBorder?: boolean
   showProductMenu?: boolean
   customSidebarContent?: ReactNode
-  handleMobileMenu: Function
 }
 
 const LayoutHeader = ({
@@ -52,11 +52,11 @@ const LayoutHeader = ({
   breadcrumbs = [],
   headerBorder = true,
   showProductMenu,
-  handleMobileMenu,
 }: LayoutHeaderProps) => {
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   const { data: subscription } = useOrgSubscriptionQuery({
@@ -91,7 +91,7 @@ const LayoutHeader = ({
             className={cn(
               'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
             )}
-            onClick={() => handleMobileMenu()}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
             <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
