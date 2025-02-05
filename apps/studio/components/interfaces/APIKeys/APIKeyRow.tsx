@@ -64,8 +64,6 @@ export const APIKeyRow = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent className="max-w-40" align="end">
             <APIKeyDeleteDialog apiKey={apiKey} />
-            <DropdownMenuSeparator />
-            <APIKeyDeleteDialog apiKey={apiKey} />
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>
