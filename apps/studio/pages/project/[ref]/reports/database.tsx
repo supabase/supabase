@@ -413,7 +413,6 @@ const DatabaseUsage = () => {
                   label="Replication lag"
                   interval={dateRange.interval}
                   provider="infra-monitoring"
-                  updateDateRange={updateDateRange}
                 />
               </div>
             </Panel.Content>
