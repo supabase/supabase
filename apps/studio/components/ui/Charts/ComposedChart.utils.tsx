@@ -29,13 +29,22 @@ interface TooltipProps {
   isPercentage?: boolean
   valuePrecision?: number
   showMaxValue?: boolean
+  showTotal?: boolean
+}
+
+const formatBytes = (bytes: number, precision: number = 1) => {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return `${(bytes / Math.pow(k, i)).toFixed(precision)} ${sizes[i]}`
 }
 
 const formatLargeNumber = (num: number, precision: number = 0) => {
   if (num >= 1000000) {
-    return `${(num / 1000000).toFixed(precision)}MiB`
+    return `${(num / 1000000).toFixed(precision)}M`
   } else if (num >= 1000) {
-    return `${(num / 1000).toFixed(precision)}KiB`
+    return `${(num / 1000).toFixed(precision)}K`
   } else {
     return num.toString()
   }
@@ -49,6 +58,7 @@ const CustomTooltip = ({
   attributes,
   isPercentage,
   valuePrecision,
+  showTotal,
 }: TooltipProps) => {
   if (active && payload && payload.length) {
     const timestamp = payload[0].payload.timestamp
@@ -56,10 +66,12 @@ const CustomTooltip = ({
     const maxValueData =
       maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
     const maxValue = maxValueData?.value
-    const isRamChart = payload?.some((p: any) => p.name.toLowerCase().includes('ram_'))
-    const total = payload
-      ?.filter((p) => p.dataKey !== maxValueAttribute?.attribute)
-      .reduce((acc, curr) => acc + curr.value, 0)
+    const isRamChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
+    const total =
+      showTotal &&
+      payload
+        ?.filter((p) => p.dataKey !== maxValueAttribute?.attribute)
+        .reduce((acc, curr) => acc + curr.value, 0)
 
     const getIcon = (name: string, color: string) => {
       switch (name.toLowerCase().includes('max')) {
@@ -83,12 +95,12 @@ const CustomTooltip = ({
           </span>
           <span className="ml-3.5 flex items-end gap-1">
             {isRamChart
-              ? formatLargeNumber(entry.value, valuePrecision)
+              ? formatBytes(entry.value, valuePrecision)
               : numberFormatter(entry.value, valuePrecision)}
             {isPercentage ? '%' : ''}
 
             {/* Show percentage if max value is set */}
-            {percentage && !isMax && (
+            {!!maxValueData && !isMax && (
               <span className="text-[11px] text-foreground-light mb-0.5">({percentage}%)</span>
             )}
           </span>
@@ -103,12 +115,12 @@ const CustomTooltip = ({
           {payload.reverse().map((entry: any) => (
             <LabelItem key={entry.name} entry={entry} />
           ))}
-          {active && (
+          {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground font-semibold">
               <span className="flex-grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
-                  {isRamChart ? formatLargeNumber(total, 1) : numberFormatter(total)}
+                  {isRamChart ? formatBytes(total, 1) : numberFormatter(total)}
                 </span>
                 {maxValueAttribute &&
                   !isNaN(total / maxValueData?.value) &&
@@ -128,11 +140,15 @@ const CustomTooltip = ({
   return null
 }
 
-const CustomLabel = ({ active, payload, label, attributes, showMaxValue }: TooltipProps) => {
+interface CustomLabelProps {
+  payload?: any[]
+  attributes?: MultiAttribute[]
+  showMaxValue?: boolean
+}
+
+const CustomLabel = ({ payload, attributes, showMaxValue }: CustomLabelProps) => {
   const items = payload ?? []
   const maxValueAttribute = isMax(attributes)
-  const maxValueData =
-    maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
 
   const getIcon = (name: string, color: string) => {
     console.log(name, maxValueAttribute)
@@ -146,8 +162,9 @@ const CustomLabel = ({ active, payload, label, attributes, showMaxValue }: Toolt
 
   const LabelItem = ({ entry }: { entry: any }) => {
     const attribute = attributes?.find((a) => a.attribute === entry.name)
+    const isMax = entry.name === maxValueAttribute?.attribute
 
-    // if (!showMaxValue) return null
+    if (!showMaxValue && isMax) return null
 
     return (
       <p key={entry.name} className="inline-flex md:flex-col gap-1 md:gap-0 w-fit text-foreground">
@@ -157,53 +174,15 @@ const CustomLabel = ({ active, payload, label, attributes, showMaxValue }: Toolt
             {attribute?.label || entry.name}
           </span>
         </div>
-        {/* <div className="ml-3.5 flex items-end gap-1">
-          {active && (
-            <span className="text-base">
-              {isRamChart ? formatLargeNumber(entry.value, 1) : numberFormatter(entry.value)}
-            </span>
-          )}
-          {active &&
-            !entry.name.toLowerCase().includes('max') &&
-            !isNaN(entry.value / maxConnections?.value) &&
-            isFinite(entry.value / maxConnections?.value) && (
-              <span className="text-[11px] text-foreground-light mb-0.5">
-                ({numberFormatter((entry.value / maxConnections?.value) * 100)}%)
-              </span>
-            )}
-        </div> */}
       </p>
     )
   }
 
   return (
-    <div className="absolute left-0 right-0 mx-auto -bottom-4 top-auto flex flex-col items-center gap-1 text-xs w-full min-h-16">
-      <div className="flex flex-col sm:flex-wrap justify-start sm:flex-row gap-0 md:gap-2">
+    <div className="relative z-0 mx-auto flex flex-col items-center gap-1 text-xs w-full">
+      <div className="flex flex-wrap items-center justify-center gap-2">
         {items?.map((entry) => <LabelItem key={entry.name} entry={entry} />)}
-        {/* {active && (
-          <p className="flex sm:flex-col gap-1 sm:gap-0 text-foreground font-semibold">
-            <span className="flex-grow text-foreground-lighter">Total</span>
-            <div className="flex items-end gap-1">
-              <span className="text-base">
-                {isRamChart
-                  ? formatLargeNumber(totalConnections, 1)
-                  : numberFormatter(totalConnections)}
-              </span>
-              {!isNaN(totalConnections / maxConnections?.value) &&
-                isFinite(totalConnections / maxConnections?.value) && (
-                  <span className="text-[11px] text-foreground-light mb-0.5">
-                    ({numberFormatter((totalConnections / maxConnections?.value) * 100)}%)
-                  </span>
-                )}
-            </div>
-          </p>
-        )} */}
       </div>
-      {/* {active && (
-        <p className="text-foreground-lighter text-xs">
-          {dayjs(label).format('DD MMM YYYY, HH:mm:ss')}
-        </p>
-      )} */}
     </div>
   )
 }

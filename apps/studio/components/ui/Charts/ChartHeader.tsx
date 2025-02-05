@@ -1,9 +1,5 @@
-import dayjs from 'dayjs'
-import { ChartHighlight } from './useChartHighlight'
-import Link from 'next/link'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { ArrowRight, Activity, BarChartIcon, LogsIcon, XIcon, Maximize2 } from 'lucide-react'
-import { useParams } from 'common'
+import { Button, Checkbox, Checkbox_Shadcn_, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Activity, BarChartIcon, GitCommitHorizontalIcon } from 'lucide-react'
 
 export interface ChartHeaderProps {
   title?: string
@@ -87,12 +83,23 @@ const ChartHeader = ({
           </Tooltip>
         )}
         {setShowMaxValue && (
-          <Button
-            type="default"
-            className="px-1.5"
-            icon={<Maximize2 />}
-            onClick={() => setShowMaxValue(!showMaxValue)}
-          />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type={showMaxValue ? 'default' : 'dashed'}
+                className="px-1.5"
+                icon={
+                  <GitCommitHorizontalIcon
+                    className={showMaxValue ? 'text-foreground' : 'text-foreground-lighter'}
+                  />
+                }
+                onClick={() => setShowMaxValue(!showMaxValue)}
+              />
+            </TooltipTrigger>
+            <TooltipContent side="left" align="center">
+              {showMaxValue ? 'Hide' : 'Show'} limit
+            </TooltipContent>
+          </Tooltip>
         )}
       </div>
     </div>

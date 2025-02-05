@@ -56,6 +56,7 @@ const REPORT_ATTRIBUTES = [
     showLegend: true,
     hideChartType: true,
     defaultChartStyle: 'line',
+    showTotal: false,
     attributes: [
       {
         attribute: 'ram_available_max',
@@ -119,18 +120,18 @@ const REPORT_ATTRIBUTES = [
         label: 'IRQs',
         format: 'percent',
       },
-      {
-        attribute: 'cpu_usage_busy_other',
-        provider: 'infra-monitoring',
-        label: 'other',
-        format: 'percent',
-      },
-      {
-        attribute: 'cpu_usage_busy_idle',
-        provider: 'infra-monitoring',
-        label: 'Idle',
-        format: 'percent',
-      },
+      // {
+      //   attribute: 'cpu_usage_busy_other',
+      //   provider: 'infra-monitoring',
+      //   label: 'other',
+      //   format: 'percent',
+      // },
+      // {
+      //   attribute: 'cpu_usage_busy_idle',
+      //   provider: 'infra-monitoring',
+      //   label: 'Idle',
+      //   format: 'percent',
+      // },
     ],
   },
   {

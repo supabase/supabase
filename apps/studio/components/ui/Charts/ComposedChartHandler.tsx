@@ -2,8 +2,6 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useState, useMemo } from 'react'
 import { cn } from 'ui'
 
-import AreaChart from 'components/ui/Charts/AreaChart'
-import BarChart from 'components/ui/Charts/BarChart'
 import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
 import {
   InfraMonitoringAttribute,
@@ -53,6 +51,7 @@ interface ComposedChartHandlerProps {
   className?: string
   showTooltip?: boolean
   showLegend?: boolean
+  showTotal?: boolean
   updateDateRange: UpdateDateRange
   valuePrecision?: number
 }
@@ -83,6 +82,7 @@ const ComposedChartHandler = ({
   className,
   showTooltip,
   showLegend,
+  showTotal,
   updateDateRange,
   valuePrecision,
 }: PropsWithChildren<ComposedChartHandlerProps>) => {
@@ -242,6 +242,7 @@ const ComposedChartHandler = ({
           chartStyle={chartStyle}
           showTooltip={showTooltip}
           showLegend={showLegend}
+          showTotal={showTotal}
           onChartStyleChange={setChartStyle}
           updateDateRange={updateDateRange}
           valuePrecision={valuePrecision}

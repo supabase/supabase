@@ -39,6 +39,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   YAxisProps?: ComponentProps<typeof YAxis>
   showGrid?: boolean
   showTooltip?: boolean
+  showTotal?: boolean
   chartHighlight?: ChartHighlight
   hideChartType?: boolean
   chartStyle?: string
@@ -69,6 +70,7 @@ export default function ComposedChart({
   YAxisProps,
   showGrid = false,
   showTooltip = false,
+  showTotal = true,
   chartHighlight,
   hideChartType,
   chartStyle,
@@ -76,9 +78,10 @@ export default function ComposedChart({
   updateDateRange,
 }: BarChartProps) {
   const [_activePayload, setActivePayload] = useState<any>(null)
-  const { Container } = useChartSize(size)
   const [showMaxValue, setShowMaxValue] = useState(true)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
+
+  const { Container } = useChartSize(size)
 
   // Default props
   const _XAxisProps = XAxisProps || {
@@ -118,18 +121,22 @@ export default function ComposedChart({
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
-  const maxValueAttribute = attributes.find((a) => a.isMaxValue)
-  const defaultAttributes = data
+  const maxAttribute = attributes.find((a) => a.isMaxValue)
+  const maxAttributeData = {
+    name: maxAttribute?.attribute,
+    color: '#3ECF8E',
+  }
+  const chartData = data
     ? Object.entries(data[0])
         .map(([key, value], index) => ({
           name: key,
           value: value,
           color: STACKED_CHART_COLORS[index - (1 % STACKED_CHART_COLORS.length)],
         }))
-        .filter((att) => att.name !== 'timestamp' && att.name !== maxValueAttribute?.attribute)
+        .filter((att) => att.name !== 'timestamp' && att.name !== maxAttribute?.attribute)
     : []
 
-  const stackedAttributes = defaultAttributes.filter((att) => !att.name.includes('max'))
+  const stackedAttributes = chartData.filter((att) => !att.name.includes('max'))
   const isPercentage = format === '%'
 
   if (data.length === 0) {
@@ -146,7 +153,7 @@ export default function ComposedChart({
   }
 
   return (
-    <div className={cn('flex flex-col gap-y-3', showLegend && 'pb-10', className)}>
+    <div className={cn('flex flex-col gap-y-3', className)}>
       <ChartHeader
         title={title}
         format={format}
@@ -162,9 +169,9 @@ export default function ComposedChart({
         chartStyle={chartStyle}
         onChartStyleChange={onChartStyleChange}
         showMaxValue={showMaxValue}
-        setShowMaxValue={maxValueAttribute ? setShowMaxValue : undefined}
+        setShowMaxValue={maxAttribute ? setShowMaxValue : undefined}
       />
-      <Container className="relative">
+      <Container className="relative z-10">
         <RechartComposedChart
           data={data}
           onMouseMove={(e: any) => {
@@ -219,6 +226,7 @@ export default function ComposedChart({
                   label={resolvedHighlightedLabel}
                   attributes={attributes}
                   valuePrecision={valuePrecision}
+                  showTotal={showTotal}
                 />
               ) : null
             }
@@ -253,16 +261,16 @@ export default function ComposedChart({
                 />
               ))}
           {/* Max value, if available */}
-          {maxValueAttribute && showMaxValue && (
+          {maxAttribute && showMaxValue && (
             <Line
-              key={maxValueAttribute.attribute}
+              key={maxAttribute.attribute}
               type="stepAfter"
-              dataKey={maxValueAttribute.attribute}
+              dataKey={maxAttribute.attribute}
               stroke="#3ECF8E"
               strokeWidth={2}
               strokeDasharray="3 3"
               dot={false}
-              name={maxValueAttribute.label}
+              name={maxAttribute.label}
             />
           )}
           {/* Selection highlight */}
@@ -291,7 +299,13 @@ export default function ComposedChart({
           </span>
         </div>
       )}
-      {showLegend && <CustomLabel payload={defaultAttributes} attributes={attributes} />}
+      {showLegend && (
+        <CustomLabel
+          payload={[maxAttributeData, ...chartData]}
+          attributes={attributes}
+          showMaxValue={showMaxValue}
+        />
+      )}
     </div>
   )
 }
