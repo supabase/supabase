@@ -4,6 +4,10 @@ title: 'How to do automatic retries with `supabase-js`'
 subtitle: 'Learn how to add automatic retries to your Supabase API requests using `fetch-retry`.'
 ---
 
+<Admonition type="danger" title="Note title">
+Note description
+</Admonition>
+
 The `fetch-retry` package allows you to add retry logic to `fetch` requests, making it a useful tool for enhancing the resilience of API calls in your Supabase applications. Here's a step-by-step guide on how to integrate `fetch-retry` with the `supabase-js` library.
 
 ## 1. Install dependencies
@@ -46,10 +50,6 @@ const fetchWithRetry = fetchRetry(fetch, {
   retryOn: [520], // Retry only on Cloudflare errors
 })
 ```
-
-<Admonition type="danger" title="Important: Only Retry 520 Errors by Default">
-In most cases, 520 errors (Cloudflare origin errors) indicate temporary network failures, making them safe to retry.
-</Admonition>
 
 In this example, the `retryDelay` function implements an exponential backoff strategy, and retries are triggered only for specific HTTP status codes.
 
