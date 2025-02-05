@@ -35,15 +35,12 @@ export async function deployEdgeFunction({
     bodySerializer(body) {
       const formData = new FormData()
 
-      formData.append(
-        'metadata',
-        JSON.stringify({ entrypoint_path: 'index.ts', name: 'test', verify_jwt: false })
-      )
+      formData.append('metadata', JSON.stringify(body.metadata))
 
       body.file.forEach((f: any) => {
         const file = f as { name: string; content: string }
-        const blob = new Blob(["console.log('Hello, world!')"], { type: 'text/plain' })
-        formData.append('file', blob, 'index.ts')
+        const blob = new Blob([file.content], { type: 'text/plain' })
+        formData.append('file', blob, file.name)
       })
 
       return formData
