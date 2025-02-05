@@ -23,7 +23,11 @@ const Hooks: NextPageWithLayout = () => {
       <div>
         <ScaffoldHeader className="pb-0">
           <ScaffoldContainer id="auth-page-top">
-            <ScaffoldTitle>Hooks</ScaffoldTitle>
+            <ScaffoldTitle>Auth Hooks</ScaffoldTitle>
+            <ScaffoldDescription>
+              Use Postgres functions or HTTP endpoints to customize the behavior of Supabase Auth to
+              meet your needs.
+            </ScaffoldDescription>
           </ScaffoldContainer>
         </ScaffoldHeader>
 

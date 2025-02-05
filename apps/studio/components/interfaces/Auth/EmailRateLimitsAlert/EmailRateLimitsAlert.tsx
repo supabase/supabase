@@ -30,9 +30,7 @@ export function EmailRateLimitsAlert() {
         </a>{' '}
         for an up-to-date information on the current rate limits.
         <Button asChild type="default" className="mt-2">
-          <Link target="_blank" href={`/project/${ref}/settings/auth#auth-config-smtp-form`}>
-            Set up custom SMTP server
-          </Link>
+          <Link href={`/project/${ref}/auth/smtp`}>Set up custom SMTP server</Link>
         </Button>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
