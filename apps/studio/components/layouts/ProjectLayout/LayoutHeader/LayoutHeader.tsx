@@ -49,7 +49,6 @@ interface LayoutHeaderProps {
   hasProductMenu?: boolean
   customSidebarContent?: ReactNode
   headerTitle?: string
-  handleMobileMenu: Function
   showHomeLink?: boolean
 }
 
@@ -64,7 +63,6 @@ const LayoutHeader = ({
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
-  const isOrgPage = router.pathname.startsWith('/org/') // Add this check
   const { aiAssistantPanel, setMobileMenuOpen } = useAppStateSnapshot()
 
   const { data: subscription } = useOrgSubscriptionQuery({

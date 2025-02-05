@@ -1,7 +1,7 @@
 import { AppBannerWrapper } from 'components/interfaces/App'
 // import { AppDefaultNavigation } from 'components/interfaces/app-default-navigation'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, ReactNode } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 // import { SidebarProvider } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
@@ -16,6 +16,7 @@ export interface DefaultLayoutProps {
   hasProductMenu?: boolean
   // Shows header in the top left of the page
   headerTitle?: string
+  productMenu?: ReactNode
 }
 
 const DefaultLayout = ({
@@ -23,8 +24,9 @@ const DefaultLayout = ({
   hasProductMenu,
   product,
   headerTitle,
+  productMenu,
 }: PropsWithChildren<DefaultLayoutProps>) => {
-  // const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
+  const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
 
   return (
     <>
@@ -45,9 +47,6 @@ const DefaultLayout = ({
             <div className="flex-grow h-full overflow-y-auto">{children}</div>
           </div>
         </div>
-        {/* <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-          <span>mobile menu here</span>
-        </MobileSheetNav> */}
       </AppBannerContextProvider>
     </>
   )

@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import AISettingsModal from 'components/ui/AISettingsModal'
@@ -9,7 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
+import { PROJECT_STATUS } from 'lib/constants'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
@@ -18,7 +17,6 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
-// import { useEditorType } from '../editors/editors-layout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import LoadingState from './LoadingState'
@@ -90,12 +88,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
-    const {
-      aiAssistantPanel,
-      setAiAssistantPanel,
-      // mobileInnerMenuOpen,
-      // setMobileInnerMenuOpen
-    } = useAppStateSnapshot()
+    const { aiAssistantPanel, setAiAssistantPanel, mobileMenuOpen, setMobileMenuOpen } =
+      useAppStateSnapshot()
     const { open } = aiAssistantPanel
 
     const projectName = selectedProject?.name
@@ -149,11 +143,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>
-        {/* <OrganizationResourceBanner /> */}
         <div className="flex flex-row h-full w-full">
-          {/* <ProjectNavigationBarHorizontal /> */}
-          {/* <div className="flex h-full flex-row flex-grow gap-1"> */}
-          {/* {!hideIconBar && <NavigationBar />} */}
           <div className={cn('w-full overflow-hidden flex-row')}>
             <ResizablePanelGroup className="" direction="horizontal" autoSaveId="project-layout">
               {showProductMenu && productMenu && (
@@ -249,16 +239,13 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               </ResizablePanel>
             </ResizablePanelGroup>
           </div>
-          {/* </div> */}
         </div>
         <EnableBranchingModal />
         <AISettingsModal />
         <ProjectAPIDocs />
-        {/* <MobileSheetNav 
-        // open={mobileInnerMenuOpen} onOpenChange={setMobileInnerMenuOpen}
-        >
+        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           {productMenu}
-        </MobileSheetNav> */}
+        </MobileSheetNav>
       </ProjectContextProvider>
     )
   }
