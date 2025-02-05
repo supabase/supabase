@@ -1663,11 +1663,13 @@ export const storage: NavMenuConstant = {
       ],
     },
     {
-      name: 'Management',
+      name: 'Objects',
       url: undefined,
       items: [
-        { name: 'Copy / Move Objects', url: '/guides/storage/management/copy-move-objects' },
-        { name: 'Delete Objects', url: '/guides/storage/management/delete-objects' },
+        { name: 'Metadata', url: '/guides/storage/management/metadata' },
+        { name: 'Exists', url: '/guides/storage/management/exists' },
+        { name: 'Copy / Move ', url: '/guides/storage/management/copy-move-objects' },
+        { name: 'Delete', url: '/guides/storage/management/delete-objects' },
       ],
     },
     {
