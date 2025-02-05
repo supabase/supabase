@@ -1,0 +1,3 @@
+{
+  "buildCommand": "next build && ./../../scripts/upload-static-assets.sh"
+}
