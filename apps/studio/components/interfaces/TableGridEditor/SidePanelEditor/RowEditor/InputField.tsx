@@ -293,6 +293,28 @@ const InputField = ({
     )
   }
 
+  if (field.format === 'bytea') {
+    return (
+      <Input
+        data-testid={`${field.name}-input`}
+        layout="horizontal"
+        label={field.name}
+        descriptionText={
+          <>
+            {field.comment && <p>{field.comment}</p>}
+            <p>Bytea columns are edited and displayed as hex in the dashboard</p>
+          </>
+        }
+        labelOptional={field.format}
+        error={errors[field.name]}
+        value={field.value ?? ''}
+        placeholder={`\\x`}
+        disabled={!isEditable}
+        onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+      />
+    )
+  }
+
   return (
     <Input
       data-testid={`${field.name}-input`}

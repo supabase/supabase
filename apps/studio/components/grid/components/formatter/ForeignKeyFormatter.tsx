@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
 
+import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
@@ -27,6 +28,7 @@ export const ForeignKeyFormatter = (props: Props) => {
     connectionString: project?.connectionString,
     id,
   })
+  const foreignKeyColumn = data?.columns.find((x) => x.name === column.key)
   const selectedTable = isTableLike(data) ? data : undefined
 
   const relationship = (selectedTable?.relationships ?? []).find(
@@ -48,13 +50,14 @@ export const ForeignKeyFormatter = (props: Props) => {
   )
 
   const value = row[column.key]
+  const formattedValue = foreignKeyColumn?.format === 'bytea' ? convertByteaToHex(value) : value
 
   return (
     <div className="sb-grid-foreign-key-formatter flex justify-between">
       <span className="sb-grid-foreign-key-formatter__text">
-        {value === null ? <NullValue /> : value}
+        {formattedValue === null ? <NullValue /> : formattedValue}
       </span>
-      {relationship !== undefined && targetTable !== undefined && value !== null && (
+      {relationship !== undefined && targetTable !== undefined && formattedValue !== null && (
         <Popover_Shadcn_>
           <PopoverTrigger_Shadcn_ asChild>
             <ButtonTooltip
@@ -69,7 +72,7 @@ export const ForeignKeyFormatter = (props: Props) => {
             <ReferenceRecordPeek
               table={targetTable}
               column={relationship.target_column_name}
-              value={value}
+              value={formattedValue}
             />
           </PopoverContent_Shadcn_>
         </Popover_Shadcn_>
