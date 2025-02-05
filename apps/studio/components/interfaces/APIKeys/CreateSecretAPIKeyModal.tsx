@@ -47,7 +47,6 @@ const CreateSecretAPIKeyModal = () => {
   const { mutate: createAPIKey, isLoading: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
-    console.log('got to onSubmit')
     createAPIKey(
       {
         projectRef,
