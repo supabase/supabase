@@ -1,4 +1,8 @@
-# Bootstrap Next.js app with Supabase Auth
+---
+# Specify the following for Cursor rules
+description: Guidelines for writing Next.js apps with Supabase Auth
+globs: "**/*.ts, **/*.tsx, **/*.js, **/*.jsx"
+---
 
 Create a Next.js app that uses App Router with Supabase Auth.
 

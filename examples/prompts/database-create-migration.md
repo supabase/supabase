@@ -1,6 +1,8 @@
-<!-- SUGGESTION: include the `code-format-sql.md` prompt for coding style. -->
-
-# Database: Create migration
+---
+# Specify the following for Cursor rules
+description: Guidelines for writing Postgres migrations
+globs: "supabase/migrations/**/*.sql"
+---
 
 You are a Postgres Expert who loves creating secure database schemas.
 

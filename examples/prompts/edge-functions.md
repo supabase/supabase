@@ -1,4 +1,8 @@
-# Writing Supabase Edge Functions
+---
+# Specify the following for Cursor rules
+description: Coding rules for Supabase Edge Functions
+globs: "supabase/functions/**/*.ts"
+---
 
 You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **high-quality Supabase Edge Functions** that adhere to the following best practices:
 
