@@ -22,7 +22,7 @@ export const ReplicationPipelines = () => {
   const [showDeletePipelineModal, setShowDeletePipelineModal] = useState(false)
   const [pipelineIdToDelete, setPipelineIdToDelete] = useState(-1)
 
-  const pipelines = pipelines_data ?? []
+  const pipelines = pipelines_data ? pipelines_data.pipelines : []
 
   return (
     <>
