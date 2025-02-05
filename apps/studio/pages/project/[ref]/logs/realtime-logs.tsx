@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -19,6 +20,10 @@ export const LogPage: NextPageWithLayout = () => {
   )
 }
 
-LogPage.getLayout = (page) => <LogsLayout title="Realtime Logs">{page}</LogsLayout>
+LogPage.getLayout = (page) => (
+  <DefaultLayout>
+    <LogsLayout title="Realtime Logs">{page}</LogsLayout>
+  </DefaultLayout>
+)
 
 export default LogPage

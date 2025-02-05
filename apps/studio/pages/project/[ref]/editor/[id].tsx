@@ -11,6 +11,7 @@ import {
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -48,9 +49,11 @@ const TableEditorPage: NextPageWithLayout = () => {
 }
 
 TableEditorPage.getLayout = (page) => (
-  <ProjectContextFromParamsProvider>
-    <TableEditorLayout>{page}</TableEditorLayout>
-  </ProjectContextFromParamsProvider>
+  <DefaultLayout>
+    <ProjectContextFromParamsProvider>
+      <TableEditorLayout>{page}</TableEditorLayout>
+    </ProjectContextFromParamsProvider>
+  </DefaultLayout>
 )
 
 export default TableEditorPage

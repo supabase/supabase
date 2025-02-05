@@ -7,6 +7,7 @@ import SidePanelEditor from 'components/interfaces/TableGridEditor/SidePanelEdit
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
@@ -25,9 +26,11 @@ const TableEditorPage: NextPageWithLayout = () => {
 }
 
 TableEditorPage.getLayout = (page) => (
-  <ProjectContextFromParamsProvider>
-    <TableEditorLayout>{page}</TableEditorLayout>
-  </ProjectContextFromParamsProvider>
+  <DefaultLayout>
+    <ProjectContextFromParamsProvider>
+      <TableEditorLayout>{page}</TableEditorLayout>
+    </ProjectContextFromParamsProvider>
+  </DefaultLayout>
 )
 
 export default TableEditorPage

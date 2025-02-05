@@ -30,6 +30,7 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -330,6 +331,10 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
+PageLayout.getLayout = (page) => (
+  <DefaultLayout>
+    <FunctionsLayout>{page}</FunctionsLayout>
+  </DefaultLayout>
+)
 
 export default PageLayout
