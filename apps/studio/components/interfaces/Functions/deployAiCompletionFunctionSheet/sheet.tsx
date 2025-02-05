@@ -50,7 +50,7 @@ export const DeployAiCompletionFunctionSheetContent = ({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       prompt: '',
-      apiUrl: 'https://openai.com/sdk/v1',
+      apiUrl: 'https://api.openai.com/v1',
       apiKey: '',
       name: '',
       stream: false,
