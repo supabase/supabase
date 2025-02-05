@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useState } from 'react'
-import { cn } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import AreaChart from 'components/ui/Charts/AreaChart'
 import BarChart from 'components/ui/Charts/BarChart'
@@ -13,15 +13,10 @@ import {
   ProjectDailyStatsAttribute,
   useProjectDailyStatsQuery,
 } from 'data/analytics/project-daily-stats-query'
-import { Loader2 } from 'lucide-react'
+import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { WarningIcon } from 'ui'
 import type { ChartData } from './Charts.types'
-import Panel from 'components/ui/Panel'
-import { useChartHighlight } from './useChartHighlight'
-import MockClientConnectionsChart from './MockClientConnectionsChart'
-import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
-import MockDiskSpaceUsedChart from './MockDiskSpaceUsedChart'
 
 interface ChartHandlerProps {
   id?: string
@@ -32,15 +27,12 @@ interface ChartHandlerProps {
   endDate: string
   interval: string
   customDateFormat?: string
-  defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
+  defaultChartStyle?: 'bar' | 'line'
   hideChartType?: boolean
   data?: ChartData
   isLoading?: boolean
   format?: string
   highlightedValue?: string | number
-  className?: string
-  isStacked?: boolean
-  updateDateRange: UpdateDateRange
 }
 
 /**
@@ -67,16 +59,12 @@ const ChartHandler = ({
   isLoading,
   format,
   highlightedValue,
-  className,
-  isStacked = false,
-  updateDateRange,
 }: PropsWithChildren<ChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
 
   const state = useDatabaseSelectorStateSnapshot()
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
-  const chartHighlight = useChartHighlight()
 
   const databaseIdentifier = state.selectedDatabaseId
 
@@ -104,8 +92,6 @@ const ChartHandler = ({
       },
       { enabled: provider === 'infra-monitoring' && data === undefined }
     )
-
-  console.log(label, infraMonitoringData)
 
   const chartData =
     data ||
@@ -160,22 +146,27 @@ const ChartHandler = ({
     )
   }
 
-  console.log('chartData', chartData)
-
   return (
-    <Panel
-      noMargin
-      noHideOverflow
-      className={cn('relative py-2 w-full', className)}
-      wrapWithLoading={false}
-    >
-      <Panel.Content className="flex flex-col gap-4">
-        <div
-          className="absolute right-6 z-50 flex justify-between scroll-mt-10"
-          id={label.toLowerCase().replaceAll(' ', '-')}
-        >
-          {children}
-        </div>
+    <div className="h-full w-full">
+      <div className="absolute right-6 z-50 flex justify-between">
+        {!hideChartType && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="default"
+                className="px-1.5"
+                icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
+                onClick={() => setChartStyle(chartStyle === 'bar' ? 'line' : 'bar')}
+              />
+            </TooltipTrigger>
+            <TooltipContent side="left" align="center">
+              View as {chartStyle === 'bar' ? 'line chart' : 'bar chart'}
+            </TooltipContent>
+          </Tooltip>
+        )}
+        {children}
+      </div>
+      {chartStyle === 'bar' ? (
         <BarChart
           YAxisProps={{ width: 1 }}
           data={(chartData?.data ?? []) as any}
@@ -185,14 +176,19 @@ const ChartHandler = ({
           highlightedValue={_highlightedValue}
           title={label}
           customDateFormat={customDateFormat}
-          chartHighlight={chartHighlight}
-          hideChartType={hideChartType}
-          chartStyle={chartStyle}
-          onChartStyleChange={setChartStyle}
-          updateDateRange={updateDateRange}
         />
-      </Panel.Content>
-    </Panel>
+      ) : (
+        <AreaChart
+          data={(chartData?.data ?? []) as any}
+          format={format || chartData?.format}
+          xAxisKey="period_start"
+          yAxisKey={attribute}
+          highlightedValue={_highlightedValue}
+          title={label}
+          customDateFormat={customDateFormat}
+        />
+      )}
+    </div>
   )
 }
 

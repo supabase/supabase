@@ -1,16 +1,12 @@
 import dayjs from 'dayjs'
 import { useState } from 'react'
-import { Area, AreaChart as RechartAreaChart, ReferenceArea, Tooltip, XAxis } from 'recharts'
+import { Area, AreaChart as RechartAreaChart, Tooltip, XAxis } from 'recharts'
 
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import ChartHeader from './ChartHeader'
+import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-import ChartHighlightActions from './ChartHighlightActions'
-
-import type { ChartHighlight } from './useChartHighlight'
-import type { CommonChartProps, Datum } from './Charts.types'
-import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 
 export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -18,11 +14,6 @@ export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
   format?: string
   customDateFormat?: string
   displayDateInUtc?: boolean
-  chartHighlight?: ChartHighlight
-  hideChartType?: boolean
-  chartStyle?: string
-  onChartStyleChange?: (style: string) => void
-  updateDateRange: UpdateDateRange
 }
 
 const AreaChart = ({
@@ -39,11 +30,6 @@ const AreaChart = ({
   className = '',
   valuePrecision,
   size = 'normal',
-  chartHighlight,
-  hideChartType,
-  chartStyle,
-  onChartStyleChange,
-  updateDateRange,
 }: AreaChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -58,11 +44,6 @@ const AreaChart = ({
 
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
-
-  const showHighlightActions =
-    chartHighlight?.coordinates.left &&
-    chartHighlight?.coordinates.right &&
-    chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
   if (data.length === 0) {
     return (
@@ -89,11 +70,8 @@ const AreaChart = ({
         }
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
-        hideChartType={hideChartType}
-        chartStyle={chartStyle}
-        onChartStyleChange={onChartStyleChange}
       />
-      <Container className="relative">
+      <Container>
         <RechartAreaChart
           data={data}
           margin={{
@@ -108,20 +86,7 @@ const AreaChart = ({
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
             }
-            const activeTimestamp = data[e.activeTooltipIndex]?.[xAxisKey]
-            chartHighlight?.handleMouseMove({
-              activeLabel: activeTimestamp?.toString(),
-              coordinates: e.activeLabel,
-            })
           }}
-          onMouseDown={(e: any) => {
-            const activeTimestamp = data[e.activeTooltipIndex]?.[xAxisKey]
-            chartHighlight?.handleMouseDown({
-              activeLabel: activeTimestamp?.toString(),
-              coordinates: e.activeLabel,
-            })
-          }}
-          onMouseUp={chartHighlight?.handleMouseUp}
           onMouseLeave={() => setFocusDataIndex(null)}
         >
           <defs>
@@ -148,18 +113,7 @@ const AreaChart = ({
             fillOpacity={1}
             fill="url(#colorUv)"
           />
-          {showHighlightActions && (
-            <ReferenceArea
-              x1={chartHighlight?.coordinates.left}
-              x2={chartHighlight?.coordinates.right}
-              strokeOpacity={0.5}
-              stroke="#3ECF8E"
-              fill="#3ECF8E"
-              fillOpacity={0.3}
-            />
-          )}
         </RechartAreaChart>
-        <ChartHighlightActions chartHighlight={chartHighlight} updateDateRange={updateDateRange} />
       </Container>
       {data && (
         <div className="text-foreground-lighter -mt-8 flex items-center justify-between text-xs">

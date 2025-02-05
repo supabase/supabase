@@ -1,4 +1,4 @@
-import { Button, Checkbox, Checkbox_Shadcn_, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Activity, BarChartIcon, GitCommitHorizontalIcon } from 'lucide-react'
 
 export interface ChartHeaderProps {

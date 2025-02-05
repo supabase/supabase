@@ -57,16 +57,6 @@ export const DEFAULT_STACK_COLORS: ValidStackColor[] = [
   'blue',
   'yellow',
   'indigo',
-  'tomato',
-]
-
-export const MONOTONE_STACK_COLORS: ValidStackColor[] = [
-  'brand',
-  'slate',
-  'blue',
-  'yellow',
-  'indigo',
-  'tomato',
 ]
 
 export enum DateTimeFormats {

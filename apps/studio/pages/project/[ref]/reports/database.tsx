@@ -120,6 +120,13 @@ const REPORT_ATTRIBUTES = [
         label: 'IRQs',
         format: 'percent',
       },
+      {
+        attribute: 'max_cpu_usage',
+        provider: 'infra-monitoring',
+        label: 'Max CPU',
+        isMaxValue: true,
+        format: 'percent',
+      },
       // {
       //   attribute: 'cpu_usage_busy_other',
       //   provider: 'infra-monitoring',

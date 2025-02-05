@@ -5,10 +5,7 @@ import {
   CartesianGrid,
   Cell,
   Legend,
-  Area,
   BarChart as RechartBarChart,
-  ComposedChart,
-  ReferenceArea,
   Tooltip,
   XAxis,
   YAxis,
@@ -20,10 +17,6 @@ import ChartHeader from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-import { cn } from 'ui'
-import type { ChartHighlight } from './useChartHighlight'
-import ChartHighlightActions from './ChartHighlightActions'
-import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -37,11 +30,6 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   XAxisProps?: ComponentProps<typeof XAxis>
   YAxisProps?: ComponentProps<typeof YAxis>
   showGrid?: boolean
-  chartHighlight?: ChartHighlight
-  hideChartType?: boolean
-  chartStyle?: string
-  onChartStyleChange?: (style: string) => void
-  updateDateRange: UpdateDateRange
 }
 
 const BarChart = ({
@@ -65,11 +53,6 @@ const BarChart = ({
   XAxisProps,
   YAxisProps,
   showGrid = false,
-  chartHighlight,
-  hideChartType,
-  chartStyle,
-  onChartStyleChange,
-  updateDateRange,
 }: BarChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -108,11 +91,6 @@ const BarChart = ({
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
 
-  const showHighlightActions =
-    chartHighlight?.coordinates.left &&
-    chartHighlight?.coordinates.right &&
-    chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
-
   if (data.length === 0) {
     return (
       <NoDataPlaceholder
@@ -127,7 +105,7 @@ const BarChart = ({
   }
 
   return (
-    <div className={cn('flex flex-col gap-y-3', className)}>
+    <div className={['flex flex-col gap-y-3', className].join(' ')}>
       <ChartHeader
         title={title}
         format={format}
@@ -139,34 +117,20 @@ const BarChart = ({
         }
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
-        hideChartType={hideChartType}
-        chartStyle={chartStyle}
-        onChartStyleChange={onChartStyleChange}
       />
-      <Container className="relative">
-        <ComposedChart
+      <Container>
+        <RechartBarChart
           data={data}
           className="overflow-visible"
+          //   mouse hover focusing logic
           onMouseMove={(e: any) => {
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
             }
-            const activeTimestamp = data[e.activeTooltipIndex]?.[xAxisKey]
-            chartHighlight?.handleMouseMove({
-              activeLabel: activeTimestamp?.toString(),
-              coordinates: e.activeLabel,
-            })
           }}
-          onMouseDown={(e: any) => {
-            const activeTimestamp = data[e.activeTooltipIndex]?.[xAxisKey]
-            chartHighlight?.handleMouseDown({
-              activeLabel: activeTimestamp?.toString(),
-              coordinates: e.activeLabel,
-            })
-          }}
-          onMouseUp={chartHighlight?.handleMouseUp}
           onMouseLeave={() => setFocusDataIndex(null)}
           onClick={(tooltipData) => {
+            // receives tooltip data https://github.com/recharts/recharts/blob/2a3405ff64a0c050d2cf94c36f0beef738d9e9c2/src/chart/generateCategoricalChart.tsx
             const datum = tooltipData?.activePayload?.[0]?.payload
             if (onBarClick) onBarClick(datum, tooltipData)
           }}
@@ -186,47 +150,27 @@ const BarChart = ({
             key={xAxisKey}
           />
           <Tooltip content={() => null} />
-          {chartStyle === 'bar' ? (
-            <Bar
-              dataKey={yAxisKey}
-              fill={CHART_COLORS.GREEN_1}
-              animationDuration={300}
-              maxBarSize={48}
-            >
-              {data?.map((_entry: Datum, index: any) => (
-                <Cell
-                  key={`cell-${index}`}
-                  className={`transition-all duration-300 ${onBarClick ? 'cursor-pointer' : ''}`}
-                  fill={
-                    focusDataIndex === index || focusDataIndex === null
-                      ? CHART_COLORS.GREEN_1
-                      : CHART_COLORS.GREEN_2
-                  }
-                  enableBackground={12}
-                />
-              ))}
-            </Bar>
-          ) : (
-            <Area
-              type="monotone"
-              dataKey={yAxisKey}
-              stroke={CHART_COLORS.GREEN_1}
-              fillOpacity={1}
-              fill="url(#colorUv)"
-            />
-          )}
-          {showHighlightActions && (
-            <ReferenceArea
-              x1={chartHighlight?.coordinates.left}
-              x2={chartHighlight?.coordinates.right}
-              strokeOpacity={0.5}
-              stroke="#3ECF8E"
-              fill="#3ECF8E"
-              fillOpacity={0.3}
-            />
-          )}
-        </ComposedChart>
-        <ChartHighlightActions chartHighlight={chartHighlight} updateDateRange={updateDateRange} />
+          <Bar
+            dataKey={yAxisKey}
+            fill={CHART_COLORS.GREEN_1}
+            animationDuration={300}
+            // Max bar size required to prevent bars from expanding to max width.
+            maxBarSize={48}
+          >
+            {data?.map((_entry: Datum, index: any) => (
+              <Cell
+                key={`cell-${index}`}
+                className={`transition-all duration-300 ${onBarClick ? 'cursor-pointer' : ''}`}
+                fill={
+                  focusDataIndex === index || focusDataIndex === null
+                    ? CHART_COLORS.GREEN_1
+                    : CHART_COLORS.GREEN_2
+                }
+                enableBackground={12}
+              />
+            ))}
+          </Bar>
+        </RechartBarChart>
       </Container>
       {data && (
         <div className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs">
