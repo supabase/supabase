@@ -38,10 +38,7 @@ const SQLEditorLayout = ({ title, children }: SQLEditorLayoutProps) => {
       resizableSidebar
     >
       {children}
-      <OngoingQueriesPanel
-        visible={showOngoingQueries}
-        onClose={() => setShowOngoingQueries(false)}
-      />
+      <OngoingQueriesPanel />
     </ProjectLayout>
   )
 }
