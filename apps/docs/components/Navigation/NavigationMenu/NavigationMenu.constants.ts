@@ -258,7 +258,7 @@ export const gettingstarted: NavMenuConstant = {
       items: [
         { name: 'Next.js', url: '/guides/getting-started/quickstarts/nextjs' },
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
-        { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
+        { name: 'Nuxt', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
         { name: 'Hono', url: '/guides/getting-started/quickstarts/hono' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
@@ -1903,12 +1903,16 @@ export const local_development: NavMenuConstant = {
       items: [
         { name: 'Getting started', url: '/guides/local-development/overview' },
         {
-          name: 'Managing config and secrets',
-          url: '/guides/local-development/managing-config',
+          name: 'Declarative database schemas',
+          url: '/guides/local-development/declarative-database-schemas',
         },
         {
           name: 'Seeding your database',
           url: '/guides/local-development/seeding-your-database',
+        },
+        {
+          name: 'Managing config and secrets',
+          url: '/guides/local-development/managing-config',
         },
         {
           name: 'Customizing email templates',

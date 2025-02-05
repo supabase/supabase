@@ -4,7 +4,7 @@ title: 'Login with Bitbucket'
 description: 'Add Bitbucket OAuth to your Supabase project'
 ---
 
-To enable Bitbucket Auth for your project, you need to set up a BitBucket OAuth application and add the application credentials to your Supabase Dashboard.
+To enable Bitbucket Auth for your project, you need to set up a Bitbucket OAuth application and add the application credentials to your Supabase Dashboard.
 
 ## Overview
 
@@ -57,7 +57,7 @@ Setting up Bitbucket logins for your application consists of 3 parts:
 
 <CreateClientSnippet />
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `bitbucket` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `bitbucket` as the `provider`:
 
 ```js
 async function signInWithBitbucket() {
@@ -70,7 +70,7 @@ async function signInWithBitbucket() {
 </TabPanel>
 <TabPanel id="flutter" label="Flutter">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `bitbucket` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `bitbucket` as the `provider`:
 
 ```dart
 Future<void> signInWithBitbucket() async {

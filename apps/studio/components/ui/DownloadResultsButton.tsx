@@ -32,6 +32,15 @@ export const DownloadResultsButton = ({
 }: DownloadResultsButtonProps) => {
   const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
 
+  // [Joshen] Ensure JSON values are stringified for CSV and Markdown
+  const formattedResults = results.map((row) => {
+    const r = { ...row }
+    Object.keys(row).forEach((x) => {
+      if (typeof row[x] === 'object') r[x] = JSON.stringify(row[x])
+    })
+    return r
+  })
+
   const headers = useMemo(() => {
     if (results) {
       const firstRow = Array.from(results)[0]
@@ -42,10 +51,10 @@ export const DownloadResultsButton = ({
 
   const copyAsMarkdown = () => {
     if (navigator) {
-      if (results.length == 0) toast('Results are empty')
+      if (formattedResults.length == 0) toast('Results are empty')
 
-      const columns = Object.keys(results[0])
-      const rows = results.map((x) => {
+      const columns = Object.keys(formattedResults[0])
+      const rows = formattedResults.map((x) => {
         let temp: any[] = []
         columns.forEach((col) => temp.push(x[col]))
         return temp
@@ -79,7 +88,13 @@ export const DownloadResultsButton = ({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align={align} className="w-44">
-          <DropdownMenuItem className="gap-x-2" onClick={() => csvRef.current?.link.click()}>
+          <DropdownMenuItem
+            className="gap-x-2"
+            onClick={() => {
+              csvRef.current?.link.click()
+              toast.success('Downloading results as CSV')
+            }}
+          >
             <Download size={14} />
             <p>Download CSV</p>
           </DropdownMenuItem>
@@ -97,7 +112,7 @@ export const DownloadResultsButton = ({
         ref={csvRef}
         className="hidden"
         headers={headers}
-        data={results}
+        data={formattedResults}
         filename={`${fileName}.csv`}
       />
     </>

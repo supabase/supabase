@@ -70,6 +70,7 @@ export enum TelemetryActions {
   IMPORT_DATA_ADDED = 'import_data_added',
   SQL_EDITOR_QUERY_RUN_BUTTON_CLICKED = 'sql_editor_query_run_button_clicked',
   STUDIO_PRICING_PLAN_CTA_CLICKED = 'studio_pricing_plan_cta_clicked',
+  STUDIO_PRICING_SIDE_PANEL_OPENED = 'studio_pricing_side_panel_opened',
 }
 
 /**
@@ -1059,6 +1060,19 @@ export interface StudioPricingPlanCtaClickedEvent {
   groups: { organization: string }
 }
 
+/**
+ * User opened the pricing side panel in studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingSidePanelOpenedEvent {
+  action: TelemetryActions.STUDIO_PRICING_SIDE_PANEL_OPENED
+  properties: { currentPlan?: string }
+  groups: { organization: string }
+}
+
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
@@ -1119,3 +1133,4 @@ export type TelemetryEvent =
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
+  | StudioPricingSidePanelOpenedEvent

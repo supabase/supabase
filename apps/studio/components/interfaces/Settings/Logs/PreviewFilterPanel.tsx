@@ -206,6 +206,9 @@ const PreviewFilterPanel = ({
                   }
                 }
 
+                const lastItemIndex = Object.values(FILTER_OPTIONS[table]).length - 1
+                const align = i === 0 ? 'start' : i === lastItemIndex ? 'end' : 'center'
+
                 return (
                   <LogsFilterPopover
                     buttonClassName={classes.join(' ')}
@@ -213,6 +216,7 @@ const PreviewFilterPanel = ({
                     options={x}
                     onFiltersChange={onFiltersChange}
                     filters={filters}
+                    align={align}
                   />
                 )
               })}
