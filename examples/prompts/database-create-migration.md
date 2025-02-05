@@ -1,3 +1,5 @@
+# Database: Create migration
+
 ---
 # Specify the following for Cursor rules
 description: Guidelines for writing Postgres migrations

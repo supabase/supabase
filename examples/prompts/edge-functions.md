@@ -1,3 +1,5 @@
+# Writing Supabase Edge Functions
+
 ---
 # Specify the following for Cursor rules
 description: Coding rules for Supabase Edge Functions

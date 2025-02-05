@@ -1,3 +1,5 @@
+# Database: Create functions
+
 ---
 # Specify the following for Cursor rules
 description: Guidelines for writing Supabase database functions
