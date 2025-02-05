@@ -9,7 +9,7 @@ import { RestrictionBanner } from 'components/layouts/AppLayout/RestrictionBanne
 import { getTheme } from 'components/ui/CodeEditor/CodeEditor.utils'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
-// import { OrganizationResourceBanner } from '../Organization/resource-banner'
+import { OrganizationResourceBanner } from '../Organization/resource-banner'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useParams } from 'common'
 
@@ -19,7 +19,7 @@ const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { resolvedTheme } = useTheme()
   const { ref } = useParams()
 
-  const ongoingIncident = true // useFlag('ongoingIncident')
+  const ongoingIncident = useFlag('ongoingIncident')
   const showNoticeBanner = useFlag('showNoticeBanner')
   const clockSkewBanner = useFlag('clockSkewBanner')
 
@@ -38,7 +38,6 @@ const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
         {ongoingIncident && <IncidentBanner />}
         {showNoticeBanner && <NoticeBanner />}
         {profile !== undefined && <RestrictionBanner />}
-        {/* <OrganizationResourceBanner headerBanner={true} /> */}
         {clockSkewBanner && <ClockSkewBanner />}
       </div>
       {children}
