@@ -108,5 +108,4 @@ Vue
 WhatsApp
 Xcode
 pgTAP
-pgTLE
 dbdev
