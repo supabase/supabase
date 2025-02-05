@@ -73,7 +73,6 @@ export const DeployAiCompletionFunctionSheetContent = ({
         projectRef: projectRef!,
         metadata: {
           entrypoint_path: 'index.ts',
-          import_map_path: 'import_map.json',
           name: values.name,
           verify_jwt: values.verifyJwt,
         },
