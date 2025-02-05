@@ -7,14 +7,13 @@ import { useParams } from 'common'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
-  const project = useSelectedProject()
   const { ref } = useParams() as { ref: string }
 
   return (
     <ProductEmptyState title="Authentication settings have moved">
       <div className="text-sm">
         <p className="text-foreground-light mb-4">
-          All authentication settings now exist under Authentication in the dashboard.
+          We have moved all settings under configuration within the Authentication page.
         </p>
         <Link
           href={`/project/${ref}/auth/providers`}
