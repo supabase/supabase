@@ -1,10 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { X } from 'lucide-react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common/hooks/useParams'
+import console from 'console'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
+import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
 import {
   Button,
   ExpandingTextArea,
@@ -56,23 +59,22 @@ export const DeployAiCompletionFunctionSheetContent = ({
     },
   })
 
-  const { mutateAsync: deployEdgeFunction } = useEdgeFunctionDeployMutation()
+  const { mutateAsync: deployEdgeFunction, isLoading: isDeploying } =
+    useEdgeFunctionDeployMutation()
+
+  const { mutateAsync: createSecret, isLoading: isSavingSecret } = useSecretsCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+    const toastId = toast.loading('Deploying function...')
     try {
-      const content = generateFunctionCode(
-        values.prompt,
-        values.apiUrl,
-        values.apiKey,
-        values.stream
-      )
+      const content = generateFunctionCode(values.prompt, values.apiUrl, 'gpt-4o', values.stream)
 
       console.log(content)
       const deployResult = await deployEdgeFunction({
         projectRef: projectRef!,
         metadata: {
           entrypoint_path: 'index.ts',
-          // import_map_path: 'import_map.json',
+          import_map_path: 'import_map.json',
           name: values.name,
           verify_jwt: values.verifyJwt,
         },
@@ -80,9 +82,16 @@ export const DeployAiCompletionFunctionSheetContent = ({
       })
       console.log(deployResult)
 
-      // onClose()
+      toast.loading('Saving the API key as a secret...', { id: toastId })
+
+      createSecret({ projectRef, secrets: [{ name: 'OPENAI_API_KEY', value: values.apiKey }] })
+
+      toast.success('Edge function deployed successfully', { id: toastId })
+
+      onClose()
     } catch (error) {
       console.error(error)
+      toast.dismiss(toastId)
     }
   }
 
@@ -213,10 +222,10 @@ export const DeployAiCompletionFunctionSheetContent = ({
         </Form_Shadcn_>
       </SheetSection>
       <SheetFooter>
-        <Button type="default" onClick={() => onClose()}>
+        <Button type="default" onClick={() => onClose()} disabled={isSavingSecret || isDeploying}>
           Cancel
         </Button>
-        <Button form={FORM_ID} htmlType="submit">
+        <Button form={FORM_ID} htmlType="submit" disabled={isSavingSecret || isDeploying}>
           Create function
         </Button>
       </SheetFooter>
