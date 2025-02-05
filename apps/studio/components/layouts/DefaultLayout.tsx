@@ -28,29 +28,27 @@ const DefaultLayout = ({
 
   return (
     <>
-      <div className="h-full min-h-[0px] basis-0 flex-1">
-        <AppBannerContextProvider>
-          <div className="flex flex-col h-screen w-screen">
-            {/* Top Banner */}
-            <AppBannerWrapper />
-            <div className="flex-shrink-0">
-              <LayoutHeader />
-              <MobileViewNav />
-            </div>
-            {/* Main Content Area */}
-            <div className="flex flex-1 w-full overflow-y-hidden">
-              {/* Sidebar */}
-              <NavigationBar />
-              {/* <AppDefaultNavigation /> */}
-              {/* Main Content */}
-              <div className="flex-grow h-full overflow-y-auto">{children}</div>
-            </div>
+      <AppBannerContextProvider>
+        <div className="flex flex-col h-screen w-screen">
+          {/* Top Banner */}
+          <AppBannerWrapper />
+          <div className="flex-shrink-0">
+            <LayoutHeader />
+            <MobileViewNav />
           </div>
-          {/* <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          {/* Main Content Area */}
+          <div className="flex flex-1 w-full overflow-y-hidden">
+            {/* Sidebar */}
+            <NavigationBar />
+            {/* <AppDefaultNavigation /> */}
+            {/* Main Content */}
+            <div className="flex-grow h-full overflow-y-auto">{children}</div>
+          </div>
+        </div>
+        {/* <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <span>mobile menu here</span>
         </MobileSheetNav> */}
-        </AppBannerContextProvider>
-      </div>
+      </AppBannerContextProvider>
     </>
   )
 }
