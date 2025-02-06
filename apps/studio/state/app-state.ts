@@ -1,7 +1,7 @@
 import type { Message as MessageType } from 'ai/react'
 import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
-import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 export type CommonDatabaseEntity = {
@@ -30,6 +30,15 @@ type AiAssistantPanelType = {
   tables: { schema: string; name: string }[]
 }
 
+type EditorPanelType = {
+  open: boolean
+  initialValue?: string
+  label?: string
+  saveLabel?: string
+  onSave?: (value: string) => void
+  functionName?: string
+}
+
 type DashboardHistoryType = {
   sql?: string
   editor?: string
@@ -47,6 +56,13 @@ const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
   tables: [],
 }
 
+const INITIAL_EDITOR_PANEL: EditorPanelType = {
+  open: false,
+  initialValue: '',
+  label: '',
+  saveLabel: '',
+}
+
 const EMPTY_DASHBOARD_HISTORY: DashboardHistoryType = {
   sql: undefined,
   editor: undefined,
@@ -56,6 +72,7 @@ const getInitialState = () => {
   if (typeof window === 'undefined') {
     return {
       aiAssistantPanel: INITIAL_AI_ASSISTANT,
+      editorPanel: INITIAL_EDITOR_PANEL,
       dashboardHistory: EMPTY_DASHBOARD_HISTORY,
       activeDocsSection: ['introduction'],
       docsLanguage: 'js',
@@ -73,11 +90,13 @@ const getInitialState = () => {
   }
 
   const stored = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE)
+  const storedEditor = localStorage.getItem(LOCAL_STORAGE_KEYS.EDITOR_PANEL_STATE)
 
   const urlParams = new URLSearchParams(window.location.search)
   const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
 
   let parsedAiAssistant = INITIAL_AI_ASSISTANT
+  let parsedEditorPanel = INITIAL_EDITOR_PANEL
 
   try {
     if (stored) {
@@ -87,6 +106,9 @@ const getInitialState = () => {
         }
         return value
       })
+    }
+    if (storedEditor) {
+      parsedEditorPanel = JSON.parse(storedEditor)
     }
   } catch {
     // Ignore parsing errors
@@ -100,6 +122,7 @@ const getInitialState = () => {
           ? aiAssistantPanelOpenParam === 'true'
           : parsedAiAssistant.open,
     },
+    editorPanel: parsedEditorPanel,
     dashboardHistory: EMPTY_DASHBOARD_HISTORY,
     activeDocsSection: ['introduction'],
     docsLanguage: 'js',
@@ -204,8 +227,12 @@ export const appState = proxy({
   },
 
   setAiAssistantPanel: (value: Partial<AiAssistantPanelType>) => {
-    const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
+    // Close Editor panel if AI Assistant panel is being opened
+    if (value.open && appState.editorPanel.open) {
+      appState.editorPanel.open = false
+    }
 
+    const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
     appState.aiAssistantPanel = {
       ...appState.aiAssistantPanel,
       content: hasEntityChanged ? '' : appState.aiAssistantPanel.content,
@@ -224,17 +251,35 @@ export const appState = proxy({
   setOnGoingQueriesPanelOpen: (value: boolean) => {
     appState.ongoingQueriesPanelOpen = value
   },
+
+  setEditorPanel: (value: Partial<EditorPanelType>) => {
+    // Close AI Assistant panel if editor panel is being opened
+    if (value.open && appState.aiAssistantPanel.open) {
+      appState.aiAssistantPanel.open = false
+    }
+    appState.editorPanel = {
+      ...appState.editorPanel,
+      ...value,
+    }
+  },
 })
 
-// Set up localStorage subscription
+// Set up localStorage subscriptions
 if (typeof window !== 'undefined') {
   subscribe(appState, () => {
-    const state = {
+    // Save AI assistant state with limited message history
+    const aiAssistantState = {
       ...appState.aiAssistantPanel,
       // limit to 20 messages so as to not overflow the context window
       messages: appState.aiAssistantPanel.messages?.slice(-20),
     }
-    localStorage.setItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE, JSON.stringify(state))
+    localStorage.setItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE, JSON.stringify(aiAssistantState))
+
+    // Save editor panel state
+    localStorage.setItem(
+      LOCAL_STORAGE_KEYS.EDITOR_PANEL_STATE,
+      JSON.stringify(appState.editorPanel)
+    )
   })
 }
 
