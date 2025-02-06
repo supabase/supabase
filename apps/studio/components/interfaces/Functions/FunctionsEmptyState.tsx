@@ -1,7 +1,7 @@
-import { ExternalLink } from 'lucide-react'
-
 import { DocsButton } from 'components/ui/DocsButton'
+import { ExternalLink } from 'lucide-react'
 import { Button } from 'ui'
+import { DeployAiCompletionFunctionSheet } from './deployAiCompletionFunctionSheet'
 import TerminalInstructions from './TerminalInstructions'
 
 const FunctionsEmptyState = () => {
@@ -28,6 +28,7 @@ const FunctionsEmptyState = () => {
                 Examples
               </a>
             </Button>
+            <DeployAiCompletionFunctionSheet />
           </div>
         </div>
         <div className="col-span-8 bg-surface-100 px-5 py-4 border rounded-md">
