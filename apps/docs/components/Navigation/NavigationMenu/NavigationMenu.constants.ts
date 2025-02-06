@@ -2123,6 +2123,10 @@ export const platform: NavMenuConstant = {
               name: 'Storage Size',
               url: '/guides/platform/manage-your-usage/storage-size',
             },
+            {
+              name: 'Disk Size',
+              url: '/guides/platform/manage-your-usage/disk-size',
+            },
           ],
         },
         {
