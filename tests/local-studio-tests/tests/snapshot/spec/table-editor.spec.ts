@@ -85,7 +85,7 @@ test.describe('Table Editor page', () => {
     await expect(page.locator('div.rdg-row:nth-child(2)')).toContainText('2')
     await expect(page.locator('div.rdg-row:nth-child(3)')).toContainText('100')
     // remove the sorting
-    await page.getByRole('button', { name: 'Sorted by 1 rule' }).click()
+    await page.getByTestId('table-editor-sort-button').click()
     await page.getByRole('dialog').getByRole('button').nth(1).click()
 
     // filter by a column
