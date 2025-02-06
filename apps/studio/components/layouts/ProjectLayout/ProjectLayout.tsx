@@ -209,10 +209,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                           </div>
                         ) : (
                           <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                            <Fragment key={selectedProject?.ref}>
-                              <ResourceExhaustionWarningBanner />
-                              {children}
-                            </Fragment>
+                            <ResourceExhaustionWarningBanner />
+                            {children}
                           </ContentWrapper>
                         )}
                       </main>
@@ -226,10 +224,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                         <ResizablePanel
                           id="panel-assistant"
                           className={cn(
+                            'bg fixed z-40 md:absolute right-0 top-0 md:top-[48px] bottom-0 xl:relative xl:top-0',
                             'bg absolute right-0 top-[48px] bottom-0 xl:relative xl:top-0',
+                            'w-screen h-[100dvh] md:h-auto md:w-auto md:min-w-[400px] max-w-[500px]',
                             'min-w-[400px] max-w-[500px]',
-                            '2xl:min-w-[500px] 2xl:max-w-[600px]',
-                            'border-l'
+                            '2xl:min-w-[500px] 2xl:max-w-[600px]'
                           )}
                         >
                           <AIAssistantPanel />
@@ -274,7 +273,6 @@ const MenuBarWrapper = ({
 }: MenuBarWrapperProps) => {
   const router = useRouter()
   const selectedProject = useSelectedProject()
-
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
   if (!isBlocking) {
