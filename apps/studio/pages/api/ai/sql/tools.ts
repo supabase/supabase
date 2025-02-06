@@ -387,5 +387,179 @@ export const getTools = ({
         }
       },
     }),
+    getEdgeFunctionKnowledge: tool({
+      description: 'Get knowledge about how to write edge functions for Supabase',
+      parameters: z.object({}),
+      execute: async ({}) => {
+        console.log('schemas', 'edge function called...')
+        return stripIndent`
+        # Writing Supabase Edge Functions
+
+        You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **high-quality Supabase Edge Functions** that adhere to the following best practices:
+
+        ## Guidelines
+
+        1. Try to use Web APIs and Deno's core APIs instead of external dependencies (eg: use fetch instead of Axios, use WebSockets API instead of node-ws)
+        2. If you are reusing utility methods between Edge Functions, add them to \`supabase/functions/_shared\` and import using a relative path. Do NOT have cross dependencies between Edge Functions.
+        3. Do NOT use bare specifiers when importing dependecnies. If you need to use an external dependency, make sure it's prefixed with either \`npm:\` or \`jsr:\`. For example, \`@supabase/supabase-js\` should be written as \`npm:@supabase/supabase-js\`.
+        4. For external imports, always define a version. For example, \`npm:@express\` should be written as \`npm:express@4.18.2\`.
+        5. For external dependencies, importing via \`npm:\` and \`jsr:\` is preferred. Minimize the use of imports from @\`deno.land/x\` , \`esm.sh\` and @\`unpkg.com\` . If you have a package from one of those CDNs, you can replace the CDN hostname with \`npm:\` specifier.
+        6. You can also use Node built-in APIs. You will need to import them using \`node:\` specifier. For example, to import Node process: \`import process from "node:process"\`. Use Node APIs when you find gaps in Deno APIs.
+        7. Do NOT use \`import { serve } from "https://deno.land/std@0.168.0/http/server.ts"\`. Instead use the built-in \`Deno.serve\`.
+        8. Following environment variables (ie. secrets) are pre-populated in both local and hosted Supabase environments. Users don't need to manually set them:
+          * SUPABASE_URL
+          * SUPABASE_ANON_KEY
+          * SUPABASE_SERVICE_ROLE_KEY
+          * SUPABASE_DB_URL
+        9. To set other environment variables (ie. secrets) users can put them in a env file and run the \`supabase secrets set --env-file path/to/env-file\`
+        10. A single Edge Function can handle multiple routes. It is recommended to use a library like Express or Hono to handle the routes as it's easier for developer to understand and maintain. Each route must be prefixed with \`/function-name\` so they are routed correctly.
+        11. File write operations are ONLY permitted on \`/tmp\` directory. You can use either Deno or Node File APIs.
+        12. Use \`EdgeRuntime.waitUntil(promise)\` static method to run long-running tasks in the background without blocking response to a request. Do NOT assume it is available in the request / execution context.
+
+        ## Example Templates
+
+        ### Simple Hello World Function
+
+        \`\`\`edge
+        interface reqPayload {
+          name: string;
+        }
+
+        console.info('server started');
+
+        Deno.serve(async (req: Request) => {
+          const { name }: reqPayload = await req.json();
+          const data = {
+            message: \`Hello \${name} from foo!\`,
+          };
+
+          return new Response(
+            JSON.stringify(data),
+            { headers: { 'Content-Type': 'application/json', 'Connection': 'keep-alive' }}
+          );
+        });
+        \`\`\`
+
+        ### Example Function using Node built-in API
+
+        \`\`\`edge
+        import { randomBytes } from "node:crypto";
+        import { createServer } from "node:http";
+        import process from "node:process";
+
+        const generateRandomString = (length) => {
+          const buffer = randomBytes(length);
+          return buffer.toString('hex');
+        };
+
+        const randomString = generateRandomString(10);
+        console.log(randomString);
+
+        const server = createServer((req, res) => {
+          const message = \`Hello\`;
+          res.end(message);
+        });
+
+        server.listen(9999);
+        \`\`\`
+
+        ### Using npm packages in Functions
+
+        \`\`\`edge
+        import express from "npm:express@4.18.2";
+
+        const app = express();
+
+        app.get(/(.*)/, (req, res) => {
+          res.send("Welcome to Supabase");
+        });
+
+        app.listen(8000);
+        \`\`\`
+
+        ### Generate embeddings using built-in @Supabase.ai API
+
+        \`\`\`edge
+        const model = new Supabase.ai.Session('gte-small');
+
+        Deno.serve(async (req: Request) => {
+          const params = new URL(req.url).searchParams;
+          const input = params.get('text');
+          const output = await model.run(input, { mean_pool: true, normalize: true });
+          return new Response(
+            JSON.stringify(output),
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Connection': 'keep-alive',
+              },
+            },
+          );
+        });
+        \`\`\`
+
+        ## Integrating with Supabase Auth
+
+        \`\`\`edge
+          import { createClient } from \\'jsr:@supabase/supabase-js@2\\'
+          import { corsHeaders } from \\'../_shared/cors.ts\\'
+
+          console.log(\`Function "select-from-table-with-auth-rls" up and running!\`)
+
+          Deno.serve(async (req: Request) => {
+            // This is needed if you\\'re planning to invoke your function from a browser.
+            if (req.method === \\'OPTIONS\\') {
+              return new Response(\\'ok\\', { headers: corsHeaders })
+            }
+
+            try {
+              // Create a Supabase client with the Auth context of the logged in user.
+              const supabaseClient = createClient(
+                // Supabase API URL - env var exported by default.
+                Deno.env.get(\\'SUPABASE_URL\\') ?? \\'\\',
+                // Supabase API ANON KEY - env var exported by default.
+                Deno.env.get(\\'SUPABASE_ANON_KEY\\') ?? \\'\\',
+                // Create client with Auth context of the user that called the function.
+                // This way your row-level-security (RLS) policies are applied.
+                {
+                  global: {
+                    headers: { Authorization: req.headers.get(\\'Authorization\\')! },
+                  },
+                }
+              )
+
+              // First get the token from the Authorization header
+              const token = req.headers.get(\\'Authorization\\').replace(\\'Bearer \\', \\'\\')
+
+              // Now we can get the session or user object
+              const {
+                data: { user },
+              } = await supabaseClient.auth.getUser(token)
+
+              // And we can run queries in the context of our authenticated user
+              const { data, error } = await supabaseClient.from(\\'users\\').select(\\'*\\')
+              if (error) throw error
+
+              return new Response(JSON.stringify({ user, data }), {
+                headers: { ...corsHeaders, \\'Content-Type\\': \\'application/json\\' },
+                status: 200,
+              })
+            } catch (error) {
+              return new Response(JSON.stringify({ error: error.message }), {
+                headers: { ...corsHeaders, \\'Content-Type\\': \\'application/json\\' },
+                status: 400,
+              })
+            }
+          })
+
+          // To invoke:
+          // curl -i --location --request POST \\'http://localhost:54321/functions/v1/select-from-table-with-auth-rls\\' \\
+          //   --header \\'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs\\' \\
+          //   --header \\'Content-Type: application/json\\' \\
+          //   --data \\'{"name":"Functions"}\\'
+        \`\`\`
+        `
+      },
+    }),
   }
 }
