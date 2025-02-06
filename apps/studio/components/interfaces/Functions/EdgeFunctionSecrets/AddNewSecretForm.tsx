@@ -15,6 +15,7 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -95,7 +96,13 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
   const { mutate: createSecret, isLoading: isCreating } = useSecretsCreateMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully created new secret "${variables.secrets[0].name}"`)
-      form.reset(defaultValues)
+      // useFieldArray maintains internal state independently of useForm
+      // so it retains field state even after calling form.reset().
+      // setTimeout avoids a React state update conflict between useFieldArray and form.setValue
+      setTimeout(() => {
+        form.setValue('secrets', [{ name: '', value: '' }])
+      }, 0)
+
       onComplete?.()
     },
   })
@@ -132,7 +139,7 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
                   control={form.control}
                   name={`secrets.${index}.value`}
                   render={({ field }) => (
-                    <FormItem_Shadcn_ className="w-full">
+                    <FormItem_Shadcn_ className="w-full relative">
                       <FormLabel_Shadcn_>Value</FormLabel_Shadcn_>
                       <FormControl_Shadcn_>
                         <Input
@@ -146,16 +153,13 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
                                 icon={showSecretValue ? <EyeOff /> : <Eye />}
                                 onClick={() => setShowSecretValue(!showSecretValue)}
                               />
-
-                              {form.formState.errors.secrets?.[index]?.value && (
-                                <p className="text-xs text-red-500">
-                                  {form.formState.errors.secrets?.[index]?.value.message}
-                                </p>
-                              )}
                             </div>
                           }
                         />
                       </FormControl_Shadcn_>
+                      <div className="absolute -bottom-8">
+                        <FormMessage_Shadcn_ />
+                      </div>
                     </FormItem_Shadcn_>
                   )}
                 />
@@ -164,11 +168,7 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
                   type="default"
                   className="self-end h-9 flex"
                   icon={<MinusCircle />}
-                  onClick={() => {
-                    if (fields.length > 1) {
-                      remove(index)
-                    }
-                  }}
+                  onClick={() => (fields.length > 1 ? remove(index) : form.reset(defaultValues))}
                 />
               </div>
             ))}
@@ -176,8 +176,14 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
             <Button
               type="default"
               onClick={() => {
-                const isEmptyForm = fields.every((field) => !field.name && !field.value)
-                isEmptyForm ? form.reset(defaultValues) : append({ name: '', value: '' })
+                const formValues = form.getValues('secrets')
+                const isEmptyForm = formValues.every((field) => !field.name && !field.value)
+                if (isEmptyForm) {
+                  fields.forEach((_, index) => remove(index))
+                  append({ name: '', value: '' })
+                } else {
+                  append({ name: '', value: '' })
+                }
               }}
             >
               Add another
