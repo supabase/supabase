@@ -432,7 +432,8 @@ const MultiSelectorList = React.forwardRef<
 >(({ className, children, creatable = false }, ref) => {
   const { open, inputValue, setInputValue, toggleValue } = useMultiSelect()
 
-  const availableOptions = (children as React.ReactNode[])
+  const options = (children as React.ReactNode[]) ?? []
+  const availableOptions = options
     .filter((x: any) => !!x.props.value)
     .map((x: any) => x.props.value.toLowerCase())
   const isOptionExists = availableOptions.some((x) => x === inputValue.toLowerCase())
@@ -459,6 +460,10 @@ const MultiSelectorList = React.forwardRef<
         >
           Create "{inputValue}"
         </CommandItem>
+      ) : creatable && options.length === 0 ? (
+        <div className="p-2 py-1.5 text-xs text-foreground-lighter font-italic">
+          Type to add a value
+        </div>
       ) : (
         <CommandEmpty>
           <span className="text-foreground-muted">No results found</span>
