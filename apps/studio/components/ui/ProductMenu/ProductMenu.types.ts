@@ -17,4 +17,5 @@ export interface ProductMenuGroupItem {
   isExternal?: boolean
   disabled?: boolean
   label?: string
+  pages?: string[]
 }

@@ -20,7 +20,8 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
           ? [
               {
                 name: 'Sign In / Up',
-                key: 'providers',
+                key: 'sign-in-up',
+                pages: ['providers', 'third-party'],
                 url: `/project/${ref}/auth/providers`,
                 items: [],
               },
@@ -38,7 +39,8 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
               },
               {
                 name: 'Emails',
-                key: 'templates',
+                key: 'emails',
+                pages: ['templates', 'smtp'],
                 url: `/project/${ref}/auth/templates`,
                 items: [],
               },
