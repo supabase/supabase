@@ -1,10 +1,7 @@
 import { AppBannerWrapper } from 'components/interfaces/App'
-// import { AppDefaultNavigation } from 'components/interfaces/app-default-navigation'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { PropsWithChildren, ReactNode } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
-// import { SidebarProvider } from 'ui'
-import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
 import MobileViewNav from './ProjectLayout/NavigationBar/MobileViewNav'
 import NavigationBar from './ProjectLayout/NavigationBar/NavigationBar'
@@ -19,15 +16,7 @@ export interface DefaultLayoutProps {
   productMenu?: ReactNode
 }
 
-const DefaultLayout = ({
-  children,
-  hasProductMenu,
-  product,
-  headerTitle,
-  productMenu,
-}: PropsWithChildren<DefaultLayoutProps>) => {
-  const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
-
+const DefaultLayout = ({ children }: PropsWithChildren<DefaultLayoutProps>) => {
   return (
     <>
       <AppBannerContextProvider>
