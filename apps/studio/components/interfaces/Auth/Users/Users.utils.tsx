@@ -9,10 +9,8 @@ import { Checkbox_Shadcn_, cn } from 'ui'
 import { HeaderCell } from './UsersGridComponents'
 import { ColumnConfiguration, USERS_TABLE_COLUMNS } from './UsersV2'
 
-const SUPPORTED_CSP_AVATAR_URLS = [
-  'https://avatars.githubusercontent.com',
-  'https://lh3.googleusercontent.com',
-]
+const GITHUB_AVATAR_URL = 'https://avatars.githubusercontent.com'
+const SUPPORTED_CSP_AVATAR_URLS = [GITHUB_AVATAR_URL, 'https://lh3.googleusercontent.com']
 
 export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean => {
   return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
@@ -234,7 +232,15 @@ export function getAvatarUrl(user: User): string | undefined {
 
   if (typeof url !== 'string') return undefined
   const isSupported = SUPPORTED_CSP_AVATAR_URLS.some((x) => url.startsWith(x))
-  return isSupported ? url : undefined
+
+  // [Joshen] Only for GH, not entirely sure whats the image transformation equiv for Google
+  try {
+    const _url = new URL(url)
+    _url.searchParams.set('s', '24')
+    return isSupported ? (url.startsWith(GITHUB_AVATAR_URL) ? _url.href : url) : undefined
+  } catch (error) {
+    return isSupported ? url : undefined
+  }
 }
 
 export const formatUserColumns = ({

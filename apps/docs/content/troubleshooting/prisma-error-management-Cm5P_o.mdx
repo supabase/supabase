@@ -91,7 +91,7 @@ Some users have discussed how they managed this problem in a [GitHub Discussion.
 create user "prisma" with password 'secret_password' bypassrls createdb;
 ```
 
-> Prisma requires the [createdb modifier](https://supabase.com/blog/postgres-roles-and-privileges#role-attributes) to create shadow databases. It uses them to help manage migrations.
+> Prisma requires the [`createdb` modifier](https://supabase.com/blog/postgres-roles-and-privileges#role-attributes) to create shadow databases. It uses them to help manage migrations.
 
 ### Give Postgres ownership of the new user:
 
