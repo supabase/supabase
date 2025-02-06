@@ -2119,6 +2119,10 @@ export const platform: NavMenuConstant = {
               name: 'Egress',
               url: '/guides/platform/manage-your-usage/egress',
             },
+            {
+              name: 'Storage Size',
+              url: '/guides/platform/manage-your-usage/storage-size',
+            },
           ],
         },
         {
