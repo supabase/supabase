@@ -4,6 +4,8 @@ description: Guidelines for writing Postgres SQL
 globs: "**/*.sql"
 ---
 
+# Postgres SQL Style Guide
+
 ## General
 
 - Use lowercase for SQL reserved words to maintain consistency and readability.
