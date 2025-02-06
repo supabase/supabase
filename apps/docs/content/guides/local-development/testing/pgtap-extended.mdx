@@ -349,7 +349,9 @@ Now to setup the RLS policies for each tables:
 create schema if not exists private;
 -- Helper function for role checks
 create or replace function private.get_user_org_role(org_id bigint, user_id uuid)
-returns text as $$
+returns text
+set search_path = ''
+as $$
   select role from public.org_members
   where org_id = $1 and user_id = $2;
 -- Note the use of security definer to avoid RLS checking recursion issue
@@ -357,11 +359,13 @@ returns text as $$
 $$ language sql security definer;
 -- Helper utils to check if an org is below the max post limit
 create or replace function private.can_add_post(org_id bigint)
-returns boolean as $$
+returns boolean
+set search_path = ''
+as $$
   select (select count(*)
-          from posts p
+          from public.posts p
           where p.org_id = $1) < o.max_posts
-  from organizations o
+  from public.organizations o
   where o.id = $1
 $$ language sql security definer;
 
