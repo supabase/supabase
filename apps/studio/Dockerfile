@@ -12,11 +12,6 @@ FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
-# Workaround for https://github.com/nodejs/corepack/issues/612.
-RUN npm install -g corepack@0.31.0
-
-RUN corepack enable
-
 # Fixes issues with Sentry CLI and SSL certificates during build
 # TODO: Git is added because it's needed to build libpg, remove it once they publish a binary on the S3 bucket
 RUN apt-get update -qq && \
@@ -27,6 +22,8 @@ RUN apt-get update -qq && \
   build-essential && \ 
   rm -rf /var/lib/apt/lists/* && \
   update-ca-certificates
+
+RUN npm install -g pnpm@9.15.5
 
 WORKDIR /app
 
