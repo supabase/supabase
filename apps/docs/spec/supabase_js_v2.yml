@@ -6055,7 +6055,7 @@ functions:
           ```ts
           const { data, error } = await supabase
             .from('characters')
-            .select('id', 'name')
+            .select('id, name')
             .order('id', { ascending: false })
           ```
         data:
