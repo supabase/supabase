@@ -447,6 +447,7 @@ const MultiSelectorList = React.forwardRef<
         className
       )}
     >
+      {children}
       {creatable && inputValue.length > 0 && !isOptionExists ? (
         <CommandItem
           role="option"
@@ -463,7 +464,6 @@ const MultiSelectorList = React.forwardRef<
           <span className="text-foreground-muted">No results found</span>
         </CommandEmpty>
       )}
-      {children}
     </CommandList>
   )
 })
