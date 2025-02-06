@@ -31,12 +31,9 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
 import { SearchList } from './SQLEditorNavV2/SearchList'
+import { getAppStateSnapshot } from 'state/app-state'
 
-interface SQLEditorMenuProps {
-  onViewOngoingQueries: () => void
-}
-
-export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
+export const SQLEditorMenu = () => {
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
@@ -50,6 +47,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
     'inserted_at'
   )
 
+  const appState = getAppStateSnapshot()
   const debouncedSearch = useDebounce(search, 500)
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
@@ -156,13 +154,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
         </div>
 
         {showSearch ? (
-          <SearchList
-            search={debouncedSearch}
-            onSelectSnippet={() => {
-              setSearch('')
-              setShowSearch(false)
-            }}
-          />
+          <SearchList search={debouncedSearch} />
         ) : (
           <>
             <div className="px-2">
@@ -188,7 +180,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
       </div>
 
       <div className="p-4 border-t sticky bottom-0 bg-studio">
-        <Button block type="default" onClick={onViewOngoingQueries}>
+        <Button block type="default" onClick={() => appState.setOnGoingQueriesPanelOpen(true)}>
           View running queries
         </Button>
       </div>

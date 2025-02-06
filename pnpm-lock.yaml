@@ -1124,9 +1124,6 @@ importers:
       react-syntax-highlighter:
         specifier: ^15.5.0
         version: 15.5.0(react@18.2.0)
-      react-tooltip:
-        specifier: ^4.2.17
-        version: 4.5.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-transition-group:
         specifier: ^4.4.1
         version: 4.4.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -13562,7 +13559,7 @@ snapshots:
   '@babel/code-frame@7.24.7':
     dependencies:
       '@babel/highlight': 7.24.7
-      picocolors: 1.0.1
+      picocolors: 1.1.1
 
   '@babel/code-frame@7.26.2':
     dependencies:
@@ -27094,7 +27091,7 @@ snapshots:
       html-escaper: 2.0.2
       is-plain-object: 5.0.0
       opener: 1.5.2
-      picocolors: 1.0.1
+      picocolors: 1.1.1
       sirv: 2.0.4
       ws: 7.5.10
     transitivePeerDependencies:

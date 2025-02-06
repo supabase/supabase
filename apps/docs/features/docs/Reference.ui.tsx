@@ -204,6 +204,8 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
         ? getSubDetails(paramOrType)
         : undefined
 
+  const defaultOpen = isDefaultExpanded(paramOrType)
+
   return (
     <>
       <div className="flex flex-wrap items-baseline gap-3">
@@ -228,7 +230,9 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
           <MDXRemoteBase source={description} customPreprocess={normalizeMarkdown} />
         </div>
       )}
-      {subContent && subContent.length > 0 && <TypeSubDetails details={subContent} />}
+      {subContent && subContent.length > 0 && (
+        <TypeSubDetails details={subContent} defaultOpen={defaultOpen} />
+      )}
     </>
   )
 }
@@ -240,6 +244,7 @@ export function ReturnTypeDetails({ returnType }: { returnType: MethodTypes['ret
   if (isNameOnlyType) return
 
   const subContent = getSubDetails(returnType)
+  const isDefaultOpen = isDefaultExpanded(returnType)
 
   return (
     <div>
@@ -254,7 +259,9 @@ export function ReturnTypeDetails({ returnType }: { returnType: MethodTypes['ret
             />
           </div>
         )}
-        {subContent && subContent.length > 0 && <TypeSubDetails details={subContent} />}
+        {subContent && subContent.length > 0 && (
+          <TypeSubDetails defaultOpen={isDefaultOpen} details={subContent} />
+        )}
       </div>
     </div>
   )
@@ -263,12 +270,14 @@ export function ReturnTypeDetails({ returnType }: { returnType: MethodTypes['ret
 function TypeSubDetails({
   details,
   className,
+  defaultOpen = false,
 }: {
   details: Array<SubContent> | Array<CustomTypePropertyType> | Array<TypeDetails>
   className?: string
+  defaultOpen?: boolean
 }) {
   return (
-    <Collapsible_Shadcn_>
+    <Collapsible_Shadcn_ defaultOpen={defaultOpen}>
       <CollapsibleTrigger_Shadcn_
         className={cn(
           'group',
@@ -616,7 +625,7 @@ function getTypeName(parameter: object): string {
       // @ts-ignore
       return `Promise<${getTypeName({ type: type.awaited })}>`
     case 'union':
-      return 'Union: expand to see options'
+      return 'One of the following options'
     case 'index signature':
       // Needs an extra level of wrapping to fake the wrapping parameter
       // @ts-ignore
@@ -667,7 +676,7 @@ function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['
       break
     case 'union':
       subDetails = parentType.type.subTypes.map((subType, index) => ({
-        name: `union option ${index + 1}`,
+        name: `Option ${index + 1}`,
         type: { ...subType },
         isOptional: 'NA',
       }))
@@ -675,7 +684,7 @@ function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['
     case 'promise':
       if (parentType.type.awaited.type === 'union') {
         subDetails = parentType.type.awaited.subTypes.map((subType, index) => ({
-          name: `union option ${index + 1}`,
+          name: `Option ${index + 1}`,
           type: { ...subType },
           isOptional: 'NA',
         }))
@@ -693,7 +702,7 @@ function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['
     case 'array':
       if (parentType.type.elemType?.type === 'union') {
         subDetails = parentType.type.elemType.subTypes.map((subType, index) => ({
-          name: `union option ${index + 1}`,
+          name: `Option ${index + 1}`,
           type: { ...subType },
           isOptional: 'NA',
         }))
@@ -870,4 +879,18 @@ function applyParameterMergeStrategy(
       }
     }
   }
+}
+
+function isDefaultExpanded(meta: object) {
+  return (
+    'type' in meta &&
+    typeof meta.type === 'object' &&
+    'type' in meta.type &&
+    (meta.type.type == 'union' ||
+      (meta.type.type === 'promise' &&
+        'awaited' in meta.type &&
+        typeof meta.type.awaited === 'object' &&
+        'type' in meta.type.awaited &&
+        meta.type.awaited.type === 'union'))
+  )
 }

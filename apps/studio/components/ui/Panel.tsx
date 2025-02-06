@@ -62,8 +62,9 @@ const PanelNotice = forwardRef<
     description?: string
     href?: string
     buttonText?: string
+    badgeLabel?: string
   }
->(({ className, title, description, href, buttonText, ...props }, ref) => {
+>(({ className, title, description, href, buttonText, badgeLabel, ...props }, ref) => {
   return (
     <div
       ref={ref}
@@ -95,7 +96,7 @@ const PanelNotice = forwardRef<
             flex-shrink-0 gap-1.5 border-dashed bg-opacity-0 bg-surface-400 text-foreground-lighter"
           >
             <Megaphone size={16} strokeWidth={1.2} />
-            Upcoming change
+            <span className="text-foreground-lighter">{badgeLabel ?? 'Upcoming change'}</span>
           </Badge>
           <Badge
             variant={'default'}

@@ -12,22 +12,7 @@ export interface SQLEditorLayoutProps {
 }
 
 const SQLEditorLayout = ({ title, children }: SQLEditorLayoutProps) => {
-  const { viewOngoingQueries } = useParams()
-  const [showOngoingQueries, setShowOngoingQueries] = useState(false)
-
-  const productMenu = useMemo(
-    () => (
-      <SQLEditorMenu
-        key="sql-editor-menu"
-        onViewOngoingQueries={() => setShowOngoingQueries(true)}
-      />
-    ),
-    []
-  )
-
-  useEffect(() => {
-    if (viewOngoingQueries === 'true') setShowOngoingQueries(true)
-  }, [viewOngoingQueries])
+  const productMenu = useMemo(() => <SQLEditorMenu key="sql-editor-menu" />, [])
 
   return (
     <ProjectLayout
@@ -38,10 +23,7 @@ const SQLEditorLayout = ({ title, children }: SQLEditorLayoutProps) => {
       resizableSidebar
     >
       {children}
-      <OngoingQueriesPanel
-        visible={showOngoingQueries}
-        onClose={() => setShowOngoingQueries(false)}
-      />
+      <OngoingQueriesPanel />
     </ProjectLayout>
   )
 }
