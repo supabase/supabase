@@ -27,18 +27,6 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
   const [open, setOpen] = useState(false)
 
   const hasSorts = (sorts || []).length > 0
-  const btnText = useMemo(() => {
-    return (
-      <RuleSetButtonText
-        rules={sorts}
-        type="sort"
-        renderRule={(sort) => {
-          const [column, direction] = sort.split(':')
-          return { column, value: direction }
-        }}
-      />
-    )
-  }, [sorts])
 
   const onApplySorts = (appliedSorts: Sort[]) => {
     setParams((prevParams) => {
@@ -58,7 +46,14 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
           className={cn('rounded-full', hasSorts && sorts.length <= 2 && 'pr-0.5')}
           data-testid="table-editor-sort-button"
         >
-          {btnText}
+          <RuleSetButtonText
+            rules={sorts}
+            type="sort"
+            renderRule={(sort) => {
+              const [column, direction] = sort.split(':')
+              return { column, value: direction }
+            }}
+          />
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">

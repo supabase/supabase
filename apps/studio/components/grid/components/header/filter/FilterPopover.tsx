@@ -28,19 +28,6 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
   const [open, setOpen] = useState(false)
   const snap = useTableEditorStateSnapshot()
 
-  const btnText = useMemo(() => {
-    return (
-      <RuleSetButtonText
-        rules={filters}
-        type="filter"
-        renderRule={(filter) => {
-          const [column, operator, value] = filter.split(':')
-          return { column, operator, value }
-        }}
-      />
-    )
-  }, [filters])
-
   const onApplyFilters = (appliedFilters: Filter[]) => {
     snap.setEnforceExactCount(false)
     setParams((prevParams) => {
@@ -67,7 +54,14 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
           icon={!hasFilters && <PlusCircle strokeWidth={1.5} />}
           className={cn('rounded-full', hasFilters && filters.length <= 2 && 'pr-0.5')}
         >
-          {btnText}
+          <RuleSetButtonText
+            rules={filters}
+            type="filter"
+            renderRule={(filter) => {
+              const [column, operator, value] = filter.split(':')
+              return { column, operator, value }
+            }}
+          />
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
