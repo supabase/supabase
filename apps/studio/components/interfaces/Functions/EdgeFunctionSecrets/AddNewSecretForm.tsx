@@ -189,17 +189,17 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
               Add another
             </Button>
 
-            <div className="flex items-center gap-2 col-span-2 -mx-6 px-6 border-t  pt-4 mt-4">
+            <div className="flex items-center gap-2 col-span-2 -mx-6 px-6 border-t pt-4 mt-4">
               <Button
                 type="primary"
+                htmlType="submit"
+                form="create-secret-form"
                 disabled={isCreating}
                 loading={isCreating}
-                onClick={() => submitRef?.current?.click()}
               >
                 {isCreating ? 'Saving...' : 'Save'}
               </Button>
             </div>
-            <button className="hidden" type="submit" ref={submitRef} />
           </form>
         </Form_Shadcn_>
       </Panel.Content>
