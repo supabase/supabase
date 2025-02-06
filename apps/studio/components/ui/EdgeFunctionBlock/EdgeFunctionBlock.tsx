@@ -114,7 +114,7 @@ export const EdgeFunctionBlock = ({
         >
           <p>An edge function with the name "{functionName}" already exists.</p>
           <p className="text-foreground-light">
-            Deploying will overwrite the existing function. Are you sure you want to proceed?
+            Deploying will replace the existing function. Are you sure you want to proceed?
           </p>
           <div className="flex justify-stretch mt-2 gap-2">
             <Button
