@@ -1,18 +1,19 @@
-import update from 'immutability-helper'
-import { isEqual } from 'lodash'
-import { ChevronDown, List } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
-
 import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
 import { DropdownControl } from 'components/grid/components/common/DropdownControl'
+import RuleSetButtonText from 'components/grid/components/header/RulesSetButtonText'
 import type { Sort, SupaTable } from 'components/grid/types'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import update from 'immutability-helper'
+import { isEqual } from 'lodash'
+import { ChevronDown, PlusCircle } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   Button,
   PopoverContent_Shadcn_,
   PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  cn,
 } from 'ui'
 import SortRow from './SortRow'
 
@@ -25,10 +26,7 @@ export interface SortPopoverProps {
 const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
   const [open, setOpen] = useState(false)
 
-  const btnText =
-    (sorts || []).length > 0
-      ? `Sorted by ${sorts.length} rule${sorts.length > 1 ? 's' : ''}`
-      : 'Sort'
+  const hasSorts = (sorts || []).length > 0
 
   const onApplySorts = (appliedSorts: Sort[]) => {
     setParams((prevParams) => {
@@ -42,8 +40,20 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type={(sorts || []).length > 0 ? 'link' : 'text'} icon={<List />}>
-          {btnText}
+        <Button
+          type={hasSorts ? 'default' : 'dashed'}
+          icon={!hasSorts && <PlusCircle strokeWidth={1.5} />}
+          className={cn('rounded-full', hasSorts && sorts.length <= 2 && 'pr-0.5')}
+          data-testid="table-editor-sort-button"
+        >
+          <RuleSetButtonText
+            rules={sorts}
+            type="sort"
+            renderRule={(sort) => {
+              const [column, direction] = sort.split(':')
+              return { column, value: direction }
+            }}
+          />
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
