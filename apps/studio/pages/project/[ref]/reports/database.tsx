@@ -59,7 +59,7 @@ const REPORT_ATTRIBUTES = [
     showTotal: false,
     attributes: [
       {
-        attribute: 'ram_available_max',
+        attribute: 'ram_usage_max_available',
         provider: 'infra-monitoring',
         label: 'Max RAM Available',
         isMaxValue: true,
