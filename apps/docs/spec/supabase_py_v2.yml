@@ -6479,72 +6479,81 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          channel = supabase.channel("room1")
+          channel = await supabase.channel("room1")
 
           def on_subscribe(status, err):
             if status == RealtimeSubscribeStates.SUBSCRIBED:
-              channel.send_broadcast('cursor-pos', { "x": random.random(), "y": random.random() })
+              asyncio.create_task(
+                channel.send_broadcast('cursor-pos', { "x": random.random(), "y": random.random() })
+              )
 
           def handle_broadcast(payload):
             print("Cursor position received!", payload)
 
-          channel.on_broadcast(event="cursor-pos", callback=handle_broadcast).subscribe(on_subscribe)
+          await channel.on_broadcast(event="cursor-pos", callback=handle_broadcast).subscribe(on_subscribe)
           ```
       - id: listen-to-presence-sync
         name: Listen to presence sync
         isSpotlight: true
         code: |
           ```python
-          channel = supabase.channel('room1')
+          channel = await supabase.channel('room1')
 
           def on_subscribe(status, err):
             if status == RealtimeSubscribeStates.SUBSCRIBED:
-              channel.track({ "online_at": datetime.datetime.now().isoformat() })
+              asyncio.create_task(
+                channel.track({ "online_at": datetime.datetime.now().isoformat() })
+              )
 
           def handle_presence_sync():
             print('Synced presence state: ', channel.presence.state)
 
-          channel.on_presence_sync(callback=handle_presence_sync).subscribe(on_subscribe)
+          await channel.on_presence_sync(callback=handle_presence_sync).subscribe(on_subscribe)
           ```
       - id: listen-to-presence-join
         name: Listen to presence join
         isSpotlight: true
         code: |
           ```python
-          channel = supabase.channel('room1')
+          channel = await supabase.channel('room1')
 
           def handle_presence_join(key, current_presence, new_presence):
             print('Newly joined presences: ', new_presence)
 
           def on_subscribe(status, err):
             if status == RealtimeSubscribeStates.SUBSCRIBED:
-              channel.track({ "online_at": datetime.datetime.now().isoformat() })
+              asyncio.create_task(
+                channel.track({ "online_at": datetime.datetime.now().isoformat() })
+              )
 
-          channel.on_presence_join(callback=handle_presence_join).subscribe(on_subscribe)
+          await channel.on_presence_join(callback=handle_presence_join).subscribe(on_subscribe)
           ```
       - id: listen-to-presence-leave
         name: Listen to presence leave
         isSpotlight: true
         code: |
           ```python
-          channel = supabase.channel('room1')
+          channel = await supabase.channel('room1')
 
           def handle_presence_leave(key, current_presence, left_presence):
             print('Newly left presences: ', left_presence)
 
           def on_subscribe(status, err):
             if status == RealtimeSubscribeStates.SUBSCRIBED:
-              channel.track({ "online_at": datetime.datetime.now().isoformat() })
-              channel.untrack()
+              async def subscribed():
+                await channel.track({ "online_at": datetime.datetime.now().isoformat() })
+                await channel.untrack()
+              
+              asyncio.create_task(subscribed())
 
-          channel.on_presence_leave(callback=handle_presence_leave).subscribe(on_subscribe)
+          await channel.on_presence_leave(callback=handle_presence_leave).subscribe(on_subscribe)
           ```
       - id: listen-to-all-database-changes
         name: Listen to all database changes
         isSpotlight: true
         code: |
           ```python
-          supabase
+          await supabase
             .channel('room1')
             .on_postgres_changes("*", schema="*", callback=handle_record_updated)
             .subscribe()
@@ -6553,7 +6562,7 @@ functions:
         name: Listen to a specific table
         code: |
           ```python
-          supabase
+          await supabase
             .channel('room1')
             .on_postgres_changes("*", schema="public", table="countries", callback=handle_record_updated)
             .subscribe()
@@ -6562,7 +6571,7 @@ functions:
         name: Listen to inserts
         code: |
           ```python
-          supabase
+          await supabase
             .channel('room1')
             .on_postgres_changes("INSERT", schema="public", table="countries", callback=handle_record_inserted)
             .subscribe()
@@ -6578,7 +6587,7 @@ functions:
           ```
         code: |
           ```python
-          supabase
+          await supabase
             .channel('room1')
             .on_postgres_changes("UPDATE", schema="public", table="countries", callback=handle_record_updated)
             .subscribe()
@@ -6594,7 +6603,7 @@ functions:
           ```
         code: |
           ```python
-          supabase
+          await supabase
             .channel('room1')
             .on_postgres_changes("DELETE", schema="public", table="countries", callback=handle_record_deleted)
             .subscribe()
@@ -6604,7 +6613,7 @@ functions:
         description: You can chain listeners if you want to listen to multiple events for each table.
         code: |
           ```python
-          supabase
+          await supabase
             .channel('room1')
             .on_postgres_changes("INSERT", schema="public", table="countries", callback=handle_record_inserted)
             .on_postgres_changes("DELETE", schema="public", table="countries", callback=handle_record_deleted)
@@ -6617,7 +6626,7 @@ functions:
           - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         code: |
           ```python
-          supabase
+          await supabase
             .channel('room1')
             .on_postgres_changes("UPDATE", schema="public", table="countries", filter="id=eq.200", callback=handle_record_updated)
             .subscribe()
@@ -6632,13 +6641,15 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          channel = supabase.channel('room1')
+          channel = await supabase.channel('room1')
 
           def on_subscribe(status, err):
             if status == RealtimeSubscribeStates.SUBSCRIBED:
-              channel.send_broadcast('cursor-pos', { "x": random.random(), "y": random.random() })
+              asyncio.create_task(
+                channel.send_broadcast('cursor-pos', { "x": random.random(), "y": random.random() })
+              )
 
-          channel.subscribe(on_subscribe)
+          await channel.subscribe(on_subscribe)
           ```
         response: |
           ```
@@ -6652,7 +6663,7 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          channels = supabase.get_channels()
+          channels = await supabase.get_channels()
           ```
 
   - id: remove-channel
@@ -6665,7 +6676,7 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          supabase.remove_channel(myChannel)
+          await supabase.remove_channel(myChannel)
           ```
 
   - id: remove-all-channels
@@ -6678,7 +6689,7 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          supabase.remove_all_channels()
+          await supabase.remove_all_channels()
           ```
 
   - id: list-buckets
