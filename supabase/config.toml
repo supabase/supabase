@@ -87,4 +87,5 @@ redirect_uri = ""
 url = ""
 
 [functions.search-embeddings]
+enabled = true
 verify_jwt = false
