@@ -8604,6 +8604,40 @@ export interface components {
       publish_update?: boolean
       tables?: string[] | null
     }
+    CreateReplicationPipelineBody: {
+      /** @description Pipeline config */
+      config: {
+        config: {
+          max_fill_secs: number
+          max_size: number
+        }
+      }
+      /** @description Publication name */
+      publication_name: string
+      /** @description Sink id */
+      sink_id: number
+      /** @description Source id */
+      source_id: number
+    }
+    CreateReplicationPublicationBody: {
+      /** @description Publication name */
+      name: string
+      /** @description Publication tables */
+      tables: {
+        name: string
+        schema: string
+      }[]
+    }
+    CreateReplicationSinkBody: {
+      /** @description BigQuery dataset id */
+      dataset_id: string
+      /** @description BigQuery project id */
+      project_id: string
+      /** @description BigQuery service account key */
+      service_account_key: string
+      /** @description Sink name */
+      sink_name: string
+    }
     CreateSchemaBody: {
       name: string
       owner: string
@@ -8989,6 +9023,229 @@ export interface components {
       max_rows: number
     }
     ProjectAvailableRestoreVersion: {
+      /** @enum {string} */
+      postgres_engine: '13' | '14' | '15' | '17' | '17-oriole'
+      /** @enum {string} */
+      release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+      version: string
+    }
+    ProjectClonedResponse: {
+      source_project_ref: string
+      target_disk_size_gb: number
+      target_instance_size: string
+      target_project_ref: string
+    }
+    ProjectClonedStatusResponse: {
+      cloned_from: Record<string, never>
+      clones: components['schemas']['TargetCloneStatus'][]
+      id: number
+      ref: string
+    }
+    ProjectCreationVersionInfo: {
+      postgres_engine: components['schemas']['PostgresEngine']
+      release_channel: components['schemas']['ReleaseChannel']
+      version: string
+    }
+    ProjectDatabase: {
+      cloud_provider: string
+      disk_last_modified_at?: string
+      disk_throughput_mbps?: number
+      /** @enum {string} */
+      disk_type?: 'gp3' | 'io2'
+      disk_volume_size_gb?: number
+      identifier: string
+      infra_compute_size?: components['schemas']['DbInstanceSize']
+      region: string
+      status: components['schemas']['database_status']
+      type: components['schemas']['database_type']
+    }
+    ProjectDetailResponse: {
+      cloud_provider: string
+      connectionString: string
+      db_host: string
+      dbVersion?: string
+      id: number
+      infra_compute_size?: components['schemas']['DbInstanceSize']
+      inserted_at: string
+      is_branch_enabled: boolean
+      is_physical_backups_enabled: boolean
+      lastDatabaseResizeAt?: string
+      maxDatabasePreprovisionGb?: number
+      name: string
+      organization_id: number
+      parent_project_ref?: string
+      ref: string
+      region: string
+      restUrl: string
+      /** @enum {string} */
+      status:
+        | 'INACTIVE'
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'UNKNOWN'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UPGRADING'
+        | 'PAUSING'
+        | 'RESTORE_FAILED'
+        | 'RESTARTING'
+        | 'PAUSE_FAILED'
+        | 'RESIZING'
+      subscription_id: string
+      volumeSizeGb?: number
+    }
+    ProjectInfo: {
+      cloud_provider: string
+      disk_volume_size_gb?: number
+      id: number
+      infra_compute_size?: components['schemas']['DbInstanceSize']
+      inserted_at: string | null
+      is_branch_enabled: boolean
+      is_physical_backups_enabled: boolean | null
+      name: string
+      organization_id: number
+      organization_slug: string
+      preview_branch_refs: string[]
+      ref: string
+      region: string
+      status: string
+      subscription_id: string | null
+    }
+    ProjectIntegrationConnection: {
+      added_by: {
+        primary_email?: string
+        username?: string
+      }
+      id: string
+      inserted_at: string
+      organization_integration_id: string
+      supabase_project_ref: string
+      updated_at: string
+    }
+    ProjectLintMetadata: {
+      entity?: string
+      fkey_columns?: number[]
+      fkey_name?: string
+      name?: string
+      schema?: string
+      /** @enum {string} */
+      type?: 'table' | 'view' | 'auth' | 'function' | 'extension'
+    }
+    ProjectLintResponse: {
+      cache_key: string
+      categories: ('PERFORMANCE' | 'SECURITY')[]
+      description: string
+      detail: string
+      facing: string
+      /** @enum {string} */
+      level: 'ERROR' | 'WARN' | 'INFO'
+      metadata: components['schemas']['ProjectLintMetadata'] | null
+      /** @enum {string} */
+      name:
+        | 'unindexed_foreign_keys'
+        | 'auth_users_exposed'
+        | 'auth_rls_initplan'
+        | 'no_primary_key'
+        | 'unused_index'
+        | 'multiple_permissive_policies'
+        | 'policy_exists_rls_disabled'
+        | 'rls_enabled_no_policy'
+        | 'duplicate_index'
+        | 'security_definer_view'
+        | 'function_search_path_mutable'
+        | 'rls_disabled_in_public'
+        | 'extension_in_public'
+        | 'rls_references_user_metadata'
+        | 'materialized_view_in_api'
+        | 'foreign_table_in_api'
+        | 'unsupported_reg_types'
+        | 'auth_otp_long_expiry'
+        | 'auth_otp_short_length'
+        | 'ssl_not_enforced'
+        | 'network_restrictions_not_set'
+        | 'password_requirements_min_length'
+        | 'pitr_not_enabled'
+      remediation: Record<string, never>
+      title: string
+    }
+    ProjectMetric: {
+      metric: string
+      project_ref: string
+      value: number
+    }
+    ProjectRefResponse: {
+      id: number
+      name: string
+      ref: string
+    }
+    ProjectResourceWarningsResponse: {
+      /** @enum {string|null} */
+      auth_email_offender: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      auth_rate_limit_exhaustion: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      auth_restricted_email_sending: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      cpu_exhaustion: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      disk_io_exhaustion: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      disk_space_exhaustion: 'critical' | 'warning' | null
+      is_readonly_mode_enabled: boolean
+      /** @enum {string|null} */
+      memory_and_swap_exhaustion: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      need_pitr: 'critical' | 'warning' | null
+      project: string
+    }
+    ProjectResponse: {
+      cloud_provider: string
+      db_dns_name: string
+      db_host: string
+      db_name: string
+      db_port: string
+      db_user: string
+      id: number
+      inserted_at: string
+      jwt_secret: string
+      name: string
+      ref: string
+      region: string
+      services?: components['schemas']['ServiceResponse'][]
+      ssl_enforced: boolean
+      status: string
+    }
+    ProjectSensitivityResponse: {
+      is_sensitive: boolean
+    }
+    ProjectServiceApiKeyResponse: {
+      api_key: string
+      name: string
+      tags: string
+    }
+    ProjectSettingsResponse: {
+      app_config?: components['schemas']['ProjectAppConfigResponse']
+      cloud_provider: string
+      db_dns_name: string
+      db_host: string
+      db_ip_addr_config: string
+      db_name: string
+      db_port: number
+      db_user: string
+      inserted_at: string
+      is_sensitive?: boolean
+      jwt_secret?: string
+      name: string
+      ref: string
+      region: string
+      service_api_keys?: components['schemas']['ProjectServiceApiKeyResponse'][]
+      ssl_enforced: boolean
+      status: string
+    }
+    ProjectUnpauseVersionInfo: {
       /** @enum {string} */
       postgres_engine: '13' | '14' | '15' | '17' | '17-oriole'
       /** @enum {string} */
@@ -19068,7 +19325,9 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        ref: string
+      }
       cookie?: never
     }
     requestBody?: never
@@ -19100,10 +19359,16 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        ref: string
+      }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationPipelineBody']
+      }
+    }
     responses: {
       201: {
         headers: {
@@ -19130,7 +19395,10 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        pipeline_id: number
+        ref: string
+      }
       cookie?: never
     }
     requestBody?: never
@@ -19160,7 +19428,10 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        pipeline_id: number
+        ref: string
+      }
       cookie?: never
     }
     requestBody?: never
@@ -19190,7 +19461,10 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        pipeline_id: number
+        ref: string
+      }
       cookie?: never
     }
     requestBody?: never
@@ -19222,7 +19496,10 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        pipeline_id: number
+        ref: string
+      }
       cookie?: never
     }
     requestBody?: never
@@ -19252,7 +19529,9 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        ref: string
+      }
       cookie?: never
     }
     requestBody?: never
@@ -19284,10 +19563,16 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        ref: string
+      }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationSinkBody']
+      }
+    }
     responses: {
       201: {
         headers: {
@@ -19314,7 +19599,10 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        ref: string
+        sink_id: number
+      }
       cookie?: never
     }
     requestBody?: never
@@ -19344,7 +19632,9 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        ref: string
+      }
       cookie?: never
     }
     requestBody?: never
@@ -19377,7 +19667,9 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        ref: string
+      }
       cookie?: never
     }
     requestBody?: never
@@ -19410,7 +19702,10 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        ref: string
+        source_id: number
+      }
       cookie?: never
     }
     requestBody?: never
@@ -19443,10 +19738,17 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        ref: string
+        source_id: number
+      }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationPublicationBody']
+      }
+    }
     responses: {
       /** @description Returned when the publication is created. */
       200: {
@@ -19480,7 +19782,11 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        publication_name: string
+        ref: string
+        source_id: number
+      }
       cookie?: never
     }
     requestBody?: never
@@ -19511,7 +19817,10 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        ref: string
+        source_id: number
+      }
       cookie?: never
     }
     requestBody?: never
