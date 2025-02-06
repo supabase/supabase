@@ -506,18 +506,19 @@ const nextConfig = {
       },
       {
         source: '/img/:slug*',
-        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
+        headers: [{ key: 'cache-control', value: 'public, max-age=2592000' }],
+      },
+      {
+        source: '/css/fonts.css',
+        headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
       },
       {
         source: '/fonts/:slug*',
-        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
+        headers: [{ key: 'cache-control', value: 'public, max-age=2592000' }],
       },
       {
-        source: '/favicon/favicon.ico',
-        headers: [
-          // Cached for 1 day, but browsers can use a stale version for up to 7 days
-          { key: 'cache-control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
-        ],
+        source: '/favicon/:slug*',
+        headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
       },
     ]
   },
