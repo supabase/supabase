@@ -62,6 +62,12 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/publications`,
           items: [],
         },
+        {
+          name: 'Replication',
+          key: 'replication',
+          url: `/project/${ref}/database/replication`,
+          items: [],
+        },
       ],
     },
     {
