@@ -1,7 +1,7 @@
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Image } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition, type AdmonitionProps } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
@@ -46,6 +46,7 @@ const components = {
   Accordion,
   AccordionItem,
   Admonition,
+  // Admonition: (props: AdmonitionProps) => <Admonition className="[&_a]:underline" {...props} />,
   AuthErrorCodesTable,
   AuthRateLimits,
   AuthSmsProviderConfig,
