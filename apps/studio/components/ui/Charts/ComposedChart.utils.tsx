@@ -121,6 +121,7 @@ const CustomTooltip = ({
               <div className="flex items-end gap-1">
                 <span className="text-base">
                   {isRamChart ? formatBytes(total, 1) : numberFormatter(total)}
+                  {isPercentage ? '%' : ''}
                 </span>
                 {maxValueAttribute &&
                   !isNaN(total / maxValueData?.value) &&
@@ -151,7 +152,6 @@ const CustomLabel = ({ payload, attributes, showMaxValue }: CustomLabelProps) =>
   const maxValueAttribute = isMax(attributes)
 
   const getIcon = (name: string, color: string) => {
-    console.log(name, maxValueAttribute)
     switch (name === maxValueAttribute?.attribute) {
       case true:
         return <MaxConnectionsIcon />
