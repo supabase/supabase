@@ -18,6 +18,7 @@ export function SqlEditorMenuStaticLinks() {
         const active = isPageActive(pageId)
         return (
           <InnerSideMenuDataItem
+            key={pageId}
             title="Templates"
             isActive={active}
             isOpened={false}
