@@ -16,6 +16,12 @@ export type SuggestionsType = {
   prompts?: string[]
 }
 
+export type Template = {
+  name: string
+  description: string
+  content: string
+}
+
 type AiAssistantPanelType = {
   open: boolean
   messages: MessageType[]
@@ -37,6 +43,7 @@ type EditorPanelType = {
   saveLabel?: string
   onSave?: (value: string) => void
   functionName?: string
+  templates?: Template[]
 }
 
 type DashboardHistoryType = {

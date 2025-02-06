@@ -1,4 +1,4 @@
-import { CornerDownLeft, Loader2 } from 'lucide-react'
+import { CornerDownLeft, Loader2, Book } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -25,6 +25,7 @@ const SQLEditor = ({ onChange }: SQLEditorProps) => {
   const [showResults, setShowResults] = useState(false)
   const [showWarning, setShowWarning] = useState<boolean>(false)
   const [currentValue, setCurrentValue] = useState(editorPanel.initialValue || '')
+  const [showTemplates, setShowTemplates] = useState(false)
 
   const numResults = (results ?? []).length
   const [errorHeader, ...errorContent] =
@@ -67,9 +68,34 @@ const SQLEditor = ({ onChange }: SQLEditorProps) => {
     onChange?.(newValue)
   }
 
+  const onSelectTemplate = (content: string) => {
+    handleChange(content)
+    setShowTemplates(false)
+  }
+
   return (
     <div className="flex flex-col flex-1">
       <div className="relative flex-1">
+        {showTemplates && editorPanel.templates && (
+          <div className="absolute inset-0 z-10 bg-background border rounded-md m-5 overflow-auto">
+            <div className="px-5 py-4 border-b bg-surface-100">
+              <h3 className="text-sm">Templates</h3>
+              <p className="text-xs text-foreground-light">Select a template to get started</p>
+            </div>
+            <div className="p-5 space-y-4">
+              {editorPanel.templates.map((template, i) => (
+                <div
+                  key={i}
+                  className="cursor-pointer group rounded border px-4 py-3 hover:border-foreground transition"
+                  onClick={() => onSelectTemplate(template.content)}
+                >
+                  <p className="text-sm font-medium mb-1">{template.name}</p>
+                  <p className="text-sm text-foreground-light">{template.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <CodeEditor
           id="editor-panel-sql"
           className="!bg-transparent"
@@ -118,7 +144,15 @@ const SQLEditor = ({ onChange }: SQLEditorProps) => {
           Success. No rows returned.
         </p>
       )}
-      <div className="z-10 bg-surface-100 flex items-center gap-2 !justify-end px-5 py-4 w-full border-t">
+      <div className="z-10 bg-surface-100 flex items-center gap-2 !justify-between px-5 py-4 w-full border-t">
+        <Button
+          size="tiny"
+          type="default"
+          onClick={() => setShowTemplates(!showTemplates)}
+          icon={<Book size={14} />}
+        >
+          {showTemplates ? 'Hide templates' : 'Show templates'}
+        </Button>
         <Button
           loading={isExecuting}
           onClick={() => onExecuteSql()}
