@@ -167,9 +167,7 @@ const SessionsAuthSettingsForm = () => {
 
               <FormSection header={<FormSectionLabel>User Sessions</FormSectionLabel>}>
                 <FormSectionContent loading={isLoading}>
-                  {!promptProPlanUpgrade ? (
-                    <></>
-                  ) : (
+                  {promptProPlanUpgrade && (
                     <UpgradeToPro
                       primaryText="Upgrade to Pro"
                       secondaryText="Configuring user sessions requires the Pro Plan."

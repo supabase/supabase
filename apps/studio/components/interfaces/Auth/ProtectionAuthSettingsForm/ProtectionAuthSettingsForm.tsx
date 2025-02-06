@@ -1,17 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink, Eye, EyeOff } from 'lucide-react'
-import Link from 'next/link'
+import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { boolean, number, object, string } from 'yup'
 
 import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -25,7 +22,6 @@ import {
   Button,
   Form,
   Input,
-  InputNumber,
   Toggle,
   WarningIcon,
 } from 'ui'
@@ -34,9 +30,6 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
 const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
-const LETTERS_AND_DIGITS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
-const LOWER_UPPER_DIGITS = 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
-const LOWER_UPPER_DIGITS_SYMBOLS = LOWER_UPPER_DIGITS + ':!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~'
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
@@ -63,16 +56,6 @@ const schema = object({
   PASSWORD_HIBP_ENABLED: boolean(),
 })
 
-function HoursOrNeverText({ value }: { value: number }) {
-  if (value === 0) {
-    return 'never'
-  } else if (value === 1) {
-    return 'hour'
-  } else {
-    return 'hours'
-  }
-}
-
 const formId = 'auth-config-protection-settings'
 
 const ProtectionAuthSettingsForm = () => {
@@ -89,17 +72,6 @@ const ProtectionAuthSettingsForm = () => {
   const [hidden, setHidden] = useState(true)
   const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
-
-  const organization = useSelectedOrganization()
-  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery(
-    {
-      orgSlug: organization?.slug,
-    },
-    { enabled: IS_PLATFORM }
-  )
-
-  const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
-  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig?.DISABLE_SIGNUP,

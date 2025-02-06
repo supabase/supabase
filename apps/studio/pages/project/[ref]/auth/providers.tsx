@@ -25,11 +25,11 @@ const PageLayout: NextPageWithLayout = () => {
 
   const navMenuItems = [
     {
-      label: 'Supabase auth',
+      label: 'Supabase Auth',
       href: `/project/${ref}/auth/providers`,
     },
     {
-      label: 'Third Party auth',
+      label: 'Third Party Auth',
       href: `/project/${ref}/auth/third-party`,
     },
   ]
@@ -42,7 +42,7 @@ const PageLayout: NextPageWithLayout = () => {
     <div>
       <ScaffoldHeader className="pb-0">
         <ScaffoldContainer id="auth-page-top">
-          <ScaffoldTitle>Sign in / up</ScaffoldTitle>
+          <ScaffoldTitle>Sign In / Up</ScaffoldTitle>
           <ScaffoldDescription>
             Configure authentication providers and login methods for your users
           </ScaffoldDescription>

@@ -42,7 +42,7 @@ const PageLayout: NextPageWithLayout = () => {
     <div>
       <ScaffoldHeader className="pb-0">
         <ScaffoldContainer id="auth-page-top">
-          <ScaffoldTitle>Email Settings</ScaffoldTitle>
+          <ScaffoldTitle>Emails</ScaffoldTitle>
           <ScaffoldDescription>
             Configure what emails your users receive and how they are sent
           </ScaffoldDescription>

@@ -26,9 +26,7 @@ const AuthSettings: NextPageWithLayout = () => {
         ) : !canReadAuthSettings ? (
           <NoPermission isFullPage resourceText="access your project's authentication settings" />
         ) : (
-          <>
-            <SessionsAuthSettingsForm />
-          </>
+          <SessionsAuthSettingsForm />
         )}
       </ScaffoldContainer>
     </>

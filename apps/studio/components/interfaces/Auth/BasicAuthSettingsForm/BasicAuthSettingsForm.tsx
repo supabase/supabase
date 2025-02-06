@@ -3,7 +3,7 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { boolean, number, object, string } from 'yup'
+import { boolean, object, string } from 'yup'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -11,31 +11,22 @@ import { FormActions } from 'components/ui/Forms/FormActions'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   Form,
-  InputNumber,
   Toggle,
   WarningIcon,
 } from 'ui'
-import FormField from '../AuthProvidersForm/FormField'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
 const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
-const LETTERS_AND_DIGITS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
-const LOWER_UPPER_DIGITS = 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
-const LOWER_UPPER_DIGITS_SYMBOLS = LOWER_UPPER_DIGITS + ':!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~'
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
@@ -59,17 +50,6 @@ const BasicAuthSettingsForm = () => {
 
   const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
-
-  const organization = useSelectedOrganization()
-  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery(
-    {
-      orgSlug: organization?.slug,
-    },
-    { enabled: IS_PLATFORM }
-  )
-
-  const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
-  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig?.DISABLE_SIGNUP,
@@ -232,30 +212,30 @@ const BasicAuthSettingsForm = () => {
                         </Alert_Shadcn_>
                       </div>
                     )}
-                    {/* TODO: CHECK CAPTURE SETTINGS NOW THAT THEY HAVE MOVED FROM THIS PAGE
-                    {!values.SECURITY_CAPTCHA_ENABLED && (
-                      <Alert_Shadcn_>
-                        <WarningIcon />
-                        <AlertTitle_Shadcn_>
-                          We highly recommend{' '}
-                          <span
-                            tabIndex={1}
-                            className="cursor-pointer underline"
-                            onClick={() => {
-                              const el = document.getElementById('enable-captcha')
-                              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                            }}
-                          >
-                            enabling captcha
-                          </span>{' '}
-                          for anonymous sign-ins
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
-                          This will prevent potential abuse on sign-ins which may bloat your
-                          database and incur costs for monthly active users (MAU)
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    )} */}
+                    {!authConfig?.SECURITY_CAPTCHA_ENABLED &&
+                      values.EXTERNAL_ANONYMOUS_USERS_ENABLED && (
+                        <Alert_Shadcn_>
+                          <WarningIcon />
+                          <AlertTitle_Shadcn_>
+                            We highly recommend{' '}
+                            <span
+                              tabIndex={1}
+                              className="cursor-pointer underline"
+                              onClick={() => {
+                                const el = document.getElementById('enable-captcha')
+                                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                              }}
+                            >
+                              enabling captcha
+                            </span>{' '}
+                            for anonymous sign-ins
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_>
+                            This will prevent potential abuse on sign-ins which may bloat your
+                            database and incur costs for monthly active users (MAU)
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      )}
                   </FormSectionContent>
                 </FormSection>
               </FormPanel>

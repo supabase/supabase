@@ -43,7 +43,7 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
                 items: [],
               },
               {
-                name: 'Multi-factor',
+                name: 'Multifactor',
                 key: 'mfa',
                 url: `/project/${ref}/auth/mfa`,
                 items: [],
@@ -61,7 +61,7 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
                 items: [],
               },
               {
-                name: 'Hooks',
+                name: 'Auth Hooks',
                 key: 'hooks',
                 url: `/project/${ref}/auth/hooks`,
                 items: [],

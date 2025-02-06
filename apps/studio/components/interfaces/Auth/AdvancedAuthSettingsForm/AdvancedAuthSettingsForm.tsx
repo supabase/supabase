@@ -95,13 +95,7 @@ const AdvancedAuthSettingsForm = () => {
   }
 
   return (
-    <Form
-      id={formId}
-      initialValues={INITIAL_VALUES}
-      onSubmit={onSubmit}
-      validationSchema={schema}
-      key={JSON.stringify(INITIAL_VALUES)}
-    >
+    <Form id={formId} initialValues={INITIAL_VALUES} onSubmit={onSubmit} validationSchema={schema}>
       {({ handleReset, values, initialValues }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
