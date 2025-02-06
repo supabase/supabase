@@ -1,9 +1,8 @@
+import { useParams } from 'common'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { useParams } from 'common'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
@@ -74,7 +73,7 @@ const ProjectSettings: NextPageWithLayout = () => {
         </Link>
         <Link
           href={`/project/${ref}/auth/third-party`}
-          className="block py-2 hover:text-foreground flex items-center justify-between"
+          className="block py-2 hover:text-foreground border-b flex items-center justify-between"
         >
           Third party authentication
           <ChevronRight strokeWidth={1.5} size={16} />
