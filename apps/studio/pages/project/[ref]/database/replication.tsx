@@ -9,9 +9,14 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
       <FormHeader
         title="Database Replication"
         description="Send data to other destinations"
-        className="px-8 py-8 mb-0"
+        className="px-20 py-8 mb-0"
       />
       <InstanceConfiguration />
+      <FormHeader
+        title="Destinations"
+        description="Publish data from your primary database to another"
+        className="px-20 py-8 mb-0"
+      />
     </div>
   )
 }

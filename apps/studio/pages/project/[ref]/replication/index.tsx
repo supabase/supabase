@@ -18,7 +18,9 @@ const PageLayout: NextPageWithLayout = () => {
     projectRef: ref,
   })
 
-  let replicationEnabled = data ? data?.sources?.length !== 0 && data.sources[0].name === ref : false
+  let replicationEnabled = data
+    ? data?.sources?.length !== 0 && data.sources[0].name === ref
+    : false
 
   const { mutate: createSource, isLoading: isCreating } = useCreateSourceMutation({
     onSuccess: () => {
