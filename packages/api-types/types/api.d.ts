@@ -4203,11 +4203,8 @@ export interface paths {
     }
     get?: never
     put?: never
-    /**
-     * Create a project (deprecated)
-     * @deprecated
-     */
-    post: operations['SystemProjectsController_createProjectDeprecated']
+    /** Create a project */
+    post: operations['SystemProjectsController_createProject']
     delete?: never
     options?: never
     head?: never
@@ -4435,26 +4432,6 @@ export interface paths {
      * @description Updates a function with the specified slug and project.
      */
     patch: operations['v1-update-a-function']
-    trace?: never
-  }
-  '/system/projects/{ref}/functions/deploy': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Deploy a function
-     * @description A new endpoint to deploy functions. It will create if function does not exist.
-     */
-    post: operations['v1-deploy-a-function']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
     trace?: never
   }
   '/system/projects/{ref}/ha-events': {
@@ -7434,26 +7411,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/projects/{ref}/functions/deploy': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Deploy a function
-     * @description A new endpoint to deploy functions. It will create if function does not exist.
-     */
-    post: operations['v1-deploy-a-function']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/v1/projects/{ref}/health': {
     parameters: {
       query?: never
@@ -8454,7 +8411,7 @@ export interface components {
       }
       description?: string
       /** Format: uuid */
-      folder_id?: (null | (string | null)) | null
+      folder_id?: null | string
       id?: string
       name: string
       owner_id?: number
@@ -9115,16 +9072,6 @@ export interface components {
     FormatQueryBody: {
       query: string
     }
-    FunctionDeployBody: {
-      file: Record<string, never>[]
-      metadata: {
-        entrypoint_path?: string
-        import_map_path?: string
-        name?: string
-        static_patterns?: string[]
-        verify_jwt?: boolean
-      }
-    }
     FunctionResponse: {
       compute_multiplier?: number
       /** Format: int64 */
@@ -9247,16 +9194,9 @@ export interface components {
       ref: string
     }
     GetProjectDbMetadataResponseDto: {
-      databases: ({
-        name: string
-        schemas: ({
-          name: string
-        } & {
-          [key: string]: unknown
-        })[]
-      } & {
+      databases: {
         [key: string]: unknown
-      })[]
+      }[]
     }
     GetProviderResponse: {
       created_at?: string
@@ -10882,7 +10822,18 @@ export interface components {
       id: number
       recovery_time_target: string
     }
-    RestoreProjectBodyDto: Record<string, never>
+    RestoreProjectBodyDto: {
+      /**
+       * @description Postgres engine version. If not provided, the latest version from the given release channel will be used.
+       * @enum {string}
+       */
+      postgres_engine?: '15' | '17-oriole'
+      /**
+       * @description Release channel version. If not provided, GeneralAvailability will be used.
+       * @enum {string}
+       */
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+    }
     RestrictionData: {
       grace_period_end?: string
       report_date?: string
@@ -12191,7 +12142,7 @@ export interface components {
       }
       description?: string
       /** Format: uuid */
-      folder_id?: (null | (string | null)) | null
+      folder_id?: null | string
       id: string
       name: string
       owner_id: number
@@ -12354,6 +12305,11 @@ export interface components {
        */
       plan?: 'free' | 'pro'
       /**
+       * @description Postgres engine version. If not provided, the latest version will be used.
+       * @enum {string}
+       */
+      postgres_engine?: '15' | '17-oriole'
+      /**
        * @description Region you want your server to reside in
        * @enum {string}
        */
@@ -12376,6 +12332,11 @@ export interface components {
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
+      /**
+       * @description Release channel. If not provided, GA will be used.
+       * @enum {string}
+       */
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       /**
        * Format: uri
        * @description Template URL used to create the project from the CLI.
@@ -20869,18 +20830,47 @@ export interface operations {
     parameters: {
       query: {
         attribute:
-          | 'cpu_usage'
-          | 'max_cpu_usage'
           | 'avg_cpu_usage'
+          | 'max_cpu_usage'
+          | 'cpu_usage'
+          | 'cpu_usage_busy_system'
+          | 'cpu_usage_busy_user'
+          | 'cpu_usage_busy_iowait'
+          | 'cpu_usage_busy_irqs'
+          | 'cpu_usage_busy_other'
+          | 'cpu_usage_busy_idle'
+          | 'client_connections_max_limit'
+          | 'client_connections_pgbouncer'
+          | 'client_connections_pgbouncer_waiting'
+          | 'client_connections_postgres'
+          | 'client_connections_realtime'
+          | 'client_connections_supavisor'
           | 'disk_io_budget'
           | 'disk_io_consumption'
+          | 'disk_iops_max'
+          | 'disk_iops_read'
+          | 'disk_iops_usage'
+          | 'disk_iops_write'
           | 'ram_usage'
+          | 'ram_usage_applications'
+          | 'ram_usage_buffers'
+          | 'ram_usage_cache'
+          | 'ram_usage_cache_and_buffers'
+          | 'ram_usage_free'
+          | 'ram_usage_hardware_corrupted'
+          | 'ram_usage_max_available'
+          | 'ram_usage_page_tables'
+          | 'ram_usage_slab'
+          | 'ram_usage_swap'
+          | 'ram_usage_swap_cache'
+          | 'ram_usage_unused'
+          | 'ram_usage_used'
           | 'swap_usage'
           | 'physical_replication_lag_physical_replica_lag_seconds'
           | 'pg_stat_database_num_backends'
         databaseIdentifier?: string
         endDate: string
-        interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
+        interval?: '15s' | '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
         startDate: string
       }
       header?: never
@@ -23374,7 +23364,7 @@ export interface operations {
       }
     }
   }
-  SystemProjectsController_createProjectDeprecated: {
+  SystemProjectsController_createProject: {
     parameters: {
       query?: never
       header?: never
@@ -23413,9 +23403,7 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          'application/json': components['schemas']['ProjectRefResponse']
-        }
+        content?: never
       }
     }
   }
@@ -24003,47 +23991,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update function with given slug */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  'v1-deploy-a-function': {
-    parameters: {
-      query?: {
-        slug?: string
-      }
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'multipart/form-data': components['schemas']['FunctionDeployBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['FunctionResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to deploy function */
       500: {
         headers: {
           [name: string]: unknown
@@ -29551,18 +29498,47 @@ export interface operations {
     parameters: {
       query: {
         attribute:
-          | 'cpu_usage'
-          | 'max_cpu_usage'
           | 'avg_cpu_usage'
+          | 'max_cpu_usage'
+          | 'cpu_usage'
+          | 'cpu_usage_busy_system'
+          | 'cpu_usage_busy_user'
+          | 'cpu_usage_busy_iowait'
+          | 'cpu_usage_busy_irqs'
+          | 'cpu_usage_busy_other'
+          | 'cpu_usage_busy_idle'
+          | 'client_connections_max_limit'
+          | 'client_connections_pgbouncer'
+          | 'client_connections_pgbouncer_waiting'
+          | 'client_connections_postgres'
+          | 'client_connections_realtime'
+          | 'client_connections_supavisor'
           | 'disk_io_budget'
           | 'disk_io_consumption'
+          | 'disk_iops_max'
+          | 'disk_iops_read'
+          | 'disk_iops_usage'
+          | 'disk_iops_write'
           | 'ram_usage'
+          | 'ram_usage_applications'
+          | 'ram_usage_buffers'
+          | 'ram_usage_cache'
+          | 'ram_usage_cache_and_buffers'
+          | 'ram_usage_free'
+          | 'ram_usage_hardware_corrupted'
+          | 'ram_usage_max_available'
+          | 'ram_usage_page_tables'
+          | 'ram_usage_slab'
+          | 'ram_usage_swap'
+          | 'ram_usage_swap_cache'
+          | 'ram_usage_unused'
+          | 'ram_usage_used'
           | 'swap_usage'
           | 'physical_replication_lag_physical_replica_lag_seconds'
           | 'pg_stat_database_num_backends'
         databaseIdentifier?: string
         endDate: string
-        interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
+        interval?: '15s' | '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
         startDate: string
       }
       header?: never
@@ -32625,47 +32601,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve function body with given slug */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  'v1-deploy-a-function': {
-    parameters: {
-      query?: {
-        slug?: string
-      }
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'multipart/form-data': components['schemas']['FunctionDeployBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['FunctionResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to deploy function */
       500: {
         headers: {
           [name: string]: unknown
