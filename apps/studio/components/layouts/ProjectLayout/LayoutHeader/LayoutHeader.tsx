@@ -57,13 +57,14 @@ const LayoutHeader = ({
   breadcrumbs = [],
   hasProductMenu,
   headerTitle,
+  showHomeLink = false,
 }: LayoutHeaderProps) => {
   const { ref: projectRef, slug } = useParams()
   const router = useRouter()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const { aiAssistantPanel, mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
-  const { aiAssistantPanel, setMobileMenuOpen } = useAppStateSnapshot()
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganization?.slug,
@@ -109,6 +110,19 @@ const LayoutHeader = ({
             </div>
           )}
           <div className="flex items-center text-sm">
+            {showHomeLink && (
+              <Link
+                href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
+                className="mx-1 hidden md:flex items-center w-[40px] h-[40px]"
+              >
+                <img
+                  alt="Supabase"
+                  src={`${router.basePath}/img/supabase-logo.svg`}
+                  className="absolute h-[40px] w-6 cursor-pointer rounded"
+                />
+              </Link>
+            )}
+
             {projectRef && (
               <Link
                 href={IS_PLATFORM ? `/projects` : `/project/${projectRef}`}

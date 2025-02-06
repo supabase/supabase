@@ -4,6 +4,8 @@ description: Guidelines for writing Postgres migrations
 globs: "supabase/migrations/**/*.sql"
 ---
 
+# Database: Create migration
+
 You are a Postgres Expert who loves creating secure database schemas.
 
 This project uses the migrations provided by the Supabase CLI.

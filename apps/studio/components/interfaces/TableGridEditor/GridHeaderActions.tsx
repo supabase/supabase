@@ -38,6 +38,7 @@ import {
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
+import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 
 export interface GridHeaderActionsProps {
   table: Entity
@@ -73,7 +74,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const [open, setOpen] = useState(false)
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
-
+  const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
   const state = useTrackedState()
   const { selectedRows } = state
   const showHeaderActions = selectedRows.size === 0
@@ -299,7 +300,15 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                     APIs.
                   </p>
 
-                  <div className="mt-2">
+                  <div className="mt-2 flex items-center gap-2">
+                    <Button
+                      type="secondary"
+                      onClick={() => {
+                        setIsAutofixViewSecurityModalOpen(true)
+                      }}
+                    >
+                      Autofix
+                    </Button>
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
@@ -424,6 +433,13 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           )}
         </div>
       </ConfirmationModal>
+
+      <ViewEntityAutofixSecurityModal
+        table={table}
+        isAutofixViewSecurityModalOpen={isAutofixViewSecurityModalOpen}
+        setIsAutofixViewSecurityModalOpen={setIsAutofixViewSecurityModalOpen}
+      />
+
       {isTable && (
         <ConfirmModal
           danger={table.rls_enabled}
