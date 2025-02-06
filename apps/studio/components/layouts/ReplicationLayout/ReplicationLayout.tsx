@@ -19,7 +19,7 @@ const ReplicationLayout = ({ title, children }: PropsWithChildren<ReplicationLay
   const { data } = useReplicationSourcesQuery({
     projectRef: ref,
   })
-  let showProductMenu = data?.length !== 0
+  let showProductMenu = data?.sources.length !== 0
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
