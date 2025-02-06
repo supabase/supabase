@@ -63,7 +63,7 @@ export const EdgeFunctionBlock = ({
     }
   }
 
-  const functionUrl = ref ? `https://${ref}.supabase.co/functions/v1/${functionName}` : ''
+  const functionUrl = ref ? `https://${ref}.supabase.red/functions/v1/${functionName}` : ''
 
   return (
     <ReportBlockContainer
