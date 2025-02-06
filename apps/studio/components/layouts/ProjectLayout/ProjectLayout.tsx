@@ -23,6 +23,7 @@ import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
 import MobileNavigationBar from './NavigationBar/MobileNavigationBar'
 import MobileViewNav from './NavigationBar/MobileViewNav'
+import NavigationBar from './NavigationBar/NavigationBar'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
@@ -33,7 +34,6 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import NavigationBar from './NavigationBar/NavigationBar'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -195,7 +195,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                           initial={{ width: 0, opacity: 0, height: '100%' }}
                           animate={{ width: 'auto', opacity: 1, height: '100%' }}
                           exit={{ width: 0, opacity: 0, height: '100%' }}
-                          className="h-full"
+                          className="h-full flex-grow max-w-full"
                           transition={{ duration: 0.12 }}
                         >
                           <MenuBarWrapper
