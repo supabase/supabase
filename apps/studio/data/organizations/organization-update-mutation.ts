@@ -10,6 +10,7 @@ export type OrganizationUpdateVariables = {
   slug: string
   name?: string
   billing_email?: string
+  additional_billing_emails?: string[]
   opt_in_tags?: string[]
 }
 
@@ -18,12 +19,14 @@ export async function updateOrganization({
   name,
   billing_email,
   opt_in_tags,
+  additional_billing_emails,
 }: OrganizationUpdateVariables) {
   // @ts-ignore [Joshen] API spec is wrong
   const payload: components['schemas']['UpdateOrganizationBody'] = {}
   if (name) payload.name = name
   if (billing_email) payload.billing_email = billing_email
   if (opt_in_tags) payload.opt_in_tags = opt_in_tags
+  if (additional_billing_emails) payload.additional_billing_emails = additional_billing_emails
 
   const { data, error } = await patch('/platform/organizations/{slug}', {
     params: { path: { slug } },
@@ -51,7 +54,12 @@ export const useOrganizationUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         // [Joshen] Not sure if necessary to refresh the organizations list though
-        await queryClient.invalidateQueries(organizationKeys.list())
+        await Promise.all([
+          queryClient.invalidateQueries(organizationKeys.list()),
+          queryClient.invalidateQueries(organizationKeys.detail(data.slug)),
+          queryClient.invalidateQueries(organizationKeys.customerProfile(data.slug)),
+        ])
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
