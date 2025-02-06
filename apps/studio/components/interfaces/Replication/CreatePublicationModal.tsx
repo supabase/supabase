@@ -32,8 +32,8 @@ const CreatePublicationModal = ({ visible, onClose, sourceId }: CreatePublicatio
   const onSubmit = (values: any) => {
     let requested_tables = []
     if (tables) {
-      for (const table in tables) {
-        const key = tables[table]
+      for (const table in tables.tables) {
+        const key = tables.tables[table]
         const schema = values[key.schema]
         if (schema) {
           let lowercase_key = key.name.toLowerCase()
@@ -81,10 +81,10 @@ const CreatePublicationModal = ({ visible, onClose, sourceId }: CreatePublicatio
               </Modal.Content>
               <Modal.Content>
                 <div className="text-sm text-foreground-light">Publication tables</div>
-                {tables?.length === 0 ? (
+                {tables?.tables.length === 0 ? (
                   <div className="text-sm py-5">No tables in database</div>
                 ) : (
-                  tables?.map((table) => {
+                  tables?.tables.map((table) => {
                     let tableLabel = `${table.schema}.${table.name}`
                     let tableName = `${table.schema}/${table.name}`
                     return (
