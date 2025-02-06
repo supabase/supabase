@@ -85,6 +85,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     ref
   ) => {
     const router = useRouter()
+    const [isClient, setIsClient] = useState(false)
     const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
@@ -106,15 +107,13 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
-    const [isClient, setIsClient] = useState(false)
-
     useEffect(() => {
       setIsClient(true)
     }, [])
 
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
-        if (e.metaKey && e.code === 'KeyI' && !e.altKey && !e.shiftKey) {
+        if (e.metaKey && e.key === 'i' && !e.altKey && !e.shiftKey) {
           setAiAssistantPanel({ open: !open })
           e.preventDefault()
           e.stopPropagation()
