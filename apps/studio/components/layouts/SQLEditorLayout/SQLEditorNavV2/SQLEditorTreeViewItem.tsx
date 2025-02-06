@@ -1,3 +1,8 @@
+import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ComponentProps, useEffect } from 'react'
+
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
@@ -6,10 +11,6 @@ import { Snippet } from 'data/content/sql-folders-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import useLatest from 'hooks/misc/useLatest'
 import { useProfile } from 'lib/profile'
-import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ComponentProps, useEffect } from 'react'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -75,12 +76,11 @@ export const SQLEditorTreeViewItem = ({
   sort,
   name,
   onFolderContentsChange,
-  ...props
 }: SQLEditorTreeViewItemProps) => {
   const router = useRouter()
   const { id, ref: projectRef } = useParams()
   const { profile } = useProfile()
-
+  const { className, onClick } = getNodeProps()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const isOwner = profile?.id === element?.metadata.owner_id
@@ -159,6 +159,7 @@ export const SQLEditorTreeViewItem = ({
       <ContextMenu_Shadcn_ modal={false}>
         <ContextMenuTrigger_Shadcn_ asChild>
           <TreeViewItem
+            className={className}
             level={level}
             isExpanded={isExpanded}
             isBranch={isBranch}
@@ -183,9 +184,11 @@ export const SQLEditorTreeViewItem = ({
                 if (isEditing) {
                   return
                 }
+
+                // When the item is a folder, we want to expand/close it
+                onClick(e)
               }
             }}
-            {...props}
             name={element.name}
             xPadding={16}
           />
