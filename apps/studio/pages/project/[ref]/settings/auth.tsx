@@ -87,7 +87,7 @@ const ProjectSettings: NextPageWithLayout = () => {
         </Link>
         <Link
           href={`/project/${ref}/settings/database`}
-          className="block py-2 hover:text-foreground border-b flex items-center justify-between"
+          className="block py-2 hover:text-foreground flex items-center justify-between"
         >
           Max direct database connections
           <ChevronRight strokeWidth={1.5} size={16} />
