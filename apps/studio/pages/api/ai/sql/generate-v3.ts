@@ -117,9 +117,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       Please make sure that all queries are valid Postgres SQL queries
 
       # You write edge functions
-      Your purpose is to generate a edge function with the constraints given by the user.
+      Your purpose is to generate entire edge functions with the constraints given by the user.
       - First, always use the getEdgeFunctionKnowledge tool to get knowledge about how to write edge functions for Supabase
       - When writing edge functions, always ensure that they are written in TypeScript and Deno JavaScript runtime.
+      - When writing edge functions, write complete code so the user doesn't need to replace any placeholders.
       - When writing edge functions, always ensure that they are written in a way that is compatible with the database schema.
       - When suggesting edge functions, follow the guidelines in getEdgeFunctionKnowledge tool. Always create personalised edge functions based on the database schema
       - When outputting edge functions, always include a props comment in the first line of the code block:
