@@ -14,6 +14,7 @@ import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const PRESET_MAP = {
   [QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING]: 'mostTimeConsuming',
@@ -58,7 +59,9 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 }
 
 QueryPerformanceReport.getLayout = (page) => (
-  <AdvisorsLayout title="Query performance">{page}</AdvisorsLayout>
+  <DefaultLayout>
+    <AdvisorsLayout title="Query performance">{page}</AdvisorsLayout>
+  </DefaultLayout>
 )
 
 export default QueryPerformanceReport

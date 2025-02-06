@@ -21,6 +21,7 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 /**
  * Filter tables by table name and policy name
@@ -174,9 +175,11 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 }
 
 AuthPoliciesPage.getLayout = (page) => (
-  <AuthLayout title="Auth">
-    <div className="h-full p-4">{page}</div>
-  </AuthLayout>
+  <DefaultLayout>
+    <AuthLayout title="Auth">
+      <div className="h-full p-4">{page}</div>
+    </AuthLayout>
+  </DefaultLayout>
 )
 
 export default AuthPoliciesPage

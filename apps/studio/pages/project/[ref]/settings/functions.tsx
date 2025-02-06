@@ -1,4 +1,5 @@
 import EdgeFunctionSecrets from 'components/interfaces/Functions/EdgeFunctionSecrets/EdgeFunctionSecrets'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,
@@ -26,6 +27,10 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <SettingsLayout title="Settings">{page}</SettingsLayout>
+PageLayout.getLayout = (page) => (
+  <DefaultLayout>
+    <SettingsLayout title="Settings">{page}</SettingsLayout>
+  </DefaultLayout>
+)
 
 export default PageLayout

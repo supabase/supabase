@@ -1,6 +1,5 @@
 import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
 
-import { useParams } from 'common'
 import { Project, useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import { DatabaseSelectorStateContextProvider } from 'state/database-selector'
@@ -49,12 +48,6 @@ export const ProjectContextProvider = ({
       </TableEditorStateContextProvider>
     </ProjectContext.Provider>
   )
-}
-
-export const ProjectContextFromParamsProvider = ({ children }: PropsWithChildren<{}>) => {
-  const { ref: projectRef } = useParams()
-
-  return <ProjectContextProvider projectRef={projectRef}>{children}</ProjectContextProvider>
 }
 
 export const useIsProjectActive = () => {

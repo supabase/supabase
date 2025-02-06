@@ -10,6 +10,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 // [Joshen] Technically, best that we have these as separate URLs
 // makes it easier to manage state, but foresee that this page might
@@ -56,6 +57,10 @@ const DatabasePublications: NextPageWithLayout = () => {
   )
 }
 
-DatabasePublications.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+DatabasePublications.getLayout = (page) => (
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
+)
 
 export default DatabasePublications

@@ -123,14 +123,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     >
                       <AppBannerContextProvider>
                         <CommandProvider>
-                          <AppBannerWrapper>
-                            <FeaturePreviewContextProvider>
-                              {getLayout(<Component {...pageProps} />)}
-                              <StudioCommandMenu />
-                              <GenerateSql />
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                          </AppBannerWrapper>
+                          <FeaturePreviewContextProvider>
+                            {getLayout(<Component {...pageProps} />)}
+                            <StudioCommandMenu />
+                            <GenerateSql />
+                            <FeaturePreviewModal />
+                          </FeaturePreviewContextProvider>
                           <SonnerToaster position="top-right" />
                         </CommandProvider>
                       </AppBannerContextProvider>

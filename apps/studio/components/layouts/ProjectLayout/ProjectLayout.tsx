@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { PROJECT_STATUS } from 'lib/constants'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
@@ -19,11 +19,7 @@ import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
-import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
-import MobileNavigationBar from './NavigationBar/MobileNavigationBar'
-import MobileViewNav from './NavigationBar/MobileViewNav'
-import NavigationBar from './NavigationBar/NavigationBar'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
@@ -128,7 +124,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
 
-    const sideBarIsOpen = true // @mildtomato - var to use later to control collapsible sidebar
+    const sideBarIsOpen = true // @mildtomato - var for later to use collapsible sidebar
 
     return (
       <>
@@ -147,33 +143,14 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             </title>
             <meta name="description" content="Supabase Studio" />
           </Head>
-
-          <div className="flex flex-col h-screen w-screen">
-            {/* Top Nav to access products from mobile */}
-            {!hideIconBar && <MobileNavigationBar />}
-            {!hideHeader && IS_PLATFORM && (
-              <LayoutHeader showHomeLink showProductMenu={!!(showProductMenu && productMenu)} />
-            )}
-            <div className="flex h-full flex-row grow overflow-y-auto">
-              {showProductMenu && productMenu && !(!hideHeader && IS_PLATFORM) && (
-                <MobileViewNav title={product} />
-              )}
-              {/* Left-most navigation side bar to access products */}
-              {!hideIconBar && <NavigationBar />}
-              {/* Product menu bar */}
-              <ResizablePanelGroup
-                className="flex h-full"
-                direction="horizontal"
-                autoSaveId="project-layout"
-              >
-                {/* Existing desktop menu */}
+          <div className="flex flex-row h-full w-full">
+            <div className={cn('w-full overflow-hidden flex-row')}>
+              <ResizablePanelGroup className="" direction="horizontal" autoSaveId="project-layout">
                 {showProductMenu && productMenu && (
                   <ResizablePanel
                     order={1}
-                    defaultSize={1}
                     id="panel-left"
                     className={cn(
-                      'hidden md:flex',
                       'transition-all duration-[120ms]',
                       sideBarIsOpen
                         ? resizableSidebar
@@ -183,12 +160,12 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                     )}
                   >
                     {sideBarIsOpen && (
-                      <AnimatePresence>
+                      <AnimatePresence initial={false}>
                         <motion.div
                           initial={{ width: 0, opacity: 0, height: '100%' }}
                           animate={{ width: 'auto', opacity: 1, height: '100%' }}
                           exit={{ width: 0, opacity: 0, height: '100%' }}
-                          className="h-full flex-grow max-w-full"
+                          className="h-full"
                           transition={{ duration: 0.12 }}
                         >
                           <MenuBarWrapper
@@ -206,13 +183,16 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 {showProductMenu && productMenu && sideBarIsOpen && (
                   <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
                 )}
-                <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col">
+                <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col w-full">
                   <ResizablePanelGroup
-                    className="h-full w-full overflow-x-hidden flex-1"
+                    className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
                     direction="horizontal"
                     autoSaveId="project-layout-content"
                   >
-                    <ResizablePanel id="panel-content" className="w-full md:min-w-[600px]">
+                    <ResizablePanel
+                      id="panel-content"
+                      className={cn('w-full min-w-[600px] bg-dash-sidebar')}
+                    >
                       <main
                         className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
                         ref={ref}
@@ -233,7 +213,10 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                     </ResizablePanel>
                     {isClient && aiAssistantPanel.open && (
                       <>
-                        <ResizableHandle />
+                        <ResizableHandle
+                          withHandle
+                          className="opacity-0 focus-within:opacity-100 hover:opacity-100"
+                        />
                         <ResizablePanel
                           id="panel-assistant"
                           className={cn(
@@ -251,14 +234,13 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               </ResizablePanelGroup>
             </div>
           </div>
-
           <EnableBranchingModal />
           <AISettingsModal />
           <ProjectAPIDocs />
+          <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            {productMenu}
+          </MobileSheetNav>
         </ProjectContextProvider>
-        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-          {productMenu}
-        </MobileSheetNav>
       </>
     )
   }

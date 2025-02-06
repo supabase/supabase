@@ -28,6 +28,7 @@ import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -37,7 +38,11 @@ const DatabaseReport: NextPageWithLayout = () => {
   )
 }
 
-DatabaseReport.getLayout = (page) => <ReportsLayout title="Database">{page}</ReportsLayout>
+DatabaseReport.getLayout = (page) => (
+  <DefaultLayout>
+    <ReportsLayout title="Database">{page}</ReportsLayout>
+  </DefaultLayout>
+)
 
 export default DatabaseReport
 

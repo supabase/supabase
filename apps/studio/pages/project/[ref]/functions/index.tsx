@@ -7,6 +7,7 @@ import {
   TerminalInstructions,
 } from 'components/interfaces/Functions'
 import FunctionsLayout from 'components/layouts/FunctionsLayout/FunctionsLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -82,6 +83,10 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
+PageLayout.getLayout = (page) => (
+  <DefaultLayout>
+    <FunctionsLayout>{page}</FunctionsLayout>
+  </DefaultLayout>
+)
 
 export default PageLayout

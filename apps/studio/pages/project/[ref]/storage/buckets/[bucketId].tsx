@@ -4,6 +4,7 @@ import { find } from 'lodash'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { StorageExplorer } from 'components/to-be-cleaned/Storage'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import type { NextPageWithLayout } from 'types'
@@ -37,6 +38,10 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <StorageLayout title="Buckets">{page}</StorageLayout>
+PageLayout.getLayout = (page) => (
+  <DefaultLayout>
+    <StorageLayout title="Buckets">{page}</StorageLayout>
+  </DefaultLayout>
+)
 
 export default PageLayout
