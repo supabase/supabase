@@ -2124,6 +2124,10 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/manage-your-usage/storage-size',
             },
             {
+              name: 'Storage Image Transformations',
+              url: '/guides/platform/manage-your-usage/storage-image-transformations',
+            },
+            {
               name: 'Disk Size',
               url: '/guides/platform/manage-your-usage/disk-size',
             },
