@@ -129,12 +129,6 @@ const RateLimits = () => {
 
   return (
     <div>
-      <FormHeader
-        title="Rate Limits"
-        description="Safeguard against bursts of incoming traffic to prevent abuse and maximize stability"
-        docsUrl="https://supabase.com/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention"
-      />
-
       {isError && <AlertError subject="Failed to retrieve auth config rate limits" error={error} />}
 
       {isLoading && <GenericSkeletonLoader />}

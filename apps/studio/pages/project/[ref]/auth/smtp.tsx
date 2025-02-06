@@ -1,8 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { EmailTemplates } from 'components/interfaces/Auth'
+
+import { SmtpForm } from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useParams } from 'common'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
 import Link from 'next/link'
 import { NavMenu, NavMenuItem } from 'ui'
@@ -61,7 +62,7 @@ const PageLayout: NextPageWithLayout = () => {
       <ScaffoldDivider />
 
       <ScaffoldContainer className="my-8 space-y-8">
-        <EmailTemplates />
+        <SmtpForm />
       </ScaffoldContainer>
     </div>
   )

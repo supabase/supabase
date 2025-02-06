@@ -147,7 +147,7 @@ const ServiceList = () => {
             <DisplayApiSettings key="DisplayAPISettings" />
           </section>
 
-          <section>
+          <section id="jwt-settings">
             <JWTSettings />
           </section>
 

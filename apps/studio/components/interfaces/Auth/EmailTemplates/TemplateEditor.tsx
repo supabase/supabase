@@ -166,7 +166,7 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
         return (
           <>
-            <FormSection className="!border-t-0 pb-8 pt-4">
+            <FormSection className="!border-t-0 pb-8 !pt-4">
               <FormSectionContent loading={false}>
                 {Object.keys(properties).map((x: string) => {
                   const property = properties[x]
