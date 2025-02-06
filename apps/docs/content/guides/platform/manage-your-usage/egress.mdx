@@ -36,13 +36,13 @@ Data pushed to clients via Supabase Realtime for subscribed events.
 **Example:** When a user views a product page in an online shop, their client subscribes to real-time inventory updates. As stock levels change, Supabase Realtime pushes updates to all subscribed clients, contributing to Realtime Egress.
 
 ## How charges are calculated
-Egress is charged by byte. Charges apply only for usage exceeding your subscription plan's base quota. This quota is called the Unified Egress Quota because it can be used across all services (Database, Authentication, Storage etc.).
+Egress is charged by byte. Charges apply only for usage exceeding your subscription plan's quota. This quota is called the Unified Egress Quota because it can be used across all services (Database, Auth, Storage etc.).
 
 ### Egress usage on your invoice
 Egress usage is shown as "Egress GB" on your invoice.
 
 ## Pricing
-1 GB is $0.09 per month. You are only charged for usage exceeding your subscription plan's free quota.
+1 GB is $0.09 per month. You are only charged for usage exceeding your subscription plan's quota.
 
 | Plan       | Unified Egress Quota | Over-Usage per GB per month |
 |------------|----------------------|-----------------------------|
@@ -53,7 +53,7 @@ Egress usage is shown as "Egress GB" on your invoice.
 
 ## Billing examples
 ### Within quota
-The organization's Egress usage is within the free quota, so no charges for Egress apply.
+The organization's Egress usage is within the quota, so no charges for Egress apply.
 
 | Line Item           | Units     | Costs   |
 |---------------------|-----------|---------|
@@ -65,7 +65,7 @@ The organization's Egress usage is within the free quota, so no charges for Egre
 | **Total**           |           | **$25** |
 
 ### Exceeding quota
-The organization's Egress usage exceeds the free quota by 50 GB, incurring charges for this additional usage.
+The organization's Egress usage exceeds the quota by 50 GB, incurring charges for this additional usage.
 
 | Line Item           | Units     | Costs     |
 |---------------------|-----------|-----------|
