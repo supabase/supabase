@@ -2139,6 +2139,10 @@ export const platform: NavMenuConstant = {
               name: 'Custom Domains',
               url: '/guides/platform/manage-your-usage/custom-domains',
             },
+            {
+              name: 'Point-in-Time Recovery',
+              url: '/guides/platform/manage-your-usage/point-in-time-recovery',
+            },
           ],
         },
         {
