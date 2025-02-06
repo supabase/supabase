@@ -178,6 +178,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 {showProductMenu && productMenu && (
                   <ResizablePanel
                     order={1}
+                    defaultSize={1}
                     id="panel-left"
                     className={cn(
                       'hidden md:flex',
