@@ -34,7 +34,7 @@ export async function deployEdgeFunction({
   })
 
   const response = await fetch(
-    `${API_URL?.replace('/platform', '')}/v1/projects/${projectRef}/functions/deploy?slug=${metadata.name}`,
+    `/v1/projects/${projectRef}/functions/deploy?slug=${metadata.name}`,
     {
       method: 'POST',
       body: formData,
