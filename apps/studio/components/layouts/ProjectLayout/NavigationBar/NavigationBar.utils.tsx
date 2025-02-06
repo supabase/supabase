@@ -9,6 +9,7 @@ import {
   EdgeFunctions,
   Realtime,
   Reports,
+  RESTApi,
   SqlEditor,
   Storage,
   TableEditor,
@@ -41,7 +42,13 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
 export const generateProductRoutes = (
   ref?: string,
   project?: Project,
-  features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean; realtime?: boolean }
+  features?: {
+    auth?: boolean
+    edgeFunctions?: boolean
+    storage?: boolean
+    realtime?: boolean
+    replication?: boolean
+  }
 ): Route[] => {
   const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -51,6 +58,7 @@ export const generateProductRoutes = (
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
+  const replicationEnabled = features?.replication ?? true
 
   return [
     {
@@ -102,6 +110,17 @@ export const generateProductRoutes = (
             label: 'Realtime',
             icon: <Realtime size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/inspector`),
+          },
+        ]
+      : []),
+    ...(replicationEnabled
+      ? [
+          {
+            key: 'replication',
+            label: 'Replication',
+            //TODO: Use a proper icon
+            icon: <RESTApi size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/replication`),
           },
         ]
       : []),
