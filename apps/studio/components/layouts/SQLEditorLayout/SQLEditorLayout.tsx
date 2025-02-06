@@ -1,10 +1,8 @@
-import { ReactNode, useEffect, useMemo, useState } from 'react'
-
 import { OngoingQueriesPanel } from 'components/interfaces/SQLEditor/OngoingQueriesPanel'
 import { withAuth } from 'hooks/misc/withAuth'
+import { ReactNode, useMemo } from 'react'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { SQLEditorMenu } from './SQLEditorMenu'
-import { useParams } from 'common'
 
 export interface SQLEditorLayoutProps {
   title: string
