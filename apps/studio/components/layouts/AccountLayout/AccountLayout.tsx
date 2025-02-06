@@ -149,7 +149,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
         <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className="h-screen min-h-[0px] basis-0 flex-1">
+      <div className="flex flex-col h-screen w-screen">
         <WithSidebar title={title} breadcrumbs={breadcrumbs} sections={sectionsWithHeaders}>
           {children}
         </WithSidebar>
