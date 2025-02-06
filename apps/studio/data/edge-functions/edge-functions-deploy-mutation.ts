@@ -1,8 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, constructHeaders } from 'data/fetchers'
-import { API_URL } from 'lib/constants'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
@@ -25,33 +24,29 @@ export async function deployEdgeFunction({
 }: EdgeFunctionsDeployVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const formData = new FormData()
-  formData.append('metadata', JSON.stringify(metadata))
+  const { data, error } = await post(`/v1/projects/{ref}/functions/deploy`, {
+    params: { path: { ref: projectRef }, query: { slug: metadata.name } },
+    body: {
+      file: files as any,
+      metadata: metadata,
+    },
+    bodySerializer(body) {
+      const formData = new FormData()
 
-  files.forEach((file) => {
-    const blob = new Blob([file.content], { type: 'text/plain' })
-    formData.append('file', blob, file.name)
+      formData.append('metadata', JSON.stringify(body.metadata))
+
+      body.file.forEach((f: any) => {
+        const file = f as { name: string; content: string }
+        const blob = new Blob([file.content], { type: 'text/plain' })
+        formData.append('file', blob, file.name)
+      })
+
+      return formData
+    },
   })
 
-  const response = await fetch(
-    `/v1/projects/${projectRef}/functions/deploy?slug=${metadata.name}`,
-    {
-      method: 'POST',
-      body: formData,
-      headers: await constructHeaders(),
-      credentials: 'include',
-      referrerPolicy: 'no-referrer-when-downgrade',
-    }
-  )
-
-  const result = await response.json()
-  if (response.ok) {
-    return result
-  }
-
-  result.code = response.status
-  result.requestId = response.headers.get('X-Request-Id')
-  handleError(result)
+  if (error) handleError(error)
+  return data
 }
 
 type EdgeFunctionsDeployData = Awaited<ReturnType<typeof deployEdgeFunction>>
