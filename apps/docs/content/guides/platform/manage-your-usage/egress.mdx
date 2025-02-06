@@ -4,7 +4,36 @@ title: 'Manage Egress usage'
 ---
 
 ## What you are charged for
-You are charged for the network data transmitted out of the system to a connected client. Egress is incurred by all services - Database, Authentication, Storage, Edge Functions, Realtime, and Log Drains.
+You are charged for the network data transmitted out of the system to a connected client. Egress is incurred by all services - Database, Auth, Storage, Edge Functions, and Realtime.
+
+### Database Egress
+Data sent to the client when retrieving data stored in your database.
+
+**Example:** A user views their order history in an online shop. The client application requests the database to retrieve the user's past orders. The order data is sent back to the client, contributing to Database Egress.
+
+<Admonition type="note">
+  There are various ways to interact with your database, such as through the PostgREST API using one of the client SDKs or via the Supavisor connection pooler. On the Supabase Dashboard, Egress from the PostgREST API is labeled as **Database Egress**, while Egress through Supavisor is labeled as **Supavisor Egress**.
+</Admonition>
+
+### Auth Egress
+Data sent from Supabase Auth to the client while managing your application's users. This includes actions like signing in, signing out, or creating new users, e.g. via the JavaScript Client SDK.
+
+**Example:** A user signs in to an online shop. The client application requests the Supabase Auth service to authenticate and authorize the user. The session data, including authentication tokens and user profile details, is sent back to the client, contributing to Auth Egress.
+
+### Storage Egress
+Data sent from Supabase Storage to the client when retrieving assets. This includes actions like downloading files, images, or other stored content, e.g. via the JavaScript Client SDK.
+
+**Example:** A user downloads an invoice from an online shop. The client application requests Supabase Storage to retrieve the PDF file from the storage bucket. The file is sent back to the client, contributing to Storage Egress.
+
+### Edge Functions Egress
+Data sent to the client when executing Edge Functions.
+
+**Example:** A user completes a checkout process in an online shop. The client application triggers an Edge Function to process the payment and confirm the order. The confirmation response, along with any necessary details, is sent back to the client, contributing to Edge Functions Egress.
+
+### Realtime Egress
+Data pushed to clients via Supabase Realtime for subscribed events.
+
+**Example:** When a user views a product page in an online shop, their client subscribes to real-time inventory updates. As stock levels change, Supabase Realtime pushes updates to all subscribed clients, contributing to Realtime Egress.
 
 ## How charges are calculated
 Egress is charged by byte. Charges apply only for usage exceeding the subscription plan's free quota. This quota can be used across all services (Database, Authentication, Storage etc.), also referred to as Unified Egress.
