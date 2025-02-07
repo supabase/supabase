@@ -12,9 +12,10 @@ export interface DefaultLayoutProps {
   hasProductMenu?: boolean
   // Shows header in the top left of the page
   headerTitle?: string
+  showProductMenu?: boolean
 }
 
-const DefaultLayout = ({ children }: PropsWithChildren<DefaultLayoutProps>) => {
+const DefaultLayout = ({ children, showProductMenu }: PropsWithChildren<DefaultLayoutProps>) => {
   return (
     <>
       <AppBannerContextProvider>
@@ -23,7 +24,7 @@ const DefaultLayout = ({ children }: PropsWithChildren<DefaultLayoutProps>) => {
           <AppBannerWrapper />
           <div className="flex-shrink-0">
             <MobileNavigationBar />
-            <LayoutHeader />
+            <LayoutHeader showProductMenu={showProductMenu} />
           </div>
           {/* Main Content Area */}
           <div className="flex flex-1 w-full overflow-y-hidden">

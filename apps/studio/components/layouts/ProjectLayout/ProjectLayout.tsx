@@ -152,6 +152,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                   defaultSize={1}
                   id="panel-left"
                   className={cn(
+                    'hidden md:block',
                     'transition-all duration-[120ms]',
                     sideBarIsOpen
                       ? resizableSidebar
@@ -182,7 +183,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 </ResizablePanel>
               )}
               {showProductMenu && productMenu && sideBarIsOpen && (
-                <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
+                <ResizableHandle
+                  withHandle
+                  disabled={resizableSidebar ? false : true}
+                  className="hidden md:block"
+                />
               )}
               <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col w-full">
                 <ResizablePanelGroup
@@ -192,7 +197,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 >
                   <ResizablePanel
                     id="panel-content"
-                    className={cn('w-full min-w-[600px] bg-dash-sidebar')}
+                    className={cn('w-full xl:min-w-[600px] bg-dash-sidebar')}
                   >
                     <main
                       className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
