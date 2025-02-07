@@ -144,7 +144,7 @@ const BillingMetric = ({
             <div>
               <Button type="default" asChild>
                 <Link
-                  href={`/org/${slug}/billing?panel=subscriptionPlan&source=usage${metric.anchor}`}
+                  href={`/org/${slug}/billing?panel=subscriptionPlan&source=billingBreakdownUsage${metric.anchor}`}
                 >
                   Upgrade
                 </Link>
