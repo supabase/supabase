@@ -1,32 +1,14 @@
-import { MessageSquare, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { AiIconAnimation, Button } from 'ui'
 import { useAppStateSnapshot } from 'state/app-state'
 import SQLEditor from './SQLEditor'
 import { useEffect, useState } from 'react'
+import { EditQueryButton } from '../QueryBlock/EditQueryButton'
 
 interface EditorPanelHeaderProps {
   onClose: () => void
   onChat: () => void
-}
-
-const EditorPanelHeader = ({ onClose, onChat }: EditorPanelHeaderProps) => {
-  return (
-    <div className="border-b flex shrink-0 items-center bg gap-x-3 px-5 h-[46px]">
-      <span className="text-sm flex-1">SQL Editor</span>
-      <div className="flex gap-2 items-center">
-        <Button size="tiny" type="default" onClick={onChat} icon={<AiIconAnimation size={14} />}>
-          Chat
-        </Button>
-        <Button
-          size="tiny"
-          type="default"
-          className="w-7"
-          onClick={onClose}
-          icon={<X size={14} />}
-        />
-      </div>
-    </div>
-  )
+  onSave: () => void
 }
 
 export const EditorPanel = () => {
@@ -60,8 +42,28 @@ export const EditorPanel = () => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-background border-l">
-      <EditorPanelHeader onClose={() => setEditorPanel({ open: false })} onChat={handleChat} />
+    <div className="flex flex-col h-full bg-surface-100">
+      <div className="border-b flex shrink-0 items-center gap-x-3 px-5 h-[46px]">
+        <span className="text-sm flex-1">SQL Editor</span>
+        <div className="flex gap-2 items-center">
+          <Button
+            size="tiny"
+            type="default"
+            onClick={handleChat}
+            icon={<AiIconAnimation size={14} />}
+          >
+            Chat
+          </Button>
+          <EditQueryButton type="default" title={'untitled-snippet'} sql={currentSql} />
+          <Button
+            size="tiny"
+            type="default"
+            className="w-7"
+            onClick={() => setEditorPanel({ open: false })}
+            icon={<X size={14} />}
+          />
+        </div>
+      </div>
       <SQLEditor onChange={setCurrentSql} />
     </div>
   )

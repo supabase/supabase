@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { ComponentProps } from 'react'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -23,9 +24,17 @@ interface EditQueryButtonProps {
   id?: string
   title: string
   sql?: string
+  className?: string
+  type?: 'default' | 'text'
 }
 
-export const EditQueryButton = ({ id, sql, title }: EditQueryButtonProps) => {
+export const EditQueryButton = ({
+  id,
+  sql,
+  title,
+  className,
+  type = 'text',
+}: EditQueryButtonProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { newQuery } = useNewQuery()
@@ -54,9 +63,9 @@ export const EditQueryButton = ({ id, sql, title }: EditQueryButtonProps) => {
     return (
       <ButtonTooltip
         asChild
-        type="text"
+        type={type}
         size="tiny"
-        className="w-7 h-7"
+        className={cn('w-7 h-7', className)}
         icon={<Edit size={14} />}
         tooltip={tooltip}
       >
@@ -67,9 +76,9 @@ export const EditQueryButton = ({ id, sql, title }: EditQueryButtonProps) => {
 
   return !isInSQLEditor || isInNewSnippet ? (
     <ButtonTooltip
-      type="text"
+      type={type}
       size="tiny"
-      className="w-7 h-7"
+      className={cn('w-7 h-7', className)}
       icon={<Edit size={14} />}
       onClick={() => {
         handleEditInSQLEditor()
@@ -88,10 +97,10 @@ export const EditQueryButton = ({ id, sql, title }: EditQueryButtonProps) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <ButtonTooltip
-          type="text"
+          type={type}
           size="tiny"
           disabled={!sql}
-          className="w-7 h-7"
+          className={cn('w-7 h-7', className)}
           icon={<Edit size={14} />}
           tooltip={!!sql ? tooltip : { content: { side: 'bottom', text: undefined } }}
         />
