@@ -54,7 +54,6 @@ const LayoutHeader = ({
   breadcrumbs = [],
   headerBorder = true,
   showProductMenu,
-  showHomeLink = false,
 }: LayoutHeaderProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -105,26 +104,23 @@ const LayoutHeader = ({
       <div className="relative flex flex-1 overflow-hidden">
         <div className="flex w-full items-center justify-between py-2 pl-1 pr-3 md:px-3 flex-nowrap overflow-x-auto no-scrollbar">
           <div className="flex items-center text-sm">
-            {showHomeLink && (
-              <Link
-                href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
-                className="mx-1 hidden md:flex items-center w-[40px] h-[40px]"
-              >
-                <img
-                  alt="Supabase"
-                  src={`${router.basePath}/img/supabase-logo.svg`}
-                  className="absolute h-[40px] w-6 cursor-pointer rounded"
-                />
-              </Link>
-            )}
-
-            {projectRef && (
+            <Link
+              href={IS_PLATFORM ? '/projects' : `/project/default`}
+              className="mx-1 hidden md:flex items-center w-[40px] h-[40px]"
+            >
+              <img
+                alt="Supabase"
+                src={`${router.basePath}/img/supabase-logo.svg`}
+                className="absolute h-[40px] w-6 cursor-pointer rounded"
+              />
+            </Link>
+            <div className="ml-3 text-xs text-foreground-light">Default project</div>
+            {projectRef && IS_PLATFORM && (
               <>
                 <div className="flex items-center">
                   <OrganizationDropdown />
                   <LayoutHeaderDivider />
                   <ProjectDropdown />
-
                   {exceedingLimits && (
                     <div className="ml-2">
                       <Link href={`/org/${selectedOrganization?.slug}/usage`}>
@@ -132,7 +128,6 @@ const LayoutHeader = ({
                       </Link>
                     </div>
                   )}
-
                   {selectedProject && isBranchingEnabled && (
                     <>
                       <LayoutHeaderDivider />
@@ -147,7 +142,6 @@ const LayoutHeader = ({
                 </div>
               </>
             )}
-
             {/* Additional breadcrumbs are supplied */}
             <BreadcrumbsView defaultValue={breadcrumbs} />
           </div>

@@ -66,7 +66,6 @@ export interface ProjectLayoutProps {
   isBlocking?: boolean
   product?: string
   productMenu?: ReactNode
-  hideHeader?: boolean
   hideIconBar?: boolean
   selectedTable?: string
   resizableSidebar?: boolean
@@ -81,7 +80,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       product = '',
       productMenu,
       children,
-      hideHeader = false,
       hideIconBar = false,
       selectedTable,
       resizableSidebar = false,
@@ -151,13 +149,14 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           <div className="flex flex-col h-screen w-screen">
             {/* Top Nav to access products from mobile */}
             {!hideIconBar && <MobileNavigationBar />}
-            {!hideHeader && IS_PLATFORM && (
-              <LayoutHeader showHomeLink showProductMenu={!!(showProductMenu && productMenu)} />
-            )}
+
+            <LayoutHeader
+              showHomeLink={IS_PLATFORM}
+              showProductMenu={!!(showProductMenu && productMenu)}
+            />
+
             <div className="flex h-full flex-row grow overflow-y-auto">
-              {showProductMenu && productMenu && !(!hideHeader && IS_PLATFORM) && (
-                <MobileViewNav title={product} />
-              )}
+              {showProductMenu && productMenu && !IS_PLATFORM && <MobileViewNav title={product} />}
               {/* Left-most navigation side bar to access products */}
               {!hideIconBar && <NavigationBar />}
               {/* Product menu bar */}
