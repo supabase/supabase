@@ -6,6 +6,7 @@ import NavigationBar from './ProjectLayout/NavigationBar/NavigationBar'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { useParams } from 'common'
+import { withAuth } from 'hooks/misc/withAuth'
 
 export interface DefaultLayoutProps {
   title?: string
@@ -18,10 +19,10 @@ export interface DefaultLayoutProps {
 }
 
 const DefaultLayout = ({ children, showProductMenu }: PropsWithChildren<DefaultLayoutProps>) => {
-  const { projectRef } = useParams()
+  const { ref } = useParams()
   return (
     <>
-      <ProjectContextProvider projectRef={projectRef}>
+      <ProjectContextProvider projectRef={ref}>
         <AppBannerContextProvider>
           <div className="flex flex-col h-screen w-screen">
             {/* Top Banner */}
@@ -44,4 +45,4 @@ const DefaultLayout = ({ children, showProductMenu }: PropsWithChildren<DefaultL
   )
 }
 
-export default DefaultLayout
+export default withAuth(DefaultLayout)
