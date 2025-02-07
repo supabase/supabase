@@ -18,6 +18,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { RefreshCw } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
@@ -83,6 +84,10 @@ export const StorageReport: NextPageWithLayout = () => {
   )
 }
 
-StorageReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
+StorageReport.getLayout = (page) => (
+  <DefaultLayout>
+    <ReportsLayout>{page}</ReportsLayout>
+  </DefaultLayout>
+)
 
 export default StorageReport

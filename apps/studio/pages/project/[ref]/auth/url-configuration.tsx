@@ -8,7 +8,7 @@ import { FormsContainer } from 'components/ui/Forms/FormsContainer'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
-
+import DefaultLayout from 'components/layouts/DefaultLayout'
 const URLConfiguration: NextPageWithLayout = () => {
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const isPermissionsLoaded = usePermissionsLoaded()
@@ -33,8 +33,10 @@ const URLConfiguration: NextPageWithLayout = () => {
   }
 }
 
-URLConfiguration.getLayout = (page) => {
-  return <AuthLayout>{page}</AuthLayout>
-}
+URLConfiguration.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthLayout>{page}</AuthLayout>
+  </DefaultLayout>
+)
 
 export default URLConfiguration
