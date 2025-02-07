@@ -22,7 +22,7 @@ const AuthSettings: NextPageWithLayout = () => {
     <>
       <ScaffoldContainer>
         <ScaffoldHeader>
-          <ScaffoldTitle>Multifactor (MFA)</ScaffoldTitle>
+          <ScaffoldTitle>Multi-Factor Authentication (MFA)</ScaffoldTitle>
           <ScaffoldDescription>
             Requires users to provide additional verification factors to authenticate
           </ScaffoldDescription>
