@@ -45,16 +45,13 @@ interface LayoutHeaderProps {
   breadcrumbs?: any[]
   headerBorder?: boolean
   showProductMenu?: boolean
-  customSidebarContent?: ReactNode
-  showHomeLink?: boolean
 }
 
 const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
   headerBorder = true,
-  showProductMenu,
-  showHomeLink = false,
+  showProductMenu = true,
 }: LayoutHeaderProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -105,7 +102,7 @@ const LayoutHeader = ({
       <div className="relative flex flex-1 overflow-hidden">
         <div className="flex w-full items-center justify-between py-2 pl-1 pr-3 md:px-3 flex-nowrap overflow-x-auto no-scrollbar">
           <div className="flex items-center text-sm">
-            {showHomeLink && (
+            {projectRef && (
               <Link
                 href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
                 className="mx-1 hidden md:flex items-center w-[40px] h-[40px]"
