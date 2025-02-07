@@ -6,7 +6,6 @@ import NavigationBar from './ProjectLayout/NavigationBar/NavigationBar'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { useParams } from 'common'
-import { withAuth } from 'hooks/misc/withAuth'
 
 export interface DefaultLayoutProps {
   title?: string
@@ -45,4 +44,4 @@ const DefaultLayout = ({ children, showProductMenu }: PropsWithChildren<DefaultL
   )
 }
 
-export default withAuth(DefaultLayout)
+export default DefaultLayout
