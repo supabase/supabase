@@ -48,9 +48,7 @@ body,
 .main {
   @apply bg-studio relative;
   @apply text-foreground;
-  height: 100%;
-  padding: 0;
-  margin: 0;
+  @apply overflow-x-clip;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 }
@@ -279,7 +277,7 @@ div[data-radix-portal]:not(.portal--toast) {
 }
 
 .react-grid-item > .react-resizable-handle::after {
-  content: "";
+  content: '';
   position: absolute;
   right: 3px !important;
   bottom: 3px !important;

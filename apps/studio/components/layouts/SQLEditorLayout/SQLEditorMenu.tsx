@@ -1,9 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -11,6 +6,11 @@ import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
+import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { getAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -27,11 +27,10 @@ import {
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
-  InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
-import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
+import { SqlEditorMenuStaticLinks } from './SqlEditorMenuStaticLinks'
 import { SearchList } from './SQLEditorNavV2/SearchList'
-import { getAppStateSnapshot } from 'state/app-state'
+import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
 
 export const SQLEditorMenu = () => {
   const router = useRouter()
@@ -157,23 +156,7 @@ export const SQLEditorMenu = () => {
           <SearchList search={debouncedSearch} />
         ) : (
           <>
-            <div className="px-2">
-              <InnerSideMenuItem
-                title="Templates"
-                isActive={router.asPath === `/project/${ref}/sql/templates`}
-                href={`/project/${ref}/sql/templates`}
-              >
-                Templates
-              </InnerSideMenuItem>
-              <InnerSideMenuItem
-                title="Quickstarts"
-                isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
-                href={`/project/${ref}/sql/quickstarts`}
-              >
-                Quickstarts
-              </InnerSideMenuItem>
-            </div>
-
+            <SqlEditorMenuStaticLinks />
             <SQLEditorNav sort={sort} />
           </>
         )}

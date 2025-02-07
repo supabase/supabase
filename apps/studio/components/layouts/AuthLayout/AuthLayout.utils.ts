@@ -45,7 +45,7 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
                 items: [],
               },
               {
-                name: 'Multifactor',
+                name: 'Multi-Factor',
                 key: 'mfa',
                 url: `/project/${ref}/auth/mfa`,
                 items: [],
