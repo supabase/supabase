@@ -159,7 +159,9 @@ export const Restriction = () => {
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild type="default">
-                <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=fairUseRestricted`}>
+                <Link
+                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=fairUseRestricted`}
+                >
                   Upgrade plan
                 </Link>
               </Button>
