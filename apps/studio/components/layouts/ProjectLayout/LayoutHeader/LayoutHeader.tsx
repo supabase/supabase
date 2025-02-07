@@ -45,15 +45,13 @@ interface LayoutHeaderProps {
   breadcrumbs?: any[]
   headerBorder?: boolean
   showProductMenu?: boolean
-  customSidebarContent?: ReactNode
-  showHomeLink?: boolean
 }
 
 const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
   headerBorder = true,
-  showProductMenu,
+  showProductMenu = true,
 }: LayoutHeaderProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
