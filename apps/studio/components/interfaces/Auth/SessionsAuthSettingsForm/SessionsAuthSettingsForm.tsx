@@ -148,7 +148,7 @@ const SessionsAuthSettingsForm = () => {
                     size="small"
                     label="Detect and revoke potentially compromised refresh tokens"
                     layout="flex"
-                    descriptionText="Prevent replay attacks from potentially compromised refresh tokens. Recommendation: ON."
+                    descriptionText="Prevent replay attacks from potentially compromised refresh tokens."
                     disabled={!canUpdateConfig}
                   />
                   {values.REFRESH_TOKEN_ROTATION_ENABLED && (
