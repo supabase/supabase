@@ -1069,7 +1069,7 @@ export interface StudioPricingPlanCtaClickedEvent {
  */
 export interface StudioPricingSidePanelOpenedEvent {
   action: TelemetryActions.STUDIO_PRICING_SIDE_PANEL_OPENED
-  properties: { currentPlan?: string; source?: string }
+  properties: { currentPlan?: string; upgradeOrigin?: string }
   groups: { organization: string }
 }
 
