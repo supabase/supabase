@@ -29,8 +29,8 @@ const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   }, [resolvedTheme, monaco])
 
   return (
-    <div className="h-screen flex flex-col">
-      <div className="flex-none">
+    <div className="flex flex-col">
+      <div className="flex-shrink-0">
         {ongoingIncident && <IncidentBanner />}
         {showNoticeBanner && <NoticeBanner />}
         {profile !== undefined && <RestrictionBanner />}

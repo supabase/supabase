@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { ChevronRight } from 'lucide-react'
@@ -97,6 +98,10 @@ const ProjectSettings: NextPageWithLayout = () => {
   )
 }
 
-ProjectSettings.getLayout = (page) => <SettingsLayout title="Authentication">{page}</SettingsLayout>
+ProjectSettings.getLayout = (page) => (
+  <DefaultLayout>
+    <SettingsLayout title="Authentication">{page}</SettingsLayout>
+  </DefaultLayout>
+)
 
 export default ProjectSettings
