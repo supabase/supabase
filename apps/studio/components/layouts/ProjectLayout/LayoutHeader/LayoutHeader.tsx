@@ -21,7 +21,6 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
-
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger">
     <svg
@@ -112,7 +111,11 @@ const LayoutHeader = ({
                 className="absolute h-[40px] w-6 cursor-pointer rounded"
               />
             </Link>
-            <div className="ml-3 text-xs text-foreground-light">Default project</div>
+
+            {!IS_PLATFORM && (
+              <div className="ml-3 text-xs text-foreground-light">Default project</div>
+            )}
+
             {projectRef && IS_PLATFORM && (
               <>
                 <div className="flex items-center">
