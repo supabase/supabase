@@ -305,7 +305,10 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                 <p>
                   The plan applies only to this new organization. To upgrade an existing
                   organization,{' '}
-                  <Link className="underline" href="/org/_/billing?panel=subscriptionPlan">
+                  <Link
+                    className="underline"
+                    href="/org/_/billing?panel=subscriptionPlan&source=newOrgUpgradeExisting"
+                  >
                     click here
                   </Link>
                   .
