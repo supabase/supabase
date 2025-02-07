@@ -98,7 +98,7 @@ export const Restriction = () => {
             <div className="flex items-center gap-x-2 mt-3">
               <Button asChild key="upgrade-button" type="default">
                 <Link
-                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=gracePeriodStarted`}
+                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=fairUseGracePeriodStarted`}
                 >
                   Upgrade plan
                 </Link>
@@ -129,7 +129,7 @@ export const Restriction = () => {
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild type="default">
                 <Link
-                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=gracePeriodOver`}
+                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=fairUseGracePeriodOver`}
                 >
                   Upgrade plan
                 </Link>
@@ -159,7 +159,7 @@ export const Restriction = () => {
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild type="default">
-                <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=restricted`}>
+                <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=fairUseRestricted`}>
                   Upgrade plan
                 </Link>
               </Button>
