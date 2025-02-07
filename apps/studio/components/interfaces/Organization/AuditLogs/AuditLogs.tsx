@@ -165,7 +165,7 @@ const AuditLogs = () => {
 
                   <div className="flex items-center">
                     <Button type="primary" asChild>
-                      <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                      <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=auditLogs`}>
                         Upgrade subscription
                       </Link>
                     </Button>

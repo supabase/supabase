@@ -126,10 +126,12 @@ const PlanUpdateSidePanel = () => {
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
+      console.log('router.query.source', router.query.source)
       sendEvent({
         action: TelemetryActions.STUDIO_PRICING_SIDE_PANEL_OPENED,
         properties: {
           currentPlan: subscription?.plan?.name,
+          source: Array.isArray(router.query.source) ? router.query.source[0] : router.query.source,
         },
         groups: { organization: slug ?? 'Unknown' },
       })

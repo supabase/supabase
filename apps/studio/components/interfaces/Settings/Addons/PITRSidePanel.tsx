@@ -279,7 +279,9 @@ const PITRSidePanel = () => {
                   title="Changing your Point-In-Time-Recovery is only available on the Pro Plan"
                   actions={
                     <Button asChild type="default">
-                      <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                      <Link
+                        href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=pitrSidePanel`}
+                      >
                         View available plans
                       </Link>
                     </Button>

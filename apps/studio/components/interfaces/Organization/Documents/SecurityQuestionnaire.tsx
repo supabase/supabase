@@ -74,7 +74,9 @@ const SecurityQuestionnaire = () => {
               {isSuccess && (
                 <div className="flex items-center justify-center h-full">
                   {currentPlan?.id === 'free' || currentPlan?.id === 'pro' ? (
-                    <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                    <Link
+                      href={`/org/${slug}/billing?panel=subscriptionPlan&source=securityQuestionnaire`}
+                    >
                       <Button type="default">Upgrade to Team</Button>
                     </Link>
                   ) : (
