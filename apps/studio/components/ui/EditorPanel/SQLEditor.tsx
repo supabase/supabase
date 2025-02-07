@@ -50,6 +50,22 @@ const SQLEditor = ({ onChange }: SQLEditorProps) => {
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<any | null>(null)
 
+  useEffect(() => {
+    if (editorRef.current && editorPanel.initialValue !== currentValue) {
+      const editor = editorRef.current
+      const model = editor.getModel()
+      if (model) {
+        editor.executeEdits('update-value', [
+          {
+            text: editorPanel.initialValue || '',
+            range: model.getFullModelRange(),
+          },
+        ])
+        setCurrentValue(editorPanel.initialValue || '')
+      }
+    }
+  }, [editorPanel.initialValue])
+
   const {
     complete,
     completion,
@@ -118,6 +134,18 @@ const SQLEditor = ({ onChange }: SQLEditorProps) => {
   const handleEditorOnMount = (editor: any, monaco: any) => {
     editorRef.current = editor
     monacoRef.current = monaco
+
+    // Set initial value on mount
+    const model = editor.getModel()
+    if (model && editorPanel.initialValue) {
+      editor.executeEdits('initial-value', [
+        {
+          text: editorPanel.initialValue,
+          range: model.getFullModelRange(),
+        },
+      ])
+      setCurrentValue(editorPanel.initialValue)
+    }
 
     editor.addAction({
       id: 'run-query',
@@ -239,7 +267,7 @@ const SQLEditor = ({ onChange }: SQLEditorProps) => {
     )
   })
 
-  console.log('templates:', editorPanel.templates)
+  console.log('templates:', editorPanel.initialValue)
 
   return (
     <div className="flex-1 overflow-hidden flex flex-col h-full">
@@ -249,7 +277,6 @@ const SQLEditor = ({ onChange }: SQLEditorProps) => {
             className="monaco-editor"
             theme="supabase"
             language="pgsql"
-            defaultValue={editorPanel.initialValue}
             onChange={handleChange}
             onMount={handleEditorOnMount}
             options={{

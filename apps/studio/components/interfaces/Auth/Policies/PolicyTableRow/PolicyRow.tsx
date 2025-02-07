@@ -37,7 +37,7 @@ const PolicyRow = ({
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const { setAiAssistantPanel, setEditorPanel } = useAppStateSnapshot()
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
   const { project } = useProjectContext()
@@ -105,7 +105,45 @@ const PolicyRow = ({
               <Button type="default" className="px-1.5" icon={<MoreVertical />} />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-52">
-              <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>
+              <DropdownMenuItem
+                className="gap-x-2"
+                onClick={() => {
+                  const sql = generatePolicyCreateSQL(policy)
+                  setEditorPanel({
+                    open: true,
+                    initialValue: sql,
+                    label: `Edit policy "${policy.name}"`,
+                    saveLabel: 'Update policy',
+                    templates: [
+                      {
+                        name: 'Enable Row Level Security',
+                        description: 'Enable RLS and create a policy that allows all operations',
+                        content: `ALTER TABLE ${policy.schema}.${policy.table} ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY "Allow all" ON ${policy.schema}.${policy.table}\nAS PERMISSIVE FOR ALL\nTO authenticated\nUSING (true)\nWITH CHECK (true);`,
+                      },
+                      {
+                        name: 'User Owns Row',
+                        description: 'Only allow users to access their own data',
+                        content: `CREATE POLICY "Users can only access their own rows" ON ${policy.schema}.${policy.table}\nAS PERMISSIVE FOR ALL\nTO authenticated\nUSING (auth.uid() = user_id)\nWITH CHECK (auth.uid() = user_id);`,
+                      },
+                      {
+                        name: 'Tenant Access',
+                        description: 'Multi-tenant policy based on org_id',
+                        content: `CREATE POLICY "Tenant isolation" ON ${policy.schema}.${policy.table}\nAS PERMISSIVE FOR ALL\nTO authenticated\nUSING (org_id IN (SELECT org_id FROM memberships WHERE user_id = auth.uid()))\nWITH CHECK (org_id IN (SELECT org_id FROM memberships WHERE user_id = auth.uid()));`,
+                      },
+                      {
+                        name: 'Public Read Only',
+                        description: 'Allow public read access but restrict modifications',
+                        content: `CREATE POLICY "Public read access" ON ${policy.schema}.${policy.table}\nAS PERMISSIVE FOR SELECT\nTO public\nUSING (true);`,
+                      },
+                      {
+                        name: 'Role-Based Access',
+                        description: 'Control access based on user role',
+                        content: `CREATE POLICY "Role-based access control" ON ${policy.schema}.${policy.table}\nAS PERMISSIVE FOR ALL\nTO authenticated\nUSING (\n  auth.jwt() ? auth.jwt()->>'role' = 'admin'\n)\nWITH CHECK (\n  auth.jwt() ? auth.jwt()->>'role' = 'admin'\n);`,
+                      },
+                    ],
+                  })
+                }}
+              >
                 <Edit size={14} />
                 <p>Edit policy</p>
               </DropdownMenuItem>
