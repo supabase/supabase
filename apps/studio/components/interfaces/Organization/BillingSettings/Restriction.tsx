@@ -98,7 +98,7 @@ export const Restriction = () => {
             <div className="flex items-center gap-x-2 mt-3">
               <Button asChild key="upgrade-button" type="default">
                 <Link
-                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=gracePeriodStarted`}
+                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=fairUseGracePeriodStarted`}
                 >
                   Upgrade plan
                 </Link>
