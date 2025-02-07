@@ -30,10 +30,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useParams } from 'common'
 
-interface OngoingQueriesPanel {
-  onClose: () => void
-}
-
 export const OngoingQueriesPanel = () => {
   const [_, setParams] = useUrlState({ replace: true })
   const { viewOngoingQueries } = useParams()

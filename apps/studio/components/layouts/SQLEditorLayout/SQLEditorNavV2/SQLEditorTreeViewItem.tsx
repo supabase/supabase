@@ -1,9 +1,9 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { ComponentProps, useEffect } from 'react'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
 import { useSQLSnippetFolderContentsQuery } from 'data/content/sql-folder-contents-query'
@@ -22,12 +22,9 @@ import {
   TreeViewItem,
 } from 'ui'
 
-interface SQLEditorTreeViewItemProps {
+interface SQLEditorTreeViewItemProps
+  extends Omit<ComponentProps<typeof TreeViewItem>, 'name' | 'xPadding'> {
   element: any
-  level: number
-  isBranch: boolean
-  isSelected: boolean
-  isExpanded: boolean
   isMultiSelected?: boolean
   status?: 'editing' | 'saving' | 'idle'
   getNodeProps: () => any
@@ -162,13 +159,11 @@ export const SQLEditorTreeViewItem = ({
       <ContextMenu_Shadcn_ modal={false}>
         <ContextMenuTrigger_Shadcn_ asChild>
           <TreeViewItem
-            level={level}
-            xPadding={16}
-            name={element.name}
             className={className}
+            level={level}
             isExpanded={isExpanded}
             isBranch={isBranch}
-            isSelected={isSelected || id === element.id}
+            isSelected={isSelected}
             isEditing={isEditing}
             isLoading={(isEnabled && isLoading) || isSaving}
             onEditSubmit={(value) => {
@@ -190,9 +185,12 @@ export const SQLEditorTreeViewItem = ({
                   return
                 }
 
+                // When the item is a folder, we want to expand/close it
                 onClick(e)
               }
             }}
+            name={element.name}
+            xPadding={16}
           />
         </ContextMenuTrigger_Shadcn_>
         <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
