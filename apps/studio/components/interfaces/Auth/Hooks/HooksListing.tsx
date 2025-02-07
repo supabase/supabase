@@ -69,11 +69,7 @@ export const HooksListing = () => {
 
   return (
     <div className="pb-4">
-      <FormHeader
-        title="Auth Hooks"
-        description="Use Postgres functions or HTTP endpoints to customize the behavior of Supabase Auth to meet your needs."
-        actions={<AddHookDropdown onSelectHook={setSelectedHook} />}
-      />
+      <FormHeader title="All hooks" actions={<AddHookDropdown onSelectHook={setSelectedHook} />} />
 
       {hooks.filter((h) => isValidHook(h)).length === 0 && (
         <div

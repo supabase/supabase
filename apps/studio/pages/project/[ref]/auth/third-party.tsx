@@ -1,8 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { EmailTemplates } from 'components/interfaces/Auth'
+
+import { ThirdPartyAuthForm } from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useParams } from 'common'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
 import Link from 'next/link'
 import { NavMenu, NavMenuItem } from 'ui'
@@ -24,30 +25,30 @@ const PageLayout: NextPageWithLayout = () => {
 
   const navMenuItems = [
     {
-      label: 'Templates',
-      href: `/project/${ref}/auth/templates`,
+      label: 'Supabase auth',
+      href: `/project/${ref}/auth/providers`,
     },
     {
-      label: 'SMTP Settings',
-      href: `/project/${ref}/auth/smtp`,
+      label: 'Third Party auth',
+      href: `/project/${ref}/auth/third-party`,
     },
   ]
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
-    return <NoPermission isFullPage resourceText="access your project's email settings" />
+    return <NoPermission isFullPage resourceText="access your project's auth provider settings" />
   }
 
   return (
-    <div>
+    <>
       <ScaffoldHeader className="pb-0">
         <ScaffoldContainer id="auth-page-top">
-          <ScaffoldTitle>Emails</ScaffoldTitle>
+          <ScaffoldTitle>Sign in / up</ScaffoldTitle>
           <ScaffoldDescription>
-            Configure what emails your users receive and how they are sent
+            Configure authentication providers and login methods for your users
           </ScaffoldDescription>
           <NavMenu
             className="border-none max-w-full overflow-y-hidden overflow-x-auto mt-4"
-            aria-label="Auth email settings navigation"
+            aria-label="Auth provider settings navigation"
           >
             {navMenuItems.map((item) => (
               <NavMenuItem key={item.label} active={currentPath === item.href}>
@@ -60,10 +61,10 @@ const PageLayout: NextPageWithLayout = () => {
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer className="my-8 space-y-8">
-        <EmailTemplates />
+      <ScaffoldContainer className="my-8">
+        <ThirdPartyAuthForm />
       </ScaffoldContainer>
-    </div>
+    </>
   )
 }
 
