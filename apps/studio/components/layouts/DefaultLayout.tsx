@@ -4,6 +4,8 @@ import { PropsWithChildren, ReactNode } from 'react'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
 import NavigationBar from './ProjectLayout/NavigationBar/NavigationBar'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
+import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
+import { useParams } from 'common'
 
 export interface DefaultLayoutProps {
   title?: string
@@ -16,25 +18,28 @@ export interface DefaultLayoutProps {
 }
 
 const DefaultLayout = ({ children, showProductMenu }: PropsWithChildren<DefaultLayoutProps>) => {
+  const { ref } = useParams()
   return (
     <>
-      <AppBannerContextProvider>
-        <div className="flex flex-col h-screen w-screen">
-          {/* Top Banner */}
-          <AppBannerWrapper />
-          <div className="flex-shrink-0">
-            <MobileNavigationBar />
-            <LayoutHeader showProductMenu={showProductMenu} />
+      <ProjectContextProvider projectRef={ref}>
+        <AppBannerContextProvider>
+          <div className="flex flex-col h-screen w-screen">
+            {/* Top Banner */}
+            <AppBannerWrapper />
+            <div className="flex-shrink-0">
+              <MobileNavigationBar />
+              <LayoutHeader showProductMenu={showProductMenu} />
+            </div>
+            {/* Main Content Area */}
+            <div className="flex flex-1 w-full overflow-y-hidden">
+              {/* Sidebar */}
+              <NavigationBar />
+              {/* Main Content */}
+              <div className="flex-grow h-full overflow-y-auto">{children}</div>
+            </div>
           </div>
-          {/* Main Content Area */}
-          <div className="flex flex-1 w-full overflow-y-hidden">
-            {/* Sidebar */}
-            <NavigationBar />
-            {/* Main Content */}
-            <div className="flex-grow h-full overflow-y-auto">{children}</div>
-          </div>
-        </div>
-      </AppBannerContextProvider>
+        </AppBannerContextProvider>
+      </ProjectContextProvider>
     </>
   )
 }
