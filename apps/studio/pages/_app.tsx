@@ -32,11 +32,12 @@ import { ErrorBoundary } from 'react-error-boundary'
 
 import { FeatureFlagProvider, PageTelemetry, ThemeProvider, useThemeSandbox } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import { AppBannerWrapper, RouteValidationWrapper } from 'components/interfaces/App'
+import { RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
 import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
 import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
 import GroupsTelemetry from 'components/ui/GroupsTelemetry'
@@ -130,6 +131,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                             <FeaturePreviewModal />
                           </FeaturePreviewContextProvider>
                           <SonnerToaster position="top-right" />
+                          <MonacoThemeProvider />
                         </CommandProvider>
                       </AppBannerContextProvider>
                     </ThemeProvider>
