@@ -34,6 +34,7 @@ import { projectSpecToMonthlyPrice } from 'components/interfaces/Database/Backup
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { DiskType } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   return (
@@ -54,7 +55,9 @@ const RestoreToNewProjectPage: NextPageWithLayout = () => {
 }
 
 RestoreToNewProjectPage.getLayout = (page) => (
-  <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
 )
 
 const RestoreToNewProject = () => {
