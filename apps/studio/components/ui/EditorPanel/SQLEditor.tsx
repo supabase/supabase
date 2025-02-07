@@ -2,7 +2,7 @@ import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CornerDownLeft, Loader2, Book, Command } from 'lucide-react'
 import { useRef, useState, useEffect } from 'react'
-import { Button, cn } from 'ui'
+import { Button, cn, Input_Shadcn_, SQL_ICON } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { useParams } from 'common'
 import { IStandaloneCodeEditor } from 'components/interfaces/SQLEditor/SQLEditor.types'
@@ -37,6 +37,7 @@ const SQLEditor = ({ onChange }: SQLEditorProps) => {
   const [showTemplates, setShowTemplates] = useState(false)
   const [promptInput, setPromptInput] = useState('')
   const [isCompletionLoading, setIsCompletionLoading] = useState(false)
+  const [templateSearch, setTemplateSearch] = useState('')
   const [promptState, setPromptState] = useState({
     isOpen: false,
     selection: '',
@@ -230,29 +231,19 @@ const SQLEditor = ({ onChange }: SQLEditorProps) => {
     setPromptInput('')
   }
 
+  const filteredTemplates = editorPanel.templates?.filter((template) => {
+    const searchLower = templateSearch.toLowerCase()
+    return (
+      template.name.toLowerCase().includes(searchLower) ||
+      template.description.toLowerCase().includes(searchLower)
+    )
+  })
+
+  console.log('templates:', editorPanel.templates)
+
   return (
     <div className="flex-1 overflow-hidden flex flex-col h-full">
       <div className="flex-1 min-h-0 relative">
-        {showTemplates && editorPanel.templates && (
-          <div className="absolute inset-0 z-10 bg-background border rounded-md m-5 overflow-auto">
-            <div className="px-5 py-4 border-b bg-surface-100">
-              <h3 className="text-sm">Templates</h3>
-              <p className="text-xs text-foreground-light">Select a template to get started</p>
-            </div>
-            <div className="p-5 space-y-4">
-              {editorPanel.templates.map((template, i) => (
-                <div
-                  key={i}
-                  className="cursor-pointer group rounded border px-4 py-3 hover:border-foreground transition"
-                  onClick={() => onSelectTemplate(template.content)}
-                >
-                  <p className="text-sm font-medium mb-1">{template.name}</p>
-                  <p className="text-sm text-foreground-light">{template.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
         <div className="w-full h-full relative">
           <Editor
             className="monaco-editor"
@@ -311,6 +302,39 @@ const SQLEditor = ({ onChange }: SQLEditorProps) => {
           </AnimatePresence>
         </div>
       </div>
+      {showTemplates && editorPanel.templates && (
+        <div className="bg-surface-100 border-t w-full flex flex-col max-h-80 h-full bg-surface-75 text-sm">
+          <div className="px-4 py-3 border-b shrink-0">
+            <Input_Shadcn_
+              placeholder="Search templates..."
+              value={templateSearch}
+              onChange={(e) => setTemplateSearch(e.target.value)}
+            />
+          </div>
+          <div className="overflow-auto flex-1">
+            {filteredTemplates?.map((template, i) => (
+              <div
+                key={i}
+                className="cursor-pointer group border-b flex items-center gap-4 px-4 py-3 hover:bg-surface-200"
+                onClick={() => onSelectTemplate(template.content)}
+              >
+                <SQL_ICON
+                  size={18}
+                  strokeWidth={1.5}
+                  className={cn(
+                    'transition-colors fill-foreground-muted group-aria-selected:fill-foreground',
+                    'w-5 h-5 shrink-0 grow-0 -ml-0.5'
+                  )}
+                />
+                <div>
+                  <p className="text-xs mb-1">{template.name}</p>
+                  <p className="text-xs text-foreground-light">{template.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {error !== undefined && (
         <div className="shrink-0">
           <Admonition
