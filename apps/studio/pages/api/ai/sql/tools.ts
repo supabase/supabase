@@ -409,7 +409,7 @@ export const getTools = ({
           * SUPABASE_ANON_KEY
           * SUPABASE_SERVICE_ROLE_KEY
           * SUPABASE_DB_URL
-        8. To set other environment variables (ie. secrets) users can put them in a env file and run the \`supabase secrets set --env-file path/to/env-file\`
+        8. To set other environment variables the user can go to project settings then edge functions to set them
         9. A single Edge Function can handle multiple routes. It is recommended to use a library like Express or Hono to handle the routes as it's easier for developer to understand and maintain. Each route must be prefixed with \`/function-name\` so they are routed correctly.
         10. File write operations are ONLY permitted on \`/tmp\` directory. You can use either Deno or Node File APIs.
         11. Use \`EdgeRuntime.waitUntil(promise)\` static method to run long-running tasks in the background without blocking response to a request. Do NOT assume it is available in the request / execution context.
@@ -419,6 +419,8 @@ export const getTools = ({
         ### Simple Hello World Function
 
         \`\`\`edge
+        // Setup type definitions for built-in Supabase Runtime APIs
+        import "jsr:@supabase/functions-js/edge-runtime.d.ts";
         interface reqPayload {
           name: string;
         }
@@ -441,6 +443,8 @@ export const getTools = ({
         ### Example Function using Node built-in API
 
         \`\`\`edge
+        // Setup type definitions for built-in Supabase Runtime APIs
+        import "jsr:@supabase/functions-js/edge-runtime.d.ts";
         import { randomBytes } from "node:crypto";
         import { createServer } from "node:http";
         import process from "node:process";
@@ -464,6 +468,8 @@ export const getTools = ({
         ### Using npm packages in Functions
 
         \`\`\`edge
+        // Setup type definitions for built-in Supabase Runtime APIs
+        import "jsr:@supabase/functions-js/edge-runtime.d.ts";
         import express from "npm:express@4.18.2";
 
         const app = express();
@@ -478,6 +484,8 @@ export const getTools = ({
         ### Generate embeddings using built-in @Supabase.ai API
 
         \`\`\`edge
+        // Setup type definitions for built-in Supabase Runtime APIs
+        import "jsr:@supabase/functions-js/edge-runtime.d.ts";
         const model = new Supabase.ai.Session('gte-small');
 
         Deno.serve(async (req: Request) => {
@@ -499,6 +507,8 @@ export const getTools = ({
         ## Integrating with Supabase Auth
 
         \`\`\`edge
+          // Setup type definitions for built-in Supabase Runtime APIs
+          import "jsr:@supabase/functions-js/edge-runtime.d.ts";
           import { createClient } from \\'jsr:@supabase/supabase-js@2\\'
           import { corsHeaders } from \\'../_shared/cors.ts\\'
 
@@ -514,9 +524,9 @@ export const getTools = ({
               // Create a Supabase client with the Auth context of the logged in user.
               const supabaseClient = createClient(
                 // Supabase API URL - env var exported by default.
-                Deno.env.get(\\'SUPABASE_URL\\') ?? \\'\\',
+                Deno.env.get('SUPABASE_URL')!,
                 // Supabase API ANON KEY - env var exported by default.
-                Deno.env.get(\\'SUPABASE_ANON_KEY\\') ?? \\'\\',
+                Deno.env.get('SUPABASE_ANON_KEY')!,
                 // Create client with Auth context of the user that called the function.
                 // This way your row-level-security (RLS) policies are applied.
                 {

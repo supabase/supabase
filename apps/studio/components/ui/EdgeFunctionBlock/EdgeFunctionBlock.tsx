@@ -63,7 +63,7 @@ export const EdgeFunctionBlock = ({
         metadata: {
           entrypoint_path: 'index.ts',
           name: functionName,
-          verify_jwt: false,
+          verify_jwt: true,
         },
         files: [{ name: 'index.ts', content: code }],
       })
@@ -137,7 +137,7 @@ export const EdgeFunctionBlock = ({
                     metadata: {
                       entrypoint_path: 'index.ts',
                       name: functionName,
-                      verify_jwt: false,
+                      verify_jwt: true,
                     },
                     files: [{ name: 'index.ts', content: code }],
                   })
