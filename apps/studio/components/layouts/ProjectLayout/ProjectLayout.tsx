@@ -62,6 +62,7 @@ export interface ProjectLayoutProps {
   isBlocking?: boolean
   product?: string
   productMenu?: ReactNode
+  hideHeader?: boolean
   hideIconBar?: boolean
   selectedTable?: string
   resizableSidebar?: boolean
@@ -76,6 +77,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       product = '',
       productMenu,
       children,
+      hideHeader = false,
       hideIconBar = false,
       selectedTable,
       resizableSidebar = false,
@@ -126,42 +128,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
 
     return (
       <>
-<<<<<<< HEAD
-        <ProjectContextProvider projectRef={projectRef}>
-          <Head>
-            <title>
-              {title
-                ? `${title} | Supabase`
-                : selectedTable
-                  ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
-                  : projectName
-                    ? `${projectName} | ${organizationName} | Supabase`
-                    : organizationName
-                      ? `${organizationName} | Supabase`
-                      : 'Supabase'}
-            </title>
-            <meta name="description" content="Supabase Studio" />
-          </Head>
-
-          <div className="flex flex-col h-screen w-screen">
-            {/* Top Nav to access products from mobile */}
-            {!hideIconBar && <MobileNavigationBar />}
-
-            <LayoutHeader
-              showHomeLink={IS_PLATFORM}
-              showProductMenu={!!(showProductMenu && productMenu)}
-            />
-
-            <div className="flex h-full flex-row grow overflow-y-auto">
-              {showProductMenu && productMenu && !IS_PLATFORM && <MobileViewNav title={product} />}
-              {/* Left-most navigation side bar to access products */}
-              {!hideIconBar && <NavigationBar />}
-              {/* Product menu bar */}
-              <ResizablePanelGroup
-                className="flex h-full"
-                direction="horizontal"
-                autoSaveId="project-layout"
-=======
         <Head>
           <title>
             {title
@@ -193,7 +159,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                       : 'min-w-64 max-w-64'
                     : 'w-0 flex-shrink-0 max-w-0'
                 )}
->>>>>>> @{-1}
               >
                 {sideBarIsOpen && (
                   <AnimatePresence initial={false}>
