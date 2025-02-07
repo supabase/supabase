@@ -223,7 +223,7 @@ const IPv4SidePanel = () => {
               <p>Upgrade your plan to enable a IPv4 address for your project</p>
               <Button asChild type="default">
                 <Link
-                  href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=ipv4`}
+                  href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=ipv4SidePanel`}
                 >
                   View available plans
                 </Link>

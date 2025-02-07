@@ -1072,9 +1072,9 @@ export interface StudioPricingSidePanelOpenedEvent {
   properties: {
     currentPlan?: string
     /**
-     * Tracks how user landed on the Pricing side panel, e.g. computeDiskManagement, restoreToNewProject
+     * Tracks how user landed on the Pricing side panel, e.g. diskManagementPanelDiskSize, backupsRestoreToNewProject
      */
-    upgradeOrigin?: string
+    origin?: string
   }
   groups: { organization: string }
 }

@@ -60,7 +60,7 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
         </Button>
         <Button asChild size="tiny">
           <Link
-            href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=logsRetention`}
+            href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=logsRetentionUpgradePrompt`}
           >
             Upgrade
           </Link>

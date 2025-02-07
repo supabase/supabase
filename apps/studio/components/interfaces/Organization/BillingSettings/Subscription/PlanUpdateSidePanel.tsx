@@ -133,7 +133,7 @@ const PlanUpdateSidePanel = () => {
         currentPlan: subscription?.plan?.name,
       }
       if (source) {
-        properties.upgradeOrigin = source
+        properties.origin = source
       }
       sendEvent({
         action: TelemetryActions.STUDIO_PRICING_SIDE_PANEL_OPENED,

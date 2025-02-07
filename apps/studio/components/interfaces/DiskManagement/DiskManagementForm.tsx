@@ -315,7 +315,7 @@ export function DiskManagementForm() {
             actions={
               <Button type="default" asChild>
                 <Link
-                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=computeDiskManagement`}
+                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=diskManagementConfigure`}
                 >
                   Upgrade plan
                 </Link>

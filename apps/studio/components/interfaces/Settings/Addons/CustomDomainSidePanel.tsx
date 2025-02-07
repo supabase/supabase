@@ -230,7 +230,7 @@ const CustomDomainSidePanel = () => {
               actions={
                 <Button asChild type="default">
                   <Link
-                    href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=customDomain`}
+                    href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=customDomainSidePanel`}
                   >
                     View available plans
                   </Link>

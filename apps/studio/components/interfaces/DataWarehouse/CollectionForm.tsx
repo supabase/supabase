@@ -128,7 +128,7 @@ export const CollectionForm = ({
                     type="primary"
                     onClick={() =>
                       router.push(
-                        `/org/${currentOrg?.slug}/billing?panel=subscriptionPlan&source=increaseRetention`
+                        `/org/${currentOrg?.slug}/billing?panel=subscriptionPlan&source=dataWarehouseIncreaseRetention`
                       )
                     }
                   >

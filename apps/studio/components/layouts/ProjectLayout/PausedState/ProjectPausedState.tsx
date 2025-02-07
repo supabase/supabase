@@ -291,7 +291,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   {isFreePlan ? (
                     <Button asChild type="primary">
                       <Link
-                        href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=restoreProject`}
+                        href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=projectPausedStateRestore`}
                       >
                         Upgrade to Pro
                       </Link>

@@ -283,7 +283,7 @@ const ComputeInstanceSidePanel = () => {
                   actions={
                     <Button asChild type="default">
                       <Link
-                        href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=computeSize`}
+                        href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=computeInstanceSidePanel`}
                       >
                         View available plans
                       </Link>

@@ -20,7 +20,7 @@ export const getUpgradeUrl = (slug: string, subscription?: OrgSubscription, sour
 
   return subscription?.plan?.id === 'pro' && subscription?.usage_billing_enabled === false
     ? `/org/${slug}/billing#cost-control`
-    : `/org/${slug}/billing?panel=subscriptionPlan&source=${source}`
+    : `/org/${slug}/billing?panel=subscriptionPlan&source=usage${source}`
 }
 
 const compactNumberFormatter = new Intl.NumberFormat('en-US', {
