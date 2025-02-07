@@ -1,8 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { AuthProvidersForm, BasicAuthSettingsForm } from 'components/interfaces/Auth'
+
+import { ThirdPartyAuthForm } from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useParams } from 'common'
+import { useCurrentPath } from 'hooks/misc/useCurrentPath'
+import Link from 'next/link'
+import { NavMenu, NavMenuItem } from 'ui'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
@@ -11,11 +15,7 @@ import {
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useCurrentPath } from 'hooks/misc/useCurrentPath'
-import Link from 'next/link'
 import type { NextPageWithLayout } from 'types'
-import { NavMenu, NavMenuItem } from 'ui'
 
 const PageLayout: NextPageWithLayout = () => {
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
@@ -25,11 +25,11 @@ const PageLayout: NextPageWithLayout = () => {
 
   const navMenuItems = [
     {
-      label: 'Supabase Auth',
+      label: 'Supabase auth',
       href: `/project/${ref}/auth/providers`,
     },
     {
-      label: 'Third Party Auth',
+      label: 'Third Party auth',
       href: `/project/${ref}/auth/third-party`,
     },
   ]
@@ -39,10 +39,10 @@ const PageLayout: NextPageWithLayout = () => {
   }
 
   return (
-    <div>
+    <>
       <ScaffoldHeader className="pb-0">
         <ScaffoldContainer id="auth-page-top">
-          <ScaffoldTitle>Sign In / Up</ScaffoldTitle>
+          <ScaffoldTitle>Sign in / up</ScaffoldTitle>
           <ScaffoldDescription>
             Configure authentication providers and login methods for your users
           </ScaffoldDescription>
@@ -61,20 +61,15 @@ const PageLayout: NextPageWithLayout = () => {
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer className="my-8 space-y-8">
-        <BasicAuthSettingsForm />
-        <AuthProvidersForm />
+      <ScaffoldContainer className="my-8">
+        <ThirdPartyAuthForm />
       </ScaffoldContainer>
-    </div>
+    </>
   )
 }
 
 PageLayout.getLayout = (page) => {
-  return (
-    <DefaultLayout>
-      <AuthLayout>{page}</AuthLayout>
-    </DefaultLayout>
-  )
+  return <AuthLayout>{page}</AuthLayout>
 }
 
 export default PageLayout

@@ -1,8 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { AuthProvidersForm, BasicAuthSettingsForm } from 'components/interfaces/Auth'
+
+import { SmtpForm } from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useParams } from 'common'
+import { useCurrentPath } from 'hooks/misc/useCurrentPath'
+import Link from 'next/link'
+import { NavMenu, NavMenuItem } from 'ui'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
@@ -11,11 +15,7 @@ import {
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useCurrentPath } from 'hooks/misc/useCurrentPath'
-import Link from 'next/link'
 import type { NextPageWithLayout } from 'types'
-import { NavMenu, NavMenuItem } from 'ui'
 
 const PageLayout: NextPageWithLayout = () => {
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
@@ -25,30 +25,30 @@ const PageLayout: NextPageWithLayout = () => {
 
   const navMenuItems = [
     {
-      label: 'Supabase Auth',
-      href: `/project/${ref}/auth/providers`,
+      label: 'Templates',
+      href: `/project/${ref}/auth/templates`,
     },
     {
-      label: 'Third Party Auth',
-      href: `/project/${ref}/auth/third-party`,
+      label: 'SMTP Settings',
+      href: `/project/${ref}/auth/smtp`,
     },
   ]
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
-    return <NoPermission isFullPage resourceText="access your project's auth provider settings" />
+    return <NoPermission isFullPage resourceText="access your project's email settings" />
   }
 
   return (
     <div>
       <ScaffoldHeader className="pb-0">
         <ScaffoldContainer id="auth-page-top">
-          <ScaffoldTitle>Sign In / Up</ScaffoldTitle>
+          <ScaffoldTitle>Emails</ScaffoldTitle>
           <ScaffoldDescription>
-            Configure authentication providers and login methods for your users
+            Configure what emails your users receive and how they are sent
           </ScaffoldDescription>
           <NavMenu
             className="border-none max-w-full overflow-y-hidden overflow-x-auto mt-4"
-            aria-label="Auth provider settings navigation"
+            aria-label="Auth email settings navigation"
           >
             {navMenuItems.map((item) => (
               <NavMenuItem key={item.label} active={currentPath === item.href}>
@@ -62,19 +62,14 @@ const PageLayout: NextPageWithLayout = () => {
       <ScaffoldDivider />
 
       <ScaffoldContainer className="my-8 space-y-8">
-        <BasicAuthSettingsForm />
-        <AuthProvidersForm />
+        <SmtpForm />
       </ScaffoldContainer>
     </div>
   )
 }
 
 PageLayout.getLayout = (page) => {
-  return (
-    <DefaultLayout>
-      <AuthLayout>{page}</AuthLayout>
-    </DefaultLayout>
-  )
+  return <AuthLayout>{page}</AuthLayout>
 }
 
 export default PageLayout

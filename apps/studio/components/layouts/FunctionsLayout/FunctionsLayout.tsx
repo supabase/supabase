@@ -5,16 +5,16 @@ import type { PropsWithChildren } from 'react'
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
-import { Code, ExternalLink } from 'lucide-react'
-import { Button } from 'ui'
+import { Code } from 'lucide-react'
+import { Button, cn } from 'ui'
 import FunctionsNav from '../../interfaces/Functions/FunctionsNav'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
-import { DocsButton } from 'components/ui/DocsButton'
 
 interface FunctionsLayoutProps {
   title?: string
@@ -65,18 +65,18 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
       ) : (
         <div className="flex h-full flex-grow flex-col py-6">
           <div
-            className={[
+            className={cn(
               'mx-auto flex w-full flex-col transition-all',
-              '1xl:px-28 gap-4 px-5 lg:px-16 xl:px-24 2xl:px-32',
-            ].join(' ')}
+              '1xl:px-28 gap-4 px-5 lg:px-16 xl:px-24 2xl:px-32'
+            )}
           >
             <div className="item-center flex flex-col justify-between gap-y-4 xl:flex-row">
               <div className="flex items-center gap-3 w-full">
                 <div
-                  className={[
+                  className={cn(
                     'h-6 w-6 rounded border border-brand-600 bg-brand-300',
-                    'flex items-center justify-center text-brand',
-                  ].join(' ')}
+                    'flex items-center justify-center text-brand'
+                  )}
                 >
                   <Code size={14} strokeWidth={3} />
                 </div>
@@ -122,10 +122,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                         }
                       />
                     )}
-                    <DocsButton
-                      className="translate-y-[1px]"
-                      href="https://supabase.com/docs/guides/functions"
-                    />
+                    <DocsButton href="https://supabase.com/docs/guides/functions" />
                   </div>
                 </div>
               </div>

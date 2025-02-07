@@ -1,42 +1,41 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { RedirectUrls } from 'components/interfaces/Auth/RedirectUrls/RedirectUrls'
-import SiteUrl from 'components/interfaces/Auth/SiteUrl/SiteUrl'
+import {
+  AuthProvidersForm,
+  ProtectionAuthSettingsForm,
+  ThirdPartyAuthForm,
+} from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
-import { FormsContainer } from 'components/ui/Forms/FormsContainer'
+import { ScaffoldHeader, ScaffoldContainer, ScaffoldTitle } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-const URLConfiguration: NextPageWithLayout = () => {
+
+const PageLayout: NextPageWithLayout = () => {
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const isPermissionsLoaded = usePermissionsLoaded()
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
-    return <NoPermission isFullPage resourceText="access your project's email settings" />
+    return <NoPermission isFullPage resourceText="access your project's auth provider settings" />
   } else {
     return (
       <div>
         <ScaffoldHeader className="pb-0">
           <ScaffoldContainer id="auth-page-top">
-            <ScaffoldTitle>URL Configuration</ScaffoldTitle>
+            <ScaffoldTitle>Attack Protection</ScaffoldTitle>
           </ScaffoldContainer>
         </ScaffoldHeader>
 
         <ScaffoldContainer className="my-8 space-y-8">
-          <SiteUrl />
-          <RedirectUrls />
+          <ProtectionAuthSettingsForm />
         </ScaffoldContainer>
       </div>
     )
   }
 }
 
-URLConfiguration.getLayout = (page) => (
-  <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
-  </DefaultLayout>
-)
+PageLayout.getLayout = (page) => {
+  return <AuthLayout>{page}</AuthLayout>
+}
 
-export default URLConfiguration
+export default PageLayout
