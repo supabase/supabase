@@ -2135,6 +2135,10 @@ export const platform: NavMenuConstant = {
               name: 'IPv4',
               url: '/guides/platform/manage-your-usage/ipv4',
             },
+            {
+              name: 'Custom Domains',
+              url: '/guides/platform/manage-your-usage/custom-domains',
+            },
           ],
         },
         {
