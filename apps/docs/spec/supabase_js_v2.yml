@@ -3223,14 +3223,14 @@ functions:
             "statusText": "OK"
           }
           ```
-      - id: query-referenced-tables-with-space-in-the-table-name
-        name: Query referenced tables with space in the table name
+      - id: query-referenced-tables-with-spaces-in-their-names
+        name: Query referenced tables with spaces in their names
         description: |
-          If your table name has a space in it, you can use double quotes to escape it.
+          If your table name contains spaces, you must use double quotes in the `select` statement to reference the table.
         code: |
           ```js
           const { data, error } = await supabase
-            .from('orchestal_sections')
+            .from('orchestal sections')
             .select(`
               name,
               "musical instruments" (
@@ -3242,16 +3242,16 @@ functions:
           sql: |
             ```sql
             create table
-              orchestral_sections (id int8 primary key, name text);
+              "orchestral sections" (id int8 primary key, name text);
             create table
               "musical instruments" (
                 id int8 primary key,
-                section_id int8 not null references orchestral_sections,
+                section_id int8 not null references "orchestral sections",
                 name text
               );
 
             insert into
-              orchestral_sections (id, name)
+              "orchestral sections" (id, name)
             values
               (1, 'strings'),
               (2, 'woodwinds');
