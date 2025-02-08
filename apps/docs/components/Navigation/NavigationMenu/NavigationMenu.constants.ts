@@ -2127,6 +2127,10 @@ export const platform: NavMenuConstant = {
               name: 'Disk Size',
               url: '/guides/platform/manage-your-usage/disk-size',
             },
+            {
+              name: 'Edge Function Invocations',
+              url: '/guides/platform/manage-your-usage/edge-function-invocations',
+            },
           ],
         },
         {
