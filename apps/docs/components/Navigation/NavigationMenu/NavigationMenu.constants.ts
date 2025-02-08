@@ -2115,6 +2115,10 @@ export const platform: NavMenuConstant = {
               name: 'Read Replicas',
               url: '/guides/platform/manage-your-usage/read-replicas',
             },
+            {
+              name: 'Egress',
+              url: '/guides/platform/manage-your-usage/egress',
+            },
           ],
         },
         {
