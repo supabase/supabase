@@ -10,6 +10,7 @@ import { ScaffoldHeader, ScaffoldContainer, ScaffoldTitle } from 'components/lay
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const PageLayout: NextPageWithLayout = () => {
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
@@ -35,7 +36,11 @@ const PageLayout: NextPageWithLayout = () => {
 }
 
 PageLayout.getLayout = (page) => {
-  return <AuthLayout>{page}</AuthLayout>
+  return (
+    <DefaultLayout>
+      <AuthLayout>{page}</AuthLayout>
+    </DefaultLayout>
+  )
 }
 
 export default PageLayout

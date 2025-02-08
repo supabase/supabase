@@ -7,6 +7,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const AuthSettings: NextPageWithLayout = () => {
   const isPermissionsLoaded = usePermissionsLoaded()
@@ -34,6 +35,10 @@ const AuthSettings: NextPageWithLayout = () => {
 }
 
 AuthSettings.getLayout = (page) => {
-  return <AuthLayout>{page}</AuthLayout>
+  return (
+    <DefaultLayout>
+      <AuthLayout>{page}</AuthLayout>
+    </DefaultLayout>
+  )
 }
 export default AuthSettings
