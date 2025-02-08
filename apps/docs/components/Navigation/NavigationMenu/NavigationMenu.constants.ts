@@ -2131,6 +2131,10 @@ export const platform: NavMenuConstant = {
               name: 'Edge Function Invocations',
               url: '/guides/platform/manage-your-usage/edge-function-invocations',
             },
+            {
+              name: 'IPv4',
+              url: '/guides/platform/manage-your-usage/ipv4',
+            },
           ],
         },
         {
