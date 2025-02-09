@@ -35,6 +35,8 @@ export interface ProviderFormProps {
   provider: Provider
 }
 
+const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
+
 const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   const ref = useRef<HTMLButtonElement>(null)
   const [open, setOpen] = useState(false)
@@ -174,6 +176,10 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
       if (doubleNegativeKeys.includes(x)) payload[x] = !values[x]
       if (payload[x] === '') payload[x] = null
     })
+
+    if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
+      payload.PASSWORD_REQUIRED_CHARACTERS = ''
+    }
 
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
