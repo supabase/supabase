@@ -74,7 +74,9 @@ export const Restriction = () => {
                 </Link>
               </Button>
               <Button asChild type="default" icon={<ExternalLink />}>
-                <a href="https://supabase.com/docs/guides/platform/spend-cap">About spend cap</a>
+                <a href="https://supabase.com/docs/guides/platform/cost-control#spend-cap">
+                  About spend cap
+                </a>
               </Button>
             </div>
           </AlertDescription_Shadcn_>
