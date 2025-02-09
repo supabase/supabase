@@ -108,6 +108,6 @@ Supabase – это [управляемая платформа](https://supabase
   <img width="168" height="30" src="https://supabase.com/badge-made-with-supabase-dark.svg" alt="Сделано с Supabase" />
 </a>
 ```
-## Translations / Переводы
+## Переводы
 
-[List of translations / Список переводов](./languages.md)
+[Список переводов](./languages.md)
