@@ -12,6 +12,9 @@ Each database change counts as one message per client that listens to the event.
 **Broadcast**
 Each broadcast message counts as one message sent plus one message per subscribed client that receives it. For example, if you broadcast a message and 4 clients listen to it, it counts as 5 messages—1 sent and 4 received.
 
+**Presence**
+TODO: Ask Data Engineering.
+
 ## How charges are calculated
 Realtime Messages are billed using Package pricing, with each package representing 1 million messages. If your usage falls between two packages, you are billed for the next whole package.
 
