@@ -2167,6 +2167,10 @@ export const platform: NavMenuConstant = {
               name: 'Monthly Active Third-Party Users',
               url: '/guides/platform/manage-your-usage/monthly-active-users-third-party',
             },
+            {
+              name: 'Realtime Messages',
+              url: '/guides/platform/manage-your-usage/realtime-messages',
+            },
           ],
         },
         {
