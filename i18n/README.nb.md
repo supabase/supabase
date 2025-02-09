@@ -11,18 +11,18 @@
 
 **Nøkkelfunksjoner:**
 
-*   **Administrert Postgres-database:** [Dokumentasjon](https://supabase.com/docs/guides/database)
-*   **Autentisering og autorisasjon:** [Dokumentasjon](https://supabase.com/docs/guides/auth)
-*   **Automatisk genererte API-er:**
-    *   REST: [Dokumentasjon](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentasjon](https://supabase.com/docs/guides/graphql)
-    *   Sanntidsabonnementer: [Dokumentasjon](https://supabase.com/docs/guides/realtime)
-*   **Funksjoner:**
-    *   Databasefunksjoner: [Dokumentasjon](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (funksjoner på kanten av nettverket): [Dokumentasjon](https://supabase.com/docs/guides/functions)
-*   **Fillagring:** [Dokumentasjon](https://supabase.com/docs/guides/storage)
-* **AI, Vektor og Embedding verktøy:** [Dokumentasjon](https://supabase.com/docs/guides/ai)
-*   **Dashbord**
+- [x] **Administrert Postgres-database:** [Dokumentasjon](https://supabase.com/docs/guides/database)
+- [x] **Autentisering og autorisasjon:** [Dokumentasjon](https://supabase.com/docs/guides/auth)
+- [x] **Automatisk genererte API-er:**
+    - [x] REST: [Dokumentasjon](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentasjon](https://supabase.com/docs/guides/graphql)
+    - [x] Sanntidsabonnementer: [Dokumentasjon](https://supabase.com/docs/guides/realtime)
+- [x] **Funksjoner:**
+    - [x] Databasefunksjoner: [Dokumentasjon](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (funksjoner på kanten av nettverket): [Dokumentasjon](https://supabase.com/docs/guides/functions)
+- [x] **Fillagring:** [Dokumentasjon](https://supabase.com/docs/guides/storage)
+- [x] **AI, Vektor og Embedding verktøy:** [Dokumentasjon](https://supabase.com/docs/guides/ai)
+- [x] **Dashbord**
 
 ![Supabase Dashbord](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

@@ -11,18 +11,18 @@
 
 **Põhifunktsioonid:**
 
-*   **Hallatud Postgresi andmebaas:** [Dokumentatsioon](https://supabase.com/docs/guides/database)
-*   **Autentimine ja autoriseerimine:** [Dokumentatsioon](https://supabase.com/docs/guides/auth)
-*   **Automaatselt genereeritud API-d:**
-    *   REST: [Dokumentatsioon](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentatsioon](https://supabase.com/docs/guides/graphql)
-    *   Reaalajas tellimused: [Dokumentatsioon](https://supabase.com/docs/guides/realtime)
-*   **Funktsioonid:**
-    *   Andmebaasi funktsioonid: [Dokumentatsioon](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (funktsioonid võrgu serval): [Dokumentatsioon](https://supabase.com/docs/guides/functions)
-*   **Failide salvestusruum:** [Dokumentatsioon](https://supabase.com/docs/guides/storage)
-* **AI, vektorid ja manustused (embeddings) tööriistad:** [Dokumentatsioon](https://supabase.com/docs/guides/ai)
-*   **Juhtpaneel**
+- [x] **Hallatud Postgresi andmebaas:** [Dokumentatsioon](https://supabase.com/docs/guides/database)
+- [x] **Autentimine ja autoriseerimine:** [Dokumentatsioon](https://supabase.com/docs/guides/auth)
+- [x] **Automaatselt genereeritud API-d:**
+    - [x] REST: [Dokumentatsioon](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentatsioon](https://supabase.com/docs/guides/graphql)
+    - [x] Reaalajas tellimused: [Dokumentatsioon](https://supabase.com/docs/guides/realtime)
+- [x] **Funktsioonid:**
+    - [x] Andmebaasi funktsioonid: [Dokumentatsioon](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (funktsioonid võrgu serval): [Dokumentatsioon](https://supabase.com/docs/guides/functions)
+- [x] **Failide salvestusruum:** [Dokumentatsioon](https://supabase.com/docs/guides/storage)
+- [x] **AI, vektorid ja manustused (embeddings) tööriistad:** [Dokumentatsioon](https://supabase.com/docs/guides/ai)
+- [x] **Juhtpaneel**
 
 ![Supabase'i juhtpaneel](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

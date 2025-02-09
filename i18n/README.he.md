@@ -11,18 +11,18 @@
 
 **תכונות עיקריות:**
 
-*   **מסד נתונים Postgres מנוהל:** [תיעוד](https://supabase.com/docs/guides/database)
-*   **אימות והרשאה:** [תיעוד](https://supabase.com/docs/guides/auth)
-*   **ממשקי API שנוצרים אוטומטית:**
-    *   REST: [תיעוד](https://supabase.com/docs/guides/api)
-    *   GraphQL: [תיעוד](https://supabase.com/docs/guides/graphql)
-    *   מנויים בזמן אמת: [תיעוד](https://supabase.com/docs/guides/realtime)
-*   **פונקציות:**
-    *   פונקציות מסד נתונים: [תיעוד](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (פונקציות בקצה הרשת): [תיעוד](https://supabase.com/docs/guides/functions)
-*   **אחסון קבצים:** [תיעוד](https://supabase.com/docs/guides/storage)
-* **כלי AI, וקטורים והטמעות (Embeddings):** [תיעוד](https://supabase.com/docs/guides/ai)
-*   **לוח מחוונים**
+- [x] **מסד נתונים Postgres מנוהל:** [תיעוד](https://supabase.com/docs/guides/database)
+- [x] **אימות והרשאה:** [תיעוד](https://supabase.com/docs/guides/auth)
+- [x] **ממשקי API שנוצרים אוטומטית:**
+    - [x] REST: [תיעוד](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [תיעוד](https://supabase.com/docs/guides/graphql)
+    - [x] מנויים בזמן אמת: [תיעוד](https://supabase.com/docs/guides/realtime)
+- [x] **פונקציות:**
+    - [x] פונקציות מסד נתונים: [תיעוד](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (פונקציות בקצה הרשת): [תיעוד](https://supabase.com/docs/guides/functions)
+- [x] **אחסון קבצים:** [תיעוד](https://supabase.com/docs/guides/storage)
+- [x] **כלי AI, וקטורים והטמעות (Embeddings):** [תיעוד](https://supabase.com/docs/guides/ai)
+- [x] **לוח מחוונים**
 
 ![לוח מחוונים של Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

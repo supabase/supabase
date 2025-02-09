@@ -11,18 +11,18 @@
 
 **Βασικά χαρακτηριστικά:**
 
-*   **Διαχειριζόμενη βάση δεδομένων Postgres:** [Τεκμηρίωση](https://supabase.com/docs/guides/database)
-*   **Έλεγχος ταυτότητας και εξουσιοδότηση:** [Τεκμηρίωση](https://supabase.com/docs/guides/auth)
-*   **Αυτόματα δημιουργούμενα API:**
-    *   REST: [Τεκμηρίωση](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Τεκμηρίωση](https://supabase.com/docs/guides/graphql)
-    *   Συνδρομές σε πραγματικό χρόνο: [Τεκμηρίωση](https://supabase.com/docs/guides/realtime)
-*   **Λειτουργίες:**
-    *   Λειτουργίες βάσης δεδομένων: [Τεκμηρίωση](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (Λειτουργίες στην άκρη του δικτύου): [Τεκμηρίωση](https://supabase.com/docs/guides/functions)
-*   **Αποθήκευση αρχείων:** [Τεκμηρίωση](https://supabase.com/docs/guides/storage)
-* **Εργαλεία AI, διανυσμάτων και ενσωματώσεων (embeddings):** [Τεκμηρίωση](https://supabase.com/docs/guides/ai)
-*   **Πίνακας ελέγχου**
+- [x] **Διαχειριζόμενη βάση δεδομένων Postgres:** [Τεκμηρίωση](https://supabase.com/docs/guides/database)
+- [x] **Έλεγχος ταυτότητας και εξουσιοδότηση:** [Τεκμηρίωση](https://supabase.com/docs/guides/auth)
+- [x] **Αυτόματα δημιουργούμενα API:**
+    - [x] REST: [Τεκμηρίωση](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Τεκμηρίωση](https://supabase.com/docs/guides/graphql)
+    - [x] Συνδρομές σε πραγματικό χρόνο: [Τεκμηρίωση](https://supabase.com/docs/guides/realtime)
+- [x] **Λειτουργίες:**
+    - [x] Λειτουργίες βάσης δεδομένων: [Τεκμηρίωση](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (Λειτουργίες στην άκρη του δικτύου): [Τεκμηρίωση](https://supabase.com/docs/guides/functions)
+- [x] **Αποθήκευση αρχείων:** [Τεκμηρίωση](https://supabase.com/docs/guides/storage)
+- [x] **Εργαλεία AI, διανυσμάτων και ενσωματώσεων (embeddings):** [Τεκμηρίωση](https://supabase.com/docs/guides/ai)
+- [x] **Πίνακας ελέγχου**
 
 ![Πίνακας ελέγχου Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

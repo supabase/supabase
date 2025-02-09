@@ -11,18 +11,18 @@
 
 **मुख्य विशेषताएं:**
 
-*   **प्रबंधित Postgres डेटाबेस:** [दस्तावेज़ीकरण](https://supabase.com/docs/guides/database)
-*   **प्रमाणीकरण और प्राधिकरण:** [दस्तावेज़ीकरण](https://supabase.com/docs/guides/auth)
-*   **स्वचालित रूप से जेनरेट किए गए API:**
-    *   REST: [दस्तावेज़ीकरण](https://supabase.com/docs/guides/api)
-    *   GraphQL: [दस्तावेज़ीकरण](https://supabase.com/docs/guides/graphql)
-    *   रीयलटाइम सदस्यताएँ: [दस्तावेज़ीकरण](https://supabase.com/docs/guides/realtime)
-*   **कार्य:**
-    *   डेटाबेस फ़ंक्शन: [दस्तावेज़ीकरण](https://supabase.com/docs/guides/database/functions)
-    *   एज फ़ंक्शंस (नेटवर्क के किनारे पर कार्य): [दस्तावेज़ीकरण](https://supabase.com/docs/guides/functions)
-*   **फ़ाइल संग्रहण:** [दस्तावेज़ीकरण](https://supabase.com/docs/guides/storage)
-* **AI, वेक्टर और एम्बेडिंग (embeddings) उपकरण:** [दस्तावेज़ीकरण](https://supabase.com/docs/guides/ai)
-*   **डैशबोर्ड**
+- [x] **प्रबंधित Postgres डेटाबेस:** [दस्तावेज़ीकरण](https://supabase.com/docs/guides/database)
+- [x] **प्रमाणीकरण और प्राधिकरण:** [दस्तावेज़ीकरण](https://supabase.com/docs/guides/auth)
+- [x] **स्वचालित रूप से जेनरेट किए गए API:**
+    - [x] REST: [दस्तावेज़ीकरण](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [दस्तावेज़ीकरण](https://supabase.com/docs/guides/graphql)
+    - [x] रीयलटाइम सदस्यताएँ: [दस्तावेज़ीकरण](https://supabase.com/docs/guides/realtime)
+- [x] **कार्य:**
+    - [x] डेटाबेस फ़ंक्शन: [दस्तावेज़ीकरण](https://supabase.com/docs/guides/database/functions)
+    - [x] एज फ़ंक्शंस (नेटवर्क के किनारे पर कार्य): [दस्तावेज़ीकरण](https://supabase.com/docs/guides/functions)
+- [x] **फ़ाइल संग्रहण:** [दस्तावेज़ीकरण](https://supabase.com/docs/guides/storage)
+- [x] **AI, वेक्टर और एम्बेडिंग (embeddings) उपकरण:** [दस्तावेज़ीकरण](https://supabase.com/docs/guides/ai)
+- [x] **डैशबोर्ड**
 
 ![Supabase डैशबोर्ड](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

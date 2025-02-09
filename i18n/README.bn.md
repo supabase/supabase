@@ -11,18 +11,18 @@
 
 **মূল বৈশিষ্ট্য:**
 
-*   **পরিচালিত Postgres ডেটাবেস:** [ডকুমেন্টেশন](https://supabase.com/docs/guides/database)
-*   **প্রমাণীকরণ এবং অনুমোদন:** [ডকুমেন্টেশন](https://supabase.com/docs/guides/auth)
-*   **স্বয়ংক্রিয়ভাবে তৈরি API:**
-    *   REST: [ডকুমেন্টেশন](https://supabase.com/docs/guides/api)
-    *   GraphQL: [ডকুমেন্টেশন](https://supabase.com/docs/guides/graphql)
-    *   রিয়েলটাইম সাবস্ক্রিপশন: [ডকুমেন্টেশন](https://supabase.com/docs/guides/realtime)
-*   **ফাংশন:**
-    *   ডেটাবেস ফাংশন: [ডকুমেন্টেশন](https://supabase.com/docs/guides/database/functions)
-    *   এজ ফাংশন (Edge Functions): [ডকুমেন্টেশন](https://supabase.com/docs/guides/functions)
-*   **ফাইল স্টোরেজ:** [ডকুমেন্টেশন](https://supabase.com/docs/guides/storage)
-* **AI, ভেক্টর এবং এমবেডিং (embeddings) টুলস:**[ডকুমেন্টেশন](https://supabase.com/docs/guides/ai)
-*   **ড্যাশবোর্ড**
+- [x] **পরিচালিত Postgres ডেটাবেস:** [ডকুমেন্টেশন](https://supabase.com/docs/guides/database)
+- [x] **প্রমাণীকরণ এবং অনুমোদন:** [ডকুমেন্টেশন](https://supabase.com/docs/guides/auth)
+- [x] **স্বয়ংক্রিয়ভাবে তৈরি API:**
+    - [x] REST: [ডকুমেন্টেশন](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [ডকুমেন্টেশন](https://supabase.com/docs/guides/graphql)
+    - [x] রিয়েলটাইম সাবস্ক্রিপশন: [ডকুমেন্টেশন](https://supabase.com/docs/guides/realtime)
+- [x] **ফাংশন:**
+    - [x] ডেটাবেস ফাংশন: [ডকুমেন্টেশন](https://supabase.com/docs/guides/database/functions)
+    - [x] এজ ফাংশন (Edge Functions): [ডকুমেন্টেশন](https://supabase.com/docs/guides/functions)
+- [x] **ফাইল স্টোরেজ:** [ডকুমেন্টেশন](https://supabase.com/docs/guides/storage)
+- [x] **AI, ভেক্টর এবং এমবেডিং (embeddings) টুলস:**[ডকুমেন্টেশন](https://supabase.com/docs/guides/ai)
+- [x] **ড্যাশবোর্ড**
 
 ![Supabase ড্যাশবোর্ড](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

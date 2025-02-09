@@ -11,18 +11,18 @@
 
 **الميزات الرئيسية:**
 
-*   **قاعدة بيانات Postgres مُدارة:** [التوثيق](https://supabase.com/docs/guides/database)
-*   **المصادقة والتفويض:** [التوثيق](https://supabase.com/docs/guides/auth)
-*   **واجهات برمجة التطبيقات (APIs) التي يتم إنشاؤها تلقائيًا:**
-    *   REST: [التوثيق](https://supabase.com/docs/guides/api)
-    *   GraphQL: [التوثيق](https://supabase.com/docs/guides/graphql)
-    *   الاشتراكات في الوقت الفعلي: [التوثيق](https://supabase.com/docs/guides/realtime)
-*   **الوظائف:**
-    *   وظائف قاعدة البيانات: [التوثيق](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (وظائف على حافة الشبكة): [التوثيق](https://supabase.com/docs/guides/functions)
-*   **تخزين الملفات:** [التوثيق](https://supabase.com/docs/guides/storage)
-* **أدوات الذكاء الاصطناعي, المتجهات, والتضمينات (Vectors & Embeddings):** [التوثيق](https://supabase.com/docs/guides/ai)
-*   **لوحة التحكم**
+- [x] **قاعدة بيانات Postgres مُدارة:** [التوثيق](https://supabase.com/docs/guides/database)
+- [x] **المصادقة والتفويض:** [التوثيق](https://supabase.com/docs/guides/auth)
+- [x] **واجهات برمجة التطبيقات (APIs) التي يتم إنشاؤها تلقائيًا:**
+    - [x] REST: [التوثيق](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [التوثيق](https://supabase.com/docs/guides/graphql)
+    - [x] الاشتراكات في الوقت الفعلي: [التوثيق](https://supabase.com/docs/guides/realtime)
+- [x] **الوظائف:**
+    - [x]  وظائف قاعدة البيانات: [التوثيق](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (وظائف على حافة الشبكة): [التوثيق](https://supabase.com/docs/guides/functions)
+- [x] **تخزين الملفات:** [التوثيق](https://supabase.com/docs/guides/storage)
+- [x] **أدوات الذكاء الاصطناعي, المتجهات, والتضمينات (Vectors & Embeddings):** [التوثيق](https://supabase.com/docs/guides/ai)
+- [x] **لوحة التحكم**
 
 ![لوحة تحكم Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

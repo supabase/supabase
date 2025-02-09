@@ -11,18 +11,18 @@
 
 **Основни функции:**
 
-*   **Управлявана база данни Postgres:** [Документация](https://supabase.com/docs/guides/database)
-*   **Удостоверяване и оторизация:** [Документация](https://supabase.com/docs/guides/auth)
-*   **Автоматично генерирани API:**
-    *   REST: [Документация](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Документация](https://supabase.com/docs/guides/graphql)
-    *   Абонаменти в реално време: [Документация](https://supabase.com/docs/guides/realtime)
-*   **Функции:**
-    *   Функции на базата данни: [Документация](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (функции в периферията на мрежата): [Документация](https://supabase.com/docs/guides/functions)
-*   **Съхранение на файлове:** [Документация](https://supabase.com/docs/guides/storage)
-* **AI, вектори и вграждания (embeddings) инструменти:** [Документация](https://supabase.com/docs/guides/ai)
-*   **Табло за управление**
+- [x] **Управлявана база данни Postgres:** [Документация](https://supabase.com/docs/guides/database)
+- [x] **Удостоверяване и оторизация:** [Документация](https://supabase.com/docs/guides/auth)
+- [x] **Автоматично генерирани API:**
+    - [x] REST: [Документация](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Документация](https://supabase.com/docs/guides/graphql)
+    - [x] Абонаменти в реално време: [Документация](https://supabase.com/docs/guides/realtime)
+- [x] **Функции:**
+    - [x] Функции на базата данни: [Документация](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (функции в периферията на мрежата): [Документация](https://supabase.com/docs/guides/functions)
+- [x] **Съхранение на файлове:** [Документация](https://supabase.com/docs/guides/storage)
+- [x] **AI, вектори и вграждания (embeddings) инструменти:** [Документация](https://supabase.com/docs/guides/ai)
+- [x] **Табло за управление**
 
 ![Табло за управление на Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

@@ -11,18 +11,18 @@
 
 **คุณสมบัติหลัก:**
 
-*   **ฐานข้อมูล Postgres ที่มีการจัดการ:** [เอกสารประกอบ](https://supabase.com/docs/guides/database)
-*   **การรับรองความถูกต้องและการอนุญาต:** [เอกสารประกอบ](https://supabase.com/docs/guides/auth)
-*   **API ที่สร้างขึ้นโดยอัตโนมัติ:**
-    *   REST: [เอกสารประกอบ](https://supabase.com/docs/guides/api)
-    *   GraphQL: [เอกสารประกอบ](https://supabase.com/docs/guides/graphql)
-    *   การสมัครสมาชิกแบบเรียลไทม์: [เอกสารประกอบ](https://supabase.com/docs/guides/realtime)
-*   **ฟังก์ชัน:**
-    *   ฟังก์ชันฐานข้อมูล: [เอกสารประกอบ](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (ฟังก์ชันบนขอบเครือข่าย): [เอกสารประกอบ](https://supabase.com/docs/guides/functions)
-*   **ที่เก็บไฟล์:** [เอกสารประกอบ](https://supabase.com/docs/guides/storage)
-* **เครื่องมือสำหรับการทำงานกับ AI, เวกเตอร์ และ embeddings:** [เอกสารประกอบ](https://supabase.com/docs/guides/ai)
-*   **แดชบอร์ด**
+- [x] **ฐานข้อมูล Postgres ที่มีการจัดการ:** [เอกสารประกอบ](https://supabase.com/docs/guides/database)
+- [x] **การรับรองความถูกต้องและการอนุญาต:** [เอกสารประกอบ](https://supabase.com/docs/guides/auth)
+- [x] **API ที่สร้างขึ้นโดยอัตโนมัติ:**
+    - [x] REST: [เอกสารประกอบ](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [เอกสารประกอบ](https://supabase.com/docs/guides/graphql)
+    - [x] การสมัครสมาชิกแบบเรียลไทม์: [เอกสารประกอบ](https://supabase.com/docs/guides/realtime)
+- [x] **ฟังก์ชัน:**
+    - [x] ฟังก์ชันฐานข้อมูล: [เอกสารประกอบ](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (ฟังก์ชันบนขอบเครือข่าย): [เอกสารประกอบ](https://supabase.com/docs/guides/functions)
+- [x] **ที่เก็บไฟล์:** [เอกสารประกอบ](https://supabase.com/docs/guides/storage)
+- [x] **เครื่องมือสำหรับการทำงานกับ AI, เวกเตอร์ และ embeddings:** [เอกสารประกอบ](https://supabase.com/docs/guides/ai)
+- [x] **แดชบอร์ด**
 
 ![แดชบอร์ด Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

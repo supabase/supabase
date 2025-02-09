@@ -11,18 +11,18 @@
 
 **Ključne karakteristike:**
 
-*   **Upravljana Postgres baza podataka:** [Dokumentacija](https://supabase.com/docs/guides/database)
-*   **Autentifikacija i autorizacija:** [Dokumentacija](https://supabase.com/docs/guides/auth)
-*   **Automatski generisani API-ji:**
-    *   REST: [Dokumentacija](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentacija](https://supabase.com/docs/guides/graphql)
-    *   Pretplate u realnom vremenu: [Dokumentacija](https://supabase.com/docs/guides/realtime)
-*   **Funkcije:**
-    *   Funkcije baze podataka: [Dokumentacija](https://supabase.com/docs/guides/database/functions)
-    *   Edge funkcije (funkcije na ivici mreže): [Dokumentacija](https://supabase.com/docs/guides/functions)
-*   **Skladištenje datoteka:** [Dokumentacija](https://supabase.com/docs/guides/storage)
-* **Alati za rad sa veštačkom inteligencijom, vektorima i ugradnjama (embeddings):** [Dokumentacija](https://supabase.com/docs/guides/ai)
-*   **Kontrolna tabla**
+- [x] **Upravljana Postgres baza podataka:** [Dokumentacija](https://supabase.com/docs/guides/database)
+- [x] **Autentifikacija i autorizacija:** [Dokumentacija](https://supabase.com/docs/guides/auth)
+- [x] **Automatski generisani API-ji:**
+    - [x] REST: [Dokumentacija](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentacija](https://supabase.com/docs/guides/graphql)
+    - [x] Pretplate u realnom vremenu: [Dokumentacija](https://supabase.com/docs/guides/realtime)
+- [x] **Funkcije:**
+    - [x] Funkcije baze podataka: [Dokumentacija](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge funkcije (funkcije na ivici mreže): [Dokumentacija](https://supabase.com/docs/guides/functions)
+- [x] **Skladištenje datoteka:** [Dokumentacija](https://supabase.com/docs/guides/storage)
+- [x] **Alati za rad sa veštačkom inteligencijom, vektorima i ugradnjama (embeddings):** [Dokumentacija](https://supabase.com/docs/guides/ai)
+- [x] **Kontrolna tabla**
 
 ![Supabase kontrolna tabla](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

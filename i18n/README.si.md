@@ -11,18 +11,18 @@
 
 **ප්‍රධාන විශේෂාංග:**
 
-*   **කළමනාකරණය කළ Postgres දත්ත සමුදාය:** [ලේඛනගත කිරීම](https://supabase.com/docs/guides/database)
-*   **සත්‍යාපනය සහ අවසර දීම:** [ලේඛනගත කිරීම](https://supabase.com/docs/guides/auth)
-*   **ස්වයංක්‍රීයව ජනනය කරන ලද API:**
-    *   REST: [ලේඛනගත කිරීම](https://supabase.com/docs/guides/api)
-    *   GraphQL: [ලේඛනගත කිරීම](https://supabase.com/docs/guides/graphql)
-    *   තත්‍ය කාලීන දායකත්ව: [ලේඛනගත කිරීම](https://supabase.com/docs/guides/realtime)
-*   **කාර්යයන්:**
-    *   දත්ත සමුදා කාර්යයන්: [ලේඛනගත කිරීම](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (ජාලයේ මායිමේ ඇති කාර්යයන්): [ලේඛනගත කිරීම](https://supabase.com/docs/guides/functions)
-*   **ගොනු ගබඩාව:** [ලේඛනගත කිරීම](https://supabase.com/docs/guides/storage)
-* **AI, දෛශික සහ කාවැද්දීම් (embeddings) මෙවලම්:** [ලේඛනගත කිරීම](https://supabase.com/docs/guides/ai)
-*   **டாஷ்போர்டு**
+- [x] **කළමනාකරණය කළ Postgres දත්ත සමුදාය:** [ලේඛනගත කිරීම](https://supabase.com/docs/guides/database)
+- [x] **සත්‍යාපනය සහ අවසර දීම:** [ලේඛනගත කිරීම](https://supabase.com/docs/guides/auth)
+- [x] **ස්වයංක්‍රීයව ජනනය කරන ලද API:**
+    - [x] REST: [ලේඛනගත කිරීම](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [ලේඛනගත කිරීම](https://supabase.com/docs/guides/graphql)
+    - [x] තත්‍ය කාලීන දායකත්ව: [ලේඛනගත කිරීම](https://supabase.com/docs/guides/realtime)
+- [x] **කාර්යයන්:**
+    - [x] දත්ත සමුදා කාර්යයන්: [ලේඛනගත කිරීම](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (ජාලයේ මායිමේ ඇති කාර්යයන්): [ලේඛනගත කිරීම](https://supabase.com/docs/guides/functions)
+- [x] **ගොනු ගබඩාව:** [ලේඛනගත කිරීම](https://supabase.com/docs/guides/storage)
+- [x] **AI, දෛශික සහ කාවැද්දීම් (embeddings) මෙවලම්:** [ලේඛනගත කිරීම](https://supabase.com/docs/guides/ai)
+- [x] **டாஷ்போர்டு**
 
 ![Supabase டாஷ்போர்டு](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

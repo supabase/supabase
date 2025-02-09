@@ -11,18 +11,18 @@
 
 **Belangrijkste kenmerken:**
 
-*   **Beheerde Postgres-database:** [Documentatie](https://supabase.com/docs/guides/database)
-*   **Authenticatie en autorisatie:** [Documentatie](https://supabase.com/docs/guides/auth)
-*   **Automatisch gegenereerde API's:**
-    *   REST: [Documentatie](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Documentatie](https://supabase.com/docs/guides/graphql)
-    *   Realtime-abonnementen: [Documentatie](https://supabase.com/docs/guides/realtime)
-*   **Functies:**
-    *   Databasefuncties: [Documentatie](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (functies aan de rand van het netwerk): [Documentatie](https://supabase.com/docs/guides/functions)
-*   **Bestandsopslag:** [Documentatie](https://supabase.com/docs/guides/storage)
-* **AI, Vector en Embedding tools:** [Documentatie](https://supabase.com/docs/guides/ai)
-*   **Dashboard**
+- [x] **Beheerde Postgres-database:** [Documentatie](https://supabase.com/docs/guides/database)
+- [x] **Authenticatie en autorisatie:** [Documentatie](https://supabase.com/docs/guides/auth)
+- [x] **Automatisch gegenereerde API's:**
+    - [x] REST: [Documentatie](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Documentatie](https://supabase.com/docs/guides/graphql)
+    - [x] Realtime-abonnementen: [Documentatie](https://supabase.com/docs/guides/realtime)
+- [x] **Functies:**
+    - [x] Databasefuncties: [Documentatie](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (functies aan de rand van het netwerk): [Documentatie](https://supabase.com/docs/guides/functions)
+- [x] **Bestandsopslag:** [Documentatie](https://supabase.com/docs/guides/storage)
+- [x] **AI, Vector en Embedding tools:** [Documentatie](https://supabase.com/docs/guides/ai)
+- [x] **Dashboard**
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

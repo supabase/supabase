@@ -11,18 +11,18 @@
 
 **Caracteristici cheie:**
 
-*   **Bază de date Postgres gestionată:** [Documentație](https://supabase.com/docs/guides/database)
-*   **Autentificare și autorizare:** [Documentație](https://supabase.com/docs/guides/auth)
-*   **API-uri generate automat:**
-    *   REST: [Documentație](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Documentație](https://supabase.com/docs/guides/graphql)
-    *   Abonamente în timp real: [Documentație](https://supabase.com/docs/guides/realtime)
-*   **Funcții:**
-    *   Funcții de bază de date: [Documentație](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (funcții la marginea rețelei): [Documentație](https://supabase.com/docs/guides/functions)
-*   **Stocare fișiere:** [Documentație](https://supabase.com/docs/guides/storage)
-* **Instrumente AI, Vectori și Embedding-uri:** [Documentație](https://supabase.com/docs/guides/ai)
-*   **Panou de control (Dashboard)**
+- [x] **Bază de date Postgres gestionată:** [Documentație](https://supabase.com/docs/guides/database)
+- [x] **Autentificare și autorizare:** [Documentație](https://supabase.com/docs/guides/auth)
+- [x] **API-uri generate automat:**
+    - [x] REST: [Documentație](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Documentație](https://supabase.com/docs/guides/graphql)
+    - [x] Abonamente în timp real: [Documentație](https://supabase.com/docs/guides/realtime)
+- [x] **Funcții:**
+    - [x] Funcții de bază de date: [Documentație](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (funcții la marginea rețelei): [Documentație](https://supabase.com/docs/guides/functions)
+- [x] **Stocare fișiere:** [Documentație](https://supabase.com/docs/guides/storage)
+- [x] **Instrumente AI, Vectori și Embedding-uri:** [Documentație](https://supabase.com/docs/guides/ai)
+- [x] **Panou de control (Dashboard)**
 
 ![Panou de control Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

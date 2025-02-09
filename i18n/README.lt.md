@@ -11,18 +11,18 @@
 
 **Pagrindinės funkcijos:**
 
-*   **Valdoma Postgres duomenų bazė:** [Dokumentacija](https://supabase.com/docs/guides/database)
-*   **Autentifikavimas ir autorizacija:** [Dokumentacija](https://supabase.com/docs/guides/auth)
-*   **Automatiškai generuojamos API:**
-    *   REST: [Dokumentacija](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentacija](https://supabase.com/docs/guides/graphql)
-    *   Realaus laiko prenumeratos: [Dokumentacija](https://supabase.com/docs/guides/realtime)
-*   **Funkcijos:**
-    *   Duomenų bazės funkcijos: [Dokumentacija](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (funkcijos tinkle): [Dokumentacija](https://supabase.com/docs/guides/functions)
-*   **Failų saugykla:** [Dokumentacija](https://supabase.com/docs/guides/storage)
-* **AI, vektorių ir įdėjimų įrankiai:** [Dokumentacija](https://supabase.com/docs/guides/ai)
-*   **Valdymo skydelis**
+- [x] **Valdoma Postgres duomenų bazė:** [Dokumentacija](https://supabase.com/docs/guides/database)
+- [x] **Autentifikavimas ir autorizacija:** [Dokumentacija](https://supabase.com/docs/guides/auth)
+- [x] **Automatiškai generuojamos API:**
+    - [x] REST: [Dokumentacija](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentacija](https://supabase.com/docs/guides/graphql)
+    - [x] Realaus laiko prenumeratos: [Dokumentacija](https://supabase.com/docs/guides/realtime)
+- [x] **Funkcijos:**
+    - [x] Duomenų bazės funkcijos: [Dokumentacija](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (funkcijos tinkle): [Dokumentacija](https://supabase.com/docs/guides/functions)
+- [x] **Failų saugykla:** [Dokumentacija](https://supabase.com/docs/guides/storage)
+- [x] **AI, vektorių ir įdėjimų įrankiai:** [Dokumentacija](https://supabase.com/docs/guides/ai)
+- [x] **Valdymo skydelis**
 
 ![Supabase valdymo skydelis](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

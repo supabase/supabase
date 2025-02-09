@@ -11,18 +11,18 @@
 
 **Kluczowe cechy:**
 
-*   **Zarządzana baza danych Postgres:** [Dokumentacja](https://supabase.com/docs/guides/database)
-*   **Uwierzytelnianie i autoryzacja:** [Dokumentacja](https://supabase.com/docs/guides/auth)
-*   **Automatycznie generowane API:**
-    *   REST: [Dokumentacja](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentacja](https://supabase.com/docs/guides/graphql)
-    *   Subskrypcje w czasie rzeczywistym: [Dokumentacja](https://supabase.com/docs/guides/realtime)
-*   **Funkcje:**
-    *   Funkcje bazy danych: [Dokumentacja](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (funkcje na brzegu sieci): [Dokumentacja](https://supabase.com/docs/guides/functions)
-*   **Przechowywanie plików:** [Dokumentacja](https://supabase.com/docs/guides/storage)
-* **Narzędzia AI, wektorowe i osadzania:** [Dokumentacja](https://supabase.com/docs/guides/ai)
-*   **Panel sterowania**
+- [x] **Zarządzana baza danych Postgres:** [Dokumentacja](https://supabase.com/docs/guides/database)
+- [x] **Uwierzytelnianie i autoryzacja:** [Dokumentacja](https://supabase.com/docs/guides/auth)
+- [x] **Automatycznie generowane API:**
+    - [x] REST: [Dokumentacja](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentacja](https://supabase.com/docs/guides/graphql)
+    - [x] Subskrypcje w czasie rzeczywistym: [Dokumentacja](https://supabase.com/docs/guides/realtime)
+- [x] **Funkcje:**
+    - [x] Funkcje bazy danych: [Dokumentacja](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (funkcje na brzegu sieci): [Dokumentacja](https://supabase.com/docs/guides/functions)
+- [x] **Przechowywanie plików:** [Dokumentacja](https://supabase.com/docs/guides/storage)
+- [x] **Narzędzia AI, wektorowe i osadzania:** [Dokumentacja](https://supabase.com/docs/guides/ai)
+- [x] **Panel sterowania**
 
 ![Panel sterowania Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

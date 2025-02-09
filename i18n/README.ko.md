@@ -11,18 +11,18 @@
 
 **주요 기능:**
 
-*   **관리형 Postgres 데이터베이스:** [문서](https://supabase.com/docs/guides/database)
-*   **인증 및 권한 부여:** [문서](https://supabase.com/docs/guides/auth)
-*   **자동 생성 API:**
-    *   REST: [문서](https://supabase.com/docs/guides/api)
-    *   GraphQL: [문서](https://supabase.com/docs/guides/graphql)
-    *   실시간 구독: [문서](https://supabase.com/docs/guides/realtime)
-*   **함수:**
-    *   데이터베이스 함수: [문서](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (엣지 함수): [문서](https://supabase.com/docs/guides/functions)
-*   **파일 저장소:** [문서](https://supabase.com/docs/guides/storage)
-* **AI, 벡터 및 임베딩 도구:** [문서](https://supabase.com/docs/guides/ai)
-*   **대시보드**
+- [x] **관리형 Postgres 데이터베이스:** [문서](https://supabase.com/docs/guides/database)
+- [x] **인증 및 권한 부여:** [문서](https://supabase.com/docs/guides/auth)
+- [x] **자동 생성 API:**
+    - [x] REST: [문서](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [문서](https://supabase.com/docs/guides/graphql)
+    - [x] 실시간 구독: [문서](https://supabase.com/docs/guides/realtime)
+- [x] **함수:**
+    - [x] 데이터베이스 함수: [문서](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (엣지 함수): [문서](https://supabase.com/docs/guides/functions)
+- [x] **파일 저장소:** [문서](https://supabase.com/docs/guides/storage)
+- [x] **AI, 벡터 및 임베딩 도구:** [문서](https://supabase.com/docs/guides/ai)
+- [x] **대시보드**
 
 ![Supabase 대시보드](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

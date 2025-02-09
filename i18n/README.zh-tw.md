@@ -11,18 +11,18 @@
 
 **主要功能：**
 
-*   **託管的 Postgres 資料庫：** [文件](https://supabase.com/docs/guides/database)
-*   **身份驗證和授權：** [文件](https://supabase.com/docs/guides/auth)
-*   **自動生成的 API：**
-    *   REST: [文件](https://supabase.com/docs/guides/api)
-    *   GraphQL: [文件](https://supabase.com/docs/guides/graphql)
-    *   即時訂閱： [文件](https://supabase.com/docs/guides/realtime)
-*   **函數：**
-    *   資料庫函數： [文件](https://supabase.com/docs/guides/database/functions)
-    *   邊緣函數（網路邊緣的函數）： [文件](https://supabase.com/docs/guides/functions)
-*   **檔案儲存：** [文件](https://supabase.com/docs/guides/storage)
-* **用於處理 AI、向量和嵌入 (embeddings) 的工具：** [文件](https://supabase.com/docs/guides/ai)
-*   **控制面板**
+- [x] **託管的 Postgres 資料庫：** [文件](https://supabase.com/docs/guides/database)
+- [x] **身份驗證和授權：** [文件](https://supabase.com/docs/guides/auth)
+- [x] **自動生成的 API：**
+    - [x] REST: [文件](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [文件](https://supabase.com/docs/guides/graphql)
+    - [x] 即時訂閱： [文件](https://supabase.com/docs/guides/realtime)
+- [x] **函數：**
+    - [x] 資料庫函數： [文件](https://supabase.com/docs/guides/database/functions)
+    - [x] 邊緣函數（網路邊緣的函數）： [文件](https://supabase.com/docs/guides/functions)
+- [x] **檔案儲存：** [文件](https://supabase.com/docs/guides/storage)
+- [x] **用於處理 AI、向量和嵌入 (embeddings) 的工具：** [文件](https://supabase.com/docs/guides/ai)
+- [x] **控制面板**
 
 ![Supabase 控制面板](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

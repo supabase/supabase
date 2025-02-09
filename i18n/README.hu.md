@@ -11,18 +11,18 @@ A [Supabase](https://supabase.com) a Firebase nyílt forráskódú alternatívá
 
 **Főbb jellemzők:**
 
-*   **Menedzselt Postgres adatbázis:** [Dokumentáció](https://supabase.com/docs/guides/database)
-*   **Hitelesítés és engedélyezés:** [Dokumentáció](https://supabase.com/docs/guides/auth)
-*   **Automatikusan generált API-k:**
-    *   REST: [Dokumentáció](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentáció](https://supabase.com/docs/guides/graphql)
-    *   Valós idejű feliratkozások: [Dokumentáció](https://supabase.com/docs/guides/realtime)
-*   **Funkciók:**
-    *   Adatbázis funkciók: [Dokumentáció](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (funkciók a hálózat peremén): [Dokumentáció](https://supabase.com/docs/guides/functions)
-*   **Fájltárolás:** [Dokumentáció](https://supabase.com/docs/guides/storage)
-* **AI, vektorok és beágyazások (embeddings) eszközök:** [Dokumentáció](https://supabase.com/docs/guides/ai)
-*   **Irányítópult**
+- [x] **Menedzselt Postgres adatbázis:** [Dokumentáció](https://supabase.com/docs/guides/database)
+- [x] **Hitelesítés és engedélyezés:** [Dokumentáció](https://supabase.com/docs/guides/auth)
+- [x] **Automatikusan generált API-k:**
+    - [x] REST: [Dokumentáció](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentáció](https://supabase.com/docs/guides/graphql)
+    - [x] Valós idejű feliratkozások: [Dokumentáció](https://supabase.com/docs/guides/realtime)
+- [x] **Funkciók:**
+    - [x] Adatbázis funkciók: [Dokumentáció](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (funkciók a hálózat peremén): [Dokumentáció](https://supabase.com/docs/guides/functions)
+- [x] **Fájltárolás:** [Dokumentáció](https://supabase.com/docs/guides/storage)
+- [x] **AI, vektorok és beágyazások (embeddings) eszközök:** [Dokumentáció](https://supabase.com/docs/guides/ai)
+- [x] **Irányítópult**
 
 ![Supabase irányítópult](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

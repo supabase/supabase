@@ -11,18 +11,18 @@
 
 **முக்கிய அம்சங்கள்:**
 
-*   **நிர்வகிக்கப்படும் Postgres தரவுத்தளம்:** [ஆவணங்கள்](https://supabase.com/docs/guides/database)
-*   **அங்கீகாரம் மற்றும் அங்கீகாரம்:** [ஆவணங்கள்](https://supabase.com/docs/guides/auth)
-*   **தானாக உருவாக்கப்பட்ட APIகள்:**
-    *   REST: [ஆவணங்கள்](https://supabase.com/docs/guides/api)
-    *   GraphQL: [ஆவணங்கள்](https://supabase.com/docs/guides/graphql)
-    *   நிகழ்நேர சந்தாக்கள்: [ஆவணங்கள்](https://supabase.com/docs/guides/realtime)
-*   **செயல்பாடுகள்:**
-    *   தரவுத்தள செயல்பாடுகள்: [ஆவணங்கள்](https://supabase.com/docs/guides/database/functions)
-    *   எட்ஜ் செயல்பாடுகள் (நெட்வொர்க்கின் விளிம்பில் உள்ள செயல்பாடுகள்): [ஆவணங்கள்](https://supabase.com/docs/guides/functions)
-*   **கோப்பு சேமிப்பு:** [ஆவணங்கள்](https://supabase.com/docs/guides/storage)
-* **AI, வெக்டர்கள் மற்றும் உட்பொதிப்புகளுடன் (embeddings) வேலை செய்வதற்கான கருவிகள்:** [ஆவணங்கள்](https://supabase.com/docs/guides/ai)
-*   **டாஷ்போர்டு**
+- [x] **நிர்வகிக்கப்படும் Postgres தரவுத்தளம்:** [ஆவணங்கள்](https://supabase.com/docs/guides/database)
+- [x] **அங்கீகாரம் மற்றும் அங்கீகாரம்:** [ஆவணங்கள்](https://supabase.com/docs/guides/auth)
+- [x] **தானாக உருவாக்கப்பட்ட APIகள்:**
+    - [x] REST: [ஆவணங்கள்](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [ஆவணங்கள்](https://supabase.com/docs/guides/graphql)
+    - [x] நிகழ்நேர சந்தாக்கள்: [ஆவணங்கள்](https://supabase.com/docs/guides/realtime)
+- [x] **செயல்பாடுகள்:**
+    - [x] தரவுத்தள செயல்பாடுகள்: [ஆவணங்கள்](https://supabase.com/docs/guides/database/functions)
+    - [x] எட்ஜ் செயல்பாடுகள் (நெட்வொர்க்கின் விளிம்பில் உள்ள செயல்பாடுகள்): [ஆவணங்கள்](https://supabase.com/docs/guides/functions)
+- [x] **கோப்பு சேமிப்பு:** [ஆவணங்கள்](https://supabase.com/docs/guides/storage)
+- [x] **AI, வெக்டர்கள் மற்றும் உட்பொதிப்புகளுடன் (embeddings) வேலை செய்வதற்கான கருவிகள்:** [ஆவணங்கள்](https://supabase.com/docs/guides/ai)
+- [x] **டாஷ்போர்டு**
 
 ![Supabase டாஷ்போர்டு](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

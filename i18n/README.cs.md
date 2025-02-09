@@ -11,18 +11,18 @@
 
 **Klíčové vlastnosti:**
 
-*   **Spravovaná databáze Postgres:** [Dokumentace](https://supabase.com/docs/guides/database)
-*   **Ověřování a autorizace:** [Dokumentace](https://supabase.com/docs/guides/auth)
-*   **Automaticky generovaná API:**
-    *   REST: [Dokumentace](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentace](https://supabase.com/docs/guides/graphql)
-    *   Předplatné v reálném čase: [Dokumentace](https://supabase.com/docs/guides/realtime)
-*   **Funkce:**
-    *   Funkce databáze: [Dokumentace](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (funkce na okraji sítě): [Dokumentace](https://supabase.com/docs/guides/functions)
-*   **Úložiště souborů:** [Dokumentace](https://supabase.com/docs/guides/storage)
-* **Nástroje pro AI, vektory a vkládání (embeddings):** [Dokumentace](https://supabase.com/docs/guides/ai)
-*   **Řídicí panel**
+- [x] **Spravovaná databáze Postgres:** [Dokumentace](https://supabase.com/docs/guides/database)
+- [x] **Ověřování a autorizace:** [Dokumentace](https://supabase.com/docs/guides/auth)
+- [x] **Automaticky generovaná API:**
+    - [x] REST: [Dokumentace](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentace](https://supabase.com/docs/guides/graphql)
+    - [x] Předplatné v reálném čase: [Dokumentace](https://supabase.com/docs/guides/realtime)
+- [x] **Funkce:**
+    - [x] Funkce databáze: [Dokumentace](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (funkce na okraji sítě): [Dokumentace](https://supabase.com/docs/guides/functions)
+- [x] **Úložiště souborů:** [Dokumentace](https://supabase.com/docs/guides/storage)
+- [x] **Nástroje pro AI, vektory a vkládání (embeddings):** [Dokumentace](https://supabase.com/docs/guides/ai)
+- [x] **Řídicí panel**
 
 ![Řídicí panel Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

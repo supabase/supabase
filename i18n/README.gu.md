@@ -11,18 +11,18 @@
 
 **મુખ્ય વિશેષતાઓ:**
 
-*   **મેનેજ્ડ Postgres ડેટાબેઝ:** [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/database)
-*   **પ્રમાણીકરણ અને અધિકૃતતા:** [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/auth)
-*   **આપમેળે જનરેટ થયેલ API:**
-    *   REST: [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/api)
-    *   GraphQL: [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/graphql)
-    *   રીઅલટાઇમ સબ્સ્ક્રિપ્શન્સ: [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/realtime)
-*   **કાર્યો:**
-    *   ડેટાબેઝ કાર્યો: [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/database/functions)
-    *   એજ ફંક્શન્સ (નેટવર્કની ધાર પરના કાર્યો): [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/functions)
-*   **ફાઇલ સ્ટોરેજ:** [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/storage)
-* **AI, વેક્ટર અને એમ્બેડિંગ્સ (embeddings) ટૂલ્સ:** [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/ai)
-*   **ડેશબોર્ડ**
+- [x] **મેનેજ્ડ Postgres ડેટાબેઝ:** [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/database)
+- [x] **પ્રમાણીકરણ અને અધિકૃતતા:** [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/auth)
+- [x] **આપમેળે જનરેટ થયેલ API:**
+    - [x] REST: [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/graphql)
+    - [x] રીઅલટાઇમ સબ્સ્ક્રિપ્શન્સ: [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/realtime)
+- [x] **કાર્યો:**
+    - [x] ડેટાબેઝ કાર્યો: [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/database/functions)
+    - [x] એજ ફંક્શન્સ (નેટવર્કની ધાર પરના કાર્યો): [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/functions)
+- [x] **ફાઇલ સ્ટોરેજ:** [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/storage)
+- [x] **AI, વેક્ટર અને એમ્બેડિંગ્સ (embeddings) ટૂલ્સ:** [દસ્તાવેજીકરણ](https://supabase.com/docs/guides/ai)
+- [x] **ડેશબોર્ડ**
 
 ![Supabase ડેશબોર્ડ](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

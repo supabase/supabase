@@ -11,18 +11,18 @@
 
 **मुख्य विशेषताहरू:**
 
-*   **व्यवस्थित Postgres डाटाबेस:** [कागजातहरू](https://supabase.com/docs/guides/database)
-*   **प्रमाणीकरण र प्राधिकरण:** [कागजातहरू](https://supabase.com/docs/guides/auth)
-*   **स्वचालित रूपमा उत्पन्न API हरू:**
-    *   REST: [कागजातहरू](https://supabase.com/docs/guides/api)
-    *   GraphQL: [कागजातहरू](https://supabase.com/docs/guides/graphql)
-    *   वास्तविक-समय सदस्यताहरू: [कागजातहरू](https://supabase.com/docs/guides/realtime)
-*   **कार्यहरू (Functions):**
-    *   डाटाबेस कार्यहरू: [कागजातहरू](https://supabase.com/docs/guides/database/functions)
-    *   एज कार्यहरू (Edge Functions): [कागजातहरू](https://supabase.com/docs/guides/functions)
-*   **फाइल भण्डारण:** [कागजातहरू](https://supabase.com/docs/guides/storage)
-* **AI, भेक्टर र इम्बेडिङ उपकरण:** [कागजातहरू](https://supabase.com/docs/guides/ai)
-*   **ड्यासबोर्ड (Dashboard)**
+- [x] **व्यवस्थित Postgres डाटाबेस:** [कागजातहरू](https://supabase.com/docs/guides/database)
+- [x] **प्रमाणीकरण र प्राधिकरण:** [कागजातहरू](https://supabase.com/docs/guides/auth)
+- [x] **स्वचालित रूपमा उत्पन्न API हरू:**
+    - [x] REST: [कागजातहरू](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [कागजातहरू](https://supabase.com/docs/guides/graphql)
+    - [x] वास्तविक-समय सदस्यताहरू: [कागजातहरू](https://supabase.com/docs/guides/realtime)
+- [x] **कार्यहरू (Functions):**
+    - [x] डाटाबेस कार्यहरू: [कागजातहरू](https://supabase.com/docs/guides/database/functions)
+    - [x] एज कार्यहरू (Edge Functions): [कागजातहरू](https://supabase.com/docs/guides/functions)
+- [x] **फाइल भण्डारण:** [कागजातहरू](https://supabase.com/docs/guides/storage)
+- [x] **AI, भेक्टर र इम्बेडिङ उपकरण:** [कागजातहरू](https://supabase.com/docs/guides/ai)
+- [x] **ड्यासबोर्ड (Dashboard)**
 
 ![सुपाबेस ड्यासबोर्ड](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

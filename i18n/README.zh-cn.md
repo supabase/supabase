@@ -11,18 +11,18 @@
 
 **主要功能：**
 
-*   **托管的 Postgres 数据库：** [文档](https://supabase.com/docs/guides/database)
-*   **身份验证和授权：** [文档](https://supabase.com/docs/guides/auth)
-*   **自动生成的 API：**
-    *   REST: [文档](https://supabase.com/docs/guides/api)
-    *   GraphQL: [文档](https://supabase.com/docs/guides/graphql)
-    *   实时订阅： [文档](https://supabase.com/docs/guides/realtime)
-*   **函数：**
-    *   数据库函数： [文档](https://supabase.com/docs/guides/database/functions)
-    *   边缘函数（网络边缘的函数）： [文档](https://supabase.com/docs/guides/functions)
-*   **文件存储：** [文档](https://supabase.com/docs/guides/storage)
-* **用于处理 AI、向量和嵌入 (embeddings) 的工具：** [文档](https://supabase.com/docs/guides/ai)
-*   **控制面板**
+- [x] **托管的 Postgres 数据库：** [文档](https://supabase.com/docs/guides/database)
+- [x] **身份验证和授权：** [文档](https://supabase.com/docs/guides/auth)
+- [x] **自动生成的 API：**
+    - [x] REST: [文档](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [文档](https://supabase.com/docs/guides/graphql)
+    - [x] 实时订阅： [文档](https://supabase.com/docs/guides/realtime)
+- [x] **函数：**
+    - [x] 数据库函数： [文档](https://supabase.com/docs/guides/database/functions)
+    - [x] 边缘函数（网络边缘的函数）： [文档](https://supabase.com/docs/guides/functions)
+- [x] **文件存储：** [文档](https://supabase.com/docs/guides/storage)
+- [x] **用于处理 AI、向量和嵌入 (embeddings) 的工具：** [文档](https://supabase.com/docs/guides/ai)
+- [x] **控制面板**
 
 ![Supabase 控制面板](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

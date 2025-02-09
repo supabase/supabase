@@ -11,18 +11,18 @@
 
 **Karakteristikat kryesore:**
 
-*   **Bazë të dhënash Postgres e menaxhuar:** [Dokumentacioni](https://supabase.com/docs/guides/database)
-*   **Autentifikimi dhe autorizimi:** [Dokumentacioni](https://supabase.com/docs/guides/auth)
-*   **API të gjeneruara automatikisht:**
-    *   REST: [Dokumentacioni](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentacioni](https://supabase.com/docs/guides/graphql)
-    *   Abonime në kohë reale: [Dokumentacioni](https://supabase.com/docs/guides/realtime)
-*   **Funksionet:**
-    *   Funksionet e bazës së të dhënave: [Dokumentacioni](https://supabase.com/docs/guides/database/functions)
-    *   Funksionet Edge (funksionet në skajin e rrjetit): [Dokumentacioni](https://supabase.com/docs/guides/functions)
-*   **Ruajtja e skedarëve:** [Dokumentacioni](https://supabase.com/docs/guides/storage)
-* **Mjetet për punë me AI, vektorë dhe ngulitje (embeddings):** [Dokumentacioni](https://supabase.com/docs/guides/ai)
-*   **Paneli i kontrollit**
+- [x] **Bazë të dhënash Postgres e menaxhuar:** [Dokumentacioni](https://supabase.com/docs/guides/database)
+- [x] **Autentifikimi dhe autorizimi:** [Dokumentacioni](https://supabase.com/docs/guides/auth)
+- [x] **API të gjeneruara automatikisht:**
+    - [x] REST: [Dokumentacioni](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentacioni](https://supabase.com/docs/guides/graphql)
+    - [x] Abonime në kohë reale: [Dokumentacioni](https://supabase.com/docs/guides/realtime)
+- [x] **Funksionet:**
+    - [x] Funksionet e bazës së të dhënave: [Dokumentacioni](https://supabase.com/docs/guides/database/functions)
+    - [x] Funksionet Edge (funksionet në skajin e rrjetit): [Dokumentacioni](https://supabase.com/docs/guides/functions)
+- [x] **Ruajtja e skedarëve:** [Dokumentacioni](https://supabase.com/docs/guides/storage)
+- [x] **Mjetet për punë me AI, vektorë dhe ngulitje (embeddings):** [Dokumentacioni](https://supabase.com/docs/guides/ai)
+- [x] **Paneli i kontrollit**
 
 ![Paneli i kontrollit Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

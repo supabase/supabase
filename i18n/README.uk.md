@@ -11,18 +11,18 @@
 
 **Ключові можливості:**
 
-*   **Керована база даних Postgres:** [Документація](https://supabase.com/docs/guides/database)
-*   **Аутентифікація та авторизація:** [Документація](https://supabase.com/docs/guides/auth)
-*   **Автоматично генеровані API:**
-    *   REST: [Документація](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Документація](https://supabase.com/docs/guides/graphql)
-    *   Підписки в реальному часі: [Документація](https://supabase.com/docs/guides/realtime)
-*   **Функції:**
-    *   Функції бази даних: [Документація](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (функції на кордоні мережі): [Документація](https://supabase.com/docs/guides/functions)
-*   **Сховище файлів:** [Документація](https://supabase.com/docs/guides/storage)
-* **Інструменти для роботи зі ШІ, векторами та вбудовуваннями (embeddings):** [Документація](https://supabase.com/docs/guides/ai)
-*   **Панель управління**
+- [x] **Керована база даних Postgres:** [Документація](https://supabase.com/docs/guides/database)
+- [x] **Аутентифікація та авторизація:** [Документація](https://supabase.com/docs/guides/auth)
+- [x] **Автоматично генеровані API:**
+    - [x] REST: [Документація](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Документація](https://supabase.com/docs/guides/graphql)
+    - [x] Підписки в реальному часі: [Документація](https://supabase.com/docs/guides/realtime)
+- [x] **Функції:**
+    - [x] Функції бази даних: [Документація](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (функції на кордоні мережі): [Документація](https://supabase.com/docs/guides/functions)
+- [x] **Сховище файлів:** [Документація](https://supabase.com/docs/guides/storage)
+- [x] **Інструменти для роботи зі ШІ, векторами та вбудовуваннями (embeddings):** [Документація](https://supabase.com/docs/guides/ai)
+- [x] **Панель управління**
 
 ![Панель управління Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

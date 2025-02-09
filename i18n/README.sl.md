@@ -11,18 +11,18 @@
 
 **Ključne lastnosti:**
 
-*   **Gostujoča Postgres baza podatkov:** [Dokumentacija](https://supabase.com/docs/guides/database)
-*   **Avtentikacija in avtorizacija:** [Dokumentacija](https://supabase.com/docs/guides/auth)
-*   **Samodejno generirani API-ji:**
-    *   REST: [Dokumentacija](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentacija](https://supabase.com/docs/guides/graphql)
-    *   Naročnine v realnem času: [Dokumentacija](https://supabase.com/docs/guides/realtime)
-*   **Funkcije:**
-    *   Funkcije baze podatkov: [Dokumentacija](https://supabase.com/docs/guides/database/functions)
-    *   Edge funkcije (funkcije na robu omrežja): [Dokumentacija](https://supabase.com/docs/guides/functions)
-*   **Shramba datotek:** [Dokumentacija](https://supabase.com/docs/guides/storage)
-* **Orodja za delo z UI, vektorji in embeddingi:** [Dokumentacija](https://supabase.com/docs/guides/ai)
-*   **Nadzorna plošča**
+- [x] **Gostujoča Postgres baza podatkov:** [Dokumentacija](https://supabase.com/docs/guides/database)
+- [x] **Avtentikacija in avtorizacija:** [Dokumentacija](https://supabase.com/docs/guides/auth)
+- [x] **Samodejno generirani API-ji:**
+    - [x] REST: [Dokumentacija](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentacija](https://supabase.com/docs/guides/graphql)
+    - [x] Naročnine v realnem času: [Dokumentacija](https://supabase.com/docs/guides/realtime)
+- [x] **Funkcije:**
+    - [x] Funkcije baze podatkov: [Dokumentacija](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge funkcije (funkcije na robu omrežja): [Dokumentacija](https://supabase.com/docs/guides/functions)
+- [x] **Shramba datotek:** [Dokumentacija](https://supabase.com/docs/guides/storage)
+- [x] **Orodja za delo z UI, vektorji in embeddingi:** [Dokumentacija](https://supabase.com/docs/guides/ai)
+- [x] **Nadzorna plošča**
 
 ![Supabase nadzorna plošča](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

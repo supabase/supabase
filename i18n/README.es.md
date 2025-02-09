@@ -11,18 +11,18 @@
 
 **Características principales:**
 
-*   **Base de datos Postgres administrada:** [Documentación](https://supabase.com/docs/guides/database)
-*   **Autenticación y autorización:** [Documentación](https://supabase.com/docs/guides/auth)
-*   **API generadas automáticamente:**
-    *   REST: [Documentación](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Documentación](https://supabase.com/docs/guides/graphql)
-    *   Suscripciones en tiempo real: [Documentación](https://supabase.com/docs/guides/realtime)
-*   **Funciones:**
-    *   Funciones de base de datos: [Documentación](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (funciones en el borde de la red): [Documentación](https://supabase.com/docs/guides/functions)
-*   **Almacenamiento de archivos:** [Documentación](https://supabase.com/docs/guides/storage)
-* **Herramientas de IA, vectores e incrustaciones (embeddings):** [Documentación](https://supabase.com/docs/guides/ai)
-*   **Panel de control**
+- [x] **Base de datos Postgres administrada:** [Documentación](https://supabase.com/docs/guides/database)
+- [x] **Autenticación y autorización:** [Documentación](https://supabase.com/docs/guides/auth)
+- [x] **API generadas automáticamente:**
+    - [x] REST: [Documentación](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Documentación](https://supabase.com/docs/guides/graphql)
+    - [x] Suscripciones en tiempo real: [Documentación](https://supabase.com/docs/guides/realtime)
+- [x] **Funciones:**
+    - [x] Funciones de base de datos: [Documentación](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (funciones en el borde de la red): [Documentación](https://supabase.com/docs/guides/functions)
+- [x] **Almacenamiento de archivos:** [Documentación](https://supabase.com/docs/guides/storage)
+- [x] **Herramientas de IA, vectores e incrustaciones (embeddings):** [Documentación](https://supabase.com/docs/guides/ai)
+- [x] **Panel de control**
 
 ![Panel de control de Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

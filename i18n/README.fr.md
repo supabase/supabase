@@ -11,18 +11,18 @@
 
 **Fonctionnalités clés :**
 
-*   **Base de données Postgres gérée :** [Documentation](https://supabase.com/docs/guides/database)
-*   **Authentification et autorisation :** [Documentation](https://supabase.com/docs/guides/auth)
-*   **API générées automatiquement :**
-    *   REST : [Documentation](https://supabase.com/docs/guides/api)
-    *   GraphQL : [Documentation](https://supabase.com/docs/guides/graphql)
-    *   Abonnements en temps réel : [Documentation](https://supabase.com/docs/guides/realtime)
-*   **Fonctions :**
-    *   Fonctions de base de données : [Documentation](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (fonctions à la périphérie du réseau) : [Documentation](https://supabase.com/docs/guides/functions)
-*   **Stockage de fichiers :** [Documentation](https://supabase.com/docs/guides/storage)
-* **Outils d'IA, vecteurs et intégrations (embeddings) :** [Documentation](https://supabase.com/docs/guides/ai)
-*   **Tableau de bord**
+- [x] **Base de données Postgres gérée :** [Documentation](https://supabase.com/docs/guides/database)
+- [x] **Authentification et autorisation :** [Documentation](https://supabase.com/docs/guides/auth)
+- [x] **API générées automatiquement :**
+    - [x] REST : [Documentation](https://supabase.com/docs/guides/api)
+    - [x] GraphQL : [Documentation](https://supabase.com/docs/guides/graphql)
+    - [x] Abonnements en temps réel : [Documentation](https://supabase.com/docs/guides/realtime)
+- [x] **Fonctions :**
+    - [x] Fonctions de base de données : [Documentation](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (fonctions à la périphérie du réseau) : [Documentation](https://supabase.com/docs/guides/functions)
+- [x] **Stockage de fichiers :** [Documentation](https://supabase.com/docs/guides/storage)
+- [x] **Outils d'IA, vecteurs et intégrations (embeddings) :** [Documentation](https://supabase.com/docs/guides/ai)
+- [x] **Tableau de bord**
 
 ![Tableau de bord Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

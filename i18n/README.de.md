@@ -11,18 +11,18 @@
 
 **Hauptmerkmale:**
 
-*   **Verwaltete Postgres-Datenbank:** [Dokumentation](https://supabase.com/docs/guides/database)
-*   **Authentifizierung und Autorisierung:** [Dokumentation](https://supabase.com/docs/guides/auth)
-*   **Automatisch generierte APIs:**
-    *   REST: [Dokumentation](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentation](https://supabase.com/docs/guides/graphql)
-    *   Echtzeit-Abonnements: [Dokumentation](https://supabase.com/docs/guides/realtime)
-*   **Funktionen:**
-    *   Datenbankfunktionen: [Dokumentation](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (Funktionen am Netzwerkrand): [Dokumentation](https://supabase.com/docs/guides/functions)
-*   **Dateispeicher:** [Dokumentation](https://supabase.com/docs/guides/storage)
-* **KI, Vektoren und Einbettungen (Embeddings) Tools:** [Dokumentation](https://supabase.com/docs/guides/ai)
-*   **Dashboard**
+- [x] **Verwaltete Postgres-Datenbank:** [Dokumentation](https://supabase.com/docs/guides/database)
+- [x] **Authentifizierung und Autorisierung:** [Dokumentation](https://supabase.com/docs/guides/auth)
+- [x] **Automatisch generierte APIs:**
+    - [x] REST: [Dokumentation](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentation](https://supabase.com/docs/guides/graphql)
+    - [x] Echtzeit-Abonnements: [Dokumentation](https://supabase.com/docs/guides/realtime)
+- [x] **Funktionen:**
+    - [x] Datenbankfunktionen: [Dokumentation](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (Funktionen am Netzwerkrand): [Dokumentation](https://supabase.com/docs/guides/functions)
+- [x] **Dateispeicher:** [Dokumentation](https://supabase.com/docs/guides/storage)
+- [x] **KI, Vektoren und Einbettungen (Embeddings) Tools:** [Dokumentation](https://supabase.com/docs/guides/ai)
+- [x] **Dashboard**
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

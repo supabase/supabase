@@ -11,18 +11,18 @@
 
 **Fitur Utama:**
 
-*   **Database Postgres Terkelola:** [Dokumentasi](https://supabase.com/docs/guides/database)
-*   **Autentikasi dan Otorisasi:** [Dokumentasi](https://supabase.com/docs/guides/auth)
-*   **API yang Dihasilkan Secara Otomatis:**
-    *   REST: [Dokumentasi](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentasi](https://supabase.com/docs/guides/graphql)
-    *   Langganan *Realtime*: [Dokumentasi](https://supabase.com/docs/guides/realtime)
-*   **Fungsi:**
-    *   Fungsi Database: [Dokumentasi](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (Fungsi di tepi jaringan): [Dokumentasi](https://supabase.com/docs/guides/functions)
-*   **Penyimpanan File:** [Dokumentasi](https://supabase.com/docs/guides/storage)
-* **Tools AI, Vektor, dan Embedding:** [Dokumentasi](https://supabase.com/docs/guides/ai)
-*   **Dasbor**
+- [x] **Database Postgres Terkelola:** [Dokumentasi](https://supabase.com/docs/guides/database)
+- [x] **Autentikasi dan Otorisasi:** [Dokumentasi](https://supabase.com/docs/guides/auth)
+- [x] **API yang Dihasilkan Secara Otomatis:**
+    - [x] REST: [Dokumentasi](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentasi](https://supabase.com/docs/guides/graphql)
+    - [x] Langganan *Realtime*: [Dokumentasi](https://supabase.com/docs/guides/realtime)
+- [x] **Fungsi:**
+    - [x] Fungsi Database: [Dokumentasi](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (Fungsi di tepi jaringan): [Dokumentasi](https://supabase.com/docs/guides/functions)
+- [x] **Penyimpanan File:** [Dokumentasi](https://supabase.com/docs/guides/storage)
+- [x] **Tools AI, Vektor, dan Embedding:** [Dokumentasi](https://supabase.com/docs/guides/ai)
+- [x] **Dasbor**
 
 ![Dasbor Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

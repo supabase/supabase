@@ -11,18 +11,18 @@
 
 **Nøglefunktioner:**
 
-*   **Administreret Postgres-database:** [Dokumentation](https://supabase.com/docs/guides/database)
-*   **Godkendelse og autorisation:** [Dokumentation](https://supabase.com/docs/guides/auth)
-*   **Automatisk genererede API'er:**
-    *   REST: [Dokumentation](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentation](https://supabase.com/docs/guides/graphql)
-    *   Realtidsabonnementer: [Dokumentation](https://supabase.com/docs/guides/realtime)
-*   **Funktioner:**
-    *   Databasefunktioner: [Dokumentation](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (funktioner i udkanten af netværket): [Dokumentation](https://supabase.com/docs/guides/functions)
-*   **Fillagring:** [Dokumentation](https://supabase.com/docs/guides/storage)
-* **AI, vektorer og indlejringer (embeddings) værktøjer:** [Dokumentation](https://supabase.com/docs/guides/ai)
-*   **Dashboard**
+- [x] **Administreret Postgres-database:** [Dokumentation](https://supabase.com/docs/guides/database)
+- [x] **Godkendelse og autorisation:** [Dokumentation](https://supabase.com/docs/guides/auth)
+- [x] **Automatisk genererede API'er:**
+    - [x] REST: [Dokumentation](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentation](https://supabase.com/docs/guides/graphql)
+    - [x] Realtidsabonnementer: [Dokumentation](https://supabase.com/docs/guides/realtime)
+- [x] **Funktioner:**
+    - [x] Databasefunktioner: [Dokumentation](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (funktioner i udkanten af netværket): [Dokumentation](https://supabase.com/docs/guides/functions)
+- [x] **Fillagring:** [Dokumentation](https://supabase.com/docs/guides/storage)
+- [x] **AI, vektorer og indlejringer (embeddings) værktøjer:** [Dokumentation](https://supabase.com/docs/guides/ai)
+- [x] **Dashboard**
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

@@ -11,18 +11,18 @@
 
 **Tärkeimmät ominaisuudet:**
 
-*   **Hallittu Postgres-tietokanta:** [Dokumentaatio](https://supabase.com/docs/guides/database)
-*   **Todennus ja valtuutus:** [Dokumentaatio](https://supabase.com/docs/guides/auth)
-*   **Automaattisesti luodut API:t:**
-    *   REST: [Dokumentaatio](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentaatio](https://supabase.com/docs/guides/graphql)
-    *   Reaaliaikaiset tilaukset: [Dokumentaatio](https://supabase.com/docs/guides/realtime)
-*   **Funktiot:**
-    *   Tietokantafunktiot: [Dokumentaatio](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (reunatoiminnot): [Dokumentaatio](https://supabase.com/docs/guides/functions)
-*   **Tiedostojen tallennustila:** [Dokumentaatio](https://supabase.com/docs/guides/storage)
-* **Tekoäly-, vektori- ja upotus-(embeddings) työkalut:** [Dokumentaatio](https://supabase.com/docs/guides/ai)
-*   **Hallintapaneeli**
+- [x] **Hallittu Postgres-tietokanta:** [Dokumentaatio](https://supabase.com/docs/guides/database)
+- [x] **Todennus ja valtuutus:** [Dokumentaatio](https://supabase.com/docs/guides/auth)
+- [x] **Automaattisesti luodut API:t:**
+    - [x] REST: [Dokumentaatio](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentaatio](https://supabase.com/docs/guides/graphql)
+    - [x] Reaaliaikaiset tilaukset: [Dokumentaatio](https://supabase.com/docs/guides/realtime)
+- [x] **Funktiot:**
+    - [x] Tietokantafunktiot: [Dokumentaatio](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (reunatoiminnot): [Dokumentaatio](https://supabase.com/docs/guides/functions)
+- [x] **Tiedostojen tallennustila:** [Dokumentaatio](https://supabase.com/docs/guides/storage)
+- [x] **Tekoäly-, vektori- ja upotus-(embeddings) työkalut:** [Dokumentaatio](https://supabase.com/docs/guides/ai)
+- [x] **Hallintapaneeli**
 
 ![Supabasen hallintapaneeli](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

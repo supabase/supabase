@@ -11,18 +11,18 @@
 
 **Ciri-ciri Utama:**
 
-*   **Pangkalan Data Postgres Terurus:** [Dokumentasi](https://supabase.com/docs/guides/database)
-*   **Pengesahan dan Kebenaran:** [Dokumentasi](https://supabase.com/docs/guides/auth)
-*   **API Dijana Secara Automatik:**
-    *   REST: [Dokumentasi](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentasi](https://supabase.com/docs/guides/graphql)
-    *   Langganan Masa Nyata: [Dokumentasi](https://supabase.com/docs/guides/realtime)
-*   **Fungsi:**
-    *   Fungsi Pangkalan Data: [Dokumentasi](https://supabase.com/docs/guides/database/functions)
-    *   Fungsi Sempadan (Edge Functions): [Dokumentasi](https://supabase.com/docs/guides/functions)
-*   **Storan Fail:** [Dokumentasi](https://supabase.com/docs/guides/storage)
-* **Alat AI, Vektor dan Pembenaman:** [Dokumentasi](https://supabase.com/docs/guides/ai)
-*   **Papan Pemuka**
+- [x] **Pangkalan Data Postgres Terurus:** [Dokumentasi](https://supabase.com/docs/guides/database)
+- [x] **Pengesahan dan Kebenaran:** [Dokumentasi](https://supabase.com/docs/guides/auth)
+- [x] **API Dijana Secara Automatik:**
+    - [x] REST: [Dokumentasi](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentasi](https://supabase.com/docs/guides/graphql)
+    - [x] Langganan Masa Nyata: [Dokumentasi](https://supabase.com/docs/guides/realtime)
+- [x] **Fungsi:**
+    - [x] Fungsi Pangkalan Data: [Dokumentasi](https://supabase.com/docs/guides/database/functions)
+    - [x] Fungsi Sempadan (Edge Functions): [Dokumentasi](https://supabase.com/docs/guides/functions)
+- [x] **Storan Fail:** [Dokumentasi](https://supabase.com/docs/guides/storage)
+- [x] **Alat AI, Vektor dan Pembenaman:** [Dokumentasi](https://supabase.com/docs/guides/ai)
+- [x] **Papan Pemuka**
 
 ![Papan Pemuka Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

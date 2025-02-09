@@ -11,18 +11,18 @@
 
 **Temel Özellikler:**
 
-*   **Yönetilen Postgres Veritabanı:** [Belgeler](https://supabase.com/docs/guides/database)
-*   **Kimlik Doğrulama ve Yetkilendirme:** [Belgeler](https://supabase.com/docs/guides/auth)
-*   **Otomatik Oluşturulan API'ler:**
-    *   REST: [Belgeler](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Belgeler](https://supabase.com/docs/guides/graphql)
-    *   Gerçek Zamanlı Abonelikler: [Belgeler](https://supabase.com/docs/guides/realtime)
-*   **Fonksiyonlar:**
-    *   Veritabanı Fonksiyonları: [Belgeler](https://supabase.com/docs/guides/database/functions)
-    *   Edge Fonksiyonları (Ağın ucundaki fonksiyonlar): [Belgeler](https://supabase.com/docs/guides/functions)
-*   **Dosya Depolama:** [Belgeler](https://supabase.com/docs/guides/storage)
-* **Yapay Zeka, Vektörler ve Gömme İşlemleri (Embeddings) ile Çalışmak için Araçlar:** [Belgeler](https://supabase.com/docs/guides/ai)
-*   **Kontrol Paneli**
+- [x] **Yönetilen Postgres Veritabanı:** [Belgeler](https://supabase.com/docs/guides/database)
+- [x] **Kimlik Doğrulama ve Yetkilendirme:** [Belgeler](https://supabase.com/docs/guides/auth)
+- [x] **Otomatik Oluşturulan API'ler:**
+    - [x] REST: [Belgeler](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Belgeler](https://supabase.com/docs/guides/graphql)
+    - [x] Gerçek Zamanlı Abonelikler: [Belgeler](https://supabase.com/docs/guides/realtime)
+- [x] **Fonksiyonlar:**
+    - [x] Veritabanı Fonksiyonları: [Belgeler](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Fonksiyonları (Ağın ucundaki fonksiyonlar): [Belgeler](https://supabase.com/docs/guides/functions)
+- [x] **Dosya Depolama:** [Belgeler](https://supabase.com/docs/guides/storage)
+- [x] **Yapay Zeka, Vektörler ve Gömme İşlemleri (Embeddings) ile Çalışmak için Araçlar:** [Belgeler](https://supabase.com/docs/guides/ai)
+- [x] **Kontrol Paneli**
 
 ![Supabase Kontrol Paneli](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

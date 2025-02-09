@@ -11,18 +11,18 @@
 
 **ویژگی‌های کلیدی:**
 
-*   **پایگاه داده Postgres مدیریت شده:** [مستندات](https://supabase.com/docs/guides/database)
-*   **احراز هویت و مجوز:** [مستندات](https://supabase.com/docs/guides/auth)
-*   **APIهای تولید شده خودکار:**
-    *   REST: [مستندات](https://supabase.com/docs/guides/api)
-    *   GraphQL: [مستندات](https://supabase.com/docs/guides/graphql)
-    *   اشتراک‌های بی‌درنگ: [مستندات](https://supabase.com/docs/guides/realtime)
-*   **توابع:**
-    *   توابع پایگاه داده: [مستندات](https://supabase.com/docs/guides/database/functions)
-    *   توابع Edge (توابع در لبه شبکه): [مستندات](https://supabase.com/docs/guides/functions)
-*   **ذخیره‌سازی فایل:** [مستندات](https://supabase.com/docs/guides/storage)
-* **ابزارهای هوش مصنوعی، بردارها و جاسازی‌ها (Embeddings):** [مستندات](https://supabase.com/docs/guides/ai)
-*   **داشبورد**
+- [x] **پایگاه داده Postgres مدیریت شده:** [مستندات](https://supabase.com/docs/guides/database)
+- [x] **احراز هویت و مجوز:** [مستندات](https://supabase.com/docs/guides/auth)
+- [x] **APIهای تولید شده خودکار:**
+    - [x] REST: [مستندات](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [مستندات](https://supabase.com/docs/guides/graphql)
+    - [x] اشتراک‌های بی‌درنگ: [مستندات](https://supabase.com/docs/guides/realtime)
+- [x] **توابع:**
+    - [x] توابع پایگاه داده: [مستندات](https://supabase.com/docs/guides/database/functions)
+    - [x] توابع Edge (توابع در لبه شبکه): [مستندات](https://supabase.com/docs/guides/functions)
+- [x] **ذخیره‌سازی فایل:** [مستندات](https://supabase.com/docs/guides/storage)
+- [x] **ابزارهای هوش مصنوعی، بردارها و جاسازی‌ها (Embeddings):** [مستندات](https://supabase.com/docs/guides/ai)
+- [x] **داشبورد**
 
 ![داشبورد Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

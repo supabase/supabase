@@ -11,18 +11,18 @@
 
 **Các tính năng chính:**
 
-*   **Cơ sở dữ liệu Postgres được quản lý:** [Tài liệu](https://supabase.com/docs/guides/database)
-*   **Xác thực và ủy quyền:** [Tài liệu](https://supabase.com/docs/guides/auth)
-*   **API được tạo tự động:**
-    *   REST: [Tài liệu](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Tài liệu](https://supabase.com/docs/guides/graphql)
-    *   Đăng ký thời gian thực: [Tài liệu](https://supabase.com/docs/guides/realtime)
-*   **Chức năng:**
-    *   Chức năng cơ sở dữ liệu: [Tài liệu](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (chức năng ở biên mạng): [Tài liệu](https://supabase.com/docs/guides/functions)
-*   **Lưu trữ tệp:** [Tài liệu](https://supabase.com/docs/guides/storage)
-* **Công cụ để làm việc với AI, vector và embedding:** [Tài liệu](https://supabase.com/docs/guides/ai)
-*   **Bảng điều khiển**
+- [x] **Cơ sở dữ liệu Postgres được quản lý:** [Tài liệu](https://supabase.com/docs/guides/database)
+- [x] **Xác thực và ủy quyền:** [Tài liệu](https://supabase.com/docs/guides/auth)
+- [x] **API được tạo tự động:**
+    - [x] REST: [Tài liệu](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Tài liệu](https://supabase.com/docs/guides/graphql)
+    - [x] Đăng ký thời gian thực: [Tài liệu](https://supabase.com/docs/guides/realtime)
+- [x] **Chức năng:**
+    - [x] Chức năng cơ sở dữ liệu: [Tài liệu](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (chức năng ở biên mạng): [Tài liệu](https://supabase.com/docs/guides/functions)
+- [x] **Lưu trữ tệp:** [Tài liệu](https://supabase.com/docs/guides/storage)
+- [x] **Công cụ để làm việc với AI, vector và embedding:** [Tài liệu](https://supabase.com/docs/guides/ai)
+- [x] **Bảng điều khiển**
 
 ![Bảng điều khiển Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

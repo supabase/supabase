@@ -11,18 +11,18 @@
 
 **Galvenās funkcijas:**
 
-*   **Pārvaldīta Postgres datubāze:** [Dokumentācija](https://supabase.com/docs/guides/database)
-*   **Autentifikācija un autorizācija:** [Dokumentācija](https://supabase.com/docs/guides/auth)
-*   **Automātiski ģenerētas API:**
-    *   REST: [Dokumentācija](https://supabase.com/docs/guides/api)
-    *   GraphQL: [Dokumentācija](https://supabase.com/docs/guides/graphql)
-    *   Reāllaika abonementi: [Dokumentācija](https://supabase.com/docs/guides/realtime)
-*   **Funkcijas:**
-    *   Datubāzes funkcijas: [Dokumentācija](https://supabase.com/docs/guides/database/functions)
-    *   Edge Functions (funkcijas tīkla malā): [Dokumentācija](https://supabase.com/docs/guides/functions)
-*   **Failu krātuve:** [Dokumentācija](https://supabase.com/docs/guides/storage)
-* **AI, vektoru un iegulšanas rīki:** [Dokumentācija](https://supabase.com/docs/guides/ai)
-*   **Vadības panelis**
+- [x] **Pārvaldīta Postgres datubāze:** [Dokumentācija](https://supabase.com/docs/guides/database)
+- [x] **Autentifikācija un autorizācija:** [Dokumentācija](https://supabase.com/docs/guides/auth)
+- [x] **Automātiski ģenerētas API:**
+    - [x] REST: [Dokumentācija](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Dokumentācija](https://supabase.com/docs/guides/graphql)
+    - [x] Reāllaika abonementi: [Dokumentācija](https://supabase.com/docs/guides/realtime)
+- [x] **Funkcijas:**
+    - [x] Datubāzes funkcijas: [Dokumentācija](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (funkcijas tīkla malā): [Dokumentācija](https://supabase.com/docs/guides/functions)
+- [x] **Failu krātuve:** [Dokumentācija](https://supabase.com/docs/guides/storage)
+- [x] **AI, vektoru un iegulšanas rīki:** [Dokumentācija](https://supabase.com/docs/guides/ai)
+- [x] **Vadības panelis**
 
 ![Supabase vadības panelis](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 

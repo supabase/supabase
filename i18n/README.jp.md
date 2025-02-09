@@ -11,18 +11,18 @@
 
 **主な機能:**
 
-*   **マネージド Postgres データベース:** [ドキュメント](https://supabase.com/docs/guides/database)
-*   **認証と認可:** [ドキュメント](https://supabase.com/docs/guides/auth)
-*   **自動生成 API:**
-    *   REST: [ドキュメント](https://supabase.com/docs/guides/api)
-    *   GraphQL: [ドキュメント](https://supabase.com/docs/guides/graphql)
-    *   リアルタイム サブスクリプション: [ドキュメント](https://supabase.com/docs/guides/realtime)
-*   **関数:**
-    *   データベース関数: [ドキュメント](https://supabase.com/docs/guides/database/functions)
-    *   エッジ関数 (ネットワークのエッジでの関数): [ドキュメント](https://supabase.com/docs/guides/functions)
-*   **ファイル ストレージ:** [ドキュメント](https://supabase.com/docs/guides/storage)
-* **AI、ベクター、埋め込み (embeddings) ツール:** [ドキュメント](https://supabase.com/docs/guides/ai)
-*   **ダッシュボード**
+- [x] **マネージド Postgres データベース:** [ドキュメント](https://supabase.com/docs/guides/database)
+- [x] **認証と認可:** [ドキュメント](https://supabase.com/docs/guides/auth)
+- [x] **自動生成 API:**
+    - [x] REST: [ドキュメント](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [ドキュメント](https://supabase.com/docs/guides/graphql)
+    - [x] リアルタイム サブスクリプション: [ドキュメント](https://supabase.com/docs/guides/realtime)
+- [x] **関数:**
+    - [x] データベース関数: [ドキュメント](https://supabase.com/docs/guides/database/functions)
+    - [x] エッジ関数 (ネットワークのエッジでの関数): [ドキュメント](https://supabase.com/docs/guides/functions)
+- [x] **ファイル ストレージ:** [ドキュメント](https://supabase.com/docs/guides/storage)
+- [x] **AI、ベクター、埋め込み (embeddings) ツール:** [ドキュメント](https://supabase.com/docs/guides/ai)
+- [x] **ダッシュボード**
 
 ![Supabase ダッシュボード](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
