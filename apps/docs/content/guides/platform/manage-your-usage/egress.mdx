@@ -38,8 +38,8 @@ Data pushed to clients via Supabase Realtime for subscribed events.
 ## How charges are calculated
 Egress is charged by byte. Charges apply only for usage exceeding your subscription plan's quota. This quota is called the Unified Egress Quota because it can be used across all services (Database, Auth, Storage etc.).
 
-### Egress usage on your invoice
-Egress usage is shown as "Egress GB" on your invoice.
+### Usage on your invoice
+Usage is shown as "Egress GB" on your invoice.
 
 ## Pricing
 1 GB is $0.09 per month. You are only charged for usage exceeding your subscription plan's quota.
@@ -76,7 +76,7 @@ The organization's Egress usage exceeds the quota by 50 GB, incurring charges fo
 | Compute Credits     |           | -$10      |
 | **Total**           |           | **$29.5** |
 
-## View Egress usage
+## View usage
 ### Usage page
 You can view Egress usage on the [organization's usage page](https://supabase.com/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
 <Image
@@ -110,7 +110,7 @@ In the Total Egress section, you can see the usage for the selected time period.
   zoomable
 />
 
-## Debug Egress usage
+## Debug usage
 To better understand your Egress usage, identify what’s driving the most traffic. Check the most frequent database queries, or analyze the most requested API paths to pinpoint high-bandwidth endpoints.
 
 ### Frequent database queries
@@ -135,7 +135,7 @@ In the [Logs Explorer](https://supabase.com/dashboard/project/_/logs/explorer) y
   zoomable
 />
 
-## Optimize Egress usage
+## Optimize usage
 - Reduce the number of fields or entries selected when querying your database
 - Reduce the number of queries or calls by optimizing client code or using caches
 - For update or insert queries, configure your ORM or queries to not return the entire row if not needed
