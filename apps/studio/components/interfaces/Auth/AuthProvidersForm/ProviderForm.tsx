@@ -177,6 +177,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
       if (payload[x] === '') payload[x] = null
     })
 
+    // The backend uses empty string to represent no required characters in the password
     if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
       payload.PASSWORD_REQUIRED_CHARACTERS = ''
     }
