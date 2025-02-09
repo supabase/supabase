@@ -2175,6 +2175,10 @@ export const platform: NavMenuConstant = {
               name: 'Realtime Peak Connections',
               url: '/guides/platform/manage-your-usage/realtime-peak-connections',
             },
+            {
+              name: 'Advanced MFA Phone',
+              url: '/guides/platform/manage-your-usage/advanced-mfa-phone',
+            },
           ],
         },
         {
