@@ -2147,6 +2147,10 @@ export const platform: NavMenuConstant = {
               name: 'Point-in-Time Recovery',
               url: '/guides/platform/manage-your-usage/point-in-time-recovery',
             },
+            {
+              name: 'Monthly Active Users',
+              url: '/guides/platform/manage-your-usage/monthly-active-users',
+            },
           ],
         },
         {
