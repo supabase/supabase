@@ -6,6 +6,7 @@ import {
   ThirdPartyAuthForm,
 } from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldHeader, ScaffoldContainer, ScaffoldTitle } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
@@ -35,7 +36,10 @@ const PageLayout: NextPageWithLayout = () => {
 }
 
 PageLayout.getLayout = (page) => {
-  return <AuthLayout>{page}</AuthLayout>
+  return (
+    <DefaultLayout>
+      <AuthLayout>{page}</AuthLayout>
+    </DefaultLayout>
+  )
 }
-
 export default PageLayout
