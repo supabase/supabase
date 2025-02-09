@@ -2155,6 +2155,10 @@ export const platform: NavMenuConstant = {
               name: 'Monthly Active SSO Users',
               url: '/guides/platform/manage-your-usage/monthly-active-users-sso',
             },
+            {
+              name: 'Monthly Active Third-Party Users',
+              url: '/guides/platform/manage-your-usage/monthly-active-users-third-party',
+            },
           ],
         },
         {
