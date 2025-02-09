@@ -1,6 +1,13 @@
+<p align="center">
+<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
+</p>
+
+---
+
 # Supabase
 
-**Supabase** হল Firebase এর একটি ওপেন সোর্স বিকল্প। আমরা এন্টারপ্রাইজ-গ্রেড ওপেন সোর্স টুল ব্যবহার করে Firebase এর ফিচার তৈরি করছি।
+[Supabase](https://supabase.com) হল Firebase এর একটি ওপেন সোর্স বিকল্প। আমরা এন্টারপ্রাইজ-গ্রেড ওপেন সোর্স টুল ব্যবহার করে Firebase এর ফিচার তৈরি করছি।
 
 **মূল বৈশিষ্ট্য:**
 
