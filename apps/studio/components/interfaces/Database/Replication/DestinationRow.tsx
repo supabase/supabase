@@ -5,6 +5,8 @@ import { ResponseError } from 'types'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import RowMenu from './RowMenu'
 import PipelineStatus from './PipelineStatus'
+import { useParams } from 'common'
+import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 
 export type Pipeline = ReplicationPipelinesData['pipelines'][0]
 
@@ -27,6 +29,18 @@ const DestinationRow = ({
   isError: isPipelineError,
   isSuccess: isPipelineSuccess,
 }: DestinationRowProps) => {
+  const { ref: projectRef } = useParams()
+  const {
+    data: pipelineStatusData,
+    error: pipelineStatusError,
+    isLoading: isPipelineStatusLoading,
+    isError: isPipelineStatusError,
+    isSuccess: isPipelineStatusSuccess,
+  } = useReplicationPipelineStatusQuery({
+    projectRef,
+    pipelineId: pipeline?.id,
+  })
+
   return (
     <>
       {isPipelineError && (
@@ -42,7 +56,13 @@ const DestinationRow = ({
             {isPipelineLoading || !pipeline ? (
               <ShimmeringLoader></ShimmeringLoader>
             ) : (
-              <PipelineStatus pipeline={pipeline}></PipelineStatus>
+              <PipelineStatus
+                pipelineStatus={pipelineStatusData?.status}
+                error={pipelineStatusError}
+                isLoading={isPipelineStatusLoading}
+                isError={isPipelineStatusError}
+                isSuccess={isPipelineStatusSuccess}
+              ></PipelineStatus>
             )}
           </Table.td>
           <Table.td>
@@ -52,7 +72,17 @@ const DestinationRow = ({
               pipeline.publication_name
             )}
           </Table.td>
-          <Table.td>{pipeline && <RowMenu pipeline_id={pipeline?.id}></RowMenu>}</Table.td>
+          <Table.td>
+            {pipeline && (
+              <RowMenu
+                pipelineStatus={pipelineStatusData?.status}
+                error={pipelineStatusError}
+                isLoading={isPipelineStatusLoading}
+                isError={isPipelineStatusError}
+                isSuccess={isPipelineStatusSuccess}
+              ></RowMenu>
+            )}
+          </Table.td>
         </Table.tr>
       )}
     </>

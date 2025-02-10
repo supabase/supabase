@@ -1,6 +1,4 @@
-import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { Edit, MoreVertical, Pause, Play, Trash } from 'lucide-react'
 import {
   Button,
@@ -10,14 +8,10 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { PipelineStatusProps } from './PipelineStatus'
 
-const RowMenu = ({ pipeline_id }: { pipeline_id: number }) => {
-  const { ref: projectRef } = useParams()
-  const { data, error, isLoading, isError, isSuccess } = useReplicationPipelineStatusQuery({
-    projectRef,
-    pipelineId: pipeline_id,
-  })
-  const pipelineEnabled = data?.status === 'Stopped' ? false : true
+const RowMenu = ({ pipelineStatus, error, isLoading, isError, isSuccess }: PipelineStatusProps) => {
+  const pipelineEnabled = pipelineStatus === 'Stopped' ? false : true
   return (
     <div className="flex justify-end items-center space-x-2">
       {isLoading && <ShimmeringLoader></ShimmeringLoader>}
