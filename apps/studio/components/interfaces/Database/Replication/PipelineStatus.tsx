@@ -3,7 +3,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { cn } from 'ui'
 import { ResponseError } from 'types'
 
-export interface PipelineStatusProps {
+interface PipelineStatusProps {
   pipelineStatus: string | undefined
   error: ResponseError | null
   isLoading: boolean

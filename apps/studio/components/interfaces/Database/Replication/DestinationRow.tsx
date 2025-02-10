@@ -7,6 +7,10 @@ import RowMenu from './RowMenu'
 import PipelineStatus from './PipelineStatus'
 import { useParams } from 'common'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
+import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 
 export type Pipeline = ReplicationPipelinesData['pipelines'][0]
 
@@ -30,16 +34,56 @@ const DestinationRow = ({
   isSuccess: isPipelineSuccess,
 }: DestinationRowProps) => {
   const { ref: projectRef } = useParams()
+  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const {
     data: pipelineStatusData,
     error: pipelineStatusError,
     isLoading: isPipelineStatusLoading,
     isError: isPipelineStatusError,
     isSuccess: isPipelineStatusSuccess,
-  } = useReplicationPipelineStatusQuery({
-    projectRef,
-    pipelineId: pipeline?.id,
+  } = useReplicationPipelineStatusQuery(
+    {
+      projectRef,
+      pipelineId: pipeline?.id,
+    },
+    { refetchInterval }
+  )
+  const [requestStatus, setRequestStatus] = useState<'None' | 'StartRequested' | 'StopRequested'>(
+    'None'
+  )
+  const { mutate: startPipeline } = useStartPipelineMutation({
+    onSuccess: () => {
+      toast.success('Start pipeline request submitted. Pipeline will start shortly')
+    },
   })
+  const { mutate: stopPipeline } = useStopPipelineMutation({
+    onSuccess: () => {
+      toast.success('Stop pipeline request submitted. Pipeline will stop shortly')
+    },
+  })
+  const pipelineStatus = pipelineStatusData?.status
+  if (
+    (requestStatus === 'StartRequested' && pipelineStatus === 'Started') ||
+    (requestStatus === 'StopRequested' && pipelineStatus === 'Stopped')
+  ) {
+    setRefetchInterval(false)
+    setRequestStatus('None')
+  }
+
+  const onEnableClick = () => {
+    if (!projectRef || !pipeline) return
+
+    startPipeline({ projectRef, pipelineId: pipeline.id })
+    setRequestStatus('StartRequested')
+    setRefetchInterval(5000)
+  }
+  const onDisableClick = () => {
+    if (!projectRef || !pipeline) return
+
+    stopPipeline({ projectRef, pipelineId: pipeline.id })
+    setRequestStatus('StopRequested')
+    setRefetchInterval(5000)
+  }
 
   return (
     <>
@@ -80,6 +124,8 @@ const DestinationRow = ({
                 isLoading={isPipelineStatusLoading}
                 isError={isPipelineStatusError}
                 isSuccess={isPipelineStatusSuccess}
+                onEnableClick={onEnableClick}
+                onDisableClick={onDisableClick}
               ></RowMenu>
             )}
           </Table.td>
