@@ -1223,7 +1223,6 @@ export const api: NavMenuConstant = {
         { name: 'Creating API routes', url: '/guides/api/creating-routes' },
         { name: 'How API Keys work', url: '/guides/api/api-keys' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
-        { name: 'Automatic retries', url: '/guides/api/automatic-retries-in-supabase-js' },
       ],
     },
     {
