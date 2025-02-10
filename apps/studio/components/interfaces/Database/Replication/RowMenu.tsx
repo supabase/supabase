@@ -1,5 +1,6 @@
 import AlertError from 'components/ui/AlertError'
 import { Edit, MoreVertical, Pause, Play, Trash } from 'lucide-react'
+import { ResponseError } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -8,9 +9,26 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { PipelineStatusProps } from './PipelineStatus'
 
-const RowMenu = ({ pipelineStatus, error, isLoading, isError, isSuccess }: PipelineStatusProps) => {
+interface RowMenuProps {
+  pipelineStatus: string | undefined
+  error: ResponseError | null
+  isLoading: boolean
+  isError: boolean
+  isSuccess: boolean
+  onEnableClick: () => void
+  onDisableClick: () => void
+}
+
+const RowMenu = ({
+  pipelineStatus,
+  error,
+  isLoading,
+  isError,
+  isSuccess,
+  onEnableClick,
+  onDisableClick,
+}: RowMenuProps) => {
   const pipelineEnabled = pipelineStatus === 'Stopped' ? false : true
   return (
     <div className="flex justify-end items-center space-x-2">
@@ -23,12 +41,12 @@ const RowMenu = ({ pipelineStatus, error, isLoading, isError, isSuccess }: Pipel
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end" className="w-32">
             {pipelineEnabled ? (
-              <DropdownMenuItem className="space-x-2">
+              <DropdownMenuItem className="space-x-2" onClick={() => onDisableClick()}>
                 <Pause size={14} />
                 <p>Disable</p>
               </DropdownMenuItem>
             ) : (
-              <DropdownMenuItem className="space-x-2">
+              <DropdownMenuItem className="space-x-2" onClick={() => onEnableClick()}>
                 <Play size={14} />
                 <p>Enable</p>
               </DropdownMenuItem>
