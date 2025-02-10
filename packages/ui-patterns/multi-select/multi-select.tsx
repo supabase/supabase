@@ -1,12 +1,12 @@
 'use client'
 
-import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 import React, { useEffect } from 'react'
+import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
 
-import { VariantProps, cva } from 'class-variance-authority'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
+import { VariantProps, cva } from 'class-variance-authority'
 
-import { Badge, cn, useOnClickOutside } from 'ui'
+import { cn, Badge, useOnClickOutside } from 'ui'
 import {
   Command,
   CommandEmpty,
@@ -30,12 +30,6 @@ interface MultiSelectContextProps {
 }
 
 const MultiSelectContext = React.createContext<MultiSelectContextProps | null>(null)
-
-const commandItemClass = cn(
-  'relative text-foreground-lighter text-left px-2 py-1.5 rounded',
-  'hover:text-foreground hover:!bg-overlay-hover w-full flex items-center space-x-2',
-  'peer-data-[value=true]:bg-overlay-hover peer-data-[value=true]:text-strong'
-)
 
 function useMultiSelect() {
   const context = React.useContext(MultiSelectContext)
@@ -217,7 +211,6 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
         setOpen(true)
-        setInputValue('')
 
         if (IS_INLINE_MODE) {
           event.stopPropagation()
@@ -236,7 +229,6 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
         ref={inputRef}
         onClick={(e) => !isDeleteHovered && handleTriggerClick(e)}
         disabled={disabled}
-        type="button"
         role="combobox"
         className={cn(
           'flex w-full min-w-[200px] min-h-[40px] items-center justify-between rounded-md border',
@@ -265,8 +257,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
                 <div
                   onMouseEnter={() => setIsDeleteHovered(true)}
                   onMouseLeave={() => setIsDeleteHovered(false)}
-                  onClick={(e) => {
-                    e.stopPropagation()
+                  onClick={() => {
                     toggleValue(value)
                     setIsDeleteHovered(false)
                   }}
@@ -428,49 +419,21 @@ MultiSelector.Content = MultiSelectorContent
 
 const MultiSelectorList = React.forwardRef<
   React.ElementRef<typeof CommandList>,
-  React.ComponentPropsWithoutRef<typeof CommandList> & {
-    creatable?: boolean
-  }
->(({ className, children, creatable = false }, ref) => {
-  const { open, inputValue, setInputValue, toggleValue } = useMultiSelect()
-
-  const options = (children as React.ReactNode[]) ?? []
-  const availableOptions = options
-    .filter((x: any) => !!x.props.value)
-    .map((x: any) => x.props.value.toLowerCase())
-  const isOptionExists = availableOptions.some((x) => x === inputValue.toLowerCase())
-
+  React.ComponentPropsWithoutRef<typeof CommandList>
+>(({ className, children }, ref) => {
   return (
     <CommandList
       ref={ref}
       className={cn(
-        'p-2 flex flex-col gap-2 scrollbar-thin scrollbar-track-transparent transition-colors',
-        'scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted',
-        'scrollbar-thumb-rounded-lg w-full max-h-[300px] overflow-y-auto',
+        'p-2 flex flex-col gap-2 scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg w-full',
+        'max-h-[300px] overflow-y-auto',
         className
       )}
     >
       {children}
-      {creatable && inputValue.length > 0 && !isOptionExists ? (
-        <CommandItem
-          role="option"
-          onSelect={() => {
-            open && toggleValue(inputValue)
-            setInputValue('')
-          }}
-          className={commandItemClass}
-        >
-          Create "{inputValue}"
-        </CommandItem>
-      ) : creatable && options.length === 0 ? (
-        <div className="p-2 py-1.5 text-xs text-foreground-lighter font-italic">
-          Type to add a value
-        </div>
-      ) : (
-        <CommandEmpty>
-          <span className="text-foreground-muted">No results found</span>
-        </CommandEmpty>
-      )}
+      <CommandEmpty>
+        <span className="text-foreground-muted">No results found</span>
+      </CommandEmpty>
     </CommandList>
   )
 })
@@ -494,7 +457,15 @@ const MultiSelectorItem = React.forwardRef<
         open && toggleValue(value)
         setInputValue('')
       }}
-      className={cn(commandItemClass, className)}
+      className={cn(
+        'relative',
+        'text-foreground-lighter text-left',
+        'px-2 py-1.5 rounded',
+        'hover:text-foreground hover:!bg-overlay-hover',
+        'w-full flex items-center space-x-2',
+        'peer-data-[value=true]:bg-overlay-hover peer-data-[value=true]:text-strong',
+        className
+      )}
       {...props}
     >
       <div
