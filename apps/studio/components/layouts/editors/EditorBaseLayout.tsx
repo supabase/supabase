@@ -6,7 +6,7 @@ import { ComponentProps, ReactNode } from 'react'
 import { cn } from 'ui'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 import { CollapseButton } from '../Tabs/CollapseButton'
-import { Tabs } from '../Tabs/Tabs'
+import { Tabs } from '../Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
