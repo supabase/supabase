@@ -1,5 +1,6 @@
 import { Megaphone } from 'lucide-react'
 import { forwardRef, PropsWithChildren, ReactNode } from 'react'
+
 import { Badge, Button, cn, Loading } from 'ui'
 
 interface PanelProps {
@@ -111,7 +112,7 @@ const PanelNotice = forwardRef<
               <span className="text-foreground-lighter">{badgeLabel ?? 'Upcoming change'}</span>
             </Badge>
             <Badge
-              variant={'default'}
+              variant="default"
               className="rounded-l-none flex-shrink-0 gap-1.5 bg-opacity-0 bg-surface-400 text-foreground-lighter border-l-0"
             >
               <span className="text-foreground text-xs">{title}</span>
