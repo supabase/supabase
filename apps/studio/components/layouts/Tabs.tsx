@@ -9,7 +9,7 @@ import {
 import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useParams } from 'common'
-import { EntityTypeIcon } from 'components/tabs/entity-type-icon'
+
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -24,8 +24,9 @@ import {
 } from 'state/tabs'
 import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { useSnapshot } from 'valtio'
-import { useEditorType } from '../editors/EditorsLayout.hooks'
-import { CollapseButton } from './CollapseButton'
+import { useEditorType } from './editors/EditorsLayout.hooks'
+import { CollapseButton } from './Tabs/CollapseButton'
+import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 
 /**
  * Individual draggable tab component that handles:
