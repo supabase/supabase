@@ -36,6 +36,7 @@ import {
   Listbox,
   Separator,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -98,7 +99,7 @@ export const ConnectionPooling = () => {
     isLoading,
     isError,
     isSuccess,
-  } = usePoolingConfigurationQuery({ projectRef: projectRef })
+  } = usePoolingConfigurationQuery({ projectRef })
 
   const { data: authConfig } = useAuthConfigQuery({ projectRef })
 
@@ -297,29 +298,32 @@ export const ConnectionPooling = () => {
                         <>
                           {field.value === 'transaction' ? (
                             <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
-                              <Alert_Shadcn_>
-                                <AlertTitle_Shadcn_ className="text-foreground">
-                                  Pool mode will be set to transaction permanently on port 6543
-                                </AlertTitle_Shadcn_>
-                                <AlertDescription_Shadcn_>
-                                  This will take into effect once saved. You can use session mode by
-                                  pointing the pooler connection to use port 5432.
-                                </AlertDescription_Shadcn_>
-                              </Alert_Shadcn_>
+                              <Admonition
+                                type="warning"
+                                title="Pool mode will be set to transaction permanently on port 6543"
+                                description="This will take into effect once saved. If you are using Session mode with port 6543 in your applications, please update to use port 5432 instead before saving."
+                              />
                             </FormDescription_Shadcn_>
                           ) : (
                             <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
-                              <Alert_Shadcn_>
-                                <AlertTitle_Shadcn_ className="text-foreground">
-                                  Set to transaction mode to use both pooling modes concurrently
-                                </AlertTitle_Shadcn_>
-                                <AlertDescription_Shadcn_>
-                                  Session mode can be used concurrently with transaction mode by
+                              {/* [Joshen] Can probably remove this after Feb 28 */}
+                              <Panel.Notice
+                                layout="vertical"
+                                className="border rounded-lg"
+                                title="Deprecating Session Mode on Port 6543"
+                                description="On February 28, 2025, Supavisor is deprecating Session Mode on port 6543. Please update your application/database clients to use port 5432 for Session Mode."
+                                href="https://github.com/orgs/supabase/discussions/32755"
+                                buttonText="Read the announcement"
+                              />
+                              <Admonition
+                                showIcon={false}
+                                type="default"
+                                title="Set to transaction mode to use both pooling modes concurrently"
+                                description="Session mode can be used concurrently with transaction mode by
                                   using 5432 for session and 6543 for transaction. However, by
                                   configuring the pooler mode to session here, you will not be able
-                                  to use transaction mode at the same time.
-                                </AlertDescription_Shadcn_>
-                              </Alert_Shadcn_>
+                                  to use transaction mode at the same time."
+                              />
                             </FormDescription_Shadcn_>
                           )}
                         </>

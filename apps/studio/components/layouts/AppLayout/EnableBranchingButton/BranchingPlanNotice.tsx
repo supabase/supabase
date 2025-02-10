@@ -22,7 +22,7 @@ const BranchingPlanNotice = () => {
       <AlertDescription_Shadcn_>
         <Button size="tiny" type="default" className="mt-4">
           <Link
-            href={`/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`}
+            href={`/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan&source=enableBranchingButton`}
             onClick={() => snap.setShowEnableBranchingModal(false)}
           >
             Upgrade to Pro

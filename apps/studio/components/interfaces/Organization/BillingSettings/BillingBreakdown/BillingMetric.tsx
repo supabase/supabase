@@ -143,7 +143,11 @@ const BillingMetric = ({
           ) : (
             <div>
               <Button type="default" asChild>
-                <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>Upgrade</Link>
+                <Link
+                  href={`/org/${slug}/billing?panel=subscriptionPlan&source=billingBreakdownUsage${metric.anchor}`}
+                >
+                  Upgrade
+                </Link>
               </Button>
             </div>
           )}
