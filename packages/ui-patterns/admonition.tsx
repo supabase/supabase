@@ -96,7 +96,6 @@ export const Admonition = forwardRef<
   ) => {
     const typeMapped = variant ? admonitionToAlertMapping[variant] : admonitionToAlertMapping[type]
 
-    console.log(typeMapped)
 
     return (
       <Alert_Shadcn_
