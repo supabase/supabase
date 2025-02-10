@@ -68,7 +68,6 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
 
   const showAlert = (title: string) => {
     switch (title) {
-      // TODO (KM): Remove after 10th October 2024 when we disable the provider
       case 'Slack (Deprecated)':
         return (
           <Alert_Shadcn_ variant="warning">
@@ -156,12 +155,18 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
     (config as any)['EXTERNAL_LINKEDIN_OIDC_ENABLED']
   const isSlackOIDCEnabled =
     provider.title === 'Slack (OIDC)' && config['EXTERNAL_SLACK_OIDC_ENABLED']
+  const isSlackDeprecated = provider.title === 'Slack (Deprecated)'
+  const isSlackDeprecatedEnabled = isSlackDeprecated && config['EXTERNAL_SLACK_ENABLED']
   const isExternalProviderAndEnabled: boolean =
     config && (config as any)[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
 
   // [Joshen] Doing this check as SAML doesn't follow the same naming structure as the other provider options
   const isActive: boolean =
-    isSAMLEnabled || isExternalProviderAndEnabled || isLinkedInOIDCEnabled || isSlackOIDCEnabled
+    isSAMLEnabled ||
+    isExternalProviderAndEnabled ||
+    isLinkedInOIDCEnabled ||
+    isSlackOIDCEnabled ||
+    isSlackDeprecatedEnabled
   const INITIAL_VALUES = generateInitialValues()
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -194,6 +199,11 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlProvider])
+
+  if (isSlackDeprecated && !isSlackDeprecatedEnabled) {
+    // only show deprecated Slack provider for projects that already have it configured, everyone else must use the new OIDC provider
+    return null
+  }
 
   return (
     <Collapsible
