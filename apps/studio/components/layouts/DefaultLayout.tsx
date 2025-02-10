@@ -1,11 +1,11 @@
+import { useParams } from 'common'
 import { AppBannerWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
-import { PropsWithChildren, ReactNode } from 'react'
+import { PropsWithChildren } from 'react'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
-import NavigationBar from './ProjectLayout/NavigationBar/NavigationBar'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
+import NavigationBar from './ProjectLayout/NavigationBar/NavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
-import { useParams } from 'common'
 
 export interface DefaultLayoutProps {
   title?: string
@@ -28,7 +28,7 @@ const DefaultLayout = ({ children, showProductMenu }: PropsWithChildren<DefaultL
             <AppBannerWrapper />
             <div className="flex-shrink-0">
               <MobileNavigationBar />
-              <LayoutHeader showProductMenu={showProductMenu} />
+              <LayoutHeader hasProductMenu={showProductMenu} />
             </div>
             {/* Main Content Area */}
             <div className="flex flex-1 w-full overflow-y-hidden">

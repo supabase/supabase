@@ -60,11 +60,11 @@ const ProjectLints: NextPageWithLayout = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <FormHeader
+      {/* <FormHeader
         className="py-4 px-6 !mb-0"
         title="Performance Advisor"
         docsUrl="https://supabase.com/docs/guides/database/database-linter"
-      />
+      /> */}
       <LintPageTabs
         activeLints={activeLints}
         isLoading={isLoading}

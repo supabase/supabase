@@ -2,6 +2,7 @@ import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePrevi
 import SQLQuickstarts from 'components/interfaces/SQLEditor/SQLTemplates/SQLQuickstarts'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
@@ -41,10 +42,12 @@ const SqlQuickstarts: NextPageWithLayout = () => {
 }
 
 SqlQuickstarts.getLayout = (page) => (
-  <DefaultLayout>
-    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
-      <SQLEditorLayout>{page}</SQLEditorLayout>
-    </EditorBaseLayout>
+  <DefaultLayout product="SQL editor">
+    <ProjectLayoutWithAuth productMenu={<SQLEditorMenu />} product="SQL Editor">
+      <EditorBaseLayout>
+        <SQLEditorLayout>{page}</SQLEditorLayout>
+      </EditorBaseLayout>
+    </ProjectLayoutWithAuth>
   </DefaultLayout>
 )
 

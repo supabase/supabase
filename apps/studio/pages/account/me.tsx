@@ -2,13 +2,10 @@ import { AccountInformation, AnalyticsSettings } from 'components/interfaces/Acc
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import AccountLayout from 'components/layouts/AccountLayout/account-layout'
+import AccountSettingsLayout from 'components/layouts/AccountLayout/account-settings-layout'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -17,31 +14,25 @@ import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
-  return (
-    <ScaffoldContainer>
-      <ScaffoldHeader>
-        <ScaffoldTitle>User Preferences</ScaffoldTitle>
-        <ScaffoldDescription>
-          Manage your profile, account settings, and preferences for your Supabase experience
-        </ScaffoldDescription>
-      </ScaffoldHeader>
-      <ProfileCard />
-    </ScaffoldContainer>
-  )
+  return <ProfileCard />
 }
 
 User.getLayout = (page) => (
-  <AccountLayout
-    title="Preferences"
-    breadcrumbs={[
-      {
-        key: `supabase-settings`,
-        label: 'Preferences',
-      },
-    ]}
-  >
-    {page}
-  </AccountLayout>
+  <AppLayout>
+    <DefaultLayout headerTitle="Account">
+      <AccountLayout
+        title="Preferences"
+        breadcrumbs={[
+          {
+            key: `supabase-settings`,
+            label: 'Preferences',
+          },
+        ]}
+      >
+        <AccountSettingsLayout>{page}</AccountSettingsLayout>
+      </AccountLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 export default User
@@ -51,7 +42,7 @@ const ProfileCard = () => {
   const { profile, error, isLoading, isError, isSuccess } = useProfile()
 
   return (
-    <article>
+    <article className="max-w-4xl">
       {isLoading && (
         <Panel>
           <div className="p-4">

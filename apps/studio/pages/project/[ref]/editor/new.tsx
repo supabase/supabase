@@ -1,5 +1,6 @@
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import TableEditorMenu from 'components/layouts/TableEditorLayout/TableEditorMenu'
 import { NewTab } from 'components/layouts/Tabs/NewTab'
@@ -10,10 +11,12 @@ const EditorNewPage: NextPageWithLayout = () => {
 }
 
 EditorNewPage.getLayout = (page) => (
-  <DefaultLayout>
-    <EditorBaseLayout productMenu={<TableEditorMenu />} product="Table Editor">
-      <TableEditorLayout>{page}</TableEditorLayout>
-    </EditorBaseLayout>
+  <DefaultLayout hasProductMenu>
+    <ProjectLayoutWithAuth productMenu={<TableEditorMenu />} product="Table Editor">
+      <EditorBaseLayout>
+        <TableEditorLayout>{page}</TableEditorLayout>
+      </EditorBaseLayout>
+    </ProjectLayoutWithAuth>
   </DefaultLayout>
 )
 

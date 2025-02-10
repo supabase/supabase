@@ -86,10 +86,10 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     ref
   ) => {
     const router = useRouter()
-    const [isClient, setIsClient] = useState(false)
     const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
+    const [isClient, setIsClient] = useState(false)
     const { aiAssistantPanel, setAiAssistantPanel, mobileMenuOpen, setMobileMenuOpen } =
       useAppStateSnapshot()
     const { open } = aiAssistantPanel
@@ -102,7 +102,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const sqlEditorTabsEnabled = editor === 'sql' && !flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
     const forceShowProductMenu = tableEditorTabsEnabled && !sqlEditorTabsEnabled
     // end of tabs preview flag logic
-
     const projectName = selectedProject?.name
     const organizationName = selectedOrganization?.name
 
@@ -123,7 +122,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
 
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
-        if (e.metaKey && e.key === 'i' && !e.altKey && !e.shiftKey) {
+        if (e.metaKey && e.code === 'KeyI' && !e.altKey && !e.shiftKey) {
           setAiAssistantPanel({ open: !open })
           e.preventDefault()
           e.stopPropagation()
@@ -277,6 +276,7 @@ const MenuBarWrapper = ({
 }: MenuBarWrapperProps) => {
   const router = useRouter()
   const selectedProject = useSelectedProject()
+
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
   if (!isBlocking) {

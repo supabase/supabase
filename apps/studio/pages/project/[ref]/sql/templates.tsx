@@ -1,6 +1,8 @@
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import SQLTemplates from 'components/interfaces/SQLEditor/SQLTemplates/SQLTemplates'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
@@ -40,9 +42,13 @@ const SqlTemplates: NextPageWithLayout = () => {
 }
 
 SqlTemplates.getLayout = (page) => (
-  <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
-    <SQLEditorLayout>{page}</SQLEditorLayout>
-  </EditorBaseLayout>
+  <DefaultLayout product="SQL editor">
+    <ProjectLayoutWithAuth productMenu={<SQLEditorMenu />} product="SQL Editor">
+      <EditorBaseLayout>
+        <SQLEditorLayout>{page}</SQLEditorLayout>
+      </EditorBaseLayout>
+    </ProjectLayoutWithAuth>
+  </DefaultLayout>
 )
 
 export default SqlTemplates

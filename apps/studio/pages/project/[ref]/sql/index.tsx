@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { NewTab } from 'components/layouts/Tabs/NewTab'
@@ -44,10 +45,12 @@ const TableEditorPage: NextPageWithLayout = () => {
 }
 
 TableEditorPage.getLayout = (page) => (
-  <DefaultLayout>
-    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
-      <SQLEditorLayout>{page}</SQLEditorLayout>
-    </EditorBaseLayout>
+  <DefaultLayout product="SQL Editor">
+    <ProjectLayoutWithAuth productMenu={<SQLEditorMenu />} product="SQL Editor">
+      <EditorBaseLayout>
+        <SQLEditorLayout>{page}</SQLEditorLayout>
+      </EditorBaseLayout>
+    </ProjectLayoutWithAuth>
   </DefaultLayout>
 )
 

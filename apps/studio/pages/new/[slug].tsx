@@ -26,6 +26,8 @@ import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/Proje
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
 import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
@@ -969,6 +971,12 @@ const PageLayout = withAuth(({ children }: PropsWithChildren) => {
   )
 })
 
-Wizard.getLayout = (page) => <PageLayout>{page}</PageLayout>
+Wizard.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="New Project" headerTitle="New project">
+      <PageLayout>{page}</PageLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default Wizard

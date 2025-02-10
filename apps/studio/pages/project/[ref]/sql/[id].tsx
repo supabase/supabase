@@ -1,20 +1,19 @@
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-
 import { useParams } from 'common/hooks/useParams'
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
-
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { useContentIdQuery } from 'data/content/content-id-query'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { addTab, createTabId } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -83,10 +82,12 @@ const SqlEditor: NextPageWithLayout = () => {
 }
 
 SqlEditor.getLayout = (page) => (
-  <DefaultLayout>
-    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
-      <SQLEditorLayout>{page}</SQLEditorLayout>
-    </EditorBaseLayout>
+  <DefaultLayout product="SQL Editor">
+    <ProjectLayoutWithAuth productMenu={<SQLEditorMenu />} product="SQL Editor">
+      <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
+        <SQLEditorLayout>{page}</SQLEditorLayout>
+      </EditorBaseLayout>
+    </ProjectLayoutWithAuth>
   </DefaultLayout>
 )
 

@@ -227,16 +227,21 @@ export const appState = proxy({
     appState.ongoingQueriesPanelOpen = value
   },
 
+  mobileMenuOpen: false,
+  setMobileMenuOpen: (value: boolean) => {
+    appState.mobileMenuOpen = value
+  },
+
+  mobileInnerMenuOpen: false,
+  setMobileInnerMenuOpen: (value: boolean) => {
+    appState.mobileInnerMenuOpen = value
+  },
+
   saveLatestMessage: (message: any) => {
     appState.aiAssistantPanel = {
       ...appState.aiAssistantPanel,
       messages: [...appState.aiAssistantPanel.messages, message],
     }
-  },
-
-  mobileMenuOpen: false,
-  setMobileMenuOpen: (value: boolean) => {
-    appState.mobileMenuOpen = value
   },
 })
 
