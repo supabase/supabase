@@ -43,6 +43,15 @@ We'll start by setting up the infrastructure needed to queue and process embeddi
 
 First, let's enable the required extensions:
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="database-method"
+>
+<TabPanel id="sql" label="SQL">
+
 ```sql
 -- For vector operations
 create extension if not exists vector
@@ -59,15 +68,31 @@ with
   schema extensions;
 
 -- For scheduled processing and retries
-create extension if not exists pg_cron
-with
-  schema extensions;
+-- (pg_cron will create its own schema)
+create extension if not exists pg_cron;
 
 -- For clearing embeddings during updates
 create extension if not exists hstore
 with
   schema extensions;
 ```
+
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+To disable an extension, call `drop extension`.
+
+</TabPanel>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [Extensions](/dashboard/project/_/database/extensions) page in the Dashboard.
+2. Search for and enable the following extensions:
+   - `vector`
+   - `pgmq`
+   - `pg_net`
+   - `pg_cron`
+   - `hstore`
+
+</TabPanel>
+</Tabs>
 
 ### Step 2: Create utility functions
 
