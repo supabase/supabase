@@ -1,9 +1,7 @@
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import SQLQuickstarts from 'components/interfaces/SQLEditor/SQLTemplates/SQLQuickstarts'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
-import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
@@ -44,17 +42,13 @@ const SqlQuickstarts: NextPageWithLayout = () => {
 }
 
 SqlQuickstarts.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="SQL editor">
-      <ProjectLayoutWithAuth productMenu={<SQLEditorMenu />} product="SQL Editor">
-        <EditorBaseLayout>
-          <SQLEditorLayout>
-            <ProjectContextFromParamsProvider>{page}</ProjectContextFromParamsProvider>
-          </SQLEditorLayout>
-        </EditorBaseLayout>
-      </ProjectLayoutWithAuth>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout product="SQL editor">
+    <ProjectLayoutWithAuth productMenu={<SQLEditorMenu />} product="SQL Editor">
+      <EditorBaseLayout>
+        <SQLEditorLayout>{page}</SQLEditorLayout>
+      </EditorBaseLayout>
+    </ProjectLayoutWithAuth>
+  </DefaultLayout>
 )
 
 export default SqlQuickstarts

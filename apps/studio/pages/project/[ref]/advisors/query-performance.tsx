@@ -14,7 +14,6 @@ import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const PRESET_MAP = {
@@ -48,23 +47,21 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
   return (
     <div className="h-full flex flex-col">
-      {/* <FormHeader
+      <FormHeader
         className="py-4 px-6 !mb-0"
         title="Query Performance"
         docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
         actions={<DatabaseSelector />}
-      /> */}
+      />
       <QueryPerformance queryHitRate={queryHitRate} queryPerformanceQuery={queryPerformanceQuery} />
     </div>
   )
 }
 
 QueryPerformanceReport.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Query Performance">
-      <AdvisorsLayout title="Query performance">{page}</AdvisorsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <AdvisorsLayout title="Query performance">{page}</AdvisorsLayout>
+  </DefaultLayout>
 )
 
 export default QueryPerformanceReport

@@ -1,5 +1,4 @@
 import IntegrationSettings from 'components/interfaces/Settings/Integrations/IntegrationsSettings'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
@@ -25,11 +24,8 @@ const OrgIntegrationSettings: NextPageWithLayout = () => {
 }
 
 OrgIntegrationSettings.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Integrations">
-      <SettingsLayout>{page}</SettingsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <SettingsLayout>{page}</SettingsLayout>
+  </DefaultLayout>
 )
-
 export default OrgIntegrationSettings

@@ -105,7 +105,7 @@ export const SchemaGraph = () => {
 
   return (
     <>
-      <div className="border-default flex max-h-12 items-center justify-between border-b px-4 min-h-10 box-content">
+      <div className="flex items-center justify-between p-4 border-b border-muted">
         {isLoadingSchemas && (
           <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
         )}

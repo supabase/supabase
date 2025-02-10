@@ -1,10 +1,9 @@
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
-import { useState } from 'react'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { useState } from 'react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,

@@ -3,15 +3,14 @@ import { useState } from 'react'
 
 import { CreateFunction, DeleteFunction } from 'components/interfaces/Database'
 import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const FunctionsPage: NextPageWithLayout = () => {
   const [selectedFunction, setSelectedFunction] = useState<DatabaseFunction | undefined>()
@@ -72,11 +71,9 @@ const FunctionsPage: NextPageWithLayout = () => {
 }
 
 FunctionsPage.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Functions">
-      <DatabaseLayout title="Database">{page}</DatabaseLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
 )
 
 export default FunctionsPage

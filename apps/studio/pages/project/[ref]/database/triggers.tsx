@@ -9,7 +9,6 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const TriggersPage: NextPageWithLayout = () => {
@@ -72,11 +71,9 @@ const TriggersPage: NextPageWithLayout = () => {
 }
 
 TriggersPage.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Triggers">
-      <DatabaseLayout title="Database">{page}</DatabaseLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
 )
 
 export default TriggersPage

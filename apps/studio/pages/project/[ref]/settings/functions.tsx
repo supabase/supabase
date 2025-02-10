@@ -1,5 +1,4 @@
 import EdgeFunctionSecrets from 'components/interfaces/Functions/EdgeFunctionSecrets/EdgeFunctionSecrets'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
@@ -29,11 +28,9 @@ const PageLayout: NextPageWithLayout = () => {
 }
 
 PageLayout.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Functions">
-      <SettingsLayout title="Settings">{page}</SettingsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <SettingsLayout title="Settings">{page}</SettingsLayout>
+  </DefaultLayout>
 )
 
 export default PageLayout

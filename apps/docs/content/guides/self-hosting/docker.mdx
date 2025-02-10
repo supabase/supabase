@@ -16,7 +16,7 @@ Docker is the easiest way to get started with self-hosted Supabase. It should on
 
 ## Before you begin
 
-You need the following installed in your system: [Git](https://git-scm.com/downloads) and Docker ([Windows](https://docs.docker.com/desktop/install/windows-install/), [MacOS](https://docs.docker.com/desktop/install/mac-install/), or [Linux](https://docs.docker.com/desktop/install/linux-install/)).
+You need the following installed in your system: [Git](https://git-scm.com/downloads) and Docker ([Windows](https://docs.docker.com/desktop/install/windows-install/), [macOS](https://docs.docker.com/desktop/install/mac-install/), or [Linux](https://docs.docker.com/desktop/install/linux-install/)).
 
 ## Installing and running Supabase
 
@@ -72,7 +72,7 @@ docker compose up -d
 </TabPanel>
 </Tabs>
 
-<Admonition>
+<Admonition type="tip">
 
 If you are using rootless docker, edit `.env` and set `DOCKER_SOCKET_LOCATION` to your docker socket location. For example: `/run/user/1000/docker.sock`. Otherwise, you will see an error like `container supabase-vector exited (0)`.
 
@@ -183,7 +183,7 @@ Update the `./docker/.env` file with your own secrets. In particular, these are 
 - `JWT_SECRET`: used by PostgREST and GoTrue, among others.
 - `SITE_URL`: the base URL of your site.
 - `SMTP_*`: mail server credentials. You can use any SMTP server.
-- `POOLER_TENANT_ID`: the tenant-id that will be used by supavisor pooler for your connection string
+- `POOLER_TENANT_ID`: the tenant-id that will be used by Supavisor pooler for your connection string
 
 You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 
@@ -251,7 +251,7 @@ Some suggested systems include:
 - [Key Vault](https://docs.microsoft.com/en-us/azure/key-vault/general/overview) by Azure (Microsoft)
 - [Secrets Manager](https://aws.amazon.com/secrets-manager/) by AWS
 - [Secrets Manager](https://cloud.google.com/secret-manager) by GCP
-- [Vault](https://www.hashicorp.com/products/vault) by Hashicorp
+- [Vault](https://www.hashicorp.com/products/vault) by HashiCorp
 
 ## Advanced
 
@@ -275,9 +275,9 @@ If the tool doesn't exist, we build and open source it ourselves.
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
 - [GoTrue](https://github.com/supabase/gotrue) is an JWT based API for managing users and issuing JWT tokens.
 - [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
-- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
+- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using WebSockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over WebSockets to authorized clients.
 - [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
-- [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
+- [`postgres-meta`](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
 - [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
 - [Supavisor](https://github.com/supabase/supavisor) is a scalable connection pooler for Postgres, allowing for efficient management of database connections.
 

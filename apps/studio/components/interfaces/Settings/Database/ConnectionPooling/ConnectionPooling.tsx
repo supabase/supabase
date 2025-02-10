@@ -13,6 +13,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
@@ -37,6 +38,11 @@ import {
 } from 'ui'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 
 const formId = 'connection-pooling-form'
 
@@ -58,12 +64,21 @@ const FormSchema = z.object({
   default_pool_size: StringToPositiveNumber,
   pool_mode: z.union([z.literal('transaction'), z.literal('session')]),
   max_client_conn: StringToPositiveNumber,
+  DB_MAX_POOL_SIZE: StringToPositiveNumber,
 })
 
 export const ConnectionPooling = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const snap = useDatabaseSettingsStateSnapshot()
+  const organization = useSelectedOrganization()
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
+    orgSlug: organization?.slug,
+  })
+
+  const isTeamsEnterprisePlan =
+    isSuccessSubscription && subscription.plan.id !== 'free' && subscription.plan.id !== 'pro'
+  const promptTeamsEnterpriseUpgrade = IS_PLATFORM && !isTeamsEnterprisePlan
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
@@ -85,6 +100,8 @@ export const ConnectionPooling = () => {
     isSuccess,
   } = usePoolingConfigurationQuery({ projectRef: projectRef })
 
+  const { data: authConfig } = useAuthConfigQuery({ projectRef })
+
   const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -103,12 +120,15 @@ export const ConnectionPooling = () => {
     }
   )
 
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       pool_mode: poolingConfiguration?.pool_mode as 'transaction' | 'session',
       default_pool_size: poolingConfiguration?.default_pool_size as number | undefined,
       max_client_conn: poolingConfiguration?.max_client_conn as number | undefined,
+      DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE ?? null,
     },
   })
 
@@ -120,11 +140,14 @@ export const ConnectionPooling = () => {
             pool_mode: data.pool_mode,
             default_pool_size: data.default_pool_size,
             max_client_conn: poolingConfiguration?.max_client_conn,
+            DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE ?? null,
           })
         }
         toast.success('Successfully saved settings')
       },
     })
+
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -135,6 +158,20 @@ export const ConnectionPooling = () => {
       default_pool_size: data.default_pool_size as number | undefined,
       pool_mode: data.pool_mode,
     })
+
+    if (data.DB_MAX_POOL_SIZE !== authConfig?.DB_MAX_POOL_SIZE) {
+      updateAuthConfig(
+        { projectRef, config: { DB_MAX_POOL_SIZE: data.DB_MAX_POOL_SIZE ?? undefined } },
+        {
+          onError: (error: Error) => {
+            toast.error(`Failed to update auth max direct connections: ${error?.message}`)
+          },
+          onSuccess: () => {
+            toast.success('Successfully updated auth max direct connections')
+          },
+        }
+      )
+    }
   }
 
   useEffect(() => {
@@ -143,9 +180,10 @@ export const ConnectionPooling = () => {
         pool_mode: poolingConfiguration?.pool_mode as 'transaction' | 'session',
         default_pool_size: poolingConfiguration?.default_pool_size as number | undefined,
         max_client_conn: poolingConfiguration?.max_client_conn as number | undefined,
+        DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE ?? null,
       })
     }
-  }, [isSuccess])
+  }, [isSuccess, authConfig])
 
   return (
     <section id="connection-pooler">
@@ -394,6 +432,45 @@ export const ConnectionPooling = () => {
                         to find out more.
                       </FormDescription_Shadcn_>
                       <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                    </FormItem_Shadcn_>
+                  )}
+                />
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="DB_MAX_POOL_SIZE"
+                  render={({ field }) => (
+                    <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                      <FormLabel_Shadcn_ className="col-span-4 text-sm text-foreground-light">
+                        Max Direct Auth Connections
+                      </FormLabel_Shadcn_>
+                      <div className="col-span-8 space-y-2">
+                        {promptTeamsEnterpriseUpgrade && (
+                          <div className="mb-4">
+                            <UpgradeToPro
+                              primaryText="Upgrade to Team or Enterprise"
+                              secondaryText="Max Direct Auth Connections settings are only available on the Team Plan and up."
+                              buttonText="Upgrade to Team"
+                            />
+                          </div>
+                        )}
+                        <FormControl_Shadcn_ className="col-span-8">
+                          <Input_Shadcn_
+                            {...field}
+                            type="number"
+                            className="w-full"
+                            value={field.value || undefined}
+                            placeholder={field.value === null ? '10' : ''}
+                            disabled={!canUpdateConfig || isTeamsEnterprisePlan}
+                          />
+                        </FormControl_Shadcn_>
+                        <FormDescription_Shadcn_>
+                          Auth will take up no more than this number of connections from the total
+                          number of available connections to serve requests. These connections are
+                          not reserved, so when unused they are released. Defaults to 10
+                          connections.
+                        </FormDescription_Shadcn_>
+                        <FormMessage_Shadcn_ />
+                      </div>
                     </FormItem_Shadcn_>
                   )}
                 />

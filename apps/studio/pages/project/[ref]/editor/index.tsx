@@ -1,19 +1,17 @@
 import { useParams } from 'common'
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import EmptyState from 'components/interfaces/TableGridEditor/EmptyState'
 import SidePanelEditor from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
-import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
-import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import TableEditorMenu from 'components/layouts/TableEditorLayout/TableEditorMenu'
-import { NewTab } from 'components/layouts/tabs/new-tab'
+import { NewTab } from 'components/layouts/Tabs/NewTab'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { editorEntityTypes, getTabsStore } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
-import EmptyState from 'components/interfaces/TableGridEditor/EmptyState'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
@@ -51,17 +49,13 @@ const TableEditorPage: NextPageWithLayout = () => {
 }
 
 TableEditorPage.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout hasProductMenu>
-      <ProjectLayoutWithAuth productMenu={<TableEditorMenu />} product="Table Editor">
-        <EditorBaseLayout>
-          <TableEditorLayout>
-            <ProjectContextFromParamsProvider>{page}</ProjectContextFromParamsProvider>
-          </TableEditorLayout>
-        </EditorBaseLayout>
-      </ProjectLayoutWithAuth>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout hasProductMenu>
+    <ProjectLayoutWithAuth productMenu={<TableEditorMenu />} product="Table Editor">
+      <EditorBaseLayout>
+        <TableEditorLayout>{page}</TableEditorLayout>
+      </EditorBaseLayout>
+    </ProjectLayoutWithAuth>
+  </DefaultLayout>
 )
 
 export default TableEditorPage

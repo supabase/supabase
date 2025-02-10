@@ -17,13 +17,12 @@ const ProductMenuBar = ({ title, children }: PropsWithChildren<ProductMenuBarPro
         'border-default ',
       ].join(' ')}
     >
-      {/* <div
+      <div
         className="border-default flex max-h-12 items-center border-b px-6"
         style={{ minHeight: '3rem' }}
       >
-      <div className="border-default flex max-h-12 items-center border-b px-4 min-h-10 box-content">
         <h4 className="text-lg">{title}</h4>
-      </div> */}
+      </div>
       <div className="flex-grow overflow-y-auto">{children}</div>
     </div>
   )

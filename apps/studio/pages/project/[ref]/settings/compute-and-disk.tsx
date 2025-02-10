@@ -1,5 +1,4 @@
 import { DiskManagementForm } from 'components/interfaces/DiskManagement/DiskManagementForm'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
@@ -27,10 +26,8 @@ const AuthSettings: NextPageWithLayout = () => {
 }
 
 AuthSettings.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Compute and Disk">
-      <SettingsLayout>{page}</SettingsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <SettingsLayout>{page}</SettingsLayout>
+  </DefaultLayout>
 )
 export default AuthSettings

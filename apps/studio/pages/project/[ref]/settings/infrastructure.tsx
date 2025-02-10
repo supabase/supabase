@@ -1,6 +1,5 @@
 import InfrastructureActivity from 'components/interfaces/Settings/Infrastructure/InfrastructureActivity'
 import InfrastructureInfo from 'components/interfaces/Settings/Infrastructure/InfrastructureInfo'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
@@ -31,11 +30,9 @@ const ProjectInfrastructure: NextPageWithLayout = () => {
 }
 
 ProjectInfrastructure.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Infrastructure">
-      <SettingsLayout title="Infrastructure">{page}</SettingsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <SettingsLayout title="Infrastructure">{page}</SettingsLayout>
+  </DefaultLayout>
 )
 
 export default ProjectInfrastructure

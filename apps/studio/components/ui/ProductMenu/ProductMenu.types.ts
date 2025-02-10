@@ -21,7 +21,7 @@ export interface ProductMenuGroupItem {
   label?: string
   hasChild?: boolean
   childId?: string
-
   childIcon?: ReactNode
   childItems?: ProductMenuGroupItem[]
+  pages?: string[]
 }

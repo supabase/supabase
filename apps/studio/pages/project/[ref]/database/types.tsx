@@ -2,6 +2,7 @@ import { ExternalLink } from 'lucide-react'
 
 import { EnumeratedTypes } from 'components/interfaces/Database'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import {
   ScaffoldContainer,
   ScaffoldSection,
@@ -12,8 +13,6 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { DocsButton } from 'components/ui/DocsButton'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
   return (
@@ -35,11 +34,9 @@ const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
 }
 
 DatabaseEnumeratedTypes.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Enumerated Types">
-      <DatabaseLayout title="Database">{page}</DatabaseLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
 )
 
 export default DatabaseEnumeratedTypes

@@ -1,7 +1,6 @@
 import BranchManagement from 'components/interfaces/BranchManagement/BranchManagement'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import type { NextPageWithLayout } from 'types'
 
 const BranchManagementPage: NextPageWithLayout = () => {
@@ -9,11 +8,9 @@ const BranchManagementPage: NextPageWithLayout = () => {
 }
 
 BranchManagementPage.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Branches">
-      <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+  </DefaultLayout>
 )
 
 export default BranchManagementPage

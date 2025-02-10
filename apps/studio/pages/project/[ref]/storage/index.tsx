@@ -1,6 +1,5 @@
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import type { NextPageWithLayout } from 'types'
 
 const Storage: NextPageWithLayout = () => {
@@ -8,11 +7,9 @@ const Storage: NextPageWithLayout = () => {
 }
 
 Storage.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Storage">
-      <StorageLayout title="Storage">{page}</StorageLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <StorageLayout title="Storage">{page}</StorageLayout>
+  </DefaultLayout>
 )
 
 export default Storage

@@ -2,13 +2,9 @@ import { useParams } from 'common/hooks'
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
-import {
-  ProjectContextFromParamsProvider,
-  useProjectContext,
-} from 'components/layouts/ProjectLayout/ProjectContext'
+import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import TableEditorMenu from 'components/layouts/TableEditorLayout/TableEditorMenu'
@@ -94,17 +90,13 @@ const TableEditorPage: NextPageWithLayout = () => {
 }
 
 TableEditorPage.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout hasProductMenu product="Table Editor">
-      <ProjectLayoutWithAuth productMenu={<TableEditorMenu />}>
-        <EditorBaseLayout>
-          <TableEditorLayout>
-            <ProjectContextFromParamsProvider>{page}</ProjectContextFromParamsProvider>
-          </TableEditorLayout>
-        </EditorBaseLayout>
-      </ProjectLayoutWithAuth>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout hasProductMenu product="Table Editor">
+    <ProjectLayoutWithAuth productMenu={<TableEditorMenu />}>
+      <EditorBaseLayout>
+        <TableEditorLayout>{page}</TableEditorLayout>
+      </EditorBaseLayout>
+    </ProjectLayoutWithAuth>
+  </DefaultLayout>
 )
 
 export default TableEditorPage

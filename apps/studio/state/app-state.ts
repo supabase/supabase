@@ -71,7 +71,6 @@ const getInitialState = () => {
       showConnectDialog: false,
       ongoingQueriesPanelOpen: false,
       mobileMenuOpen: false,
-      mobileInnerMenuOpen: false,
     }
   }
 
@@ -118,7 +117,6 @@ const getInitialState = () => {
     showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
-    mobileInnerMenuOpen: false,
   }
 }
 

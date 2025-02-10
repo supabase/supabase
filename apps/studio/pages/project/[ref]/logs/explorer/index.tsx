@@ -34,8 +34,6 @@ import LogsQueryPanel, { SourceType } from 'components/interfaces/Settings/Logs/
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { createWarehouseQueryTemplates } from 'components/interfaces/Settings/Logs/Warehouse.utils'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
@@ -55,6 +53,7 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const PLACEHOLDER_WAREHOUSE_QUERY =
   '-- Fetch the last 10 logs in the last 7 days \nselect id, timestamp, event_message from `COLLECTION_NAME` \nwhere timestamp > timestamp_sub(current_timestamp(), interval 7 day) \norder by timestamp desc limit 10'
@@ -470,11 +469,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 }
 
 LogsExplorerPage.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Explorer">
-      <LogsLayout>{page}</LogsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <LogsLayout>{page}</LogsLayout>
+  </DefaultLayout>
 )
 
 export default LogsExplorerPage

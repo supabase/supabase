@@ -1,7 +1,6 @@
 import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -61,11 +60,9 @@ const IntegrationPage: NextPageWithLayout = () => {
 }
 
 IntegrationPage.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Integration">
-      <IntegrationsLayout>{page}</IntegrationsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <IntegrationsLayout>{page}</IntegrationsLayout>
+  </DefaultLayout>
 )
 
 export default IntegrationPage

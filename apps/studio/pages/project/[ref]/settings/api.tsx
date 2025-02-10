@@ -1,5 +1,4 @@
 import ServiceList from 'components/interfaces/Settings/API/ServiceList'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
@@ -21,10 +20,8 @@ const ApiSettings: NextPageWithLayout = () => {
 }
 
 ApiSettings.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="API">
-      <SettingsLayout title="API Settings">{page}</SettingsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <SettingsLayout title="API Settings">{page}</SettingsLayout>
+  </DefaultLayout>
 )
 export default ApiSettings

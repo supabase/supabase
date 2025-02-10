@@ -1,5 +1,4 @@
 import { RolesList } from 'components/interfaces/Database'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -23,11 +22,9 @@ const DatabaseRoles: NextPageWithLayout = () => {
 }
 
 DatabaseRoles.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Roles">
-      <DatabaseLayout title="Database">{page}</DatabaseLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
 )
 
 export default DatabaseRoles

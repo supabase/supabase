@@ -10,8 +10,6 @@ import { IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { LastSignInWrapper } from 'components/interfaces/SignIn/LastSignInWrapper'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -69,17 +67,13 @@ const SignInPage: NextPageWithLayout = () => {
 }
 
 SignInPage.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Sign In">
-      <SignInLayout
-        heading="Welcome back"
-        subheading="Sign in to your account"
-        logoLinkToMarketingSite={true}
-      >
-        {page}
-      </SignInLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <SignInLayout
+    heading="Welcome back"
+    subheading="Sign in to your account"
+    logoLinkToMarketingSite={true}
+  >
+    {page}
+  </SignInLayout>
 )
 
 export default SignInPage

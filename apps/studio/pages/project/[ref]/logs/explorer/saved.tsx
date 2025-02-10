@@ -9,7 +9,6 @@ import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import { useContentQuery } from 'data/content/content-query'
 import type { NextPageWithLayout } from 'types'
 import { Loading } from 'ui'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 
 // [Joshen] This page looks like its not longer in use from a UI POV - double checking and deprecate + add redirects
@@ -68,11 +67,9 @@ export const LogsSavedPage: NextPageWithLayout = () => {
 }
 
 LogsSavedPage.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Saved logs">
-      <LogsLayout>{page}</LogsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <LogsLayout>{page}</LogsLayout>
+  </DefaultLayout>
 )
 
 export default LogsSavedPage

@@ -11,7 +11,6 @@ import { useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const UserReportPage: NextPageWithLayout = () => {
@@ -77,11 +76,9 @@ export const UserReportPage: NextPageWithLayout = () => {
 }
 
 UserReportPage.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Reports">
-      <ReportsLayout>{page}</ReportsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <ReportsLayout>{page}</ReportsLayout>
+  </DefaultLayout>
 )
 
 export default UserReportPage

@@ -29,14 +29,13 @@ import type { Dictionary } from 'types'
 import GridHeaderActions from './GridHeaderActions'
 import { TableGridSkeletonLoader } from './LoadingState'
 import NotFoundState from './NotFoundState'
+import { convertByteaToHex } from './SidePanelEditor/RowEditor/RowEditor.utils'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
 import { makeActiveTabPermanent } from 'state/tabs'
 
 export interface TableGridEditorProps {
-  /** Theme for the editor */
   theme?: 'dark' | 'light'
-
   isLoadingSelectedTable?: boolean
   selectedTable?: Entity
 }
@@ -173,9 +172,13 @@ const TableGridEditor = ({
 
     const identifiers = {} as Dictionary<any>
     isTableLike(selectedTable) &&
-      selectedTable.primary_keys.forEach(
-        (column) => (identifiers[column.name] = previousRow[column.name])
-      )
+      selectedTable.primary_keys.forEach((column) => {
+        const col = selectedTable.columns.find((c) => c.name === column.name)
+        identifiers[column.name] =
+          col?.format === 'bytea'
+            ? convertByteaToHex(previousRow[column.name])
+            : previousRow[column.name]
+      })
 
     const configuration = { identifiers }
     if (Object.keys(identifiers).length === 0) {
@@ -246,12 +249,11 @@ const TableGridEditor = ({
         showCustomChildren={(isViewSelected || isTableSelected) && selectedView === 'definition'}
         customHeader={
           (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
-            <div className="flex items-center space-x-2 px-3">
-              <p className="text-sm text-foreground-light">
-                SQL Definition of{' '}
-                <span className="text-sm text-foreground">{selectedTable.name}</span>{' '}
+            <div className="flex items-center space-x-2">
+              <p>
+                SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
               </p>
-              <p className="text-foreground-lighter text-sm">(Read only)</p>
+              <p className="text-foreground-light text-sm">(Read only)</p>
             </div>
           ) : null
         }

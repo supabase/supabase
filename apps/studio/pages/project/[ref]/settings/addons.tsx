@@ -1,5 +1,4 @@
 import Addons from 'components/interfaces/Settings/Addons/Addons'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
@@ -25,10 +24,8 @@ const ProjectAddons: NextPageWithLayout = () => {
 }
 
 ProjectAddons.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Add ons">
-      <SettingsLayout title="Add ons">{page}</SettingsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <SettingsLayout title="Add ons">{page}</SettingsLayout>
+  </DefaultLayout>
 )
 export default ProjectAddons

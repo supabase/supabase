@@ -1,12 +1,11 @@
+import { useParams } from 'common'
 import { AppBannerWrapper } from 'components/interfaces/App'
-import { AppDefaultNavigation } from 'components/interfaces/app-default-navigation'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { PropsWithChildren } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
-import { SidebarProvider } from 'ui'
-import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
-import MobileViewNav from './ProjectLayout/NavigationBar/MobileViewNav'
+import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
+import NavigationBar from './ProjectLayout/NavigationBar/NavigationBar'
+import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 
 export interface DefaultLayoutProps {
   title?: string
@@ -15,40 +14,32 @@ export interface DefaultLayoutProps {
   hasProductMenu?: boolean
   // Shows header in the top left of the page
   headerTitle?: string
+  showProductMenu?: boolean
 }
 
-const DefaultLayout = ({
-  children,
-  hasProductMenu,
-  product,
-  headerTitle,
-}: PropsWithChildren<DefaultLayoutProps>) => {
-  const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
-
+const DefaultLayout = ({ children, showProductMenu }: PropsWithChildren<DefaultLayoutProps>) => {
+  const { ref } = useParams()
   return (
     <>
-      <AppBannerContextProvider>
-        <SidebarProvider>
+      <ProjectContextProvider projectRef={ref}>
+        <AppBannerContextProvider>
           <div className="flex flex-col h-screen w-screen">
             {/* Top Banner */}
             <AppBannerWrapper />
             <div className="flex-shrink-0">
-              <LayoutHeader hasProductMenu={hasProductMenu} headerTitle={headerTitle} />
-              <MobileViewNav title={product} />
+              <MobileNavigationBar />
+              <LayoutHeader hasProductMenu={showProductMenu} />
             </div>
             {/* Main Content Area */}
             <div className="flex flex-1 w-full overflow-y-hidden">
               {/* Sidebar */}
-              <AppDefaultNavigation />
+              <NavigationBar />
               {/* Main Content */}
               <div className="flex-grow h-full overflow-y-auto">{children}</div>
             </div>
           </div>
-        </SidebarProvider>
-        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-          <span>mobile menu here</span>
-        </MobileSheetNav>
-      </AppBannerContextProvider>
+        </AppBannerContextProvider>
+      </ProjectContextProvider>
     </>
   )
 }

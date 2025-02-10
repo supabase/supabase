@@ -1,4 +1,3 @@
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import type { NextPageWithLayout } from 'types'
@@ -8,11 +7,9 @@ const Settings: NextPageWithLayout = () => {
 }
 
 Settings.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout>
-      <SettingsLayout>{page}</SettingsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <SettingsLayout>{page}</SettingsLayout>
+  </DefaultLayout>
 )
 
 export default Settings

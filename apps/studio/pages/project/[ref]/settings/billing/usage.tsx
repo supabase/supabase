@@ -5,7 +5,6 @@ import { useParams } from 'common'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const ProjectBillingUsage: NextPageWithLayout = () => {
@@ -35,11 +34,9 @@ const ProjectBillingUsage: NextPageWithLayout = () => {
 }
 
 ProjectBillingUsage.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Usage">
-      <SettingsLayout title="Usage">{page}</SettingsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <SettingsLayout title="Usage">{page}</SettingsLayout>
+  </DefaultLayout>
 )
 
 export default ProjectBillingUsage

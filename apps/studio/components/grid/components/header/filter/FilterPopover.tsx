@@ -1,22 +1,21 @@
+import update from 'immutability-helper'
+import { isEqual } from 'lodash'
+import { FilterIcon, Plus } from 'lucide-react'
+import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
+
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from 'components/grid/types'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import update from 'immutability-helper'
-import { isEqual } from 'lodash'
-import { Plus, PlusCircle } from 'lucide-react'
-import { Fragment, KeyboardEvent, useCallback, useMemo, useState } from 'react'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
   PopoverContent_Shadcn_,
   PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  cn,
 } from 'ui'
 import { FilterOperatorOptions } from './Filter.constants'
 import FilterRow from './FilterRow'
-import RuleSetButtonText from '../rules-set-button-text'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface FilterPopoverProps {
   table: SupaTable
@@ -28,18 +27,10 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
   const [open, setOpen] = useState(false)
   const snap = useTableEditorStateSnapshot()
 
-  const btnText = useMemo(() => {
-    return (
-      <RuleSetButtonText
-        rules={filters}
-        type="filter"
-        renderRule={(filter) => {
-          const [column, operator, value] = filter.split(':')
-          return { column, operator, value }
-        }}
-      />
-    )
-  }, [filters])
+  const btnText =
+    (filters || []).length > 0
+      ? `Filtered by ${filters.length} rule${filters.length > 1 ? 's' : ''}`
+      : 'Filter'
 
   const onApplyFilters = (appliedFilters: Filter[]) => {
     snap.setEnforceExactCount(false)
@@ -57,16 +48,10 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
     })
   }
 
-  const hasFilters = (filters || []).length > 0
-
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type={hasFilters ? 'default' : 'dashed'}
-          icon={!hasFilters && <PlusCircle strokeWidth={1.5} />}
-          className={cn('rounded-full', hasFilters && filters.length <= 2 && 'pr-0.5')}
-        >
+        <Button type={(filters || []).length > 0 ? 'link' : 'text'} icon={<FilterIcon />}>
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>

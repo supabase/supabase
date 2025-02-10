@@ -7,13 +7,12 @@ import {
   TerminalInstructions,
 } from 'components/interfaces/Functions'
 import FunctionsLayout from 'components/layouts/FunctionsLayout/FunctionsLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import type { NextPageWithLayout } from 'types'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -85,11 +84,9 @@ const PageLayout: NextPageWithLayout = () => {
 }
 
 PageLayout.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Functions">
-      <FunctionsLayout>{page}</FunctionsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <FunctionsLayout>{page}</FunctionsLayout>
+  </DefaultLayout>
 )
 
 export default PageLayout

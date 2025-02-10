@@ -5,6 +5,10 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Button, SidePanel, Tabs } from 'ui'
 import ActionBar from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
@@ -43,11 +47,8 @@ const SpreadsheetImport = ({
   closePanel,
   updateEditorDirty = noop,
 }: SpreadsheetImportProps) => {
-  useEffect(() => {
-    if (visible && headers.length === 0) {
-      resetSpreadsheetImport()
-    }
-  }, [visible])
+  const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
 
   const [tab, setTab] = useState<'fileUpload' | 'pasteText'>('fileUpload')
   const [input, setInput] = useState<string>('')
@@ -61,6 +62,8 @@ const SpreadsheetImport = ({
   })
   const [errors, setErrors] = useState<any>([])
   const [selectedHeaders, setSelectedHeaders] = useState<string[]>([])
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const selectedTableColumns = (selectedTable?.columns ?? []).map((column) => column.name)
   const incompatibleHeaders = selectedHeaders.filter(
@@ -168,8 +171,16 @@ const SpreadsheetImport = ({
       resolve()
     } else {
       saveContent({ file: uploadedFile, ...spreadsheetData, selectedHeaders, resolve })
+      sendEvent({
+        action: TelemetryActions.IMPORT_DATA_ADDED,
+        groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
     }
   }
+
+  useEffect(() => {
+    if (visible && headers.length === 0) resetSpreadsheetImport()
+  }, [visible])
 
   return (
     <SidePanel

@@ -57,7 +57,7 @@ const MobileHeader = ({
           organizations={organizations}
           onClick={() =>
             sendTelemetryEvent({
-              action: TelemetryActions.PRICING_PLAN_CTA_CLICKED,
+              action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED,
               properties: {
                 plan,
                 showUpgradeText: true,
@@ -74,7 +74,7 @@ const MobileHeader = ({
             href={selectedPlan.href}
             onClick={() =>
               sendTelemetryEvent({
-                action: TelemetryActions.PRICING_PLAN_CTA_CLICKED,
+                action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED,
                 properties: {
                   plan,
                   showUpgradeText: false,
@@ -403,7 +403,7 @@ const PricingComparisonTable = ({
                             organizations={organizations}
                             onClick={() =>
                               sendTelemetryEvent({
-                                action: TelemetryActions.PRICING_PLAN_CTA_CLICKED,
+                                action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED,
                                 properties: {
                                   plan: plan.name,
                                   showUpgradeText: true,
@@ -425,7 +425,7 @@ const PricingComparisonTable = ({
                               href={plan.href}
                               onClick={() =>
                                 sendTelemetryEvent({
-                                  action: TelemetryActions.PRICING_PLAN_CTA_CLICKED,
+                                  action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED,
                                   properties: {
                                     plan: plan.name,
                                     showUpgradeText: false,

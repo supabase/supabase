@@ -5,8 +5,6 @@ import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import type { NextPageWithLayout } from 'types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = router.query
@@ -22,11 +20,9 @@ export const LogPage: NextPageWithLayout = () => {
 }
 
 LogPage.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Edge functions logs">
-      <LogsLayout title="Edge Functions Logs">{page}</LogsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <LogsLayout title="Edge Functions Logs">{page}</LogsLayout>
+  </DefaultLayout>
 )
 
 export default LogPage

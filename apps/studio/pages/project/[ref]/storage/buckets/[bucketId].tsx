@@ -4,11 +4,10 @@ import { find } from 'lodash'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { StorageExplorer } from 'components/to-be-cleaned/Storage'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import type { NextPageWithLayout } from 'types'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ref, bucketId } = useParams()
@@ -21,7 +20,7 @@ const PageLayout: NextPageWithLayout = () => {
   if (!project) return null
 
   return (
-    <div className="storage-container flex flex-grow">
+    <div className="storage-container flex flex-grow p-4">
       {isError && <StorageBucketsError error={error as any} />}
 
       {isSuccess ? (
@@ -40,11 +39,9 @@ const PageLayout: NextPageWithLayout = () => {
 }
 
 PageLayout.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Bucket">
-      <StorageLayout title="Buckets">{page}</StorageLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <StorageLayout title="Buckets">{page}</StorageLayout>
+  </DefaultLayout>
 )
 
 export default PageLayout

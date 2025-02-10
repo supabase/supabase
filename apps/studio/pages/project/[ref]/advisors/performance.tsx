@@ -13,7 +13,6 @@ import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import { LoadingLine } from 'ui'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const ProjectLints: NextPageWithLayout = () => {
@@ -97,11 +96,9 @@ const ProjectLints: NextPageWithLayout = () => {
 }
 
 ProjectLints.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Performance">
-      <AdvisorsLayout title="Linter">{page}</AdvisorsLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <AdvisorsLayout title="Linter">{page}</AdvisorsLayout>
+  </DefaultLayout>
 )
 
 export default ProjectLints

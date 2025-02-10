@@ -17,7 +17,6 @@ import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPe
 import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
@@ -104,11 +103,9 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
 }
 
 DatabaseScheduledBackups.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout product="Database backups">
-      <DatabaseLayout title="Database">{page}</DatabaseLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
 )
 
 export default DatabaseScheduledBackups

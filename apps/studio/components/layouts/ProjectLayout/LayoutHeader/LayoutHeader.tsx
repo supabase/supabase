@@ -64,6 +64,7 @@ const LayoutHeader = ({
   const router = useRouter()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
   const isOrgPage = router.pathname.startsWith('/org/') // Add this check
   const { aiAssistantPanel, setMobileInnerMenuOpen } = useAppStateSnapshot()
