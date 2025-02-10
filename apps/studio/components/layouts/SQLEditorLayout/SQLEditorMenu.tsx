@@ -28,7 +28,7 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
 } from 'ui-patterns/InnerSideMenu'
-import { SqlEditorMenuStaticLinks } from './sql-editor-menu-static-links'
+import { SqlEditorMenuStaticLinks } from './SqlEditorMenuStaticLinks'
 import { SearchList } from './SQLEditorNavV2/SearchList'
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
 
