@@ -2851,6 +2851,86 @@ module.exports = [
   },
   {
     permanent: false,
+    source: '/docs/guides/platform/org-based-billing#how-billing-is-organized',
+    destination: '/docs/guides/platform/billing-on-supabase#organization-based-billing',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#quotas-and-features',
+    destination: '/docs/guides/platform/billing-on-supabase#usage-quota',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#usage-items',
+    destination: '/docs/guides/platform/billing-on-supabase#usage-quota',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours',
+    destination: '/docs/guides/platform/manage-your-usage/compute',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#compute-pricing',
+    destination: '/docs/guides/platform/manage-your-usage/compute#pricing',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#compute-credits',
+    destination: '/docs/guides/platform/manage-your-usage/compute#compute-credits',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#read-replicas',
+    destination: '/docs/guides/platform/manage-your-usage/read-replicas',
+  },
+  {
+    permanent: false,
+    source: '/docs/docs/guides/platform/org-based-billing#project-add-ons',
+    destination: '/docs/guides/platform/manage-your-usage',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#unified-egress',
+    destination: '/docs/guides/platform/manage-your-usage/egress',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#included-egress-quota',
+    destination: '/docs/guides/platform/manage-your-usage/egress#pricing',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#egress-dashboards',
+    destination: '/docs/guides/platform/manage-your-usage/egress#usage-page',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#disk-size',
+    destination: '/docs/guides/platform/manage-your-usage/disk-size',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#free-plan',
+    destination: '/docs/guides/platform/billing-on-supabase#free-plan',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#billing-examples',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#multiple-projects-in-a-free-plan-organization',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#multiple-projects-in-a-pro-plan-organization',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
     source: '/docs/guides/platform/spend-cap',
     destination: '/docs/guides/platform/cost-control#spend-cap',
   },
