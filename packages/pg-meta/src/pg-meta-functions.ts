@@ -93,13 +93,13 @@ export function list({
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
   if (filter) {
-    sql += ` WHERE schema ${filter}`
+    sql += ` where schema ${filter}`
   }
   if (limit) {
-    sql = `${sql} LIMIT ${limit}`
+    sql = `${sql} limit ${limit}`
   }
   if (offset) {
-    sql = `${sql} OFFSET ${offset}`
+    sql = `${sql} offset ${offset}`
   }
 
   return {
