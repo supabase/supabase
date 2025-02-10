@@ -102,7 +102,7 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
       )}
 
       {isSuccess && branches.length > 0 && (
-        <>
+        <div>
           <Link href={`/project/${ref}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
             <span className="text-foreground max-w-32 lg:max-w-none truncate">
               {selectedBranch?.name}
@@ -189,7 +189,7 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
               </PopoverContent_Shadcn_>
             </Popover_Shadcn_>
           </div>
-        </>
+        </div>
       )}
     </>
   )

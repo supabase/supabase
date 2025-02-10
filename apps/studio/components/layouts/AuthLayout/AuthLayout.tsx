@@ -10,8 +10,6 @@ import Link from 'next/link'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateAuthMenu } from './AuthLayout.utils'
-import { ProjectPageNavigation } from './ProjectPageNavigation'
-import { useSearchParams } from 'next/navigation'
 
 export interface AuthLayoutProps {
   title?: string
@@ -28,7 +26,7 @@ const AuthProductMenu = () => {
 
   return (
     <>
-      {/* <ProductMenu page={page} menu={generateAuthMenu(projectRef)} /> */}
+      <ProductMenu page={page} menu={generateAuthMenu(projectRef)} />
       {columnLevelPrivileges && (
         <div className="px-3">
           <Alert_Shadcn_>
@@ -51,15 +49,14 @@ const AuthProductMenu = () => {
 }
 
 const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
-  const { ref } = useParams()
   return (
     <ProjectLayout
       title={title || 'Authentication'}
       product="Authentication"
-      // productMenu={<AuthProductMenu />}
+      productMenu={<AuthProductMenu />}
       isBlocking={false}
     >
-      <ProjectPageNavigation navKey="auth">{children}</ProjectPageNavigation>
+      {children}
     </ProjectLayout>
   )
 }
