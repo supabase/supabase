@@ -90,6 +90,7 @@ const CustomDomainConfig = () => {
                 : 'To configure a custom domain for your project, please enable the add-on'
           }
           addon="customDomain"
+          source="customDomain"
           disabled={customDomainsDisabledDueToQuota}
         />
       ) : (

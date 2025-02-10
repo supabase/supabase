@@ -16,6 +16,7 @@ interface UpgradeToProProps {
   secondaryText: string
   addon?: 'pitr' | 'customDomain' | 'computeInstance'
   buttonText?: string
+  source?: string
   disabled?: boolean
 }
 
@@ -25,6 +26,7 @@ const UpgradeToPro = ({
   secondaryText,
   addon,
   buttonText,
+  source = 'upgrade',
   disabled = false,
 }: UpgradeToProProps) => {
   const project = useSelectedProject()
@@ -80,8 +82,8 @@ const UpgradeToPro = ({
               <Link
                 href={
                   plan === 'free'
-                    ? `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan`
-                    : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}`
+                    ? `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
+                    : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
                 }
               >
                 {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}
