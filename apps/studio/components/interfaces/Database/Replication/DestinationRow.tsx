@@ -48,14 +48,10 @@ const DestinationRow = ({
     },
     { refetchInterval }
   )
-  const [requestStatus, setRequestStatus] = useState<'None' | 'StartRequested' | 'StopRequested'>(
-    'None'
-  )
-  const { mutate: startPipeline } = useStartPipelineMutation({
-    onSuccess: () => {
-      toast.success('Start pipeline request submitted. Pipeline will start shortly')
-    },
-  })
+  const [requestStatus, setRequestStatus] = useState<
+    'None' | 'EnableRequested' | 'DisableRequested'
+  >('None')
+  const { mutate: startPipeline } = useStartPipelineMutation()
   const { mutate: stopPipeline } = useStopPipelineMutation({
     onSuccess: () => {
       toast.success('Stop pipeline request submitted. Pipeline will stop shortly')
@@ -63,8 +59,8 @@ const DestinationRow = ({
   })
   const pipelineStatus = pipelineStatusData?.status
   if (
-    (requestStatus === 'StartRequested' && pipelineStatus === 'Started') ||
-    (requestStatus === 'StopRequested' && pipelineStatus === 'Stopped')
+    (requestStatus === 'EnableRequested' && pipelineStatus === 'Started') ||
+    (requestStatus === 'DisableRequested' && pipelineStatus === 'Stopped')
   ) {
     setRefetchInterval(false)
     setRequestStatus('None')
@@ -74,14 +70,14 @@ const DestinationRow = ({
     if (!projectRef || !pipeline) return
 
     startPipeline({ projectRef, pipelineId: pipeline.id })
-    setRequestStatus('StartRequested')
+    setRequestStatus('EnableRequested')
     setRefetchInterval(5000)
   }
   const onDisableClick = () => {
     if (!projectRef || !pipeline) return
 
     stopPipeline({ projectRef, pipelineId: pipeline.id })
-    setRequestStatus('StopRequested')
+    setRequestStatus('DisableRequested')
     setRefetchInterval(5000)
   }
 
@@ -106,6 +102,7 @@ const DestinationRow = ({
                 isLoading={isPipelineStatusLoading}
                 isError={isPipelineStatusError}
                 isSuccess={isPipelineStatusSuccess}
+                requestStatus={requestStatus}
               ></PipelineStatus>
             )}
           </Table.td>
