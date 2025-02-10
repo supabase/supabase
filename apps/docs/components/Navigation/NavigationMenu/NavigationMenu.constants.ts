@@ -1748,6 +1748,10 @@ export const ai = {
           items: vectorIndexItems,
         },
         {
+          name: 'Automatic embeddings',
+          url: '/guides/ai/automatic-embeddings',
+        },
+        {
           name: 'Engineering for scale',
           url: '/guides/ai/engineering-for-scale',
         },
