@@ -1,4 +1,4 @@
-import { Home, User } from 'icons'
+import { Home } from 'icons'
 import { isUndefined } from 'lodash'
 import { Command, FileText, FlaskConical, Search, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -8,6 +8,7 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ProfileImage } from 'components/ui/ProfileImage'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -16,7 +17,6 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import Image from 'next/image'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   AiIconAnimation,
@@ -59,8 +59,6 @@ export const ICON_STROKE_WIDTH = 1.5
 const NavigationBar = () => {
   const snap = useAppStateSnapshot()
 
-  const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
-
   const [storedAllowNavPanel] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
     true
@@ -79,9 +77,7 @@ const NavigationBar = () => {
           'hide-scrollbar flex flex-col justify-between overflow-y-auto'
         )}
         onMouseEnter={() => allowNavPanelToExpand && snap.setNavigationPanelOpen(true)}
-        onMouseLeave={() => {
-          if (!userDropdownOpen && allowNavPanelToExpand) snap.setNavigationPanelOpen(false)
-        }}
+        onMouseLeave={() => allowNavPanelToExpand && snap.setNavigationPanelOpen(false)}
       >
         <NavContent />
       </nav>
@@ -199,24 +195,11 @@ export const NavContent = () => {
       )}
     >
       <div className="relative w-full h-full flex items-center justify-center">
-        {!!profile?.profileImageUrl && !hasInvalidImg ? (
-          <Image
-            alt={profile.username}
-            src={profile.profileImageUrl}
-            width="24"
-            height="24"
-            className="absolute left-1.5 bg-foreground rounded-full w-6 h-6"
-            onError={() => setHasInvalidImg(true)}
-          />
-        ) : (
-          <figure className="absolute left-1.5 min-h-6 min-w-6 bg-foreground rounded-full flex items-center justify-center">
-            <User
-              size={ICON_SIZE - 2}
-              strokeWidth={ICON_STROKE_WIDTH}
-              className="text-background"
-            />
-          </figure>
-        )}
+        <ProfileImage
+          alt={profile?.username}
+          src={profile?.profileImageUrl}
+          className="absolute left-1.5 w-6 h-6"
+        />
         <span
           className={cn(
             'w-full md:w-[8rem] flex flex-col items-start text-sm truncate',

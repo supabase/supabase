@@ -75,7 +75,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
 
   const value = useMemo(() => {
     const isLoading = isLoadingProfile || isCreatingProfile || isLoadingPermissions
-    const isGHUser = !!profile && profile.auth0_id.startsWith('github')
+    const isGHUser = !!profile && 'auth0_id' in profile && profile?.auth0_id.startsWith('github')
     const profileImageUrl = isGHUser ? getGitHubProfileImgUrl(profile.username) : undefined
 
     return {
