@@ -2088,18 +2088,6 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/manage-your-subscription',
         },
         {
-          name: 'Credits',
-          url: '/guides/platform/credits',
-        },
-        {
-          name: 'Your monthly invoice',
-          url: '/guides/platform/your-monthly-invoice',
-        },
-        {
-          name: 'Control your costs',
-          url: '/guides/platform/cost-control',
-        },
-        {
           name: 'Manage your usage',
           url: '/guides/platform/manage-your-usage',
           items: [
@@ -2108,24 +2096,8 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/manage-your-usage/compute',
             },
             {
-              name: 'Branching',
-              url: '/guides/platform/manage-your-usage/branching',
-            },
-            {
-              name: 'Read Replicas',
-              url: '/guides/platform/manage-your-usage/read-replicas',
-            },
-            {
               name: 'Egress',
               url: '/guides/platform/manage-your-usage/egress',
-            },
-            {
-              name: 'Storage Size',
-              url: '/guides/platform/manage-your-usage/storage-size',
-            },
-            {
-              name: 'Storage Image Transformations',
-              url: '/guides/platform/manage-your-usage/storage-image-transformations',
             },
             {
               name: 'Disk Size',
@@ -2140,32 +2112,28 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/manage-your-usage/disk-iops',
             },
             {
-              name: 'Edge Function Invocations',
-              url: '/guides/platform/manage-your-usage/edge-function-invocations',
-            },
-            {
-              name: 'IPv4',
-              url: '/guides/platform/manage-your-usage/ipv4',
-            },
-            {
-              name: 'Custom Domains',
-              url: '/guides/platform/manage-your-usage/custom-domains',
-            },
-            {
-              name: 'Point-in-Time Recovery',
-              url: '/guides/platform/manage-your-usage/point-in-time-recovery',
-            },
-            {
               name: 'Monthly Active Users',
               url: '/guides/platform/manage-your-usage/monthly-active-users',
+            },
+            {
+              name: 'Monthly Active Third-Party Users',
+              url: '/guides/platform/manage-your-usage/monthly-active-users-third-party',
             },
             {
               name: 'Monthly Active SSO Users',
               url: '/guides/platform/manage-your-usage/monthly-active-users-sso',
             },
             {
-              name: 'Monthly Active Third-Party Users',
-              url: '/guides/platform/manage-your-usage/monthly-active-users-third-party',
+              name: 'Storage Size',
+              url: '/guides/platform/manage-your-usage/storage-size',
+            },
+            {
+              name: 'Storage Image Transformations',
+              url: '/guides/platform/manage-your-usage/storage-image-transformations',
+            },
+            {
+              name: 'Edge Function Invocations',
+              url: '/guides/platform/manage-your-usage/edge-function-invocations',
             },
             {
               name: 'Realtime Messages',
@@ -2176,10 +2144,42 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/manage-your-usage/realtime-peak-connections',
             },
             {
-              name: 'Advanced MFA Phone',
+              name: 'Custom Domains',
+              url: '/guides/platform/manage-your-usage/custom-domains',
+            },
+            {
+              name: 'Point-in-Time Recovery',
+              url: '/guides/platform/manage-your-usage/point-in-time-recovery',
+            },
+            {
+              name: 'IPv4',
+              url: '/guides/platform/manage-your-usage/ipv4',
+            },
+            {
+              name: 'MFA Phone',
               url: '/guides/platform/manage-your-usage/advanced-mfa-phone',
             },
+            {
+              name: 'Read Replicas',
+              url: '/guides/platform/manage-your-usage/read-replicas',
+            },
+            {
+              name: 'Branching',
+              url: '/guides/platform/manage-your-usage/branching',
+            },
           ],
+        },
+        {
+          name: 'Your monthly invoice',
+          url: '/guides/platform/your-monthly-invoice',
+        },
+        {
+          name: 'Control your costs',
+          url: '/guides/platform/cost-control',
+        },
+        {
+          name: 'Credits',
+          url: '/guides/platform/credits',
         },
         {
           name: 'Billing FAQ',
