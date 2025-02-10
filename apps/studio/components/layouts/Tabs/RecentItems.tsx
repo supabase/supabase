@@ -9,7 +9,7 @@ import type { RecentItem } from 'state/recent-items'
 import { getRecentItemsStore } from 'state/recent-items'
 import { editorEntityTypes } from 'state/tabs'
 import { useSnapshot } from 'valtio'
-import { useEditorType } from '../editors/editors-layout.hooks'
+import { useEditorType } from '../editors/EditorsLayout.hooks'
 
 dayjs.extend(relativeTime)
 

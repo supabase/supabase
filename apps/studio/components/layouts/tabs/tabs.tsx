@@ -24,8 +24,8 @@ import {
 } from 'state/tabs'
 import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { useSnapshot } from 'valtio'
-import { useEditorType } from '../editors/editors-layout.hooks'
-import { CollapseButton } from './collapse-button'
+import { useEditorType } from '../editors/EditorsLayout.hooks'
+import { CollapseButton } from './CollapseButton'
 
 /**
  * Individual draggable tab component that handles:

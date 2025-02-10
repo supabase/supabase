@@ -3,7 +3,7 @@ import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePrevi
 import { TableGridEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
+import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import TableEditorMenu from 'components/layouts/TableEditorLayout/TableEditorMenu'

@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useParams } from 'common/hooks/useParams'
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
-import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
+import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'

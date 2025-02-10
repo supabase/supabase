@@ -1,10 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
-import { Table2 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { TelemetryActions } from 'common/telemetry-constants'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
@@ -14,6 +8,11 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { partition } from 'lodash'
+import { Table2 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { toast } from 'sonner'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { getTabsStore } from 'state/tabs'
@@ -26,10 +25,10 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
-import { useEditorType } from '../editors/editors-layout.hooks'
+import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { ActionCard } from './actions-card'
-import { RecentItems } from './recent-items'
+import { ActionCard } from './ActionCard'
+import { RecentItems } from './RecentItems'
 
 export function NewTab() {
   const router = useRouter()

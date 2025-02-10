@@ -5,9 +5,9 @@ import { usePathname } from 'next/navigation'
 import { ComponentProps, ReactNode } from 'react'
 import { cn } from 'ui'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
-import { CollapseButton } from '../tabs/collapse-button'
-import { Tabs } from '../tabs/tabs'
-import { useEditorType } from './editors-layout.hooks'
+import { CollapseButton } from '../Tabs/CollapseButton'
+import { Tabs } from '../Tabs/Tabs'
+import { useEditorType } from './EditorsLayout.hooks'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode
