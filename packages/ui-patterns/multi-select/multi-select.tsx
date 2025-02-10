@@ -236,6 +236,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
         ref={inputRef}
         onClick={(e) => !isDeleteHovered && handleTriggerClick(e)}
         disabled={disabled}
+        type="button"
         role="combobox"
         className={cn(
           'flex w-full min-w-[200px] min-h-[40px] items-center justify-between rounded-md border',
@@ -264,7 +265,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
                 <div
                   onMouseEnter={() => setIsDeleteHovered(true)}
                   onMouseLeave={() => setIsDeleteHovered(false)}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation()
                     toggleValue(value)
                     setIsDeleteHovered(false)
                   }}
