@@ -13,7 +13,7 @@ interface IntroductionProps {
 const Introduction = ({ selectedLang }: IntroductionProps) => {
   const { ref: projectRef } = useParams()
 
-  const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
+  const { data: config, isSuccess } = useProjectPostgrestConfigQuery({ projectRef })
 
   const isPublicSchemaEnabled = config?.db_schema
     .split(',')
@@ -31,7 +31,7 @@ const Introduction = ({ selectedLang }: IntroductionProps) => {
           </p>
         </article>
         <article className="code">
-          {!isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert />}
+          {isSuccess && !isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert />}
         </article>
       </div>
 

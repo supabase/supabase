@@ -15,7 +15,7 @@ export default function Introduction({ selectedLang }: Props) {
   const { ref: projectRef } = useParams()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
+  const { data: config, isSuccess } = useProjectPostgrestConfigQuery({ projectRef })
 
   const protocol = settings?.app_config?.protocol ?? 'https'
   const hostEndpoint = settings?.app_config?.endpoint
@@ -44,7 +44,7 @@ export default function Introduction({ selectedLang }: Props) {
         </article>
         <article className="code flex flex-col gap-y-2">
           <CodeSnippet selectedLang={selectedLang} snippet={Snippets.init(endpoint)} />
-          {!isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert />}
+          {isSuccess && !isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert />}
         </article>
       </div>
     </>
