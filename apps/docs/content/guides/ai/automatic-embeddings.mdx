@@ -445,20 +445,26 @@ Deno.serve(async (req) => {
     )
   }
 
+  // Log completed and failed jobs for traceability
+  console.log('finished processing jobs:', {
+    completedJobs: completedJobs.length,
+    failedJobs: failedJobs.length,
+  })
+
   return new Response(
     JSON.stringify({
       completedJobs,
       failedJobs,
     }),
     {
-      // 207 Multi-Status (multiple jobs)
-      status: 207,
+      // 200 OK response
+      status: 200,
 
       // Custom headers to report job status
       headers: {
-        'content-type': 'application/json',
-        'x-completed-jobs': completedJobs.length.toString(),
-        'x-failed-jobs': failedJobs.length.toString(),
+        'Content-Type': 'application/json',
+        'X-Completed-Jobs': completedJobs.length.toString(),
+        'X-Failed-Jobs': failedJobs.length.toString(),
       },
     }
   )
@@ -536,7 +542,7 @@ function catchUnload() {
 
 The Edge Function listens for incoming HTTP requests from `pg_net` and processes each embedding job. It is a generic worker that can handle embedding jobs for any table and column. It uses OpenAI's API to generate embeddings and updates the corresponding row in the database. It also deletes the job from the queue once it has been processed.
 
-The function is designed to process multiple jobs independently. If one job fails, it will not affect the processing of other jobs. The function returns a `207 Multi-Status` response with a list of completed and failed jobs. We can use this information to diagnose failed jobs. See [Troubleshooting](#troubleshooting) for more details.
+The function is designed to process multiple jobs independently. If one job fails, it will not affect the processing of other jobs. The function returns a `200 OK` response with a list of completed and failed jobs. We can use this information to diagnose failed jobs. See [Troubleshooting](#troubleshooting) for more details.
 
 You will need to set the `OPENAI_API_KEY` environment variable to authenticate with OpenAI. When running the Edge Function locally, you can add it to a `.env` file:
 
@@ -740,7 +746,7 @@ You should see the updated embedding for the document.
 
 ## Troubleshooting
 
-The `embed` Edge Function processes a batch of embedding jobs and returns a `207 Multi-Status` response with a list of completed and failed jobs in the body. For example:
+The `embed` Edge Function processes a batch of embedding jobs and returns a `200 OK` response with a list of completed and failed jobs in the body. For example:
 
 ```json
 {
@@ -771,9 +777,11 @@ The `embed` Edge Function processes a batch of embedding jobs and returns a `207
 It also returns the number of completed and failed jobs in the response headers. For example:
 
 ```
-x-completed-jobs: 1
-x-failed-jobs: 1
+X-Completed-Jobs: 1
+X-Failed-Jobs: 1
 ```
+
+You can also use the `X-Deno-Execution-Id` header to trace the execution of the Edge Function within the [dashboard](/dashboard/project/_/functions) logs.
 
 Each failed job includes an `error` field with a description of the failure. Reasons for a job failing could include:
 
@@ -790,7 +798,7 @@ select
 from
   net._http_response
 where
-  (headers->>'x-failed-jobs')::int > 0;
+  (headers->>'X-Failed-Jobs')::int > 0;
 ```
 
 ## Conclusion
