@@ -12,20 +12,17 @@ Each database change counts as one message per client that listens to the event.
 **Broadcast**
 Each broadcast message counts as one message sent plus one message per subscribed client that receives it. For example, if you broadcast a message and 4 clients listen to it, it counts as 5 messages—1 sent and 4 received.
 
-**Presence**
-TODO: Ask Data Engineering.
-
 ## How charges are calculated
 Realtime Messages are billed using Package pricing, with each package representing 1 million messages. If your usage falls between two packages, you are billed for the next whole package.
 
 ### Example
 For simplicity, let's assume a package size of 5 and a charge of $2 per package.
 
-| Number Of Messages | Number Of Packages Billed | Costs |
-|--------------------|---------------------------|-------|
-| 4                  | 1                         | $2    |
-| 5                  | 1                         | $2    |
-| 6                  | 2                         | $4    |
+| Messages | Packages Billed | Costs |
+|----------|-----------------|-------|
+| 4        | 1               | $2    |
+| 5        | 1               | $2    |
+| 6        | 2               | $4    |
 
 ### Usage on your invoice
 Usage is shown as "Realtime Messages" on your invoice.
@@ -33,12 +30,12 @@ Usage is shown as "Realtime Messages" on your invoice.
 ## Pricing
 $2.50 per 1 million messages. You are only charged for usage exceeding your subscription plan's quota.
 
-| Plan       | Quota              | Over-Usage          |
-|------------|--------------------|---------------------|
-| Free       | 2 Million messages | -                   |
-| Pro        | 5 Million messages | $2.50 per 1 Million |
-| Team       | 5 Million messages | $2.50 per 1 Million |
-| Enterprise | Custom             | Custom              |
+| Plan       | Quota     | Over-Usage                   |
+|------------|-----------|------------------------------|
+| Free       | 2 million | -                            |
+| Pro        | 5 million | $2.50 per 1 million messages |
+| Team       | 5 million | $2.50 per 1 million messages |
+| Enterprise | Custom    | Custom                       |
 
 ## Billing examples
 ### Within quota
