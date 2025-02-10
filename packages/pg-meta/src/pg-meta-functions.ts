@@ -4,6 +4,30 @@ import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
 import { FUNCTIONS_SQL } from './sql/functions'
 
+export type PGFunction = {
+  id: number
+  schema: string
+  name: string
+  language: string
+  definition: string
+  complete_statement: string
+  args: Array<{
+    mode: 'in' | 'out' | 'inout' | 'variadic' | 'table'
+    name: string
+    type_id: number
+    has_default: boolean
+  }>
+  argument_types: string
+  identity_argument_types: string
+  return_type_id: number
+  return_type: string
+  return_type_relation_id: number | null
+  is_set_returning_function: boolean
+  behavior: 'IMMUTABLE' | 'STABLE' | 'VOLATILE'
+  security_definer: boolean
+  config_params: Record<string, string> | null
+}
+
 export const pgFunctionZod = z.object({
   id: z.number(),
   schema: z.string(),
@@ -34,12 +58,10 @@ export const pgFunctionZod = z.object({
   behavior: z.union([z.literal('IMMUTABLE'), z.literal('STABLE'), z.literal('VOLATILE')]),
   security_definer: z.boolean(),
   config_params: z.union([z.record(z.string(), z.string()), z.null()]),
-})
+}) satisfies z.ZodType<PGFunction>
 
 export const pgFunctionArrayZod = z.array(pgFunctionZod)
 export const pgFunctionOptionalZod = z.optional(pgFunctionZod)
-
-export type PGFunction = z.infer<typeof pgFunctionZod>
 
 export function list({
   includeSystemSchemas = false,
@@ -71,13 +93,13 @@ export function list({
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
   if (filter) {
-    sql += ` where schema ${filter}`
+    sql += ` WHERE schema ${filter}`
   }
   if (limit) {
-    sql = `${sql} limit ${limit}`
+    sql = `${sql} LIMIT ${limit}`
   }
   if (offset) {
-    sql = `${sql} offset ${offset}`
+    sql = `${sql} OFFSET ${offset}`
   }
 
   return {
@@ -86,10 +108,12 @@ export function list({
   }
 }
 
-export function retrieve({ id }: { id: number }): {
+type FunctionsRetrieveReturn = {
   sql: string
   zod: typeof pgFunctionOptionalZod
 }
+
+export function retrieve({ id }: { id: number }): FunctionsRetrieveReturn
 export function retrieve({
   name,
   schema,
@@ -98,10 +122,7 @@ export function retrieve({
   name: string
   schema: string
   args: string[]
-}): {
-  sql: string
-  zod: typeof pgFunctionOptionalZod
-}
+}): FunctionsRetrieveReturn
 export function retrieve({
   id,
   name,
@@ -112,10 +133,7 @@ export function retrieve({
   name?: string
   schema?: string
   args?: string[]
-}): {
-  sql: string
-  zod: typeof pgFunctionOptionalZod
-} {
+}): FunctionsRetrieveReturn {
   if (id) {
     const sql = /* SQL */ `
       with f as (
@@ -212,8 +230,8 @@ function _generateCreateFunctionSql(
       config_params
         ? Object.entries(config_params)
             .map(
-              ([param, value]: string[]) =>
-                `SET ${param} ${value[0] === 'FROM CURRENT' ? 'FROM CURRENT' : 'TO ' + (value === '""' ? "''" : value)}`
+              ([param, value]) =>
+                `SET ${param} ${value === 'FROM CURRENT' ? 'FROM CURRENT' : 'TO ' + (value === '""' ? "''" : value)}`
             )
             .join('\n')
         : ''
