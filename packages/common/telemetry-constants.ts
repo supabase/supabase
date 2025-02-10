@@ -1069,7 +1069,13 @@ export interface StudioPricingPlanCtaClickedEvent {
  */
 export interface StudioPricingSidePanelOpenedEvent {
   action: TelemetryActions.STUDIO_PRICING_SIDE_PANEL_OPENED
-  properties: { currentPlan?: string }
+  properties: {
+    currentPlan?: string
+    /**
+     * Tracks how user landed on the Pricing side panel, e.g. diskManagementPanelDiskSize, backupsRestoreToNewProject
+     */
+    origin?: string
+  }
   groups: { organization: string }
 }
 
