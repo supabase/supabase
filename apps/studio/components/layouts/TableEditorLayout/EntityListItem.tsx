@@ -4,12 +4,11 @@ import {
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import { EntityTypeIcon } from 'components/tabs/entity-type-icon'
+import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
@@ -27,7 +26,6 @@ import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { createTabId, getTabsStore, makeTabPermanent } from 'state/tabs'
 import {
   cn,
   DropdownMenu,
@@ -45,6 +43,7 @@ import {
 } from 'ui'
 import { useSnapshot } from 'valtio'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+
 export interface EntityListItemProps {
   id: number | string
   projectRef: string
@@ -63,19 +62,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
-  // tabs preview flag logic
-  const { flags } = useFeaturePreviewContext()
-  const isTableEditorTabsEnabled = flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
-  const tabId = createTabId(entity.type, {
-    schema: selectedSchema,
-    name: entity.name,
-  })
-  const tabStore = getTabsStore(projectRef)
-  const isPreview = isTableEditorTabsEnabled ? tabStore.previewTabId === tabId : false
-  // end of tabs preview logic
-
-  const tabs = useSnapshot(tabStore)
-  const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
 
@@ -229,20 +215,10 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       aria-label={`View ${entity.name}`}
       className={cn(
         TreeViewItemVariant({
-          isSelected: isActive && !isPreview,
-          isOpened: isOpened && !isPreview,
-          isPreview,
+          isSelected: isActive,
         }),
         'px-4'
       )}
-      onDoubleClick={(e) => {
-        e.preventDefault()
-        const tabId = createTabId(entity.type, {
-          schema: selectedSchema,
-          name: entity.name,
-        })
-        makeTabPermanent(projectRef, tabId)
-      }}
     >
       <>
         {isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
