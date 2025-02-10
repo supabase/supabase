@@ -169,7 +169,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
             links: [
               {
                 name: 'Documentation',
-                url: 'https://supabase.com/docs/guides/platform/org-based-billing#disk-size',
+                url: 'https://supabase.com/docs/guides/platform/manage-your-usage/disk-size',
               },
               {
                 name: 'Disk Management',

@@ -190,7 +190,7 @@ const Usage = () => {
           >
             <DocsButton
               abbrev={false}
-              href="https://supabase.com/docs/guides/platform/org-based-billing"
+              href="https://supabase.com/docs/guides/platform/billing-on-supabase#organization-based-billing"
             />
           </Admonition>
         </ScaffoldContainer>

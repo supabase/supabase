@@ -2080,6 +2080,10 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         {
+          name: 'About billing on Supabase',
+          url: '/guides/platform/billing-on-supabase',
+        },
+        {
           name: 'Get set up for billing',
           url: '/guides/platform/get-set-up-for-billing',
         },
