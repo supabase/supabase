@@ -15,7 +15,6 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
 import Image from 'next/image'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -111,7 +110,6 @@ export const NavContent = () => {
   )
   // Don't allow the nav panel to expand in playwright tests
   const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
-  const isGHUser = !!profile && profile.auth0_id.startsWith('github')
 
   const {
     projectAuthAll: authEnabled,
@@ -201,10 +199,10 @@ export const NavContent = () => {
       )}
     >
       <div className="relative w-full h-full flex items-center justify-center">
-        {isGHUser && !hasInvalidImg ? (
+        {!!profile?.profileImageUrl && !hasInvalidImg ? (
           <Image
             alt={profile.username}
-            src={getGitHubProfileImgUrl(profile.username)}
+            src={profile.profileImageUrl}
             width="24"
             height="24"
             className="absolute left-1.5 bg-foreground rounded-full w-6 h-6"
