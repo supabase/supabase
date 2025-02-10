@@ -408,7 +408,9 @@ export const InviteMemberButton = () => {
                       {isSuccessSubscription &&
                         (currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
                           <Button asChild type="default">
-                            <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                            <Link
+                              href={`/org/${slug}/billing?panel=subscriptionPlan&source=inviteMemberSSO`}
+                            >
                               Upgrade to Team
                             </Link>
                           </Button>
