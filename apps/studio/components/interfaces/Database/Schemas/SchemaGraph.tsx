@@ -172,7 +172,7 @@ export const SchemaGraph = () => {
                   deletable: false,
                   style: {
                     stroke: 'hsl(var(--border-stronger))',
-                    strokeWidth: 0.5,
+                    strokeWidth: 1,
                   },
                 }}
                 nodeTypes={nodeTypes}
