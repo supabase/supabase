@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
-import type { PropsWithChildren } from 'react'
+import { useEffect, type PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -12,6 +12,8 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
 import { Code } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { toast } from 'sonner'
 import { Button, cn } from 'ui'
 import FunctionsNav from '../../interfaces/Functions/FunctionsNav'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
@@ -21,12 +23,36 @@ interface FunctionsLayoutProps {
 }
 
 const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutProps>) => {
+  const router = useRouter()
   const { functionSlug, ref } = useParams()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+
   const { data: functions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
-  const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
+  const {
+    data: selectedFunction,
+    error,
+    isError,
+  } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
 
   const canReadFunctions = useCheckPermissions(PermissionAction.FUNCTIONS_READ, '*')
+
+  const name = selectedFunction?.name || ''
+  const hasFunctions = (functions ?? []).length > 0
+  const centered = !hasFunctions
+
+  useEffect(() => {
+    let cancel = false
+
+    if (!!functionSlug && isError && error.code === 404 && !cancel) {
+      toast('Edge function cannot be found in your project')
+      router.push(`/project/${ref}/functions`)
+    }
+
+    return () => {
+      cancel = true
+    }
+  }, [isError])
+
   if (!canReadFunctions) {
     return (
       <ProjectLayout title={title || 'Edge Functions'} product="Edge Functions">
@@ -34,10 +60,6 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
       </ProjectLayout>
     )
   }
-
-  const name = selectedFunction?.name || ''
-  const hasFunctions = (functions ?? []).length > 0
-  const centered = !hasFunctions
 
   return (
     <ProjectLayout isLoading={isLoading} title={title || 'Edge Functions'} product="Edge Functions">
