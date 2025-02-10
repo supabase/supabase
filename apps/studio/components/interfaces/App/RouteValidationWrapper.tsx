@@ -8,7 +8,6 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import useLatest from 'hooks/misc/useLatest'
 import { DEFAULT_HOME, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useFlag } from 'hooks/ui/useFlag'
 
 // Ideally these could all be within a _middleware when we use Next 12
 const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
@@ -17,8 +16,6 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   const isLoggedIn = useIsLoggedIn()
   const snap = useAppStateSnapshot()
-
-  const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewTabsSqlEditor')
 
   /**
    * Array of urls/routes that should be ignored
@@ -113,14 +110,12 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   }, [ref, projectsInitialized])
 
   useEffect(() => {
-    if (!isFeaturePreviewTabsSqlEditorFlag) {
-      if (ref !== undefined && id !== undefined) {
-        if (router.pathname.endsWith('/sql/[id]') && id !== 'new') {
-          snap.setDashboardHistory(ref, 'sql', id)
-        }
-        if (router.pathname.endsWith('/editor/[id]')) {
-          snap.setDashboardHistory(ref, 'editor', id)
-        }
+    if (ref !== undefined && id !== undefined) {
+      if (router.pathname.endsWith('/sql/[id]') && id !== 'new') {
+        snap.setDashboardHistory(ref, 'sql', id)
+      }
+      if (router.pathname.endsWith('/editor/[id]')) {
+        snap.setDashboardHistory(ref, 'editor', id)
       }
     }
   }, [ref, id])
