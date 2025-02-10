@@ -37,14 +37,14 @@ const BlogListItem = ({ post }: Props) => {
       </div>
       <div className="lg:col-span-2 xl:col-span-4 flex justify-start items-center lg:grid grid-cols-2 xl:grid-cols-3 gap-2 text-sm">
         <div className="hidden lg:flex items-center -space-x-2">
-          {author.map((author: any, i: number) => {
+          {author.map((author, i) => {
             return (
               <div className="relative ring-background w-6 h-6 rounded-full ring-2" key={i}>
-                {author.author_image_url && (
+                {author?.author_image_url && (
                   <Image
                     src={author.author_image_url}
                     className="rounded-full object-cover border border-default w-full h-full"
-                    alt={`${author.author} avatar`}
+                    alt={`${author?.author} avatar`}
                     fill
                   />
                 )}
