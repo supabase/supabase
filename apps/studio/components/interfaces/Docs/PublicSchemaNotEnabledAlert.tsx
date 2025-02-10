@@ -12,7 +12,7 @@ const PublicSchemaNotEnabledAlert = () => {
       <p className="!mt-0 !mb-1.5">The public schema for this project is not exposed</p>
       <p className="!mt-0 !mb-1.5 text-foreground-light">
         You will not be able to query tables and views in the public schema via supabase-js or HTTP
-        clients. Configure this behaviour in your project's Data API settings.
+        clients. Configure this behavior in your project's Data API settings.
       </p>
       <Button asChild type="default" className="mt-1">
         <Link
