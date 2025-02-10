@@ -3,10 +3,11 @@ import { useParams } from 'common'
 import { AuthProvidersForm, BasicAuthSettingsForm } from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout'
+import { PageContainer, PageLayout } from 'components/layouts/PageLayout'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
+import { Button } from 'ui'
 
 const ProvidersPage: NextPageWithLayout = () => {
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
@@ -17,10 +18,10 @@ const ProvidersPage: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <PageContainer>
       <BasicAuthSettingsForm />
       <AuthProvidersForm />
-    </div>
+    </PageContainer>
   )
 }
 
@@ -56,10 +57,13 @@ ProvidersPage.getLayout = (page) => {
     <DefaultLayout>
       <AuthLayout>
         <PageLayout
+          // size="full"
+          // isCompact
           title="Sign In / Up"
           subtitle="Configure authentication providers and login methods for your users"
           breadcrumbs={breadcrumbItems}
           navigationItems={navigationItems}
+          primaryActions={<Button>Create provider</Button>}
         >
           {page}
         </PageLayout>

@@ -24,6 +24,7 @@ import {
   WarningIcon,
 } from 'ui'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { SectionHeader } from 'components/layouts/PageLayout'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
 const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
@@ -96,7 +97,7 @@ const BasicAuthSettingsForm = () => {
 
   return (
     <div>
-      <FormHeader title="General" />
+      <SectionHeader title="General" />
 
       <Form
         id={formId}

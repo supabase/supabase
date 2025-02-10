@@ -15,6 +15,7 @@ import {
 import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import ProviderForm from './ProviderForm'
+import { SectionHeader } from 'components/layouts/PageLayout'
 
 const AuthProvidersForm = () => {
   const { ref: projectRef } = useParams()
@@ -28,9 +29,9 @@ const AuthProvidersForm = () => {
 
   return (
     <div>
-      <FormHeader
+      <SectionHeader
         title="Auth Providers"
-        description="Authenticate your users through a suite of providers and login methods"
+        subtitle="Authenticate your users through a suite of providers and login methods"
       />
 
       <div className="-space-y-px">

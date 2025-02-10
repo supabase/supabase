@@ -1,56 +1,100 @@
-import { ReactNode } from 'react'
-import { cn } from 'ui'
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
-import { Breadcrumbs, PageHeader, PageNavigation } from '.'
-import type { BreadcrumbItem, NavigationItem } from '.'
+import React, { ReactNode } from 'react'
+import { cn, NavMenu, NavMenuItem, Button } from 'ui'
+import Link from 'next/link'
+import { PageHeader } from '.'
+import { PAGE_SIZE_CLASSES, type PageSize } from 'ui/src/lib/constants'
+
+export interface NavigationItem {
+  id?: string
+  label: string
+  href?: string
+  onClick?: () => void
+  icon?: ReactNode
+}
 
 interface PageLayoutProps {
   children?: ReactNode
   title?: string
   subtitle?: string
-  headerActions?: ReactNode
-  breadcrumbs?: BreadcrumbItem[]
+  icon?: ReactNode
+  breadcrumbs?: Array<{
+    label: string
+    href?: string
+  }>
+  primaryActions?: ReactNode
+  secondaryActions?: ReactNode
   navigationItems?: NavigationItem[]
-  hideBreadcrumbs?: boolean
-  hideHeader?: boolean
-  hideNavigation?: boolean
   className?: string
+  size?: PageSize
+  isCompact?: boolean
 }
 
 const PageLayout = ({
   children,
   title,
   subtitle,
-  headerActions,
-  breadcrumbs,
-  navigationItems,
-  hideBreadcrumbs = false,
-  hideHeader = false,
-  hideNavigation = false,
+  icon,
+  breadcrumbs = [],
+  primaryActions,
+  secondaryActions,
+  navigationItems = [],
   className,
+  size = 'default',
+  isCompact = false,
 }: PageLayoutProps) => {
   return (
-    <div className={cn('flex flex-col', className)}>
-      {!hideBreadcrumbs && breadcrumbs && breadcrumbs.length > 0 && (
-        <div className="mb-4">
-          <Breadcrumbs items={breadcrumbs} />
-        </div>
-      )}
+    <div className="w-full">
+      <div
+        className={cn(
+          'w-full mx-auto',
+          PAGE_SIZE_CLASSES[size],
+          size === 'full' && (isCompact ? 'px-6 border-b' : 'px-8 border-b'),
+          isCompact ? 'pt-4' : 'pt-12',
+          navigationItems.length === 0 && size === 'full' && (isCompact ? 'pb-4' : 'pb-8'),
+          className
+        )}
+      >
+        {/* Header section */}
+        {(title || subtitle || primaryActions || secondaryActions || breadcrumbs.length > 0) && (
+          <PageHeader
+            title={title}
+            subtitle={subtitle}
+            icon={icon}
+            breadcrumbs={breadcrumbs}
+            primaryActions={primaryActions}
+            secondaryActions={secondaryActions}
+            isCompact={isCompact}
+          />
+        )}
 
-      {!hideHeader && (title || subtitle || headerActions) && (
-        <PageHeader title={title || ''} subtitle={subtitle} actions={headerActions} />
-      )}
+        {/* Navigation section */}
+        {navigationItems.length > 0 && (
+          <NavMenu className={cn('mt-4', size === 'full' && 'border-none')}>
+            {navigationItems.map((item) => (
+              <NavMenuItem key={item.label} active={false}>
+                {item.href ? (
+                  <Link
+                    href={item.href}
+                    className="inline-flex items-center gap-2"
+                    onClick={item.onClick}
+                  >
+                    {item.icon && <span>{item.icon}</span>}
+                    {item.label}
+                  </Link>
+                ) : (
+                  <Button type="link" onClick={item.onClick}>
+                    {item.icon && <span className="mr-2">{item.icon}</span>}
+                    {item.label}
+                  </Button>
+                )}
+              </NavMenuItem>
+            ))}
+          </NavMenu>
+        )}
+      </div>
 
-      {!hideNavigation && navigationItems && navigationItems.length > 0 && (
-        <>
-          <div className="mt-4">
-            <PageNavigation items={navigationItems} />
-          </div>
-          <ScaffoldDivider />
-        </>
-      )}
-
-      <ScaffoldContainer className="my-8">{children}</ScaffoldContainer>
+      {/* Content section */}
+      <main>{children}</main>
     </div>
   )
 }
