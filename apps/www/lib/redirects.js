@@ -2886,7 +2886,7 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/docs/docs/guides/platform/org-based-billing#project-add-ons',
+    source: '/docs/guides/platform/org-based-billing#project-add-ons',
     destination: '/docs/guides/platform/manage-your-usage',
   },
   {
