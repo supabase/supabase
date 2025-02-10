@@ -1,5 +1,5 @@
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
-import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import TableEditorMenu from 'components/layouts/TableEditorLayout/TableEditorMenu'
 import { NewTab } from 'components/layouts/tabs/new-tab'
@@ -10,11 +10,11 @@ const EditorNewPage: NextPageWithLayout = () => {
 }
 
 EditorNewPage.getLayout = (page) => (
-  <ProjectContextFromParamsProvider>
+  <DefaultLayout>
     <EditorBaseLayout productMenu={<TableEditorMenu />} product="Table Editor">
       <TableEditorLayout>{page}</TableEditorLayout>
     </EditorBaseLayout>
-  </ProjectContextFromParamsProvider>
+  </DefaultLayout>
 )
 
 export default EditorNewPage
