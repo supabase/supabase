@@ -38,6 +38,10 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
         query: { ref },
       })
     }
+
+    if (last5chars === '/logs' && !lastLogsPage) {
+      router.push('/logs/explorer')
+    }
   }, [router, lastLogsPage, ref])
 
   if (!canUseLogsExplorer) {
