@@ -107,11 +107,15 @@ export const AIAssistant = ({
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
-  const { data: tables, isLoading: isLoadingTables } = useTablesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema: 'public',
-  })
+  const { data: tables, isLoading: isLoadingTables } = useTablesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: 'public',
+    },
+    { enabled: isApiKeySet }
+  )
+
   const currentTable = tables?.find((t) => t.id.toString() === entityId)
   const currentSchema = searchParams?.get('schema') ?? 'public'
 
@@ -370,7 +374,7 @@ export const AIAssistant = ({
                 ))}
               </div>
             </div>
-          ) : isLoadingTables ? (
+          ) : isLoadingTables && isApiKeySet ? (
             <div className="w-full h-full flex-1 flex flex-col justify-end items-start p-5">
               {/* [Joshen] We could try play around with a custom loader for the assistant here */}
               <GenericSkeletonLoader className="w-4/5" />
