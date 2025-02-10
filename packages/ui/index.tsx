@@ -250,6 +250,7 @@ export * from './src/components/radio-group-card'
 export * from './src/components/TreeView'
 
 export * from './src/components/shadcn/ui/chart'
+export * from './src/components/shadcn/ui/sidebar'
 
 // links
 
