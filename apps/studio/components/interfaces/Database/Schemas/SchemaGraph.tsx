@@ -7,6 +7,7 @@ import 'reactflow/dist/style.css'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
@@ -147,42 +148,58 @@ export const SchemaGraph = () => {
         </div>
       )}
       {isSuccessTables && (
-        <div className="w-full h-full">
-          <ReactFlow
-            defaultNodes={[]}
-            defaultEdges={[]}
-            defaultEdgeOptions={{
-              type: 'smoothstep',
-              animated: true,
-              deletable: false,
-              style: {
-                stroke: 'hsl(var(--border-stronger))',
-                strokeWidth: 0.5,
-              },
-            }}
-            nodeTypes={nodeTypes}
-            fitView
-            minZoom={0.8}
-            maxZoom={1.8}
-            proOptions={{ hideAttribution: true }}
-            onNodeDragStop={() => saveNodePositions()}
-          >
-            <Background
-              gap={16}
-              className="[&>*]:stroke-foreground-muted opacity-[25%]"
-              variant={BackgroundVariant.Dots}
-              color={'inherit'}
-            />
-            <MiniMap
-              pannable
-              zoomable
-              nodeColor={miniMapNodeColor}
-              maskColor={miniMapMaskColor}
-              className="border rounded-md shadow-sm"
-            />
-            <SchemaGraphLegend />
-          </ReactFlow>
-        </div>
+        <>
+          {tables.length === 0 ? (
+            <div className="h-full flex items-center justify-center">
+              <ProductEmptyState
+                title="No tables created yet"
+                ctaButtonLabel="Create a new table"
+                ctaUrl={`/project/${ref}/editor?create=table`}
+              >
+                <p className="text-sm text-foreground-light">
+                  There are no tables found in the schema "{selectedSchema}"
+                </p>
+              </ProductEmptyState>
+            </div>
+          ) : (
+            <div className="w-full h-full">
+              <ReactFlow
+                defaultNodes={[]}
+                defaultEdges={[]}
+                defaultEdgeOptions={{
+                  type: 'smoothstep',
+                  animated: true,
+                  deletable: false,
+                  style: {
+                    stroke: 'hsl(var(--border-stronger))',
+                    strokeWidth: 1,
+                  },
+                }}
+                nodeTypes={nodeTypes}
+                fitView
+                minZoom={0.8}
+                maxZoom={1.8}
+                proOptions={{ hideAttribution: true }}
+                onNodeDragStop={() => saveNodePositions()}
+              >
+                <Background
+                  gap={16}
+                  className="[&>*]:stroke-foreground-muted opacity-[25%]"
+                  variant={BackgroundVariant.Dots}
+                  color={'inherit'}
+                />
+                <MiniMap
+                  pannable
+                  zoomable
+                  nodeColor={miniMapNodeColor}
+                  maskColor={miniMapMaskColor}
+                  className="border rounded-md shadow-sm"
+                />
+                <SchemaGraphLegend />
+              </ReactFlow>
+            </div>
+          )}
+        </>
       )}
     </>
   )
