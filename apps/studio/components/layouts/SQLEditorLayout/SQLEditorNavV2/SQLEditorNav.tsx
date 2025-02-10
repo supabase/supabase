@@ -1,14 +1,10 @@
-import { Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import { EmptyPrivateQueriesPanel } from 'components/layouts/SQLEditorLayout/PrivateSqlSnippetEmpty'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import { useContentCountQuery } from 'data/content/content-count-query'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
@@ -22,6 +18,10 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
+import { Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
   SnippetWithContent,
   useSnippetFolders,
@@ -39,7 +39,6 @@ import {
 } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useSnapshot } from 'valtio'
-import { EmptyPrivateQueriesPanel } from '../private-sql-snippet-empty'
 import SQLEditorLoadingSnippets from './SQLEditorLoadingSnippets'
 import { formatFolderResponseForTreeView, getLastItemIds, ROOT_NODE } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
@@ -571,7 +570,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     isOpened={isOpened && !isPreview}
                     isSelected={isActive}
                     isPreview={isPreview}
-                    element={element}
                     onDoubleClick={(e) => {
                       e.preventDefault()
                       const tabId = createTabId('sql', {
@@ -579,6 +577,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                       })
                       makeTabPermanent(projectRef, tabId)
                     }}
+                    element={element}
                     onSelectDelete={() => {
                       setShowDeleteModal(true)
                       setSelectedSnippets([element.metadata as unknown as Snippet])
@@ -651,10 +650,9 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                 return (
                   <SQLEditorTreeViewItem
                     {...props}
+                    isSelected={isActive}
                     isOpened={isOpened && !isPreview}
                     isPreview={isPreview}
-                    isSelected={isActive}
-                    element={element}
                     onDoubleClick={(e) => {
                       e.preventDefault()
                       const tabId = createTabId('sql', {
@@ -662,6 +660,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                       })
                       makeTabPermanent(projectRef, tabId)
                     }}
+                    element={element}
                     onSelectDelete={() => {
                       setShowDeleteModal(true)
                       setSelectedSnippets([element.metadata as unknown as Snippet])

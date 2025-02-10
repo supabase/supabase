@@ -6925,7 +6925,7 @@ functions:
         isOptional: false
         type: BufferedReader | bytes | FileIO | string | Path
         description: The body of the file to be stored in the bucket.
-      - name: options
+      - name: file_options
         isOptional: false
         type: FileOptions
         subContent:
@@ -6979,7 +6979,7 @@ functions:
         isOptional: false
         type: BufferedReader | bytes | FileIO | string | Path
         description: The body of the file to be stored in the bucket.
-      - name: options
+      - name: file_options
         isOptional: false
         type: FileOptions
         subContent:

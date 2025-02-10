@@ -5,7 +5,7 @@ import { useParams } from 'common/hooks/useParams'
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
 import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
-import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { useContentIdQuery } from 'data/content/content-id-query'
@@ -14,6 +14,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { addTab, createTabId } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -82,11 +83,11 @@ const SqlEditor: NextPageWithLayout = () => {
 }
 
 SqlEditor.getLayout = (page) => (
-  <ProjectContextFromParamsProvider>
+  <DefaultLayout>
     <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
       <SQLEditorLayout>{page}</SQLEditorLayout>
     </EditorBaseLayout>
-  </ProjectContextFromParamsProvider>
+  </DefaultLayout>
 )
 
 export default SqlEditor

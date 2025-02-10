@@ -45,7 +45,6 @@ import {
 } from 'ui'
 import { useSnapshot } from 'valtio'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-
 export interface EntityListItemProps {
   id: number | string
   projectRef: string
@@ -246,11 +245,10 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       }}
     >
       <>
-        {/* <> // there was a px-2 in here because scroll bar was messing up */}
-        {!isPreview && isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
+        {isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
         <Tooltip disableHoverableContent={true}>
-          <TooltipTrigger className="min-w-4" asChild>
-            <EntityTypeIcon type={entity.type} />
+          <TooltipTrigger className="min-w-4">
+            <EntityTypeIcon type={entity.type} isActive={isActive} />
           </TooltipTrigger>
           <TooltipContent side="bottom">{formatTooltipText(entity.type)}</TooltipContent>
         </Tooltip>

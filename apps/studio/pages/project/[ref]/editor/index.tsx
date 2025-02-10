@@ -1,8 +1,9 @@
 import { useParams } from 'common'
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import EmptyState from 'components/interfaces/TableGridEditor/EmptyState'
 import SidePanelEditor from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
-import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import TableEditorMenu from 'components/layouts/TableEditorLayout/TableEditorMenu'
 import { NewTab } from 'components/layouts/tabs/new-tab'
@@ -10,7 +11,6 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { editorEntityTypes, getTabsStore } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
-import EmptyState from 'components/interfaces/TableGridEditor/EmptyState'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
@@ -48,11 +48,11 @@ const TableEditorPage: NextPageWithLayout = () => {
 }
 
 TableEditorPage.getLayout = (page) => (
-  <ProjectContextFromParamsProvider>
+  <DefaultLayout>
     <EditorBaseLayout productMenu={<TableEditorMenu />} product="Table Editor">
       <TableEditorLayout>{page}</TableEditorLayout>
     </EditorBaseLayout>
-  </ProjectContextFromParamsProvider>
+  </DefaultLayout>
 )
 
 export default TableEditorPage

@@ -501,11 +501,19 @@ const nextConfig = {
       },
       {
         source: '/img/:slug*',
-        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
+        headers: [{ key: 'cache-control', value: 'public, max-age=2592000' }],
+      },
+      {
+        source: '/css/fonts.css',
+        headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
       },
       {
         source: '/fonts/:slug*',
-        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
+        headers: [{ key: 'cache-control', value: 'public, max-age=2592000' }],
+      },
+      {
+        source: '/favicon/:slug*',
+        headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
       },
     ]
   },

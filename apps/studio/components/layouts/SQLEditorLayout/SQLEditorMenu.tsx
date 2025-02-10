@@ -153,13 +153,7 @@ export const SQLEditorMenu = () => {
         </div>
 
         {showSearch ? (
-          <SearchList
-            search={debouncedSearch}
-            onSelectSnippet={() => {
-              setSearch('')
-              setShowSearch(false)
-            }}
-          />
+          <SearchList search={debouncedSearch} />
         ) : (
           <>
             <SqlEditorMenuStaticLinks />

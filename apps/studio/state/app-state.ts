@@ -70,6 +70,7 @@ const getInitialState = () => {
       navigationPanelJustClosed: false,
       showConnectDialog: false,
       ongoingQueriesPanelOpen: false,
+      mobileMenuOpen: false,
     }
   }
 
@@ -115,6 +116,7 @@ const getInitialState = () => {
     navigationPanelJustClosed: false,
     showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
+    mobileMenuOpen: false,
   }
 }
 
@@ -230,6 +232,11 @@ export const appState = proxy({
       ...appState.aiAssistantPanel,
       messages: [...appState.aiAssistantPanel.messages, message],
     }
+  },
+
+  mobileMenuOpen: false,
+  setMobileMenuOpen: (value: boolean) => {
+    appState.mobileMenuOpen = value
   },
 })
 

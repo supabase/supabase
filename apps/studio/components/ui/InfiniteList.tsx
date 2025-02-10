@@ -1,11 +1,9 @@
+import { propsAreEqual } from 'lib/helpers'
 import memoize from 'memoize-one'
 import { CSSProperties, ComponentType, MutableRefObject, ReactNode, memo, useRef } from 'react'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { VariableSizeList, areEqual } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
-
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { propsAreEqual } from 'lib/helpers'
 import { Skeleton } from 'ui'
 
 /**
