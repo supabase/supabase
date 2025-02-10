@@ -2844,6 +2844,16 @@ module.exports = [
     source: '/partners/experts/:path*',
     destination: '/partners',
   },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/spend-cap',
+    destination: '/docs/guides/platform/cost-control#spend-cap',
+  },
 
   // marketing
 
