@@ -8,7 +8,7 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    
+
     <QuickstartDbSetup />
 
   </StepHikeCompact.Step>
@@ -87,9 +87,9 @@ hideToc: true
         import { supabase } from "$lib/supabaseClient";
 
         export async function load() {
-          const { data } = await supabase.from("countries").select();
+          const { data } = await supabase.from("instruments").select();
           return {
-            countries: data ?? [],
+            instruments: data ?? [],
           };
         }
       ```
@@ -110,8 +110,8 @@ hideToc: true
         </script>
 
         <ul>
-          {#each data.countries as country}
-            <li>{country.name}</li>
+          {#each data.instruments as instrument}
+            <li>{instrument.name}</li>
           {/each}
         </ul>
       ```
@@ -123,7 +123,7 @@ hideToc: true
   <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Start the app">
 
-    Start the app and go to http://localhost:5173 in a browser and you should see the list of countries.
+    Start the app and go to http://localhost:5173 in a browser and you should see the list of instruments.
 
     </StepHikeCompact.Details>
 

@@ -121,6 +121,8 @@ export const parseValue = (originalValue: any, format: string) => {
       return originalValue
     } else if (typeof originalValue === 'number' || !format) {
       return originalValue
+    } else if (format === 'bytea') {
+      return convertByteaToHex(originalValue)
     } else if (typeof originalValue === 'object') {
       return JSON.stringify(originalValue)
     } else if (typeof originalValue === 'boolean') {
@@ -261,4 +263,8 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
  */
 export const isValueTruncated = (value: string | null | undefined) => {
   return value?.endsWith('...') && (value ?? '').length > MAX_CHARACTERS
+}
+
+export const convertByteaToHex = (value: { type: 'Buffer'; data: number[] }) => {
+  return `\\x${Buffer.from(value.data).toString('hex')}`
 }

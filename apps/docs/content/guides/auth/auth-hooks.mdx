@@ -36,7 +36,7 @@ Supabase supports 2 ways to [configure a hook](/dashboard/project/_/auth/hooks) 
 >
 <TabPanel id="postgres-function" label="Postgres Function">
 
-A [postgres function](/docs/guides/database/functions) can be configured as a hook. The function should take in a single argument -- the event of type JSONB -- and return a JSONB object. Since the postgres function runs on your database, the request does not leave your project's instance.
+A [Postgres function](/docs/guides/database/functions) can be configured as a hook. The function should take in a single argument -- the event of type JSONB -- and return a JSONB object. Since the Postgres function runs on your database, the request does not leave your project's instance.
 
 </TabPanel>
 <TabPanel id="http" label="HTTP Endpoint">
@@ -59,9 +59,9 @@ Sign the payload and grant permissions selectively in order to guard the integri
 >
 <TabPanel id="sql" label="SQL">
 
-When you configure a postgres function as a hook, Supabase will automatically apply the following grants to the function for these reasons:
+When you configure a Postgres function as a hook, Supabase will automatically apply the following grants to the function for these reasons:
 
-- Allow the `supabase_auth_admin` role to execute the function. The `supabase_auth_admin` role is the postgres role that is used by Supabase Auth to make requests to your database.
+- Allow the `supabase_auth_admin` role to execute the function. The `supabase_auth_admin` role is the Postgres role that is used by Supabase Auth to make requests to your database.
 - Revoke permissions from other roles (e.g. `anon`, `authenticated`, `public`) to ensure the function is not accessible by Supabase Data APIs.
 
 ```sql
@@ -81,7 +81,7 @@ revoke execute
 
 You will need to alter your row-level security (RLS) policies to allow the `supabase_auth_admin` role to access tables that you have RLS policies on. You can read more about RLS policies [here](/docs/guides/database/postgres/row-level-security).
 
-Alternatively, you can create your postgres function via the dashboard with the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it.
+Alternatively, you can create your Postgres function via the dashboard with the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it.
 
 Currently, functions created via the dashboard take on the `postgres` role. Read more about the `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker)
 
@@ -344,7 +344,7 @@ Outside of runtime errors, both HTTP Hooks and Postgres Hooks return timeout err
 
 ## Available Hooks
 
-Each Hook description contains an example JSONSchema which you can use in conjunction with [JSONSchema Faker](https://json-schema-faker.js.org/) in order to generate a mock payload. For HTTP Hooks, you can also use [the Standard Webhooks Testing Tool](https://www.standardwebhooks.com/simulate) to simulate a request.
+Each Hook description contains an example JSON Schema which you can use in conjunction with [JSON Schema Faker](https://json-schema-faker.js.org/) in order to generate a mock payload. For HTTP Hooks, you can also use [the Standard Webhooks Testing Tool](https://www.standardwebhooks.com/simulate) to simulate a request.
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
   {[

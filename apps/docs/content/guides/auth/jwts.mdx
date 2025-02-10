@@ -41,7 +41,7 @@ The JSON object starts out looking something like this:
 
 Just note that the more data you store in your token, the longer the encoded string will be.
 
-When we want to send the JWT to the user, we first encode the data using an algorithm such as `HS256`. There are many libraries (and several different algorithms) that can be used to do this encoding/decoding, such as [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken). The signing is as simple as:
+When we want to send the JWT to the user, we first encode the data using an algorithm such as `HS256`. There are many libraries (and several different algorithms) that can be used to do this encoding/decoding, such as [`jsonwebtoken`](https://www.npmjs.com/package/jsonwebtoken). The signing is as simple as:
 
 ```js
 // from https://replit.com/@awalias/jsonwebtokens#index.js

@@ -80,6 +80,9 @@ export const LOCAL_STORAGE_KEYS = {
   AUTH_SMTP_CHANGES_WARNING: 'auth-smtp-changes-warning-dismissed',
 
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
+
+  // api keys view switcher for new and legacy api keys
+  API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
 }
 
 export const OPT_IN_TAGS = {

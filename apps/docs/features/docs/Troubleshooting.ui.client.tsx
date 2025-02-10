@@ -24,7 +24,6 @@ import {
 } from 'ui-patterns/multi-select'
 import { type ITroubleshootingMetadata } from './Troubleshooting.utils'
 import {
-  formatError,
   TROUBLESHOOTING_CONTAINER_ID,
   TROUBLESHOOTING_DATA_ATTRIBUTES,
   troubleshootingSearchParams,
@@ -388,17 +387,17 @@ function TroubleshootingListControllerInternal() {
       selectedTags.length === 0
     ) {
       allEntries.current.forEach((entry) => {
-        entry.hidden = false
+        entry.style.removeProperty('display')
       })
     } else {
       allEntries.current.forEach((entry) => {
-        entry.hidden = !entryMatchesFilter(
-          entry,
-          selectedProducts,
-          selectedErrorCodes,
-          selectedTags,
-          searchState
-        )
+        if (
+          entryMatchesFilter(entry, selectedProducts, selectedErrorCodes, selectedTags, searchState)
+        ) {
+          entry.style.removeProperty('display')
+        } else {
+          entry.style.display = 'none'
+        }
       })
     }
   }, [searchState, selectedProducts, selectedErrorCodes, selectedTags])

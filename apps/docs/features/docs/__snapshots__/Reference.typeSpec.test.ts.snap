@@ -202,6 +202,34 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   "comment": {
                     "shortText": "Options passed to the realtime-js instance"
                   }
+                },
+                {
+                  "type": "function",
+                  "name": "accessToken",
+                  "params": [],
+                  "ret": {
+                    "type": {
+                      "type": "promise",
+                      "name": "Promise",
+                      "awaited": {
+                        "type": "union",
+                        "subTypes": [
+                          {
+                            "type": "literal",
+                            "value": null
+                          },
+                          {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "comment": {
+                    "shortText": "Optional function for using a third-party authentication system with\\nSupabase. The function should return an access token or ID token (JWT) by\\nobtaining it from the third-party auth client library. Note that this\\nfunction may be called concurrently and many times. Use memoization and\\nlocking techniques if this is not supported by the client libraries.",
+                    "text": "When set, the \`auth\` namespace of the Supabase client cannot be used.\\nCreate another client if you wish to use Supabase Auth and third-party\\nauthentications concurrently in the same application.\\n"
+                  }
                 }
               ]
             },
@@ -692,44 +720,28 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               "type": "intrinsic",
               "name": "number"
             }
+          },
+          {
+            "name": "code",
+            "type": {
+              "type": "union",
+              "subTypes": [
+                {
+                  "type": "intrinsic",
+                  "name": "undefined"
+                },
+                {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              ]
+            }
           }
         ],
         "ret": {
           "type": {
             "type": "nameOnly",
             "name": "AuthApiError"
-          }
-        }
-      },
-      "@supabase/auth-js.AuthApiError.toJSON": {
-        "name": "@supabase/auth-js.AuthApiError.toJSON",
-        "params": [],
-        "ret": {
-          "type": {
-            "type": "object",
-            "properties": [
-              {
-                "name": "message",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              },
-              {
-                "name": "name",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              },
-              {
-                "name": "status",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "number"
-                }
-              }
-            ]
           }
         }
       },
@@ -748,6 +760,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": {
               "type": "intrinsic",
               "name": "number"
+            },
+            "isOptional": true
+          },
+          {
+            "name": "code",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
             },
             "isOptional": true
           }
@@ -889,38 +909,6 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         }
       },
-      "@supabase/auth-js.AuthInvalidCredentialsError.toJSON": {
-        "name": "@supabase/auth-js.AuthInvalidCredentialsError.toJSON",
-        "params": [],
-        "ret": {
-          "type": {
-            "type": "object",
-            "properties": [
-              {
-                "name": "message",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              },
-              {
-                "name": "name",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              },
-              {
-                "name": "status",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "number"
-                }
-              }
-            ]
-          }
-        }
-      },
       "@supabase/auth-js.AuthInvalidTokenResponseError.constructor": {
         "name": "@supabase/auth-js.AuthInvalidTokenResponseError.constructor",
         "params": [],
@@ -928,38 +916,6 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           "type": {
             "type": "nameOnly",
             "name": "AuthInvalidTokenResponseError"
-          }
-        }
-      },
-      "@supabase/auth-js.AuthInvalidTokenResponseError.toJSON": {
-        "name": "@supabase/auth-js.AuthInvalidTokenResponseError.toJSON",
-        "params": [],
-        "ret": {
-          "type": {
-            "type": "object",
-            "properties": [
-              {
-                "name": "message",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              },
-              {
-                "name": "name",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              },
-              {
-                "name": "status",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "number"
-                }
-              }
-            ]
           }
         }
       },
@@ -1100,38 +1056,6 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         }
       },
-      "@supabase/auth-js.AuthRetryableFetchError.toJSON": {
-        "name": "@supabase/auth-js.AuthRetryableFetchError.toJSON",
-        "params": [],
-        "ret": {
-          "type": {
-            "type": "object",
-            "properties": [
-              {
-                "name": "message",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              },
-              {
-                "name": "name",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              },
-              {
-                "name": "status",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "number"
-                }
-              }
-            ]
-          }
-        }
-      },
       "@supabase/auth-js.AuthSessionMissingError.constructor": {
         "name": "@supabase/auth-js.AuthSessionMissingError.constructor",
         "params": [],
@@ -1139,38 +1063,6 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           "type": {
             "type": "nameOnly",
             "name": "AuthSessionMissingError"
-          }
-        }
-      },
-      "@supabase/auth-js.AuthSessionMissingError.toJSON": {
-        "name": "@supabase/auth-js.AuthSessionMissingError.toJSON",
-        "params": [],
-        "ret": {
-          "type": {
-            "type": "object",
-            "properties": [
-              {
-                "name": "message",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              },
-              {
-                "name": "name",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              },
-              {
-                "name": "status",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "number"
-                }
-              }
-            ]
           }
         }
       },
@@ -1234,38 +1126,6 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         }
       },
-      "@supabase/auth-js.AuthWeakPasswordError.toJSON": {
-        "name": "@supabase/auth-js.AuthWeakPasswordError.toJSON",
-        "params": [],
-        "ret": {
-          "type": {
-            "type": "object",
-            "properties": [
-              {
-                "name": "message",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              },
-              {
-                "name": "name",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              },
-              {
-                "name": "status",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "number"
-                }
-              }
-            ]
-          }
-        }
-      },
       "@supabase/auth-js.CustomAuthError.constructor": {
         "name": "@supabase/auth-js.CustomAuthError.constructor",
         "params": [
@@ -1289,44 +1149,28 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               "type": "intrinsic",
               "name": "number"
             }
+          },
+          {
+            "name": "code",
+            "type": {
+              "type": "union",
+              "subTypes": [
+                {
+                  "type": "intrinsic",
+                  "name": "undefined"
+                },
+                {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              ]
+            }
           }
         ],
         "ret": {
           "type": {
             "type": "nameOnly",
             "name": "CustomAuthError"
-          }
-        }
-      },
-      "@supabase/auth-js.CustomAuthError.toJSON": {
-        "name": "@supabase/auth-js.CustomAuthError.toJSON",
-        "params": [],
-        "ret": {
-          "type": {
-            "type": "object",
-            "properties": [
-              {
-                "name": "message",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              },
-              {
-                "name": "name",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              },
-              {
-                "name": "status",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "number"
-                }
-              }
-            ]
           }
         }
       },
@@ -1464,6 +1308,18 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   }
                 },
                 {
+                  "name": "id",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "The \`id\` for the user.",
+                    "text": "Allows you to overwrite the default \`id\` set for the user.\\n"
+                  }
+                },
+                {
                   "name": "nonce",
                   "type": {
                     "type": "intrinsic",
@@ -1484,6 +1340,18 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   "isOptional": true,
                   "comment": {
                     "shortText": "The user's password."
+                  }
+                },
+                {
+                  "name": "password_hash",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "The \`password_hash\` for the user's password.",
+                    "text": "Allows you to specify a password hash for the user. This is useful for migrating a user's password hash from another service.\\n\\nSupports bcrypt, scrypt (firebase), and argon2 password hashes.\\n"
                   }
                 },
                 {
@@ -1656,11 +1524,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         {
                                           "name": "factor_type",
                                           "type": {
-                                            "type": "intrinsic",
-                                            "name": "string"
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
                                           },
                                           "comment": {
-                                            "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                           }
                                         },
                                         {
@@ -1807,6 +1685,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
                                   },
                                   "isOptional": true
                                 },
@@ -1952,7 +1838,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               "name": "boolean"
             },
             "comment": {
-              "shortText": "If true, then the user will be soft-deleted (setting \`deleted_at\` to the current timestamp and disabling their account while preserving their data) from the auth schema.\\nDefaults to false for backward compatibility.\\n\\nThis function should only be called on a server. Never expose your \`service_role\` key in the browser.\\n"
+              "shortText": "If true, then the user will be soft-deleted from the auth schema. Soft deletion allows user identification from the hashed user ID but is not reversible.\\nDefaults to false for backward compatibility.\\n\\nThis function should only be called on a server. Never expose your \`service_role\` key in the browser.\\n"
             }
           }
         ],
@@ -2075,11 +1961,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         {
                                           "name": "factor_type",
                                           "type": {
-                                            "type": "intrinsic",
-                                            "name": "string"
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
                                           },
                                           "comment": {
-                                            "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                           }
                                         },
                                         {
@@ -2226,6 +2122,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
                                   },
                                   "isOptional": true
                                 },
@@ -2782,11 +2686,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         {
                                           "name": "factor_type",
                                           "type": {
-                                            "type": "intrinsic",
-                                            "name": "string"
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
                                           },
                                           "comment": {
-                                            "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                           }
                                         },
                                         {
@@ -2933,6 +2847,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
                                   },
                                   "isOptional": true
                                 },
@@ -3198,11 +3120,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         {
                                           "name": "factor_type",
                                           "type": {
-                                            "type": "intrinsic",
-                                            "name": "string"
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
                                           },
                                           "comment": {
-                                            "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                           }
                                         },
                                         {
@@ -3349,6 +3281,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
                                   },
                                   "isOptional": true
                                 },
@@ -3640,11 +3580,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         {
                                           "name": "factor_type",
                                           "type": {
-                                            "type": "intrinsic",
-                                            "name": "string"
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
                                           },
                                           "comment": {
-                                            "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                           }
                                         },
                                         {
@@ -3791,6 +3741,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
                                   },
                                   "isOptional": true
                                 },
@@ -4148,6 +4106,18 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   }
                 },
                 {
+                  "name": "id",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "The \`id\` for the user.",
+                    "text": "Allows you to overwrite the default \`id\` set for the user.\\n"
+                  }
+                },
+                {
                   "name": "nonce",
                   "type": {
                     "type": "intrinsic",
@@ -4168,6 +4138,18 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   "isOptional": true,
                   "comment": {
                     "shortText": "The user's password."
+                  }
+                },
+                {
+                  "name": "password_hash",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "The \`password_hash\` for the user's password.",
+                    "text": "Allows you to specify a password hash for the user. This is useful for migrating a user's password hash from another service.\\n\\nSupports bcrypt, scrypt (firebase), and argon2 password hashes.\\n"
                   }
                 },
                 {
@@ -4343,11 +4325,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         {
                                           "name": "factor_type",
                                           "type": {
-                                            "type": "intrinsic",
-                                            "name": "string"
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
                                           },
                                           "comment": {
-                                            "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                           }
                                         },
                                         {
@@ -4494,6 +4486,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
                                   },
                                   "isOptional": true
                                 },
@@ -4710,6 +4710,23 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     ]
                   },
                   "isOptional": true
+                },
+                {
+                  "name": "hasCustomAuthorizationHeader",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "Set to \\"true\\" if there is a custom authorization header set globally.",
+                    "tags": [
+                      {
+                        "tag": "experimental",
+                        "text": "\\n"
+                      }
+                    ]
+                  }
                 },
                 {
                   "name": "headers",
@@ -5064,11 +5081,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               {
                                                 "name": "factor_type",
                                                 "type": {
-                                                  "type": "intrinsic",
-                                                  "name": "string"
+                                                  "type": "union",
+                                                  "subTypes": [
+                                                    null,
+                                                    {
+                                                      "type": "literal",
+                                                      "value": "totp"
+                                                    },
+                                                    {
+                                                      "type": "literal",
+                                                      "value": "phone"
+                                                    }
+                                                  ]
                                                 },
                                                 "comment": {
-                                                  "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                  "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                                 }
                                               },
                                               {
@@ -5215,6 +5242,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         "type": {
                                           "type": "intrinsic",
                                           "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "is_anonymous",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "boolean"
                                         },
                                         "isOptional": true
                                       },
@@ -5399,11 +5434,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         {
                                           "name": "factor_type",
                                           "type": {
-                                            "type": "intrinsic",
-                                            "name": "string"
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
                                           },
                                           "comment": {
-                                            "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                           }
                                         },
                                         {
@@ -5550,6 +5595,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
                                   },
                                   "isOptional": true
                                 },
@@ -5897,11 +5950,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               {
                                                 "name": "factor_type",
                                                 "type": {
-                                                  "type": "intrinsic",
-                                                  "name": "string"
+                                                  "type": "union",
+                                                  "subTypes": [
+                                                    null,
+                                                    {
+                                                      "type": "literal",
+                                                      "value": "totp"
+                                                    },
+                                                    {
+                                                      "type": "literal",
+                                                      "value": "phone"
+                                                    }
+                                                  ]
                                                 },
                                                 "comment": {
-                                                  "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                  "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                                 }
                                               },
                                               {
@@ -6048,6 +6111,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         "type": {
                                           "type": "intrinsic",
                                           "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "is_anonymous",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "boolean"
                                         },
                                         "isOptional": true
                                       },
@@ -6338,11 +6409,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         {
                                           "name": "factor_type",
                                           "type": {
-                                            "type": "intrinsic",
-                                            "name": "string"
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
                                           },
                                           "comment": {
-                                            "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                           }
                                         },
                                         {
@@ -6489,6 +6570,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
                                   },
                                   "isOptional": true
                                 },
@@ -6922,6 +7011,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       },
                       {
                         "type": "literal",
+                        "value": "slack_oidc"
+                      },
+                      {
+                        "type": "literal",
                         "value": "spotify"
                       },
                       {
@@ -7035,6 +7128,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 {
                                   "type": "literal",
                                   "value": "slack"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "slack_oidc"
                                 },
                                 {
                                   "type": "literal",
@@ -7155,6 +7252,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 {
                                   "type": "literal",
                                   "value": "slack"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "slack_oidc"
                                 },
                                 {
                                   "type": "literal",
@@ -7459,11 +7560,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         {
                                           "name": "factor_type",
                                           "type": {
-                                            "type": "intrinsic",
-                                            "name": "string"
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
                                           },
                                           "comment": {
-                                            "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                           }
                                         },
                                         {
@@ -7610,6 +7721,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
                                   },
                                   "isOptional": true
                                 },
@@ -7989,11 +8108,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                       {
                                                         "name": "factor_type",
                                                         "type": {
-                                                          "type": "intrinsic",
-                                                          "name": "string"
+                                                          "type": "union",
+                                                          "subTypes": [
+                                                            null,
+                                                            {
+                                                              "type": "literal",
+                                                              "value": "totp"
+                                                            },
+                                                            {
+                                                              "type": "literal",
+                                                              "value": "phone"
+                                                            }
+                                                          ]
                                                         },
                                                         "comment": {
-                                                          "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                          "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                                         }
                                                       },
                                                       {
@@ -8140,6 +8269,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                 "type": {
                                                   "type": "intrinsic",
                                                   "name": "string"
+                                                },
+                                                "isOptional": true
+                                              },
+                                              {
+                                                "name": "is_anonymous",
+                                                "type": {
+                                                  "type": "intrinsic",
+                                                  "name": "boolean"
                                                 },
                                                 "isOptional": true
                                               },
@@ -8480,11 +8617,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                   {
                                                     "name": "factor_type",
                                                     "type": {
-                                                      "type": "intrinsic",
-                                                      "name": "string"
+                                                      "type": "union",
+                                                      "subTypes": [
+                                                        null,
+                                                        {
+                                                          "type": "literal",
+                                                          "value": "totp"
+                                                        },
+                                                        {
+                                                          "type": "literal",
+                                                          "value": "phone"
+                                                        }
+                                                      ]
                                                     },
                                                     "comment": {
-                                                      "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                      "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                                     }
                                                   },
                                                   {
@@ -8631,6 +8778,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             "type": {
                                               "type": "intrinsic",
                                               "name": "string"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
+                                            "name": "is_anonymous",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "boolean"
                                             },
                                             "isOptional": true
                                           },
@@ -8824,11 +8979,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             {
                                               "name": "factor_type",
                                               "type": {
-                                                "type": "intrinsic",
-                                                "name": "string"
+                                                "type": "union",
+                                                "subTypes": [
+                                                  null,
+                                                  {
+                                                    "type": "literal",
+                                                    "value": "totp"
+                                                  },
+                                                  {
+                                                    "type": "literal",
+                                                    "value": "phone"
+                                                  }
+                                                ]
                                               },
                                               "comment": {
-                                                "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                               }
                                             },
                                             {
@@ -8975,6 +9140,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                       "type": {
                                         "type": "intrinsic",
                                         "name": "string"
+                                      },
+                                      "isOptional": true
+                                    },
+                                    {
+                                      "name": "is_anonymous",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "boolean"
                                       },
                                       "isOptional": true
                                     },
@@ -9352,11 +9525,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                   {
                                                     "name": "factor_type",
                                                     "type": {
-                                                      "type": "intrinsic",
-                                                      "name": "string"
+                                                      "type": "union",
+                                                      "subTypes": [
+                                                        null,
+                                                        {
+                                                          "type": "literal",
+                                                          "value": "totp"
+                                                        },
+                                                        {
+                                                          "type": "literal",
+                                                          "value": "phone"
+                                                        }
+                                                      ]
                                                     },
                                                     "comment": {
-                                                      "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                      "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                                     }
                                                   },
                                                   {
@@ -9503,6 +9686,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             "type": {
                                               "type": "intrinsic",
                                               "name": "string"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
+                                            "name": "is_anonymous",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "boolean"
                                             },
                                             "isOptional": true
                                           },
@@ -9696,11 +9887,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             {
                                               "name": "factor_type",
                                               "type": {
-                                                "type": "intrinsic",
-                                                "name": "string"
+                                                "type": "union",
+                                                "subTypes": [
+                                                  null,
+                                                  {
+                                                    "type": "literal",
+                                                    "value": "totp"
+                                                  },
+                                                  {
+                                                    "type": "literal",
+                                                    "value": "phone"
+                                                  }
+                                                ]
                                               },
                                               "comment": {
-                                                "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                               }
                                             },
                                             {
@@ -9847,6 +10048,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                       "type": {
                                         "type": "intrinsic",
                                         "name": "string"
+                                      },
+                                      "isOptional": true
+                                    },
+                                    {
+                                      "name": "is_anonymous",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "boolean"
                                       },
                                       "isOptional": true
                                     },
@@ -10561,11 +10770,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                   {
                                                     "name": "factor_type",
                                                     "type": {
-                                                      "type": "intrinsic",
-                                                      "name": "string"
+                                                      "type": "union",
+                                                      "subTypes": [
+                                                        null,
+                                                        {
+                                                          "type": "literal",
+                                                          "value": "totp"
+                                                        },
+                                                        {
+                                                          "type": "literal",
+                                                          "value": "phone"
+                                                        }
+                                                      ]
                                                     },
                                                     "comment": {
-                                                      "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                      "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                                     }
                                                   },
                                                   {
@@ -10712,6 +10931,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             "type": {
                                               "type": "intrinsic",
                                               "name": "string"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
+                                            "name": "is_anonymous",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "boolean"
                                             },
                                             "isOptional": true
                                           },
@@ -10905,11 +11132,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             {
                                               "name": "factor_type",
                                               "type": {
-                                                "type": "intrinsic",
-                                                "name": "string"
+                                                "type": "union",
+                                                "subTypes": [
+                                                  null,
+                                                  {
+                                                    "type": "literal",
+                                                    "value": "totp"
+                                                  },
+                                                  {
+                                                    "type": "literal",
+                                                    "value": "phone"
+                                                  }
+                                                ]
                                               },
                                               "comment": {
-                                                "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                               }
                                             },
                                             {
@@ -11056,6 +11293,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                       "type": {
                                         "type": "intrinsic",
                                         "name": "string"
+                                      },
+                                      "isOptional": true
+                                    },
+                                    {
+                                      "name": "is_anonymous",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "boolean"
                                       },
                                       "isOptional": true
                                     },
@@ -11456,11 +11701,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                   {
                                                     "name": "factor_type",
                                                     "type": {
-                                                      "type": "intrinsic",
-                                                      "name": "string"
+                                                      "type": "union",
+                                                      "subTypes": [
+                                                        null,
+                                                        {
+                                                          "type": "literal",
+                                                          "value": "totp"
+                                                        },
+                                                        {
+                                                          "type": "literal",
+                                                          "value": "phone"
+                                                        }
+                                                      ]
                                                     },
                                                     "comment": {
-                                                      "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                      "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                                     }
                                                   },
                                                   {
@@ -11607,6 +11862,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             "type": {
                                               "type": "intrinsic",
                                               "name": "string"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
+                                            "name": "is_anonymous",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "boolean"
                                             },
                                             "isOptional": true
                                           },
@@ -11800,11 +12063,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             {
                                               "name": "factor_type",
                                               "type": {
-                                                "type": "intrinsic",
-                                                "name": "string"
+                                                "type": "union",
+                                                "subTypes": [
+                                                  null,
+                                                  {
+                                                    "type": "literal",
+                                                    "value": "totp"
+                                                  },
+                                                  {
+                                                    "type": "literal",
+                                                    "value": "phone"
+                                                  }
+                                                ]
                                               },
                                               "comment": {
-                                                "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                               }
                                             },
                                             {
@@ -11951,6 +12224,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                       "type": {
                                         "type": "intrinsic",
                                         "name": "string"
+                                      },
+                                      "isOptional": true
+                                    },
+                                    {
+                                      "name": "is_anonymous",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "boolean"
                                       },
                                       "isOptional": true
                                     },
@@ -12163,13 +12444,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                         "value": "facebook"
                       },
                       {
-                        "type": "intrinsic",
-                        "name": "string"
-                      }
+                        "type": "literal",
+                        "value": "kakao"
+                      },
+                      null
                     ]
                   },
                   "comment": {
-                    "shortText": "Provider name or OIDC \`iss\` value identifying which provider should be used to verify the provided token. Supported names: \`google\`, \`apple\`, \`azure\`, \`facebook\`, \`keycloak\` (deprecated)."
+                    "shortText": "Provider name or OIDC \`iss\` value identifying which provider should be used to verify the provided token. Supported names: \`google\`, \`apple\`, \`azure\`, \`facebook\`, \`kakao\`, \`keycloak\` (deprecated)."
                   }
                 },
                 {
@@ -12399,11 +12681,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               {
                                                 "name": "factor_type",
                                                 "type": {
-                                                  "type": "intrinsic",
-                                                  "name": "string"
+                                                  "type": "union",
+                                                  "subTypes": [
+                                                    null,
+                                                    {
+                                                      "type": "literal",
+                                                      "value": "totp"
+                                                    },
+                                                    {
+                                                      "type": "literal",
+                                                      "value": "phone"
+                                                    }
+                                                  ]
                                                 },
                                                 "comment": {
-                                                  "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                  "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                                 }
                                               },
                                               {
@@ -12550,6 +12842,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         "type": {
                                           "type": "intrinsic",
                                           "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "is_anonymous",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "boolean"
                                         },
                                         "isOptional": true
                                       },
@@ -12734,11 +13034,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         {
                                           "name": "factor_type",
                                           "type": {
-                                            "type": "intrinsic",
-                                            "name": "string"
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
                                           },
                                           "comment": {
-                                            "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                           }
                                         },
                                         {
@@ -12885,6 +13195,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
                                   },
                                   "isOptional": true
                                 },
@@ -13154,6 +13472,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                       },
                       {
                         "type": "literal",
+                        "value": "slack_oidc"
+                      },
+                      {
+                        "type": "literal",
                         "value": "spotify"
                       },
                       {
@@ -13267,6 +13589,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 {
                                   "type": "literal",
                                   "value": "slack"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "slack_oidc"
                                 },
                                 {
                                   "type": "literal",
@@ -13387,6 +13713,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 {
                                   "type": "literal",
                                   "value": "slack"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "slack_oidc"
                                 },
                                 {
                                   "type": "literal",
@@ -14037,11 +14367,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               {
                                                 "name": "factor_type",
                                                 "type": {
-                                                  "type": "intrinsic",
-                                                  "name": "string"
+                                                  "type": "union",
+                                                  "subTypes": [
+                                                    null,
+                                                    {
+                                                      "type": "literal",
+                                                      "value": "totp"
+                                                    },
+                                                    {
+                                                      "type": "literal",
+                                                      "value": "phone"
+                                                    }
+                                                  ]
                                                 },
                                                 "comment": {
-                                                  "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                  "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                                 }
                                               },
                                               {
@@ -14188,6 +14528,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         "type": {
                                           "type": "intrinsic",
                                           "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "is_anonymous",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "boolean"
                                         },
                                         "isOptional": true
                                       },
@@ -14372,11 +14720,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         {
                                           "name": "factor_type",
                                           "type": {
-                                            "type": "intrinsic",
-                                            "name": "string"
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
                                           },
                                           "comment": {
-                                            "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                           }
                                         },
                                         {
@@ -14527,6 +14885,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "isOptional": true
                                 },
                                 {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
                                   "name": "last_sign_in_at",
                                   "type": {
                                     "type": "intrinsic",
@@ -14634,10 +15000,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "literal",
                                           "value": "pwned"
                                         },
-                                        {
-                                          "type": "intrinsic",
-                                          "name": "string"
-                                        }
+                                        null
                                       ]
                                     }
                                   }
@@ -15324,11 +15687,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                   {
                                                     "name": "factor_type",
                                                     "type": {
-                                                      "type": "intrinsic",
-                                                      "name": "string"
+                                                      "type": "union",
+                                                      "subTypes": [
+                                                        null,
+                                                        {
+                                                          "type": "literal",
+                                                          "value": "totp"
+                                                        },
+                                                        {
+                                                          "type": "literal",
+                                                          "value": "phone"
+                                                        }
+                                                      ]
                                                     },
                                                     "comment": {
-                                                      "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                      "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                                     }
                                                   },
                                                   {
@@ -15475,6 +15848,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             "type": {
                                               "type": "intrinsic",
                                               "name": "string"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
+                                            "name": "is_anonymous",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "boolean"
                                             },
                                             "isOptional": true
                                           },
@@ -15668,11 +16049,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             {
                                               "name": "factor_type",
                                               "type": {
-                                                "type": "intrinsic",
-                                                "name": "string"
+                                                "type": "union",
+                                                "subTypes": [
+                                                  null,
+                                                  {
+                                                    "type": "literal",
+                                                    "value": "totp"
+                                                  },
+                                                  {
+                                                    "type": "literal",
+                                                    "value": "phone"
+                                                  }
+                                                ]
                                               },
                                               "comment": {
-                                                "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                               }
                                             },
                                             {
@@ -15819,6 +16210,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                       "type": {
                                         "type": "intrinsic",
                                         "name": "string"
+                                      },
+                                      "isOptional": true
+                                    },
+                                    {
+                                      "name": "is_anonymous",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "boolean"
                                       },
                                       "isOptional": true
                                     },
@@ -16329,11 +16728,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         {
                                           "name": "factor_type",
                                           "type": {
-                                            "type": "intrinsic",
-                                            "name": "string"
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
                                           },
                                           "comment": {
-                                            "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                           }
                                         },
                                         {
@@ -16480,6 +16889,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
                                   },
                                   "isOptional": true
                                 },
@@ -17068,11 +17485,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                   {
                                                     "name": "factor_type",
                                                     "type": {
-                                                      "type": "intrinsic",
-                                                      "name": "string"
+                                                      "type": "union",
+                                                      "subTypes": [
+                                                        null,
+                                                        {
+                                                          "type": "literal",
+                                                          "value": "totp"
+                                                        },
+                                                        {
+                                                          "type": "literal",
+                                                          "value": "phone"
+                                                        }
+                                                      ]
                                                     },
                                                     "comment": {
-                                                      "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                      "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                                     }
                                                   },
                                                   {
@@ -17219,6 +17646,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             "type": {
                                               "type": "intrinsic",
                                               "name": "string"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
+                                            "name": "is_anonymous",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "boolean"
                                             },
                                             "isOptional": true
                                           },
@@ -17412,11 +17847,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             {
                                               "name": "factor_type",
                                               "type": {
-                                                "type": "intrinsic",
-                                                "name": "string"
+                                                "type": "union",
+                                                "subTypes": [
+                                                  null,
+                                                  {
+                                                    "type": "literal",
+                                                    "value": "totp"
+                                                  },
+                                                  {
+                                                    "type": "literal",
+                                                    "value": "phone"
+                                                  }
+                                                ]
                                               },
                                               "comment": {
-                                                "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                                "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                               }
                                             },
                                             {
@@ -17563,6 +18008,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                       "type": {
                                         "type": "intrinsic",
                                         "name": "string"
+                                      },
+                                      "isOptional": true
+                                    },
+                                    {
+                                      "name": "is_anonymous",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "boolean"
                                       },
                                       "isOptional": true
                                     },
@@ -17884,11 +18337,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   {
                                     "name": "factor_type",
                                     "type": {
-                                      "type": "intrinsic",
-                                      "name": "string"
+                                      "type": "union",
+                                      "subTypes": [
+                                        null,
+                                        {
+                                          "type": "literal",
+                                          "value": "totp"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "phone"
+                                        }
+                                      ]
                                     },
                                     "comment": {
-                                      "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                      "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                     }
                                   },
                                   {
@@ -17994,6 +18457,26 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               "type": "object",
               "properties": [
                 {
+                  "name": "channel",
+                  "type": {
+                    "type": "union",
+                    "subTypes": [
+                      {
+                        "type": "literal",
+                        "value": "sms"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "whatsapp"
+                      }
+                    ]
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "Messaging channel to use (e.g. whatsapp or sms). Only relevant for phone factors"
+                  }
+                },
+                {
                   "name": "factorId",
                   "type": {
                     "type": "intrinsic",
@@ -18041,6 +18524,25 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                             },
                             "comment": {
                               "shortText": "ID of the newly created challenge."
+                            }
+                          },
+                          {
+                            "name": "type",
+                            "type": {
+                              "type": "union",
+                              "subTypes": [
+                                {
+                                  "type": "literal",
+                                  "value": "totp"
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": "phone"
+                                }
+                              ]
+                            },
+                            "comment": {
+                              "shortText": "Factor Type which generated the challenge"
                             }
                           }
                         ]
@@ -18274,11 +18776,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         {
                                           "name": "factor_type",
                                           "type": {
-                                            "type": "intrinsic",
-                                            "name": "string"
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
                                           },
                                           "comment": {
-                                            "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                           }
                                         },
                                         {
@@ -18429,6 +18941,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "isOptional": true
                                 },
                                 {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
                                   "name": "last_sign_in_at",
                                   "type": {
                                     "type": "intrinsic",
@@ -18551,7 +19071,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           {
             "name": "params",
             "type": {
-              "name": "MFAEnrollParams",
+              "name": "MFAEnrollTOTPParams",
               "type": "object",
               "properties": [
                 {
@@ -18596,7 +19116,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "name": "Promise",
             "awaited": {
               "type": "union",
-              "name": "AuthMFAEnrollResponse",
+              "name": "AuthMFAEnrollTOTPResponse",
               "subTypes": [
                 {
                   "type": "object",
@@ -18675,7 +19195,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                               "value": "totp"
                             },
                             "comment": {
-                              "shortText": "Type of MFA factor. Only \`totp\` supported for now."
+                              "shortText": "Type of MFA factor."
                             }
                           }
                         ]
@@ -18716,7 +19236,444 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "comment": {
           "shortText": "Starts the enrollment process for a new Multi-Factor Authentication (MFA)\\nfactor. This method creates a new \`unverified\` factor.\\nTo verify a factor, present the QR code or secret to the user and ask them to add it to their\\nauthenticator app.\\nThe user has to enter the code from their authenticator app to verify it.",
           "text": "Upon verifying a factor, all other sessions are logged out and the current session's authenticator level is promoted to \`aal2\`.\\n\\n"
-        }
+        },
+        "altSignatures": [
+          {
+            "params": [
+              {
+                "name": "params",
+                "type": {
+                  "name": "MFAEnrollPhoneParams",
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "factorType",
+                      "type": {
+                        "type": "literal",
+                        "value": "phone"
+                      },
+                      "comment": {
+                        "shortText": "The type of factor being enrolled."
+                      }
+                    },
+                    {
+                      "name": "friendlyName",
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      "isOptional": true,
+                      "comment": {
+                        "shortText": "Human readable name assigned to the factor."
+                      }
+                    },
+                    {
+                      "name": "phone",
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      "comment": {
+                        "shortText": "Phone number associated with a factor. Number should conform to E.164 format"
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "ret": {
+              "type": {
+                "type": "promise",
+                "name": "Promise",
+                "awaited": {
+                  "type": "union",
+                  "name": "AuthMFAEnrollPhoneResponse",
+                  "subTypes": [
+                    {
+                      "type": "object",
+                      "properties": [
+                        {
+                          "name": "data",
+                          "type": {
+                            "type": "object",
+                            "properties": [
+                              {
+                                "name": "friendly_name",
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                },
+                                "isOptional": true,
+                                "comment": {
+                                  "shortText": "Friendly name of the factor, useful for distinguishing between factors"
+                                }
+                              },
+                              {
+                                "name": "id",
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                },
+                                "comment": {
+                                  "shortText": "ID of the factor that was just enrolled (in an unverified state)."
+                                }
+                              },
+                              {
+                                "name": "phone",
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                },
+                                "comment": {
+                                  "shortText": "Phone number of the MFA factor in E.164 format. Used to send messages"
+                                }
+                              },
+                              {
+                                "name": "type",
+                                "type": {
+                                  "type": "literal",
+                                  "value": "phone"
+                                },
+                                "comment": {
+                                  "shortText": "Type of MFA factor."
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "error",
+                          "type": {
+                            "type": "literal",
+                            "value": null
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": [
+                        {
+                          "name": "data",
+                          "type": {
+                            "type": "literal",
+                            "value": null
+                          }
+                        },
+                        {
+                          "name": "error",
+                          "type": {
+                            "type": "nameOnly",
+                            "name": "AuthError"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "params": [
+              {
+                "name": "params",
+                "type": {
+                  "type": "union",
+                  "name": "MFAEnrollParams",
+                  "subTypes": [
+                    {
+                      "type": "object",
+                      "properties": [
+                        {
+                          "name": "factorType",
+                          "type": {
+                            "type": "literal",
+                            "value": "totp"
+                          },
+                          "comment": {
+                            "shortText": "The type of factor being enrolled."
+                          }
+                        },
+                        {
+                          "name": "friendlyName",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "isOptional": true,
+                          "comment": {
+                            "shortText": "Human readable name assigned to the factor."
+                          }
+                        },
+                        {
+                          "name": "issuer",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "isOptional": true,
+                          "comment": {
+                            "shortText": "Domain which the user is enrolled with."
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": [
+                        {
+                          "name": "factorType",
+                          "type": {
+                            "type": "literal",
+                            "value": "phone"
+                          },
+                          "comment": {
+                            "shortText": "The type of factor being enrolled."
+                          }
+                        },
+                        {
+                          "name": "friendlyName",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "isOptional": true,
+                          "comment": {
+                            "shortText": "Human readable name assigned to the factor."
+                          }
+                        },
+                        {
+                          "name": "phone",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "comment": {
+                            "shortText": "Phone number associated with a factor. Number should conform to E.164 format"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "ret": {
+              "type": {
+                "type": "promise",
+                "name": "Promise",
+                "awaited": {
+                  "type": "union",
+                  "name": "AuthMFAEnrollResponse",
+                  "subTypes": [
+                    {
+                      "type": "union",
+                      "subTypes": [
+                        {
+                          "type": "object",
+                          "properties": [
+                            {
+                              "name": "data",
+                              "type": {
+                                "type": "object",
+                                "properties": [
+                                  {
+                                    "name": "friendly_name",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    },
+                                    "isOptional": true,
+                                    "comment": {
+                                      "shortText": "Friendly name of the factor, useful for distinguishing between factors"
+                                    }
+                                  },
+                                  {
+                                    "name": "id",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    },
+                                    "comment": {
+                                      "shortText": "ID of the factor that was just enrolled (in an unverified state)."
+                                    }
+                                  },
+                                  {
+                                    "name": "totp",
+                                    "type": {
+                                      "type": "object",
+                                      "properties": [
+                                        {
+                                          "name": "qr_code",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          },
+                                          "comment": {
+                                            "shortText": "Contains a QR code encoding the authenticator URI. You can\\nconvert it to a URL by prepending \`data:image/svg+xml;utf-8,\` to\\nthe value. Avoid logging this value to the console."
+                                          }
+                                        },
+                                        {
+                                          "name": "secret",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          },
+                                          "comment": {
+                                            "shortText": "The TOTP secret (also encoded in the QR code). Show this secret\\nin a password-style field to the user, in case they are unable to\\nscan the QR code. Avoid logging this value to the console."
+                                          }
+                                        },
+                                        {
+                                          "name": "uri",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          },
+                                          "comment": {
+                                            "shortText": "The authenticator URI encoded within the QR code, should you need\\nto use it. Avoid loggin this value to the console."
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    "comment": {
+                                      "shortText": "TOTP enrollment information."
+                                    }
+                                  },
+                                  {
+                                    "name": "type",
+                                    "type": {
+                                      "type": "literal",
+                                      "value": "totp"
+                                    },
+                                    "comment": {
+                                      "shortText": "Type of MFA factor."
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "name": "error",
+                              "type": {
+                                "type": "literal",
+                                "value": null
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": [
+                            {
+                              "name": "data",
+                              "type": {
+                                "type": "literal",
+                                "value": null
+                              }
+                            },
+                            {
+                              "name": "error",
+                              "type": {
+                                "type": "nameOnly",
+                                "name": "AuthError"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "union",
+                      "subTypes": [
+                        {
+                          "type": "object",
+                          "properties": [
+                            {
+                              "name": "data",
+                              "type": {
+                                "type": "object",
+                                "properties": [
+                                  {
+                                    "name": "friendly_name",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    },
+                                    "isOptional": true,
+                                    "comment": {
+                                      "shortText": "Friendly name of the factor, useful for distinguishing between factors"
+                                    }
+                                  },
+                                  {
+                                    "name": "id",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    },
+                                    "comment": {
+                                      "shortText": "ID of the factor that was just enrolled (in an unverified state)."
+                                    }
+                                  },
+                                  {
+                                    "name": "phone",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    },
+                                    "comment": {
+                                      "shortText": "Phone number of the MFA factor in E.164 format. Used to send messages"
+                                    }
+                                  },
+                                  {
+                                    "name": "type",
+                                    "type": {
+                                      "type": "literal",
+                                      "value": "phone"
+                                    },
+                                    "comment": {
+                                      "shortText": "Type of MFA factor."
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "name": "error",
+                              "type": {
+                                "type": "literal",
+                                "value": null
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": [
+                            {
+                              "name": "data",
+                              "type": {
+                                "type": "literal",
+                                "value": null
+                              }
+                            },
+                            {
+                              "name": "error",
+                              "type": {
+                                "type": "nameOnly",
+                                "name": "AuthError"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
       },
       "@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel": {
         "name": "@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel",
@@ -18748,8 +19705,26 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   {
                                     "name": "method",
                                     "type": {
-                                      "type": "intrinsic",
-                                      "name": "string"
+                                      "type": "union",
+                                      "subTypes": [
+                                        {
+                                          "type": "literal",
+                                          "value": "password"
+                                        },
+                                        null,
+                                        {
+                                          "type": "literal",
+                                          "value": "otp"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "oauth"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "mfa/totp"
+                                        }
+                                      ]
                                     },
                                     "comment": {
                                       "shortText": "Authentication method name."
@@ -18913,11 +19888,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   {
                                     "name": "factor_type",
                                     "type": {
-                                      "type": "intrinsic",
-                                      "name": "string"
+                                      "type": "union",
+                                      "subTypes": [
+                                        null,
+                                        {
+                                          "type": "literal",
+                                          "value": "totp"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "phone"
+                                        }
+                                      ]
                                     },
                                     "comment": {
-                                      "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                      "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                     }
                                   },
                                   {
@@ -18975,6 +19960,95 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                             }
                           },
                           {
+                            "name": "phone",
+                            "type": {
+                              "type": "array",
+                              "elemType": {
+                                "type": "object",
+                                "name": "Factor",
+                                "properties": [
+                                  {
+                                    "name": "created_at",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  },
+                                  {
+                                    "name": "factor_type",
+                                    "type": {
+                                      "type": "union",
+                                      "subTypes": [
+                                        null,
+                                        {
+                                          "type": "literal",
+                                          "value": "totp"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "phone"
+                                        }
+                                      ]
+                                    },
+                                    "comment": {
+                                      "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
+                                    }
+                                  },
+                                  {
+                                    "name": "friendly_name",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    },
+                                    "isOptional": true,
+                                    "comment": {
+                                      "shortText": "Friendly name of the factor, useful to disambiguate between multiple factors."
+                                    }
+                                  },
+                                  {
+                                    "name": "id",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    },
+                                    "comment": {
+                                      "shortText": "ID of the factor."
+                                    }
+                                  },
+                                  {
+                                    "name": "status",
+                                    "type": {
+                                      "type": "union",
+                                      "subTypes": [
+                                        {
+                                          "type": "literal",
+                                          "value": "verified"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "unverified"
+                                        }
+                                      ]
+                                    },
+                                    "comment": {
+                                      "shortText": "Factor's status."
+                                    }
+                                  },
+                                  {
+                                    "name": "updated_at",
+                                    "type": {
+                                      "type": "intrinsic",
+                                      "name": "string"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "comment": {
+                              "shortText": "Only verified Phone factors. (A subset of \`all\`.)"
+                            }
+                          },
+                          {
                             "name": "totp",
                             "type": {
                               "type": "array",
@@ -18992,11 +20066,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   {
                                     "name": "factor_type",
                                     "type": {
-                                      "type": "intrinsic",
-                                      "name": "string"
+                                      "type": "union",
+                                      "subTypes": [
+                                        null,
+                                        {
+                                          "type": "literal",
+                                          "value": "totp"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "phone"
+                                        }
+                                      ]
                                     },
                                     "comment": {
-                                      "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                      "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                     }
                                   },
                                   {
@@ -19396,11 +20480,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         {
                                           "name": "factor_type",
                                           "type": {
-                                            "type": "intrinsic",
-                                            "name": "string"
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
                                           },
                                           "comment": {
-                                            "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                           }
                                         },
                                         {
@@ -19547,6 +20641,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
                                   },
                                   "isOptional": true
                                 },
@@ -19911,11 +21013,21 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   {
                                     "name": "factor_type",
                                     "type": {
-                                      "type": "intrinsic",
-                                      "name": "string"
+                                      "type": "union",
+                                      "subTypes": [
+                                        null,
+                                        {
+                                          "type": "literal",
+                                          "value": "totp"
+                                        },
+                                        {
+                                          "type": "literal",
+                                          "value": "phone"
+                                        }
+                                      ]
                                     },
                                     "comment": {
-                                      "shortText": "Type of factor. Only \`totp\` supported with this version but may change in\\nfuture versions."
+                                      "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
                                     }
                                   },
                                   {
@@ -20066,6 +21178,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                             "isOptional": true
                           },
                           {
+                            "name": "is_anonymous",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "boolean"
+                            },
+                            "isOptional": true
+                          },
+                          {
                             "name": "last_sign_in_at",
                             "type": {
                               "type": "intrinsic",
@@ -20188,6 +21308,34 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         }
       },
+      "@supabase/postgrest-js.PostgrestBuilder.setHeader": {
+        "name": "@supabase/postgrest-js.PostgrestBuilder.setHeader",
+        "params": [
+          {
+            "name": "name",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            }
+          },
+          {
+            "name": "value",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "Result"
+          }
+        },
+        "comment": {
+          "shortText": "Set an HTTP header for the request."
+        }
+      },
       "@supabase/postgrest-js.PostgrestBuilder.then": {
         "name": "@supabase/postgrest-js.PostgrestBuilder.then",
         "params": [
@@ -20204,134 +21352,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   "type": "function",
                   "params": [
                     {
-                      "name": "value",
-                      "type": {
-                        "type": "union",
-                        "name": "PostgrestSingleResponse",
-                        "subTypes": [
-                          {
-                            "type": "object",
-                            "name": "PostgrestResponseSuccess",
-                            "properties": [
-                              {
-                                "name": "count",
-                                "type": {
-                                  "type": "union",
-                                  "subTypes": [
-                                    {
-                                      "type": "literal",
-                                      "value": null
-                                    },
-                                    {
-                                      "type": "intrinsic",
-                                      "name": "number"
-                                    }
-                                  ]
-                                }
-                              },
-                              {
-                                "name": "data",
-                                "type": {
-                                  "type": "nameOnly",
-                                  "name": "T"
-                                }
-                              },
-                              {
-                                "name": "error",
-                                "type": {
-                                  "type": "literal",
-                                  "value": null
-                                }
-                              },
-                              {
-                                "name": "status",
-                                "type": {
-                                  "type": "intrinsic",
-                                  "name": "number"
-                                }
-                              },
-                              {
-                                "name": "statusText",
-                                "type": {
-                                  "type": "intrinsic",
-                                  "name": "string"
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "type": "object",
-                            "name": "PostgrestResponseFailure",
-                            "properties": [
-                              {
-                                "name": "count",
-                                "type": {
-                                  "type": "literal",
-                                  "value": null
-                                }
-                              },
-                              {
-                                "name": "data",
-                                "type": {
-                                  "type": "literal",
-                                  "value": null
-                                }
-                              },
-                              {
-                                "name": "error",
-                                "type": {
-                                  "name": "PostgrestError",
-                                  "type": "object",
-                                  "properties": [
-                                    {
-                                      "name": "code",
-                                      "type": {
-                                        "type": "intrinsic",
-                                        "name": "string"
-                                      }
-                                    },
-                                    {
-                                      "name": "details",
-                                      "type": {
-                                        "type": "intrinsic",
-                                        "name": "string"
-                                      }
-                                    },
-                                    {
-                                      "name": "hint",
-                                      "type": {
-                                        "type": "intrinsic",
-                                        "name": "string"
-                                      }
-                                    },
-                                    {
-                                      "name": "message",
-                                      "type": {
-                                        "type": "intrinsic",
-                                        "name": "string"
-                                      }
-                                    }
-                                  ]
-                                }
-                              },
-                              {
-                                "name": "status",
-                                "type": {
-                                  "type": "intrinsic",
-                                  "name": "number"
-                                }
-                              },
-                              {
-                                "name": "statusText",
-                                "type": {
-                                  "type": "intrinsic",
-                                  "name": "string"
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
+                      "name": "value"
                     }
                   ],
                   "ret": {
@@ -20405,12 +21426,6 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
       "@supabase/postgrest-js.PostgrestBuilder.throwOnError": {
         "name": "@supabase/postgrest-js.PostgrestBuilder.throwOnError",
         "params": [],
-        "ret": {
-          "type": {
-            "type": "nameOnly",
-            "name": "Result"
-          }
-        },
         "comment": {
           "shortText": "If there's an error with the query, throwOnError will reject the promise by\\nthrowing the error instead of returning it as part of a successful response.",
           "text": "{@link https://github.com/supabase/supabase-js/issues/92}\\n"
@@ -20691,6 +21706,47 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           "shortText": "Select a schema to query or perform an function (rpc) call.",
           "text": "The schema needs to be on the list of exposed schemas inside Supabase.\\n"
         }
+      },
+      "@supabase/postgrest-js.PostgrestError.constructor": {
+        "name": "@supabase/postgrest-js.PostgrestError.constructor",
+        "params": [
+          {
+            "name": "context",
+            "type": {
+              "type": "object",
+              "properties": [
+                {
+                  "name": "code",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                },
+                {
+                  "name": "details",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                },
+                {
+                  "name": "hint",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                },
+                {
+                  "name": "message",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  }
+                }
+              ]
+            }
+          }
+        ]
       },
       "@supabase/postgrest-js.PostgrestFilterBuilder.constructor": {
         "name": "@supabase/postgrest-js.PostgrestFilterBuilder.constructor",
@@ -20992,10 +22048,6 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           },
           {
             "name": "value",
-            "type": {
-              "type": "nameOnly",
-              "name": "NonNullable"
-            },
             "comment": {
               "shortText": "The value to filter with\\n"
             }
@@ -21010,43 +22062,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "comment": {
           "shortText": "Match only rows where \`column\` is equal to \`value\`.",
           "text": "To check if the value of \`column\` is NULL, you should use \`.is()\` instead.\\n"
-        },
-        "altSignatures": [
-          {
-            "params": [
-              {
-                "name": "column",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                },
-                "comment": {
-                  "shortText": "The column to filter on"
-                }
-              },
-              {
-                "name": "value",
-                "type": {
-                  "type": "nameOnly",
-                  "name": "NonNullable"
-                },
-                "comment": {
-                  "shortText": "The value to filter with\\n"
-                }
-              }
-            ],
-            "ret": {
-              "type": {
-                "type": "nameOnly",
-                "name": "Schema"
-              }
-            },
-            "comment": {
-              "shortText": "Match only rows where \`column\` is equal to \`value\`.",
-              "text": "To check if the value of \`column\` is NULL, you should use \`.is()\` instead.\\n"
-            }
-          }
-        ]
+        }
       },
       "@supabase/postgrest-js.PostgrestFilterBuilder.explain": {
         "name": "@supabase/postgrest-js.PostgrestFilterBuilder.explain",
@@ -21747,11 +22763,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           {
             "name": "values",
             "type": {
-              "type": "array",
-              "elemType": {
-                "type": "nameOnly",
-                "name": "Row['ColumnName']"
-              }
+              "type": "array"
             },
             "comment": {
               "shortText": "The values array to filter with\\n"
@@ -21766,45 +22778,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         },
         "comment": {
           "shortText": "Match only rows where \`column\` is included in the \`values\` array."
-        },
-        "altSignatures": [
-          {
-            "params": [
-              {
-                "name": "column",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                },
-                "comment": {
-                  "shortText": "The column to filter on"
-                }
-              },
-              {
-                "name": "values",
-                "type": {
-                  "type": "array",
-                  "elemType": {
-                    "type": "intrinsic",
-                    "name": "unknown"
-                  }
-                },
-                "comment": {
-                  "shortText": "The values array to filter with\\n"
-                }
-              }
-            ],
-            "ret": {
-              "type": {
-                "type": "nameOnly",
-                "name": "Schema"
-              }
-            },
-            "comment": {
-              "shortText": "Match only rows where \`column\` is included in the \`values\` array."
-            }
-          }
-        ]
+        }
       },
       "@supabase/postgrest-js.PostgrestFilterBuilder.is": {
         "name": "@supabase/postgrest-js.PostgrestFilterBuilder.is",
@@ -22399,10 +23373,6 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           },
           {
             "name": "value",
-            "type": {
-              "type": "nameOnly",
-              "name": "Row['ColumnName']"
-            },
             "comment": {
               "shortText": "The value to filter with\\n"
             }
@@ -22416,42 +23386,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         },
         "comment": {
           "shortText": "Match only rows where \`column\` is not equal to \`value\`."
-        },
-        "altSignatures": [
-          {
-            "params": [
-              {
-                "name": "column",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "string"
-                },
-                "comment": {
-                  "shortText": "The column to filter on"
-                }
-              },
-              {
-                "name": "value",
-                "type": {
-                  "type": "intrinsic",
-                  "name": "unknown"
-                },
-                "comment": {
-                  "shortText": "The value to filter with\\n"
-                }
-              }
-            ],
-            "ret": {
-              "type": {
-                "type": "nameOnly",
-                "name": "Schema"
-              }
-            },
-            "comment": {
-              "shortText": "Match only rows where \`column\` is not equal to \`value\`."
-            }
-          }
-        ]
+        }
       },
       "@supabase/postgrest-js.PostgrestFilterBuilder.not": {
         "name": "@supabase/postgrest-js.PostgrestFilterBuilder.not",
@@ -23032,7 +23967,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Limit the query result by starting at an offset (\`from\`) and ending at the offset (\`from + to\`).\\nOnly records within this range are returned.\\nThis respects the query order and if there is no order clause the range could behave unexpectedly.\\nThe \`from\` and \`to\` values are 0-based and inclusive: \`range(1, 3)\` will include the second, third\\nand fourth rows of the query."
+          "shortText": "Limit the query result by starting at an offset \`from\` and ending at the offset \`to\`.\\nOnly records within this range are returned.\\nThis respects the query order and if there is no order clause the range could behave unexpectedly.\\nThe \`from\` and \`to\` values are 0-based and inclusive: \`range(1, 3)\` will include the second, third\\nand fourth rows of the query."
         }
       },
       "@supabase/postgrest-js.PostgrestFilterBuilder.rangeAdjacent": {
@@ -23433,6 +24368,34 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           "text": "By default, \`.insert()\`, \`.update()\`, \`.upsert()\`, and \`.delete()\` do not\\nreturn modified rows. By calling this method, modified rows are returned in\\n\`data\`.\\n"
         }
       },
+      "@supabase/postgrest-js.PostgrestFilterBuilder.setHeader": {
+        "name": "@supabase/postgrest-js.PostgrestFilterBuilder.setHeader",
+        "params": [
+          {
+            "name": "name",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            }
+          },
+          {
+            "name": "value",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "Schema"
+          }
+        },
+        "comment": {
+          "shortText": "Set an HTTP header for the request."
+        }
+      },
       "@supabase/postgrest-js.PostgrestFilterBuilder.single": {
         "name": "@supabase/postgrest-js.PostgrestFilterBuilder.single",
         "params": [],
@@ -23700,41 +24663,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 }
                               },
                               {
-                                "name": "error",
-                                "type": {
-                                  "name": "PostgrestError",
-                                  "type": "object",
-                                  "properties": [
-                                    {
-                                      "name": "code",
-                                      "type": {
-                                        "type": "intrinsic",
-                                        "name": "string"
-                                      }
-                                    },
-                                    {
-                                      "name": "details",
-                                      "type": {
-                                        "type": "intrinsic",
-                                        "name": "string"
-                                      }
-                                    },
-                                    {
-                                      "name": "hint",
-                                      "type": {
-                                        "type": "intrinsic",
-                                        "name": "string"
-                                      }
-                                    },
-                                    {
-                                      "name": "message",
-                                      "type": {
-                                        "type": "intrinsic",
-                                        "name": "string"
-                                      }
-                                    }
-                                  ]
-                                }
+                                "name": "error"
                               },
                               {
                                 "name": "status",
@@ -23827,12 +24756,6 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
       "@supabase/postgrest-js.PostgrestFilterBuilder.throwOnError": {
         "name": "@supabase/postgrest-js.PostgrestFilterBuilder.throwOnError",
         "params": [],
-        "ret": {
-          "type": {
-            "type": "nameOnly",
-            "name": "Schema"
-          }
-        },
         "comment": {
           "shortText": "If there's an error with the query, throwOnError will reject the promise by\\nthrowing the error instead of returning it as part of a successful response.",
           "text": "{@link https://github.com/supabase/supabase-js/issues/92}\\n"
@@ -25039,7 +25962,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Limit the query result by starting at an offset (\`from\`) and ending at the offset (\`from + to\`).\\nOnly records within this range are returned.\\nThis respects the query order and if there is no order clause the range could behave unexpectedly.\\nThe \`from\` and \`to\` values are 0-based and inclusive: \`range(1, 3)\` will include the second, third\\nand fourth rows of the query."
+          "shortText": "Limit the query result by starting at an offset \`from\` and ending at the offset \`to\`.\\nOnly records within this range are returned.\\nThis respects the query order and if there is no order clause the range could behave unexpectedly.\\nThe \`from\` and \`to\` values are 0-based and inclusive: \`range(1, 3)\` will include the second, third\\nand fourth rows of the query."
         }
       },
       "@supabase/postgrest-js.PostgrestTransformBuilder.returns": {
@@ -25093,6 +26016,34 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "comment": {
           "shortText": "Perform a SELECT on the query result.",
           "text": "By default, \`.insert()\`, \`.update()\`, \`.upsert()\`, and \`.delete()\` do not\\nreturn modified rows. By calling this method, modified rows are returned in\\n\`data\`.\\n"
+        }
+      },
+      "@supabase/postgrest-js.PostgrestTransformBuilder.setHeader": {
+        "name": "@supabase/postgrest-js.PostgrestTransformBuilder.setHeader",
+        "params": [
+          {
+            "name": "name",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            }
+          },
+          {
+            "name": "value",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "Schema"
+          }
+        },
+        "comment": {
+          "shortText": "Set an HTTP header for the request."
         }
       },
       "@supabase/postgrest-js.PostgrestTransformBuilder.single": {
@@ -25199,41 +26150,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 }
                               },
                               {
-                                "name": "error",
-                                "type": {
-                                  "name": "PostgrestError",
-                                  "type": "object",
-                                  "properties": [
-                                    {
-                                      "name": "code",
-                                      "type": {
-                                        "type": "intrinsic",
-                                        "name": "string"
-                                      }
-                                    },
-                                    {
-                                      "name": "details",
-                                      "type": {
-                                        "type": "intrinsic",
-                                        "name": "string"
-                                      }
-                                    },
-                                    {
-                                      "name": "hint",
-                                      "type": {
-                                        "type": "intrinsic",
-                                        "name": "string"
-                                      }
-                                    },
-                                    {
-                                      "name": "message",
-                                      "type": {
-                                        "type": "intrinsic",
-                                        "name": "string"
-                                      }
-                                    }
-                                  ]
-                                }
+                                "name": "error"
                               },
                               {
                                 "name": "status",
@@ -25326,12 +26243,6 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
       "@supabase/postgrest-js.PostgrestTransformBuilder.throwOnError": {
         "name": "@supabase/postgrest-js.PostgrestTransformBuilder.throwOnError",
         "params": [],
-        "ret": {
-          "type": {
-            "type": "nameOnly",
-            "name": "Schema"
-          }
-        },
         "comment": {
           "shortText": "If there's an error with the query, throwOnError will reject the promise by\\nthrowing the error instead of returning it as part of a successful response.",
           "text": "{@link https://github.com/supabase/supabase-js/issues/92}\\n"
@@ -25410,6 +26321,17 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                         "comment": {
                           "shortText": "key option is used to track presence payload across clients"
                         }
+                      },
+                      {
+                        "name": "private",
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "boolean"
+                        },
+                        "isOptional": true,
+                        "comment": {
+                          "shortText": "defines if the channel is private or not and if RLS policies will be used to check data"
+                        }
                       }
                     ]
                   }
@@ -25421,49 +26343,6 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "name": "socket"
           }
         ]
-      },
-      "@supabase/realtime-js.RealtimeChannel._fetchWithTimeout": {
-        "name": "@supabase/realtime-js.RealtimeChannel._fetchWithTimeout",
-        "params": [
-          {
-            "name": "url",
-            "type": {
-              "type": "intrinsic",
-              "name": "string"
-            }
-          },
-          {
-            "name": "options",
-            "type": {
-              "type": "index signature",
-              "keyType": {
-                "type": "intrinsic",
-                "name": "string"
-              },
-              "valueType": {
-                "type": "intrinsic",
-                "name": "any"
-              }
-            }
-          },
-          {
-            "name": "timeout",
-            "type": {
-              "type": "intrinsic",
-              "name": "number"
-            }
-          }
-        ],
-        "ret": {
-          "type": {
-            "type": "promise",
-            "name": "Promise",
-            "awaited": {
-              "type": "nameOnly",
-              "name": "Response"
-            }
-          }
-        }
       },
       "@supabase/realtime-js.RealtimeChannel.on": {
         "name": "@supabase/realtime-js.RealtimeChannel.on",
@@ -26145,6 +27024,41 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 }
               }
             ]
+          },
+          {
+            "params": [
+              {
+                "name": "type",
+                "type": {
+                  "type": "literal",
+                  "value": "system"
+                }
+              },
+              {
+                "name": "filter"
+              },
+              {
+                "name": "callback",
+                "type": {
+                  "type": "function",
+                  "params": [
+                    {
+                      "name": "payload",
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "any"
+                      }
+                    }
+                  ],
+                  "ret": {
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "void"
+                    }
+                  }
+                }
+              }
+            ]
           }
         ]
       },
@@ -26284,25 +27198,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 {
                   "name": "status",
                   "type": {
-                    "type": "union",
-                    "subTypes": [
-                      {
-                        "type": "literal",
-                        "value": "SUBSCRIBED"
-                      },
-                      {
-                        "type": "literal",
-                        "value": "TIMED_OUT"
-                      },
-                      {
-                        "type": "literal",
-                        "value": "CLOSED"
-                      },
-                      {
-                        "type": "literal",
-                        "value": "CHANNEL_ERROR"
-                      }
-                    ]
+                    "type": "nameOnly",
+                    "name": "REALTIME_SUBSCRIBE_STATES"
                   }
                 },
                 {
@@ -26636,6 +27533,46 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     "name": "WebSocketLikeConstructor"
                   },
                   "isOptional": true
+                },
+                {
+                  "name": "worker",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "workerUrl",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "type": "function",
+                  "name": "accessToken",
+                  "params": [],
+                  "ret": {
+                    "type": {
+                      "type": "promise",
+                      "name": "Promise",
+                      "awaited": {
+                        "type": "union",
+                        "subTypes": [
+                          {
+                            "type": "literal",
+                            "value": null
+                          },
+                          {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        ]
+                      }
+                    }
+                  }
                 }
               ]
             },
@@ -26644,6 +27581,33 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         ],
         "comment": {
           "shortText": "Initializes the Socket."
+        }
+      },
+      "@supabase/realtime-js.RealtimeClient._workerObjectUrl": {
+        "name": "@supabase/realtime-js.RealtimeClient._workerObjectUrl",
+        "params": [
+          {
+            "name": "url",
+            "type": {
+              "type": "union",
+              "subTypes": [
+                {
+                  "type": "intrinsic",
+                  "name": "undefined"
+                },
+                {
+                  "type": "intrinsic",
+                  "name": "string"
+                }
+              ]
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "intrinsic",
+            "name": "string"
+          }
         }
       },
       "@supabase/realtime-js.RealtimeClient.channel": {
@@ -26714,6 +27678,17 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                         "comment": {
                           "shortText": "key option is used to track presence payload across clients"
                         }
+                      },
+                      {
+                        "name": "private",
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "boolean"
+                        },
+                        "isOptional": true,
+                        "comment": {
+                          "shortText": "defines if the channel is private or not and if RLS policies will be used to check data"
+                        }
                       }
                     ]
                   }
@@ -26783,6 +27758,33 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         },
         "comment": {
           "shortText": "Disconnects the socket."
+        }
+      },
+      "@supabase/realtime-js.RealtimeClient.endpointURL": {
+        "name": "@supabase/realtime-js.RealtimeClient.endpointURL",
+        "params": [],
+        "ret": {
+          "type": {
+            "type": "intrinsic",
+            "name": "string"
+          }
+        },
+        "comment": {
+          "shortText": "Returns the URL of the websocket.",
+          "returns": "string The URL of the websocket.\\n"
+        }
+      },
+      "@supabase/realtime-js.RealtimeClient.flushSendBuffer": {
+        "name": "@supabase/realtime-js.RealtimeClient.flushSendBuffer",
+        "params": [],
+        "ret": {
+          "type": {
+            "type": "intrinsic",
+            "name": "void"
+          }
+        },
+        "comment": {
+          "shortText": "Flushes send buffer"
         }
       },
       "@supabase/realtime-js.RealtimeClient.getChannels": {
@@ -26979,6 +27981,23 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           "shortText": "Unsubscribes and removes a single channel"
         }
       },
+      "@supabase/realtime-js.RealtimeClient.sendHeartbeat": {
+        "name": "@supabase/realtime-js.RealtimeClient.sendHeartbeat",
+        "params": [],
+        "ret": {
+          "type": {
+            "type": "promise",
+            "name": "Promise",
+            "awaited": {
+              "type": "intrinsic",
+              "name": "void"
+            }
+          }
+        },
+        "comment": {
+          "shortText": "Sends a heartbeat message if the socket is connected."
+        }
+      },
       "@supabase/realtime-js.RealtimeClient.setAuth": {
         "name": "@supabase/realtime-js.RealtimeClient.setAuth",
         "params": [
@@ -26998,18 +28017,23 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               ]
             },
             "comment": {
-              "shortText": "A JWT string.\\n"
+              "shortText": "A JWT string to override the token set on the client.\\n"
             }
           }
         ],
         "ret": {
           "type": {
-            "type": "intrinsic",
-            "name": "void"
+            "type": "promise",
+            "name": "Promise",
+            "awaited": {
+              "type": "intrinsic",
+              "name": "void"
+            }
           }
         },
         "comment": {
-          "shortText": "Sets the JWT access token used for channel subscription authorization and Realtime RLS."
+          "shortText": "Sets the JWT access token used for channel subscription authorization and Realtime RLS.",
+          "text": "If param is null it will use the \`accessToken\` callback function or the token set on the client.\\n\\nOn callback used, it will set the value of the token internal to the client.\\n"
         }
       },
       "@supabase/realtime-js.RealtimePresence.constructor": {
@@ -28730,7 +29754,28 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               "name": "string"
             },
             "comment": {
-              "shortText": "The new file path, including the new file name. For example \`folder/image-copy.png\`.\\n"
+              "shortText": "The new file path, including the new file name. For example \`folder/image-copy.png\`."
+            }
+          },
+          {
+            "name": "options",
+            "type": {
+              "type": "object",
+              "name": "DestinationOptions",
+              "properties": [
+                {
+                  "name": "destinationBucket",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "isOptional": true
+                }
+              ]
+            },
+            "isOptional": true,
+            "comment": {
+              "shortText": "The destination options.\\n"
             }
           }
         ],
@@ -28805,8 +29850,27 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               "name": "string"
             },
             "comment": {
-              "shortText": "The file path, including the current file name. For example \`folder/image.png\`.\\n"
+              "shortText": "The file path, including the current file name. For example \`folder/image.png\`."
             }
+          },
+          {
+            "name": "options",
+            "type": {
+              "type": "object",
+              "properties": [
+                {
+                  "name": "upsert",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "comment": {
+                    "shortText": "If set to true, allows the file to be overwritten if it already exists.\\n"
+                  }
+                }
+              ]
+            },
+            "isOptional": true
           }
         ],
         "ret": {
@@ -29389,6 +30453,73 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           "shortText": "Downloads a file from a private bucket. For public buckets, make a request to the URL returned from \`getPublicUrl\` instead."
         }
       },
+      "@supabase/storage-js.packages/StorageFileApi.default.exists": {
+        "name": "@supabase/storage-js.packages/StorageFileApi.default.exists",
+        "params": [
+          {
+            "name": "path",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            },
+            "comment": {
+              "shortText": "\\n"
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "promise",
+            "name": "Promise",
+            "awaited": {
+              "type": "union",
+              "subTypes": [
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "boolean"
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "boolean"
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "nameOnly",
+                        "name": "StorageError"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "comment": {
+          "shortText": "Checks the existence of a file."
+        }
+      },
       "@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl": {
         "name": "@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl",
         "params": [
@@ -29538,6 +30669,73 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         },
         "comment": {
           "shortText": "A simple convenience function to get the URL for an asset in a public bucket. If you do not want to use this function, you can construct the public URL by concatenating the bucket URL with the path to the asset.\\nThis function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset."
+        }
+      },
+      "@supabase/storage-js.packages/StorageFileApi.default.info": {
+        "name": "@supabase/storage-js.packages/StorageFileApi.default.info",
+        "params": [
+          {
+            "name": "path",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            },
+            "comment": {
+              "shortText": "\\n"
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "promise",
+            "name": "Promise",
+            "awaited": {
+              "type": "union",
+              "subTypes": [
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "nameOnly",
+                        "name": "Camelize"
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "nameOnly",
+                        "name": "StorageError"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "comment": {
+          "shortText": "Retrieves the details of an existing file."
         }
       },
       "@supabase/storage-js.packages/StorageFileApi.default.list": {
@@ -29860,7 +31058,28 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               "name": "string"
             },
             "comment": {
-              "shortText": "The new file path, including the new file name. For example \`folder/image-new.png\`.\\n"
+              "shortText": "The new file path, including the new file name. For example \`folder/image-new.png\`."
+            }
+          },
+          {
+            "name": "options",
+            "type": {
+              "type": "object",
+              "name": "DestinationOptions",
+              "properties": [
+                {
+                  "name": "destinationBucket",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "string"
+                  },
+                  "isOptional": true
+                }
+              ]
+            },
+            "isOptional": true,
+            "comment": {
+              "shortText": "The destination options.\\n"
             }
           }
         ],
@@ -30134,6 +31353,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           "shortText": "Deletes files within the same bucket"
         }
       },
+      "@supabase/storage-js.packages/StorageFileApi.default.toBase64": {
+        "name": "@supabase/storage-js.packages/StorageFileApi.default.toBase64",
+        "params": [
+          {
+            "name": "data",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "intrinsic",
+            "name": "string"
+          }
+        }
+      },
       "@supabase/storage-js.packages/StorageFileApi.default.update": {
         "name": "@supabase/storage-js.packages/StorageFileApi.default.update",
         "params": [
@@ -30235,6 +31472,44 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   "isOptional": true,
                   "comment": {
                     "shortText": "The duplex option is a string parameter that enables or disables duplex streaming, allowing for both reading and writing data in the same stream. It can be passed as an option to the fetch() method."
+                  }
+                },
+                {
+                  "name": "headers",
+                  "type": {
+                    "type": "record",
+                    "name": "Record",
+                    "keyType": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    },
+                    "valueType": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "Optionally add extra headers"
+                  }
+                },
+                {
+                  "name": "metadata",
+                  "type": {
+                    "type": "record",
+                    "name": "Record",
+                    "keyType": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    },
+                    "valueType": {
+                      "type": "intrinsic",
+                      "name": "any"
+                    }
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "The metadata option is an object that allows you to store additional information about the file. This information can be used to filter and search for files. The metadata object can contain any key-value pairs you want to store."
                   }
                 },
                 {
@@ -30388,6 +31663,44 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   "isOptional": true,
                   "comment": {
                     "shortText": "The duplex option is a string parameter that enables or disables duplex streaming, allowing for both reading and writing data in the same stream. It can be passed as an option to the fetch() method."
+                  }
+                },
+                {
+                  "name": "headers",
+                  "type": {
+                    "type": "record",
+                    "name": "Record",
+                    "keyType": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    },
+                    "valueType": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "Optionally add extra headers"
+                  }
+                },
+                {
+                  "name": "metadata",
+                  "type": {
+                    "type": "record",
+                    "name": "Record",
+                    "keyType": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    },
+                    "valueType": {
+                      "type": "intrinsic",
+                      "name": "any"
+                    }
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "The metadata option is an object that allows you to store additional information about the file. This information can be used to filter and search for files. The metadata object can contain any key-value pairs you want to store."
                   }
                 },
                 {
@@ -30551,6 +31864,44 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   "isOptional": true,
                   "comment": {
                     "shortText": "The duplex option is a string parameter that enables or disables duplex streaming, allowing for both reading and writing data in the same stream. It can be passed as an option to the fetch() method."
+                  }
+                },
+                {
+                  "name": "headers",
+                  "type": {
+                    "type": "record",
+                    "name": "Record",
+                    "keyType": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    },
+                    "valueType": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "Optionally add extra headers"
+                  }
+                },
+                {
+                  "name": "metadata",
+                  "type": {
+                    "type": "record",
+                    "name": "Record",
+                    "keyType": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    },
+                    "valueType": {
+                      "type": "intrinsic",
+                      "name": "any"
+                    }
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "The metadata option is an object that allows you to store additional information about the file. This information can be used to filter and search for files. The metadata object can contain any key-value pairs you want to store."
                   }
                 },
                 {

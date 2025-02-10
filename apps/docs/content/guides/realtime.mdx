@@ -138,6 +138,26 @@ for await insertion in insertions {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```py
+# Initialize the Python client
+from supabase import create_client, Client
+
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+# Create a function to handle inserts
+def handle_inserts(payload):
+  print("Change received", payload)
+
+# Listen to inserts
+await supabase.channel("todos").on_postgres_changes(
+    "INSERT", schema="public", table="todos", callback=handle_inserts
+).subscribe()
+```
+
+</TabPanel>
+
 </Tabs>
 
 Use [subscribe()](/docs/reference/javascript/subscribe) to listen to database changes.
