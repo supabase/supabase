@@ -42,7 +42,7 @@ export default function Introduction({ selectedLang }: Props) {
             the easiest way to interact with everything we offer within the Supabase ecosystem.
           </p>
         </article>
-        <article className="code">
+        <article className="code flex flex-col gap-y-2">
           <CodeSnippet selectedLang={selectedLang} snippet={Snippets.init(endpoint)} />
           {!isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert />}
         </article>

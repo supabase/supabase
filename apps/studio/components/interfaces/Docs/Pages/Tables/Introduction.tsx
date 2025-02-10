@@ -24,12 +24,13 @@ const Introduction = ({ selectedLang }: IntroductionProps) => {
     <>
       <h2 className="doc-heading">Introduction</h2>
       <div className="doc-section">
-        <article className="code-column text-foreground">
+        <article className="code-column text-foreground flex flex-col gap-y-2">
           <p>
             All views and tables in the <code>public</code> schema and accessible by the active
             database role for a request are available for querying.
           </p>
-
+        </article>
+        <article className="code">
           {!isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert />}
         </article>
       </div>
