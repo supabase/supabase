@@ -8,6 +8,7 @@ import { useOrganizationRolesV2Query } from 'data/organization-members/organizat
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
 import Link from 'next/link'
 import {
@@ -78,7 +79,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             ) : (
               <Image
                 alt={member.username}
-                src={`https://github.com/${member.username}.png?size=80`}
+                src={getGitHubProfileImgUrl(member.username)}
                 width="40"
                 height="40"
                 className="border rounded-full w-[32px] h-[32px] md:w-[40px] md:h-[40px]"

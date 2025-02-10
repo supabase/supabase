@@ -15,7 +15,9 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
+import Image from 'next/image'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   AiIconAnimation,
@@ -100,6 +102,7 @@ export const NavContent = () => {
   const signOut = useSignOut()
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const [hasInvalidImg, setHasInvalidImg] = useState(false)
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
   const [storedAllowNavPanel] = useLocalStorageQuery(
@@ -108,6 +111,7 @@ export const NavContent = () => {
   )
   // Don't allow the nav panel to expand in playwright tests
   const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
+  const isGHUser = !!profile && profile.auth0_id.startsWith('github')
 
   const {
     projectAuthAll: authEnabled,
@@ -189,17 +193,32 @@ export const NavContent = () => {
 
   const UserAccountButton = (
     <Button
+      block
       type="text"
       size="tiny"
       className={cn(
         'mt-3 h-10 [&>span]:relative [&>span]:flex [&>span]:w-full [&>span]:h-full p-0'
       )}
-      block
     >
       <div className="relative w-full h-full flex items-center justify-center">
-        <figure className="absolute left-1.5 min-h-6 min-w-6 bg-foreground rounded-full flex items-center justify-center">
-          <User size={ICON_SIZE - 2} strokeWidth={ICON_STROKE_WIDTH} className="text-background" />
-        </figure>
+        {isGHUser && !hasInvalidImg ? (
+          <Image
+            alt={profile.username}
+            src={getGitHubProfileImgUrl(profile.username)}
+            width="24"
+            height="24"
+            className="absolute left-1.5 bg-foreground rounded-full w-6 h-6"
+            onError={() => setHasInvalidImg(true)}
+          />
+        ) : (
+          <figure className="absolute left-1.5 min-h-6 min-w-6 bg-foreground rounded-full flex items-center justify-center">
+            <User
+              size={ICON_SIZE - 2}
+              strokeWidth={ICON_STROKE_WIDTH}
+              className="text-background"
+            />
+          </figure>
+        )}
         <span
           className={cn(
             'w-full md:w-[8rem] flex flex-col items-start text-sm truncate',
