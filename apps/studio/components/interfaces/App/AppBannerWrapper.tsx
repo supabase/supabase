@@ -13,7 +13,7 @@ import { useParams } from 'common'
 const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { profile } = useProfile()
 
-  const ongoingIncident = true // useFlag('ongoingIncident')
+  const ongoingIncident = useFlag('ongoingIncident')
   const showNoticeBanner = useFlag('showNoticeBanner')
   const clockSkewBanner = useFlag('clockSkewBanner')
 
