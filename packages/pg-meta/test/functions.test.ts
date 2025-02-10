@@ -303,3 +303,39 @@ withTestDatabase('retrieve set-returning function', async ({ executeQuery }) => 
   `
   )
 })
+
+withTestDatabase('create function with various config_params values', async ({ executeQuery }) => {
+  // Test empty string value
+  const { sql: createSql1 } = await pgMeta.functions.create({
+    name: 'test_func_config_1',
+    schema: 'public',
+    definition: 'select 1',
+    return_type: 'integer',
+    language: 'sql',
+    config_params: {
+      search_path: '""', // Should become ''
+      application_name: 'FROM CURRENT', // Special syntax: SET param FROM CURRENT
+      work_mem: "'8MB'", // Regular syntax: SET param TO value
+    },
+  })
+  await executeQuery(createSql1)
+
+  // Verify the function was created correctly
+  const { sql: retrieveSql1, zod: retrieveZod } = await pgMeta.functions.retrieve({
+    name: 'test_func_config_1',
+    schema: 'public',
+    args: [],
+  })
+  const result1 = retrieveZod.parse((await executeQuery(retrieveSql1))[0])
+
+  expect(result1).toBeDefined()
+  expect(result1!.config_params).toEqual({
+    search_path: '""',
+    application_name: 'postgres.js',
+    work_mem: '8MB',
+  })
+
+  // Clean up
+  const { sql: removeSql1 } = await pgMeta.functions.remove(result1!)
+  await executeQuery(removeSql1)
+})
