@@ -19,16 +19,8 @@ export const PipelineActionButton = ({ projectRef, pipelineId }: PipelineActionB
   const [requestStatus, setRequestStatus] = useState<'None' | 'StartRequested' | 'StopRequested'>(
     'None'
   )
-  const { mutate: startPipeline } = useStartPipelineMutation({
-    onSuccess: (res) => {
-      toast.success('Start pipeline request submitted. Pipeline will start shortly')
-    },
-  })
-  const { mutate: stopPipeline } = useStopPipelineMutation({
-    onSuccess: () => {
-      toast.success('Stop pipeline request submitted. Pipeline will stop shortly')
-    },
-  })
+  const { mutate: startPipeline } = useStartPipelineMutation()
+  const { mutate: stopPipeline } = useStopPipelineMutation()
   const actionButtonLoading =
     requestStatus === 'StartRequested' || requestStatus === 'StopRequested'
   const pipelineStatus = status?.status
