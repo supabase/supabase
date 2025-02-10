@@ -2189,14 +2189,6 @@ export const platform: NavMenuConstant = {
           name: 'Billing FAQ',
           url: '/guides/platform/billing-faq',
         },
-        {
-          name: 'How billing works',
-          url: '/guides/platform/org-based-billing',
-        },
-        {
-          name: 'Spend caps and cost-controls',
-          url: '/guides/platform/spend-cap',
-        },
       ],
     },
   ],
