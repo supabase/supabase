@@ -1,9 +1,17 @@
-import { Code } from 'lucide-react'
+import { BASE_PATH } from 'lib/constants'
+import Image from 'next/image'
 
 const InlineEditorPreview = () => {
   return (
-    <div className="space-y-2">
-      <p className="text-sm text-foreground-light">
+    <div>
+      <Image
+        src={`${BASE_PATH}/img/previews/inline-editor-preview.png`}
+        width={1296}
+        height={900}
+        alt="api-docs-side-panel-preview"
+        className="rounded border mb-4"
+      />
+      <p className="text-sm text-foreground-light mb-2">
         The inline editor allows you to quickly edit SQL queries directly in the interface without
         opening a new tab or window. This feature streamlines your workflow by providing immediate
         access to query editing capabilities wherever you see SQL code.
