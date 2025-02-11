@@ -27,6 +27,7 @@ Your billing cycle runs from January 1 to January 31. Although User-1 was signed
   </StepHikeCompact.Step>
 
 {' '}
+
 <StepHikeCompact.Step step={2}>
   <StepHikeCompact.Details title="Sign User-1 out on January 4" fullWidth>
     ```javascript const {error} = await supabase.auth.signOut() ```
@@ -60,7 +61,11 @@ Usage is shown as "Monthly Active Users" on your invoice.
 
 $0.00325 per MAU. You are only charged for usage exceeding your subscription plan's quota.
 
-<Admonition type="note">The count resets at the start of each billing cycle.</Admonition>
+<Admonition type="note">
+
+The count resets at the start of each billing cycle.
+
+</Admonition>
 
 | Plan       | Quota   | Over-Usage       |
 | ---------- | ------- | ---------------- |
