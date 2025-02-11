@@ -1,8 +1,7 @@
+import { useState } from 'react'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-
-import { useParams } from 'common'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import {
@@ -13,9 +12,10 @@ import {
   WarningIcon,
 } from 'ui'
 import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
-import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import ProviderForm from './ProviderForm'
 import { SectionHeader } from 'components/layouts/PageLayout'
+import { useParams } from 'common'
+import type { Provider } from './AuthProvidersForm.types'
 
 const AuthProvidersForm = () => {
   const { ref: projectRef } = useParams()
@@ -57,38 +57,50 @@ const AuthProvidersForm = () => {
             </div>
           </Alert_Shadcn_>
         )}
-        {isLoading &&
-          PROVIDERS_SCHEMAS.map((provider) => {
-            return (
-              <div
-                key={`provider_${provider.title}`}
-                className={[...ProviderCollapsibleClasses, 'px-6 py-3'].join(' ')}
-              >
+        <ResourceList>
+          {isLoading &&
+            PROVIDERS_SCHEMAS.map((provider) => (
+              <div key={`provider_${provider.title}`}>
                 <HorizontalShimmerWithIcon />
               </div>
-            )
-          })}
-        {isError && (
-          <Alert_Shadcn_ variant="destructive">
-            <WarningIcon />
-            <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        )}
-        {isSuccess &&
-          PROVIDERS_SCHEMAS.map((provider) => {
-            const providerSchema =
-              provider.title === 'Phone'
-                ? { ...provider, validationSchema: getPhoneProviderValidationSchema(authConfig) }
-                : provider
-            return (
-              <ProviderForm
-                key={`provider_${providerSchema.title}`}
-                config={authConfig}
-                provider={providerSchema as any}
-              />
-            )
-          })}
+            ))}
+          {isSuccess &&
+            PROVIDERS_SCHEMAS.map((provider) => {
+              const providerSchema =
+                provider.title === 'Phone'
+                  ? { ...provider, validationSchema: getPhoneProviderValidationSchema(authConfig) }
+                  : provider
+              let isActive = false
+              if (providerSchema.title === 'SAML 2.0') {
+                isActive = authConfig && (authConfig as any)['SAML_ENABLED']
+              } else if (providerSchema.title === 'LinkedIn (OIDC)') {
+                isActive = authConfig && (authConfig as any)['EXTERNAL_LINKEDIN_OIDC_ENABLED']
+              } else if (providerSchema.title === 'Slack (OIDC)') {
+                isActive = authConfig && (authConfig as any)['EXTERNAL_SLACK_OIDC_ENABLED']
+              } else {
+                isActive =
+                  authConfig &&
+                  (authConfig as any)[`EXTERNAL_${providerSchema.title.toUpperCase()}_ENABLED`]
+              }
+              return (
+                <ProviderForm
+                  key={`provider_${providerSchema.title}`}
+                  config={authConfig!}
+                  provider={providerSchema as unknown as Provider}
+                  isActive={isActive}
+                />
+              )
+            })}
+          {isError && (
+            <Alert_Shadcn_ variant="destructive">
+              <WarningIcon />
+              <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                {(authConfigError as any)?.message}
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )}
+        </ResourceList>
       </div>
     </div>
   )

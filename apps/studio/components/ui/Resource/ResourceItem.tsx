@@ -23,9 +23,7 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
         {...props}
       >
         {media && (
-          <div className="w-12 h-12 rounded bg-muted text-foreground-light flex items-center justify-center">
-            {media}
-          </div>
+          <div className="text-foreground-light flex items-center justify-center">{media}</div>
         )}
         <div className="flex-1">{children}</div>
         {meta && <div>{meta}</div>}
