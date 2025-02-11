@@ -110,6 +110,10 @@ export const gotrueClient = new AuthClient({
   detectSessionInUrl: shouldDetectSessionInUrl,
   debug: debug ? (persistedDebug ? logIndexedDB : true) : false,
   lock: navigatorLockEnabled ? navigatorLock : undefined,
+
+  ...('localStorage' in globalThis
+    ? { storage: globalThis.localStorage, userStorage: globalThis.localStorage }
+    : null),
 })
 
 export type { User }
