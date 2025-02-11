@@ -32,6 +32,7 @@ export type MultiAttribute = {
   docsLink?: string
   isMaxValue?: boolean
   type?: 'line' | 'area-bar'
+  omitFromTotal?: boolean
 }
 
 interface ComposedChartHandlerProps {
@@ -161,6 +162,7 @@ const ComposedChartHandler = ({
   const loading = isLoading || attributeQueries.some((query) => query.isLoading)
 
   // Calculate highlighted value based on the first attribute's data
+  // TODO: need to update this to show total aggregate over multiple attributes in a stacked chart
   const _highlightedValue = useMemo(() => {
     if (highlightedValue !== undefined) return highlightedValue
 

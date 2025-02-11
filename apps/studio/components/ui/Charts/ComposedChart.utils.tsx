@@ -32,7 +32,7 @@ interface TooltipProps {
   showTotal?: boolean
 }
 
-const formatBytes = (bytes: number, precision: number = 1) => {
+export const formatBytes = (bytes: number, precision: number = 1) => {
   if (bytes === 0) return '0 Bytes'
   const k = 1024
   const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']

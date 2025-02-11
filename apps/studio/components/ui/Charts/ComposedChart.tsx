@@ -24,7 +24,7 @@ import { ChartHighlight } from './useChartHighlight'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { MultiAttribute } from './ComposedChartHandler'
-import { CustomLabel, CustomTooltip } from './ComposedChart.utils'
+import { CustomLabel, CustomTooltip, formatBytes } from './ComposedChart.utils'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
@@ -138,6 +138,7 @@ export default function ComposedChart({
 
   const stackedAttributes = chartData.filter((att) => !att.name.includes('max'))
   const isPercentage = format === '%'
+  const isRamChart = chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
 
   if (data.length === 0) {
     return (
@@ -160,7 +161,9 @@ export default function ComposedChart({
         customDateFormat={customDateFormat}
         highlightedValue={
           typeof resolvedHighlightedValue === 'number'
-            ? numberFormatter(resolvedHighlightedValue, valuePrecision)
+            ? isRamChart
+              ? formatBytes(resolvedHighlightedValue, valuePrecision)
+              : numberFormatter(resolvedHighlightedValue, valuePrecision)
             : resolvedHighlightedValue
         }
         highlightedLabel={resolvedHighlightedLabel}

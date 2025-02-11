@@ -96,7 +96,6 @@ const REPORT_ATTRIBUTES = [
     showMaxValue: false,
     hideChartType: true,
     defaultChartStyle: 'line',
-    // showTotal: false,
     attributes: [
       {
         attribute: 'cpu_usage_busy_system',
@@ -128,19 +127,6 @@ const REPORT_ATTRIBUTES = [
         label: 'other',
         format: '%',
       },
-      // {
-      //   attribute: 'cpu_usage_busy_idle',
-      //   provider: 'infra-monitoring',
-      //   label: 'Idle',
-      //   format: '%',
-      // },
-      // {
-      //   attribute: 'max_cpu_usage',
-      //   provider: 'infra-monitoring',
-      //   label: 'Max CPU',
-      //   isMaxValue: true,
-      //   // format: '%',
-      // },
     ],
   },
   {
@@ -166,16 +152,6 @@ const REPORT_ATTRIBUTES = [
         attribute: 'client_connections_realtime',
         provider: 'infra-monitoring',
         label: 'realtime',
-      },
-      {
-        attribute: 'client_connections_pgbouncer',
-        provider: 'infra-monitoring',
-        label: 'pgbouncer',
-      },
-      {
-        attribute: 'client_connections_pgbouncer_waiting',
-        provider: 'infra-monitoring',
-        label: 'pgbouncer waiting',
       },
       {
         attribute: 'client_connections_max_limit',
