@@ -36,7 +36,7 @@ pg_cron operates as the `pg_cron scheduler` process within Postgres. Use the bel
 ```sql
 SELECT
   pid as process_id,
-  usename as database_user,
+  username as database_user,
   application_name,
   backend_start as when_process_began,
   wait_event_type,
@@ -96,7 +96,7 @@ The below query can be used to find actively querying jobs:
 ```sql
 SELECT
   pid as process_id,
-  usename as database_user,
+  username as database_user,
   application_name,
   backend_start as when_process_began,
   wait_event_type,
