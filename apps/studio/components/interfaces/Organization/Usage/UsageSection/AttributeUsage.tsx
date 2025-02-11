@@ -53,7 +53,7 @@ const AttributeUsage = ({
   isSuccess,
   currentBillingCycleSelected,
 }: AttributeUsageProps) => {
-  const upgradeUrl = getUpgradeUrl(slug ?? '', subscription)
+  const upgradeUrl = getUpgradeUrl(slug ?? '', subscription, attribute.key)
   const usageRatio = (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
   const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.pricing_free_units ?? 0)
   const usageBasedBilling = subscription?.usage_billing_enabled

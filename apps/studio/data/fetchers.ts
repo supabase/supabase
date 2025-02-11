@@ -7,7 +7,6 @@ import { ResponseError } from 'types'
 import type { paths } from './api' // generated from openapi-typescript
 
 const DEFAULT_HEADERS = {
-  'Content-Type': 'application/json',
   Accept: 'application/json',
 }
 

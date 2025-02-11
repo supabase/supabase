@@ -3,7 +3,9 @@ import { Home } from 'lucide-react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { useContentQuery } from 'data/content/content-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Metric, METRIC_CATEGORIES, METRICS } from 'lib/constants/metrics'
@@ -50,6 +52,8 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
     if (key === 'api_storage') return storageEnabled
     return true
   })
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const debouncedSearch = useDebounce(search, 300)
   const { data, isLoading } = useContentQuery({
@@ -132,6 +136,9 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                                 label: snippet.name,
                               },
                               isAddingChart: true,
+                            })
+                            sendEvent({
+                              action: TelemetryActions.CUSTOM_REPORT_ADD_SQL_BLOCK_CLICKED,
                             })
                           }
                         }}

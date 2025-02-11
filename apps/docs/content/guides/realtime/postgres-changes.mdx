@@ -883,7 +883,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 Realtime offers filters so you can specify the data your client receives at a more granular level.
 
-### Equal to (eq)
+### Equal to (`eq`)
 
 To listen to changes when a column's value in a table equals a client-specified value:
 
@@ -990,7 +990,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 This filter uses Postgres's `=` filter.
 
-### Not equal to (neq)
+### Not equal to (`neq`)
 
 To listen to changes when a column's value in a table does not equal a client-specified value:
 
@@ -1098,7 +1098,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 This filter uses Postgres's `!=` filter.
 
-### Less than (lt)
+### Less than (`lt`)
 
 To listen to changes when a column's value in a table is less than a client-specified value:
 
@@ -1205,7 +1205,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 This filter uses Postgres's `<` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
-### Less than or equal to (lte)
+### Less than or equal to (`lte`)
 
 To listen to changes when a column's value in a table is less than or equal to a client-specified value:
 
@@ -1312,7 +1312,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 This filter uses Postgres' `<=` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
-### Greater than (gt)
+### Greater than (`gt`)
 
 To listen to changes when a column's value in a table is greater than a client-specified value:
 
@@ -1419,7 +1419,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 This filter uses Postgres's `>` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
-### Greater than or equal to (gte)
+### Greater than or equal to (`gte`)
 
 To listen to changes when a column's value in a table is greater than or equal to a client-specified value:
 

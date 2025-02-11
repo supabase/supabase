@@ -31,4 +31,4 @@ While pointing out the exact cause for egress may not be straightforward, there 
 - Reduce the number of queries/calls by optimising client code or use caches to reduce the number of requests/queries being done: https://github.com/psteinroe/supabase-cache-helpers/
 - In case of update/insert queries, if you don’t need the entire row to be returned, configure your ORM/queries to not return the entire row
 - In case of running manual backups through Supavisor, remove unneeded tables and/or reduce the frequency
-- For Storage, if you start using the [smartCDN](https://supabase.com/docs/guides/storage/cdn/smart-cdn) Storage Egress usage can be managed. You can also use the [Supabase Image Transformations](https://supabase.com/docs/guides/storage/image-transformations) to optimize the images and reduce the egress.
+- For Storage, if you start using the [Smart CDN](https://supabase.com/docs/guides/storage/cdn/smart-cdn) Storage Egress usage can be managed. You can also use the [Supabase Image Transformations](https://supabase.com/docs/guides/storage/image-transformations) to optimize the images and reduce the egress.

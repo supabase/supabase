@@ -54,6 +54,10 @@ const levelsData = {
     icon: 'edge-functions',
     name: 'Edge Functions',
   },
+  telemetry: {
+    icon: 'telemetry',
+    name: 'Telemetry',
+  },
   realtime: {
     icon: 'realtime',
     name: 'Realtime',

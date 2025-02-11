@@ -50,7 +50,7 @@ Preview Branch instances contain no data by default. You must include a seed fil
 
 ## Git providers
 
-To manage code changes, your Supabase project must be connected to a Git repository. At this stage, we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](https://github.com/orgs/supabase/discussions/18936) for GitLab, BitBucket, and non-Git based Branching.
+To manage code changes, your Supabase project must be connected to a Git repository. At this stage, we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](https://github.com/orgs/supabase/discussions/18936) for GitLab, Bitbucket, and non-Git based Branching.
 
 ### Branching with GitHub
 
@@ -337,7 +337,7 @@ The Supabase CLI provides two options: [manual migrations](https://supabase.com/
     <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Make schema changes locally" fullWidth>
 
-            Start supabase locally:
+            Start Supabase locally:
 
             <CH.Code lineNumbers={false}>
 
@@ -622,7 +622,7 @@ The new preview branch is reseeded from the `./supabase/seed.sql` file by defaul
 
 ### Deployment failures
 
-A deployment might fail for various reasons, including invalid SQL statements and schema conflicts in migrations. Errors within the `config.toml` config or something else.
+A deployment might fail for various reasons, including invalid SQL statements and schema conflicts in migrations, errors within the `config.toml` config, or something else.
 
 To check the error message, see the Supabase workflow run for your branch under the [View logs](/dashboard/project/_/branches) section.
 

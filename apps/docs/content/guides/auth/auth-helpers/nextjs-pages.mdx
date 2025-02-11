@@ -20,7 +20,7 @@ The `auth-helpers` package has been replaced with the `@supabase/ssr` package. W
   size="medium"
   className="text-foreground-light border-b mt-8 pb-2"
   >
-  
+
   <AccordionItem
         header="See legacy docs"
         id="legacy-docs"
@@ -196,7 +196,7 @@ You can pass types that were [generated with the Supabase CLI](/docs/reference/j
 
 ### Browser client
 
-Creating a new supabase client object:
+Creating a new `supabase` client object:
 
 ```tsx
 import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
@@ -205,7 +205,7 @@ import { Database } from '../database.types'
 const supabaseClient = createPagesBrowserClient<Database>()
 ```
 
-Retrieving a supabase client object from the SessionContext:
+Retrieving a `supabase` client object from the `SessionContext`:
 
 ```tsx
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
@@ -286,7 +286,7 @@ export default LoginPage
 
 ## Server-side rendering (SSR)
 
-Create a server supabase client to retrieve the logged in user's session:
+Create a server Supabase client to retrieve the logged in user's session:
 
 ```jsx pages/profile.js
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
@@ -321,7 +321,7 @@ export const getServerSideProps = async (ctx) => {
 
 ## Server-side data fetching with RLS
 
-You can use the server supabase client to run [row level security](/docs/learn/auth-deep-dive/auth-row-level-security) authenticated queries server-side:
+You can use the server Supabase client to run [row level security](/docs/learn/auth-deep-dive/auth-row-level-security) authenticated queries server-side:
 
 <Tabs
   scrollable
@@ -543,7 +543,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
 ## Protecting API routes
 
-Create a server supabase client to retrieve the logged in user's session:
+Create a server Supabase client to retrieve the logged in user's session:
 
 <Tabs
   scrollable
@@ -674,7 +674,7 @@ supabase.auth.signUp({
 
 #### Deprecated functions
 
-With v0.7.x of the Next.js Auth Helpers a new naming convention has been implemented for createClient functions. The `createBrowserSupabaseClient` and `createServerSupabaseClient` functions have been marked as deprecated, and will be removed in a future version of the Auth Helpers.
+With v0.7.x of the Next.js Auth Helpers a new naming convention has been implemented for `createClient` functions. The `createBrowserSupabaseClient` and `createServerSupabaseClient` functions have been marked as deprecated, and will be removed in a future version of the Auth Helpers.
 
 - `createBrowserSupabaseClient` has been replaced with `createPagesBrowserClient`
 - `createServerSupabaseClient` has been replaced with `createPagesServerClient`
@@ -917,7 +917,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 - The `useUser` hook now returns the `user` object or `null`.
 - Usage with TypeScript: You can pass types that were [generated with the Supabase CLI](/docs/reference/javascript/typescript-support#generating-types) to the Supabase Client to get enhanced type safety and auto completion:
 
-Creating a new supabase client object:
+Creating a new `supabase` client object:
 
 ```tsx
 import { Database } from '../database.types'
@@ -925,7 +925,7 @@ import { Database } from '../database.types'
 const [supabaseClient] = useState(() => createPagesBrowserClient<Database>())
 ```
 
-Retrieving a supabase client object from the SessionContext:
+Retrieving a `supabase` client object from the `SessionContext`:
 
 ```tsx
 import { useSupabaseClient } from '@supabase/auth-helpers-react'

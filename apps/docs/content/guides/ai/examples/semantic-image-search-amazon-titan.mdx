@@ -84,7 +84,7 @@ bedrock_client = boto3.client(
 
 ## Create embeddings for your images
 
-In the root of your project, create a new folder called `images` and add some images. You can use the images from the example project on [GitHub](https://github.com/supabase/supabase/tree/master/examples/ai/aws_bedrock_image_search/images) or you can find license free images on [unsplash](https://unsplash.com).
+In the root of your project, create a new folder called `images` and add some images. You can use the images from the example project on [GitHub](https://github.com/supabase/supabase/tree/master/examples/ai/aws_bedrock_image_search/images) or you can find license free images on [Unsplash](https://unsplash.com).
 
 To send images to the Amazon Bedrock API we need to need to encode them as `base64` strings. Create the following helper methods:
 
@@ -188,7 +188,7 @@ seed = "image_search.main:seed"
 search = "image_search.main:search"
 ```
 
-After activating the virtual environtment with `poetry shell` you can now run your seed script via `poetry run seed`. You can inspect the generated embeddings in your Supabase Dashboard by visiting the [Table Editor](https://supabase.com/dashboard/project/_/editor), selecting the `vecs` schema, and the `image_vectors` table.
+After activating the virtual environment with `poetry shell` you can now run your seed script via `poetry run seed`. You can inspect the generated embeddings in your Supabase Dashboard by visiting the [Table Editor](https://supabase.com/dashboard/project/_/editor), selecting the `vecs` schema, and the `image_vectors` table.
 
 ## Perform an image search from a text query
 

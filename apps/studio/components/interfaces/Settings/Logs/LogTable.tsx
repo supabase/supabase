@@ -354,7 +354,7 @@ const LogTable = ({
     }
 
     return (
-      <div className="text-foreground flex gap-2 font-mono px-6">
+      <div className="text-foreground flex gap-2 font-mono p-4">
         <DefaultErrorRenderer {...childProps} />
       </div>
     )
@@ -378,6 +378,32 @@ const LogTable = ({
       setSelectedRow(null)
     }
   }, [selectedLog, isSelectedLogLoading])
+
+  // Keyboard navigation
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (!logDataRows.length || !selectedRow) return
+
+      const currentIndex = logDataRows.findIndex((row) => isEqual(row, selectedRow))
+      if (currentIndex === -1) return
+
+      if (event.key === 'ArrowUp' && currentIndex > 0) {
+        const prevRow = logDataRows[currentIndex - 1]
+        onRowClick(prevRow)
+      } else if (event.key === 'ArrowDown' && currentIndex < logDataRows.length - 1) {
+        const nextRow = logDataRows[currentIndex + 1]
+        onRowClick(nextRow)
+      }
+    },
+    [logDataRows, selectedRow, onRowClick]
+  )
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [handleKeyDown])
 
   if (!data) return null
 

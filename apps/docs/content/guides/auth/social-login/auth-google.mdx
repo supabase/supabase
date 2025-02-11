@@ -27,7 +27,7 @@ To support Sign In with Google, you need to configure the Google provider for yo
 For web applications, you can set up your signin button two different ways:
 
 - Use your own [application code](#application-code) for the button.
-- Use [Google's pre-built sign-in or OneTap flows](#google-pre-built).
+- Use [Google's pre-built sign-in or One Tap flows](#google-pre-built).
 
 ### Application code configuration
 
@@ -78,7 +78,7 @@ To use Google's pre-built signin buttons:
     1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
         - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
           - You will have a different set of SHA-1 certificate fingerprint for testing locally and going to production. Make sure to add both to the Google Cloud Console. and add all of the Client IDs to Supabase dashboard.
-        - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
+        - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple App Store.
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
     3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Client IDs_.
 
@@ -94,7 +94,7 @@ To use Google's pre-built signin buttons:
         - For both Android and iOS, you will need to create a Web client ID in the [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
         - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
           - You will have a different set of SHA-1 certificate fingerprint for testing locally and going to production. Make sure to add both to the Google Cloud Console. and add all of the Client IDs to Supabase dashboard.
-        - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
+        - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple App Store.
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
     3. Add only the web client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Client IDs_. If you need iOS support, enable the `Skip nonce check` option.
     4. For iOS, add the `CFBundleURLTypes` attributes below into the `/ios/Runner/Info.plist` file.
@@ -129,7 +129,7 @@ To use Google's pre-built signin buttons:
 
   <TabPanel id="swift" label="Swift">
 
-    Google sign-in with Supabase is done through the [GoogleSignIn-iOS](https://github.com/google/GoogleSignIn-iOS) package.
+    Google sign-in with Supabase is done through the [`GoogleSignIn-iOS`](https://github.com/google/GoogleSignIn-iOS) package.
 
     When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
 
@@ -187,7 +187,7 @@ To use Google's pre-built signin buttons:
     1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
 
       - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
-      - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
+      - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple App Store.
 
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
     3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Client IDs_.
@@ -548,7 +548,7 @@ Future<void> _nativeGoogleSignIn() async {
 
 ### Web, macOS, Windows, and Linux
 
-Google sign-in with Supabase on Web, macOS, Windows, and Linux is done through the [signInWithOAuth](docs/reference/dart/auth-signinwithoauth) method.
+Google sign-in with Supabase on Web, macOS, Windows, and Linux is done through the [`signInWithOAuth`](docs/reference/dart/auth-signinwithoauth) method.
 
 This method of signing in is web based, and will open a browser window to perform the sign in. For non-web platforms, the user is brought back to the app via [deep linking](/docs/guides/auth/native-mobile-deep-linking?platform=flutter).
 
@@ -595,7 +595,7 @@ implementation ("com.google.android.libraries.identity.googleid:googleid:<latest
 implementation("androidx.credentials:credentials-play-services-auth:<latest version>")
 ```
 
-Add the following proguard rules to your `proguard-rules.pro` file:
+Add the following ProGuard rules to your `proguard-rules.pro` file:
 
 ```proguard
 -if class androidx.credentials.CredentialManager

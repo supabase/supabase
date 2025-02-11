@@ -49,10 +49,15 @@
     "type": "git",
     "url": "git+https://github.com/supabase/supabase.git"
   },
+  "pnpm": {
+    "overrides": {
+      "@supabase/supabase-js>@supabase/auth-js": "2.68.0-rc.6"
+    }
+  },
   "engines": {
-    "pnpm": "^9.0.0",
-    "node": ">= 20"
+    "pnpm": ">=9",
+    "node": ">=20"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@9.10.0"
+  "packageManager": "pnpm@9.15.5"
 }

@@ -1,17 +1,18 @@
+import * as Sentry from '@sentry/nextjs'
 import { useIsLoggedIn } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import { toast } from 'sonner'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
 import type { Profile } from 'data/profile/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSendIdentifyMutation } from 'data/telemetry/send-identify-mutation'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { useSignOut } from './auth'
-import { TelemetryActions } from './constants/telemetry'
+import { getGitHubProfileImgUrl } from './github'
 
 export type ProfileContextType = {
   profile: Profile | undefined
@@ -35,12 +36,14 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const signOut = useSignOut()
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: sendIdentify } = useSendIdentifyMutation()
   const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
     onSuccess: () => {
       sendEvent({ action: TelemetryActions.SIGN_UP, properties: { category: 'conversion' } })
     },
-    onError: () => toast.error('Failed to create your profile. Please refresh to try again.'),
+    onError: (error) => {
+      Sentry.captureMessage('Failed to create users profile: ' + error.message)
+      toast.error('Failed to create your profile. Please refresh to try again.')
+    },
   })
 
   // Track telemetry for the current user
@@ -52,9 +55,6 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     isSuccess,
   } = useProfileQuery({
     enabled: isLoggedIn,
-    onSuccess(profile) {
-      sendIdentify({ user: profile })
-    },
     onError(err) {
       // if the user does not yet exist, create a profile for them
       if (err.message === "User's profile not found") {
@@ -75,10 +75,12 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
 
   const value = useMemo(() => {
     const isLoading = isLoadingProfile || isCreatingProfile || isLoadingPermissions
+    const isGHUser = !!profile && 'auth0_id' in profile && profile?.auth0_id.startsWith('github')
+    const profileImageUrl = isGHUser ? getGitHubProfileImgUrl(profile.username) : undefined
 
     return {
       error,
-      profile,
+      profile: !!profile ? { ...profile, profileImageUrl } : undefined,
       isLoading,
       isError,
       isSuccess,

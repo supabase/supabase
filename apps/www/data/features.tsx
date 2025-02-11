@@ -488,44 +488,6 @@ By leveraging Read Replicas, you can achieve consistent low-latency performance 
     },
   },
   {
-    title: 'Fly Postgres',
-    subtitle: 'Launch the Supabase stack on Fly.io edge network.',
-    description: `
-Fly Postgres allows you to deploy Supabase databases on the Fly.io edge network, bringing your data closer to users and reducing latency for global applications.
-
-## Key features
-1. Edge deployment: Launch databases in any region where Fly.io operates.
-2. CLI integration: Set up and manage databases using the Fly CLI.
-3. Supabase dashboard access: Use familiar Supabase tools for database management.
-4. IPv6 support: Connect directly to databases using IPv6.
-5. Supavisor support: Use Supavisor for IPv4 connections when needed.
-6. Automatic Supabase organization creation: Seamless integration with Fly accounts.
-
-## Benefits:
-- Improved global performance: Serve data from edge locations, minimizing latency.
-- Simplified deployment: Easily set up databases using Fly CLI commands.
-- Familiar tooling: Access Supabase features like SQL editor and table editor.
-- Flexible connectivity: Support for both IPv6 and IPv4 (via Supavisor) connections.
-- Integrated management: Manage database resources alongside other Fly applications.
-
-## Fly Postgres is particularly valuable for:
-- Global applications requiring low-latency database access worldwide
-- Developers familiar with Fly.io looking to integrate Supabase databases
-- Projects needing easy deployment and management of edge-located databases
-
-By leveraging Fly Postgres, you can achieve improved global performance for your applications while maintaining the ease of use and powerful features of Supabase.
-`,
-    icon: Cloud,
-    products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/platform/fly-postgres',
-    slug: 'fly-postgres',
-    status: {
-      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
-      availableOnSelfHosted: false,
-    },
-  },
-  {
     title: 'Postgres Extensions',
     subtitle: 'Enhance your database with popular Postgres extensions.',
     description: `

@@ -3,13 +3,13 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import SignInMfaForm from 'components/interfaces/SignIn/SignInMfaForm'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { Loading } from 'components/ui/Loading'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import type { NextPageWithLayout } from 'types'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -64,7 +64,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col flex-1 bg-alternative h-full items-center justify-center">
+      <div className="flex flex-col flex-1 bg-alternative h-screen items-center justify-center">
         <Loading />
       </div>
     )

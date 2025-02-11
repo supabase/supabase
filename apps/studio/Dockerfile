@@ -11,7 +11,6 @@
 FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
 
 # Fixes issues with Sentry CLI and SSL certificates during build
 # TODO: Git is added because it's needed to build libpg, remove it once they publish a binary on the S3 bucket
@@ -23,6 +22,8 @@ RUN apt-get update -qq && \
   build-essential && \ 
   rm -rf /var/lib/apt/lists/* && \
   update-ca-certificates
+
+RUN npm install -g pnpm@9.15.5
 
 WORKDIR /app
 
@@ -59,5 +60,5 @@ COPY --from=builder /app/apps/studio/.next/standalone ./
 COPY --from=builder /app/apps/studio/.next/static ./apps/studio/.next/static
 EXPOSE 3000
 ENTRYPOINT ["docker-entrypoint.sh"]
-HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD node -e "fetch('http://localhost:3000/api/profile').then((r) => {if (r.status !== 200) throw new Error(r.status)})"
+HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD node -e "fetch('http://localhost:3000/api/platform/profile').then((r) => {if (r.status !== 200) throw new Error(r.status)})"
 CMD ["node", "apps/studio/server.js"]

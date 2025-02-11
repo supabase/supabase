@@ -19,6 +19,7 @@ interface ReportBlockProps {
   endDate: string
   interval: AnalyticsInterval
   disableUpdate: boolean
+  isRefreshing: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
   onUpdateChart: ({
     chart,
@@ -35,6 +36,7 @@ export const ReportBlock = ({
   endDate,
   interval,
   disableUpdate,
+  isRefreshing,
   onRemoveChart,
   onUpdateChart,
 }: ReportBlockProps) => {
@@ -71,6 +73,7 @@ export const ReportBlock = ({
           disableRunIfMutation
           id={item.id}
           isLoading={isLoading}
+          isRefreshing={isRefreshing}
           label={item.label}
           chartConfig={chartConfig}
           sql={sql}
@@ -136,7 +139,7 @@ export const ReportBlock = ({
           attribute={item.attribute}
           provider={item.provider}
           defaultChartStyle={item.chart_type}
-          maxHeight={232}
+          maxHeight={176}
           label={`${item.label}${projectRef !== state.selectedDatabaseId ? (item.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
           actions={
             !disableUpdate ? (

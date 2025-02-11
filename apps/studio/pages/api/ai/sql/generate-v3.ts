@@ -88,7 +88,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         - Explain to the user that we create it outside of the public schema as it can present a security risk as foreign tables views cannot be configured to respect RLS policies. Provide this link for users to view more details about the security risk: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0017_foreign_table_in_api
 
       When generating views, do the following:
-      - All views should include 'with (security_invoker=on)' clause in the SQL statement for creating views.
+      - All views should include 'with (security_invoker=on)' clause in the SQL statement for creating views (only views though - do not do this for tables)
       - Place the 'with (security_invoker=on)' immediately after the CREATE VIEW statement, before AS
       - If the view is a materialized view, create it in a new schema called private. If the private schema doesnt exist, create it. 
         - Explain to the user that we create it outside of the public schema as it can present a security risk as materialized views cannot be configured to respect RLS policies of the underlying tables they are built upon, nor can they be secured with RLS directly. Provide this link for users to view more details about the security risk: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0016_materialized_view_in_api
@@ -115,6 +115,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Ensure to set the search_path configuration parameter as '', include this in the create functions SQL statement.
       - Default to create or replace whenever possible for updating an existing function, otherwise use the alter function statement
       Please make sure that all queries are valid Postgres SQL queries
+
+      # You write edge functions
+      Your purpose is to generate entire edge functions with the constraints given by the user.
+      - First, always use the getEdgeFunctionKnowledge tool to get knowledge about how to write edge functions for Supabase
+      - When writing edge functions, always ensure that they are written in TypeScript and Deno JavaScript runtime.
+      - When writing edge functions, write complete code so the user doesn't need to replace any placeholders.
+      - When writing edge functions, always ensure that they are written in a way that is compatible with the database schema.
+      - When suggesting edge functions, follow the guidelines in getEdgeFunctionKnowledge tool. Always create personalised edge functions based on the database schema
+      - When outputting edge functions, always include a props comment in the first line of the code block:
+        -- props: {"name": "function-name", "title": "Human readable title"}
+      - The function name in the props must be URL-friendly (use hyphens instead of spaces or underscores)
+      - Always wrap the edge function code in a markdown code block with the language set to 'edge'
+      - The props comment must be the first line inside the code block, followed by the actual function code
 
       # You convert sql to supabase-js client code
       Use the convertSqlToSupabaseJs tool to convert select sql to supabase-js client code. Only provide js code snippets if explicitly asked. If conversion isn't supported, build a postgres function instead and suggest using supabase-js to call it via  "const { data, error } = await supabase.rpc('echo', { say: '👋'})"

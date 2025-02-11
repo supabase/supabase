@@ -125,8 +125,8 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Integrations
     case pathname.startsWith('local-development'):
       return MenuId.LocalDevelopment
-    case pathname.startsWith('monitoring-troubleshooting'):
-      return MenuId.MonitoringTroubleshooting
+    case pathname.startsWith('telemetry'):
+      return MenuId.Telemetry
     case pathname.startsWith('platform'):
       return MenuId.Platform
     case pathname.startsWith('queues'):

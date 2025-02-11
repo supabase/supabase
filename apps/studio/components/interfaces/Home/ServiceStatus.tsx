@@ -35,11 +35,11 @@ const StatusMessage = ({
   status?: ProjectServiceStatus
 }) => {
   if (isLoading) return 'Checking status'
-  if (isProjectNew) return 'Coming up...'
-  if (isSuccess) return 'No issues'
   if (status === 'UNHEALTHY') return 'Unhealthy'
   if (status === 'COMING_UP') return 'Coming up...'
   if (status === 'ACTIVE_HEALTHY') return 'Healthy'
+  if (isProjectNew) return 'Coming up...'
+  if (isSuccess) return 'Healthy'
   return 'Unable to connect'
 }
 
@@ -62,10 +62,12 @@ const StatusIcon = ({
   isProjectNew: boolean
   projectStatus?: ProjectServiceStatus
 }) => {
-  if (isLoading || isProjectNew) return <LoaderIcon />
-  if (isSuccess) return <CheckIcon />
+  if (isLoading) return <LoaderIcon />
   if (projectStatus === 'UNHEALTHY') return <AlertIcon />
   if (projectStatus === 'COMING_UP') return <LoaderIcon />
+  if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
+  if (isProjectNew) return <LoaderIcon />
+  if (isSuccess) return <CheckIcon />
   return <AlertIcon />
 }
 

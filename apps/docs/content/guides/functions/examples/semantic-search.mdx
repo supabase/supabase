@@ -13,7 +13,7 @@ Since Supabase Edge Runtime [v1.36.0](https://github.com/supabase/edge-runtime/r
 In this tutorial you're implementing three parts:
 
 1. A [`generate-embedding`](https://github.com/supabase/supabase/tree/master/examples/ai/edge-functions/supabase/functions/generate-embedding/index.ts) database webhook edge function which generates embeddings when a content row is added (or updated) in the [`public.embeddings`](https://github.com/supabase/supabase/tree/master/examples/ai/edge-functions/supabase/migrations/20240408072601_embeddings.sql) table.
-2. A [`query_embeddings` Postgres function](https://github.com/supabase/supabase/tree/master/examples/ai/edge-functions/supabase/migrations/20240410031515_vector-search.sql) which allows us to perform similarity search from an egde function via [Remote Procedure Call (RPC)](https://supabase.com/docs/guides/database/functions?language=js).
+2. A [`query_embeddings` Postgres function](https://github.com/supabase/supabase/tree/master/examples/ai/edge-functions/supabase/migrations/20240410031515_vector-search.sql) which allows us to perform similarity search from an Edge Function via [Remote Procedure Call (RPC)](https://supabase.com/docs/guides/database/functions?language=js).
 3. A [`search` edge function](https://github.com/supabase/supabase/tree/master/examples/ai/edge-functions/supabase/functions/search/index.ts) which generates the embedding for the search term, performs the similarity search via RPC function call, and returns the result.
 
 You can find the complete example code on [GitHub](https://github.com/supabase/supabase/tree/master/examples/ai/edge-functions)
