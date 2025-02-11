@@ -3,14 +3,9 @@ import { toast } from 'sonner'
 
 import ProjectLinker from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
-import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
-import { useGitHubConnectionCreateMutation } from 'data/integrations/github-connection-create-mutation'
-import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import type { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { Button, SidePanel } from 'ui'
@@ -19,6 +14,7 @@ import { useGitLabRepositoriesQuery } from 'data/integrations/gitlab-repositorie
 import { useGitLabConnectionsQuery } from 'data/integrations/gitlab-connections-query'
 import { useGitLabConnectionCreateMutation } from 'data/integrations/gitlab-connection-create-mutation'
 import { useGitLabConnectionDeleteMutation } from 'data/integrations/gitlab-connection-delete-mutation'
+import { useGitLabAuthorizationQuery } from 'data/integrations/gitlab-authorization-query'
 
 const GITLAB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="93.97 97.52 192.05 184.99">
@@ -52,7 +48,7 @@ const SidePanelGitLabRepoLinker = ({ projectRef }: SidePanelGitLabRepoLinkerProp
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
 
   const { data: gitLabAuthorization, isLoading: isLoadingGitLabAuthorization } =
-    useGitHubAuthorizationQuery({ enabled: sidePanelStateSnapshot.gitlabConnectionsOpen })
+    useGitLabAuthorizationQuery({ enabled: sidePanelStateSnapshot.gitlabConnectionsOpen })
 
   // [Alaister]: temp override with <any> until the typegen is fixed
   const { data: gitLabReposData, isLoading: isLoadingGitLabRepos } = useGitLabRepositoriesQuery<
@@ -73,13 +69,12 @@ const SidePanelGitLabRepoLinker = ({ projectRef }: SidePanelGitLabRepoLinkerProp
         .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
     [selectedOrganization?.id, supabaseProjectsData]
   )
-
+  console.log({ gitLabReposData })
   const gitlabRepos = useMemo(
     () =>
       gitLabReposData?.map((repo: any) => ({
         id: repo.id.toString(),
         name: repo.name,
-        installation_id: repo.installation_id,
       })) ?? EMPTY_ARR,
     [gitLabReposData]
   )

@@ -29,6 +29,9 @@ import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/Integ
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelGitLabRepoLinker from './SidePanelGitLabRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
+import { useGitLabAuthorizationQuery } from 'data/integrations/gitlab-authorization-query'
+import { useGitLabConnectionsQuery } from 'data/integrations/gitlab-connections-query'
+import { useGitLabConnectionDeleteMutation } from 'data/integrations/gitlab-connection-delete-mutation'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' | 'gitlab' }) => {
   return (
@@ -58,10 +61,17 @@ const IntegrationSettings = () => {
 
   const { data: gitHubAuthorization } = useGitHubAuthorizationQuery()
   const { data: connections } = useGitHubConnectionsQuery({ organizationId: org?.id })
-
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted Github connection')
+    },
+  })
+
+  const { data: gitLabAuthorization } = useGitLabAuthorizationQuery()
+  const { data: gitlabConnections } = useGitLabConnectionsQuery({ organizationId: org?.id })
+  const { mutate: deleteGitLabConnection } = useGitLabConnectionDeleteMutation({
+    onSuccess: () => {
+      toast.success('Successfully deleted GitLab connection')
     },
   })
 
@@ -195,8 +205,8 @@ The GitHub app will watch for changes in your repository such as file changes, b
   `
 
   // TODO(jgoux): Add GitLab authorization
-  const GitLabContentSectionBottom = gitHubAuthorization
-    ? `You are authorized with Supabase GitHub App. You can configure your GitHub App installations and repository access [here](${GITHUB_INTEGRATION_INSTALLATION_URL}). You can revoke your authorization [here](${GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL}).`
+  const GitLabContentSectionBottom = gitLabAuthorization
+    ? `You are authorized with Supabase GitLab App. You can configure your GitLab App installations and repository access [here](${GITHUB_INTEGRATION_INSTALLATION_URL}). You can revoke your authorization [here](${GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL}).`
     : ''
 
   const GitLabSection = () => (
@@ -208,7 +218,7 @@ The GitHub app will watch for changes in your repository such as file changes, b
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
           {!canReadGithubConnection ? (
-            <NoPermission resourceText="view this organization's GitHub connections" />
+            <NoPermission resourceText="view this organization's GitLab connections" />
           ) : (
             <>
               <Markdown content={GitLabContentSectionTop} />
