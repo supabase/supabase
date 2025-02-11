@@ -10,7 +10,7 @@ export const ResourceList = forwardRef<HTMLDivElement, ResourceListProps>(
   ({ children, className, ...props }, ref) => {
     return (
       <Card ref={ref} {...props}>
-        <div className={cn('divide-y divide-default', className)}>{children}</div>
+        <div className={className}>{children}</div>
       </Card>
     )
   }

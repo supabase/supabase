@@ -198,7 +198,13 @@ const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent className="flex flex-col gap-0">
-          <SheetHeader className="shrink-0">
+          <SheetHeader className="shrink-0 flex items-center gap-4">
+            <img
+              src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}.svg`}
+              width={18}
+              height={18}
+              alt={`${provider.title} auth icon`}
+            />
             <SheetTitle>{provider.title}</SheetTitle>
           </SheetHeader>
           <Form

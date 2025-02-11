@@ -18,7 +18,7 @@ const ProvidersPage: NextPageWithLayout = () => {
   }
 
   return (
-    <PageContainer>
+    <PageContainer className="pb-16">
       <BasicAuthSettingsForm />
       <AuthProvidersForm />
     </PageContainer>

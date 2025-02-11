@@ -16,7 +16,7 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
         ref={ref}
         className={cn(
           'flex items-center justify-between text-sm gap-4',
-          onClick && 'cursor-pointer hover:bg-surface-100',
+          onClick && 'cursor-pointer hover:bg-surface-200',
           className
         )}
         onClick={onClick}
