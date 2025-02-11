@@ -10,6 +10,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const FunctionsPage: NextPageWithLayout = () => {
   const [selectedFunction, setSelectedFunction] = useState<DatabaseFunction | undefined>()
@@ -69,6 +70,10 @@ const FunctionsPage: NextPageWithLayout = () => {
   )
 }
 
-FunctionsPage.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+FunctionsPage.getLayout = (page) => (
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
+)
 
 export default FunctionsPage

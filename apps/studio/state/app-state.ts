@@ -99,6 +99,7 @@ const getInitialState = () => {
       navigationPanelOpen: false,
       navigationPanelJustClosed: false,
       ongoingQueriesPanelOpen: false,
+      mobileMenuOpen: false,
     }
   }
 
@@ -149,6 +150,7 @@ const getInitialState = () => {
     navigationPanelOpen: false,
     navigationPanelJustClosed: false,
     ongoingQueriesPanelOpen: false,
+    mobileMenuOpen: false,
   }
 }
 
@@ -280,6 +282,11 @@ export const appState = proxy({
       ...appState.editorPanel,
       ...value,
     }
+  },
+
+  mobileMenuOpen: false,
+  setMobileMenuOpen: (value: boolean) => {
+    appState.mobileMenuOpen = value
   },
 })
 

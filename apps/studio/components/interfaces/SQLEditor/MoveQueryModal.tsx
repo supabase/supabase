@@ -164,7 +164,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
       snippets.forEach((snippet) => {
         snapV2.updateSnippet({
           id: snippet.id,
-          snippet: { ...snippet, folder_id: selectedId === 'root' ? null : selectedId },
+          snippet: { ...snippet, folder_id: selectedId === 'root' ? null : folderId },
           skipSave: true,
         })
       })

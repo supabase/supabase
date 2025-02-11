@@ -391,7 +391,6 @@ export const getTools = ({
       description: 'Get knowledge about how to write edge functions for Supabase',
       parameters: z.object({}),
       execute: async ({}) => {
-        console.log('schemas', 'edge function called...')
         return stripIndent`
         # Writing Supabase Edge Functions
 
@@ -400,27 +399,28 @@ export const getTools = ({
         ## Guidelines
 
         1. Try to use Web APIs and Deno's core APIs instead of external dependencies (eg: use fetch instead of Axios, use WebSockets API instead of node-ws)
-        2. If you are reusing utility methods between Edge Functions, add them to \`supabase/functions/_shared\` and import using a relative path. Do NOT have cross dependencies between Edge Functions.
-        3. Do NOT use bare specifiers when importing dependecnies. If you need to use an external dependency, make sure it's prefixed with either \`npm:\` or \`jsr:\`. For example, \`@supabase/supabase-js\` should be written as \`npm:@supabase/supabase-js\`.
-        4. For external imports, always define a version. For example, \`npm:@express\` should be written as \`npm:express@4.18.2\`.
-        5. For external dependencies, importing via \`npm:\` and \`jsr:\` is preferred. Minimize the use of imports from @\`deno.land/x\` , \`esm.sh\` and @\`unpkg.com\` . If you have a package from one of those CDNs, you can replace the CDN hostname with \`npm:\` specifier.
-        6. You can also use Node built-in APIs. You will need to import them using \`node:\` specifier. For example, to import Node process: \`import process from "node:process"\`. Use Node APIs when you find gaps in Deno APIs.
-        7. Do NOT use \`import { serve } from "https://deno.land/std@0.168.0/http/server.ts"\`. Instead use the built-in \`Deno.serve\`.
-        8. Following environment variables (ie. secrets) are pre-populated in both local and hosted Supabase environments. Users don't need to manually set them:
+        2. Do NOT use bare specifiers when importing dependencies. If you need to use an external dependency, make sure it's prefixed with either \`npm:\` or \`jsr:\`. For example, \`@supabase/supabase-js\` should be written as \`npm:@supabase/supabase-js\`.
+        3. For external imports, always define a version. For example, \`npm:@express\` should be written as \`npm:express@4.18.2\`.
+        4. For external dependencies, importing via \`npm:\` and \`jsr:\` is preferred. Minimize the use of imports from @\`deno.land/x\` , \`esm.sh\` and @\`unpkg.com\` . If you have a package from one of those CDNs, you can replace the CDN hostname with \`npm:\` specifier.
+        5. You can also use Node built-in APIs. You will need to import them using \`node:\` specifier. For example, to import Node process: \`import process from "node:process"\`. Use Node APIs when you find gaps in Deno APIs.
+        6. Do NOT use \`import { serve } from "https://deno.land/std@0.168.0/http/server.ts"\`. Instead use the built-in \`Deno.serve\`.
+        7. Following environment variables (ie. secrets) are pre-populated in both local and hosted Supabase environments. Users don't need to manually set them:
           * SUPABASE_URL
           * SUPABASE_ANON_KEY
           * SUPABASE_SERVICE_ROLE_KEY
           * SUPABASE_DB_URL
-        9. To set other environment variables (ie. secrets) users can put them in a env file and run the \`supabase secrets set --env-file path/to/env-file\`
-        10. A single Edge Function can handle multiple routes. It is recommended to use a library like Express or Hono to handle the routes as it's easier for developer to understand and maintain. Each route must be prefixed with \`/function-name\` so they are routed correctly.
-        11. File write operations are ONLY permitted on \`/tmp\` directory. You can use either Deno or Node File APIs.
-        12. Use \`EdgeRuntime.waitUntil(promise)\` static method to run long-running tasks in the background without blocking response to a request. Do NOT assume it is available in the request / execution context.
+        8. To set other environment variables the user can go to project settings then edge functions to set them
+        9. A single Edge Function can handle multiple routes. It is recommended to use a library like Express or Hono to handle the routes as it's easier for developer to understand and maintain. Each route must be prefixed with \`/function-name\` so they are routed correctly.
+        10. File write operations are ONLY permitted on \`/tmp\` directory. You can use either Deno or Node File APIs.
+        11. Use \`EdgeRuntime.waitUntil(promise)\` static method to run long-running tasks in the background without blocking response to a request. Do NOT assume it is available in the request / execution context.
 
         ## Example Templates
 
         ### Simple Hello World Function
 
         \`\`\`edge
+        // Setup type definitions for built-in Supabase Runtime APIs
+        import "jsr:@supabase/functions-js/edge-runtime.d.ts";
         interface reqPayload {
           name: string;
         }
@@ -443,6 +443,8 @@ export const getTools = ({
         ### Example Function using Node built-in API
 
         \`\`\`edge
+        // Setup type definitions for built-in Supabase Runtime APIs
+        import "jsr:@supabase/functions-js/edge-runtime.d.ts";
         import { randomBytes } from "node:crypto";
         import { createServer } from "node:http";
         import process from "node:process";
@@ -466,6 +468,8 @@ export const getTools = ({
         ### Using npm packages in Functions
 
         \`\`\`edge
+        // Setup type definitions for built-in Supabase Runtime APIs
+        import "jsr:@supabase/functions-js/edge-runtime.d.ts";
         import express from "npm:express@4.18.2";
 
         const app = express();
@@ -480,6 +484,8 @@ export const getTools = ({
         ### Generate embeddings using built-in @Supabase.ai API
 
         \`\`\`edge
+        // Setup type definitions for built-in Supabase Runtime APIs
+        import "jsr:@supabase/functions-js/edge-runtime.d.ts";
         const model = new Supabase.ai.Session('gte-small');
 
         Deno.serve(async (req: Request) => {
@@ -501,6 +507,8 @@ export const getTools = ({
         ## Integrating with Supabase Auth
 
         \`\`\`edge
+          // Setup type definitions for built-in Supabase Runtime APIs
+          import "jsr:@supabase/functions-js/edge-runtime.d.ts";
           import { createClient } from \\'jsr:@supabase/supabase-js@2\\'
           import { corsHeaders } from \\'../_shared/cors.ts\\'
 
@@ -516,9 +524,9 @@ export const getTools = ({
               // Create a Supabase client with the Auth context of the logged in user.
               const supabaseClient = createClient(
                 // Supabase API URL - env var exported by default.
-                Deno.env.get(\\'SUPABASE_URL\\') ?? \\'\\',
+                Deno.env.get('SUPABASE_URL')!,
                 // Supabase API ANON KEY - env var exported by default.
-                Deno.env.get(\\'SUPABASE_ANON_KEY\\') ?? \\'\\',
+                Deno.env.get('SUPABASE_ANON_KEY')!,
                 // Create client with Auth context of the user that called the function.
                 // This way your row-level-security (RLS) policies are applied.
                 {
