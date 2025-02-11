@@ -1,8 +1,9 @@
 import { useParams } from 'common'
+import { toast } from 'sonner'
+
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { User } from 'data/auth/users-infinite-query'
 import { timeout } from 'lib/helpers'
-import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface DeleteUserModalProps {
@@ -20,7 +21,7 @@ export const DeleteUserModal = ({
 }: DeleteUserModalProps) => {
   const { ref: projectRef } = useParams()
 
-  const { mutate: deleteUser } = useUserDeleteMutation({
+  const { mutate: deleteUser, isLoading: isDeleting } = useUserDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted ${selectedUser?.email}`)
       onDeleteSuccess?.()
@@ -41,7 +42,7 @@ export const DeleteUserModal = ({
       visible={visible}
       variant="destructive"
       title="Confirm to delete user"
-      // loading={isDeletingUsers}
+      loading={isDeleting}
       confirmLabel="Delete"
       onCancel={() => onClose()}
       onConfirm={() => handleDeleteUser()}
