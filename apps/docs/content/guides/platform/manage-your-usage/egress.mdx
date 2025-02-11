@@ -4,7 +4,7 @@ title: 'Manage Egress usage'
 ---
 
 ## What you are charged for
-You are charged for the network data transmitted out of the system to a connected client. Egress is incurred by all services - Database, Auth, Storage, Edge Functions, and Realtime.
+You are charged for the network data transmitted out of the system to a connected client. Egress is incurred by all services - Database, Auth, Storage, Edge Functions, Realtime and Log Drains.
 
 ### Database Egress
 Data sent to the client when retrieving data stored in your database.
@@ -41,7 +41,7 @@ Data pushed to to the connected log drain.
 **Example:** You set up a log drain, each log sent to the log drain is considered egress. You can toggle the GZIP option to reduce egress, in case your provider supports it.
 
 ## How charges are calculated
-Egress is charged by byte. Charges apply only for usage exceeding your subscription plan's quota. This quota is called the Unified Egress Quota because it can be used across all services (Database, Auth, Storage etc.).
+Egress is charged by gigabyte. Charges apply only for usage exceeding your subscription plan's quota. This quota is called the Unified Egress Quota because it can be used across all services (Database, Auth, Storage etc.).
 
 ### Usage on your invoice
 Usage is shown as "Egress GB" on your invoice.
