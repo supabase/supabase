@@ -2,7 +2,7 @@ import type { PostgresSchema } from '@supabase/postgres-meta'
 import { toPng } from 'html-to-image'
 import { Download, Loader2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 
@@ -28,6 +28,8 @@ export const SchemaGraph = () => {
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const miniMapNodeColor = '#111318'
   const miniMapMaskColor = resolvedTheme?.includes('dark')
@@ -99,6 +101,7 @@ export const SchemaGraph = () => {
     const reactflowViewport = document.querySelector('.react-flow__viewport') as HTMLElement
     if (!reactflowViewport) return
 
+    setIsDownloading(true)
     const width = reactflowViewport.clientWidth
     const height = reactflowViewport.clientHeight
     const { x, y, zoom } = reactFlowInstance.getViewport()
@@ -117,6 +120,7 @@ export const SchemaGraph = () => {
       a.setAttribute('download', `supabase-schema-${ref}.png`)
       a.setAttribute('href', data)
       a.click()
+      setIsDownloading(false)
     })
   }
 
@@ -154,6 +158,7 @@ export const SchemaGraph = () => {
             <div className="flex items-center gap-x-2">
               <ButtonTooltip
                 type="default"
+                loading={isDownloading}
                 className="px-1.5"
                 icon={<Download />}
                 onClick={downloadImage}
