@@ -644,6 +644,8 @@ Both of these triggers use the same `util.queue_embeddings` function that will q
 
 Note that the update trigger only fires when the `title` or `content` columns are updated. This is to avoid unnecessary updates to the embedding column when other columns are updated. Make sure that these columns match the columns used in the `embedding_input` function.
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 #### (Optional) Clearing embeddings on update
 
 Note that our trigger will enqueue new embedding jobs when content is updated, but it will not clear any existing embeddings. This means that an embedding can be temporarily out of sync with the content until the new embedding is generated and updated.
