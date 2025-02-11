@@ -42,6 +42,7 @@ allow_list = [
     "[Dd]evs?",
     "[Dd]iff(s|ing|ed)?",
     "[Dd]ropdown",
+    "[Ee]nqueues?",
     "[Ee]nums?",
     "[Ee]nv",
     "[Ff]atals",
