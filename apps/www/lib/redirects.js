@@ -2857,12 +2857,12 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/guides/platform/org-based-billing#quotas-and-features',
-    destination: '/docs/guides/platform/billing-on-supabase#usage-quota',
+    destination: '/docs/guides/platform/billing-on-supabase#variable-usage-fees-and-quotas',
   },
   {
     permanent: false,
     source: '/docs/guides/platform/org-based-billing#usage-items',
-    destination: '/docs/guides/platform/billing-on-supabase#usage-quota',
+    destination: '/docs/guides/platform/billing-on-supabase#variable-usage-fees-and-quotas',
   },
   {
     permanent: false,
