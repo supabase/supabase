@@ -4,6 +4,7 @@ title: 'Manage Realtime Messages usage'
 ---
 
 ## What you are charged for
+
 You are charged for the number of messages going through Supabase Realtime throughout the billing cycle. Includes database changes, Broadcast and Presence.
 
 **Database changes**
@@ -13,36 +14,42 @@ Each database change counts as one message per client that listens to the event.
 Each broadcast message counts as one message sent plus one message per subscribed client that receives it. For example, if you broadcast a message and 4 clients listen to it, it counts as 5 messages—1 sent and 4 received.
 
 ## How charges are calculated
+
 Realtime Messages are billed using Package pricing, with each package representing 1 million messages. If your usage falls between two packages, you are billed for the next whole package.
 
 ### Example
+
 For simplicity, let's assume a package size of 5 and a charge of $2 per package.
 
 | Messages | Packages Billed | Costs |
-|----------|-----------------|-------|
+| -------- | --------------- | ----- |
 | 4        | 1               | $2    |
 | 5        | 1               | $2    |
 | 6        | 2               | $4    |
 
 ### Usage on your invoice
+
 Usage is shown as "Realtime Messages" on your invoice.
 
 ## Pricing
+
 $2.50 per 1 million messages. You are only charged for usage exceeding your subscription plan's quota.
 
 | Plan       | Quota     | Over-Usage                   |
-|------------|-----------|------------------------------|
+| ---------- | --------- | ---------------------------- |
 | Free       | 2 million | -                            |
 | Pro        | 5 million | $2.50 per 1 million messages |
 | Team       | 5 million | $2.50 per 1 million messages |
 | Enterprise | Custom    | Custom                       |
 
 ## Billing examples
+
 ### Within quota
+
 The organization's Realtime messages are within the quota, so no charges apply.
 
 | Line Item           | Units                | Costs   |
-|---------------------|----------------------|---------|
+| ------------------- | -------------------- | ------- |
 | Pro Plan            | 1                    | $25     |
 | Compute Hours Micro | 744 hours            | $10     |
 | Realtime Messages   | 1.8 million messages | $0      |
@@ -51,10 +58,11 @@ The organization's Realtime messages are within the quota, so no charges apply.
 | **Total**           |                      | **$25** |
 
 ### Exceeding quota
+
 The organization's Realtime messages exceed the quota by 3.5 million, incurring charges for this additional usage.
 
 | Line Item           | Units                | Costs   |
-|---------------------|----------------------|---------|
+| ------------------- | -------------------- | ------- |
 | Pro Plan            | 1                    | $25     |
 | Compute Hours Micro | 744 hours            | $10     |
 | Realtime Messages   | 8.5 million messages | $10     |
@@ -63,7 +71,9 @@ The organization's Realtime messages exceed the quota by 3.5 million, incurring 
 | **Total**           |                      | **$35** |
 
 ## View usage
+
 You can view Realtime Messages usage on the [organization's usage page](https://supabase.com/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
+
 <Image
   alt="Usage page navigation bar"
   src={{
@@ -74,6 +84,7 @@ You can view Realtime Messages usage on the [organization's usage page](https://
 />
 
 In the Realtime Messages section, you can see the usage for the selected time period.
+
 <Image
   alt="Usage page Realtime Messages section"
   src={{

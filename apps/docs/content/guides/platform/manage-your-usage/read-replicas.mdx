@@ -4,9 +4,11 @@ title: 'Manage Read Replica usage'
 ---
 
 ## What you are charged for
+
 Each [Read Replica](/docs/guides/platform/read-replicas) is a dedicated database. You are charged for its resources: [Compute](/docs/guides/platform/compute-and-disk#compute), [Disk Size](/docs/guides/platform/database-size#disk-size), provisioned [Disk IOPS](/docs/guides/platform/compute-and-disk#provisioned-disk-throughput-and-iops), provisioned [Disk Throughput](/docs/guides/platform/compute-and-disk#provisioned-disk-throughput-and-iops), and [IPv4](/docs/guides/platform/ipv4-address).
 
 ## How charges are calculated
+
 Read Replica charges are the total of the charges listed below.
 
 **Compute**
@@ -27,14 +29,17 @@ Read Replicas inherit any additional provisioned Disk Throughput from the primar
 If the primary database has a configured IPv4 address, its Read Replicas are also assigned one, with charges for each. Refer to [Manage IPv4 usage](/docs/guides/platform/manage-your-usage/ipv4) for details on how charges are calculated.
 
 ### Usage on your invoice
+
 Compute incurred by Read Replicas is shown as "Replica Compute Hours" on your invoice. Disk Size, Disk IOPS, Disk Throughput and IPv4 are not shown separately for Read Replicas and are rolled up into the project.
 
 ## Billing examples
+
 ### No additional resources configured
+
 The project has one Read Replica and no IPv4 and no additional Disk IOPS and Disk Throughput configured.
 
 | Line Item                     | Units     | Costs      |
-|-------------------------------|-----------|------------|
+| ----------------------------- | --------- | ---------- |
 | Pro Plan                      | 1         | $25        |
 |                               |           |            |
 | Compute Hours Small Project 1 | 744 hours | $15        |
@@ -48,10 +53,11 @@ The project has one Read Replica and no IPv4 and no additional Disk IOPS and Dis
 | **Total**                     |           | **$46.27** |
 
 ### Additional resources configured
+
 The project has two Read Replicas and IPv4 and additional Disk IOPS and Disk Throughput configured.
 
 | Line Item                     | Units     | Costs       |
-|-------------------------------|-----------|-------------|
+| ----------------------------- | --------- | ----------- |
 | Pro Plan                      | 1         | $25         |
 |                               |           |             |
 | Compute Hours Large Project 1 | 744 hours | $110        |
@@ -77,5 +83,7 @@ The project has two Read Replicas and IPv4 and additional Disk IOPS and Disk Thr
 | **Total**                     |           | **$424.13** |
 
 ## FAQ
+
 ### Do Compute Credits apply to Read Replica Compute?
+
 No, Compute Credits do not apply to Read Replica Compute.
