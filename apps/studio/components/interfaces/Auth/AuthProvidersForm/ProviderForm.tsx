@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import type { components } from 'data/api'
@@ -24,18 +25,16 @@ import {
   Input,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
-import { Markdown } from 'components/interfaces/Markdown'
-import { Admonition } from 'ui-patterns'
 
 export interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
   provider: Provider
 }
-
-const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
 
 const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   const ref = useRef<HTMLButtonElement>(null)
