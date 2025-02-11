@@ -115,13 +115,16 @@ export const SchemaGraph = () => {
         height: height.toString(),
         transform: `translate(${x}px, ${y}px) scale(${zoom})`,
       },
-    }).then((data) => {
-      const a = document.createElement('a')
-      a.setAttribute('download', `supabase-schema-${ref}.png`)
-      a.setAttribute('href', data)
-      a.click()
-      setIsDownloading(false)
     })
+      .then((data) => {
+        const a = document.createElement('a')
+        a.setAttribute('download', `supabase-schema-${ref}.png`)
+        a.setAttribute('href', data)
+        a.click()
+      })
+      .finally(() => {
+        setIsDownloading(false)
+      })
   }
 
   useEffect(() => {
