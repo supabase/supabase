@@ -9,6 +9,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   Button,
   DropdownMenu,
@@ -35,7 +36,8 @@ const FunctionList = ({
 }: FunctionListProps) => {
   const router = useRouter()
   const { project: selectedProject } = useProjectContext()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const { setAiAssistantPanel, setEditorPanel } = useAppStateSnapshot()
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const { data: functions } = useDatabaseFunctionsQuery({
     projectRef: selectedProject?.ref,
@@ -118,7 +120,21 @@ const FunctionList = ({
                             <p>Client API docs</p>
                           </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem className="space-x-2" onClick={() => editFunction(x)}>
+                        <DropdownMenuItem
+                          className="space-x-2"
+                          onClick={() => {
+                            if (isInlineEditorEnabled) {
+                              setEditorPanel({
+                                open: true,
+                                initialValue: x.complete_statement,
+                                label: `Edit function "${x.name}"`,
+                                saveLabel: 'Update function',
+                              })
+                            } else {
+                              editFunction(x)
+                            }
+                          }}
+                        >
                           <Edit2 size={14} />
                           <p>Edit function</p>
                         </DropdownMenuItem>

@@ -8,6 +8,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   Badge,
   Button,
@@ -37,7 +38,8 @@ const TriggerList = ({
   deleteTrigger,
 }: TriggerListProps) => {
   const { project } = useProjectContext()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const { setAiAssistantPanel, setEditorPanel } = useAppStateSnapshot()
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const { data: triggers } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
@@ -139,7 +141,22 @@ const TriggerList = ({
                       <Button type="default" className="px-1" icon={<MoreVertical />} />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="bottom" align="end" className="w-52">
-                      <DropdownMenuItem className="space-x-2" onClick={() => editTrigger(x)}>
+                      <DropdownMenuItem
+                        className="space-x-2"
+                        onClick={() => {
+                          const sql = generateTriggerCreateSQL(x)
+                          if (isInlineEditorEnabled) {
+                            setEditorPanel({
+                              open: true,
+                              initialValue: sql,
+                              label: `Edit trigger "${x.name}"`,
+                              saveLabel: 'Update trigger',
+                            })
+                          } else {
+                            editTrigger(x)
+                          }
+                        }}
+                      >
                         <Edit2 size={14} />
                         <p>Edit trigger</p>
                       </DropdownMenuItem>

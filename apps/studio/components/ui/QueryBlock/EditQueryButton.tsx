@@ -19,6 +19,8 @@ import {
 } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAppStateSnapshot } from 'state/app-state'
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface EditQueryButtonProps {
   id?: string
@@ -39,9 +41,10 @@ export const EditQueryButton = ({
   const { ref } = useParams()
   const { newQuery } = useNewQuery()
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
-
+  const { setEditorPanel } = useAppStateSnapshot()
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
   const tooltip: { content: ComponentProps<typeof TooltipContent> & { text: string } } = {
     content: { side: 'bottom', text: 'Edit in SQL Editor' },
   }
@@ -81,7 +84,14 @@ export const EditQueryButton = ({
       className={cn('w-7 h-7', className)}
       icon={<Edit size={14} />}
       onClick={() => {
-        handleEditInSQLEditor()
+        if (isInlineEditorEnabled) {
+          setEditorPanel({
+            open: true,
+            initialValue: sql,
+          })
+        } else {
+          handleEditInSQLEditor()
+        }
         sendEvent({
           action: TelemetryActions.ASSISTANT_EDIT_IN_SQL_EDITOR_CLICKED,
           properties: {

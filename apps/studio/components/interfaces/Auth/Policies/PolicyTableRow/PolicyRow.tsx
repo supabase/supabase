@@ -9,6 +9,7 @@ import Panel from 'components/ui/Panel'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   Badge,
   Button,
@@ -23,6 +24,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { generatePolicyCreateSQL } from './PolicyTableRow.utils'
+import { getGeneralPolicyTemplates } from '../PolicyEditorModal/PolicyEditorModal.constants'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -39,6 +41,7 @@ const PolicyRow = ({
 }: PolicyRowProps) => {
   const { setAiAssistantPanel, setEditorPanel } = useAppStateSnapshot()
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const { project } = useProjectContext()
   const { data: authConfig } = useAuthConfigQuery({ projectRef: project?.ref })
@@ -109,39 +112,22 @@ const PolicyRow = ({
                 className="gap-x-2"
                 onClick={() => {
                   const sql = generatePolicyCreateSQL(policy)
-                  setEditorPanel({
-                    open: true,
-                    initialValue: sql,
-                    label: `Edit policy "${policy.name}"`,
-                    saveLabel: 'Update policy',
-                    templates: [
-                      {
-                        name: 'Enable Row Level Security',
-                        description: 'Enable RLS and create a policy that allows all operations',
-                        content: `ALTER TABLE ${policy.schema}.${policy.table} ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY "Allow all" ON ${policy.schema}.${policy.table}\nAS PERMISSIVE FOR ALL\nTO authenticated\nUSING (true)\nWITH CHECK (true);`,
-                      },
-                      {
-                        name: 'User Owns Row',
-                        description: 'Only allow users to access their own data',
-                        content: `CREATE POLICY "Users can only access their own rows" ON ${policy.schema}.${policy.table}\nAS PERMISSIVE FOR ALL\nTO authenticated\nUSING (auth.uid() = user_id)\nWITH CHECK (auth.uid() = user_id);`,
-                      },
-                      {
-                        name: 'Tenant Access',
-                        description: 'Multi-tenant policy based on org_id',
-                        content: `CREATE POLICY "Tenant isolation" ON ${policy.schema}.${policy.table}\nAS PERMISSIVE FOR ALL\nTO authenticated\nUSING (org_id IN (SELECT org_id FROM memberships WHERE user_id = auth.uid()))\nWITH CHECK (org_id IN (SELECT org_id FROM memberships WHERE user_id = auth.uid()));`,
-                      },
-                      {
-                        name: 'Public Read Only',
-                        description: 'Allow public read access but restrict modifications',
-                        content: `CREATE POLICY "Public read access" ON ${policy.schema}.${policy.table}\nAS PERMISSIVE FOR SELECT\nTO public\nUSING (true);`,
-                      },
-                      {
-                        name: 'Role-Based Access',
-                        description: 'Control access based on user role',
-                        content: `CREATE POLICY "Role-based access control" ON ${policy.schema}.${policy.table}\nAS PERMISSIVE FOR ALL\nTO authenticated\nUSING (\n  auth.jwt() ? auth.jwt()->>'role' = 'admin'\n)\nWITH CHECK (\n  auth.jwt() ? auth.jwt()->>'role' = 'admin'\n);`,
-                      },
-                    ],
-                  })
+                  if (isInlineEditorEnabled) {
+                    const templates = getGeneralPolicyTemplates(policy.schema, policy.table)
+                    setEditorPanel({
+                      open: true,
+                      initialValue: sql,
+                      label: `Edit policy "${policy.name}"`,
+                      saveLabel: 'Update policy',
+                      templates: templates.map((template) => ({
+                        name: template.templateName,
+                        description: template.description,
+                        content: template.statement,
+                      })),
+                    })
+                  } else {
+                    onSelectEditPolicy(policy)
+                  }
                 }}
               >
                 <Edit size={14} />

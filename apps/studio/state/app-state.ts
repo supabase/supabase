@@ -3,6 +3,7 @@ import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
+import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 
 export type CommonDatabaseEntity = {
   id: number
@@ -68,35 +69,11 @@ const INITIAL_EDITOR_PANEL: EditorPanelType = {
   initialValue: '',
   label: '',
   saveLabel: '',
-  templates: [
-    {
-      name: 'Select All Records',
-      description: 'Basic query to select all records from a table',
-      content: 'SELECT * FROM table_name;',
-    },
-    {
-      name: 'Insert Record',
-      description: 'Template for inserting a new record into a table',
-      content: 'INSERT INTO table_name (column1, column2)\nVALUES (value1, value2);',
-    },
-    {
-      name: 'Update Records',
-      description: 'Update records that match a condition',
-      content: 'UPDATE table_name\nSET column1 = value1\nWHERE condition;',
-    },
-    {
-      name: 'Join Two Tables',
-      description: 'Inner join between two tables on a common column',
-      content:
-        'SELECT t1.*, t2.*\nFROM table1 t1\nINNER JOIN table2 t2\n  ON t1.id = t2.table1_id;',
-    },
-    {
-      name: 'Group and Aggregate',
-      description: 'Group records and calculate aggregate values',
-      content:
-        'SELECT column1, COUNT(*) as count, AVG(column2) as average\nFROM table_name\nGROUP BY column1\nORDER BY count DESC;',
-    },
-  ],
+  templates: SQL_TEMPLATES.filter((template) => template.type === 'template').map((template) => ({
+    name: template.title,
+    description: template.description,
+    content: template.sql,
+  })),
 }
 
 const EMPTY_DASHBOARD_HISTORY: DashboardHistoryType = {
@@ -293,6 +270,12 @@ export const appState = proxy({
     if (value.open && appState.aiAssistantPanel.open) {
       appState.aiAssistantPanel.open = false
     }
+
+    // Reset templates to initial if initialValue is empty
+    if (value.initialValue === '') {
+      value.templates = INITIAL_EDITOR_PANEL.templates
+    }
+
     appState.editorPanel = {
       ...appState.editorPanel,
       ...value,

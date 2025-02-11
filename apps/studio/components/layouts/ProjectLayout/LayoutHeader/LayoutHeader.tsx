@@ -20,6 +20,7 @@ import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
 import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger">
@@ -59,6 +60,7 @@ const LayoutHeader = ({
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganization?.slug,
@@ -151,9 +153,11 @@ const LayoutHeader = ({
       </div>
       {!!projectRef && (
         <div className="flex h-full items-center">
-          <div className="border-l flex-0 h-full">
-            <InlineEditorButton />
-          </div>
+          {isInlineEditorEnabled && (
+            <div className="border-l flex-0 h-full">
+              <InlineEditorButton />
+            </div>
+          )}
           <div className="border-l flex-0 h-full">
             <AssistantButton />
           </div>
