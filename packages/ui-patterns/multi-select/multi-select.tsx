@@ -434,11 +434,17 @@ const MultiSelectorList = React.forwardRef<
 >(({ className, children, creatable = false }, ref) => {
   const { open, inputValue, setInputValue, toggleValue } = useMultiSelect()
 
-  const options = (children as React.ReactNode[]) ?? []
+  const options = !!children
+    ? Array.isArray(children)
+      ? (children as React.ReactNode[])
+      : typeof children === 'object' && 'props' in children
+        ? children.props.children
+        : []
+    : []
   const availableOptions = options
     .filter((x: any) => !!x.props.value)
     .map((x: any) => x.props.value.toLowerCase())
-  const isOptionExists = availableOptions.some((x) => x === inputValue.toLowerCase())
+  const isOptionExists = availableOptions.some((x: string) => x === inputValue.toLowerCase())
 
   return (
     <CommandList
