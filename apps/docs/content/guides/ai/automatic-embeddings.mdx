@@ -31,7 +31,7 @@ We'll leverage the following Postgres and Supabase features to create the automa
 
 We'll design the system to:
 
-1. Be generic, so that it can be used with any table and content. This allows you to configure embeddings in multiple places, each with the ability to customize the input used for embedding generation. These will all reuse the same queue infrastructure and Edge Function to generate the embeddings.
+1. Be generic, so that it can be used with any table and content. This allows you to configure embeddings in multiple places, each with the ability to customize the input used for embedding generation. These will all use the same queue infrastructure and Edge Function to generate the embeddings.
 
 1. Handle failures gracefully, by retrying failed jobs and providing detailed information about the status of each job.
 
