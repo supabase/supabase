@@ -35,6 +35,11 @@ Data pushed to clients via Supabase Realtime for subscribed events.
 
 **Example:** When a user views a product page in an online shop, their client subscribes to real-time inventory updates. As stock levels change, Supabase Realtime pushes updates to all subscribed clients, contributing to Realtime Egress.
 
+### Log Drain Egress
+Data pushed to to the connected log drain.
+
+**Example:** You set up a log drain, each log sent to the log drain is considered egress. You can toggle the GZIP option to reduce egress, in case your provider supports it.
+
 ## How charges are calculated
 Egress is charged by byte. Charges apply only for usage exceeding your subscription plan's quota. This quota is called the Unified Egress Quota because it can be used across all services (Database, Auth, Storage etc.).
 
