@@ -41,6 +41,19 @@ Monthly costs for paid plans include a fixed subscription fee based on your chos
 - [Manage your usage](/docs/guides/platform/manage-your-usage) - For details on how the different usage items are billed, and how to optimize usage and reduce costs
 - [Control your costs]() - For details on how you can control your costs in case unexpected high usage occurs
 
+### Compute costs for projects
+An organization can have multiple projects. Each project includes a dedicated Postgres instance running on its own server. You are charged for the Compute resources of that server, independent of your database usage.
+
+<Admonition type="caution">
+
+  Each project you launch increases your monthly Compute costs.
+
+</Admonition>
+
+Read more about [Compute costs](/docs/guides/platform/manage-your-usage/compute).
+
+
+
 ## Variable Usage Fees and Quotas
 
 Each subscription plan includes a built-in quota for some selected usage items, such as [Egress](/docs/guides/platform/manage-your-usage/egress), [Storage Size](/docs/guides/platform/manage-your-usage/storage-size), or [Edge Function Invocations](/docs/guides/platform/manage-your-usage/edge-function-invocations). This quota represents your free usage allowance. If you stay within it, you incur no extra charges for these items. Only usage beyond the quota is billed as overage.
@@ -63,3 +76,15 @@ The quota is applied to your entire organization, independent of how many projec
 | Realtime Peak Connections        | 200                      | 500 included, then $10 per 1000                    | Custom     |
 
 You can find a detailed breakdown of all usage items and how they are billed on the [Manage your usage](/docs/guides/platform/manage-your-usage) page.
+
+## Project add-ons
+
+While your subscription plan applies to your entire organization and is charged only once, you can enhance individual projects by opting into various add-ons.
+
+- [Compute](/docs/guides/platform/compute-and-disk) to scale your database up to 64 cores and 256 GB RAM
+- [Read Replicas](/docs/guides/platform/read-replicas) to scale read operations and provide resiliency
+- [Log Drains](/docs/guides/telemetry/log-drains) to sync Supabase logs to a logging system of your choice
+- [Custom Domains](/docs/guides/platform/custom-domains) to provide a branded experience
+- [PITR](/docs/guides/platform/backups#point-in-time-recovery) to roll back to any specific point in time, down to the minute
+- [IPv4](/docs/guides/platform/ipv4-address) for a dedicated IPv4 address
+- [Advanced MFA](/docs/guides/auth/auth-mfa/phone) to provide other options than TOTP
