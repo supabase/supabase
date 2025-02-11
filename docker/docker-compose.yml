@@ -19,7 +19,7 @@ services:
           "CMD",
           "node",
           "-e",
-          "fetch('http://studio:3000/health').then((r) => {if (!r.ok) throw new Error(r.status)})"
+          "fetch('http://localhost:3000/api/platform/profile').then((r) => {if (!r.ok) throw new Error(r.status)})"
         ]
       timeout: 10s
       interval: 5s
