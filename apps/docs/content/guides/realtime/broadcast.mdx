@@ -725,7 +725,10 @@ First, set up a trigger function that uses `realtime.broadcast_changes` to inser
 For this example use case, we want to have a topic with the name `topic:<record id>` to which we're going to broadcast events.
 
 ```sql
-CREATE OR REPLACE FUNCTION public.your_table_changes() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION public.your_table_changes() 
+RETURNS trigger 
+SECURITY DEFINER SET search_path = ''
+AS $$
 BEGIN
     PERFORM realtime.broadcast_changes(
 	    'topic:' || NEW.id::text,   -- topic
