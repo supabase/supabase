@@ -435,7 +435,7 @@ Deno.serve(async (req) => {
     // Process jobs while listening for worker termination
     await Promise.race([processJobs(), catchUnload()])
   } catch (error) {
-    // If the worker is terminating (eg. wall clock limit reached),
+    // If the worker is terminating (e.g. wall clock limit reached),
     // add pending jobs to fail list with termination reason
     failedJobs.push(
       ...pendingJobs.map((job) => ({
@@ -604,7 +604,7 @@ Now we'll set up the triggers to enqueue embedding jobs whenever content is inse
 
 ```sql
 -- Customize the input for embedding generation
--- eg. Concatenate title and content with a markdown header
+-- e.g. Concatenate title and content with a markdown header
 create or replace function embedding_input(doc documents)
 returns text
 language plpgsql
@@ -638,7 +638,7 @@ We create 2 triggers:
 
 Both of these triggers use the same `util.queue_embeddings` function that will queue the embedding jobs for processing. They accept 2 arguments:
 
-1. `embedding_input`: The name of the function that generates the input for embedding generation. This function allows you to customize the text input passed to the embedding model (eg. concatenating the title and content). The function should accept a single row as input and return text.
+1. `embedding_input`: The name of the function that generates the input for embedding generation. This function allows you to customize the text input passed to the embedding model (e.g. concatenating the title and content). The function should accept a single row as input and return text.
 
 2. `embedding`: The name of the destination column where the embedding will be stored.
 
@@ -787,7 +787,7 @@ Each failed job includes an `error` field with a description of the failure. Rea
 
 - An error generating the embedding via external API
 - An error connecting to the database
-- The edge function being terminated (eg. due to a wall clock limit)
+- The edge function being terminated (e.g. due to a wall clock limit)
 - Any other error thrown during processing
 
 `pg_net` stores HTTP responses in the `net._http_response` table, which can be queried to diagnose issues with the embedding generation process.
