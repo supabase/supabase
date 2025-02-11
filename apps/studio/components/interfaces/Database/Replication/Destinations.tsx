@@ -68,7 +68,8 @@ const Destinations = () => {
             })}
           ></Table>
         ) : (
-          !isSinksLoading && (
+          !isSinksLoading &&
+          !isSinksError && (
             <div
               className={cn(
                 'w-full',
