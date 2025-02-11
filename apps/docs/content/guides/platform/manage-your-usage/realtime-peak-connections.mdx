@@ -24,13 +24,14 @@ Realtime Peak Connections are billed using Package pricing, with each package re
 
 ### Example
 
-For simplicity, let's assume a package size of 5 and a charge of $2 per package.
+For simplicity, let's assume a package size of 1,000 and a charge of $10 per package with no quota.
 
 | Peak Connections | Packages Billed | Costs |
 | ---------------- | --------------- | ----- |
-| 4                | 1               | $2    |
-| 5                | 1               | $2    |
-| 6                | 2               | $4    |
+| 999              | 1               | $10   |
+| 1,000            | 1               | $10   |
+| 1,001            | 2               | $20   |
+| 1,500            | 2               | $20   |
 
 ### Usage on your invoice
 

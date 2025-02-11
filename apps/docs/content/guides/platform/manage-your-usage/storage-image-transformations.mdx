@@ -53,13 +53,14 @@ Storage Image Transformations are billed using Package pricing, with each packag
 
 ### Example
 
-For simplicity, let's assume a package size of 5 and a charge of $2 per package.
+For simplicity, let's assume a package size of 1,000 and a charge of $5 per package with no quota.
 
 | Origin Images | Packages Billed | Costs |
 | ------------- | --------------- | ----- |
-| 4             | 1               | $2    |
-| 5             | 1               | $2    |
-| 6             | 2               | $4    |
+| 999           | 1               | $5    |
+| 1,000         | 1               | $5    |
+| 1,001         | 2               | $10   |
+| 1,500         | 2               | $10   |
 
 ### Usage on your invoice
 
