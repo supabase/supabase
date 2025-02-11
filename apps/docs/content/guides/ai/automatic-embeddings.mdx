@@ -23,7 +23,7 @@ While Postgres [full-text search](/docs/guides/database/full-text-search) can ha
 We'll leverage the following Postgres and Supabase features to create the automated embedding system:
 
 1. [pgvector](/docs/guides/database/extensions/pgvector): Stores and queries vector embeddings
-1. [pgmq](/docs/guides/database/extensions/pgmq): Queues embedding generation requests for processing and retries
+1. [pgmq](/docs/guides/queues): Queues embedding generation requests for processing and retries
 1. [pg_net](/docs/guides/database/extensions/pg_net): Handles asynchronous HTTP requests to Edge Functions directly from Postgres
 1. [pg_cron](/docs/guides/cron): Automatically processes and retries embedding generations
 1. [Triggers](/docs/guides/database/postgres/triggers): Detects content changes and enqueues embedding generation requests
