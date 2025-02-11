@@ -4,30 +4,6 @@ import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
 import { FUNCTIONS_SQL } from './sql/functions'
 
-export type PGFunction = {
-  id: number
-  schema: string
-  name: string
-  language: string
-  definition: string
-  complete_statement: string
-  args: Array<{
-    mode: 'in' | 'out' | 'inout' | 'variadic' | 'table'
-    name: string
-    type_id: number
-    has_default: boolean
-  }>
-  argument_types: string
-  identity_argument_types: string
-  return_type_id: number
-  return_type: string
-  return_type_relation_id: number | null
-  is_set_returning_function: boolean
-  behavior: 'IMMUTABLE' | 'STABLE' | 'VOLATILE'
-  security_definer: boolean
-  config_params: Record<string, string> | null
-}
-
 export const pgFunctionZod = z.object({
   id: z.number(),
   schema: z.string(),
@@ -58,7 +34,9 @@ export const pgFunctionZod = z.object({
   behavior: z.union([z.literal('IMMUTABLE'), z.literal('STABLE'), z.literal('VOLATILE')]),
   security_definer: z.boolean(),
   config_params: z.union([z.record(z.string(), z.string()), z.null()]),
-}) satisfies z.ZodType<PGFunction>
+})
+
+export type PGFunction = z.infer<typeof pgFunctionZod>
 
 export const pgFunctionArrayZod = z.array(pgFunctionZod)
 export const pgFunctionOptionalZod = z.optional(pgFunctionZod)
