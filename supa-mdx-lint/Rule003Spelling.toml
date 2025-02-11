@@ -55,6 +55,7 @@ allow_list = [
     "[Hh]ypertables?",
     "[KMG]bps",
     "[KMG]iB",
+    "[Mm]atryoshka",
     "[Mm]essageBird",
     "[Mm]icroservices?",
     "[Mm]iddlewares?",
