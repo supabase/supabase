@@ -130,7 +130,7 @@ declare
   headers_raw text;
   auth_header text;
 begin
-  -- If we're in a PostgREST session, use reuse the request headers for authorization
+  -- If we're in a PostgREST session, reuse the request headers for authorization
   headers_raw := current_setting('request.headers', true);
 
   -- Only try to parse if headers are present
