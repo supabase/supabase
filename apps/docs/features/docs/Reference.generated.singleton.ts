@@ -1,8 +1,11 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { parse } from 'yaml'
 
 import type { ModuleTypes } from '~/features/docs/Reference.typeSpec'
-import type { AbbrevCommonClientLibSection } from '~/features/docs/Reference.utils'
+import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
+import { type Json } from '../helpers.types'
+import { type IApiEndPoint } from './Reference.api.utils'
 
 let typeSpec: Array<ModuleTypes>
 
@@ -34,6 +37,45 @@ export async function getTypeSpec(ref: string) {
   return mod?.methods.get(ref)
 }
 
+let cliSpec: Json
+
+export async function getCliSpec() {
+  if (!cliSpec) {
+    const rawSpec = await readFile(join(process.cwd(), 'spec', 'cli_v1_commands.yaml'), 'utf-8')
+    cliSpec = parse(rawSpec)
+  }
+
+  return cliSpec
+}
+
+let apiEndpointsById: Map<string, IApiEndPoint>
+
+export async function getApiEndpointById(id: string) {
+  if (!apiEndpointsById) {
+    const rawJson = await readFile(
+      join(process.cwd(), 'features/docs', './generated/api.latest.endpointsById.json'),
+      'utf-8'
+    )
+    apiEndpointsById = new Map(JSON.parse(rawJson))
+  }
+
+  return apiEndpointsById.get(id)
+}
+
+let selfHostedEndpointsById = new Map<string, Map<string, IApiEndPoint>>()
+
+export async function getSelfHostedApiEndpointById(servicePath: string, id: string) {
+  if (!selfHostedEndpointsById.has(servicePath)) {
+    const rawJson = await readFile(
+      join(process.cwd(), 'features/docs', `./generated/${servicePath}.latest.endpointsById.json`),
+      'utf-8'
+    )
+    selfHostedEndpointsById.set(servicePath, new Map(JSON.parse(rawJson)))
+  }
+
+  return selfHostedEndpointsById.get(servicePath)?.get(id)
+}
+
 const functionsList = new Map<string, Array<{ id: unknown }>>()
 
 export async function getFunctionsList(sdkId: string, version: string) {
@@ -50,10 +92,11 @@ export async function getFunctionsList(sdkId: string, version: string) {
   return functionsList.get(key)
 }
 
-const referenceSections = new Map<string, Array<AbbrevCommonClientLibSection>>()
+const referenceSections = new Map<string, Array<AbbrevApiReferenceSection>>()
 
 export async function getReferenceSections(sdkId: string, version: string) {
   const key = `${sdkId}.${version}`
+  console.log('Getting reference sections for %s', key)
   if (!referenceSections.has(key)) {
     const data = await readFile(
       join(process.cwd(), 'features/docs', `./generated/${sdkId}.${version}.sections.json`),
@@ -63,13 +106,16 @@ export async function getReferenceSections(sdkId: string, version: string) {
     referenceSections.set(key, JSON.parse(data))
   }
 
-  return referenceSections.get(key)
+  const result = referenceSections.get(key)
+  console.log('Got reference sections for %s', key)
+  return result
 }
 
-const flatSections = new Map<string, Array<AbbrevCommonClientLibSection>>()
+const flatSections = new Map<string, Array<AbbrevApiReferenceSection>>()
 
 export async function getFlattenedSections(sdkId: string, version: string) {
   const key = `${sdkId}.${version}`
+  console.log('Getting flattened sections for %s', key)
   if (!flatSections.has(key)) {
     const data = await readFile(
       join(process.cwd(), 'features/docs', `./generated/${sdkId}.${version}.flat.json`),
@@ -79,10 +125,12 @@ export async function getFlattenedSections(sdkId: string, version: string) {
     flatSections.set(key, JSON.parse(data))
   }
 
-  return flatSections.get(key)
+  const result = flatSections.get(key)
+  console.log('Got flattened sections for %s', key)
+  return result
 }
 
-const sectionsBySlug = new Map<string, Map<string, AbbrevCommonClientLibSection>>()
+const sectionsBySlug = new Map<string, Map<string, AbbrevApiReferenceSection>>()
 
 export async function getSectionsBySlug(sdkId: string, version: string) {
   const key = `${sdkId}.${version}`

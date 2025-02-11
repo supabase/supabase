@@ -1,9 +1,10 @@
 import { useParams } from 'common'
-import toast from 'react-hot-toast'
-import { Alert, Button, Modal } from 'ui'
+import { toast } from 'sonner'
+import { Button, Modal } from 'ui'
 
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import { Admonition } from 'ui-patterns'
 
 interface RemoveRestrictionModalProps {
   visible: boolean
@@ -59,7 +60,6 @@ const RemoveRestrictionModal = ({
 
   return (
     <Modal
-      closable
       hideFooter
       size="medium"
       visible={visible}
@@ -75,10 +75,12 @@ const RemoveRestrictionModal = ({
             : ", and no longer have access to your project's database."}
         </p>
         {isRemovingOnlyRestriction && (
-          <Alert withIcon variant="warning" title="Database access will no longer be restricted">
-            Removing all network restrictions will default to your database being accessible from
-            all IP addresses.
-          </Alert>
+          <Admonition
+            type="warning"
+            title="Database access will no longer be restricted"
+            description="Removing all network restrictions will default to your database being accessible from
+            all IP addresses."
+          />
         )}
       </Modal.Content>
       <Modal.Content className="flex items-center justify-end space-x-2">

@@ -23,7 +23,7 @@ Database backups can be categorized into two types: **logical** and **physical**
 
 As a general rule of thumb, projects will either have logical or physical backups based on plan, database size, and add-ons:
 
-| Plan       | Database Size (0-40GB) | [Database Size (>40GB)](#backup-process-for-large-databases) | [PITR](#point-in-time-recovery) | [Read Replicas](./read-replicas#prerequisites) |
+| Plan       | Database Size (0-15GB) | [Database Size (>15GB)](#backup-process-for-large-databases) | [PITR](#point-in-time-recovery) | [Read Replicas](./read-replicas#prerequisites) |
 | ---------- | ---------------------- | ------------------------------------------------------------ | ------------------------------- | ---------------------------------------------- |
 | Pro        | logical                | physical                                                     | physical                        | physical                                       |
 | Team       | logical                | physical                                                     | physical                        | physical                                       |
@@ -73,13 +73,13 @@ You can access daily backups in the [Scheduled backups](https://supabase.com/das
 
 #### Backup process for large databases
 
-Databases larger than 40GB[^1], if they're on a recent build[^2] of the Supabase platform, get automatically transitioned[^3] to use daily physical backups. Physical backups are a more performant backup mechanism that lowers the overhead and impact on the database being backed up, and also avoids holding locks on objects in your database for a long period of time. While restores are unaffected, the backups created using this method cannot be downloaded from the Backups section of the dashboard.
+Databases larger than 15GB[^1], if they're on a recent build[^2] of the Supabase platform, get automatically transitioned[^3] to use daily physical backups. Physical backups are a more performant backup mechanism that lowers the overhead and impact on the database being backed up, and also avoids holding locks on objects in your database for a long period of time. While restores are unaffected, the backups created using this method cannot be downloaded from the Backups section of the dashboard.
 
 This class of physical backups only allows for recovery to a fixed time each day, similar to daily backups. You can upgrade to [PITR](#point-in-time-recovery) for access to more granular recovery options.
 
 Once a database is transitioned to using physical backups, it continues to use physical backups, even if the database size falls back below the threshold for the transition.
 
-[^1]: The threshold for transitioning might be lowered in the future.
+[^1]: The threshold for transitioning will be slowly lowered over time. Eventually, all projects will be transitioned to using physical backups.
 [^2]: Projects created or upgraded after the 14th of July 2022 are eligible.
 [^3]: The transition to physical backups is handled transparently and does not require any user intervention. It involves a single restart of the database to pick up new configuration that can only be loaded at start; the expected downtime for the restart is a few seconds.
 
@@ -135,11 +135,52 @@ A date and time picker will be provided upon pressing the `Start a restore` butt
 
 After locking in the desired point in time to recover to, The Dashboard will then prompt for a review and confirmation before proceeding with the restoration. The project will be inaccessible following this. As such, do ensure to allot for downtime beforehand. This is dependent on the size of the database. The larger it is, the longer the downtime will be. Once the confirmation has been given, the latest physical backup available is downloaded to the project and the database is partially restored. WAL files generated after this physical backup up to the specified point-in-time are then downloaded. The underlying records of transactions in these files are replayed against the database to complete the restoration. The Dashboard will display a notification once the restoration completes.
 
+## Restore to a new project
+
+Supabase provides a convenient way to restore data from an existing project into a completely new one. Whether you're using physical backups or Point-in-Time recovery (PITR), this feature allows you to duplicate project data with ease, perform testing safely, or recover data for analysis. Access to this feature is exclusive to users on paid plans and requires that physical backups are enabled for the source project.
+
+<Admonition type="note">
+
+PITR is an additional add-on available for organizations on a paid plan with physical backups enabled.
+
+</Admonition>
+
+To begin, switch to the source project—the project containing the data you wish to restore—and go to the [database backups](https://supabase.com/dashboard/project/_/database/backups/restore-to-new-project) page. Select the **Restore to a New Project** tab.
+
+A list of available backups is displayed. Select the backup you want to use and click the "Restore" button. For projects with PITR enabled, use the date and time selector to specify the exact point in time from which you wish to restore data.
+
+Once you’ve made your choice, Supabase takes care of the rest. A new project is automatically created, replicating key configurations from the original, including the compute instance size, disk attributes, SSL enforcement settings, and network restrictions. The data will remain in the same region as the source project to ensure compliance with data residency requirements. The entire process is fully automated.
+
+<Admonition type="note">
+
+The time required to complete the restoration can vary depending largely on the volume of data involved. If you have a large amount of data you can opt for higher performing disk attributes on the source project _before_ starting a clone operation. These disk attributes will be replicated to the new project. This incurs additional costs which will be displayed before starting.
+
+</Admonition>
+
+There are a few important restrictions to be aware of with the "Restore to a New Project" process:
+
+- Projects that are created through the restoration process cannot themselves be used as a source for further clones at this time.
+- The feature is only accessible to paid plan users with physical backups enabled, ensuring that the necessary resources and infrastructure are available for the restore process.
+
+Before starting the restoration, you’ll be presented with an overview of the costs associated with creating the new project. The new project will incur additional monthly expenses based on the mirrored resources from the source project. It’s important to review these costs carefully before proceeding.
+
+Once the restoration is complete, the new project will be available in your dashboard and will include all data, tables, schemas, and selected settings from the chosen backup source. It is recommended to thoroughly review the new project and perform any necessary tests to ensure everything has been restored as expected.
+
+New projects are completely independent of their source, and as such can be modified and used as desired.
+
+<Admonition type="note">
+
+As the entire database is copied to the new project, this will include all extensions that were enabled at the source. If the source project included extensions that are configured to carry out external operations—for example pg_net, pg_cron, wrappers—these should be disabled once the copy process has completed to avoid any unwanted actions from taking place.
+
+</Admonition>
+
+Restoring to a new project is an excellent way to manage environments more effectively. You can use this feature to create staging environments for testing, experiment with changes without risk to production data, or swiftly recover from unexpected data loss scenarios.
+
 ## Troubleshooting
 
 ### Logical backups
 
-#### search_path issues
+#### `search_path` issues
 
 During the `pg_restore` process, the `search_path` is set to an empty string for predictability, and security. Using unqualified references to functions or relations can cause restorations using logical backups to fail, as the database will not be able to locate the function or relation being referenced. This can happen even if the database functions without issues during normal operations, as the `search_path` is usually set to include several schemas during normal operations. Therefore, you should always use schema-qualified names within your SQL code.
 

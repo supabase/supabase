@@ -2,19 +2,20 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { Button } from 'ui'
 import {
+  Button,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
+  RadioGroup_Shadcn_,
+  RadioGroupItem_Shadcn_,
 } from 'ui'
-import { RadioGroup_Shadcn_, RadioGroupItem_Shadcn_ } from 'ui'
-import { toast } from 'ui'
 
 const FormSchema = z.object({
   type: z.enum(['all', 'mentions', 'none'], {
@@ -28,8 +29,7 @@ export default function RadioGroupForm() {
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: 'You submitted the following values:',
+    toast('You submitted the following values:', {
       description: (
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(data, null, 2)}</code>

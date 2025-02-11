@@ -1,23 +1,32 @@
 import React from 'react'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import Link from 'next/link'
 import ProductIcon from '../ProductIcon'
 import SectionContainer from '../Layouts/SectionContainer'
 import { CTA } from '~/types/common'
 
 interface Props {
+  label?: string | React.ReactNode
   h1: string | React.ReactNode
   subheader?: string[] | React.ReactNode[]
   icon?: string
   title?: string
   image?: React.ReactNode
   footer?: React.ReactNode
+  footerPosition?: 'bottom' | 'left'
   ctas?: CTA[]
+  className?: string
+  sectionContainerClassName?: string
 }
 
 const ProductHeader = (props: Props) => (
-  <div className="w-full max-w-full relative mx-auto py-16 lg:py-24 border-b bg-alternative overflow-hidden">
-    <SectionContainer className="!py-0 grid grid-cols-12">
+  <div
+    className={cn(
+      'w-full max-w-full relative mx-auto py-16 lg:py-24 border-b bg-alternative overflow-hidden',
+      props.className
+    )}
+  >
+    <SectionContainer className={cn('!py-0 grid grid-cols-12', props.sectionContainerClassName)}>
       <div className="relative z-10 col-span-12 gap-8 lg:col-span-5">
         <div>
           {(props.icon || props.title) && (
@@ -54,13 +63,18 @@ const ProductHeader = (props: Props) => (
             </Button>
           ))}
         </div>
+        {props.footer && props.footerPosition === 'left' && (
+          <div className="ph-footer relative z-10 mt-4 md:mt-8 lg:mt-20 xl:mt-32 col-span-12">
+            {props.footer}
+          </div>
+        )}
       </div>
       {props.image && (
         <div className="relative min-h-[300px] col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
           {props.image}
         </div>
       )}
-      {props.footer && (
+      {props.footer && props.footerPosition !== 'left' && (
         <div className="relative z-10 mt-4 md:mt-8 lg:mt-20 xl:mt-32 col-span-12">
           {props.footer}
         </div>

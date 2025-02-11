@@ -1,18 +1,18 @@
-import React from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { useRouter } from 'next/router'
-import { NextSeo } from 'next-seo'
 import { range } from 'lodash'
+import { NextSeo } from 'next-seo'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import { useBreakpoint } from 'common'
-import { Badge, Button, IconCode, TextLink } from 'ui'
+import { Badge, Button, TextLink } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
-import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
+import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 
 import pageData from '~/data/partners'
+import { Code } from 'lucide-react'
 
 const Partners = () => {
   const router = useRouter()
@@ -97,12 +97,12 @@ const Partners = () => {
           <div className="absolute inset-0 z-[1] bg-[linear-gradient(to_top,hsl(var(--background-alternative-default))_40%,hsl(var(--background-default))_90%)]" />
         </div>
         <SectionContainer>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-4">
-            <div className="col-span-1 lg:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="col-span-1 md:col-span-2">
               <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-.5px]">
                 Explore our marketplace
               </h2>
-              <p className="text-foreground-lighter text-xs sm:text-sm lg:text-base py-3 lg:max-w-md">
+              <p className="text-foreground-lighter text-sm sm:text-sm md:text-base py-3 md:max-w-md">
                 Discover how technology and consulting partners are already working with Supabase.
               </p>
               <TextLink
@@ -110,38 +110,7 @@ const Partners = () => {
                 label="View docs"
               />
             </div>
-            <div className="col-span-1 lg:col-span-3 w-full max-w-4xl grid gap-8 rounded md:grid-cols-2">
-              <Panel
-                hasShimmer
-                hasActiveOnHover
-                innerClassName="px-8 py-6 group flex flex-col gap-4"
-              >
-                <div className="bg-surface-200 mb-4 text-foreground flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-
-                <div>
-                  <h3 className="text-foreground text-lg">Experts</h3>
-                  <p className="text-foreground-lighter text-sm">
-                    Find an expert to help build your next idea.
-                  </p>
-                </div>
-
-                <Link href="/partners/experts" className="absolute inset-0" />
-              </Panel>
+            <div className="col-span-1 md:col-span-2 w-full max-w-4xl grid gap-8 rounded">
               <Panel
                 hasInnerShimmer={false}
                 hasActiveOnHover={true}
@@ -190,7 +159,7 @@ const Partners = () => {
                   key={i}
                 >
                   <div className="bg-brand-300 [[data-theme*=dark]_&]:bg-brand-500 text-brand-1200 group-hover:text-brand-800 [[data-theme*=dark]_&]:group-hover:text-brand-1000 flex h-12 w-12 items-center justify-center rounded-md border border-brand transition-all group-hover:scale-105">
-                    {item.icon ? item.icon : <IconCode strokeWidth={2} />}
+                    {item.icon ? item.icon : <Code strokeWidth={2} />}
                   </div>
 
                   <div>

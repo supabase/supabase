@@ -1,13 +1,10 @@
-import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { ChangeEvent, createContext, useContext, useEffect, useRef, useState } from 'react'
-import { toast } from 'react-hot-toast'
-import { Button, Input, Listbox } from 'ui'
+import { toast } from 'sonner'
 
-import type { Dictionary } from 'types'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import {
   createVercelEnv,
@@ -23,8 +20,11 @@ import {
   PROVIDERS,
 } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
+import { generateStrongPassword } from 'lib/project'
 import { VERCEL_INTEGRATION_CONFIGS } from 'lib/vercelConfigs'
 import { AWS_REGIONS } from 'shared-data'
+import type { Dictionary } from 'types'
+import { Button, Input, Listbox } from 'ui'
 
 interface ISetupProjectStore {
   token: string
@@ -211,13 +211,8 @@ const CreateProject = observer(() => {
     setPasswordStrengthMessage(message)
   }
 
-  function generateStrongPassword() {
-    const password = generator.generate({
-      length: 16,
-      numbers: true,
-      uppercase: true,
-    })
-
+  function generatePassword() {
+    const password = generateStrongPassword()
     setDbPass(password)
     delayedCheckPasswordStrength(password)
   }
@@ -271,7 +266,7 @@ const CreateProject = observer(() => {
               passwordStrengthScore={passwordStrengthScore}
               password={dbPass}
               passwordStrengthMessage={passwordStrengthMessage}
-              generateStrongPassword={generateStrongPassword}
+              generateStrongPassword={generatePassword}
             />
           }
         />

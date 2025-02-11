@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { Settings } from 'lucide-react'
 import Link from 'next/link'
-import { IconSettings } from 'ui'
 
 const SettingsButton = () => {
   const selectedOrganization = useSelectedOrganization()
@@ -11,7 +11,7 @@ const SettingsButton = () => {
     <Tooltip.Root delayDuration={0}>
       <Tooltip.Trigger type="button" asChild className="px-1">
         <Link id="organization-settings" href={slug ? `/org/${slug}/general` : '/'}>
-          <IconSettings size={18} strokeWidth={1.5} className="text-foreground-light" />
+          <Settings size={18} strokeWidth={1.5} className="text-foreground-light" />
         </Link>
       </Tooltip.Trigger>
       <Tooltip.Portal>

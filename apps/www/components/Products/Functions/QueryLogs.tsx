@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Badge, IconAlertCircle, IconInfo, cn } from 'ui'
+import { AlertCircle, Info } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useInterval } from 'react-use'
+import { cn } from 'ui'
 
 enum STATUS {
   LOG = 'LOG',
@@ -143,9 +144,9 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
               >
                 <span>
                   {log.status === 'LOG' ? (
-                    <IconInfo size={14} strokeWidth={2} />
+                    <Info size={14} strokeWidth={2} />
                   ) : (
-                    <IconAlertCircle size={14} strokeWidth={2} />
+                    <AlertCircle size={14} strokeWidth={2} />
                   )}
                 </span>
                 <span>{log.status}</span>

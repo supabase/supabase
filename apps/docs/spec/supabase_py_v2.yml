@@ -63,11 +63,11 @@ functions:
             description: Options passed to the realtime-py instance.
           - name: postgrest_client_timeout
             isOptional: true
-            type: int, float, Timeout
+            type: number, float, Timeout
             description: Timeout passed to the SyncPostgrestClient instance.
           - name: storage_client_timeout
             isOptional: true
-            type: int, float, Timeout
+            type: number, float, Timeout
             description: Timeout passed to the SyncStorageClient instance.
           - name: flow_type
             isOptional: true
@@ -104,6 +104,13 @@ functions:
             ))
           ```
 
+  - id: auth-api
+    title: 'Overview'
+    notes: |
+      - The auth methods can be accessed via the `supabase.auth` namespace.
+      - By default, the supabase client sets `persist_session` to true and attempts to store the session in memory.
+      - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/platform/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
+      - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/auth). A refresh token never expires and can only be used once.
   - id: sign-up
     title: 'sign_up()'
     params:
@@ -332,7 +339,7 @@ functions:
                 isOptional: true
                 type: string
                 description: Verification token received when the user completes the captcha on the site.
-  
+
     notes: |
       - Returns an anonymous user
       - It is recommended to set up captcha for anonymous sign-ins to prevent abuse. You can pass in the captcha token in the `options` param.
@@ -703,7 +710,7 @@ functions:
             }
           })
           ```
-  
+
   - id: sign-in-with-id-token
     title: 'sign_in_with_id_token'
     params:
@@ -713,7 +720,7 @@ functions:
           - name: provider
             isOptional: false
             type: '"google" | "apple" | "azure" | "facebook" | "kakao" | string'
-            description: | 
+            description: |
               Provider name or OIDC `iss` value identifying which provider should be used to verify the provided token. Supported names: `google`, `apple`, `azure`, `facebook`, `kakao`, `keycloak` (deprecated).
           - name: token
             isOptional: false
@@ -1053,104 +1060,59 @@ functions:
             {"email": "email@example.com", "token_hash": "<token-hash>", "type": "email"}
           )
           ```
-  - id: auth-mfa-api
-    title: 'Overview'
+  - id: get-session
+    title: 'get_session'
     notes: |
-      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
-
-      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
-
-      Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
-  - id: mfa-enroll
-    title: 'mfa.enroll()'
-    notes: |
-      - Currently, `totp` is the only supported `factor_type`. The returned `id` should be used to create a challenge.
-      - To create a challenge, see [`mfa.challenge()`](/docs/reference/python/auth-mfa-challenge).
-      - To verify a challenge, see [`mfa.verify()`](/docs/reference/python/auth-mfa-verify).
-      - To create and verify a challenge in a single step, see [`mfa.challenge_and_verify()`](/docs/reference/python/auth-mfa-challengeandverify).
+      - This method retrieves the current local session (i.e in memory).
+      - The session contains a signed JWT and unencoded session data.
+      - Since the unencoded session data is retrieved from the local storage medium, **do not** rely on it as a source of trusted data on the server. It could be tampered with by the sender. If you need verified, trustworthy user data, call [`get_user`](/docs/reference/python/auth-getuser) instead.
+      - If the session has an expired access token, this method will use the refresh token to get a new session.
     examples:
-      - id: enroll-totp-factor
-        name: Enroll a time-based, one-time password (TOTP) factor
+      - id: get-the-session-data
+        name: Get the session data
         isSpotlight: true
         code: |
+          ```python
+          response = supabase.auth.get_session()
           ```
-          res = supabase.auth.mfa.enroll({
-            "factor_type": "totp",
-            "friendly_name": "your_friendly_name"
-          })
-          ```
-  - id: mfa-challenge
-    title: 'mfa.challenge()'
-    notes: |
-      - An [enrolled factor](/docs/reference/python/auth-mfa-enroll) is required before creating a challenge.
-      - To verify a challenge, see [`mfa.verify()`](/docs/reference/python/auth-mfa-verify).
-    examples:
-      - id: create-mfa-challenge
-        name: Create a challenge for a factor
-        isSpotlight: true
-        code: |
-          ```
-          res = supabase.auth.mfa.challenge({
-            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225'
-          })
-          ```
-  - id: mfa-verify
-    title: 'mfa.verify()'
-    notes: |
-      - To verify a challenge, please [create a challenge](/docs/reference/python/auth-mfa-challenge) first.
-    examples:
-      - id: verify-challenge
-        name: Verify a challenge for a factor
-        isSpotlight: true
-        code: |
-          ```
-          res = supabase.auth.mfa.verify({
-            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
-            "challenge_id": '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15',
-            "code": '123456'
-          })
-          ```
-  - id: mfa-challenge-and-verify
-    title: 'mfa.challenge_and_verify()'
-    notes: |
-      - An [enrolled factor](/docs/reference/python/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
-      - Executes [`mfa.challenge()`](/docs/reference/python/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/python/auth-mfa-verify) in a single step.
-    examples:
-      - id: challenge-and-verify
-        name: Create and verify a challenge for a factor
-        isSpotlight: true
-        code: |
-          ```
-          res = supabase.auth.mfa.challenge_and_verify({
-            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
-            "code": '123456'
-          })
-          ```
-  - id: mfa-unenroll
-    title: 'mfa.unenroll()'
-    examples:
-      - id: unenroll-a-factor
-        name: Unenroll a factor
-        isSpotlight: true
-        code: |
-          ```
-          res = supabase.auth.mfa.unenroll({
-            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
-          })
-          ```
-  - id: mfa-get-authenticator-assurance-level
-    title: 'mfa.get_authenticator_assurance_level()'
-    notes: |
-      - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
-      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
-      - If the user has a verified factor, the `next_level` field will return `aal2`, else, it will return `aal1`.
-    examples:
-      - id: get-aal
-        name: Get the AAL details of a session
-        isSpotlight: true
-        code: |
-          ```
-          res = supabase.auth.mfa.get_authenticator_assurance_level()
+        response: |
+          ```json
+          {
+            "provider_token": null,
+            "provider_refresh_token": null,
+            "access_token": "<ACCESS_TOKEN>",
+            "refresh_token": "<REFRESH_TOKEN>",
+            "expires_in": 3600,
+            "expires_at": 1700000000,
+            "token_type": "bearer",
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "app_metadata": {
+                "provider": "email",
+                "providers": []
+              },
+              "user_metadata": {},
+              "aud": "authenticated",
+              "confirmation_sent_at": "2023-02-19T00:01:51.147035Z",
+              "recovery_sent_at": "2024-07-21T22:20:00.366959Z",
+              "email_change_sent_at": null,
+              "new_email": null,
+              "invited_at": null,
+              "action_link": null,
+              "email": "email@example.com",
+              "phone": "",
+              "created_at": "2023-02-19T00:01:51.142802Z",
+              "confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "email_confirmed_at": "2023-02-19T00:01:51.351735Z",
+              "phone_confirmed_at": null,
+              "last_sign_in_at": "2024-07-21T22:36:45.194120Z",
+              "role": "authenticated",
+              "updated_at": "2024-07-21T22:36:45.196044Z",
+              "identities": [],
+              "factors": null,
+              "is_anonymous": false
+            }
+          }
           ```
   - id: get-user
     title: 'get_user'
@@ -1210,62 +1172,349 @@ functions:
           ```
           response = supabase.auth.get_user(jwt)
           ```
-
-  - id: get-session
-    title: 'get_session'
+  - id: update-user
+    title: 'update_user()'
     notes: |
-      - This method retrieves the current local session (i.e in memory).
-      - The session contains a signed JWT and unencoded session data.
-      - Since the unencoded session data is retrieved from the local storage medium, **do not** rely on it as a source of trusted data on the server. It could be tampered with by the sender. If you need verified, trustworthy user data, call [`get_user`](/docs/reference/python/auth-getuser) instead.
-      - If the session has an expired access token, this method will use the refresh token to get a new session.
+      - In order to use the `update_user()` method, the user needs to be signed in first.
+      - By default, email updates sends a confirmation link to both the user's current and new email.
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](/dashboard/project/_/auth/providers).
+
     examples:
-      - id: get-the-session-data
-        name: Get the session data
-        isSpotlight: true
+      - id: update-the-email-for-an-authenticated-user
+        name: Update the email for an authenticated user
+        description: Sends a "Confirm Email Change" email to the new email address.
+        isSpotlight: false
         code: |
           ```python
-          response = supabase.auth.get_session()
+          response = supabase.auth.update_user({
+            "email": "new@email.com"
+          })
           ```
         response: |
           ```json
           {
-            "provider_token": null,
-            "provider_refresh_token": null,
-            "access_token": "<ACCESS_TOKEN>",
-            "refresh_token": "<REFRESH_TOKEN>",
-            "expires_in": 3600,
-            "expires_at": 1700000000,
-            "token_type": "bearer",
             "user": {
               "id": "11111111-1111-1111-1111-111111111111",
+              "aud": "authenticated",
+              "role": "authenticated",
+              "email": "example@email.com",
+              "email_confirmed_at": "2024-01-01T00:00:00Z",
+              "phone": "",
+              "confirmed_at": "2024-01-01T00:00:00Z",
+              "new_email": "new@email.com",
+              "email_change_sent_at": "2024-01-01T00:00:00Z",
+              "last_sign_in_at": "2024-01-01T00:00:00Z",
               "app_metadata": {
                 "provider": "email",
-                "providers": []
+                "providers": [
+                  "email"
+                ]
               },
-              "user_metadata": {},
-              "aud": "authenticated",
-              "confirmation_sent_at": "2023-02-19T00:01:51.147035Z",
-              "recovery_sent_at": "2024-07-21T22:20:00.366959Z",
-              "email_change_sent_at": null,
-              "new_email": null,
-              "invited_at": null,
-              "action_link": null,
-              "email": "email@example.com",
-              "phone": "",
-              "created_at": "2023-02-19T00:01:51.142802Z",
-              "confirmed_at": "2023-02-19T00:01:51.351735Z",
-              "email_confirmed_at": "2023-02-19T00:01:51.351735Z",
-              "phone_confirmed_at": null,
-              "last_sign_in_at": "2024-07-21T22:36:45.194120Z",
-              "role": "authenticated",
-              "updated_at": "2024-07-21T22:36:45.196044Z",
-              "identities": [],
-              "factors": null,
+              "user_metadata": {
+                "email": "example@email.com",
+                "email_verified": false,
+                "phone_verified": false,
+                "sub": "11111111-1111-1111-1111-111111111111"
+              },
+              "identities": [
+                {
+                  "identity_id": "22222222-2222-2222-2222-222222222222",
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "user_id": "11111111-1111-1111-1111-111111111111",
+                  "identity_data": {
+                    "email": "example@email.com",
+                    "email_verified": false,
+                    "phone_verified": false,
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "provider": "email",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "email": "example@email.com"
+                }
+              ],
+              "created_at": "2024-01-01T00:00:00Z",
+              "updated_at": "2024-01-01T00:00:00Z",
               "is_anonymous": false
             }
           }
           ```
+      - id: update-the-phone-for-an-authenticated-user
+        name: Update the phone number for an authenticated user
+        description: Sends a one-time password (OTP) to the new phone number.
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.update_user({
+            "phone": "123456789"
+          })
+          ```
+      - id: update-the-password-for-an-authenticated-user
+        name: Update the password for an authenticated user
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.update_user({
+            "password": "new password"
+          })
+          ```
+      - id: update-the-users-metadata
+        name: Update the user's metadata
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.update_user({
+            "data": { "hello": "world" }
+          })
+          ```
+      - id: update-password-with-reauthentication
+        name: Update the user's password with a nonce
+        description: |
+          If **Secure password change** is enabled in your [project's email provider settings](/dashboard/project/_/auth/providers), updating the user's password would require a nonce if the user **hasn't recently signed in**. The nonce is sent to the user's email or phone number. A user is deemed recently signed in if the session was created in the last 24 hours.
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.update_user({
+            "password": "new password",
+            "nonce": "123456"
+          })
+          ```
+  - id: get-user-identities
+    title: 'get_user_identities()'
+    notes: |
+      Gets all the identities linked to a user.
+      - The user needs to be signed in to call `get_user_identities()`.
+    examples:
+      - id: get-user-identities
+        name: Returns a list of identities linked to the user
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.get_user_identities()
+          ```
+        response: |
+          ```json
+          {
+            "identities": [
+              {
+                "identity_id": "22222222-2222-2222-2222-222222222222",
+                "id": "2024-01-01T00:00:00Z",
+                "user_id": "2024-01-01T00:00:00Z",
+                "identity_data": {
+                  "email": "example@email.com",
+                  "email_verified": false,
+                  "phone_verified": false,
+                  "sub": "11111111-1111-1111-1111-111111111111"
+                },
+                "provider": "email",
+                "last_sign_in_at": "2024-01-01T00:00:00Z",
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z",
+                "email": "example@email.com"
+              }
+            ]
+          }
+          ```
+  - id: link-identity
+    title: 'link_identity()'
+    params:
+      - name: credentials
+        isOptional: false
+        type: SignInWithOAuthCredentials
+        subContent:
+          - name: provider
+            isOptional: false
+            type: boolean
+            description: One of the providers supported by GoTrue.
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: scopes
+                isOptional: true
+                type: string
+                description: A space-separated list of scopes granted to the OAuth application.
+              - name: redirect_to
+                isOptional: true
+                type: string
+                description: A URL to send the user to after they are confirmed.
+              - name: query_params
+                isOptional: true
+                type: string
+                description: An object of query params
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `link_identity()`.
+      - If the candidate identity is already linked to the existing user or another user, `link_identity()` will fail.
+      - If `link_identity` is run on the server, you should handle the redirect.
+    examples:
+      - id: link-identity
+        name: Link an identity to a user
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.link_identity({
+            provider: 'github'
+          })
+          ```
+        response: |
+          ```json
+          {
+            "provider": "github",
+            "url": "<PROVIDER_URL_TO_REDIRECT_TO>"
+          }
+          ```
+  - id: unlink-identity
+    title: 'unlink_identity()'
+    params:
+      - name: identity
+        isOptional: false
+        type: UserIdentity
+        subContent:
+          - name: id
+            isOptional: false
+            type: string
+          - name: identity_id
+            isOptional: false
+            type: string
+          - name: provider
+            isOptional: false
+            type: string
+          - name: user_id
+            isOptional: false
+            type: string
+          - name: created_at
+            isOptional: true
+            type: string
+          - name: identity_data
+            isOptional: true
+            type: Dict[string, Any]
+          - name: last_sign_in_at
+            isOptional: true
+            type: string
+          - name: updated_at
+            isOptional: true
+            type: string
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `unlink_identity()`.
+      - The user must have at least 2 identities in order to unlink an identity.
+      - The identity to be unlinked must belong to the user.
+    examples:
+      - id: unlink-identity
+        name: Unlink an identity
+        isSpotlight: true
+        code: |
+          ```python
+          # retrieve all identites linked to a user
+          res = supabase.auth.get_user_identities()
 
+          # find the google identity 
+          google_identity = list(
+            filter(lambda identity: identity.provider == "google", res.identities)
+          ).pop()
+
+          # unlink the google identity
+          response = supabase.auth.unlink_identity(google_identity)
+          ```
+  - id: send-password-reauthentication
+    title: 'reauthenticate()'
+    notes: |
+      - This method is used together with `updateUser()` when a user's password needs to be updated.
+      - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
+      - A user is only require to reauthenticate before updating their password if **Secure password change** is enabled and the user **hasn't recently signed in**. A user is deemed recently signed in if the session was created in the last 24 hours.
+      - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+    examples:
+      - id: send-reauthentication-nonce
+        name: Send reauthentication nonce
+        description: Sends a reauthentication nonce to the user's email or phone number.
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.reauthenticate()
+          ```
+  - id: resend-email-or-phone-otps
+    title: 'resend()'
+    params:
+      - name: credentials
+        isOptional: false
+        type: ResendCredentials
+        subContent:
+          - name: email
+            isOptional: true
+            type: string
+            description: One of email or phone must be provided.
+          - name: phone
+            isOptional: true
+            type: string
+            description: One of email or phone must be provided.
+          - name: type
+            isOptional: false
+            type: signup | email_change | sms | phone_change
+          - name: options
+            isOptional: true
+            type: object
+            subContent:
+              - name: captcha_token
+                isOptional: true
+                type: string
+                description: Verification token received when the user completes the captcha on the site.
+              - name: email_redirect_to
+                isOptional: true
+                type: string
+                description: A URL to send the user to after they have signed-in.
+    notes: |
+      - Resends a signup confirmation, email change or phone change email to the user.
+      - Passwordless sign-ins can be resent by calling the `sign_in_with_otp()` method again.
+      - Password recovery emails can be resent by calling the `reset_password_for_email()` method again.
+      - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+      - You can specify a redirect url when you resend an email link using the `email_redirect_to` option.
+    examples:
+      - id: resend-email-signup-confirmation
+        name: Resend an email signup confirmation
+        description: Resends the email signup confirmation to the user
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.resend({
+            "type": "signup",
+            "email": "email@example.com",
+            "options": {
+              "email_redirect_to": "https://example.com/welcome"
+            }
+          })
+          ```
+      - id: resend-phone-signup-confirmation
+        name: Resend a phone signup confirmation
+        description: Resends the phone signup confirmation email to the user
+        code: |
+          ```python
+          response = supabase.auth.resend({
+            "type": "sms",
+            "phone": "1234567890"
+          })
+          ```
+      - id: resend-email-change-email
+        name: Resend email change email
+        description: Resends the email change email to the user
+        code: |
+          ```python
+          response = supabase.auth.resend({
+            "type": "email_change",
+            "email": "email@example.com"
+          })
+          ```
+      - id: resend-phone-change
+        name: Resend phone change OTP
+        description: Resends the phone change OTP to the user
+        code: |
+          ```python
+          response = supabase.auth.resend({
+            "type": "phone_change",
+            "phone": "1234567890"
+          })
+          ```
   - id: set-session
     title: 'set_session()'
     params:
@@ -1448,6 +1697,1015 @@ functions:
             }
           }
           ```
+
+  - id: exchange-code-for-session
+    title: 'exchange_code_for_session()'
+    params:
+      - name: auth_code
+        isOptional: false
+        type: string
+    notes: |
+      Log in an existing user by exchanging an Auth Code issued during the PKCE flow.
+
+      - Used when `flow_type` is set to `pkce` in client options.
+    examples:
+      - id: exchange-auth-code
+        name: Exchange Auth Code
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.exchange_code_for_session("auth_code": "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          ```
+        response: |
+          ```json
+          {
+            "session": {
+              "access_token": "<ACCESS_TOKEN>",
+              "token_type": "bearer",
+              "expires_in": 3600,
+              "expires_at": 1700000000,
+              "refresh_token": "<REFRESH_TOKEN>",
+              "user": {
+                "id": "11111111-1111-1111-1111-111111111111",
+                "aud": "authenticated",
+                "role": "authenticated",
+                "email": "example@email.com",
+                "email_confirmed_at": "2024-01-01T00:00:00Z",
+                "phone": "",
+                "confirmation_sent_at": "2024-01-01T00:00:00Z",
+                "confirmed_at": "2024-01-01T00:00:00Z",
+                "last_sign_in_at": "2024-01-01T00:00:00Z",
+                "app_metadata": {
+                  "provider": "email",
+                  "providers": [
+                    "email",
+                    "<OTHER_PROVIDER>"
+                  ]
+                },
+                "user_metadata": {
+                  "email": "email@email.com",
+                  "email_verified": true,
+                  "full_name": "User Name",
+                  "iss": "<ISS>",
+                  "name": "User Name",
+                  "phone_verified": false,
+                  "provider_id": "<PROVIDER_ID>",
+                  "sub": "<SUB>"
+                },
+                "identities": [
+                  {
+                    "identity_id": "22222222-2222-2222-2222-222222222222",
+                    "id": "11111111-1111-1111-1111-111111111111",
+                    "user_id": "11111111-1111-1111-1111-111111111111",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": false,
+                      "phone_verified": false,
+                      "sub": "11111111-1111-1111-1111-111111111111"
+                    },
+                    "provider": "email",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "email@example.com"
+                  },
+                  {
+                    "identity_id": "33333333-3333-3333-3333-333333333333",
+                    "id": "<ID>",
+                    "user_id": "<USER_ID>",
+                    "identity_data": {
+                      "email": "example@email.com",
+                      "email_verified": true,
+                      "full_name": "User Name",
+                      "iss": "<ISS>",
+                      "name": "User Name",
+                      "phone_verified": false,
+                      "provider_id": "<PROVIDER_ID>",
+                      "sub": "<SUB>"
+                    },
+                    "provider": "<PROVIDER>",
+                    "last_sign_in_at": "2024-01-01T00:00:00Z",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                    "email": "example@email.com"
+                  }
+                ],
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z",
+                "is_anonymous": false
+              },
+              "provider_token": "<PROVIDER_TOKEN>",
+              "provider_refresh_token": "<PROVIDER_REFRESH_TOKEN>"
+            },
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "aud": "authenticated",
+              "role": "authenticated",
+              "email": "example@email.com",
+              "email_confirmed_at": "2024-01-01T00:00:00Z",
+              "phone": "",
+              "confirmation_sent_at": "2024-01-01T00:00:00Z",
+              "confirmed_at": "2024-01-01T00:00:00Z",
+              "last_sign_in_at": "2024-01-01T00:00:00Z",
+              "app_metadata": {
+                "provider": "email",
+                "providers": [
+                  "email",
+                  "<OTHER_PROVIDER>"
+                ]
+              },
+              "user_metadata": {
+                "email": "email@email.com",
+                "email_verified": true,
+                "full_name": "User Name",
+                "iss": "<ISS>",
+                "name": "User Name",
+                "phone_verified": false,
+                "provider_id": "<PROVIDER_ID>",
+                "sub": "<SUB>"
+              },
+              "identities": [
+                {
+                  "identity_id": "22222222-2222-2222-2222-222222222222",
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "user_id": "11111111-1111-1111-1111-111111111111",
+                  "identity_data": {
+                    "email": "example@email.com",
+                    "email_verified": false,
+                    "phone_verified": false,
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "provider": "email",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "email": "email@example.com"
+                },
+                {
+                  "identity_id": "33333333-3333-3333-3333-333333333333",
+                  "id": "<ID>",
+                  "user_id": "<USER_ID>",
+                  "identity_data": {
+                    "email": "example@email.com",
+                    "email_verified": true,
+                    "full_name": "User Name",
+                    "iss": "<ISS>",
+                    "name": "User Name",
+                    "phone_verified": false,
+                    "provider_id": "<PROVIDER_ID>",
+                    "sub": "<SUB>"
+                  },
+                  "provider": "<PROVIDER>",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "email": "example@email.com"
+                }
+              ],
+              "created_at": "2024-01-01T00:00:00Z",
+              "updated_at": "2024-01-01T00:00:00Z",
+              "is_anonymous": false
+            },
+            "redirect_type": null
+          }
+          ```
+  - id: auth-mfa-api
+    title: 'Overview'
+    notes: |
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
+
+      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
+
+      Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
+  - id: mfa-enroll
+    title: 'mfa.enroll()'
+    notes: |
+      - Currently, `totp` is the only supported `factor_type`. The returned `id` should be used to create a challenge.
+      - To create a challenge, see [`mfa.challenge()`](/docs/reference/python/auth-mfa-challenge).
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/python/auth-mfa-verify).
+      - To create and verify a challenge in a single step, see [`mfa.challenge_and_verify()`](/docs/reference/python/auth-mfa-challengeandverify).
+    examples:
+      - id: enroll-totp-factor
+        name: Enroll a time-based, one-time password (TOTP) factor
+        isSpotlight: true
+        code: |
+          ```
+          res = supabase.auth.mfa.enroll({
+            "factor_type": "totp",
+            "friendly_name": "your_friendly_name"
+          })
+          ```
+  - id: mfa-challenge
+    title: 'mfa.challenge()'
+    notes: |
+      - An [enrolled factor](/docs/reference/python/auth-mfa-enroll) is required before creating a challenge.
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/python/auth-mfa-verify).
+    examples:
+      - id: create-mfa-challenge
+        name: Create a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```
+          res = supabase.auth.mfa.challenge({
+            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225'
+          })
+          ```
+  - id: mfa-verify
+    title: 'mfa.verify()'
+    notes: |
+      - To verify a challenge, please [create a challenge](/docs/reference/python/auth-mfa-challenge) first.
+    examples:
+      - id: verify-challenge
+        name: Verify a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```
+          res = supabase.auth.mfa.verify({
+            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            "challenge_id": '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15',
+            "code": '123456'
+          })
+          ```
+  - id: mfa-challenge-and-verify
+    title: 'mfa.challenge_and_verify()'
+    notes: |
+      - An [enrolled factor](/docs/reference/python/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
+      - Executes [`mfa.challenge()`](/docs/reference/python/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/python/auth-mfa-verify) in a single step.
+    examples:
+      - id: challenge-and-verify
+        name: Create and verify a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```
+          res = supabase.auth.mfa.challenge_and_verify({
+            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            "code": '123456'
+          })
+          ```
+  - id: mfa-unenroll
+    title: 'mfa.unenroll()'
+    examples:
+      - id: unenroll-a-factor
+        name: Unenroll a factor
+        isSpotlight: true
+        code: |
+          ```
+          res = supabase.auth.mfa.unenroll({
+            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          })
+          ```
+  - id: mfa-get-authenticator-assurance-level
+    title: 'mfa.get_authenticator_assurance_level()'
+    notes: |
+      - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
+      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
+      - If the user has a verified factor, the `next_level` field will return `aal2`, else, it will return `aal1`.
+    examples:
+      - id: get-aal
+        name: Get the AAL details of a session
+        isSpotlight: true
+        code: |
+          ```
+          res = supabase.auth.mfa.get_authenticator_assurance_level()
+          ```
+  - id: admin-api
+    title: 'Overview'
+    notes: |
+      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
+    examples:
+      - id: create-auth-admin-client
+        name: Create server-side auth client
+        isSpotlight: true
+        code: |
+          ```python
+          from supabase import create_client
+          from supabase.lib.client_options import ClientOptions
+
+          supabase = create_client(
+            supabase_url, 
+            service_role_key,
+            options=ClientOptions(
+              auto_refresh_token=False,
+              persist_session=False,
+            )
+          )
+
+          # Access auth admin api
+          admin_auth_client = supabase.auth.admin
+          ```
+
+  - id: get-user-by-id
+    title: 'get_user_by_id()'
+    params:
+      - name: uid
+        isOptional: false
+        type: string
+        description: |
+          The user's unique identifier
+
+          This function should only be called on a server. Never expose your `service_role` key in the browser.
+    notes: |
+      - Fetches the user object from the database based on the user's id.
+      - The `get_user_by_id()` method requires the user's id which maps to the `auth.users.id` column.
+    examples:
+      - id: fetch-the-user-object-using-the-access-token-jwt
+        name: Fetch the user object using the access_token jwt
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.admin.get_user_by_id(1)
+          ```
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "1",
+              "aud": "authenticated",
+              "role": "authenticated",
+              "email": "example@email.com",
+              "email_confirmed_at": "2024-01-01T00:00:00Z",
+              "phone": "",
+              "confirmation_sent_at": "2024-01-01T00:00:00Z",
+              "confirmed_at": "2024-01-01T00:00:00Z",
+              "last_sign_in_at": "2024-01-01T00:00:00Z",
+              "app_metadata": {},
+              "user_metadata": {},
+              "identities": [
+                {
+                  "identity_id": "22222222-2222-2222-2222-222222222222",
+                  "id": "1",
+                  "user_id": "1",
+                  "identity_data": {
+                    "email": "example@email.com",
+                    "email_verified": true,
+                    "phone_verified": false,
+                    "sub": "1"
+                  },
+                  "provider": "email",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "email": "email@example.com"
+                }
+              ],
+              "created_at": "2024-01-01T00:00:00Z",
+              "updated_at": "2024-01-01T00:00:00Z",
+              "is_anonymous": false
+            }
+          }
+          ```
+  - id: list-users
+    title: 'list_users()'
+    params:
+      - name: params
+        isOptional: true
+        type: PageParams
+        description: |
+          An object which supports page and perPage as numbers, to alter the paginated results.
+        subContent:
+          - name: page
+            isOptional: true
+            type: number
+            description: The page number
+          - name: per_page
+            isOptional: true
+            type: number
+            description: Number of items returned per page
+    notes: |
+      - Defaults to return 50 users per page.
+    examples:
+      - id: get-a-full-list-of-users
+        name: Get a page of users
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.admin.list_users()
+          ```
+      - id: get-paginated-list-of-users
+        name: Paginated list of users
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.list_users(
+            page=1,
+            perPage=1000
+          )
+          ```
+  - id: create-user
+    title: 'create_user()'
+    params:
+      - name: attributes
+        isOptional: false
+        type: AdminUserAttributes
+        subContent:
+          - name: app_metadata
+            isOptional: true
+            type: object
+            description: |
+              A custom data object to store the user's application specific metadata. This maps to the `auth.users.app_metadata` column.
+          - name: ban_duration
+            isOptional: true
+            type: string
+            description: Determines how long a user is banned for.
+          - name: email
+            isOptional: true
+            type: string
+            description: The user's email.
+          - name: email_confirm
+            isOptional: true
+            type: boolean
+            description: Confirms the user's email address if set to true.
+          - name: nonce
+            isOptional: true
+            type: string
+            description: The nonce sent for reauthentication if the user's password is to be updated.
+          - name: password
+            isOptional: true
+            type: string
+            description: The user's password.
+          - name: phone
+            isOptional: true
+            type: string
+            description: The user's phone.
+          - name: phone_confirm
+            isOptional: true
+            type: boolean
+            description: Confirms the user's phone number if set to true.
+          - name: role
+            isOptional: true
+            type: string
+            description: The `role` claim set in the user's access token JWT.
+          - name: user_metadata
+            isOptional: true
+            type: object
+            description: |
+              A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.
+    notes: |
+      - To confirm the user's email address or phone number, set `email_confirm` or `phone_confirm` to true. Both arguments default to false.
+      - `create_user()` will not send a confirmation email to the user. You can use [`invite_user_by_email()`](/docs/reference/python/auth-admin-inviteuserbyemail) if you want to send them an email invite instead.
+      - If you are sure that the created user's email or phone number is legitimate and verified, you can set the `email_confirm` or `phone_confirm` param to `true`.
+    examples:
+      - id: create-a-new-user-with-custom-user-metadata
+        name: With custom user metadata
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.admin.create_user({
+            "email": "user@email.com",
+            "password": "password",
+            "user_metadata": { "name": "Yoda" }
+          })
+          ```
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "1",
+              "aud": "authenticated",
+              "role": "authenticated",
+              "email": "example@email.com",
+              "email_confirmed_at": "2024-01-01T00:00:00Z",
+              "phone": "",
+              "confirmation_sent_at": "2024-01-01T00:00:00Z",
+              "confirmed_at": "2024-01-01T00:00:00Z",
+              "last_sign_in_at": "2024-01-01T00:00:00Z",
+              "app_metadata": {},
+              "user_metadata": {},
+              "identities": [
+                {
+                  "identity_id": "22222222-2222-2222-2222-222222222222",
+                  "id": "1",
+                  "user_id": "1",
+                  "identity_data": {
+                    "email": "example@email.com",
+                    "email_verified": true,
+                    "phone_verified": false,
+                    "sub": "1"
+                  },
+                  "provider": "email",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "email": "email@example.com"
+                }
+              ],
+              "created_at": "2024-01-01T00:00:00Z",
+              "updated_at": "2024-01-01T00:00:00Z",
+              "is_anonymous": false
+            }
+          }
+          ```
+      - id: auto-confirm-the-users-email
+        name: Auto-confirm the user's email
+        code: |
+          ```python
+          response = supabase.auth.admin.create_user({
+            "email": "user@email.com",
+            "email_confirm": True
+          })
+          ```
+      - id: auto-confirm-the-users-phone-number
+        name: Auto-confirm the user's phone number
+        code: |
+          ```python
+          response = supabase.auth.admin.create_user({
+            "phone": "1234567890",
+            "phone_confirm": True
+          })
+          ```
+  - id: delete-user
+    title: 'delete_user()'
+    params:
+      - name: id
+        isOptional: false
+        type: string
+        description: The user id you want to remove.
+      - name: should_soft_delete
+        isOptional: true
+        type: boolean
+        description: |
+          If true, then the user will be soft-deleted (setting `deleted_at` to the current timestamp and disabling their account while preserving their data) from the auth schema. Defaults to false for backward compatibility.
+
+          This function should only be called on a server. Never expose your `service_role` key in the browser.
+    description: Delete a user. Requires a `service_role` key.
+    notes: |
+      - The `delete_user()` method requires the user's ID, which maps to the `auth.users.id` column.
+    examples:
+      - id: removes-a-user
+        name: Removes a user
+        isSpotlight: true
+        code: |
+          ```python
+          supabase.auth.admin.delete_user(
+            "715ed5db-f090-4b8c-a067-640ecee36aa0"
+          )
+          ```
+  - id: invite-user-by-email
+    title: 'invite_user_by_email()'
+    params:
+      - name: email
+        isOptional: false
+        type: string
+        description: The email address of the user.
+      - name: options
+        isOptional: true
+        type: InviteUserByEmailOptions
+        subContent:
+          - name: data
+            isOptional: true
+            type: object
+            description: |
+              A custom data object to store additional metadata about the user. This maps to the `auth.users.user_metadata` column.
+          - name: redirect_to
+            isOptional: true
+            type: string
+            description: |
+              The URL which will be appended to the email link sent to the user's email address. Once clicked the user will end up on this URL.
+    description: Sends an invite link to an email address.
+    notes: |
+      - Sends an invite link to the user's email address.
+      - The `invite_user_by_email()` method is typically used by administrators to invite users to join the application.
+      - Note that PKCE is not supported when using `invite_user_by_email`. This is because the browser initiating the invite is often different from the browser accepting the invite which makes it difficult to provide the security guarantees required of the PKCE flow.
+    examples:
+      - id: invite-a-user
+        name: Invite a user
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.admin.invite_user_by_email("email@example.com")
+          ```
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "aud": "authenticated",
+              "role": "authenticated",
+              "email": "example@email.com",
+              "invited_at": "2024-01-01T00:00:00Z",
+              "phone": "",
+              "confirmation_sent_at": "2024-01-01T00:00:00Z",
+              "app_metadata": {
+                "provider": "email",
+                "providers": [
+                  "email"
+                ]
+              },
+              "user_metadata": {},
+              "identities": [
+                {
+                  "identity_id": "22222222-2222-2222-2222-222222222222",
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "user_id": "11111111-1111-1111-1111-111111111111",
+                  "identity_data": {
+                    "email": "example@email.com",
+                    "email_verified": false,
+                    "phone_verified": false,
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "provider": "email",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "email": "example@email.com"
+                }
+              ],
+              "created_at": "2024-01-01T00:00:00Z",
+              "updated_at": "2024-01-01T00:00:00Z",
+              "is_anonymous": false
+            }
+          }
+          ```
+  - id: generate-link
+    title: 'generate_link()'
+    params:
+      - name: params
+        type: GenerateLinkParams
+        subContent:
+          - name: type
+            type: 'signup | invite | magiclink | recovery | email_change_current | email_change_new'
+          - name: email
+            type: string
+          - name: password
+            type: string
+            isOptional: true
+            description: Only required if type is `signup`.
+          - name: new_email
+            type: string
+            isOptional: true
+            description: Only required if type is `email_change_current` or `email_change_new`.
+          - name: options
+            type: object
+            isOptional: true
+            subContent:
+              - name: data
+                type: object
+                description: >
+                  Custom JSON object containing user metadata, to be stored in the `raw_user_meta_data` column.
+                  Only accepted if type is `signup`, `invite`, or `magiclink`.
+              - name: redirect_to
+                type: string
+                description: >
+                  A redirect URL which will be appended to the generated email link.
+    notes: |
+      - The following types can be passed into `generate_link()`: `signup`, `magiclink`, `invite`, `recovery`, `email_change_current`, `email_change_new`, `phone_change`.
+      - `generate_link()` only generates the email link for `email_change_email` if the **Secure email change** is enabled in your project's [email auth provider settings](/dashboard/project/_/auth/providers).
+      - `generate_link()` handles the creation of the user for `signup`, `invite` and `magiclink`.
+    examples:
+      - id: generate-a-signup-link
+        name: Generate a signup link
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.admin.generate_link({
+            "type": "signup",
+            "email": "email@example.com",
+            "password": "secret"
+          })
+          ```
+        response: |
+          ```json
+          {
+            "properties": {
+              "action_link": "<LINK_TO_SEND_TO_USER>",
+              "email_otp": "999999",
+              "hashed_token": "<HASHED_TOKEN",
+              "redirect_to": "<REDIRECT_URL>",
+              "verification_type": "signup"
+            },
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "aud": "authenticated",
+              "role": "authenticated",
+              "email": "email@example.com",
+              "phone": "",
+              "confirmation_sent_at": "2024-01-01T00:00:00Z",
+              "app_metadata": {
+                "provider": "email",
+                "providers": [
+                  "email"
+                ]
+              },
+              "user_metadata": {},
+              "identities": [
+                {
+                  "identity_id": "22222222-2222-2222-2222-222222222222",
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "user_id": "11111111-1111-1111-1111-111111111111",
+                  "identity_data": {
+                    "email": "email@example.com",
+                    "email_verified": false,
+                    "phone_verified": false,
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "provider": "email",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "email": "email@example.com"
+                }
+              ],
+              "created_at": "2024-01-01T00:00:00Z",
+              "updated_at": "2024-01-01T00:00:00Z",
+              "is_anonymous": false
+            }
+          }
+          ```
+      - id: generate-an-invite-link
+        name: Generate an invite link
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.generate_link({
+            "type": "invite",
+            "email": "email@example.com"
+          })
+          ```
+      - id: generate-a-magic-link
+        name: Generate a magic link
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.generate_link({
+            "type": "magiclink",
+            "email": "email@example.com"
+          })
+          ```
+      - id: generate-a-recovery-link
+        name: Generate a recovery link
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.generate_link({
+            "type": "recovery",
+            "email": "email@example.com"
+          })
+          ```
+      - id: generate-links-to-change-current-email-address
+        name: Generate links to change current email address
+        isSpotlight: false
+        code: |
+          ```python
+          # generate an email change link to be sent to the current email address
+          response = supabase.auth.admin.generate_link({
+            "type": "email_change_current",
+            "email": "current.email@example.com",
+            "new_email": "new.email@example.com"
+          })
+
+          # generate an email change link to be sent to the new email address
+          response = supabase.auth.admin.generate_link({
+            "type": "email_change_new",
+            "email": "current.email@example.com",
+            "new_email": "new.email@example.com"
+          })
+          ```
+  - id: update-user-by-id
+    title: 'update_user_by_id()'
+    params:
+      - name: uid
+        isOptional: false
+        type: string
+      - name: attributes
+        isOptional: false
+        type: AdminUserAttributes
+        description: |
+          The data you want to update.
+
+          This function should only be called on a server. Never expose your `service_role` key in the browser.
+        subContent:
+          - name: app_metadata
+            isOptional: true
+            type: object
+            description: |
+              A custom data object to store the user's application specific metadata. This maps to the `auth.users.app_metadata` column.
+          - name: ban_duration
+            isOptional: true
+            type: string
+            description: Determines how long a user is banned for.
+          - name: email
+            isOptional: true
+            type: string
+            description: The user's email.
+          - name: email_confirm
+            isOptional: true
+            type: boolean
+            description: Confirms the user's email address if set to true.
+          - name: nonce
+            isOptional: true
+            type: string
+            description: The nonce sent for reauthentication if the user's password is to be updated.
+          - name: password
+            isOptional: true
+            type: string
+            description: The user's password.
+          - name: phone
+            isOptional: true
+            type: string
+            description: The user's phone.
+          - name: phone_confirm
+            isOptional: true
+            type: boolean
+            description: Confirms the user's phone number if set to true.
+          - name: role
+            isOptional: true
+            type: string
+            description: The `role` claim set in the user's access token JWT.
+          - name: user_metadata
+            isOptional: true
+            type: string
+            description: A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.
+    examples:
+      - id: updates-a-users-email
+        name: Updates a user's email
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.update_user_by_id(
+            "11111111-1111-1111-1111-111111111111",
+            { "email": "new@email.com" }
+          )
+          ```
+        response: |
+          ```json
+          {
+            "user": {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "aud": "authenticated",
+              "role": "authenticated",
+              "email": "new@email.com",
+              "email_confirmed_at": "2024-01-01T00:00:00Z",
+              "phone": "",
+              "confirmed_at": "2024-01-01T00:00:00Z",
+              "recovery_sent_at": "2024-01-01T00:00:00Z",
+              "last_sign_in_at": "2024-01-01T00:00:00Z",
+              "app_metadata": {
+                "provider": "email",
+                "providers": [
+                  "email"
+                ]
+              },
+              "user_metadata": {
+                "email": "example@email.com",
+                "email_verified": false,
+                "phone_verified": false,
+                "sub": "11111111-1111-1111-1111-111111111111"
+              },
+              "identities": [
+                {
+                  "identity_id": "22222222-2222-2222-2222-222222222222",
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "user_id": "11111111-1111-1111-1111-111111111111",
+                  "identity_data": {
+                    "email": "example@email.com",
+                    "email_verified": false,
+                    "phone_verified": false,
+                    "sub": "11111111-1111-1111-1111-111111111111"
+                  },
+                  "provider": "email",
+                  "last_sign_in_at": "2024-01-01T00:00:00Z",
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "updated_at": "2024-01-01T00:00:00Z",
+                  "email": "example@email.com"
+                }
+              ],
+              "created_at": "2024-01-01T00:00:00Z",
+              "updated_at": "2024-01-01T00:00:00Z",
+              "is_anonymous": false
+            }
+          }
+          ```
+      - id: updates-a-users-password
+        name: Updates a user's password
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.update_user_by_id(
+            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+            { "password": "new_password" }
+          )
+          ```
+      - id: updates-a-users-metadata
+        name: Updates a user's metadata
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.admin.update_user_by_id(
+            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+            { "user_metadata": { "hello": "world" } }
+          )
+          ```
+      - id: updates-a-users-app-metadata
+        name: Updates a user's app_metadata
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.update_user_by_id(
+            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+            { "app_metadata": { "plan": "trial" } }
+          )
+          ```
+      - id: confirms-a-users-email-address
+        name: Confirms a user's email address
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.update_user_by_id(
+            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+            { "email_confirm": True }
+          )
+          ```
+      - id: confirms-a-users-phone-number
+        name: Confirms a user's phone number
+        isSpotlight: false
+        code: |
+          ```python
+          response = supabase.auth.admin.update_user_by_id(
+            "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
+            { "phone_confirm": True }
+          )
+          ```
+  - id: mfa-delete-factor
+    title: 'mfa.delete_factor()'
+    params:
+      - name: params
+        isOptional: false
+        type: AuthMFAAdminDeleteFactorParams
+        subContent:
+          - name: id
+            isOptional: false
+            type: string
+            description: ID of the MFA factor to delete.
+          - name: user_id
+            isOptional: false
+            type: string
+            description: ID of the user whose factor is being deleted.
+    notes: |
+      Deletes a factor on a user. This will log the user out of all active sessions if the deleted factor was verified.
+    examples:
+      - id: delete-factor
+        name: Delete a factor for a user
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.auth.admin.mfa.delete_factor({
+            "id": "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+            "user_id": "a89baba7-b1b7-440f-b4bb-91026967f66b",
+          })
+          ```
+        response: |
+          ```json
+          {
+            "id": "34e770dd-9ff9-416c-87fa-43b31d7ef225"
+          }
+          ```
+
+  - id: reset-password-for-email
+    title: 'reset_password_for_email()'
+    params:
+      - name: email
+        isOptional: false
+        type: string
+        description: The email address of the user.
+      - name: options
+        isOptional: true
+        type: object
+        subContent:
+          - name: redirect_to
+            isOptional: true
+            type: string
+            description: >
+              The URL to send the user to after they click the password reset link.
+              Must be in your configured redirect URLs.
+          - name: captcha_token
+            isOptional: true
+            type: string
+            description: Verification token received when the user completes the captcha on the site.
+    notes: |
+      - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
+      - The `reset_password_for_email()` only sends a password reset link to the user's email.
+      To update the user's password, see [`update_user()`](/docs/reference/python/auth-updateuser).
+      - When the user clicks the reset link in the email they are redirected back to your application.
+      You can configure the URL that the user is redirected to with the `redirectTo` parameter.
+      See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - After the user has been redirected successfully, prompt them for a new password and call `update_user()`:
+      ```python
+      response = supabase.auth.update_user({
+        "password": new_password
+      })
+      ```
+    examples:
+      - id: reset-password
+        name: Reset password
+        isSpotlight: true
+        code: |
+          ```python
+          supabase.auth.reset_password_for_email(email, {
+            "redirect_to": "https://example.com/update-password",
+          })
+          ```
+
   - id: select
     title: 'Fetch data: select()'
     notes: |
@@ -2019,11 +3277,11 @@ functions:
       - name: returning
         isOptional: true
         type: ReturnMethod
-        description:  Either 'minimal' or 'representation'. Defaults to 'representation'.
+        description: Either 'minimal' or 'representation'. Defaults to 'representation'.
       - name: default_to_null
         isOptional: true
         type: bool
-        description:  Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts.
+        description: Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts.
     examples:
       - id: create-a-record
         name: Create a record
@@ -2206,19 +3464,19 @@ functions:
       - name: returning
         isOptional: true
         type: ReturnMethod
-        description:  Either 'minimal' or 'representation'. Defaults to 'representation'.
+        description: Either 'minimal' or 'representation'. Defaults to 'representation'.
       - name: ignore_duplicates
         isOptional: true
         type: bool
-        description:  Whether duplicate rows should be ignored.
+        description: Whether duplicate rows should be ignored.
       - name: on_conflict
         isOptional: true
         type: string
-        description:  Specified columns to be made to work with UNIQUE constraint.
+        description: Specified columns to be made to work with UNIQUE constraint.
       - name: default_to_null
         isOptional: true
         type: bool
-        description:  Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts.
+        description: Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -2359,7 +3617,7 @@ functions:
       - name: returning
         isOptional: true
         type: ReturnMethod
-        description:  Either 'minimal' or 'representation'. Defaults to 'representation'.
+        description: Either 'minimal' or 'representation'. Defaults to 'representation'.
     examples:
       - id: delete-records
         name: Delete records
@@ -2451,15 +3709,15 @@ functions:
       - name: params
         isOptional: true
         type: dict of any
-        description:  Parameters passed into the stored procedure call.
+        description: Parameters passed into the stored procedure call.
       - name: get
         isOptional: true
         type: dict of any
-        description:  When set to `true`, `data` will not be returned. Useful if you only need the count.
+        description: When set to `true`, `data` will not be returned. Useful if you only need the count.
       - name: head
         isOptional: true
         type: dict of any
-        description:  When set to `true`, the function will be called with read-only access mode.
+        description: When set to `true`, the function will be called with read-only access mode.
       - name: count
         isOptional: true
         type: CountMethod
@@ -2592,7 +3850,6 @@ functions:
           }
           ```
         hideCodeBlock: true
-
 
   - id: using-filters
     title: Using Filters
@@ -3875,7 +5132,7 @@ functions:
           Postgres supports a number of [range types](https://www.postgresql.org/docs/current/rangetypes.html). You can filter on range columns using the string representation of range values.
         hideCodeBlock: true
         isSpotlight: true
-  
+
   - id: range-adjacent
     title: range_adjacent()
     description: |
@@ -4401,7 +5658,7 @@ functions:
           }
           ```
         hideCodeBlock: true
-  
+
   - id: filter
     title: filter()
     params:
@@ -4762,9 +6019,9 @@ functions:
         type: string
         description: Set this to limit rows of foreign tables instead of the parent table.
     notes: |
-      Limit the query result by starting at an offset (`from`) and ending at the offset (`from + to`). Only records within this range are returned. This respects the query order and if there is no order clause the range could behave unexpectedly.
-      
-      The `from` and `to` values are 0-based and inclusive: `range(1, 3)` will include the second, third and fourth rows of the query.
+      Limit the query result by starting at an offset (`start`) and ending at the offset (`end`). Only records within this range are returned. This respects the query order and if there is no order clause the range could behave unexpectedly.
+
+      The `start` and `end` values are 0-based and inclusive: `range(1, 3)` will include the second, third and fourth rows of the query.
     examples:
       - id: with-select
         name: With `select()`
@@ -5370,9 +6627,10 @@ functions:
           supabase.remove_all_channels()
           ```
 
-
   - id: list-buckets
     title: 'list_buckets()'
+    description: |
+      Retrieves the details of all Storage buckets within an existing project.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
@@ -5382,188 +6640,907 @@ functions:
       - id: list-buckets
         name: List buckets
         code: |
+          ```python
+          response = supabase.storage.list_buckets()
           ```
-          res = supabase.storage.list_buckets()
+        response: |
+          ```json
+          [
+            {
+              "id": "avatars",
+              "name": "avatars",
+              "owner": "",
+              "public": false,
+              "file_size_limit": 1024,
+              "allowed_mime_types": [
+                "image/png"
+              ],
+              "created_at": "2024-05-22T22:26:05.100Z",
+              "updated_at": "2024-05-22T22:26:05.100Z"
+            }
+          ]
           ```
 
   - id: get-bucket
     title: 'get_bucket()'
+    description: |
+      Retrieves the details of an existing Storage bucket.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: string
+        description: The unique identifier of the bucket you would like to retrieve.
     examples:
       - id: get-bucket
         name: Get bucket
         code: |
+          ```python
+          response = supabase.storage.get_bucket('avatars')
           ```
-          res = supabase.storage.get_bucket(name)
+        response: |
+          ```json
+          {
+            "id": "avatars",
+            "name": "avatars",
+            "owner": "",
+            "public": false,
+            "file_size_limit": 1024,
+            "allowed_mime_types": [
+              "image/png"
+            ],
+            "created_at": "2024-05-22T22:26:05.100Z",
+            "updated_at": "2024-05-22T22:26:05.100Z"
+          }
           ```
 
   - id: create-bucket
     title: 'create_bucket()'
+    description: |
+      Creates a new Storage bucket
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `insert`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: string
+        description: A unique identifier for the bucket you are creating.
+      - name: options
+        isOptional: false
+        type: CreateOrUpdateBucketOptions
+        subContent:
+          - name: public
+            isOptional: true
+            type: bool
+            description: The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private
+          - name: allowed_mime_types
+            isOptional: true
+            type: list[string]
+            description: Specifies the allowed mime types that this bucket can accept during upload. The default value is null, which allows files with all mime types to be uploaded. Each mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.
+          - name: file_size_limit
+            isOptional: true
+            type: number
+            description: Specifies the max file size in bytes that can be uploaded to this bucket. The global file size limit takes precedence over this value. The default value is null, which doesn't set a per bucket file size limit.
     examples:
       - id: create-bucket
         name: Create bucket
         code: |
+          ```python
+          response = supabase.storage.create_bucket('avatars',   
+            options={
+              "public": False,
+              "allowed_mime_types": ["image/png"],
+              "file_size_limit": 1024,
+            }
+          )
           ```
-          res = supabase.storage.create_bucket(name)
+        response: |
+          ```json
+          {
+            "name": "avatars"
+          }
           ```
 
   - id: empty-bucket
     title: 'empty_bucket()'
+    description: |
+      Removes all objects inside a single bucket.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: `select` and `delete`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: string
+        description: The unique identifier of the bucket you would like to empty.
     examples:
       - id: empty-bucket
         name: Empty bucket
         code: |
+          ```python
+          response = supabase.storage.empty_bucket('avatars')
           ```
-          res = supabase.storage.empty_bucket(name)
+        response: |
+          ```json
+          {
+            "message": "Successfully emptied"
+          }
           ```
+  - id: update-bucket
+    title: 'update_bucket()'
+    description: |
+      Updates a Storage bucket
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select` and `update`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: string
+        description: A unique identifier for the bucket you are creating.
+      - name: options
+        isOptional: false
+        type: CreateOrUpdateBucketOptions
+        subContent:
+          - name: public
+            isOptional: true
+            type: bool
+            description: The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private
+          - name: allowed_mime_types
+            isOptional: true
+            type: list[string]
+            description: Specifies the allowed mime types that this bucket can accept during upload. The default value is null, which allows files with all mime types to be uploaded. Each mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.
+          - name: file_size_limit
+            isOptional: true
+            type: number
+            description: Specifies the max file size in bytes that can be uploaded to this bucket. The global file size limit takes precedence over this value. The default value is null, which doesn't set a per bucket file size limit.
+    examples:
+      - id: update-bucket
+        name: Update bucket
+        code: |
+          ```python
+          response = supabase.storage.update_bucket('avatars',   
+            options={
+              "public": False,
+              "allowed_mime_types": ["image/png"],
+              "file_size_limit": 1024,
+            }
+          )
+          ```
+        response: |
+          ```json
+          {
+            "message": "Successfully updated"
+          }
+          ```
+
   - id: delete-bucket
     title: 'delete_bucket()'
+    description: |
+      Deletes an existing bucket. A bucket can't be deleted with existing objects inside it. You must first `empty()` the bucket.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `delete`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: string
+        description: The unique identifier of the bucket you would like to delete.
     examples:
       - id: delete-bucket
         name: Delete bucket
         code: |
+          ```python
+          response = supabase.storage.delete_bucket('avatars')
           ```
-          res = supabase.storage.delete_bucket(name)
+        response: |
+          ```json
+          {
+            "message": "Successfully deleted"
+          }
           ```
 
   - id: from-upload
     title: 'from_.upload()'
+    description: Uploads a file to an existing bucket.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
-        - `objects` table permissions: `insert`
+        - `objects` table permissions: only `insert` when you are uploading new files and `select`, `insert` and `update` when you are upserting files
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - Please specify the appropriate content [MIME type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types) if you are uploading images or audio. If no `file_options` are specified, the MIME type defaults to `text/html`.
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+      - name: file
+        isOptional: false
+        type: BufferedReader | bytes | FileIO | string | Path
+        description: The body of the file to be stored in the bucket.
+      - name: options
+        isOptional: false
+        type: FileOptions
+        subContent:
+          - name: cache-control
+            isOptional: true
+            type: string
+            description: |
+              The number of seconds the asset is cached in the browser and in the Supabase CDN. This is set in the `Cache-Control: max-age=<seconds>` header. Defaults to 3600 seconds.
+          - name: content-type
+            isOptional: true
+            type: string
+            description: |
+              The `Content-Type` header value. Should be specified if using a `file` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
+          - name: upsert
+            isOptional: true
+            type: string
+            description: When upsert is set to true, the file is overwritten if it exists. When set to false, an error is thrown if the object already exists. Defaults to false.
     examples:
       - id: upload-file
         name: Upload file using filepath
         code: |
           ```py
-          with open(filepath, 'rb') as f:
-              supabase.storage.from_("testbucket").upload(file=f,path=path_on_supastorage, file_options={"content-type": "audio/mpeg"})
+          with open('./public/avatar1.png', 'rb') as f:
+            response = supabase.storage.from_("avatars").upload(
+                file=f,
+                path="public/avatar1.png",
+                file_options={"cache-control": "3600", "upsert": "false"},
+            )
+          ```
+        response: |
+          ```json
+          {
+            "path": "public/avatar1.png",
+            "full_path": "avatars/public/avatar1.png"
+          }
           ```
   - id: from-update
     title: from_.update()
+    description: Replaces an existing file at the specified path with a new one.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+      - name: file
+        isOptional: false
+        type: BufferedReader | bytes | FileIO | string | Path
+        description: The body of the file to be stored in the bucket.
+      - name: options
+        isOptional: false
+        type: FileOptions
+        subContent:
+          - name: cache-control
+            isOptional: true
+            type: string
+            description: |
+              The number of seconds the asset is cached in the browser and in the Supabase CDN. This is set in the `Cache-Control: max-age=<seconds>` header. Defaults to 3600 seconds.
+          - name: content-type
+            isOptional: true
+            type: string
+            description: |
+              The `Content-Type` header value. Should be specified if using a `file` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
+          - name: upsert
+            isOptional: true
+            type: string
+            description: When upsert is set to true, the file is overwritten if it exists. When set to false, an error is thrown if the object already exists. Defaults to false.
     examples:
       - id: update-file
         name: Update file
         code: |
           ```python
-          with open(filepath, 'rb') as f:
-            supabase.storage.from_("bucket_name").update(file=f, path=path_on_supastorage, file_options={"cache-control": "3600", "upsert": "true"})
+          with open('./public/avatar1.png', 'rb') as f:
+            response = supabase.storage.from_("avatars").update(
+                file=f,
+                path="public/avatar1.png",
+                file_options={"cache-control": "3600", "upsert": "true"},
+            )
+          ```
+        response: |
+          ```json
+          {
+            "path": "public/avatar1.png",
+            "full_path": "avatars/public/avatar1.png"
+          }
           ```
   - id: from-move
     title: 'from_.move()'
+    description: Moves an existing file to a new path in the same bucket.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: from_path
+        isOptional: false
+        type: string
+        description: The original file path, including the current file name. For example `folder/image.png`.
+      - name: to_path
+        isOptional: false
+        type: string
+        description: The new file path, including the new file name. For example `folder/image-new.png`.
     examples:
       - id: move-file
         name: Move file
         code: |
+          ```py
+          response = supabase.storage.from_("avatars").move(
+            "public/avatar1.png", "private/avatar2.png"
+          )
           ```
-          res = supabase.storage.from_('bucket_name').move('public/avatar1.png', 'private/avatar2.png')
+        response: |
+          ```json
+          {
+            "message": "Successfully moved"
+          }
+          ```
+  - id: from-copy
+    title: 'from_.copy()'
+    description: Copies an existing file to a new path in the same bucket.
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `update` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: from_path
+        isOptional: false
+        type: string
+        description: The original file path, including the current file name. For example `folder/image.png`.
+      - name: to_path
+        isOptional: false
+        type: string
+        description: The new file path, including the new file name. For example `folder/image-new.png`.
+    examples:
+      - id: copy-file
+        name: Copy file
+        code: |
+          ```py
+          response = supabase.storage.from_("avatars").copy(
+            "public/avatar1.png", "private/avatar2.png"
+          )
+          ```
+        response: |
+          ```json
+          {
+            "path": "avatars/private/avatar2.png"
+          }
           ```
 
-  - id: from-create-signed-url
-    title: 'from_.create_signed_url()'
+  - id: from-create-signed-urls
+    title: 'from_.create_signed_urls()'
+    description: Creates multiple signed URLs. Use a signed URL to share a file for a fixed amount of time.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: paths
+        isOptional: false
+        type: list[string]
+        description: |
+          The file paths to be downloaded, including the current file names. For example `['folder/image.png', 'folder2/image2.png']`.
+      - name: expires_in
+        isOptional: false
+        type: number
+        description: The number of seconds until the signed URLs expire. For example, `60` for URLs which are valid for one minute.
+      - name: options
+        isOptional: true
+        type: CreateSignedURLsOptions
+        subContent:
+          - name: download
+            isOptional: true
+            type: string | bool
+            description: |
+              Triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
+    examples:
+      - id: create-signed-urls
+        name: Create Signed URLs
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.storage.from_("avatars").create_signed_urls(
+            ["folder/avatar1.png", "folder/avatar2.png"], 60
+          )
+          ```
+        response: |
+          ```json
+          [
+            {
+              "error": null,
+              "path": "folder/avatar1.png",
+              "signedURL": "/object/sign/avatars/folder/avatar1.png?token=<TOKEN>",
+              "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+            },
+            {
+              "error": null,
+              "path": "folder/avatar2.png",
+              "signedURL": "/object/sign/avatars/folder/avatar2.png?token=<TOKEN>",
+              "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar2.png?token=<TOKEN>"
+            }
+          ]
+          ```
+  - id: from-create-signed-url
+    title: 'from_.create_signed_url()'
+    description: Creates a signed URL for a file. Use a signed URL to share a file for a fixed amount of time.
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: |
+          The file path, including the file name. For example `'folder/image.png'`.
+      - name: expires_in
+        isOptional: false
+        type: number
+        description: The number of seconds until the signed URL expires. For example, `60` for URLs which are valid for one minute.
+      - name: options
+        isOptional: true
+        type: URLOptions
+        subContent:
+          - name: download
+            isOptional: true
+            type: string | bool
+            description: |
+              Triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
+          - name: transform
+            isOptional: true
+            type: TransformOptions
+            description: Transform the asset before serving it to the client.
+            subContent:
+              - name: format
+                isOptional: true
+                type: origin | avif
+                description: Specify the format of the image requested.
+              - name: height
+                isOptional: true
+                type: number
+                description: The height of the image in pixels.
+              - name: quality
+                isOptional: true
+                type: number
+                description: Set the quality of the returned image. A number from 20 to 100, with 100 being the highest quality. Defaults to 80.
+              - name: resize
+                isOptional: true
+                type: cover | contain | fill
+                description: |
+                  The resize mode can be cover, contain or fill. Defaults to cover. Cover resizes the image to maintain it's aspect ratio while filling the entire width and height. Contain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height. Fill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit.
+              - name: width
+                isOptional: true
+                type: number
+                description: The width of the image in pixels.
     examples:
       - id: create-signed-url
         name: Create Signed URL
         code: |
+          ```python
+          response = supabase.storage.from_("avatars").create_signed_url(
+            "folder/avatar1.png", 60
+          )
           ```
-          res = supabase.storage.from_('bucket_name').create_signed_url(filepath, expiry_duration)
+        response: |
+          ```json
+          {
+            "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+          }
+          ```
+      - id: create-signed-url-with-transformations
+        name: Create a signed URL for an asset with transformations
+        isSpotlight: true
+        code: |
+          ```py
+          response = supabase.storage.from_("avatars").create_signed_url(
+            "folder/avatar1.png", 60, {"transform": {"width": 100, "height": 100}}
+          )
+          ```
+      - id: create-signed-url-with-download
+        name: Create a signed URL which triggers the download of the asset
+        isSpotlight: true
+        code: |
+          ```py
+          response = supabase.storage.from_("avatars").create_signed_url(
+            "folder/avatar1.png", 60, {"download": True}
+          )
           ```
 
-  - id: from-get-public-url
-    title: 'from_.get_public_url()'
+  - id: from-create-signed-upload-url
+    title: 'from_.create_signed_upload_url()'
+    description: Creates a signed upload URL. Signed upload URLs can be used to upload files to the bucket without further authentication. They are valid for 2 hours.
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/python/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: |
+          The file path, including the current file name. For example `'folder/image.png'`.
+    examples:
+      - id: create-signed-url
+        name: Create Signed URL
+        code: |
+          ```py
+          response = supabase.storage.from_("avatars").create_signed_upload_url(
+            "folder/avatar1.png"
+          )
+          ```
+        response: |
+          ```json
+          {
+            "signedUrl": "https://example.supabase.co/storage/v1/object/upload/sign/avatars/folder/cat.jpg?token=<TOKEN>",
+              "path": "folder/cat.jpg",
+              "token": "<TOKEN>"
+          }
+          ```
+  - id: from-upload-to-signed-url
+    title: 'from_.upload_to_signed_url()'
+    description: Upload a file with a token generated from `create_signed_upload_url`.
+    notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: |
+          The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+      - name: token
+        isOptional: false
+        type: string
+        description: The token generated from `create_signed_upload_url`
+      - name: file
+        isOptional: false
+        type: BufferedReader | bytes | FileIO | string | Path
+        description: The body of the file to be stored in the bucket.
+      - name: options
+        isOptional: false
+        type: FileOptions
+        subContent:
+          - name: cache-control
+            isOptional: true
+            type: string
+            description: |
+              The number of seconds the asset is cached in the browser and in the Supabase CDN. This is set in the `Cache-Control: max-age=<seconds>` header. Defaults to 3600 seconds.
+          - name: content-type
+            isOptional: true
+            type: string
+            description: |
+              The `Content-Type` header value. Should be specified if using a `file` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
+          - name: upsert
+            isOptional: true
+            type: string
+            description: When upsert is set to true, the file is overwritten if it exists. When set to false, an error is thrown if the object already exists. Defaults to false.
+    examples:
+      - id: create-signed-url
+        name: Create Signed URL
+        code: |
+          ```py
+          with open("./public/avatar1.png", "rb") as f:
+            response = supabase.storage.from_("avatars").upload_to_signed_url(
+                path="folder/cat.jpg",
+                token="token-from-create_signed_upload_url",
+                file=f,
+            )
+          ```
+        response: |
+          ```json
+          {
+            "path": "folder/cat.jpg",
+            "full_path": "avatars/folder/cat.jpg"
+          }
+          ```
+
+  - id: from-get-public-url
+    title: 'from_.get_public_url()'
+    description: |
+      A simple convenience function to get the URL for an asset in a public bucket. If you do not want to use this function, you can construct the public URL by concatenating the bucket URL with the path to the asset. This function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
+    notes: |
+      - The bucket needs to be set to public, either via [update_bucket()](/docs/reference/python/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: |
+          The path and name of the file to generate the public URL for. For example `folder/image.png`.
+      - name: options
+        isOptional: true
+        type: URLOptions
+        subContent:
+          - name: download
+            isOptional: true
+            type: string | bool
+            description: |
+              Triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
+          - name: transform
+            isOptional: true
+            type: TransformOptions
+            description: Transform the asset before serving it to the client.
+            subContent:
+              - name: format
+                isOptional: true
+                type: origin | avif
+                description: Specify the format of the image requested.
+              - name: height
+                isOptional: true
+                type: number
+                description: The height of the image in pixels.
+              - name: quality
+                isOptional: true
+                type: number
+                description: Set the quality of the returned image. A number from 20 to 100, with 100 being the highest quality. Defaults to 80.
+              - name: resize
+                isOptional: true
+                type: cover | contain | fill
+                description: |
+                  The resize mode can be cover, contain or fill. Defaults to cover. Cover resizes the image to maintain it's aspect ratio while filling the entire width and height. Contain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height. Fill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit.
+              - name: width
+                isOptional: true
+                type: number
+                description: The width of the image in pixels.
     examples:
       - id: get-public-url
         name: Returns the URL for an asset in a public bucket
         code: |
+          ```py
+          response = supabase.storage.from_("avatars").get_public_url(
+            "folder/avatar1.jpg"
+          )
           ```
-          res = supabase.storage.from_('bucket_name').get_public_url('test/avatar1.jpg')
+        response: |
+          ```json
+          {
+            "publicURL": "https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png"
+          }
           ```
+      - id: transform-asset-in-public-bucket
+        name: Returns the URL for an asset in a public bucket with transformations
+        isSpotlight: true
+        code: |
+          ```py
+          response = supabase.storage.from_("avatars").get_public_url(
+            "folder/avatar1.jpg", {"transform": {"width": 100, "height": 100}}
+          )
+          ```
+      - id: download-asset-in-public-bucket
+        name: Returns the URL which triggers the download of an asset in a public bucket
+        isSpotlight: true
+        code: |
+          ```py
+          response = supabase.storage.from_("avatars").get_public_url(
+            "folder/avatar1.jpg", {"download": True}
+          )
 
   - id: from-download
     title: 'from_.download()'
+    description: Downloads a file from a private bucket. For public buckets, make a request to the URL returned from `get_public_url` instead.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: The full path and file name of the file to be downloaded. For example `folder/image.png`.
+      - name: options
+        isOptional: false
+        type: DownloadOptions
+        subContent:
+          - name: transform
+            isOptional: true
+            type: TransformOptions
+            description: Transform the asset before serving it to the client.
+            subContent:
+              - name: format
+                isOptional: true
+                type: origin | avif
+                description: Specify the format of the image requested.
+              - name: height
+                isOptional: true
+                type: number
+                description: The height of the image in pixels.
+              - name: quality
+                isOptional: true
+                type: number
+                description: Set the quality of the returned image. A number from 20 to 100, with 100 being the highest quality. Defaults to 80.
+              - name: resize
+                isOptional: true
+                type: cover | contain | fill
+                description: |
+                  The resize mode can be cover, contain or fill. Defaults to cover. Cover resizes the image to maintain it's aspect ratio while filling the entire width and height. Contain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height. Fill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit.
+              - name: width
+                isOptional: true
+                type: number
+                description: The width of the image in pixels.
     examples:
       - id: download-file
         name: Download file
         code: |
+          ```py
+          with open("./myfolder/avatar1.png", "wb+") as f:
+            response = supabase.storage.from_("avatars").download(
+              "folder/avatar1.png"
+            )
+            f.write(response)
           ```
-          with open(destination, 'wb+') as f:
-            res = supabase.storage.from_('bucket_name').download(source)
-            f.write(res)
+      - id: download-file-with-transformations
+        name: Download file with transformations
+        isSpotlight: true
+        code: |
+          ```py
+          with open("./myfolder/avatar1.png", "wb+") as f:
+            response = supabase.storage.from_("avatars").download(
+                "folder/avatar1.png",
+                {"transform": {"width": 100, "height": 100, "quality": 80}},
+            )
+            f.write(response)
           ```
 
   - id: from-remove
     title: 'from_.remove()'
+    description: Deletes files within the same bucket
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `delete` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: paths
+        isOptional: false
+        type: list[string]
+        description: |
+          An array of files to delete, including the path and file name. For example `['folder/image.png']`.
     examples:
       - id: delete-file
         name: Delete file
         code: |
+          ```py
+          response = supabase.storage.from_('avatars').remove(['folder/avatar1.png'])
           ```
-          res = supabase.storage.from_('bucket_name').remove('test.jpg')
+        response: |
+          ```json
+          [
+            {
+              "name": "folder/avatar1.png",
+              "bucket_id": "avatars",
+              "owner": "",
+              "owner_id": "",
+              "version": "151d16d2-0319-4e5b-add4-53820e8a0863",
+              "id": "e281a32a-6998-4ed1-b8e0-7d3d7ae9ae3c",
+              "updated_at": "2024-10-25T15:52:13.993Z",
+              "created_at": "2024-10-23T21:33:10.046Z",
+              "last_accessed_at": "2024-10-23T21:33:10.046Z",
+              "metadata": {
+                "eTag": "\"ca390059ef9fdb91e2ad5447201d2e91\"",
+                "size": 343017,
+                "mimetype": "image/png",
+                "cacheControl": "max-age=360",
+                "lastModified": "2024-10-25T15:52:13.974Z",
+                "contentLength": 343017,
+                "httpStatusCode": 200
+              },
+              "user_metadata": {}
+            }
+          ]
           ```
+
   - id: from-list
     title: 'from_.list()'
+    description: Lists all the files within a bucket.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: true
+        type: string
+        description: |
+          The folder path.
+      - name: options
+        isOptional: true
+        type: SearchOptions
+        subContent:
+          - name: limit
+            isOptional: true
+            type: number
+            description: The number of files you want to be returned.
+          - name: offset
+            isOptional: true
+            type: number
+            description: The starting position.
+          - name: search
+            isOptional: true
+            type: number
+            description: The search string to filter files by.
+          - name: sortBy
+            isOptional: true
+            type: number
+            description: The column to sort by. Can be any column inside a FileObject.
+            subContent:
+              - name: column
+                isOptional: true
+                type: string
+              - name: order
+                isOptional: true
+                type: asc | desc
     examples:
       - id: list-files
         name: List files in a bucket
         code: |
+          ```py
+          response = supabase.storage.from_("avatars").list(
+            "folder",
+            {"limit": 100, "offset": 0, "sortBy": {"column": "name", "order": "desc"}},
+          )
           ```
-          res = supabase.storage.from_('bucket_name').list()
+        response: |
+          ```json
+          [
+            {
+              "name": "avatar1.png",
+              "id": "e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2",
+              "updated_at": "2024-05-22T23:06:05.580Z",
+              "created_at": "2024-05-22T23:04:34.443Z",
+              "last_accessed_at": "2024-05-22T23:04:34.443Z",
+              "metadata": {
+                "eTag": "\"c5e8c553235d9af30ef4f6e280790b92\"",
+                "size": 32175,
+                "mimetype": "image/png",
+                "cacheControl": "max-age=3600",
+                "lastModified": "2024-05-22T23:06:05.574Z",
+                "contentLength": 32175,
+                "httpStatusCode": 200
+              }
+            }
+          ]
+          ```
+      - id: search-files-in-a-bucket
+        name: Search files in a bucket
+        code: |
+          ```py
+          response = supabase.storage.from_("avatars").list(
+            "folder",
+            {
+                "limit": 100,
+                "offset": 0,
+                "sortBy": {"column": "name", "order": "desc"},
+                "search": "jon",
+            },
+          )
           ```

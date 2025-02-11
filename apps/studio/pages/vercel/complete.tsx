@@ -1,7 +1,8 @@
-import { createContext, useEffect, useState } from 'react'
-import { observer, useLocalObservable } from 'mobx-react-lite'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
-import { Button, IconLoader } from 'ui'
+import { Loader } from 'lucide-react'
+import { observer, useLocalObservable } from 'mobx-react-lite'
+import { createContext, useEffect, useState } from 'react'
+import { Button } from 'ui'
 
 const PageContext = createContext(null)
 function IntegrationComplete() {
@@ -33,7 +34,7 @@ function IntegrationComplete() {
     <PageContext.Provider value={PageState}>
       <VercelIntegrationLayout>
         <div className="mx-auto max-w-sm">
-          <IconLoader className="animate-spin" size={30} />
+          <Loader className="animate-spin" size={30} />
           <p className="pt-4 text-lg">Your new project is spinning up</p>
           <p className="pt-2">This may take up to 2 mins, but you can continue on Vercel.</p>
           <div className="py-4">

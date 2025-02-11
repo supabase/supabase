@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "main": "next.js",
   "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules"
+  },
   "dependencies": {
     "eslint-config-next": "^14.2.3",
     "eslint-config-prettier": "^9.1.0",

@@ -1,20 +1,18 @@
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { useState } from 'react'
 
-import { useQueryClient } from '@tanstack/react-query'
 import { TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import type { Table } from 'data/tables/table-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseTables: NextPageWithLayout = () => {
-  const queryClient = useQueryClient()
   const snap = useTableEditorStateSnapshot()
-  const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table>()
+  const [selectedTableToEdit, setSelectedTableToEdit] = useState<PostgresTable>()
 
   return (
     <>
@@ -31,6 +29,10 @@ const DatabaseTables: NextPageWithLayout = () => {
               onDeleteTable={(table) => {
                 setSelectedTableToEdit(table)
                 snap.onDeleteTable()
+              }}
+              onDuplicateTable={(table) => {
+                setSelectedTableToEdit(table)
+                snap.onDuplicateTable()
               }}
             />
           </div>

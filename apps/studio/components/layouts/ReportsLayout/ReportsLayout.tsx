@@ -11,9 +11,7 @@ interface ReportsLayoutProps {
 const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps>) => {
   return (
     <ProjectLayout title={title} product="Reports" productMenu={<ReportsMenu />} isBlocking={false}>
-      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+      {children}
     </ProjectLayout>
   )
 }

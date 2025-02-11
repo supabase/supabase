@@ -135,7 +135,7 @@ const genWhereStatement = (table: LogsTableName, filters: Filters) => {
   }
 }
 
-export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
+export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: number = 100) => {
   const where = genWhereStatement(table, filters)
   const joins = genCrossJoinUnnests(table)
   const orderBy = 'order by timestamp desc'
@@ -145,12 +145,12 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
       if (IS_PLATFORM === false) {
         return `
 -- local dev edge_logs query
-select id, edge_logs.timestamp, event_message, request.method, request.path, response.status_code 
-from edge_logs 
+select id, edge_logs.timestamp, event_message, request.method, request.path, response.status_code
+from edge_logs
 ${joins}
 ${where}
 ${orderBy}
-limit 100;
+limit ${limit};
 `
       }
       return `select id, identifier, timestamp, event_message, request.method, request.path, response.status_code
@@ -158,7 +158,7 @@ limit 100;
   ${joins}
   ${where}
   ${orderBy}
-  limit 100
+  limit ${limit}
   `
 
     case 'postgres_logs':
@@ -169,14 +169,14 @@ from postgres_logs
 ${joins}
 ${where}
 ${orderBy}
-limit 100
+limit ${limit}
   `
       }
       return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
   ${joins}
   ${where}
   ${orderBy}
-  limit 100
+  limit ${limit}
   `
 
     case 'function_logs':
@@ -184,7 +184,7 @@ limit 100
   ${joins}
   ${where}
   ${orderBy}
-  limit 100
+  limit ${limit}
     `
 
     case 'auth_logs':
@@ -192,7 +192,7 @@ limit 100
   ${joins}
   ${where}
   ${orderBy}
-  limit 100
+  limit ${limit}
     `
 
     case 'function_edge_logs':
@@ -200,17 +200,31 @@ limit 100
   ${joins}
   ${where}
   ${orderBy}
-  limit 100
+  limit ${limit}
   `
     case 'supavisor_logs':
-      return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit 100`
+      return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit ${limit}`
 
     default:
       return `select id, ${table}.timestamp, event_message from ${table}
   ${where}
   ${orderBy}
-  limit 100
+  limit ${limit}
   `
+
+    case 'pg_cron_logs':
+      const baseWhere = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+
+      const pgCronWhere = where ? `${baseWhere} AND ${where.substring(6)}` : baseWhere
+
+      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.query
+from postgres_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.parsed) as parsed
+${pgCronWhere}
+${orderBy}
+limit ${limit}
+`
   }
 }
 
@@ -531,4 +545,27 @@ const _getTruncation = (date: Dayjs) => {
     3: 'day' as const,
   }[zeroCount]!
   return truncation
+}
+
+export function checkForWithClause(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const withClauseRegex = /\b(WITH)\b(?=(?:[^']*'[^']*')*[^']*$)/i
+  return withClauseRegex.test(queryWithoutComments)
+}
+
+export function checkForILIKEClause(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const ilikeClauseRegex = /\b(ILIKE)\b(?=(?:[^']*'[^']*')*[^']*$)/i
+  return ilikeClauseRegex.test(queryWithoutComments)
+}
+
+export function checkForWildcard(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const queryWithoutCount = queryWithoutComments.replace(/count\(\*\)/gi, '')
+
+  const wildcardRegex = /\*/
+  return wildcardRegex.test(queryWithoutCount)
 }

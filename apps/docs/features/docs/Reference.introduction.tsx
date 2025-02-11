@@ -3,28 +3,29 @@ import Link from 'next/link'
 
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
 
-import { MDXRemoteBase } from '~/features/docs/MdxBase'
-import { getRefMarkdown } from '~/features/docs/Reference.mdx'
+import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
-import commonClientLibSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }
+import commonClientLibSections from '~/spec/common-client-libs-sections.json' with { type: 'json' }
 
-function hasIntro(sections: typeof commonClientLibSections, excludeName: string) {
+function hasIntro(sections: typeof commonClientLibSections, excludeName?: string) {
   return Boolean(
     sections[0]?.type === 'markdown' &&
       sections[0]?.slug === 'introduction' &&
-      !(
-        'excludes' in sections[0] &&
-        Array.isArray(sections[0].excludes) &&
-        sections[0].excludes?.includes(excludeName)
-      )
+      (!excludeName ||
+        !(
+          'excludes' in sections[0] &&
+          Array.isArray(sections[0].excludes) &&
+          sections[0].excludes?.includes(excludeName)
+        ))
   )
 }
 
 interface ClientLibIntroductionProps {
   libPath: string
-  excludeName: string
+  excludeName?: string
   version: string
   isLatestVersion: boolean
+  className?: string
 }
 
 export async function ClientLibIntroduction({
@@ -32,6 +33,7 @@ export async function ClientLibIntroduction({
   excludeName,
   version,
   isLatestVersion,
+  className,
 }: ClientLibIntroductionProps) {
   if (!hasIntro(commonClientLibSections, excludeName)) return null
 
@@ -43,9 +45,9 @@ export async function ClientLibIntroduction({
     <ReferenceSectionWrapper
       id="introduction"
       link={`/docs/reference/${libPath}/${isLatestVersion ? '' : `${version}/`}introduction`}
-      className="prose"
+      className={cn('prose', className)}
     >
-      <MDXRemoteBase source={content} />
+      <MDXRemoteRefs source={content} />
     </ReferenceSectionWrapper>
   )
 }

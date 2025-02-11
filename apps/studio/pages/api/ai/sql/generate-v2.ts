@@ -1,9 +1,38 @@
 import { StreamingTextResponse } from 'ai'
-import { chatSql } from 'ai-commands/edge'
+import { chatRlsPolicy, chatSql } from 'ai-commands/edge'
+import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
+import { DatabasePoliciesData } from 'data/database-policies/database-policies-query'
 import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
 
-export const runtime = 'edge'
+export const config = {
+  runtime: 'edge',
+  /* To avoid OpenAI errors, restrict to the Vercel Edge Function regions that
+  overlap with the OpenAI API regions.
+  
+  Reference for Vercel regions: https://vercel.com/docs/edge-network/regions#region-list
+  Reference for OpenAI regions: https://help.openai.com/en/articles/5347006-openai-api-supported-countries-and-territories
+  */
+  regions: [
+    'arn1',
+    'bom1',
+    'cdg1',
+    'cle1',
+    'cpt1',
+    'dub1',
+    'fra1',
+    'gru1',
+    'hnd1',
+    'iad1',
+    'icn1',
+    'kix1',
+    'lhr1',
+    'pdx1',
+    'sfo1',
+    'sin1',
+    'syd1',
+  ],
+}
 
 const openAiKey = process.env.OPENAI_API_KEY
 
@@ -40,16 +69,29 @@ async function handlePost(request: NextRequest) {
   const openai = new OpenAI({ apiKey: openAiKey })
 
   const body = await (request.json() as Promise<{
+    context?: SupportedAssistantEntities
     messages: { content: string; role: 'user' | 'assistant' }[]
     existingSql?: string
     entityDefinitions: string[]
+    existingPolicies?: DatabasePoliciesData
   }>)
 
-  const { messages, existingSql, entityDefinitions } = body
+  const { messages, existingSql, entityDefinitions, context, existingPolicies } = body
 
   try {
-    const stream = await chatSql(openai, messages, existingSql, entityDefinitions)
-    return new StreamingTextResponse(stream)
+    if (context === 'rls-policies') {
+      const stream = await chatRlsPolicy(
+        openai,
+        messages,
+        entityDefinitions,
+        existingPolicies ?? [],
+        existingSql
+      )
+      return new StreamingTextResponse(stream)
+    } else {
+      const stream = await chatSql(openai, messages, existingSql, entityDefinitions, context)
+      return new StreamingTextResponse(stream)
+    }
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI SQL generation-v2 failed: ${error.message}`)
@@ -57,14 +99,9 @@ async function handlePost(request: NextRequest) {
       console.error(`AI SQL generation-v2 failed: ${error}`)
     }
 
-    return new Response(
-      JSON.stringify({
-        error: 'There was an error processing your request',
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    return new Response(JSON.stringify({ error: 'There was an error processing your request' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 }

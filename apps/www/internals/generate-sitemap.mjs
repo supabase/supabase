@@ -13,21 +13,22 @@ async function generate() {
   const pages = await globby([
     'pages/*.js',
     'pages/*.tsx',
-    'pages/*/*.tsx',
+    'pages/*.mdx',
+    'pages/**/*.tsx',
     'data/**/*.mdx',
     '_blog/*.mdx',
     '_case-studies/*.mdx',
     '_customers/*.mdx',
     '_events/*.mdx',
     '_alternatives/*.mdx',
-    '!pages/index.tsx',
     '!data/*.mdx',
     '!pages/_*.js',
-    '!pages/*/index.tsx',
+    '!pages/_*.tsx',
     '!pages/api',
-    '!pages/404.js',
+    '!pages/404.tsx',
     '.next/server/pages/partners/integrations/*.html',
     '.next/server/pages/partners/experts/*.html',
+    '.next/server/pages/features/*.html',
   ])
 
   const blogUrl = 'blog'
@@ -39,7 +40,6 @@ async function generate() {
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
         ${pages
-          .filter((page) => !page.includes('_document.tsx'))
           .map((page) => {
             const path = page
               .replace('.next/server/pages', '')
@@ -53,13 +53,8 @@ async function generate() {
               .replace('_alternatives', '/alternatives')
               .replace('.tsx', '')
               .replace('.mdx', '')
-              // replace the paths for nested 'index' based routes
-              .replace('/auth/Auth', '/auth')
-              .replace('/database/Database', '/database')
-              .replace('/storage/Storage', '/storage')
-              .replace('/realtime/Realtime', '/realtime')
-              .replace('/edge-functions/edge-functions', '/edge-functions')
-              .replace('/nextjs/Nextjs', '/nextjs')
+              // replace /{directory}/index with /{directory}
+              .replace(/\/([^\/]+)\/index/, '/$1')
 
             let route = path === '/index' ? '' : path
 
@@ -68,7 +63,12 @@ async function generate() {
             if (route === '/case-studies/[slug]') return null
             if (route === '/customers/[slug]') return null
             if (route === '/events/[slug]') return null
+            if (route === '/features/[slug]') return null
+            if (route === '/blog/categories/[category]') return null
+            if (route === '/partners/experts/[slug]') return null
+            if (route === '/partners/integrations/[slug]') return null
             if (route === '/launch-week/ticket-image') return null
+            if (route === '/launch-week/tickets/[username]') return null
 
             /**
              * Blog based urls
@@ -87,6 +87,27 @@ async function generate() {
                * reconsruct the route
                */
               route = `/${blogUrl}/` + substring
+            }
+
+            /**
+             * Event based urls
+             * handle removal of dates in filename
+             */
+            if (route.includes(`/${eventsUrl}/`)) {
+              // remove finelnames with __
+              if (route.includes(`__`)) return null
+              /**
+               * remove directory from route
+               */
+              const _route = route.replace(`/${eventsUrl}/`, '')
+              /**
+               * remove the date from the file name
+               */
+              const substring = _route.substring(11)
+              /**
+               * reconsruct the route
+               */
+              route = `/${eventsUrl}/` + substring
             }
 
             return `

@@ -3,11 +3,12 @@ id: 'nextjs'
 title: 'Supabase Auth with the Next.js App Router'
 description: 'Authentication and Authorization helpers for creating an authenticated Supabase client with the Next.js 13 App Router.'
 sidebar_label: 'Next.js'
+sitemapPriority: 0.5
 ---
 
 <Admonition type="caution">
 
-The `auth-helpers` package has been replaced with the `@supabase/ssr` package. We recommend setting up Auth for your Next.js app with `@supabase/ssr` instead. See the [Next.js Server-Side Auth guide](/docs/guides/auth/server-side/nextjs) to learn how.
+The `auth-helpers` are now deprecated. Use `@supabase/ssr` to set up Auth for your Next.js app. See the [Next.js Server-Side Auth guide](/docs/guides/auth/server-side/nextjs) to learn how.
 
 </Admonition>
 
@@ -19,7 +20,7 @@ The `auth-helpers` package has been replaced with the `@supabase/ssr` package. W
   size="medium"
   className="text-foreground-light border-b mt-8 pb-2"
   >
-  
+
   <AccordionItem
         header="See legacy docs"
         id="legacy-docs"
@@ -217,7 +218,7 @@ export async function GET(request: NextRequest) {
   const code = requestUrl.searchParams.get('code')
 
   if (code) {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore })
     await supabase.auth.exchangeCodeForSession(code)
   }
@@ -1293,7 +1294,7 @@ For authentication methods that have a `redirectTo` or `emailRedirectTo`, this m
 
 ```jsx
 supabase.auth.signUp({
-  email: 'jon@example.com',
+  email: 'valid.email@supabase.io',
   password: 'sup3rs3cur3',
   options: {
     emailRedirectTo: 'http://localhost:3000/auth/callback',

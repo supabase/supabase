@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://supabase.com/404</loc>
+    <loc>https://supabase.com/assistant</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://supabase.com/_app</loc>
+    <loc>https://supabase.com/aup</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/auth</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -31,6 +37,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/careers</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/changelog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -43,31 +55,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/edge-functions</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/ga</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/support</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/auth</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/blog/</loc>
+    <loc>https://supabase.com/customers</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -79,7 +67,37 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/legal/dpa</loc>
+    <loc>https://supabase.com/edge-functions</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/enterprise</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/features</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/ga-week</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/ga</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -91,7 +109,43 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/open-source</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/pricing</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/privacy-240804</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/privacy</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/realtime</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/security</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/sla</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -103,7 +157,127 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/vector/Vector</loc>
+    <loc>https://supabase.com/support-policy</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/support</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/terms</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/contact/sales</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/events</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/legal/dpa</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/modules/cron</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/modules/queues</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/modules/vector</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/opt-out/[ref]</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/opt-out</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/partners</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/launch-week</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/partners/integrations</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/launch-week/12</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/launch-week/6</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/launch-week/7</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/launch-week/8</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/launch-week/x</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -1767,6 +1941,240 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/blog/github-copilot-extension-for-vs-code</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/postgres-new</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-realtime-broadcast-and-presence-authorization</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/snaplet-is-now-open-source</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/third-party-auth-mfa-phone-send-hooks</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/log-drains</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/launch-week-12-top-10</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/pg-graphql-1-5-7</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/platform-access-control</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/postgres-foreign-data-wrappers-with-wasm</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/postgrest-12-2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/python-support</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-book-by-david-lorenz</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/vec2pg</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/mozilla-llamafile-in-supabase-edge-functions</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-lw12-hackathon</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-vercel-partnership</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/in-browser-semantic-search-pglite</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/flutter-uber-clone</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/edge-functions-faster-smaller</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/local-first-expo-legend-state</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/lw12-hackathon-winners</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/offline-first-flutter-apps</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/mongodb-realm-and-device-sync-alternatives</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/database-build-live-share</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-clickhouse-partnership</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-dynamic-functions</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/hack-the-base</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/orioledb-launch</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-ai-assistant-v2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/edge-functions-background-tasks-websockets</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/cli-v2-config-as-code</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-cron</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/high-performance-disks</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-queues</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/database-build-v2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/launch-week-13-top-10</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/restore-to-a-new-project</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/durable-workflows-in-postgres-dbos</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/customers/berriai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -1774,6 +2182,12 @@
 
   <url>
     <loc>https://supabase.com/customers/chatbase</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/customers/e2b</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -1792,6 +2206,12 @@
 
   <url>
     <loc>https://supabase.com/customers/happyteams</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/customers/humata</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -1869,7 +2289,31 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/events/scale-to-billions-generative-ai-humata</loc>
+    <loc>https://supabase.com/events/scale-to-millions-generative-ai-humata</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/events/launch-week-12-hackathon</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/events/scale-to-millions-goodtape-auth</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/events/supabase-ai-hackathon-at-y-combinator</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/events/launch-week-13-hackathon</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

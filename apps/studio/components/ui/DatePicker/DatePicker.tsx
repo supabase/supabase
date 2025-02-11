@@ -1,15 +1,12 @@
 import { format } from 'date-fns'
 import dayjs from 'dayjs'
+import { ArrowRight, ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 
 import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
   Button,
-  IconArrowRight,
-  IconCalendar,
-  IconChevronLeft,
-  IconChevronRight,
   Popover,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -149,7 +146,7 @@ function _DatePicker({
         <Button
           title={triggerButtonTitle}
           type={triggerButtonType}
-          icon={<IconCalendar />}
+          icon={<Calendar />}
           className={triggerButtonClassName}
         >
           {children !== undefined ? (
@@ -203,7 +200,7 @@ function _DatePicker({
                       text-foreground-lighter
                     `}
                     >
-                      <IconArrowRight strokeWidth={1.5} size={14} />
+                      <ArrowRight strokeWidth={1.5} size={14} />
                     </div>
                   </>
                 )}
@@ -255,7 +252,7 @@ function _DatePicker({
                         text-foreground-light hover:text-foreground focus:outline-none p-2
                     `}
                     >
-                      <IconChevronLeft size={16} strokeWidth={2} />
+                      <ChevronLeft size={16} strokeWidth={2} />
                     </button>
                     <span className="text-sm text-foreground-light">
                       {format(date, 'MMMM yyyy')}
@@ -269,7 +266,7 @@ function _DatePicker({
                         text-foreground-light p-2 hover:text-foreground focus:outline-none
                     `}
                     >
-                      <IconChevronRight size={16} strokeWidth={2} />
+                      <ChevronRight size={16} strokeWidth={2} />
                     </button>
                   </div>
                 </div>

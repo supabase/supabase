@@ -1,10 +1,10 @@
+import { Globe } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { IconGlobe } from 'ui'
 
-import solutions from '~/data/Solutions'
-import Examples from '~/data/Examples'
 import { PRODUCT_NAMES } from 'shared-data/products'
+import Examples from '~/data/Examples'
+import solutions from '~/data/MainProducts'
 
 const FunctionsHero = dynamic(() => import('~/components/Products/Functions/FunctionsHero'))
 const RealtimeLogs = dynamic(() => import('~/components/Products/Functions/RealtimeLogs'))
@@ -44,7 +44,7 @@ export default (isMobile?: boolean) => ({
     image: <FunctionsHero />,
     ctas: [
       {
-        label: 'Launch a free database',
+        label: 'Create a free account',
         href: '/dashboard',
         type: 'primary' as any,
       },
@@ -97,7 +97,7 @@ export default (isMobile?: boolean) => ({
         paragraph: 'Deploy worldwide for maximum resiliency and low latency',
         svg: (
           <div className="w-12 h-12 p-2 bg-alternative rounded-lg border flex justify-center items-center">
-            <IconGlobe className="w-7 h-7 stroke-[1.4px]" />
+            <Globe className="w-7 h-7 stroke-[1.4px]" />
           </div>
         ),
       },

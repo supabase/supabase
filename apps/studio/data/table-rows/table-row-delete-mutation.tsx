@@ -1,23 +1,22 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { ExternalLink } from 'lucide-react'
-import { toast } from 'react-hot-toast'
-import { Button, toast as UiToast } from 'ui'
+import { toast } from 'sonner'
 
 import { Query } from 'components/grid/query/Query'
 import type { SupaRow } from 'components/grid/types'
 import { Markdown } from 'components/interfaces/Markdown'
+import { DocsButton } from 'components/ui/DocsButton'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
-import type { Table } from 'data/tables/table-query'
+import { Entity } from 'data/table-editor/table-editor-types'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
+import { tableRowKeys } from './keys'
 import { getPrimaryKeys } from './utils'
 
 export type TableRowDeleteVariables = {
   projectRef: string
   connectionString?: string
-  table: Table
+  table: Entity
   rows: SupaRow[]
   impersonatedRole?: ImpersonationRole
 }
@@ -30,7 +29,7 @@ export function getTableRowDeleteSql({
   if (error) throw error
 
   let queryChains = new Query().from(table.name, table.schema ?? undefined).delete()
-  primaryKeys!.forEach((key) => {
+  primaryKeys?.forEach((key) => {
     const primaryKeyValues = rows.map((x) => x[key])
     queryChains = queryChains.filter(key, 'in', primaryKeyValues)
   })
@@ -77,7 +76,7 @@ export const useTableRowDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef, table } = variables
-        await queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name]))
+        await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
@@ -99,12 +98,7 @@ export const useTableRowDeleteMutation = ({
               : `Unable to delete row as it is currently referenced by a foreign key constraint from the table \`${referencingTable}\`.`
             const resolutionCTA = `Set an on delete behavior on the foreign key relation \`${fkName}\` in the \`${referencingTable}\` table to automatically respond when row(s) are being deleted in the \`${sourceTable}\` table.`
 
-            UiToast({
-              variant: 'default',
-              style: { flexDirection: 'column' },
-              title: (
-                <Markdown content={initialMessage} className="text-foreground [&>p]:m-0" />
-              ) as any,
+            toast(initialMessage, {
               description: <Markdown content={resolutionCTA} className="[&>p]:m-0" />,
               action: (
                 <div className="w-full flex gap-x-2 !mx-0 mt-3">
@@ -114,45 +108,21 @@ export const useTableRowDeleteMutation = ({
                       View "{referencingTable}" table
                     </Link>
                   </Button> */}
-                  <Button asChild type="outline" icon={<ExternalLink />}>
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://supabase.com/docs/guides/database/postgres/cascade-deletes"
-                    >
-                      Documentation
-                    </a>
-                  </Button>
+                  <DocsButton href="https://supabase.com/docs/guides/database/postgres/cascade-deletes" />
                 </div>
               ),
             })
           } else if (isPkError) {
-            UiToast({
-              variant: 'default',
-              style: { flexDirection: 'column' },
-              title: (
-                <Markdown
-                  className="text-foreground [&>p]:m-0"
-                  content="Unable to delete row(s) as table has no primary keys"
-                />
-              ) as any,
+            toast('Unable to delete row(s) as table has no primary keys', {
               description: (
-                <Markdown
-                  className="[&>p]:m-0"
-                  content="Add a primary key column to your table first to serve as a unique identifier for each row before updating or deleting the row."
-                />
-              ),
-              action: (
-                <div className="w-full flex gap-x-2 !mx-0 mt-3">
-                  <Button asChild type="outline" icon={<ExternalLink />}>
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://supabase.com/docs/guides/database/tables#primary-keys"
-                    >
-                      Documentation
-                    </a>
-                  </Button>
+                <div>
+                  <p className="text-sm text-foreground-light">
+                    Add a primary key column to your table first to serve as a unique identifier for
+                    each row before updating or deleting the row.
+                  </p>
+                  <div className="mt-3">
+                    <DocsButton href="https://supabase.com/docs/guides/database/tables#primary-keys" />
+                  </div>
                 </div>
               ),
             })

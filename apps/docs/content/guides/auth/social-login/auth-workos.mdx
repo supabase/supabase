@@ -1,168 +1,115 @@
 ---
-id: 'auth-workos'
-title: 'Login with WorkOS'
-description: 'Add WorkOS OAuth to your Supabase project'
+title: 'SSO and Social Login with WorkOS'
 ---
 
-To enable WorkOS Auth for your project, you need to set up WorkOS OAuth application and add the application credentials to your Supabase Dashboard.
+## Use Social Login with WorkOS
 
-## Overview
+### Step 1. Create a WorkOS organization
 
-In this guide, we will cover how to use Supabase OAuth with WorkOS to implement Single-Sign-On(SSO).
-
-The procedure consists of five broad steps:
-
-- Create a new organization from your WorkOS Dashboard.
-- Obtain the `Client ID` from the Configuration tab and configure redirect URI.
-- Obtain the `WorkOS Secret` from the credentials tab.
-- Connect a WorkOS Supported Identity Provider
-- Add your WorkOS credentials into your Supabase project
-
-## Create a WorkOS organization
-
-Log in to the dashboard and hop over to the Organizations tab to create and organization
+Log in to the WorkOS dashboard and visit the Organizations tab to create an organization.
 ![Create an Organization](/docs/img/guides/auth-workos/workos-create-organization.png)
 
-## Obtain the client ID and configure redirect URI
+Alternatively, you can [create an organization via the WorkOS API](https://workos.com/docs/reference/organization/create).
 
-Head over to the Configuration tab and configure the redirect URI.The redirect URI should look like `https://<project-ref>.supabase.co/auth/v1/callback`
-Note that this is distinct from the redirect URI referred to in the Supabase dashboard
+## Step 2. Obtain your `Client ID` and `WORKOS_API_KEY` values
 
-![Fetch Client ID and configure Redirect URI](/docs/img/guides/auth-workos/workos-clientid-redirect-uri.png)
+![Get your Environment's Client ID and Secret](/docs/img/guides/auth-workos/workos-dashboard-get-client-id-and-key.png)
 
-## Obtain the WorkOS secret
+Visit the getting started page of the [WorkOS Dashboard](https://dashboard.workos.com/get-started). Copy the following values from the Quickstart panel:
 
-Head over to the API Keys page and obtain the secret key.
+- `WORKOS_CLIENT_ID`
+- `WORKOS_API_KEY`
 
-![WorkOS Secret Key](/docs/img/guides/auth-workos/workos-secret-key.png)
+<Admonition type="tip">
 
-## Connect a WorkOS supported identity provider
+You must be signed in to see these values.
 
-Set up the identity provider by visiting the setup link.
+</Admonition>
 
-![Visiting the setup link](/docs/img/guides/auth-workos/workos-setup-identity-provider.png)
+## Step 3. Add your WorkOS credentials to your Supabase project
 
-You can pick between any one of the many identity providers that WorkOS supports.
+![Enter your WorkOS application details in your Supabase app's auth provider settings panel](/docs/img/guides/auth-workos/supabase-workos-configuration.png)
 
-## Add your WorkOS credentials into your Supabase project
+1. Go to your Supabase Project Dashboard.
+1. In the left sidebar, click the Authentication icon (near the top).
+1. Click on Providers under the Configuration section.
+1. Click on WorkOS from the accordion list to expand.
+1. Toggle the `WorkOS Enabled` switch to ON.
+1. Enter `https://api.workos.com` in the WorkOS URL field.
+1. Enter your WorkOS Client ID and WorkOS Client Secret saved in the previous step.
+1. Copy the `Callback URL (for OAuth)` value from the form and save it somewhere handy.
+1. Click Save.
 
-<SocialProviderSettingsSupabase provider="WorkOS" />
+## Step 4. Set your Supabase redirect URI in the WorkOS Dashboard
 
-## Add login code to your client app
+Visit the WorkOS dashboard and click the redirects button in the left navigation panel.
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-<TabPanel id="js" label="JavaScript">
+On the redirects page, enter your Supabase project's `Callback URL (for OAuth)` which you saved in the previous step, as shown below:
 
-<CreateClientSnippet />
+![Set your Supbase project redirect URL in the WorkOS dashboard](/docs/img/guides/auth-workos/workos-set-supabase-redirect.png)
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `workos` as the `provider`:
+## Step 5. Add login code to your client app
 
-```js
+When a user signs in, call signInWithOAuth with `workos` as the provider.
+
+```javascript
 async function signInWithWorkOS() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'workos',
     options: {
+      redirectTo: 'http://example.com/auth/v1/callback', // Make sure your redirect URL is configured in the Supabase Dashboard Auth settings
       queryParams: {
-        connection: '<your_connection>',
-        organization: '<your_organization',
-        workos_provider: '<your_provider>',
+        connection: '<connection_id>',
       },
     },
   })
+
+  if (data.url) {
+    redirect(data.url) // use the redirect API for your server or framework
+  }
 }
 ```
 
-Refer to the [WorkOS Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
+<Admonition type="tip">
 
-</TabPanel>
-<TabPanel id="flutter" label="Flutter">
+You can find your `connection_id` in the WorkOS dashboard under the Organizations tab. Select your organization and then click View connection.
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `workos` as the `provider`:
+</Admonition>
 
-```dart
-Future<void> signInWithWorkOS() async {
-  await supabase.auth.signInWithOAuth(
-    OAuthProvider.workos,
-    queryParams: {
-      'connection': '<your_connection>',
-      'organization': '<your_organization',
-      'workos_provider': '<your_provider>',
-    },
-  );
+Within your specified callback URL, you'll exchange the code for a logged-in user profile:
+
+```javascript auth/v1/callback/route.ts
+import { NextResponse } from 'next/server'
+import { createClient } from '@/utils/supabase/server'
+
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url)
+  const code = searchParams.get('code')
+  // if "next" is in param, use it as the redirect URL
+  const next = searchParams.get('next') ?? '/'
+
+  if (code) {
+    const supabase = await createClient()
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
+      const isLocalEnv = process.env.NODE_ENV === 'development'
+      if (isLocalEnv) {
+        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
+        return NextResponse.redirect(`${origin}${next}`)
+      } else if (forwardedHost) {
+        return NextResponse.redirect(`https://${forwardedHost}${next}`)
+      } else {
+        return NextResponse.redirect(`${origin}${next}`)
+      }
+    }
+  }
+
+  // return the user to an error page with instructions
+  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
 }
+
 ```
-
-Refer to the [WorkOS Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
-
-</TabPanel>
-<TabPanel id="kotlin" label="Kotlin">
-
-When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `WorkOS` as the `Provider`:
-
-```kotlin
-suspend fun signInWithWorkOS() {
-	supabase.auth.signInWith(WorkOS) {
-		queryParams["connection"] = "<your_connection>"
-		queryParams["organization"] = "<your_organization>"
-		queryParams["workos_provider"] = "<your_provider>"
-	}
-}
-```
-
-Refer to the [WorkOS Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
-
-</TabPanel>
-</Tabs>
-
-<OAuthPkceFlow />
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-<TabPanel id="js" label="JavaScript">
-
-When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
-
-```js
-async function signOut() {
-  const { error } = await supabase.auth.signOut()
-}
-```
-
-</TabPanel>
-<TabPanel id="flutter" label="Flutter">
-
-When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
-
-```dart
-Future<void> signOut() async {
-  await supabase.auth.signOut();
-}
-```
-
-</TabPanel>
-<TabPanel id="kotlin" label="Kotlin">
-
-When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
-
-```kotlin
-suspend fun signOut() {
-	supabase.auth.signOut()
-}
-```
-
-</TabPanel>
-</Tabs>
 
 ## Resources
 

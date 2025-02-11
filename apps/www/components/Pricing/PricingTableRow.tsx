@@ -1,7 +1,7 @@
-import { IconHelpCircle } from 'ui'
 import ProductIcon from 'components/ProductIcon'
-import React, { Fragment } from 'react'
+import { Fragment } from 'react'
 import { IconPricingIncludedCheck, IconPricingInfo, IconPricingMinus } from './PricingIcons'
+import { HelpCircle } from 'lucide-react'
 
 export const PricingTableRowDesktop = (props: any) => {
   const category = props.category
@@ -42,7 +42,7 @@ export const PricingTableRowDesktop = (props: any) => {
                     className="text-muted hover:text-foreground ml-2 cursor-pointer transition-colors"
                     data-tip={feat.tooltips.main}
                   >
-                    <IconHelpCircle size={14} strokeWidth={2} />
+                    <HelpCircle size={14} strokeWidth={2} />
                   </span>
                 )}
               </th>

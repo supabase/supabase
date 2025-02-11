@@ -1,7 +1,8 @@
+import { X } from 'lucide-react'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { extensions } from 'shared-data'
-import { IconX, Input } from 'ui'
+import { Input } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 
 type Extension = {
@@ -80,7 +81,7 @@ export default function Extensions() {
                         checked={filters.includes(tag)}
                       />
                       {tag}
-                      <span>{filters.includes(tag) && <IconX size={12} />}</span>
+                      <span>{filters.includes(tag) && <X size={12} />}</span>
                     </span>
                   </label>
                 </li>

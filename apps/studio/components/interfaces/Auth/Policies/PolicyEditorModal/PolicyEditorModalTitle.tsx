@@ -1,6 +1,8 @@
 import { noop } from 'lodash'
-import { FlaskConical } from 'lucide-react'
-import { Button, IconChevronLeft, IconExternalLink } from 'ui'
+import { ChevronLeft, FlaskConical } from 'lucide-react'
+
+import { DocsButton } from 'components/ui/DocsButton'
+import { Button } from 'ui'
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 
 interface PolicyEditorModalTitleProps {
@@ -39,7 +41,7 @@ const PolicyEditorModalTitle = ({
             onClick={onSelectBackFromTemplates}
             className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
           >
-            <IconChevronLeft strokeWidth={2} size={14} />
+            <ChevronLeft strokeWidth={2} size={14} />
           </span>
           <h4>Select a template to use for your new policy</h4>
         </div>
@@ -51,26 +53,16 @@ const PolicyEditorModalTitle = ({
       <h4 className="truncate" title={getTitle()}>
         {getTitle()}
       </h4>
-      <div className="flex items-center gap-x-2">
+      <div className="flex items-center gap-x-2 pr-6">
         {showAssistantPreview && view === POLICY_MODAL_VIEWS.EDITOR && (
-          <Button
-            type="default"
-            icon={<FlaskConical size={14} />}
-            onClick={onToggleFeaturePreviewModal}
-          >
+          <Button type="default" icon={<FlaskConical />} onClick={onToggleFeaturePreviewModal}>
             Try Supabase Assistant
           </Button>
         )}
-        <Button asChild type="default" icon={<IconExternalLink size={14} />}>
-          <a
-            href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {' '}
-            Documentation
-          </a>
-        </Button>
+        <DocsButton
+          className="mt-[-4px]"
+          href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
+        />
       </div>
     </div>
   )

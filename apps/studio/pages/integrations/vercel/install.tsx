@@ -2,17 +2,10 @@ import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconInfo,
-} from 'ui'
+import { toast } from 'sonner'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
-import OrganizationPicker from 'components/interfaces/Integrations/OrganizationPicker'
+import OrganizationPicker from 'components/interfaces/Integrations/Vercel/OrganizationPicker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
@@ -22,6 +15,7 @@ import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-int
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout, Organization } from 'types'
+import { AlertTriangle, Info } from 'lucide-react'
 
 /**
  * Variations of the Vercel integration flow.
@@ -181,6 +175,10 @@ const VercelIntegration: NextPageWithLayout = () => {
       : false
   }, [installed, selectedOrg, source, dataLoading])
 
+  const hasVercelManagedOrgSelected = useMemo(() => {
+    return !!selectedOrg && selectedOrg.managed_by === 'vercel-marketplace'
+  }, [selectedOrg])
+
   const disableInstallationForm =
     (isLoadingVercelIntegrationCreateMutation && !dataLoading) ||
     // disables installation button if integration is already installed and it is Marketplace flow
@@ -210,7 +208,7 @@ const VercelIntegration: NextPageWithLayout = () => {
             />
             {alreadyInstalled && (
               <Alert_Shadcn_ variant="warning">
-                <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
+                <AlertTriangle className="h-4 w-4" strokeWidth={2} />
                 <AlertTitle_Shadcn_>Vercel Integration is already installed.</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   You will need to choose another organization to install the integration.
@@ -219,7 +217,7 @@ const VercelIntegration: NextPageWithLayout = () => {
             )}
             {noOrganizations && (
               <Alert_Shadcn_ variant="warning">
-                <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
+                <AlertTriangle className="h-4 w-4" strokeWidth={2} />
                 <AlertTitle_Shadcn_>
                   No Supabase Organizations to install Integration.
                 </AlertTitle_Shadcn_>
@@ -233,11 +231,21 @@ const VercelIntegration: NextPageWithLayout = () => {
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             )}
+            {hasVercelManagedOrgSelected && (
+              <p className="prose text-sm text-red-900">
+                Vercel Integration cannot be used with Vercel-managed organizations. Choose a
+                different organization or create a Vercel resource directly.
+              </p>
+            )}
             <div className="flex flex-row w-full justify-end">
               <Button
                 size="medium"
                 className="self-end"
-                disabled={disableInstallationForm || isLoadingVercelIntegrationCreateMutation}
+                disabled={
+                  disableInstallationForm ||
+                  isLoadingVercelIntegrationCreateMutation ||
+                  hasVercelManagedOrgSelected
+                }
                 loading={isLoadingVercelIntegrationCreateMutation}
                 onClick={onInstall}
               >
@@ -249,7 +257,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-6 py-3">
         <Alert_Shadcn_ variant="default">
-          <IconInfo className="h-4 w-4" strokeWidth={2} />
+          <Info className="h-4 w-4" strokeWidth={2} />
           <AlertTitle_Shadcn_>You can uninstall this Integration at any time.</AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
             Remove this integration at any time from Vercel or the Supabase dashboard.

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useBreakpoint } from 'common'
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
+import { useBreakpoint } from 'common'
+
 import { Button } from 'ui'
 import Panel from './Panel'
 
@@ -17,7 +18,7 @@ function ExampleCard(props: any) {
 
   return (
     <Link href={props.repo_url} className="w-full h-full" target="_blank">
-      <Panel innerClassName="bg-surface-75 group/panel" hasActiveOnHover>
+      <Panel outerClassName="h-full" innerClassName="bg-surface-75 group/panel" hasActiveOnHover>
         <div className="flex flex-col justify-between">
           {props.tags && (
             <div className="relative w-full aspect-[3/1] bg flex items-center justify-center gap-4 overflow-hidden">

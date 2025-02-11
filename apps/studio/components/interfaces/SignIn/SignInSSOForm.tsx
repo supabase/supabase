@@ -2,13 +2,15 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { object, string } from 'yup'
 
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { BASE_PATH } from 'lib/constants'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
-import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 
 const WHITELIST_ERRORS = ['No SSO provider assigned for this domain']
 
@@ -16,10 +18,14 @@ const SignInSSOForm = () => {
   const queryClient = useQueryClient()
   const captchaRef = useRef<HCaptcha>(null)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const [lastSignInUsed, setLastSignInUsed] = useLastSignIn()
+  const [_, setLastSignInUsed] = useLastSignIn()
+
   const signInSchema = object({
     email: string().email('Must be a valid email').required('Email is required'),
   })
+
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const onSignIn = async ({ email }: { email: string }) => {
     const toastId = toast.loading('Signing in...')
 
@@ -47,6 +53,7 @@ const SignInSSOForm = () => {
     })
 
     if (!error) {
+      sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
       await queryClient.resetQueries()
       setLastSignInUsed('sso')
       if (data) {

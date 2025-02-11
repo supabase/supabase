@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'

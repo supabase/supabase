@@ -3,6 +3,7 @@ id: 'remix'
 title: 'Supabase Auth with Remix'
 description: 'Authentication helpers for loaders and actions in Remix.'
 sidebar_label: 'Remix'
+sitemapPriority: 0.5
 ---
 
 <Admonition type="caution">
@@ -612,7 +613,7 @@ export default function Login() {
 
   const handleEmailLogin = async () => {
     await supabase.auth.signInWithPassword({
-      email: 'jon@supabase.com',
+      email: 'valid.email@supabase.io',
       password: 'password',
     })
   }
@@ -650,7 +651,7 @@ export default function Login() {
 
   const handleEmailLogin = async () => {
     await supabase.auth.signInWithPassword({
-      email: 'jon@supabase.com',
+      email: 'valid.email@supabase.io',
       password: 'password',
     })
   }
@@ -825,7 +826,7 @@ For authentication methods that have a `redirectTo` or `emailRedirectTo`, this m
 
 ```jsx
 supabaseClient.auth.signUp({
-  email: 'jon@example.com',
+  email: 'valid.email@supabase.io',
   password: 'sup3rs3cur3',
   options: {
     emailRedirectTo: 'http://localhost:3000/auth/callback',

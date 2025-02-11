@@ -1,12 +1,17 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { handleError, post } from 'data/fetchers'
+import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
+import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import { privilegeKeys } from './keys'
 
-export type TablePrivilegesGrant = components['schemas']['GrantTablePrivilegesBody']
+export type TablePrivilegesGrant = Parameters<
+  typeof pgMeta.tablePrivileges.grant
+>[0] extends (infer T)[]
+  ? T
+  : never
 
 export type TablePrivilegesGrantVariables = {
   projectRef: string
@@ -19,21 +24,14 @@ export async function grantTablePrivileges({
   connectionString,
   grants,
 }: TablePrivilegesGrantVariables) {
-  const headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await post('/platform/pg-meta/{ref}/table-privileges', {
-    params: {
-      path: { ref: projectRef },
-      // this is needed to satisfy the typescript, but it doesn't pass the actual header
-      header: { 'x-connection-encrypted': connectionString! },
-    },
-    body: grants,
-    headers,
+  const sql = pgMeta.tablePrivileges.grant(grants).sql
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['table-privileges', 'grant'],
   })
-
-  if (error) handleError(error)
-  return data
+  return result
 }
 
 type TablePrivilegesGrantData = Awaited<ReturnType<typeof grantTablePrivileges>>
@@ -55,7 +53,7 @@ export const useTablePrivilegesGrantMutation = ({
         const { projectRef } = variables
 
         await Promise.all([
-          queryClient.invalidateQueries(privilegeKeys.tablePrivilegesList(projectRef)),
+          invalidateTablePrivilegesQuery(queryClient, projectRef),
           queryClient.invalidateQueries(privilegeKeys.columnPrivilegesList(projectRef)),
         ])
 

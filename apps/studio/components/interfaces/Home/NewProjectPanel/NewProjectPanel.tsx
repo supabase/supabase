@@ -1,8 +1,9 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
+import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
+import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Auth, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { Button } from 'ui'
@@ -10,8 +11,7 @@ import APIKeys from './APIKeys'
 import GetStartedHero from './GetStartedHero'
 
 const NewProjectPanel = () => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
 
   const {
     projectAuthAll: authEnabled,
@@ -47,12 +47,12 @@ const NewProjectPanel = () => {
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Button asChild type="default" icon={<TableEditor strokeWidth={1.5} />}>
-                  <Link href={`/project/${ref}/editor`}>Table Editor</Link>
+                  <EditorIndexPageLink projectRef={ref}>Table Editor</EditorIndexPageLink>
                 </Button>
                 <Button asChild type="default" icon={<SqlEditor strokeWidth={1.5} />}>
-                  <Link href={`/project/${ref}/sql/new`}>SQL editor</Link>
+                  <Link href={`/project/${ref}/sql/new`}>SQL Editor</Link>
                 </Button>
-                <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                <Button asChild type="default" icon={<ExternalLink />}>
                   <Link
                     href="https://supabase.com/docs/guides/database"
                     target="_blank"
@@ -98,7 +98,7 @@ const NewProjectPanel = () => {
 
                       <Button
                         className="translate-y-[1px]"
-                        icon={<ExternalLink size={14} />}
+                        icon={<ExternalLink />}
                         type="default"
                         asChild
                       >
@@ -134,7 +134,7 @@ const NewProjectPanel = () => {
 
                       <Button
                         className="translate-y-[1px]"
-                        icon={<ExternalLink size={14} />}
+                        icon={<ExternalLink />}
                         type="default"
                         asChild
                       >
@@ -170,7 +170,7 @@ const NewProjectPanel = () => {
                       </Button>
                       <Button
                         className="translate-y-[1px]"
-                        icon={<ExternalLink size={14} />}
+                        icon={<ExternalLink />}
                         type="default"
                         asChild
                       >
@@ -204,7 +204,7 @@ const NewProjectPanel = () => {
                       </Button>
                       <Button
                         className="translate-y-[1px]"
-                        icon={<ExternalLink size={14} />}
+                        icon={<ExternalLink />}
                         type="default"
                         asChild
                       >

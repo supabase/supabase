@@ -1,9 +1,9 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
-import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
-import { storageKeys } from './keys'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
 import type { ResponseError } from 'types'
+import { storageKeys } from './keys'
 
 export type BucketsVariables = { projectRef?: string }
 
@@ -36,12 +36,15 @@ export type BucketsError = ResponseError
 export const useBucketsQuery = <TData = BucketsData>(
   { projectRef }: BucketsVariables,
   { enabled = true, ...options }: UseQueryOptions<BucketsData, BucketsError, TData> = {}
-) =>
-  useQuery<BucketsData, BucketsError, TData>(
+) => {
+  const project = useSelectedProject()
+  const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
+  return useQuery<BucketsData, BucketsError, TData>(
     storageKeys.buckets(projectRef),
     ({ signal }) => getBuckets({ projectRef }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined' && isActive,
       ...options,
       retry: (failureCount, error) => {
         if (
@@ -61,3 +64,4 @@ export const useBucketsQuery = <TData = BucketsData>(
       },
     }
   )
+}

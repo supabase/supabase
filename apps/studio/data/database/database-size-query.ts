@@ -1,7 +1,8 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { databaseKeys } from './keys'
 
-export const getDatabaseSizeQuery = () => {
+export const getDatabaseSizeSql = () => {
   const sql = /* SQL */ `
 select sum(pg_database_size(pg_database.datname))::bigint as db_size from pg_database;
 `.trim()
@@ -14,23 +15,42 @@ export type DatabaseSizeVariables = {
   connectionString?: string
 }
 
-export type DatabaseSizeData = { result: { db_size: number }[] }
-export type DatabaseSizeError = ExecuteSqlError
-
-export const useDatabaseSizeQuery = <TData extends DatabaseSizeData = DatabaseSizeData>(
+export async function getDatabaseSize(
   { projectRef, connectionString }: DatabaseSizeVariables,
-  options: UseQueryOptions<ExecuteSqlData, DatabaseSizeError, TData> = {}
-) => {
-  return useExecuteSqlQuery(
+  signal?: AbortSignal
+) {
+  const sql = getDatabaseSizeSql()
+
+  const { result } = await executeSql(
     {
       projectRef,
       connectionString,
-      sql: getDatabaseSizeQuery(),
+      sql,
       queryKey: ['database-size'],
     },
+    signal
+  )
+
+  const dbSize = result?.[0]?.db_size
+  if (typeof dbSize !== 'number') {
+    throw new Error('Error fetching dbSize')
+  }
+
+  return dbSize
+}
+
+export type DatabaseSizeData = Awaited<ReturnType<typeof getDatabaseSize>>
+export type DatabaseSizeError = ExecuteSqlError
+
+export const useDatabaseSizeQuery = <TData = DatabaseSizeData>(
+  { projectRef, connectionString }: DatabaseSizeVariables,
+  { enabled = true, ...options }: UseQueryOptions<DatabaseSizeData, DatabaseSizeError, TData> = {}
+) =>
+  useQuery<DatabaseSizeData, DatabaseSizeError, TData>(
+    databaseKeys.databaseSize(projectRef),
+    ({ signal }) => getDatabaseSize({ projectRef, connectionString }, signal),
     {
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
-      staleTime: 1000 * 60, // default good for a minute
     }
   )
-}

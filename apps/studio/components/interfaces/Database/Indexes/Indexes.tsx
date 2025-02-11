@@ -1,6 +1,6 @@
 import { partition, sortBy } from 'lodash'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -13,8 +13,9 @@ import { DatabaseIndex, useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { Button, IconAlertCircle, IconSearch, IconTrash, Input, SidePanel } from 'ui'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { AlertCircle, Search, Trash } from 'lucide-react'
+import { Button, Input, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
@@ -52,23 +53,23 @@ const Indexes = () => {
   })
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess() {
-      refetchIndexes()
+    onSuccess: async () => {
+      await refetchIndexes()
       setSelectedIndexToDelete(undefined)
       toast.success('Successfully deleted index')
     },
-    onError(error) {
+    onError: (error) => {
       toast.error(`Failed to delete index: ${error.message}`)
     },
   })
 
   const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
-  const sortedIndexes = sortBy(allIndexes?.result ?? [], (index) => index.name.toLocaleLowerCase())
+  const sortedIndexes = sortBy(allIndexes ?? [], (index) => index.name.toLocaleLowerCase())
   const indexes =
     search.length > 0
       ? sortedIndexes.filter((index) => index.name.includes(search) || index.table.includes(search))
@@ -98,35 +99,35 @@ const Indexes = () => {
     <>
       <div className="pb-8">
         <div className="flex flex-col gap-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
-              {isErrorSchemas && (
-                <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
-                  <IconAlertCircle strokeWidth={2} size={16} />
-                  <p>Failed to load schemas</p>
-                </div>
-              )}
-              {isSuccessSchemas && (
-                <SchemaSelector
-                  className="w-[260px]"
-                  size="small"
-                  showError={false}
-                  selectedSchemaName={selectedSchema}
-                  onSelectSchema={setSelectedSchema}
-                />
-              )}
-              <Input
-                size="small"
-                value={search}
-                className="w-64"
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search for an index"
-                icon={<IconSearch size={14} />}
+          <div className="flex items-center gap-2 flex-wrap">
+            {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
+            {isErrorSchemas && (
+              <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
+                <AlertCircle strokeWidth={2} size={16} />
+                <p>Failed to load schemas</p>
+              </div>
+            )}
+            {isSuccessSchemas && (
+              <SchemaSelector
+                className="w-[180px]"
+                size="tiny"
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
               />
-            </div>
+            )}
+            <Input
+              size="tiny"
+              value={search}
+              className="w-52"
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search for an index"
+              icon={<Search size={14} />}
+            />
+
             {!isLocked && (
               <Button
+                className="ml-auto"
                 type="primary"
                 onClick={() => setShowCreateIndex(true)}
                 disabled={!isSuccessSchemas}
@@ -195,7 +196,7 @@ const Indexes = () => {
                               <Button
                                 type="text"
                                 className="px-1"
-                                icon={<IconTrash />}
+                                icon={<Trash />}
                                 onClick={() => setSelectedIndexToDelete(index)}
                               />
                             )}

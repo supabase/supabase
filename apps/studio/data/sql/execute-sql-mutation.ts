@@ -1,5 +1,5 @@
-import { toast } from 'react-hot-toast'
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { executeSql, ExecuteSqlData, ExecuteSqlVariables } from './execute-sql-query'
 
 export type QueryResponseError = {

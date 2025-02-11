@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 import SqlEditor from 'components/ui/SqlEditor'
 import { usePrevious } from 'hooks/deprecated'
-import { IconHelpCircle } from 'ui'
+import { HelpCircle } from 'lucide-react'
 
 interface PolicyDefinitionProps {
   operation: string
@@ -42,7 +42,7 @@ const PolicyDefinition = ({
               </label>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <IconHelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
+                  <HelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Content side="bottom">
@@ -89,7 +89,7 @@ const PolicyDefinition = ({
               </label>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <IconHelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
+                  <HelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Content side="bottom">

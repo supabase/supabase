@@ -17,7 +17,7 @@ export function useBranchCommands() {
 
   let { data: branches } = useBranchesQuery(
     {
-      projectRef: selectedProject?.ref,
+      projectRef: selectedProject?.parentRef,
     },
     { enabled: isBranchingEnabled }
   )

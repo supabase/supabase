@@ -1,3 +1,5 @@
+'use client'
+
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { Check, MessageSquareQuote, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
@@ -69,7 +71,7 @@ function reducer(state: State, action: Action) {
   }
 }
 
-function Feedback() {
+function Feedback({ className }: { className?: string }) {
   const [state, dispatch] = useReducer(reducer, initialState)
   const [modalOpen, setModalOpen] = useState(false)
   const feedbackButtonRef = useRef<HTMLButtonElement>(null)
@@ -132,7 +134,7 @@ function Feedback() {
   }
 
   return (
-    <section className="@container px-5 mb-6" aria-labelledby="feedback-title">
+    <section className={cn('@container px-5 mb-6', className)} aria-labelledby="feedback-title">
       <h3 id="feedback-title" className="block font-mono text-xs uppercase text-foreground mb-4">
         Is this helpful?
       </h3>

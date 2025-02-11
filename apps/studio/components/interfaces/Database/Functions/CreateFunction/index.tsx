@@ -3,7 +3,7 @@ import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
 import { Plus, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import z from 'zod'
 
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
@@ -13,7 +13,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import type { FormSchema } from 'types'
 import {
   Button,
@@ -203,7 +203,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       <FormControl_Shadcn_>
                         <SchemaSelector
                           selectedSchemaName={field.value}
-                          excludedSchemas={EXCLUDED_SCHEMAS}
+                          excludedSchemas={PROTECTED_SCHEMAS}
                           size="small"
                           onSelectSchema={(name) => field.onChange(name)}
                         />

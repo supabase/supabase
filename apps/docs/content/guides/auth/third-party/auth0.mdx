@@ -21,6 +21,15 @@ Auth0 can be used as a third-party authentication provider alongside Supabase Au
 
 ```typescript
 import { createClient } from '@supabase/supabase-js'
+import Auth0Client from '@auth0/auth0-spa-js'
+
+const auth0 = new Auth0Client({
+  domain: '<AUTH0_DOMAIN>',
+  clientId: '<AUTH0_CLIENT_ID>',
+  authorizationParams: {
+    redirect_uri: '<MY_CALLBACK_URL>',
+  },
+})
 
 const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
   accessToken: async () => {
@@ -113,7 +122,7 @@ In the CLI add the following config to your `supabase/config.toml` file:
 ```toml
 [auth.third_party.auth0]
 enabled = true
-tenant_id = "<id>"
+tenant = "<id>"
 tenant_region = "<region>" # if your tenant has a region
 ```
 

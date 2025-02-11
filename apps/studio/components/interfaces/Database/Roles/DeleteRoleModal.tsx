@@ -1,5 +1,5 @@
 import type { PostgresRole } from '@supabase/postgres-meta'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Modal } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'

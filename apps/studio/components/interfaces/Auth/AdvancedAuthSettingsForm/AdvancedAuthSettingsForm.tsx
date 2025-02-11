@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { boolean, number, object, string } from 'yup'
 
 import { useParams } from 'common'
@@ -205,7 +205,7 @@ const AdvancedAuthSettingsForm = () => {
 
   return (
     <Form id={formId} initialValues={INITIAL_VALUES} onSubmit={onSubmit} validationSchema={schema}>
-      {({ handleReset, resetForm, values, initialValues }: any) => {
+      {({ handleReset, resetForm, values, initialValues, setFieldValue }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         // Form is reset once remote data is loaded in store
@@ -292,6 +292,7 @@ const AdvancedAuthSettingsForm = () => {
                     }}
                     formValues={values}
                     disabled={!canUpdateConfig}
+                    setFieldValue={setFieldValue}
                   />
 
                   <InputNumber
@@ -322,6 +323,7 @@ const AdvancedAuthSettingsForm = () => {
                     }}
                     formValues={values}
                     disabled={!canUpdateConfig || !isProPlanAndUp}
+                    setFieldValue={setFieldValue}
                   />
                   {!hasValidMFAProvider && phoneMFAIsEnabled && (
                     <Alert_Shadcn_ variant="warning">
@@ -349,14 +351,15 @@ const AdvancedAuthSettingsForm = () => {
                     }}
                     formValues={values}
                     disabled={!canUpdateConfig || !isProPlanAndUp}
+                    setFieldValue={setFieldValue}
                   />
                   {hasUpgradedPhoneMFA && (
                     <Alert_Shadcn_ variant="warning">
                       <WarningIcon />
                       <AlertTitle_Shadcn_>
-                        Enabling advanced MFA with phone will result in an add additional charge of
-                        $75 per month for the first project in the organization and an additional
-                        $10 per month for additional projects.
+                        Enabling advanced MFA with phone will result in an additional charge of $75
+                        per month for the first project in the organization and an additional $10
+                        per month for additional projects.
                       </AlertTitle_Shadcn_>
                     </Alert_Shadcn_>
                   )}

@@ -2,12 +2,8 @@ import { Clipboard, Expand } from 'lucide-react'
 import { useState } from 'react'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 
-import { GridFooter } from 'components/ui/GridFooter'
 import { useKeyboardShortcuts } from 'hooks/deprecated'
-import { useFlag } from 'hooks/ui/useFlag'
 import { copyToClipboard } from 'lib/helpers'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   cn,
   ContextMenu_Shadcn_,
@@ -25,14 +21,9 @@ function formatClipboardValue(value: any) {
   return value
 }
 
-const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
-  const enableFolders = useFlag('sqlFolderOrganization')
+const Results = ({ rows }: { rows: readonly any[] }) => {
   const [expandCell, setExpandCell] = useState(false)
   const [cellPosition, setCellPosition] = useState<{ column: any; row: any; rowIdx: number }>()
-
-  const snap = useSqlEditorStateSnapshot()
-  const snapV2 = useSqlEditorV2StateSnapshot()
-  const results = enableFolders ? snapV2.results[id]?.[0] : snap.results[id]?.[0]
 
   const onCopyCell = () => {
     if (cellPosition) {
@@ -134,31 +125,15 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     }
   })
 
-  if (rows.length <= 0) {
-    return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
-      </div>
-    )
-  }
-
   return (
     <>
       <DataGrid
         columns={columns}
         rows={rows}
-        className="flex-grow border-t-0"
+        className="h-full flex-grow border-t-0"
         rowClass={() => '[&>.rdg-cell]:items-center'}
         onSelectedCellChange={setCellPosition}
       />
-
-      <GridFooter className="flex items-center justify-center">
-        <p className="text-xs text-foreground-light">
-          {rows.length} row{rows.length > 1 ? 's' : ''}
-          {results.autoLimit !== undefined && ` (auto limit ${results.autoLimit} rows)`}
-        </p>
-      </GridFooter>
-
       <CellDetailPanel
         column={cellPosition?.column.name ?? ''}
         value={cellPosition?.row?.[cellPosition.column.name]}

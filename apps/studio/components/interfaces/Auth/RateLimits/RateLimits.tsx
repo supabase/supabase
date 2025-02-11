@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
@@ -53,7 +53,7 @@ const RateLimits = () => {
   })
 
   const canUpdateEmailLimit = authConfig?.EXTERNAL_EMAIL_ENABLED && isSmtpEnabled(authConfig)
-  const canUpdateSMSRateLimit = authConfig?.EXTERNAL_PHONE_ENABLED && !authConfig?.SMS_AUTOCONFIRM
+  const canUpdateSMSRateLimit = authConfig?.EXTERNAL_PHONE_ENABLED
   const canUpdateAnonymousUsersRateLimit = authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED
 
   const FormSchema = z.object({
@@ -408,8 +408,8 @@ const RateLimits = () => {
                   <FormSectionLabel
                     description={
                       <p className="text-foreground-light text-sm">
-                        Number of sign up and sign-in requests that can be made per hour per IP
-                        address (excludes anonymous users).
+                        Number of sign up and sign-in requests that can be made in a 5 minute
+                        interval per IP address (excludes anonymous users).
                       </p>
                     }
                   >

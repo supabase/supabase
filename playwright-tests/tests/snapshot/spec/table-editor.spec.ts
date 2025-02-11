@@ -2,14 +2,14 @@ import { Page, expect, test } from '@playwright/test'
 import { kebabCase } from 'lodash'
 
 const dismissToast = async (page: Page) => {
-  await page.locator('#toast').getByRole('button').waitFor({ state: 'visible' })
-  await page.locator('#toast').getByRole('button').click()
+  await page.locator('li.toast').getByRole('button').waitFor({ state: 'visible' })
+  await page.locator('li.toast').getByRole('button').click()
 }
 
 test.describe('Table Editor page', () => {
   test.beforeEach(async ({ page }) => {
     const tableResponsePromise = page.waitForResponse(
-      'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types',
+      'http://localhost:8082/api/pg-meta/default/query?key=entity-types-public-0',
       { timeout: 0 }
     )
     await page.goto('/project/default/editor')
@@ -37,7 +37,7 @@ test.describe('Table Editor page', () => {
     await page.getByRole('button', { name: 'Add column' }).click()
     await page.getByRole('textbox', { name: 'column_name' }).click()
     await page.getByRole('textbox', { name: 'column_name' }).fill('defaultValueColumn')
-    await page.getByRole('button', { name: '---' }).click()
+    await page.locator('button').filter({ hasText: 'Choose a column type...' }).click()
     await page.getByText('Signed two-byte integer').click()
     await page.getByTestId('defaultValueColumn-default-value').click()
     await page.getByTestId('defaultValueColumn-default-value').fill('2')
@@ -77,11 +77,10 @@ test.describe('Table Editor page', () => {
     await page.getByTestId('table-editor-pick-column-to-sort-button').click()
     await page.getByLabel('Pick a column to sort by').getByText('defaultValueColumn').click()
     await page.getByRole('button', { name: 'Apply sorting' }).click()
+
     // click away to close the sorting dialog
-    await page
-      .locator('div')
-      .filter({ hasText: /^Table Editor$/ })
-      .click()
+    await page.locator('#spec-click-target').click()
+
     // expect the row to be sorted by defaultValueColumn. They're inserted in the order 100, 2
     await expect(page.locator('div.rdg-row:nth-child(2)')).toContainText('2')
     await expect(page.locator('div.rdg-row:nth-child(3)')).toContainText('100')
@@ -98,17 +97,14 @@ test.describe('Table Editor page', () => {
     await page.getByPlaceholder('Enter a value').fill('2')
     await page.getByRole('button', { name: 'Apply filter' }).click()
     // click away to close the filter dialog
-    await page
-      .locator('div')
-      .filter({ hasText: /^Table Editor$/ })
-      .click()
+    await page.locator('#spec-click-target').click()
     await expect(page.getByRole('grid')).toContainText('2')
     await expect(page.getByRole('grid')).not.toContainText('100')
   })
 
   test('should check the auth schema', async ({ page }) => {
     const tableResponsePromise = page.waitForResponse(
-      'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types',
+      'http://localhost:8082/api/pg-meta/default/query?key=entity-types-public-0',
       { timeout: 0 }
     )
 

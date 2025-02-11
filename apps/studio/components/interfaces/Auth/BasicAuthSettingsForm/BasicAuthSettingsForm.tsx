@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ExternalLink, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { boolean, number, object, string } from 'yup'
 
 import { useParams } from 'common'
@@ -27,8 +27,8 @@ import {
   Input,
   InputNumber,
   Toggle,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui'
 import FormField from '../AuthProvidersForm/FormField'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
@@ -155,7 +155,7 @@ const BasicAuthSettingsForm = () => {
 
   return (
     <Form id={formId} initialValues={INITIAL_VALUES} onSubmit={onSubmit} validationSchema={schema}>
-      {({ handleReset, resetForm, values, initialValues }: any) => {
+      {({ handleReset, resetForm, values, initialValues, setFieldValue }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
         // Form is reset once remote data is loaded in store
         // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -252,7 +252,7 @@ const BasicAuthSettingsForm = () => {
                               asChild
                               type="default"
                               className="w-min"
-                              icon={<ExternalLink size={14} />}
+                              icon={<ExternalLink />}
                             >
                               <Link href="/docs/guides/auth/auth-anonymous#access-control">
                                 View access control docs
@@ -325,6 +325,7 @@ const BasicAuthSettingsForm = () => {
                       ],
                     }}
                     formValues={values}
+                    setFieldValue={setFieldValue}
                   />
                   {!promptProPlanUpgrade ? (
                     <></>
@@ -424,6 +425,7 @@ const BasicAuthSettingsForm = () => {
                           ],
                         }}
                         formValues={values}
+                        setFieldValue={setFieldValue}
                       />
                       <Input
                         id="SECURITY_CAPTCHA_SECRET"

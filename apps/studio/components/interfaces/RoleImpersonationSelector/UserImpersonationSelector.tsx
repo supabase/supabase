@@ -1,10 +1,10 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { ChevronDown, ExternalLink, User as IconUser, Loader2, Search, X } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
-import { User, useUsersQuery } from 'data/auth/users-query'
+import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import {
   Button,
@@ -15,31 +15,31 @@ import {
   Switch,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { getAvatarUrl, getDisplayName } from '../Auth/Users/UserListItem.utils'
+import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 
 const UserImpersonationSelector = () => {
   const [searchText, setSearchText] = useState('')
   const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
+  const state = useRoleImpersonationStateSnapshot()
   const debouncedSearchText = useDebounce(searchText, 300)
 
   const { project } = useProjectContext()
-  const { data, isSuccess, isLoading, isError, error, isFetching, isPreviousData } = useUsersQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      keywords: debouncedSearchText || undefined,
-    },
-    {
-      keepPreviousData: true,
-    }
-  )
 
+  const { data, isSuccess, isLoading, isError, error, isFetching, isPreviousData } =
+    useUsersInfiniteQuery(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        keywords: debouncedSearchText.trim().toLocaleLowerCase(),
+      },
+      {
+        keepPreviousData: true,
+      }
+    )
+  const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
   const isSearching = isPreviousData && isFetching
-
-  const state = useRoleImpersonationStateSnapshot()
-
   const impersonatingUser =
     state.role?.type === 'postgrest' && state.role.role === 'authenticated' && state.role.user
 
@@ -62,7 +62,7 @@ const UserImpersonationSelector = () => {
 
   return (
     <div className="flex flex-col gap-1">
-      <h2 className="text-foreground text-base">
+      <h2 className="text-foreground text-sm">
         {impersonatingUser
           ? `Impersonating ${getDisplayName(
               impersonatingUser,
@@ -73,14 +73,14 @@ const UserImpersonationSelector = () => {
             )}`
           : 'Impersonate a User'}
       </h2>
-      <p className="text-sm text-foreground-light max-w-md">
+      <p className="text-sm text-foreground-light">
         {!impersonatingUser
           ? "Select a user to respect your database's Row-Level Security policies for that particular user."
           : "Results will respect your database's Row-Level Security policies for this user."}
       </p>
 
       {!impersonatingUser ? (
-        <div className="flex flex-col gap-2 mt-4">
+        <div className="flex flex-col gap-2 mt-2">
           <Input
             className="table-editor-search border-none"
             icon={
@@ -95,7 +95,7 @@ const UserImpersonationSelector = () => {
               )
             }
             placeholder="Search for a user.."
-            onChange={(e) => setSearchText(e.target.value.trim())}
+            onChange={(e) => setSearchText(e.target.value)}
             value={searchText}
             size="small"
             actions={
@@ -159,9 +159,9 @@ const UserImpersonationSelector = () => {
           {isError && <AlertError error={error} subject="Failed to retrieve users" />}
 
           {isSuccess &&
-            (data.users.length > 0 ? (
-              <ul className="divide-y max-h-[192px] overflow-y-scroll" role="list">
-                {data.users.map((user) => (
+            (users.length > 0 ? (
+              <ul className="divide-y max-h-[150px] overflow-y-scroll" role="list">
+                {users.map((user) => (
                   <li key={user.id} role="listitem">
                     <UserRow user={user} onClick={impersonateUser} />
                   </li>
@@ -225,12 +225,7 @@ const UserImpersonatingRow = ({
         </span>
       </div>
 
-      <Button
-        type="secondary"
-        onClick={() => {
-          onClick(user)
-        }}
-      >
+      <Button type="default" onClick={() => onClick(user)}>
         {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
       </Button>
     </div>
@@ -250,7 +245,7 @@ const UserRow = ({ user, onClick, isImpersonating = false }: UserRowProps) => {
     (user.is_anonymous ? ' (anonymous)' : '')
 
   return (
-    <div className="flex items-center justify-between py-2 text-foreground">
+    <div className="flex items-center justify-between py-1 text-foreground">
       <div className="flex items-center gap-4">
         {avatarUrl ? (
           <img className="rounded-full w-5 h-5" src={avatarUrl} alt={displayName} />
@@ -263,12 +258,7 @@ const UserRow = ({ user, onClick, isImpersonating = false }: UserRowProps) => {
         <span className="text-sm">{displayName}</span>
       </div>
 
-      <Button
-        type="secondary"
-        onClick={() => {
-          onClick(user)
-        }}
-      >
+      <Button type="default" onClick={() => onClick(user)}>
         {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
       </Button>
     </div>

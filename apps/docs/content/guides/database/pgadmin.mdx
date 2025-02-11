@@ -1,0 +1,85 @@
+---
+id: 'pgadmin'
+title: 'Connecting with pgAdmin'
+breadcrumb: 'GUI Quickstarts'
+hideToc: true
+---
+
+[`pgAdmin`](https://www.pgadmin.org/) is a GUI tool for managing Postgres databases. You can use it to connect to your database via SSL.
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Register">
+
+    Register a new Postgres server.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    <Image
+      alt="Register a new postgres server."
+      src={{
+          dark: '/docs/img/guides/database/connecting-to-postgres/pgadmin/register-server-pgAdmin.png?v=2',
+          light:
+            '/docs/img/guides/database/connecting-to-postgres/pgadmin/register-server-pgAdmin--light.png',
+        }}
+      />
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Name">
+
+    Name your server.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![Name Postgres Server.](/docs/img/guides/database/connecting-to-postgres/pgadmin/name-pg-server.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Connect">
+
+    Add the connection info. Go to your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database). Make sure `Use connection pooling` is enabled. Switch the connection mode to `Session` and copy your connection parameters. Fill in your Database password that you made when creating your project (It can be reset in Database Settings above if you don't have it).
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![Add Connection Info.](/docs/img/guides/database/connecting-to-postgres/pgadmin/add-pg-server-conn-info.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="SSL">
+
+    Download your SSL certificate from Dashboard's [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database).
+
+    In pgAdmin, navigate to the Parameters tab and select connection parameter as Root Certificate. Next navigate to the Root certificate input, it will open up a file-picker modal. Select the certificate you downloaded earlier and save the server details. PgAdmin should now be able to connect to your Postgres via SSL.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![Add Connection Info.](/docs/img/guides/database/connecting-to-postgres/pgadmin/database-settings-host.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>

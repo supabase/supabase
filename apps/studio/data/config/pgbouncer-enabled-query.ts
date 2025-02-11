@@ -26,7 +26,10 @@ export type PgBouncerStatusError = ResponseError
 
 export const usePgBouncerStatus = <TData = PgBouncerStatusData>(
   { projectRef }: PgBouncerVariables,
-  { enabled, ...options }: UseQueryOptions<PgBouncerStatusData, PgBouncerStatusError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<PgBouncerStatusData, PgBouncerStatusError, TData> = {}
 ) =>
   useQuery<PgBouncerStatusData, PgBouncerStatusError, TData>(
     configKeys.pgBouncerStatus(projectRef),

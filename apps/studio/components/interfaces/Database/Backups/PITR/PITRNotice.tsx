@@ -1,12 +1,13 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Calendar } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, IconCalendar } from 'ui'
+import { Button } from 'ui'
 import { getPITRRetentionDuration } from './PITR.utils'
 
 const PITRNotice = ({}) => {
@@ -58,7 +59,7 @@ const PITRNotice = ({}) => {
     >
       <div className="flex p-6 space-x-6">
         <div className="flex items-center justify-center w-10 h-10 rounded bg-border-strong">
-          <IconCalendar strokeWidth={2} />
+          <Calendar strokeWidth={2} />
         </div>
         <div className="space-y-2">
           <p className="text-sm">Recovery retention period</p>

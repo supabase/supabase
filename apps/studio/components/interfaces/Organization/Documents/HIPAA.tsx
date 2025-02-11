@@ -3,7 +3,8 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { Button, IconExternalLink } from 'ui'
+import { ExternalLink } from 'lucide-react'
+import { Button } from 'ui'
 
 const HIPAA = () => {
   return (
@@ -29,7 +30,7 @@ const HIPAA = () => {
         <ScaffoldSectionContent>
           <div className="flex items-center justify-center h-full">
             <a href="https://forms.supabase.com/hipaa2" target="_blank" rel="noreferrer noopener">
-              <Button type="default" iconRight={<IconExternalLink />}>
+              <Button type="default" iconRight={<ExternalLink />}>
                 Request HIPAA
               </Button>
             </a>

@@ -1,4 +1,21 @@
-export const RESOURCE_WARNING_MESSAGES = {
+interface ResourceWarningMessage {
+  // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/auth')
+  restrictToRoutes?: string[]
+
+  bannerContent: {
+    warning: { title: string; description: string }
+    critical: { title?: string; description?: string }
+  }
+  cardContent: {
+    warning: { title: string; description: string }
+    critical: { title?: string; description?: string }
+  }
+  docsUrl?: string
+  buttonText?: string
+  metric: string | null
+}
+
+export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> = {
   is_readonly_mode_enabled: {
     bannerContent: {
       warning: {
@@ -25,7 +42,7 @@ export const RESOURCE_WARNING_MESSAGES = {
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode',
-    buttonText: 'View database settings',
+    buttonText: 'View Compute and Disk',
     metric: 'read_only',
   },
   disk_io_exhaustion: {

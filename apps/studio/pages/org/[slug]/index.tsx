@@ -1,6 +1,7 @@
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
-import NoProjectsOnPaidOrgInfo from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
+import { NoProjectsOnPaidOrgInfo } from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import ProjectCard from 'components/interfaces/Home/ProjectList/ProjectCard'
 import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCard'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
@@ -11,7 +12,7 @@ import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-or
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
-import { Button, IconPlus } from 'ui'
+import { Button } from 'ui'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const {
@@ -56,7 +57,7 @@ const ProjectsPage: NextPageWithLayout = () => {
           <NoProjectsOnPaidOrgInfo organization={organization} />
 
           <div>
-            <Button asChild size="medium" type="default" iconRight={<IconPlus />}>
+            <Button asChild size="medium" type="default" iconRight={<Plus />}>
               <Link href={`/new/${organization?.slug}`}>New project</Link>
             </Button>
           </div>
@@ -82,7 +83,7 @@ const ProjectsPage: NextPageWithLayout = () => {
                       </p>
                     </div>
                     <div>
-                      <Button asChild icon={<IconPlus />}>
+                      <Button asChild icon={<Plus />}>
                         <Link href={`/new/${organization?.slug}`}>New Project</Link>
                       </Button>
                     </div>

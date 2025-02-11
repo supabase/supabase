@@ -1,6 +1,8 @@
+import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
+
 import type { Route } from 'components/ui/ui.types'
+import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import type { Project } from 'data/projects/project-detail-query'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import {
   Auth,
   Database,
@@ -11,8 +13,8 @@ import {
   Storage,
   TableEditor,
 } from 'icons'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
-import { Settings, FileText, List, Lightbulb } from 'lucide-react'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -24,6 +26,7 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
       label: 'Table Editor',
       icon: <TableEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
+      linkElement: <EditorIndexPageLink projectRef={ref} />,
     },
     {
       key: 'sql',
@@ -40,6 +43,7 @@ export const generateProductRoutes = (
   project?: Project,
   features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean; realtime?: boolean }
 ): Route[] => {
+  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
@@ -53,7 +57,13 @@ export const generateProductRoutes = (
       key: 'database',
       label: 'Database',
       icon: <Database size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/database/tables`),
+      link:
+        ref &&
+        (isProjectBuilding
+          ? buildingUrl
+          : isProjectActive
+            ? `/project/${ref}/database/schemas`
+            : `/project/${ref}/database/backups/scheduled`),
     },
     ...(authEnabled
       ? [
@@ -130,6 +140,12 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
       label: 'API Docs',
       icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
+    },
+    {
+      key: 'integrations',
+      label: 'Integrations',
+      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations`),
     },
   ]
 }

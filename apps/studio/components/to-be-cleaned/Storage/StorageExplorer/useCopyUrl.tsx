@@ -1,18 +1,16 @@
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { toast } from 'sonner'
+
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants/infrastructure'
 import { copyToClipboard } from 'lib/helpers'
-import toast from 'react-hot-toast'
 
 export const useCopyUrl = (ref: string) => {
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
-  const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
 
-  const apiService = (projectSettings?.services ?? []).find(
-    (x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
-  )
-  const apiConfig = apiService?.app_config
-  const apiUrl = `${apiConfig?.protocol ?? 'https'}://${apiConfig?.endpoint ?? '-'}`
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint
+  const apiUrl = `${protocol}://${endpoint ?? '-'}`
 
   const onCopyUrl = (name: string, url: string | Promise<string>) => {
     const formattedUrl = Promise.resolve(url).then((url) => {

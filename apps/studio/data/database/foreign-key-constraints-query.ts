@@ -1,5 +1,7 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { databaseKeys } from './keys'
 
 type GetForeignKeyConstraintsVariables = {
   schema?: string
@@ -35,7 +37,11 @@ export type ForeignKeyConstraint = {
   target_columns: string[]
 }
 
-export const getForeignKeyConstraintsQuery = ({ schema }: GetForeignKeyConstraintsVariables) => {
+export const getForeignKeyConstraintsSql = ({ schema }: GetForeignKeyConstraintsVariables) => {
+  if (!schema) {
+    throw new Error('schema is required')
+  }
+
   const sql = /* SQL */ `
 SELECT 
   con.oid as id, 
@@ -82,7 +88,7 @@ FROM
   INNER JOIN pg_namespace fnsp ON fnsp.oid = frel.relnamespace 
 WHERE 
   con.contype = 'f'
-  ${schema !== undefined ? `AND nsp.nspname = '${schema}'` : ''};
+  AND nsp.nspname = '${schema}'
 `.trim()
 
   return sql
@@ -93,33 +99,55 @@ export type ForeignKeyConstraintsVariables = GetForeignKeyConstraintsVariables &
   connectionString?: string
 }
 
-export type ForeignKeyConstraintsData = ForeignKeyConstraint[]
-export type ForeignKeyConstraintsError = ExecuteSqlError
-
-export const useForeignKeyConstraintsQuery = <
-  TData extends ForeignKeyConstraintsData = ForeignKeyConstraintsData,
->(
+export async function getForeignKeyConstraints(
   { projectRef, connectionString, schema }: ForeignKeyConstraintsVariables,
-  options: UseQueryOptions<ExecuteSqlData, ForeignKeyConstraintsError, TData> = {}
-) => {
-  return useExecuteSqlQuery(
+  signal?: AbortSignal
+) {
+  const sql = getForeignKeyConstraintsSql({ schema })
+
+  const { result } = await executeSql(
     {
       projectRef,
       connectionString,
-      sql: getForeignKeyConstraintsQuery({ schema }),
-      queryKey: ['foreign-key-constraints'],
+      sql,
+      queryKey: ['foreign-key-constraints', schema],
     },
+    signal
+  )
+
+  return (result ?? []).map((foreignKey: ForeignKeyConstraintRaw) => {
+    return {
+      ...foreignKey,
+      source_columns: foreignKey.source_columns.replace('{', '').replace('}', '').split(','),
+      target_columns: foreignKey.target_columns.replace('{', '').replace('}', '').split(','),
+    }
+  }) as ForeignKeyConstraint[]
+}
+
+export type ForeignKeyConstraintsData = Awaited<ReturnType<typeof getForeignKeyConstraints>>
+export type ForeignKeyConstraintsError = ExecuteSqlError
+
+export const useForeignKeyConstraintsQuery = <TData = ForeignKeyConstraintsData>(
+  { projectRef, connectionString, schema }: ForeignKeyConstraintsVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData> = {}
+) =>
+  useQuery<ForeignKeyConstraintsData, ForeignKeyConstraintsError, TData>(
+    databaseKeys.foreignKeyConstraints(projectRef, schema),
+    ({ signal }) => getForeignKeyConstraints({ projectRef, connectionString, schema }, signal),
     {
-      select(data) {
-        return ((data as any)?.result ?? []).map((foreignKey: ForeignKeyConstraintRaw) => {
-          return {
-            ...foreignKey,
-            source_columns: foreignKey.source_columns.replace('{', '').replace('}', '').split(','),
-            target_columns: foreignKey.target_columns.replace('{', '').replace('}', '').split(','),
-          }
-        })
-      },
+      enabled: enabled && typeof projectRef !== 'undefined' && typeof schema !== 'undefined',
       ...options,
     }
+  )
+
+export function prefetchForeignKeyConstraints(
+  client: QueryClient,
+  { projectRef, connectionString, schema }: ForeignKeyConstraintsVariables
+) {
+  return client.fetchQuery(databaseKeys.foreignKeyConstraints(projectRef, schema), ({ signal }) =>
+    getForeignKeyConstraints({ projectRef, connectionString, schema }, signal)
   )
 }

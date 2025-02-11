@@ -1,21 +1,23 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
-import { Button, IconSearch, Input } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useAppStateSnapshot } from 'state/app-state'
+import { AiIconAnimation, Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import TriggerList from './TriggerList'
 
@@ -31,6 +33,7 @@ const TriggersList = ({
   deleteTrigger = noop,
 }: TriggersListProps) => {
   const { project } = useProjectContext()
+  const { setAiAssistantPanel } = useAppStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [filterString, setFilterString] = useState<string>('')
 
@@ -39,7 +42,7 @@ const TriggersList = ({
     connectionString: project?.connectionString,
   })
   const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
@@ -85,76 +88,85 @@ const TriggersList = ({
           </ProductEmptyState>
         </div>
       ) : (
-        <div className="w-full space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex items-center gap-x-2">
               <SchemaSelector
-                className="w-[260px]"
-                size="small"
+                className="w-[180px]"
+                size="tiny"
                 showError={false}
                 selectedSchemaName={selectedSchema}
                 onSelectSchema={setSelectedSchema}
               />
               <Input
                 placeholder="Search for a trigger"
-                size="small"
-                icon={<IconSearch size="tiny" />}
+                size="tiny"
+                icon={<Search size="14" />}
                 value={filterString}
-                className="w-64"
+                className="w-52"
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>
-
             {!isLocked && (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
-                  <Button disabled={!canCreateTriggers} onClick={() => createTrigger()}>
-                    Create a new trigger
-                  </Button>
-                </Tooltip.Trigger>
-                {!canCreateTriggers && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          You need additional permissions to create triggers
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
+              <div className="flex items-center gap-x-2">
+                <ButtonTooltip
+                  disabled={!canCreateTriggers}
+                  onClick={() => createTrigger()}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canCreateTriggers
+                        ? 'You need additional permissions to create triggers'
+                        : undefined,
+                    },
+                  }}
+                >
+                  Create a new trigger
+                </ButtonTooltip>
+                <ButtonTooltip
+                  type="default"
+                  disabled={!canCreateTriggers}
+                  className="px-1 pointer-events-auto"
+                  icon={<AiIconAnimation size={16} />}
+                  onClick={() =>
+                    setAiAssistantPanel({
+                      open: true,
+                      initialInput: `Create a new trigger for the schema ${selectedSchema} that does ...`,
+                      suggestions: {
+                        title:
+                          'I can help you create a new trigger, here are a few example prompts to get you started:',
+                        prompts: [
+                          'Create a trigger that logs changes to the users table',
+                          'Create a trigger that updates updated_at timestamp',
+                          'Create a trigger that validates email format before insert',
+                        ],
+                      },
+                    })
+                  }
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canCreateTriggers
+                        ? 'You need additional permissions to create triggers'
+                        : 'Create with Supabase Assistant',
+                    },
+                  }}
+                />
+              </div>
             )}
           </div>
 
           {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
           <Table
-            className="table-fixed"
             head={
               <>
-                <Table.th key="name" className="space-x-4">
-                  Name
-                </Table.th>
-                <Table.th key="table" className="hidden lg:table-cell">
-                  Table
-                </Table.th>
-                <Table.th key="function" className="hidden xl:table-cell">
-                  Function
-                </Table.th>
-                <Table.th key="events" className="hidden xl:table-cell">
-                  Events
-                </Table.th>
-                <Table.th key="orientation" className="hidden xl:table-cell">
-                  Orientation
-                </Table.th>
-                <Table.th key="enabled" className="hidden w-20 xl:table-cell">
+                <Table.th key="name">Name</Table.th>
+                <Table.th key="table">Table</Table.th>
+                <Table.th key="function">Function</Table.th>
+                <Table.th key="events">Events</Table.th>
+                <Table.th key="orientation">Orientation</Table.th>
+                <Table.th key="enabled" className="w-20">
                   Enabled
                 </Table.th>
                 <Table.th key="buttons" className="w-1/12"></Table.th>

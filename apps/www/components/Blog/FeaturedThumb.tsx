@@ -36,7 +36,7 @@ function FeaturedThumb(blog: PostTypes) {
         </div>
         <div className="flex flex-col space-y-2 lg:col-span-4 xl:justify-center max-w-xl">
           <div className="text-lighter flex space-x-2 text-sm">
-            <span>{blog.date}</span>
+            <span>{blog.formattedDate}</span>
             <span>•</span>
             <span>{blog.readingTime}</span>
           </div>

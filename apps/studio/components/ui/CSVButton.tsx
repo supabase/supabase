@@ -1,12 +1,7 @@
+import { Download } from 'lucide-react'
 import React, { PropsWithChildren, useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
-import {
-  Button,
-  IconDownload,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import { ButtonProps } from 'ui/src/components/Button/Button'
 
 interface CSVButtonProps {
@@ -61,7 +56,7 @@ const CSVButton = ({
         <TooltipTrigger_Shadcn_ asChild>
           <Button
             type={buttonType}
-            icon={icon || <IconDownload />}
+            icon={icon || <Download />}
             disabled={disabled}
             className="px-1.5"
             onClick={(e) => {

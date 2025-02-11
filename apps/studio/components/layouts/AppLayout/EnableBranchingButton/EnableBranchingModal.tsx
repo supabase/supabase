@@ -4,7 +4,7 @@ import { last } from 'lodash'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -19,13 +19,14 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { DollarSign, FileText } from 'lucide-react'
+import { DollarSign, ExternalLink, FileText, GitBranch } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
-import { Button, Form_Shadcn_, IconExternalLink, IconGitBranch, Modal } from 'ui'
+import { Button, Form_Shadcn_, Modal } from 'ui'
 import BranchingPITRNotice from './BranchingPITRNotice'
 import BranchingPlanNotice from './BranchingPlanNotice'
 import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import GithubRepositorySelection from './GithubRepositorySelection'
+import { DocsButton } from 'components/ui/DocsButton'
 
 const EnableBranchingModal = () => {
   const { ref } = useParams()
@@ -146,21 +147,13 @@ const EnableBranchingModal = () => {
           >
             <Modal.Content className="flex items-center justify-between space-x-4">
               <div className="flex items-center gap-x-4">
-                <IconGitBranch strokeWidth={2} size={20} />
+                <GitBranch strokeWidth={2} size={20} />
                 <div>
                   <p className="text-foreground">Enable database branching</p>
                   <p className="text-sm text-foreground-light">Manage environments in Supabase</p>
                 </div>
               </div>
-              <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                <Link
-                  href="https://supabase.com/docs/guides/platform/branching"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Documentation
-                </Link>
-              </Button>
+              <DocsButton href="https://supabase.com/docs/guides/platform/branching" />
             </Modal.Content>
 
             {isLoading && (

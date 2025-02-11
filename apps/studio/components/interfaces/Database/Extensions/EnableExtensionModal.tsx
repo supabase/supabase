@@ -1,7 +1,7 @@
 import type { PostgresExtension } from '@supabase/postgres-meta'
-import { ExternalLinkIcon } from 'lucide-react'
+import { Database, ExternalLinkIcon, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -14,13 +14,16 @@ import {
   Alert_Shadcn_,
   Button,
   Form,
-  IconDatabase,
-  IconPlus,
   Input,
   Listbox,
   Modal,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { DocsButton } from 'components/ui/DocsButton'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+
+const orioleExtCallOuts = ['vector', 'postgis']
 
 interface EnableExtensionModalProps {
   visible: boolean
@@ -30,6 +33,7 @@ interface EnableExtensionModalProps {
 
 const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionModalProps) => {
   const { project } = useProjectContext()
+  const isOrioleDb = useIsOrioleDb()
   const [defaultSchema, setDefaultSchema] = useState()
   const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
 
@@ -131,7 +135,17 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
         {({ values }: any) => {
           return (
             <>
-              <Modal.Content>
+              <Modal.Content className="flex flex-col gap-y-2">
+                {isOrioleDb && orioleExtCallOuts.includes(extension.name) && (
+                  <Admonition type="default" title="Extension is limited by OrioleDB">
+                    <span className="block">
+                      {extension.name} cannot be accelerated by indexes on tables that are using the
+                      OrioleDB access method
+                    </span>
+                    <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
+                  </Admonition>
+                )}
+
                 {fetchingSchemaInfo || isSchemasLoading ? (
                   <div className="space-y-2">
                     <ShimmeringLoader />
@@ -159,7 +173,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                       id="custom"
                       label={`Create a new schema "${extension.name}"`}
                       value="custom"
-                      addOnBefore={() => <IconPlus size={16} strokeWidth={1.5} />}
+                      addOnBefore={() => <Plus size={16} strokeWidth={1.5} />}
                     >
                       Create a new schema "{extension.name}"
                     </Listbox.Option>
@@ -171,7 +185,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                           id={schema.name}
                           label={schema.name}
                           value={schema.name}
-                          addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
+                          addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
                         >
                           {schema.name}
                         </Listbox.Option>

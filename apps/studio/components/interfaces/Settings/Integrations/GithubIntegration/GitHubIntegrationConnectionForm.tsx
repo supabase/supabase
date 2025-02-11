@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronDown, GitBranch, RotateCcw, Shield } from 'lucide-react'
+import { Check, ChevronDown, GitBranch, RotateCcw, Shield } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -31,7 +31,6 @@ import {
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   Form_Shadcn_,
-  IconCheck,
   Input_Shadcn_,
   Label_Shadcn_,
   PopoverContent_Shadcn_,
@@ -209,7 +208,7 @@ const GitHubIntegrationConnectionForm = ({
                             )}
                             {branch.name}
                           </div>
-                          {branch.name === productionPreviewBranch?.git_branch && <IconCheck />}
+                          {branch.name === productionPreviewBranch?.git_branch && <Check />}
                         </CommandItem_Shadcn_>
                       )
                     })}
@@ -249,7 +248,7 @@ const GitHubIntegrationConnectionForm = ({
                     <Input_Shadcn_
                       {...field}
                       className="w-80"
-                      disabled={!canUpdateGitHubConnection}
+                      disabled={disabled || !canUpdateGitHubConnection}
                       onKeyPress={(event) => {
                         if (event.key === 'Escape') form.reset()
                       }}
@@ -302,7 +301,7 @@ const GitHubIntegrationConnectionForm = ({
                   <div className="relative">
                     <Input_Shadcn_
                       {...field}
-                      disabled={!canUpdateGitHubConnection}
+                      disabled={disabled || !canUpdateGitHubConnection}
                       className="w-80"
                       onKeyPress={(event) => {
                         if (event.key === 'Escape') form.reset()
@@ -350,7 +349,7 @@ const GitHubIntegrationConnectionForm = ({
                 <FormControl_Shadcn_>
                   <Switch
                     className="mt-1"
-                    disabled={!canUpdateGitHubConnection}
+                    disabled={disabled || !canUpdateGitHubConnection}
                     checked={field.value}
                     onCheckedChange={(e) => {
                       field.onChange(e)

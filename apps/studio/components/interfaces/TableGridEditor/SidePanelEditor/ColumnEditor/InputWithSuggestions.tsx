@@ -7,6 +7,7 @@
 
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { noop } from 'lodash'
+import { List } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   Button,
@@ -16,7 +17,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconList,
   Input,
 } from 'ui'
 
@@ -102,7 +102,7 @@ const InputWithSuggestions = ({
                 <DropdownMenuTrigger asChild>
                   <Tooltip.Trigger asChild>
                     <Button type="default" className="!px-1 mr-0.5">
-                      <IconList strokeWidth={1.5} size={14} />
+                      <List strokeWidth={1.5} size={14} />
                     </Button>
                   </Tooltip.Trigger>
                 </DropdownMenuTrigger>

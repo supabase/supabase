@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'

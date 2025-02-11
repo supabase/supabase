@@ -5,8 +5,6 @@ import { useState } from 'react'
 
 import type { ModalProps } from '@ui/components/Modal/Modal'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useFlag } from 'hooks/ui/useFlag'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, CodeBlock, Modal, Tabs } from 'ui'
 import { Markdown } from '../Markdown'
@@ -21,11 +19,9 @@ export interface DownloadSnippetModalProps extends ModalProps {
 }
 
 const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
-  const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const enableFolders = useFlag('sqlFolderOrganization')
 
-  const snippet = enableFolders ? snapV2.snippets[id]?.snippet : snap.snippets[id].snippet
+  const snippet = snapV2.snippets[id]?.snippet
   const migrationName = snakeCase(snippet?.name)
 
   const [selectedView, setSelectedView] = useState<'CLI' | 'NPM'>('CLI')
@@ -108,7 +104,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
           <div className="flex justify-between items-center gap-x-2">
             <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
-                href="https://supabase.com/docs/guides/cli/local-development#database-migrations"
+                href="https://supabase.com/docs/guides/deployment/database-migrations"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -116,7 +112,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
               </Link>
             </Button>
 
-            <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
                 href="https://supabase.com/docs/guides/cli/local-development"
                 target="_blank"

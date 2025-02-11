@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -41,7 +41,7 @@ export const useContentDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(contentKeys.list(projectRef))
+        await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

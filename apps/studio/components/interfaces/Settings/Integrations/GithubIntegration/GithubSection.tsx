@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useCallback } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'
-import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
+import { IntegrationConnectionItem } from 'components/interfaces/Integrations/VercelGithub/IntegrationConnection'
+import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
 import {
   ScaffoldContainer,
@@ -22,7 +22,6 @@ import type {
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'
@@ -46,6 +45,7 @@ const GitHubSection = () => {
   const project = useSelectedProject()
   const org = useSelectedOrganization()
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
+  const isBranch = project?.parent_project_ref !== undefined
 
   const canReadGitHubConnection = useCheckPermissions(
     PermissionAction.READ,
@@ -67,10 +67,6 @@ const GitHubSection = () => {
       toast.success('Successfully deleted Github connection')
     },
   })
-
-  const hasAccessToBranching = useFlag<boolean>('branchManagement')
-
-  const isBranch = project?.parent_project_ref !== undefined
 
   const connections =
     allConnections?.filter((connection) =>
@@ -141,7 +137,7 @@ const GitHubSection = () => {
 
                       <div className="border-b border-l border-r rounded-b-lg">
                         <GitHubIntegrationConnectionForm
-                          disabled={!canUpdateGitHubConnection}
+                          disabled={isBranch || !canUpdateGitHubConnection}
                           connection={{
                             id: String(connection.id),
                             added_by: {
@@ -168,28 +164,15 @@ const GitHubSection = () => {
                     </div>
                   ))}
                 </ul>
-              ) : hasAccessToBranching ? (
+              ) : (
                 <EmptyIntegrationConnection
                   onClick={onAddGitHubConnection}
                   orgSlug={org?.slug}
                   showNode={false}
-                  disabled={!canCreateGitHubConnection}
+                  disabled={isBranch || !canCreateGitHubConnection}
                 >
                   Add new project connection
                 </EmptyIntegrationConnection>
-              ) : (
-                <p className="text-sm text-foreground-light">
-                  Access to{' '}
-                  <a
-                    href="https://supabase.com/docs/guides/platform/branching"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-foreground"
-                  >
-                    branching
-                  </a>{' '}
-                  is required to add GitHub connections.
-                </p>
               )}
             </>
           )}

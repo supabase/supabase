@@ -271,8 +271,10 @@ const MapView = ({
                             <Badge variant="brand">Healthy</Badge>
                           ) : database.status === REPLICA_STATUS.COMING_UP ? (
                             <Badge>Coming up</Badge>
-                          ) : database.status === REPLICA_STATUS.RESTORING ? (
+                          ) : database.status === REPLICA_STATUS.RESTARTING ? (
                             <Badge>Restarting</Badge>
+                          ) : database.status === REPLICA_STATUS.RESIZING ? (
+                            <Badge>Resizing</Badge>
                           ) : (
                             <Badge variant="warning">Unhealthy</Badge>
                           )}
@@ -356,7 +358,9 @@ const MapView = ({
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: 'You need additional permissions to deploy replicas',
+                  text: !canManageReplicas
+                    ? 'You need additional permissions to deploy replicas'
+                    : undefined,
                 },
               }}
             >

@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import clsx from 'clsx'
+import { AlertTriangle, BarChart2 } from 'lucide-react'
 import Link from 'next/link'
+import { useMemo } from 'react'
 
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
@@ -9,9 +10,8 @@ import SparkBar from 'components/ui/SparkBar'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import type { OrgMetricsUsage, OrgUsageResponse } from 'data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
-import { useMemo } from 'react'
 import type { ResponseError } from 'types'
-import { Button, IconAlertTriangle, IconBarChart2 } from 'ui'
+import { Button, cn } from 'ui'
 import SectionContent from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
 import {
@@ -105,7 +105,7 @@ const AttributeUsage = ({
                             <Tooltip.Trigger asChild>
                               {usageRatio >= 1 ? (
                                 <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
-                                  <IconAlertTriangle
+                                  <AlertTriangle
                                     size={14}
                                     strokeWidth={2}
                                     className={exceededLimitStyle}
@@ -115,7 +115,7 @@ const AttributeUsage = ({
                               ) : (
                                 usageRatio >= USAGE_APPROACHING_THRESHOLD && (
                                   <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
-                                    <IconAlertTriangle
+                                    <AlertTriangle
                                       size={14}
                                       strokeWidth={2}
                                       className="text-amber-900"
@@ -153,7 +153,7 @@ const AttributeUsage = ({
                     {currentBillingCycleSelected && usageMeta && !usageMeta.unlimited && (
                       <SparkBar
                         type="horizontal"
-                        barClass={clsx(
+                        barClass={cn(
                           usageRatio >= 1
                             ? usageBasedBilling
                               ? 'bg-foreground-light'
@@ -173,7 +173,7 @@ const AttributeUsage = ({
                       {usageMeta && (
                         <div className="flex items-center justify-between border-b py-1">
                           <p className="text-xs text-foreground-light">
-                            Included in {subscription?.plan?.name.toLowerCase()} plan
+                            Included in {subscription?.plan?.name} Plan
                           </p>
                           {usageMeta.unlimited ? (
                             <p className="text-xs">Unlimited</p>
@@ -247,7 +247,7 @@ const AttributeUsage = ({
                   <Panel>
                     <Panel.Content>
                       <div className="flex flex-col items-center justify-center">
-                        <IconBarChart2 className="text-foreground-light mb-2" />
+                        <BarChart2 className="text-foreground-light mb-2" />
                         <p className="text-sm">No data in period</p>
                         <p className="text-sm text-foreground-light">
                           May take up to 24 hours to show

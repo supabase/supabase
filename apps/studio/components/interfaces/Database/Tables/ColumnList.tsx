@@ -1,5 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { ChevronLeft, Edit, MoreVertical, Plus, Search, Trash } from 'lucide-react'
@@ -7,13 +6,16 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import useTable from 'hooks/misc/useTable'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
   DropdownMenu,
@@ -35,29 +37,38 @@ const ColumnList = ({
   onEditColumn = noop,
   onDeleteColumn = noop,
 }: ColumnListProps) => {
-  const { id, ref } = useParams()
+  const { id: _id, ref } = useParams()
+  const id = _id ? Number(_id) : undefined
+
+  const { project } = useProjectContext()
+  const {
+    data: selectedTable,
+    error,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+
   const [filterString, setFilterString] = useState<string>('')
-  const { data: selectedTable, error, isError, isLoading, isSuccess } = useTable(Number(id))
-  const isTableEntity = 'live_rows_estimate' in ((selectedTable as PostgresTable) || {})
+  const isTableEntity = isTableLike(selectedTable)
 
   const columns =
     (filterString.length === 0
       ? selectedTable?.columns ?? []
       : selectedTable?.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
 
-  const isLocked = EXCLUDED_SCHEMAS.includes(selectedTable?.schema ?? '')
+  const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
   const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button
-            asChild
-            type="outline"
-            icon={<ChevronLeft size={14} />}
-            style={{ padding: '5px' }}
-          >
+          <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
             <Link href={`/project/${ref}/database/tables`} />
           </Button>
           <Input
@@ -69,32 +80,21 @@ const ColumnList = ({
           />
         </div>
         {!isLocked && isTableEntity && (
-          <div>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button disabled={!canUpdateColumns} icon={<Plus />} onClick={() => onAddColumn()}>
-                  New column
-                </Button>
-              </Tooltip.Trigger>
-              {!canUpdateColumns && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to create columns
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
-          </div>
+          <ButtonTooltip
+            icon={<Plus />}
+            disabled={!canUpdateColumns}
+            onClick={() => onAddColumn()}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canUpdateColumns
+                  ? 'You need additional permissions to create columns'
+                  : undefined,
+              },
+            }}
+          >
+            New column
+          </ButtonTooltip>
         )}
       </div>
 
@@ -121,12 +121,8 @@ const ColumnList = ({
                   <Table.th key="description" className="hidden lg:table-cell">
                     Description
                   </Table.th>,
-                  <Table.th key="type" className="hidden xl:table-cell">
-                    Data Type
-                  </Table.th>,
-                  <Table.th key="format" className="hidden xl:table-cell">
-                    Format
-                  </Table.th>,
+                  <Table.th key="type">Data Type</Table.th>,
+                  <Table.th key="format">Format</Table.th>,
                   <Table.th key="buttons"></Table.th>,
                 ]}
                 body={columns.map((x: any, i: number) => (
@@ -134,7 +130,7 @@ const ColumnList = ({
                     <Table.td>
                       <p>{x.name}</p>
                     </Table.td>
-                    <Table.td className="break-all whitespace-normal">
+                    <Table.td className="break-all whitespace-normal hidden xl:table-cell">
                       {x.comment !== null ? (
                         <p title={x.comment}>{x.comment}</p>
                       ) : (

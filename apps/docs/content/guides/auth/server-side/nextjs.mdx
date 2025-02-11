@@ -122,11 +122,11 @@ export function createClient() {
 ```
 
 ```ts utils/supabase/server.ts
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export function createClient() {
-  const cookieStore = cookies()
+export async function createClient() {
+  const cookieStore = await cookies()
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -247,9 +247,11 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
+  // Do not run code between createServerClient and
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
+
+  // IMPORTANT: DO NOT REMOVE auth.getUser()
 
   const {
     data: { user },
@@ -266,8 +268,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
-  // creating a new response object with NextResponse.next() make sure to:
+  // IMPORTANT: You *must* return the supabaseResponse object as it is.
+  // If you're creating a new response object with NextResponse.next() make sure to:
   // 1. Pass the request in it, like so:
   //    const myNewResponse = NextResponse.next({ request })
   // 2. Copy over the cookies, like so:
@@ -337,7 +339,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 
 export async function login(formData: FormData) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
@@ -357,7 +359,7 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
@@ -378,6 +380,8 @@ export async function signup(formData: FormData) {
 ```
 
 ```ts app/error/page.tsx
+'use client'
+
 export default function ErrorPage() {
   return <p>Sorry, something went wrong</p>
 }
@@ -429,7 +433,7 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get('next') ?? '/'
 
   if (token_hash && type) {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { error } = await supabase.auth.verifyOtp({
       type,
@@ -482,7 +486,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 
 export default async function PrivatePage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
@@ -787,7 +791,7 @@ If you have email confirmation turned on (the default), a new user will receive 
 
 Change the email template to support a server-side authentication flow.
 
-Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In each email template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
+Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
 
 </StepHikeCompact.Details>
 

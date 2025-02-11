@@ -1,25 +1,25 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { PostgresTable } from '@supabase/postgres-meta'
 import { AlignLeft } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import useTable from 'hooks/misc/useTable'
 import { minifyJSON, prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
 import { Button, SidePanel, cn } from 'ui'
 import ActionBar from '../../ActionBar'
+import { isValueTruncated } from '../RowEditor.utils'
 import { DrilldownViewer } from './DrilldownViewer'
 import JsonCodeEditor from './JsonCodeEditor'
 
 interface JsonEditProps {
   row?: { [key: string]: any }
   column: string
-  jsonString: string
   visible: boolean
   backButtonLabel?: string
   applyButtonLabel?: string
@@ -31,7 +31,6 @@ interface JsonEditProps {
 const JsonEdit = ({
   row,
   column,
-  jsonString,
   visible,
   backButtonLabel,
   applyButtonLabel,
@@ -41,14 +40,22 @@ const JsonEdit = ({
 }: JsonEditProps) => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const { data: selectedTable } = useTable(id)
   const project = useSelectedProject()
+
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
 
   const [view, setView] = useState<'edit' | 'view'>('edit')
   const [jsonStr, setJsonStr] = useState('')
-  const isTruncated = jsonString.endsWith('...') && jsonString.length > MAX_CHARACTERS
+  // sometimes the value is a JSON object if it was truncated, then fully loaded from the grid.
+  const value = row?.[column as keyof typeof row] as unknown
+  const jsonString = typeof value === 'object' ? JSON.stringify(value) : (value as string)
+  const isTruncated = isValueTruncated(jsonString)
 
-  const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
+  const { mutate: getCellValue, isLoading, isSuccess, reset } = useGetCellValueMutation()
 
   const validateJSON = async (resolve: () => void) => {
     try {
@@ -67,12 +74,18 @@ const JsonEdit = ({
   }
 
   const loadFullValue = () => {
-    if (selectedTable === undefined || project === undefined || row === undefined) return
-    if ((selectedTable as PostgresTable).primary_keys.length === 0) {
+    if (
+      selectedTable === undefined ||
+      project === undefined ||
+      row === undefined ||
+      !isTableLike(selectedTable)
+    )
+      return
+    if (selectedTable.primary_keys.length === 0) {
       return toast('Unable to load value as table has no primary keys')
     }
 
-    const pkMatch = (selectedTable as PostgresTable).primary_keys.reduce((a, b) => {
+    const pkMatch = selectedTable.primary_keys.reduce((a, b) => {
       return { ...a, [b.name]: (row as any)[b.name] }
     }, {})
 
@@ -98,6 +111,13 @@ const JsonEdit = ({
       setJsonStr(temp)
     }
   }, [visible])
+
+  // reset the mutation when the panel closes. Fixes an issue where the value is truncated if you close and reopen the
+  // panel again
+  const onClose = useCallback(() => {
+    reset()
+    closePanel()
+  }, [reset])
 
   return (
     <SidePanel
@@ -151,11 +171,11 @@ const JsonEdit = ({
         </div>
       }
       visible={visible}
-      onCancel={closePanel}
+      onCancel={onClose}
       customFooter={
         <ActionBar
           hideApply={readOnly}
-          closePanel={closePanel}
+          closePanel={onClose}
           backButtonLabel={backButtonLabel}
           applyButtonLabel={applyButtonLabel}
           applyFunction={readOnly ? undefined : validateJSON}

@@ -1,13 +1,14 @@
 import 'swiper/css'
 
-import React, { useState, useEffect, ReactNode } from 'react'
-import Link from 'next/link'
 import { AnimatePresence, motion, useAnimation } from 'framer-motion'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { Button, IconArrowUpRight } from 'ui'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import { Swiper, SwiperSlide } from 'swiper/react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { ReactNode, useEffect, useState } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button } from 'ui'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { ArrowUpRight } from 'lucide-react'
 
 interface TabProps {
   label: string
@@ -137,7 +138,7 @@ const TimedTabsSection = ({
           </h2>
           <p className="text-foreground-lighter mb-4 max-w-sm">{paragraph}</p>
           {cta && (
-            <Button asChild type="default" size="small" icon={<IconArrowUpRight />}>
+            <Button asChild type="default" size="small" icon={<ArrowUpRight />}>
               <Link href={cta.link}>{cta.label ?? 'Explore more'}</Link>
             </Button>
           )}

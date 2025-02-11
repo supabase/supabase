@@ -174,6 +174,15 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='hsl(0, 0%, 100%)'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E") !important;
   }
 
+  [type='checkbox']:indeterminate {
+    @apply bg-foreground;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='hsl(0, 0%, 100%)'%3E%3Crect x='3' y='7' width='10' height='2'/%3E%3C/svg%3E") !important;
+
+    [data-theme='dark'] & {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='hsl(0, 0%, 0%)'%3E%3Crect x='3' y='7' width='10' height='2'/%3E%3C/svg%3E") !important;
+    }
+  }
+
   [type='checkbox'] {
     @apply cursor-pointer rounded border border-solid;
 
@@ -336,22 +345,6 @@
 .sb-grid-checkbox-editor__input {
   @apply h-4 w-4;
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-/*
-  DateEditor
-*/
-
-.sb-grid-date-editor {
-  @apply h-full w-full px-2;
-}
-
-/*
-  DateTimeEditor
-*/
-
-.sb-grid-datetime-editor {
-  @apply h-full w-full px-2;
 }
 
 /*

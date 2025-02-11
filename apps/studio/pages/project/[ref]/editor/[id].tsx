@@ -4,9 +4,12 @@ import { useRouter } from 'next/router'
 import { useParams } from 'common/hooks'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
-import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  ProjectContextFromParamsProvider,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
-import useTable from 'hooks/misc/useTable'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
@@ -15,7 +18,12 @@ const TableEditorPage: NextPageWithLayout = () => {
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
 
-  const { data: selectedTable, isLoading } = useTable(id)
+  const { project } = useProjectContext()
+  const { data: selectedTable, isLoading } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
 
   return (
     <>
@@ -31,7 +39,7 @@ const TableEditorPage: NextPageWithLayout = () => {
           if (tables.length > 0) {
             router.push(`/project/${projectRef}/editor/${tables[0].id}`)
           } else {
-            router.push(`/project/${projectRef}/editor/`)
+            router.push(`/project/${projectRef}/editor`)
           }
         }}
       />

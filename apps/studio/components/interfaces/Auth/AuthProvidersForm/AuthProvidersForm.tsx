@@ -47,7 +47,7 @@ const AuthProvidersForm = () => {
                   We have detected that you have enabled the email provider with the OTP expiry set
                   to more than an hour. It is recommended to set this value to less than an hour.
                 </p>
-                <Button asChild type="default" className="w-min" icon={<ExternalLink size={14} />}>
+                <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
                   <Link href="https://supabase.com/docs/guides/platform/going-into-prod#security">
                     View security recommendations
                   </Link>

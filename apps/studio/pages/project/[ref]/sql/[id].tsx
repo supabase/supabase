@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 
 import { useParams } from 'common/hooks/useParams'
-import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
+import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
@@ -15,25 +15,21 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useFlag } from 'hooks/ui/useFlag'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import type { NextPageWithLayout } from 'types'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
   const monaco = useMonaco()
-  const { id, ref, content } = useParams()
+  const { id, ref, content, skip } = useParams()
 
   const { project } = useProjectContext()
   const appSnap = useAppStateSnapshot()
-  const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const snippets = useSnippets(ref)
-  const enableFolders = useFlag('sqlFolderOrganization')
+  const allSnippets = useSnippets(ref!)
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
@@ -41,21 +37,23 @@ const SqlEditor: NextPageWithLayout = () => {
     true
   )
 
-  useContentIdQuery(
+  // [Refactor] There's an unnecessary request getting triggered when we start typing while on /new
+  // the URL ID gets updated and we attempt to fetch content for a snippet that's not been created yet
+  const { data } = useContentIdQuery(
     { projectRef: ref, id },
     {
       // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
       // the snapV2 valtio store for some reason hence why the added typeof check here
       retry: false,
-      enabled: Boolean(enableFolders && id !== 'new' && typeof snapV2.addSnippet === 'function'),
-      onSuccess: (data) => {
-        snapV2.addSnippet({ projectRef: ref as string, snippet: data })
-      },
-      onError: () => {
-        // [Joshen] Thinking if we need some error handler - it'll error out here when a new snippet is created from quickstart/templates
-      },
+      enabled: Boolean(id !== 'new' && typeof snapV2.addSnippet === 'function'),
     }
   )
+
+  useEffect(() => {
+    if (ref && data) {
+      snapV2.setSnippet(ref, data as unknown as SnippetWithContent)
+    }
+  }, [ref, data])
 
   async function formatPgsql(value: string) {
     try {
@@ -116,18 +114,25 @@ const SqlEditor: NextPageWithLayout = () => {
     if (pgInfoRef.current === null) {
       pgInfoRef.current = {}
     }
-    pgInfoRef.current.tableColumns = tableColumns?.result
+    pgInfoRef.current.tableColumns = tableColumns
     pgInfoRef.current.schemas = schemas
-    pgInfoRef.current.keywords = keywords?.result
+    pgInfoRef.current.keywords = keywords
     pgInfoRef.current.functions = functions
   }
 
+  // Load the last visited snippet when landing on /new
   useEffect(() => {
-    if (id === 'new' && appSnap.dashboardHistory.sql !== undefined && content === undefined) {
-      const snippet = snippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
+    if (
+      id === 'new' &&
+      skip !== 'true' && // [Joshen] Skip flag implies to skip loading the last visited snippet
+      appSnap.dashboardHistory.sql !== undefined &&
+      content === undefined
+    ) {
+      const snippet = allSnippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
       if (snippet !== undefined) router.push(`/project/${ref}/sql/${appSnap.dashboardHistory.sql}`)
     }
-  }, [id, snippets, content])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, allSnippets, content])
 
   // Enable pgsql format
   useEffect(() => {
@@ -136,12 +141,13 @@ const SqlEditor: NextPageWithLayout = () => {
         async provideDocumentFormattingEdits(model: any) {
           const value = model.getValue()
           const formatted = await formatPgsqlRef.current(value)
-          if (id) snap.setSql(id, formatted)
+          if (id) snapV2.setSql(id, formatted)
           return [{ range: model.getFullModelRange(), text: formatted }]
         },
       })
       return () => formatProvider.dispose()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monaco])
 
   // Register auto completion item provider for pgsql
@@ -166,6 +172,7 @@ const SqlEditor: NextPageWithLayout = () => {
         signatureHelpProvider?.dispose()
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPgInfoReady])
 
   return (

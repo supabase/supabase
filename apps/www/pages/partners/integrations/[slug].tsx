@@ -2,19 +2,20 @@ import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import { CH } from '@code-hike/mdx/components'
 import { ChevronLeft, ExternalLink } from 'lucide-react'
 import { type GetStaticPaths, type GetStaticProps } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
 import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import { NextSeo } from 'next-seo'
+import Image from 'next/image'
+import Link from 'next/link'
 import { type Dispatch, type SetStateAction, useState } from 'react'
 import remarkGfm from 'remark-gfm'
-import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
+import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { useBreakpoint } from 'common'
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
-import { Admonition, Button } from 'ui'
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 
 import ImageModal from '~/components/ImageModal'
@@ -216,7 +217,7 @@ function Partner({
 
 const PartnerDetails = ({ partner }: { partner: Partner }) => {
   const videoThumbnail = partner.video
-    ? `http://img.youtube.com/vi/${partner.video}/0.jpg`
+    ? `https://img.youtube.com/vi/${partner.video}/0.jpg`
     : undefined
 
   return (
@@ -325,7 +326,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     .eq('slug', params!.slug as string)
     .single()
 
-  if (!partner) {
+  if (!partner || partner.type === 'expert') {
     return {
       notFound: true,
     }

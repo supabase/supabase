@@ -1,5 +1,5 @@
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
-import type { User } from 'data/auth/users-query'
+import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import type { User } from 'data/auth/users-infinite-query'
 import { SidePanel } from 'ui'
 
 interface UsersSidePanelProps {

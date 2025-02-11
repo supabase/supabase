@@ -1,13 +1,8 @@
-import React from 'react'
-import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 
 import { data as DevelopersData } from 'data/Developers'
-import { BlogPost } from 'contentlayer/generated'
-
-type Props = {
-  blogPosts?: BlogPost[]
-}
+import blogPosts from '~/.contentlayer/generated/LatestBlogPost/_index.json' with { type: 'json' }
 
 type LinkProps = {
   text: string
@@ -17,7 +12,7 @@ type LinkProps = {
   svg?: any
 }
 
-const DevelopersDropdown = ({ blogPosts }: Props) => (
+const DevelopersDropdown = () => (
   <div className="flex flex-col xl:flex-row">
     <div className="w-[550px] xl:w-[500px] py-8 px-8 bg-background grid gap-3 grid-cols-2">
       {DevelopersData['navigation'].map((column) => (
@@ -32,7 +27,7 @@ const DevelopersDropdown = ({ blogPosts }: Props) => (
                   href={link.url!}
                   className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded focus-visible:ring-foreground-lighter"
                 >
-                  {Icon && <Icon size={16} strokeWidth={1.2} />}
+                  {Icon && <Icon size={16} strokeWidth={1.3} />}
                   <span>{link.text}</span>
                   <ChevronRight
                     strokeWidth={2}
@@ -55,7 +50,7 @@ const DevelopersDropdown = ({ blogPosts }: Props) => (
           <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
         </Link>
         <ul className="flex flex-col gap-5">
-          {blogPosts?.map((post: any) => (
+          {blogPosts?.map((post) => (
             <li key={post.title}>
               <Link
                 href={post.url}

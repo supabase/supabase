@@ -1,4 +1,4 @@
-import clsx from 'clsx'
+import { cn } from 'ui'
 
 interface TwoOptionToggleProps {
   options: any
@@ -31,7 +31,7 @@ const TwoOptionToggle = ({
       <span
         style={{ width, translate: activeOption === options[1] ? '0px' : `${width - 2}px` }}
         aria-hidden="true"
-        className={clsx(
+        className={cn(
           'z-0 inline-block rounded h-full bg-overlay-hover shadow transform',
           'transition-all ease-in-out border border-strong'
         )}
@@ -49,7 +49,7 @@ const TwoOptionToggle = ({
           onClick={() => onClickOption(option)}
         >
           <span
-            className={clsx(
+            className={cn(
               'capitalize hover:text-foreground',
               activeOption === option ? 'text-foreground' : 'text-foreground-light'
             )}

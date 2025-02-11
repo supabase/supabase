@@ -1,6 +1,6 @@
 import { Search } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
@@ -11,12 +11,13 @@ import {
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { BASE_PATH } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { Input } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -25,22 +26,21 @@ import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 const TeamSettings = () => {
-  const { slug } = useParams()
-
   const {
     organizationMembersCreate: organizationMembersCreationEnabled,
     organizationMembersDelete: organizationMembersDeletionEnabled,
   } = useIsFeatureEnabled(['organization_members:create', 'organization_members:delete'])
 
+  const { slug } = useParams()
   const { profile } = useProfile()
   const selectedOrganization = useSelectedOrganization()
   const isOwner = selectedOrganization?.is_owner
 
   const { data: permissions } = usePermissionsQuery()
-  const { data: rolesData } = useOrganizationRolesQuery({ slug })
+  const { data: rolesData } = useOrganizationRolesV2Query({ slug })
   const { data: members } = useOrganizationMembersQuery({ slug })
 
-  const roles = rolesData?.roles ?? []
+  const roles = rolesData?.org_scoped_roles ?? []
 
   const { rolesAddable } = useGetRolesManagementPermissions(
     selectedOrganization?.slug,
@@ -58,7 +58,7 @@ const TeamSettings = () => {
     onSuccess: () => {
       setIsLeaving(false)
       setIsLeaveTeamModalOpen(false)
-      window?.location.replace('/') // Force reload to clear Store
+      window?.location.replace(BASE_PATH) // Force reload to clear Store
     },
     onError: (error) => {
       setIsLeaving(false)
@@ -81,6 +81,7 @@ const TeamSettings = () => {
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="justify-between">
             <Input
+              autoComplete="off"
               icon={<Search size={12} />}
               size="small"
               value={searchString}
@@ -122,13 +123,31 @@ const TeamSettings = () => {
       </ScaffoldContainerLegacy>
 
       <ConfirmationModal
+        size="medium"
         visible={isLeaveTeamModalOpen}
-        title="Are you sure?"
+        title="Confirm to leave organization"
         confirmLabel="Leave"
-        onCancel={() => setIsLeaveTeamModalOpen(false)}
-        onConfirm={() => {
-          leaveTeam()
+        variant="warning"
+        alert={{
+          title: 'All of your user content will be permanently removed.',
+          description: (
+            <div>
+              <p>
+                Leaving the organization will delete all of your saved content in the projects of
+                the organization, which includes:
+              </p>
+              <ul className="list-disc pl-4">
+                <li>
+                  SQL snippets <span className="text-foreground">(both private and shared)</span>
+                </li>
+                <li>Custom reports</li>
+                <li>Log Explorer queries</li>
+              </ul>
+            </div>
+          ),
         }}
+        onCancel={() => setIsLeaveTeamModalOpen(false)}
+        onConfirm={() => leaveTeam()}
       >
         <p className="text-sm text-foreground-light">
           Are you sure you want to leave this organization? This is permanent.

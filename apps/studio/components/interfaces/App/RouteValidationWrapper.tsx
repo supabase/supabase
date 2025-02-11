@@ -1,12 +1,11 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useIsLoggedIn, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import useLatest from 'hooks/misc/useLatest'
-import { useFlag } from 'hooks/ui/useFlag'
 import { DEFAULT_HOME, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 
@@ -14,7 +13,6 @@ import { useAppStateSnapshot } from 'state/app-state'
 const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref, slug, id } = useParams()
-  const navLayoutV2 = useFlag('navigationLayoutV2')
 
   const isLoggedIn = useIsLoggedIn()
   const snap = useAppStateSnapshot()
@@ -56,7 +54,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
       if (!isValidOrg) {
         toast.error('This organization does not exist')
-        router.push(navLayoutV2 ? `/org/${organizations[0].slug}` : DEFAULT_HOME)
+        router.push(DEFAULT_HOME)
         return
       }
     }
@@ -81,7 +79,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
       if (!isValidProject && !isValidBranch) {
         toast.error('This project does not exist')
-        router.push(navLayoutV2 ? `/org/${organizations?.[0].slug}` : DEFAULT_HOME)
+        router.push(DEFAULT_HOME)
         return
       }
     }

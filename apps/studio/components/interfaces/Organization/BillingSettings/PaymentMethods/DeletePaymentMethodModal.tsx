@@ -1,9 +1,10 @@
 import { useParams } from 'common'
-import toast from 'react-hot-toast'
-import { Alert, Button, Modal } from 'ui'
+import { toast } from 'sonner'
+import { Button, Modal } from 'ui'
 
 import { useOrganizationPaymentMethodDeleteMutation } from 'data/organizations/organization-payment-method-delete-mutation'
 import type { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
+import { Admonition } from 'ui-patterns'
 
 export interface DeletePaymentMethodModalProps {
   selectedPaymentMethod?: OrganizationPaymentMethod
@@ -55,9 +56,11 @@ const DeletePaymentMethodModal = ({
       }
     >
       <Modal.Content>
-        <Alert withIcon variant="info" title="This will permanently delete your payment method.">
-          <p>You can re-add the payment method any time.</p>
-        </Alert>
+        <Admonition
+          type="default"
+          title="This will permanently delete your payment method."
+          description="You can re-add the payment method any time."
+        />
       </Modal.Content>
     </Modal>
   )

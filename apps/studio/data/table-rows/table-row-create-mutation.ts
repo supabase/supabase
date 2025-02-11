@@ -1,18 +1,17 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { Query } from 'components/grid/query/Query'
-import type { SupaTable } from 'components/grid/types'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
+import { tableRowKeys } from './keys'
 
 export type TableRowCreateVariables = {
   projectRef: string
   connectionString?: string
-  table: SupaTable
+  table: { id: number; name: string; schema?: string }
   payload: any
   enumArrayColumns: string[]
   returning?: boolean
@@ -75,7 +74,7 @@ export const useTableRowCreateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef, table } = variables
-        await queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name]))
+        await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

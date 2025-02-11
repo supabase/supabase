@@ -23,7 +23,7 @@ import {
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
-} from 'ui-patterns'
+} from 'ui-patterns/InnerSideMenu'
 import BucketRow from './BucketRow'
 
 const StorageMenu = () => {
@@ -37,7 +37,7 @@ const StorageMenu = () => {
   const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
   const [selectedBucketToEmpty, setSelectedBucketToEmpty] = useState<StorageBucket>()
   const [selectedBucketToDelete, setSelectedBucketToDelete] = useState<StorageBucket>()
-  const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'created-at'>(
     'storage-explorer-sort',
@@ -72,14 +72,16 @@ const StorageMenu = () => {
           <ButtonTooltip
             block
             type="default"
-            icon={<Edit size={14} />}
+            icon={<Edit />}
             disabled={!canCreateBuckets}
             style={{ justifyContent: 'start' }}
             onClick={() => setShowCreateBucketModal(true)}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'You need additional permissions to create buckets',
+                text: !canCreateBuckets
+                  ? 'You need additional permissions to create buckets'
+                  : undefined,
               },
             }}
           >

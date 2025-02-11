@@ -1,16 +1,16 @@
-import { PostgresTable } from '@supabase/postgres-meta'
 import { isNil } from 'lodash'
 import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useTrackedState } from 'components/grid/store/Store'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import useTable from 'hooks/misc/useTable'
 import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
 import { Popover, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import { BlockKeys } from '../common/BlockKeys'
@@ -56,8 +56,13 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   const state = useTrackedState()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const { data: selectedTable } = useTable(id)
   const project = useSelectedProject()
+
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
 
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
   const initialValue = row[column.key as keyof TRow] as string
@@ -73,12 +78,12 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
 
   const loadFullValue = () => {
-    if (selectedTable === undefined || project === undefined) return
-    if ((selectedTable as PostgresTable).primary_keys.length === 0) {
+    if (selectedTable === undefined || project === undefined || !isTableLike(selectedTable)) return
+    if (selectedTable.primary_keys.length === 0) {
       return toast('Unable to load value as table has no primary keys')
     }
 
-    const pkMatch = (selectedTable as PostgresTable).primary_keys.reduce((a, b) => {
+    const pkMatch = selectedTable.primary_keys.reduce((a, b) => {
       return { ...a, [b.name]: (row as any)[b.name] }
     }, {})
 

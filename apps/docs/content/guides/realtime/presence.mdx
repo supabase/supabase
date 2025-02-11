@@ -83,22 +83,6 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 ```
 
 </TabPanel>
-<TabPanel id="dart" label="Dart">
-
-```dart
-void main() {
-  Supabase.initialize(
-    url: 'https://<project>.supabase.co',
-    anonKey: '<your-anon-key>',
-  );
-
-  runApp(MyApp());
-}
-
-final supabase = Supabase.instance.client;
-```
-
-</TabPanel>
 </Tabs>
 
 ### Sync and track state

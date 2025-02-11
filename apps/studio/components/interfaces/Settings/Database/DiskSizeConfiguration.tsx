@@ -3,8 +3,7 @@ import dayjs from 'dayjs'
 import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { SetStateAction } from 'react'
-import toast from 'react-hot-toast'
-import { number, object } from 'yup'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -20,7 +19,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { formatBytes } from 'lib/helpers'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, InfoIcon } from 'ui'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean
@@ -50,13 +49,12 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   })
 
   const { data: projectSubscriptionData } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const { mutate: updateProjectUsage, isLoading: isUpdatingDiskSize } =
-    useProjectDiskResizeMutation({
-      onSuccess: (res, variables) => {
-        toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
-        setShowIncreaseDiskSizeModal(false)
-      },
-    })
+  const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
+    onSuccess: (_, variables) => {
+      toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
+      setShowIncreaseDiskSizeModal(false)
+    },
+  })
 
   const currentDiskSize = project?.volumeSizeGb ?? 0
 
@@ -64,7 +62,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const databaseSizeBytesUsed = data?.result[0].db_size ?? 0
+  const databaseSizeBytesUsed = data ?? 0
 
   return (
     <div id="diskManagement">
@@ -155,7 +153,7 @@ Read more about [disk management](https://supabase.com/docs/guides/platform/data
         </div>
       ) : (
         <Alert_Shadcn_>
-          <Info size={16} />
+          <InfoIcon />
           <AlertTitle_Shadcn_>
             {projectSubscriptionData?.plan?.id === 'free'
               ? 'Disk size configuration is not available for projects on the Free Plan'

@@ -1,9 +1,10 @@
-import React, { FC } from 'react'
-import Image from 'next/image'
-import { useRouter } from 'next/router'
+import { ArrowUpRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { Button, IconArrowUpRight, cn } from 'ui'
+import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { FC } from 'react'
+import { Button, cn } from 'ui'
 import CostControlAnimation from './CostControlAnimation'
 
 const addons = [
@@ -95,7 +96,7 @@ const AddonCard = ({ addon }: any) => {
             asChild
             size="tiny"
             type="default"
-            iconRight={<IconArrowUpRight className="w-4 h-4" />}
+            iconRight={<ArrowUpRight className="w-4 h-4" />}
           >
             <Link href={addon.ctaLink} target={addon.ctaTarget}>
               {addon.ctaText}
@@ -141,7 +142,7 @@ const AddonCard = ({ addon }: any) => {
         </div>
       </div>
       <div className="absolute right-0 flex justify-end p-4">
-        <IconArrowUpRight className="w-5 h-5 text-foreground-lighter group-hover:text-foreground transition-colors" />
+        <ArrowUpRight className="w-5 h-5 text-foreground-lighter group-hover:text-foreground transition-colors" />
       </div>
     </>
   )

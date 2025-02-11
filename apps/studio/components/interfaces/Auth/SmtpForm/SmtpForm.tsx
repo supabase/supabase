@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { number, object, string } from 'yup'
 
 import { Markdown } from 'components/interfaces/Markdown'
@@ -19,9 +19,6 @@ import {
   Alert_Shadcn_,
   Button,
   Form,
-  IconAlertTriangle,
-  IconEye,
-  IconEyeOff,
   Input,
   InputNumber,
   Toggle,
@@ -31,6 +28,8 @@ import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
+import { AlertTriangle, Eye, EyeOff } from 'lucide-react'
+import Link from 'next/link'
 
 const SmtpForm = () => {
   const { ref: projectRef } = useParams()
@@ -78,7 +77,7 @@ const SmtpForm = () => {
       },
       then: (schema) =>
         schema
-          .matches(urlRegex, 'Must be a valid URL or IP address')
+          .matches(urlRegex({ excludeSimpleDomains: false }), 'Must be a valid URL or IP address')
           .required('Host URL is required.'),
       otherwise: (schema) => schema,
     }),
@@ -220,17 +219,24 @@ const SmtpForm = () => {
                     // @ts-ignore
                     onChange={(value: boolean) => setEnableSmtp(value)}
                     descriptionText={
-                      <Markdown
-                        className="max-w-full [&>p]:text-foreground-lighter"
-                        content={`Emails will be sent using your custom SMTP provider. Email rate limits can be adjusted [here](/dashboard/project/${projectRef}/auth/rate-limits).`}
-                      />
+                      <p className="max-w-full prose text-sm text-foreground-lighter">
+                        Emails will be sent using your custom SMTP provider. Email rate limits can
+                        be adjusted{' '}
+                        <Link
+                          className="underline"
+                          href={`/project/${projectRef}/auth/rate-limits`}
+                        >
+                          here
+                        </Link>
+                        .
+                      </p>
                     }
                   />
                   {enableSmtp ? (
                     !isValidSmtpConfig && (
                       <div className="">
                         <Alert_Shadcn_ variant="warning">
-                          <IconAlertTriangle strokeWidth={2} />
+                          <AlertTriangle strokeWidth={2} />
                           <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
                           <AlertDescription_Shadcn_>
                             The following fields must be filled before custom SMTP can be properly
@@ -287,7 +293,7 @@ const SmtpForm = () => {
                 <FormSectionContent loading={isLoading}>
                   {values['SMTP_HOST'] && values['SMTP_HOST'].endsWith('.gmail.com') && (
                     <Alert_Shadcn_ variant="warning">
-                      <IconAlertTriangle strokeWidth={2} />
+                      <AlertTriangle strokeWidth={2} />
                       <AlertTitle_Shadcn_>Check your SMTP provider</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
                         Not all SMTP providers are designed for the email sending required by
@@ -347,7 +353,7 @@ const SmtpForm = () => {
                     placeholder={authConfig?.SMTP_PASS === null ? 'SMTP Password' : '••••••••'}
                     actions={
                       <Button
-                        icon={hidden ? <IconEye /> : <IconEyeOff />}
+                        icon={hidden ? <Eye /> : <EyeOff />}
                         type="default"
                         onClick={() => setHidden(!hidden)}
                       />

@@ -70,8 +70,16 @@ const TreeViewItem = forwardRef<
     useEffect(() => {
       if (isEditing) {
         inputRef.current?.focus()
+      } else {
+        setLocalValueState(name)
       }
     }, [isEditing])
+
+    useEffect(() => {
+      if (!isLoading) {
+        setLocalValueState(name)
+      }
+    }, [isLoading])
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
@@ -229,4 +237,4 @@ const TreeViewFolderIcon = forwardRef<SVGSVGElement, LucideSVGProps & { isOpen?:
   }
 )
 
-export { TreeView, TreeViewFolderIcon, TreeViewItem, flattenTree }
+export { TreeView, TreeViewFolderIcon, TreeViewItem, flattenTree, SQL_ICON }

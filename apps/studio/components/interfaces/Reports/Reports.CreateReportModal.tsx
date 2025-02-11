@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useContentInsertMutation } from 'data/content/content-insert-mutation'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -21,7 +21,7 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
   const { mutate: insertReport, isLoading: isCreating } = useContentInsertMutation({
     onSuccess: (data) => {
       toast.success('Successfully created new report')
-      const newReportId = data[0].id
+      const newReportId = data.id
       router.push(`/project/${ref}/reports/${newReportId}`)
       afterSubmit()
     },

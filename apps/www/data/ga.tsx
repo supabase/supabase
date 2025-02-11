@@ -1,5 +1,6 @@
 import { KeyIcon, RewindIcon, ShieldCheckIcon, UserGroupIcon } from '@heroicons/react/outline'
-import { IconActivity, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
+import { Activity } from 'lucide-react'
+import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
 
 export const data = (isDark: boolean) => ({
   hero: {
@@ -226,7 +227,7 @@ We'll continue to expand the Supabase Enterprise offering to include more deploy
       },
       {
         text: 'HIPAA',
-        icon: <IconActivity strokeWidth={1} className="text-foreground-lighter w-6" />,
+        icon: <Activity strokeWidth={1} className="text-foreground-lighter w-6" />,
       },
       {
         text: 'Data Encryption',

@@ -5,8 +5,8 @@ import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
   getColumnDefaultWidth,
 } from 'components/grid/utils/gridColumns'
+import { Key } from 'lucide-react'
 import DataGrid, { Column } from 'react-data-grid'
-import { IconKey } from 'ui'
 
 export interface SelectorGridProps {
   table: SupaTable
@@ -21,7 +21,7 @@ const columnRender = (name: string, isPrimaryKey = false) => {
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
             <div className="text-brand">
-              <IconKey size="tiny" strokeWidth={2} />
+              <Key size={14} strokeWidth={2} />
             </div>
           </Tooltip.Trigger>
           <Tooltip.Portal>

@@ -3,6 +3,7 @@ id: 'nextjs-pages'
 title: 'Supabase Auth with Next.js Pages Directory'
 description: 'Authentication helpers for Next.js API routes, middleware, and SSR in the Pages Directory.'
 sidebar_label: 'Next.js (pages)'
+sitemapPriority: 0.5
 ---
 
 <Admonition type="caution">
@@ -663,7 +664,7 @@ For authentication methods that have a `redirectTo` or `emailRedirectTo`, this m
 
 ```jsx
 supabase.auth.signUp({
-  email: 'jon@example.com',
+  email: 'valid.email@supabase.io',
   password: 'sup3rs3cur3',
   options: {
     emailRedirectTo: 'http://localhost:3000/auth/callback',

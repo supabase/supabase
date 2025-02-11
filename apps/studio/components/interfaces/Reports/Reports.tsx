@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { groupBy, isNull } from 'lodash'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
@@ -34,7 +34,10 @@ const Reports = () => {
   const [endDate, setEndDate] = useState<any>(null)
   const [hasEdits, setHasEdits] = useState<any>(false)
 
-  const { data: userContents, isLoading } = useContentQuery(ref)
+  const { data: userContents, isLoading } = useContentQuery({
+    projectRef: ref,
+    type: 'report',
+  })
   const { mutate: saveReport, isLoading: isSaving } = useContentUpdateMutation({
     onSuccess: () => {
       setHasEdits(false)

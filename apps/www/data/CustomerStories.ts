@@ -1,4 +1,73 @@
-export const data = [
+export type CustomerStoryType = {
+  type: 'Customer Story'
+  title: string
+  description: string
+  organization: string
+  imgUrl: string
+  logo: string
+  logo_inverse?: string
+  url: string
+  ctaText?: string
+  path?: string
+  postMeta?: {
+    name: string
+    avatarUrl: string
+    publishDate: string
+    readLength: number
+  }
+}
+
+export const data: CustomerStoryType[] = [
+  {
+    type: 'Customer Story',
+    title:
+      "Maergo's Express Delivery: How Supabase Helped Achieve Scalability, Speed, and Cost Saving",
+    description:
+      'Discover how Maergo, a nationwide expedited parcel delivery service, reduced its codebase by 90%, decreased deployment times to just seconds, and achieved unprecedented scalability with Supabase.',
+    organization: 'Maergo',
+    imgUrl: 'images/customers/logos/maergo.png',
+    logo: '/images/customers/logos/maergo.png',
+    logo_inverse: '/images/customers/logos/light/maergo.png',
+    url: '/customers/maergo',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
+    title: 'Streamlining Success: How Tinloof Scaled Seamlessly with Supabase',
+    description:
+      'Discover Tinloof, how a full-stack development agency, managed and scaled backend services using Supabase, without having to dedicate resources to infrastructure management.',
+    organization: 'Tinloof',
+    imgUrl: 'images/customers/logos/tinloof.png',
+    logo: '/images/customers/logos/tinloof.png',
+    logo_inverse: '/images/customers/logos/light/tinloof.png',
+    url: '/customers/tinloof',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
+    title: 'HappyTeams unlocks better performance and reduces cost with Supabase.',
+    description:
+      'How a bootstrapped startup migrated from Heroku to Supabase in 30 minutes and never looked back.',
+    organization: 'HappyTeams',
+    imgUrl: 'images/customers/logos/happyteams.png',
+    logo: '/images/customers/logos/happyteams.png',
+    logo_inverse: '/images/customers/logos/light/happyteams.png',
+    url: '/customers/happyteams',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
+    title:
+      'How Mobbin migrated 200,000 users from Firebase for a better authentication experience.',
+    description:
+      'Mobbin helps over 200,000 creators globally search and view the latest design patterns from well-known apps.',
+    organization: 'Mobbin',
+    imgUrl: 'images/customers/logos/shotgun.png',
+    logo: '/images/customers/logos/mobbin.png',
+    logo_inverse: '/images/customers/logos/light/mobbin.png',
+    url: '/customers/mobbin',
+    ctaText: 'View story',
+  },
   {
     type: 'Customer Story',
     title: 'Supabase migration drives shotgun to an 83% reduction in data infrastructure costs',

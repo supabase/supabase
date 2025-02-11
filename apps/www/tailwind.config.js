@@ -9,7 +9,7 @@ module.exports = config({
     './lib/mdx/mdxComponents.tsx',
     './pages/**/*.{tsx,mdx}',
     './../../packages/ui/src/**/*.{tsx,ts,js}',
-    './../../packages/ui-patterns/**/*.{tsx,ts,js}',
+    './../../packages/ui-patterns/!(node_modules)/**/*.{tsx,ts,js}',
   ],
   theme: {
     extend: {
@@ -33,6 +33,10 @@ module.exports = config({
         marquee: {
           '0%': { transform: 'translateX(0%)' },
           '100%': { transform: 'translateX(-100%)' },
+        },
+        'marquee-reverse': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0%)' },
         },
         'marquee-vertical': {
           '0%': { transform: 'translateY(0%)' },

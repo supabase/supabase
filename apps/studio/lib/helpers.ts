@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 export { default as passwordStrength } from './password-strength'
 export { default as uuidv4 } from './uuid'
@@ -275,7 +275,14 @@ export const getDistanceLatLonKM = (lat1: number, lon1: number, lat2: number, lo
   return d
 }
 
-const currencyFormatter = Intl.NumberFormat('en-US', {
+const currencyFormatterDefault = Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
+const currencyFormatterSmallValues = Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
   minimumFractionDigits: 0,
@@ -284,7 +291,9 @@ const currencyFormatter = Intl.NumberFormat('en-US', {
 export const formatCurrency = (amount: number | undefined | null): string | null => {
   if (amount === undefined || amount === null) {
     return null
+  } else if (amount < 0.01) {
+    return currencyFormatterSmallValues.format(amount)
   } else {
-    return currencyFormatter.format(amount)
+    return currencyFormatterDefault.format(amount)
   }
 }

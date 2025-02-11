@@ -8,6 +8,7 @@ import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { LintEntity, NoIssuesFound, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import { Lint } from 'data/lint/lint-query'
+import { useRouter } from 'next/router'
 import {
   Button,
   ResizableHandle,
@@ -19,9 +20,8 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { EntityTypeIcon, LintCTA, LintCategoryBadge } from './Linter.utils'
-import { useRouter } from 'next/router'
 
 interface LinterDataGridProps {
   isLoading: boolean
@@ -181,7 +181,7 @@ const LinterDataGrid = ({
             <Button
               type="text"
               className="absolute top-3 right-3 px-1"
-              icon={<X size={14} />}
+              icon={<X />}
               onClick={handleSidepanelClose}
             />
 

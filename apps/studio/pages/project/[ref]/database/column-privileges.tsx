@@ -1,8 +1,8 @@
 import { useParams } from 'common'
-import { XIcon } from 'lucide-react'
+import { AlertCircle, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
@@ -18,6 +18,7 @@ import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { PgRole, useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
@@ -26,17 +27,10 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconExternalLink,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 
@@ -139,7 +133,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const table = tableList?.find(
     (table) => table.schema === selectedSchema && table.name === selectedTable
   )
-  const isLocked = EXCLUDED_SCHEMAS.includes(selectedSchema)
+  const isLocked = PROTECTED_SCHEMAS.includes(selectedSchema)
 
   const {
     tableCheckedStates,
@@ -234,24 +228,14 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 <p>Grant or revoke privileges on a column based on user role.</p>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                <a
-                  href="https://supabase.com/docs/guides/auth/column-level-security"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Documentation
-                </a>
-              </Button>
-            </div>
+            <DocsButton href="https://supabase.com/docs/guides/auth/column-level-security" />
           </div>
 
           {isEnabled ? (
             <>
               {!diffWarningDismissed && (
                 <Alert_Shadcn_ variant="warning">
-                  <IconAlertCircle strokeWidth={2} />
+                  <AlertCircle strokeWidth={2} />
                   <AlertTitle_Shadcn_>
                     Changes to column privileges will not be reflected in migrations when running{' '}
                     <code className="text-xs">supabase db diff</code>.
@@ -276,7 +260,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
               {!selectStarWarningDismissed && (
                 <Alert_Shadcn_ variant="warning">
-                  <IconAlertCircle strokeWidth={2} />
+                  <AlertCircle strokeWidth={2} />
                   <AlertTitle_Shadcn_>
                     Changing column privileges can break existing queries.
                   </AlertTitle_Shadcn_>

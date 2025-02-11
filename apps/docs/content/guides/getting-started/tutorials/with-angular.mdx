@@ -25,7 +25,7 @@ We can use the [Angular CLI](https://angular.io/cli) to initialize
 an app called `supabase-angular`:
 
 ```bash
-npx ng new supabase-angular --routing false --style css
+npx ng new supabase-angular --routing false --style css --standalone false
 cd supabase-angular
 ```
 
@@ -35,11 +35,11 @@ Then let's install the only additional dependency: [supabase-js](https://github.
 npm install @supabase/supabase-js
 ```
 
-And finally we want to save the environment variables in the `environment.ts` file.
+And finally we want to save the environment variables in the `src/environments/environment.ts` file.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```ts environment.ts
+```ts src/environments/environment.ts
 export const environment = {
   production: false,
   supabaseUrl: 'YOUR_SUPABASE_URL',
@@ -59,7 +59,7 @@ import {
   SupabaseClient,
   User,
 } from '@supabase/supabase-js'
-import { environment } from 'src/environments/environment'
+import { environment } from '../environments/environment'
 
 export interface Profile {
   id?: string

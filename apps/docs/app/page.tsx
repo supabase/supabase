@@ -1,9 +1,10 @@
 import { type Metadata, type ResolvingMetadata } from 'next'
 import Link from 'next/link'
-import { IconBackground, TextLink } from 'ui'
+import { cn, IconBackground, TextLink } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
 
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
+import { MIGRATION_PAGES } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { GlassPanelWithIconPicker } from '~/features/ui/GlassPanelWithIconPicker'
 import { IconPanelWithIconPicker } from '~/features/ui/IconPanelWithIconPicker'
 import HomeLayout from '~/layouts/HomeLayout'
@@ -28,6 +29,7 @@ const products = [
     href: '/guides/database/overview',
     description:
       'Supabase provides a full Postgres database for every project with Realtime functionality, database backups, extensions, and more.',
+    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Auth',
@@ -36,6 +38,7 @@ const products = [
     href: '/guides/auth',
     description:
       'Add and manage email and password, passwordless, OAuth, and mobile logins to your project through a suite of identity providers and APIs.',
+    span: 'col-span-12 md:col-span-6',
   },
   {
     title: 'Storage',
@@ -44,13 +47,6 @@ const products = [
     href: '/guides/storage',
     description:
       'Store, organize, transform, and serve large files—fully integrated with your Postgres database with Row Level Security access policies.',
-  },
-  {
-    title: 'AI & Vectors',
-    icon: 'ai',
-    hasLightIcon: true,
-    href: '/guides/ai',
-    description: 'Use Supabase to store and search embedding vectors.',
   },
   {
     title: 'Realtime',
@@ -70,56 +66,24 @@ const products = [
   },
 ]
 
-const migrationGuides = [
+const postgresIntegrations = [
   {
-    title: 'Auth',
-    icon: '/docs/img/icons/auth0-icon',
-    href: '/guides/resources/migrating-to-supabase/auth0',
+    title: 'AI & Vectors',
+    icon: 'ai',
+    href: '/guides/ai',
+    description: 'AI toolkit to manage embeddings',
   },
   {
-    title: 'Firebase Auth',
-    icon: '/docs/img/icons/firebase-icon',
-    href: '/guides/resources/migrating-to-supabase/firebase-auth',
+    title: 'Cron',
+    icon: 'cron',
+    href: '/guides/cron',
+    description: 'Schedule and monitor recurring Jobs',
   },
   {
-    title: 'Firestore Data',
-    icon: '/docs/img/icons/firebase-icon',
-    href: '/guides/resources/migrating-to-supabase/firestore-data',
-  },
-  {
-    title: 'Firebase Storage',
-    icon: '/docs/img/icons/firebase-icon',
-    href: '/guides/resources/migrating-to-supabase/firebase-storage',
-  },
-  {
-    title: 'Heroku',
-    icon: '/docs/img/icons/heroku-icon',
-    href: '/guides/resources/migrating-to-supabase/heroku',
-  },
-  {
-    title: 'Render',
-    icon: '/docs/img/icons/render-icon',
-    href: '/guides/resources/migrating-to-supabase/render',
-  },
-  {
-    title: 'Amazon RDS',
-    icon: '/docs/img/icons/aws-rds-icon',
-    href: '/guides/resources/migrating-to-supabase/amazon-rds',
-  },
-  {
-    title: 'Postgres',
-    icon: '/docs/img/icons/postgres-icon',
-    href: '/guides/resources/migrating-to-supabase/postgres',
-  },
-  {
-    title: 'MySQL',
-    icon: '/docs/img/icons/mysql-icon',
-    href: '/guides/resources/migrating-to-supabase/mysql',
-  },
-  {
-    title: 'MSSQL',
-    icon: '/docs/img/icons/mssql-icon',
-    href: '/guides/resources/migrating-to-supabase/mssql',
+    title: 'Queues',
+    icon: 'queues',
+    href: '/guides/queues',
+    description: 'Durable Message Queues with guaranteed delivery',
   },
 ]
 
@@ -213,7 +177,7 @@ const HomePage = () => (
       <ul className="grid grid-cols-12 gap-6 not-prose [&_svg]:text-brand-600">
         {products.map((product) => {
           return (
-            <li key={product.title} className="col-span-12 md:col-span-4">
+            <li key={product.title} className={cn(product.span ?? 'col-span-12 md:col-span-4')}>
               <Link href={product.href} passHref>
                 <GlassPanelWithIconPicker {...product}>
                   {product.description}
@@ -223,6 +187,26 @@ const HomePage = () => (
           )
         })}
       </ul>
+
+      <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
+        <div className="col-span-4">
+          <h2 id="postgres-integrations" className="scroll-mt-24 m-0">
+            Postgres Modules
+          </h2>
+        </div>
+        <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+          {postgresIntegrations.map((integration) => (
+            <Link
+              href={integration.href}
+              key={integration.title}
+              passHref
+              className="col-span-6 md:col-span-4"
+            >
+              <IconPanelWithIconPicker {...integration} />
+            </Link>
+          ))}
+        </div>
+      </div>
 
       <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
         <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
@@ -267,11 +251,11 @@ const HomePage = () => (
         </div>
 
         <ul className="grid col-span-8 grid-cols-12 gap-6 not-prose">
-          {migrationGuides.map((guide) => {
+          {MIGRATION_PAGES.map((guide) => {
             return (
-              <li key={guide.title} className="col-span-6 md:col-span-4">
-                <Link href={guide.href} passHref>
-                  <IconPanel {...guide} background={true} showLink={false} />
+              <li key={guide.name} className="col-span-6 md:col-span-4">
+                <Link href={guide.url} passHref>
+                  <IconPanel {...guide} title={guide.name} background={true} showLink={false} />
                 </Link>
               </li>
             )

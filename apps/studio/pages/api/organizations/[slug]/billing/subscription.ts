@@ -38,7 +38,6 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>
     scheduled_plan_change: null,
     customer_balance: 0,
     nano_enabled: false,
-    usage_based_billing_project_addons: false,
   }
 
   return res.status(200).json(response)

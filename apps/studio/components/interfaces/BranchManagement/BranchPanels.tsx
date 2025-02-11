@@ -15,8 +15,8 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode, useState } from 'react'
-import toast from 'react-hot-toast'
 import { useInView } from 'react-intersection-observer'
+import { toast } from 'sonner'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBranchQuery } from 'data/branches/branch-query'
@@ -37,6 +37,7 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
+import WorkflowLogs from './WorkflowLogs'
 
 interface BranchManagementSectionProps {
   header: string
@@ -112,10 +113,6 @@ export const BranchRow = ({
 
   const createPullRequestURL =
     generateCreatePullRequestURL?.(branch.git_branch) ?? 'https://github.com'
-
-  const shouldRenderLogsButton =
-    branch.pr_number !== undefined && branch.latest_check_run_id !== undefined
-  const checkRunLogsURL = `https://github.com/${repo}/pull/${branch.pr_number}/checks?check_run_id=${branch.latest_check_run_id}`
 
   const { ref, inView } = useInView()
   const { data } = useBranchQuery(
@@ -228,6 +225,7 @@ export const BranchRow = ({
                     View Repository
                   </Link>
                 </Button>
+                <WorkflowLogs projectRef={branch.project_ref} />
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
                     <Button type="text" icon={<MoreVertical />} className="px-1" />
@@ -274,15 +272,7 @@ export const BranchRow = ({
                 </Button>
               </div>
             )}
-
-            {shouldRenderLogsButton && (
-              <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
-                <Link passHref target="_blank" rel="noreferrer" href={checkRunLogsURL}>
-                  View Logs
-                </Link>
-              </Button>
-            )}
-
+            <WorkflowLogs projectRef={branch.project_ref} />
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button type="text" icon={<MoreVertical />} className="px-1" />

@@ -1,16 +1,15 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { ExternalLink, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
 
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
+import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import Policies from 'components/interfaces/Auth/Policies/Policies'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -19,9 +18,9 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import type { NextPageWithLayout } from 'types'
-import { Button, Input } from 'ui'
+import { Input } from 'ui'
 
 /**
  * Filter tables by table name and policy name
@@ -65,7 +64,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   }>()
   const { schema = 'public', search: searchString = '' } = params
   const { project } = useProjectContext()
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
@@ -77,7 +75,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   })
   const [protectedSchemas] = partition(
     schemas,
-    (schema) => schema?.name !== 'realtime' && EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    (schema) => schema?.name !== 'realtime' && PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const selectedSchema = schemas?.find((s) => s.name === schema)
   const isLocked = protectedSchemas.some((s) => s.id === selectedSchema?.id)
@@ -101,9 +99,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const filteredTables = onFilterTables(tables ?? [], policies ?? [], searchString)
   const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
-  const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
   const isPermissionsLoaded = usePermissionsLoaded()
-  const schemaHasNoTables = (tables ?? []).length === 0
 
   if (isPermissionsLoaded && !canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />
@@ -115,8 +111,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <SchemaSelector
-              className="w-[260px]"
-              size="small"
+              className="w-[180px]"
+              size="tiny"
               showError={false}
               selectedSchemaName={schema}
               onSelectSchema={(schema) => {
@@ -124,9 +120,9 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               }}
             />
             <Input
-              size="small"
+              size="tiny"
               placeholder="Filter tables and policies"
-              className="block w-64 text-sm placeholder-border-muted"
+              className="block w-52 text-sm placeholder-border-muted"
               value={searchString || ''}
               onChange={(e) => {
                 const str = e.target.value
@@ -135,37 +131,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               icon={<Search size={14} />}
             />
           </div>
-          <div className="flex items-center gap-x-2">
-            <Button type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />} asChild>
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
-              >
-                Documentation
-              </a>
-            </Button>
-
-            {isAiAssistantEnabled && (
-              <ButtonTooltip
-                type="primary"
-                disabled={!canCreatePolicies || schemaHasNoTables}
-                onClick={() => setShowPolicyAiEditor(true)}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canCreatePolicies
-                      ? 'You need additional permissions to create RLS policies'
-                      : schemaHasNoTables
-                        ? `No table in schema ${schema} to create policies on`
-                        : undefined,
-                  },
-                }}
-              >
-                Create a new policy
-              </ButtonTooltip>
-            )}
-          </div>
+          <DocsButton href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security" />
         </div>
       </div>
 
@@ -180,8 +146,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           hasTables={tables.length > 0}
           isLocked={isLocked}
           onSelectCreatePolicy={(table: string) => {
-            setShowPolicyAiEditor(true)
             setSelectedTable(table)
+            setShowPolicyAiEditor(true)
           }}
           onSelectEditPolicy={(policy) => {
             setSelectedPolicyToEdit(policy)
@@ -190,7 +156,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         />
       )}
 
-      <AIPolicyEditorPanel
+      <PolicyEditorPanel
         visible={showPolicyAiEditor}
         schema={schema}
         searchString={searchString}

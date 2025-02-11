@@ -1,16 +1,17 @@
 import matter from 'gray-matter'
+import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
 
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Button, IconChevronRight, IconExternalLink, IconChevronLeft } from 'ui'
+import { Button } from 'ui'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
+import { SITE_ORIGIN } from '~/lib/constants'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
-import { SITE_ORIGIN } from '~/lib/constants'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -114,31 +115,30 @@ function CaseStudyPage(props: any) {
       <DefaultLayout>
         <div
           className="
-            container mx-auto px-8 py-16 sm:px-16
+            container mx-auto p-8 sm:py-16 sm:px-16
             xl:px-20
           "
         >
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 mb-2 xl:col-span-2">
+            <div className="hidden xl:block col-span-12 mb-2 xl:col-span-2">
               {/* Back button */}
               <Link
                 href="/customers"
                 className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
               >
-                <IconChevronLeft style={{ padding: 0 }} />
+                <ChevronLeft style={{ padding: 0 }} />
                 Back
               </Link>
             </div>
 
-            <div
-              className="col-span-12 lg:col-span-8
-
-          "
-            >
+            <div className="col-span-12 lg:col-span-8">
               <div>
                 <article className="flex flex-col gap-8">
-                  <div className="flex flex-col gap-8 max-w-xxl">
-                    <Link href="/customers" className="text-brand hover:text-brand-600 mb-2 mt-0">
+                  <div className="flex flex-col gap-4 sm:gap-8 max-w-xxl">
+                    <Link
+                      href="/customers"
+                      className="text-brand hover:text-brand-600 sm:mb-2 mt-0"
+                    >
                       Customer Stories
                     </Link>
                     <h1 className="text-foreground text-4xl font-semibold xl:text-5xl">{title}</h1>
@@ -182,7 +182,7 @@ function CaseStudyPage(props: any) {
                                 target="_blank"
                               >
                                 <span>{company_url}</span>
-                                <IconExternalLink size={14} />
+                                <ExternalLink size={14} />
                               </a>
                             </span>
                           )}
@@ -200,7 +200,7 @@ function CaseStudyPage(props: any) {
                         <div>
                           <p>Ready to get started?</p>
                           <div>
-                            <Button asChild type="default" iconRight={<IconChevronRight />}>
+                            <Button asChild type="default" iconRight={<ChevronRight />}>
                               <Link
                                 href="https://supabase.com/contact/enterprise"
                                 className="no-underline"

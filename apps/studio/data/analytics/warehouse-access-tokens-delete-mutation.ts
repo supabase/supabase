@@ -1,6 +1,6 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
-import { handleError, del } from 'data/fetchers'
+import { del, handleError } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
 import { analyticsKeys } from './keys'
 
@@ -8,7 +8,9 @@ export type DeleteAccessTokenArgs = {
   projectRef: string
   token: string
 }
-
+/**
+ * This will be deprecated or rewritten in favor of the new project API keys
+ */
 export async function deleteWarehouseAccessToken({ projectRef, token }: DeleteAccessTokenArgs) {
   const { data, error } = await del(
     '/platform/projects/{ref}/analytics/warehouse/access-tokens/{token}',

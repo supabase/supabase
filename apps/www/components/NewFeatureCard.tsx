@@ -1,7 +1,7 @@
-import React from 'react'
-import Panel from '~/components/Panel'
-import { Badge, Button, ButtonProps, IconCheck, Image } from 'ui'
+import { Check } from 'lucide-react'
 import Link from 'next/link'
+import { Badge, Button, ButtonProps, Image } from 'ui'
+import Panel from '~/components/Panel'
 
 export interface CardProps {
   title: string
@@ -33,7 +33,7 @@ const NewFeatureCard = (props: CardProps) => (
           {props.features?.map((feature: any) => (
             <li key={feature} className="flex items-start gap-2">
               <span className="w-3 mt-0.5 flex items-center">
-                <IconCheck className="stroke-2" />
+                <Check className="stroke-2" />
               </span>{' '}
               <p>{feature}</p>
             </li>

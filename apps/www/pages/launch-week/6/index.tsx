@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import { ExternalLink } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 
@@ -8,16 +9,16 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import classNames from 'classnames'
+import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { useTheme } from 'next-themes'
-import classNames from 'classnames'
+import { Accordion, Badge } from 'ui'
 import { SITE_ORIGIN } from '~/lib/constants'
-import { Accordion, Badge, IconExternalLink } from 'ui'
 import { WeekDayProps } from './types6'
 
-import styleUtils from './styles/utils6.module.css'
 import styles from './styles/launchWeek6.module.css'
+import styleUtils from './styles/utils6.module.css'
 
 const days = _days as WeekDayProps[]
 const constellation = [
@@ -925,7 +926,7 @@ export default function launchweek() {
                     className="text-brand flex items-center"
                     target="_blank"
                   >
-                    Join our Discord <IconExternalLink size="small" className="inline-block ml-2" />
+                    Join our Discord <ExternalLink size="small" className="inline-block ml-2" />
                   </a>
                 </div>
               </div>
@@ -1080,7 +1081,7 @@ export default function launchweek() {
                 className="text-brand flex items-center mt-2"
               >
                 See all the content
-                <IconExternalLink size="small" className="inline-block ml-1" />
+                <ExternalLink size="small" className="inline-block ml-1" />
               </a>
             </p>
             {activeCreator !== null && (
@@ -1097,7 +1098,7 @@ export default function launchweek() {
                   <a rel="noopener" target="_blank" href={creators[activeCreator].link}>
                     <span>
                       {creators[activeCreator].link_title}
-                      <IconExternalLink size="small" className="inline-block ml-2" />
+                      <ExternalLink size="small" className="inline-block ml-2" />
                     </span>
                   </a>
                 </p>

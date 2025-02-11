@@ -49,6 +49,7 @@ export const post: typeof _post = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
 
   return await _post(url, {
+    credentials: 'include',
     ...init,
     headers,
   })
@@ -58,6 +59,7 @@ export const unauthedAllowedPost: typeof _post = async (url, init) => {
   const headers = await constructHeaders(init?.headers, { allowUnauthenticated: true })
 
   return await _post(url, {
+    credentials: 'include',
     ...init,
     headers,
   })

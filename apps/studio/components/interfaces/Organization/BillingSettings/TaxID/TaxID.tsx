@@ -1,9 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { X as IconX } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
@@ -38,6 +37,7 @@ import {
 } from 'ui'
 import { TAX_IDS } from './TaxID.constants'
 import { checkTaxIdEqual, sanitizeTaxIdValue } from './TaxID.utils'
+import { X } from 'lucide-react'
 
 const TaxID = () => {
   const { slug } = useParams()
@@ -242,7 +242,7 @@ const TaxID = () => {
                         <Button
                           type="text"
                           className="px-1"
-                          icon={<IconX />}
+                          icon={<X />}
                           onClick={() => onRemoveTaxId()}
                         />
                       </div>

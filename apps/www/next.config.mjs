@@ -5,10 +5,11 @@ import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
 import redirects from './lib/redirects.js'
+import remotePatterns from './lib/remotePatterns.js'
 import rewrites from './lib/rewrites.js'
 
 import { remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 
 import { withContentlayer } from 'next-contentlayer2'
 
@@ -48,25 +49,7 @@ const nextConfig = {
   swcMinify: true,
   images: {
     dangerouslyAllowSVG: true,
-    domains: [
-      'api.producthunt.com',
-      'avatars.githubusercontent.com',
-      'ca.slack-edge.com',
-      'colab.research.google.com',
-      'github.com',
-      'https://s3-us-west-2.amazonaws.com',
-      'images.unsplash.com',
-      'img.youtube.com',
-      'vercel.com',
-      'obuldanrptloktxcffvn.supabase.co',
-      'xguihxuzqibwxjnimxev.supabase.co',
-      'pbs.twimg.com',
-      'res.cloudinary.com',
-      's3-us-west-2.amazonaws.com',
-      'supabase.com',
-      'user-images.githubusercontent.com',
-      'media.licdn.com',
-    ],
+    remotePatterns,
   },
   async headers() {
     return [
@@ -87,6 +70,15 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/.well-known/vercel/flags',
+        headers: [
+          {
+            key: 'content-type',
+            value: 'application/json',
+          },
+        ],
+      },
     ]
   },
   async rewrites() {
@@ -101,7 +93,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel
+    // We are already running linting via GH action, this will skip linting during production build on Vercel.
     ignoreDuringBuilds: true,
   },
 }

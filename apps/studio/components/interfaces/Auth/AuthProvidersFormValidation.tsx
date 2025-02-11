@@ -12,6 +12,7 @@ const PROVIDER_EMAIL = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Email',
+  link: 'https://supabase.com/docs/guides/auth/passwords',
   properties: {
     EXTERNAL_EMAIL_ENABLED: {
       title: 'Enable Email provider',
@@ -176,10 +177,11 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
   })
 }
 
-const PROVIDER_PHONE = {
+export const PROVIDER_PHONE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Phone',
+  link: 'https://supabase.com/docs/guides/auth/phone-login',
   properties: {
     EXTERNAL_PHONE_ENABLED: {
       title: 'Enable Phone provider',
@@ -388,6 +390,7 @@ const EXTERNAL_PROVIDER_APPLE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Apple',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-apple',
   properties: {
     EXTERNAL_APPLE_ENABLED: {
       title: 'Enable Sign in with Apple',
@@ -396,22 +399,15 @@ const EXTERNAL_PROVIDER_APPLE = {
       type: 'boolean',
     },
     EXTERNAL_APPLE_CLIENT_ID: {
-      title: 'Service ID (for OAuth)',
-      description: `Client identifier used in the OAuth flow on the web.
-[Learn more](https://developer.apple.com/documentation/sign_in_with_apple/configuring_your_environment_for_sign_in_with_apple)`,
+      title: 'Client IDs',
+      description: `Comma separated list of allowed Apple app (Web, OAuth, iOS, macOS, watchOS, or tvOS) bundle IDs for native sign in, or service IDs for Sign in with Apple JS. [Learn more](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js)`,
       type: 'string',
     },
     EXTERNAL_APPLE_SECRET: {
       title: 'Secret Key (for OAuth)',
-      description: `Secret key used in the OAuth flow.
-[Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#generate-a-client_secret)`,
+      description: `Secret key used in the OAuth flow. [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#generate-a-client_secret)`,
       type: 'string',
       isSecret: true,
-    },
-    EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: {
-      title: 'Authorized Client IDs (iOS, macOS, watchOS, tvOS bundle IDs or service IDs)',
-      description: `Comma separated list of allowed Apple app bundle IDs for native sign in, or service IDs for Sign in with Apple JS. [Learn more](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js)`,
-      type: 'string',
     },
   },
   validationSchema: object().shape({
@@ -423,7 +419,6 @@ const EXTERNAL_PROVIDER_APPLE = {
         },
         then: (schema) =>
           schema
-            .required('Secret key is required when using the OAuth flow.')
             .matches(/^[a-z0-9_-]+([.][a-z0-9_-]+){2}$/i, 'Secret key should be a JWT.')
             .test({
               message: 'Secret key is not a correctly generated JWT.',
@@ -470,48 +465,26 @@ const EXTERNAL_PROVIDER_APPLE = {
               },
             }),
       })
-      .when(
-        [
-          'EXTERNAL_APPLE_ENABLED',
-          'EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS',
-          'EXTERNAL_APPLE_CLIENT_ID',
-        ],
-        {
-          is: (
-            EXTERNAL_APPLE_ENABLED: boolean,
-            EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string,
-            EXTERNAL_APPLE_CLIENT_ID: string
-          ) => {
-            return (
-              EXTERNAL_APPLE_ENABLED &&
-              !!EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS &&
-              !EXTERNAL_APPLE_CLIENT_ID
-            )
-          },
-          then: (schema) =>
-            schema.matches(
-              /^$/,
-              'Secret Key should only be set if Service ID for OAuth is provided.'
-            ),
-        }
-      ),
-    EXTERNAL_APPLE_CLIENT_ID: string().matches(
-      /^[a-z0-9.-]+$/i,
-      'Invalid characters. Apple recommends a reverse-domain name style string (e.g. com.example.app).'
-    ),
-    EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string()
-      .matches(
-        /^([.a-z0-9-]+(,\s*[.a-z0-9-]+)*,*\s*)?$/i,
-        'Invalid characters. Apple recommends a reverse-domain name style string (e.g. com.example.app). You must only use explicit bundle IDs, asterisks (*) are not allowed.'
-      )
       .when(['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'], {
         is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
           return EXTERNAL_APPLE_ENABLED && !EXTERNAL_APPLE_CLIENT_ID
         },
         then: (schema) =>
-          schema.required(
-            'At least one Authorized Client ID is required when not using the OAuth flow.'
+          schema.matches(
+            /^$/,
+            'Secret Key should only be set if Service ID for OAuth is provided.'
           ),
+      }),
+    EXTERNAL_APPLE_CLIENT_ID: string()
+      .matches(/^\S+$/, 'Client IDs should not contain spaces.')
+      .matches(
+        /^([a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
+        'Invalid characters. Each ID should follow a reverse-domain style string (e.g. com.example.app). Use commas to separate multiple IDs.'
+      )
+      .when('EXTERNAL_APPLE_ENABLED', {
+        is: true,
+        then: (schema) =>
+          schema.required('At least one Client ID is required when Apple sign-in is enabled.'),
       }),
   }),
   misc: {
@@ -530,6 +503,7 @@ const EXTERNAL_PROVIDER_AZURE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Azure',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-azure',
   properties: {
     EXTERNAL_AZURE_ENABLED: {
       title: 'Azure enabled',
@@ -566,7 +540,7 @@ const EXTERNAL_PROVIDER_AZURE = {
       then: (schema) => schema.required('Secret Value is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_AZURE_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
+    EXTERNAL_AZURE_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'microsoft-icon',
@@ -578,6 +552,7 @@ const EXTERNAL_PROVIDER_BITBUCKET = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Bitbucket',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-bitbucket',
   properties: {
     EXTERNAL_BITBUCKET_ENABLED: {
       title: 'Bitbucket enabled',
@@ -616,6 +591,7 @@ const EXTERNAL_PROVIDER_DISCORD = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Discord',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-discord?',
   properties: {
     EXTERNAL_DISCORD_ENABLED: {
       title: 'Discord enabled',
@@ -654,6 +630,7 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Facebook',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-facebook',
   properties: {
     EXTERNAL_FACEBOOK_ENABLED: {
       title: 'Facebook enabled',
@@ -692,6 +669,7 @@ const EXTERNAL_PROVIDER_FIGMA = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Figma',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-figma',
   properties: {
     EXTERNAL_FIGMA_ENABLED: {
       title: 'Figma enabled',
@@ -730,6 +708,7 @@ const EXTERNAL_PROVIDER_GITHUB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'GitHub',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-github',
   properties: {
     EXTERNAL_GITHUB_ENABLED: {
       title: 'GitHub enabled',
@@ -768,6 +747,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'GitLab',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-gitlab',
   properties: {
     EXTERNAL_GITLAB_ENABLED: {
       title: 'GitLab enabled',
@@ -802,7 +782,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_GITLAB_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
+    EXTERNAL_GITLAB_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'gitlab-icon',
@@ -814,6 +794,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Google',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-google',
   properties: {
     EXTERNAL_GOOGLE_ENABLED: {
       title: 'Enable Sign in with Google',
@@ -822,8 +803,9 @@ const EXTERNAL_PROVIDER_GOOGLE = {
       type: 'boolean',
     },
     EXTERNAL_GOOGLE_CLIENT_ID: {
-      title: 'Client ID (for OAuth)',
-      description: 'Client ID to use with the OAuth flow on the web.',
+      title: 'Client IDs',
+      description:
+        'Comma-separated list of client IDs for Web, OAuth, Android apps, One Tap, and Chrome extensions.',
       type: 'string',
     },
     EXTERNAL_GOOGLE_SECRET: {
@@ -832,78 +814,34 @@ const EXTERNAL_PROVIDER_GOOGLE = {
       type: 'string',
       isSecret: true,
     },
-    EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: {
-      title: 'Authorized Client IDs (for Android, One Tap, and Chrome extensions)',
-      description:
-        'Comma separated list of client IDs of Android apps, One Tap or Chrome extensions that are allowed to log in to your project.',
-      type: 'string',
-    },
     EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: {
       title: 'Skip nonce checks',
       description:
-        "Allows ID tokens with any nonce to be accepted, which is less secure. Useful in situations where you don't have access to the nonce used to issue the ID token, such with iOS.",
+        "Allows ID tokens with any nonce to be accepted, which is less secure. Useful in situations where you don't have access to the nonce used to issue the ID token, such as with iOS.",
       type: 'boolean',
     },
   },
   validationSchema: object().shape({
     EXTERNAL_GOOGLE_ENABLED: boolean().required(),
-    EXTERNAL_GOOGLE_SECRET: string()
-      .when(['EXTERNAL_GOOGLE_ENABLED', 'EXTERNAL_GOOGLE_CLIENT_ID'], {
-        is: (EXTERNAL_GOOGLE_ENABLED: boolean, EXTERNAL_GOOGLE_CLIENT_ID: string) => {
-          return EXTERNAL_GOOGLE_ENABLED && !!EXTERNAL_GOOGLE_CLIENT_ID
-        },
-        then: (schema) =>
-          schema
-            .matches(
-              /^[a-z0-9.\/_-]*$/i,
-              'Invalid characters. Google OAuth Client Secrets usually contain letters, numbers, dots, dashes and underscores.'
-            )
-            .required('Client Secret is required when using the OAuth flow.'),
-      })
-      .when(
-        [
-          'EXTERNAL_GOOGLE_ENABLED',
-          'EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS',
-          'EXTERNAL_GOOGLE_CLIENT_ID',
-        ],
-        {
-          is: (
-            EXTERNAL_GOOGLE_ENABLED: boolean,
-            EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string,
-            EXTERNAL_GOOGLE_CLIENT_ID: string
-          ) => {
-            return (
-              EXTERNAL_GOOGLE_ENABLED &&
-              !!EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS &&
-              !EXTERNAL_GOOGLE_CLIENT_ID
-            )
-          },
-          then: (schema) =>
-            schema.matches(
-              /^$/,
-              'Client Secret should only be set when Client ID for OAuth is set.'
-            ),
-        }
-      ),
-    EXTERNAL_GOOGLE_CLIENT_ID: string().matches(
-      /^([a-z0-9-]+([.][a-z0-9-]+)+)?$/i,
-      'Invalid characters. Google OAuth Client IDs are usually a domain-name (e.g. 01234567890-abcdefghijklmnopqrstuvwxyz012345.apps.googleusercontent.com).'
-    ),
-    EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string()
+    EXTERNAL_GOOGLE_CLIENT_ID: string()
+      .matches(/^\S+$/, 'Client IDs should not contain spaces.')
       .matches(
-        /^([a-z0-9-]+([.][a-z0-9-]+)*(,\s*[a-z0-9-]+([.][a-z0-9-]+)*)*,*\s*)?$/i,
-        'Invalid characters. Google Client IDs are usually a domain-name style string (e.g. com.example.com.app or *.apps.googleusercontent.com).'
+        /^([a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
+        'Invalid characters. Google Client IDs should be a comma-separated list of domain-like strings.'
       )
-
-      .when(['EXTERNAL_GOOGLE_ENABLED', 'EXTERNAL_GOOGLE_CLIENT_ID'], {
-        is: (EXTERNAL_GOOGLE_ENABLED: boolean, EXTERNAL_GOOGLE_CLIENT_ID: string) => {
-          return EXTERNAL_GOOGLE_ENABLED && !EXTERNAL_GOOGLE_CLIENT_ID
-        },
+      .when('EXTERNAL_GOOGLE_ENABLED', {
+        is: true,
         then: (schema) =>
-          schema.required(
-            'At least one Authorized Client ID is required when not using the OAuth flow.'
-          ),
+          schema.required('At least one Client ID is required when Google sign-in is enabled.'),
       }),
+    EXTERNAL_GOOGLE_SECRET: string().when('EXTERNAL_GOOGLE_ENABLED', {
+      is: true,
+      then: (schema) =>
+        schema.matches(
+          /^[a-z0-9.\/_-]*$/i,
+          'Invalid characters. Google OAuth Client Secrets usually contain letters, numbers, dots, dashes, and underscores.'
+        ),
+    }),
     EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean().required(),
   }),
   misc: {
@@ -918,6 +856,7 @@ const EXTERNAL_PROVIDER_KAKAO = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Kakao',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-kakao',
   properties: {
     EXTERNAL_KAKAO_ENABLED: {
       title: 'Kakao enabled',
@@ -959,6 +898,7 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'KeyCloak',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-keycloak',
   properties: {
     EXTERNAL_KEYCLOAK_ENABLED: {
       title: 'Keycloak enabled',
@@ -994,8 +934,8 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
     EXTERNAL_KEYCLOAK_URL: string().when('EXTERNAL_KEYCLOAK_ENABLED', {
       is: true,
       then: (schema) =>
-        schema.matches(urlRegex, 'Must be a valid URL').required('Realm URL is required'),
-      otherwise: (schema) => schema.matches(urlRegex, 'Must be a valid URL'),
+        schema.matches(urlRegex(), 'Must be a valid URL').required('Realm URL is required'),
+      otherwise: (schema) => schema.matches(urlRegex(), 'Must be a valid URL'),
     }),
   }),
   misc: {
@@ -1008,6 +948,7 @@ const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'LinkedIn (OIDC)',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-linkedin',
   properties: {
     EXTERNAL_LINKEDIN_OIDC_ENABLED: {
       title: 'LinkedIn enabled',
@@ -1046,6 +987,7 @@ const EXTERNAL_PROVIDER_NOTION = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Notion',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-notion',
   properties: {
     EXTERNAL_NOTION_ENABLED: {
       title: 'Notion enabled',
@@ -1084,6 +1026,7 @@ const EXTERNAL_PROVIDER_TWITCH = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Twitch',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-twitch',
   properties: {
     EXTERNAL_TWITCH_ENABLED: {
       title: 'Twitch enabled',
@@ -1122,6 +1065,7 @@ const EXTERNAL_PROVIDER_TWITTER = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Twitter',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-twitter',
   properties: {
     EXTERNAL_TWITTER_ENABLED: {
       title: 'Twitter enabled',
@@ -1160,6 +1104,7 @@ const EXTERNAL_PROVIDER_SLACK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Slack (Deprecated)',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-slack',
   properties: {
     EXTERNAL_SLACK_ENABLED: {
       title: 'Slack enabled',
@@ -1198,6 +1143,7 @@ const EXTERNAL_PROVIDER_SLACK_OIDC = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Slack (OIDC)',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-slack',
   properties: {
     EXTERNAL_SLACK_OIDC_ENABLED: {
       title: 'Slack enabled',
@@ -1236,6 +1182,7 @@ const EXTERNAL_PROVIDER_SPOTIFY = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Spotify',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-spotify',
   properties: {
     EXTERNAL_SPOTIFY_ENABLED: {
       title: 'Spotify enabled',
@@ -1274,6 +1221,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'WorkOS',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-workos',
   properties: {
     EXTERNAL_WORKOS_ENABLED: {
       title: 'WorkOS enabled',
@@ -1296,7 +1244,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
   validationSchema: object().shape({
     EXTERNAL_WORKOS_ENABLED: boolean().required(),
     EXTERNAL_WORKOS_URL: string()
-      .matches(urlRegex, 'Must be a valid URL')
+      .matches(urlRegex(), 'Must be a valid URL')
       .when('EXTERNAL_WORKOS_ENABLED', {
         is: true,
         then: (schema) => schema.required('WorkOS URL is required'),
@@ -1323,6 +1271,7 @@ const EXTERNAL_PROVIDER_ZOOM = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Zoom',
+  link: 'https://supabase.com/docs/guides/auth/social-login/auth-zoom',
   properties: {
     EXTERNAL_ZOOM_ENABLED: {
       title: 'Zoom enabled',
@@ -1361,6 +1310,7 @@ const PROVIDER_SAML = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'SAML 2.0',
+  link: 'https://supabase.com/docs/guides/auth/enterprise-sso/auth-sso-saml',
   properties: {
     SAML_ENABLED: {
       title: 'Enable SAML 2.0 Single Sign-on',
@@ -1371,14 +1321,22 @@ const PROVIDER_SAML = {
     SAML_EXTERNAL_URL: {
       title: 'SAML metadata URL',
       description:
-        'You may use a different SAML metadata URL from what is defined with the API External URL. Please validate that your SAML External URL can reach the Custom Domain or Project URL',
+        'You may use a different SAML metadata URL from what is defined with the API External URL. Please validate that your SAML External URL can reach the Custom Domain or Project URL.',
       descriptionOptional: 'Optional',
       type: 'string',
+    },
+    SAML_ALLOW_ENCRYPTED_ASSERTIONS: {
+      title: 'Allow encrypted SAML Assertions',
+      description:
+        'Some SAML Identity Providers require support for encrypted assertions. Usually this is not necessary.',
+      descriptionOptional: 'Optional',
+      type: 'boolean',
     },
   },
   validationSchema: object().shape({
     SAML_ENABLED: boolean().required(),
-    SAML_EXTERNAL_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
+    SAML_EXTERNAL_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
+    SAML_ALLOW_ENCRYPTED_ASSERTIONS: boolean().optional(),
   }),
   misc: {
     iconKey: 'saml-icon',
