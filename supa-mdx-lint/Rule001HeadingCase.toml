@@ -51,6 +51,7 @@ may_uppercase = [
     "Disk",
     "Django",
     "Docker",
+    "Drain",
     "Drizzle",
     "Edge Functions?",
     "Editor",
