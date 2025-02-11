@@ -12,6 +12,7 @@ import type { Profile } from 'data/profile/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import type { ResponseError } from 'types'
 import { useSignOut } from './auth'
+import { getGitHubProfileImgUrl } from './github'
 
 export type ProfileContextType = {
   profile: Profile | undefined
@@ -74,10 +75,12 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
 
   const value = useMemo(() => {
     const isLoading = isLoadingProfile || isCreatingProfile || isLoadingPermissions
+    const isGHUser = !!profile && 'auth0_id' in profile && profile?.auth0_id.startsWith('github')
+    const profileImageUrl = isGHUser ? getGitHubProfileImgUrl(profile.username) : undefined
 
     return {
       error,
-      profile,
+      profile: !!profile ? { ...profile, profileImageUrl } : undefined,
       isLoading,
       isError,
       isSuccess,

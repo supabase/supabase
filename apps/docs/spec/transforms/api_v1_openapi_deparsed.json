@@ -8234,7 +8234,7 @@
                           },
                           "postgres_engine": {
                             "type": "string",
-                            "enum": ["13", "14", "15", "17-oriole"]
+                            "enum": ["13", "14", "15", "17", "17-oriole"]
                           }
                         },
                         "required": ["version", "release_channel", "postgres_engine"]
@@ -14521,7 +14521,7 @@
           },
           "postgres_engine": {
             "type": "string",
-            "enum": ["13", "14", "15", "17-oriole"]
+            "enum": ["13", "14", "15", "17", "17-oriole"]
           }
         },
         "required": ["version", "release_channel", "postgres_engine"]
@@ -14543,7 +14543,7 @@
                 },
                 "postgres_engine": {
                   "type": "string",
-                  "enum": ["13", "14", "15", "17-oriole"]
+                  "enum": ["13", "14", "15", "17", "17-oriole"]
                 }
               },
               "required": ["version", "release_channel", "postgres_engine"]
