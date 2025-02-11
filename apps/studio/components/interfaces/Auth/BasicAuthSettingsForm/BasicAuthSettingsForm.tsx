@@ -239,11 +239,16 @@ const BasicAuthSettingsForm = () => {
                   </Alert_Shadcn_>
                 )}
             </CardContent>
-            <CardFooter className="justify-end">
+            <CardFooter className="justify-end space-x-2">
+              {form.formState.isDirty && (
+                <Button type="default" onClick={() => form.reset()}>
+                  Cancel
+                </Button>
+              )}
               <Button
                 type="primary"
                 htmlType="submit"
-                disabled={!canUpdateConfig || isUpdatingConfig}
+                disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
                 loading={isUpdatingConfig}
               >
                 Save changes

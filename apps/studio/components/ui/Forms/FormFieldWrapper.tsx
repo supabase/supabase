@@ -42,7 +42,7 @@ export function FormFieldWrapper({
               <FormDescription_Shadcn_ className="text-xs">{description}</FormDescription_Shadcn_>
             )}
           </div>
-          <div className={orientation === 'horizontal' ? 'col-span-6 flex justify-end' : ''}>
+          <div className={orientation === 'horizontal' ? 'col-span-6 flex flex-col items-end' : ''}>
             <FormControl_Shadcn_>{children(field)}</FormControl_Shadcn_>
             <FormMessage_Shadcn_ />
           </div>
