@@ -2190,6 +2190,10 @@ export const platform: NavMenuConstant = {
               name: 'Branching',
               url: '/guides/platform/manage-your-usage/branching',
             },
+            {
+              name: 'Log Drains',
+              url: '/guides/platform/manage-your-usage/log-drains',
+            },
           ],
         },
         {
