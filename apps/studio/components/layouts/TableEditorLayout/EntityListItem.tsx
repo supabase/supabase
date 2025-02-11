@@ -1,3 +1,9 @@
+import saveAs from 'file-saver'
+import { Clipboard, Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react'
+import Link from 'next/link'
+import Papa from 'papaparse'
+import { toast } from 'sonner'
+
 import { IS_PLATFORM } from 'common'
 import {
   MAX_EXPORT_ROW_COUNT,
@@ -17,14 +23,8 @@ import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import saveAs from 'file-saver'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { copyToClipboard } from 'lib/helpers'
-import { Clipboard, Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react'
-import Link from 'next/link'
-import Papa from 'papaparse'
-import { toast } from 'sonner'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   cn,
@@ -41,7 +41,6 @@ import {
   TooltipTrigger,
   TreeViewItemVariant,
 } from 'ui'
-import { useSnapshot } from 'valtio'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 
 export interface EntityListItemProps {

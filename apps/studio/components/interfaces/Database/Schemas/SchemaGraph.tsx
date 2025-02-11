@@ -1,7 +1,7 @@
 import type { PostgresSchema } from '@supabase/postgres-meta'
 import { Loader2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 
@@ -14,6 +14,7 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
@@ -25,7 +26,7 @@ export const SchemaGraph = () => {
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
-  const [selectedSchema, setSelectedSchema] = useState<string>('public')
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const miniMapNodeColor = '#111318'
   const miniMapMaskColor = resolvedTheme?.includes('dark')
