@@ -19,7 +19,7 @@ services:
           "CMD",
           "node",
           "-e",
-          "fetch('http://127.0.0.1:8080/health').then((r) => {if (!r.ok) throw new Error(r.status)})"
+          "fetch('http://studio:8080/health').then((r) => {if (!r.ok) throw new Error(r.status)})"
         ]
       timeout: 10s
       interval: 5s
