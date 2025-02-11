@@ -41,7 +41,7 @@ SELECT
    pg_stat_activity.pid,
    ssl AS ssl_connection,
    datname AS database,
-   usename AS connected_role,
+   username AS connected_role,
    application_name,
    client_addr,
    query,
@@ -60,7 +60,7 @@ Interpreting the query:
 | `pid`              | connection id                                       |
 | `ssl`              | Indicates if SSL is in use                          |
 | `datname`          | Name of the connected database (usually `postgres`) |
-| `usename`          | Role of the connected user                          |
+| `username`         | Role of the connected user                          |
 | `application_name` | Name of the connecting application                  |
 | `client_addr`      | IP address of the connecting server                 |
 | `query`            | Last query executed by the connection               |

@@ -18,7 +18,7 @@ select
     from
       pg_stat_activity
     where
-      r.rolname = pg_stat_activity.usename
+      r.rolname = pg_stat_activity.username
   ) as "activeConnections",
   case when rolconnlimit = -1 then current_setting('max_connections') :: int8
        else rolconnlimit
