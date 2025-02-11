@@ -53,12 +53,56 @@ export const useOrganizationUpdateMutation = ({
     (vars) => updateOrganization(vars),
     {
       async onSuccess(data, variables, context) {
-        // [Joshen] Not sure if necessary to refresh the organizations list though
-        await Promise.all([
-          queryClient.invalidateQueries(organizationKeys.list()),
-          queryClient.invalidateQueries(organizationKeys.detail(data.slug)),
-          queryClient.invalidateQueries(organizationKeys.customerProfile(data.slug)),
-        ])
+        queryClient.setQueriesData(
+          {
+            queryKey: organizationKeys.list(),
+            exact: true,
+          },
+          (prev: components['schemas']['OrganizationResponse'][] | undefined) => {
+            if (!prev) return prev
+
+            return prev.map((org) => {
+              if (org.slug !== variables.slug) return org
+
+              return {
+                ...org,
+                name: variables.name || org.name,
+                billing_email: variables.billing_email || org.billing_email,
+                opt_in_tags: variables.opt_in_tags || org.opt_in_tags,
+              }
+            })
+          }
+        )
+
+        queryClient.setQueriesData(
+          {
+            queryKey: organizationKeys.customerProfile(data.slug),
+            exact: true,
+          },
+          (prev: components['schemas']['CustomerResponse'] | undefined) => {
+            if (!prev) return prev
+            return {
+              ...prev,
+              additional_emails: variables.additional_billing_emails || prev.additional_emails,
+            }
+          }
+        )
+
+        queryClient.setQueriesData(
+          {
+            queryKey: organizationKeys.detail(data.slug),
+            exact: true,
+          },
+          (prev: components['schemas']['OrganizationSlugResponse'] | undefined) => {
+            if (!prev) return prev
+            return {
+              ...prev,
+              name: variables.name || prev.name,
+              billing_email: variables.billing_email || prev.billing_email,
+              opt_in_tags: variables.opt_in_tags || prev.opt_in_tags,
+            }
+          }
+        )
 
         await onSuccess?.(data, variables, context)
       },

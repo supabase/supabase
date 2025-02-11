@@ -160,7 +160,9 @@ const BillingEmail = () => {
                             <div className="flex items-center gap-x-1">
                               <span>Additional emails</span>
                               <InfoTooltip side="bottom">
-                                These email addresses will be CC'd in automated invoice emails.
+                                These email addresses will be CC'd in automated invoice or payment
+                                failure emails. Payment receipts will still only go to the primary
+                                billing address.
                               </InfoTooltip>
                             </div>
                           }
