@@ -15,7 +15,7 @@ import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { uuidv4 } from 'lib/helpers'
 import { toast } from 'sonner'
 import Link from 'next/link'
-import GenericEditor from './GenericEditor'
+import AIEditor from '../AIEditor'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { isReadOnlySelect, containsUnknownFunction } from '../AIAssistantPanel/AIAssistant.utils'
@@ -237,7 +237,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
 
       <div className="flex-1 overflow-hidden flex flex-col h-full">
         <div className="flex-1 min-h-0 relative">
-          <GenericEditor
+          <AIEditor
             language="pgsql"
             value={currentValue}
             onChange={handleChange}
