@@ -5,6 +5,7 @@ import Destinations from 'components/interfaces/Database/Replication/Destination
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Plus } from 'lucide-react'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
   return (
@@ -48,7 +49,9 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 }
 
 DatabaseReplicationPage.getLayout = (page) => (
-  <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
 )
 
 export default DatabaseReplicationPage
