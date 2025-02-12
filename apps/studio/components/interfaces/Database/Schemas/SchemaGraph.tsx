@@ -1,18 +1,20 @@
 import type { PostgresSchema } from '@supabase/postgres-meta'
 import { Loader2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
@@ -24,7 +26,7 @@ export const SchemaGraph = () => {
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
-  const [selectedSchema, setSelectedSchema] = useState<string>('public')
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const miniMapNodeColor = '#111318'
   const miniMapMaskColor = resolvedTheme?.includes('dark')
@@ -147,42 +149,58 @@ export const SchemaGraph = () => {
         </div>
       )}
       {isSuccessTables && (
-        <div className="w-full h-full">
-          <ReactFlow
-            defaultNodes={[]}
-            defaultEdges={[]}
-            defaultEdgeOptions={{
-              type: 'smoothstep',
-              animated: true,
-              deletable: false,
-              style: {
-                stroke: 'hsl(var(--border-stronger))',
-                strokeWidth: 0.5,
-              },
-            }}
-            nodeTypes={nodeTypes}
-            fitView
-            minZoom={0.8}
-            maxZoom={1.8}
-            proOptions={{ hideAttribution: true }}
-            onNodeDragStop={() => saveNodePositions()}
-          >
-            <Background
-              gap={16}
-              className="[&>*]:stroke-foreground-muted opacity-[25%]"
-              variant={BackgroundVariant.Dots}
-              color={'inherit'}
-            />
-            <MiniMap
-              pannable
-              zoomable
-              nodeColor={miniMapNodeColor}
-              maskColor={miniMapMaskColor}
-              className="border rounded-md shadow-sm"
-            />
-            <SchemaGraphLegend />
-          </ReactFlow>
-        </div>
+        <>
+          {tables.length === 0 ? (
+            <div className="h-full flex items-center justify-center">
+              <ProductEmptyState
+                title="No tables created yet"
+                ctaButtonLabel="Create a new table"
+                ctaUrl={`/project/${ref}/editor?create=table`}
+              >
+                <p className="text-sm text-foreground-light">
+                  There are no tables found in the schema "{selectedSchema}"
+                </p>
+              </ProductEmptyState>
+            </div>
+          ) : (
+            <div className="w-full h-full">
+              <ReactFlow
+                defaultNodes={[]}
+                defaultEdges={[]}
+                defaultEdgeOptions={{
+                  type: 'smoothstep',
+                  animated: true,
+                  deletable: false,
+                  style: {
+                    stroke: 'hsl(var(--border-stronger))',
+                    strokeWidth: 1,
+                  },
+                }}
+                nodeTypes={nodeTypes}
+                fitView
+                minZoom={0.8}
+                maxZoom={1.8}
+                proOptions={{ hideAttribution: true }}
+                onNodeDragStop={() => saveNodePositions()}
+              >
+                <Background
+                  gap={16}
+                  className="[&>*]:stroke-foreground-muted opacity-[25%]"
+                  variant={BackgroundVariant.Dots}
+                  color={'inherit'}
+                />
+                <MiniMap
+                  pannable
+                  zoomable
+                  nodeColor={miniMapNodeColor}
+                  maskColor={miniMapMaskColor}
+                  className="border rounded-md shadow-sm"
+                />
+                <SchemaGraphLegend />
+              </ReactFlow>
+            </div>
+          )}
+        </>
       )}
     </>
   )

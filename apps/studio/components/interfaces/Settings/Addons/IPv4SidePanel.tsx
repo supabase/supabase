@@ -222,7 +222,9 @@ const IPv4SidePanel = () => {
             <Admonition type="note" title="IPv4 add-on is unavailable on the Free Plan">
               <p>Upgrade your plan to enable a IPv4 address for your project</p>
               <Button asChild type="default">
-                <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                <Link
+                  href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=ipv4SidePanel`}
+                >
                   View available plans
                 </Link>
               </Button>

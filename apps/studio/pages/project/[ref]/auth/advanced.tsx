@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { AdvancedAuthSettingsForm, SmtpForm, ThirdPartyAuthForm } from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
@@ -13,7 +14,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
-const AdvancedAuthSettings: NextPageWithLayout = () => {
+const PageLayout: NextPageWithLayout = () => {
   const isPermissionsLoaded = usePermissionsLoaded()
   // TODO: check if these permissions cover third party auth as well
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
@@ -40,7 +41,11 @@ const AdvancedAuthSettings: NextPageWithLayout = () => {
   )
 }
 
-AdvancedAuthSettings.getLayout = (page) => {
-  return <AuthLayout>{page}</AuthLayout>
+PageLayout.getLayout = (page) => {
+  return (
+    <DefaultLayout>
+      <AuthLayout>{page}</AuthLayout>
+    </DefaultLayout>
+  )
 }
-export default AdvancedAuthSettings
+export default PageLayout

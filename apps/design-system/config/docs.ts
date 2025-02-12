@@ -350,6 +350,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Sidebar',
+          href: '/docs/components/sidebar',
+          items: [],
+        },
+        {
           title: 'Sonner',
           href: '/docs/components/sonner',
           items: [],

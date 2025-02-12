@@ -10,6 +10,10 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { FormFieldWrapper } from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
@@ -30,8 +34,7 @@ import {
 } from 'ui'
 import { SectionHeader } from 'components/layouts/PageLayout'
 
-// Use a const string to represent no chars option. Represented as empty string on the backend side.
-const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
+import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
