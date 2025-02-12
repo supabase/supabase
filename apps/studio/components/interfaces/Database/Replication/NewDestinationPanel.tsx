@@ -10,6 +10,12 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
   SidePanel,
   TextArea_Shadcn_,
 } from 'ui'
@@ -26,14 +32,14 @@ const NewDestinationPanel = ({ visible, onCancel, onConfirm }: NewDestinationPan
   const types = ['BigQuery'] as const
   const TypeEnum = z.enum(types)
   const FormSchema = z.object({
-    // type: TypeEnum,
+    type: TypeEnum,
     name: z.string(),
     projectId: z.string(),
     datasetId: z.string(),
     serviceAccountKey: z.string(),
   })
   const defaultValues = {
-    // type: TypeEnum.enum.BigQuery,
+    type: TypeEnum.enum.BigQuery,
     name: '',
     projectId: '',
     datasetId: '',
@@ -47,6 +53,7 @@ const NewDestinationPanel = ({ visible, onCancel, onConfirm }: NewDestinationPan
   })
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     console.log(`Form submitted: ${JSON.stringify(data)}`)
+    form.reset(defaultValues)
   }
   const submitRef = useRef<HTMLButtonElement>(null)
 
@@ -66,26 +73,28 @@ const NewDestinationPanel = ({ visible, onCancel, onConfirm }: NewDestinationPan
       <SidePanel.Content className="flex flex-col py-4 gap-y-4">
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            {/* <FormField_Shadcn_
-              name={'type'}
+            <FormField_Shadcn_
+              name="type"
               control={form.control}
               render={({ field }) => (
-                <FormItemLayout layout="vertical" label="Type">
+                <FormItem_Shadcn_>
+                  <FormLabel_Shadcn_>Type</FormLabel_Shadcn_>
                   <FormControl_Shadcn_>
-                    <Select_Shadcn_ {...field} defaultValue={field.value}>
+                    <Select_Shadcn_ {...field}>
                       <SelectTrigger_Shadcn_>
                         <SelectValue_Shadcn_></SelectValue_Shadcn_>
                       </SelectTrigger_Shadcn_>
                       <SelectContent_Shadcn_>
                         <SelectGroup_Shadcn_>
-                          <SelectItem_Shadcn_ value={'BigQuery'}>BigQuery</SelectItem_Shadcn_>
+                          <SelectItem_Shadcn_ value="BigQuery">BigQuery</SelectItem_Shadcn_>
                         </SelectGroup_Shadcn_>
                       </SelectContent_Shadcn_>
                     </Select_Shadcn_>
                   </FormControl_Shadcn_>
-                </FormItemLayout>
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
               )}
-            ></FormField_Shadcn_> */}
+            ></FormField_Shadcn_>
             <FormField_Shadcn_
               control={form.control}
               name="name"
