@@ -6,6 +6,8 @@ import { useState } from 'react'
 
 import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import Policies from 'components/interfaces/Auth/Policies/Policies'
+import { generatePolicyCreateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { getGeneralPolicyTemplates } from 'components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
@@ -171,8 +173,25 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             }
           }}
           onSelectEditPolicy={(policy) => {
-            setSelectedPolicyToEdit(policy)
-            setShowPolicyAiEditor(true)
+            if (isInlineEditorEnabled) {
+              const sql = generatePolicyCreateSQL(policy)
+              const templates = getGeneralPolicyTemplates(policy.schema, policy.table)
+              setEditorPanel({
+                open: true,
+                initialValue: sql,
+                label: `Edit policy "${policy.name}"`,
+                saveLabel: 'Update policy',
+                templates: templates.map((template) => ({
+                  name: template.templateName,
+                  description: template.description,
+                  content: template.statement,
+                })),
+                initialPrompt: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
+              })
+            } else {
+              setSelectedPolicyToEdit(policy)
+              setShowPolicyAiEditor(true)
+            }
           }}
         />
       )}

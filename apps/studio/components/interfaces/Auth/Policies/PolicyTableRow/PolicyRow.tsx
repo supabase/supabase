@@ -9,7 +9,6 @@ import Panel from 'components/ui/Panel'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   Badge,
   Button,
@@ -24,7 +23,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { generatePolicyCreateSQL } from './PolicyTableRow.utils'
-import { getGeneralPolicyTemplates } from '../PolicyEditorModal/PolicyEditorModal.constants'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -39,9 +37,8 @@ const PolicyRow = ({
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
-  const { setAiAssistantPanel, setEditorPanel } = useAppStateSnapshot()
+  const { setAiAssistantPanel } = useAppStateSnapshot()
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
-  const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const { project } = useProjectContext()
   const { data: authConfig } = useAuthConfigQuery({ projectRef: project?.ref })
@@ -111,23 +108,7 @@ const PolicyRow = ({
               <DropdownMenuItem
                 className="gap-x-2"
                 onClick={() => {
-                  const sql = generatePolicyCreateSQL(policy)
-                  if (isInlineEditorEnabled) {
-                    const templates = getGeneralPolicyTemplates(policy.schema, policy.table)
-                    setEditorPanel({
-                      open: true,
-                      initialValue: sql,
-                      label: `Edit policy "${policy.name}"`,
-                      saveLabel: 'Update policy',
-                      templates: templates.map((template) => ({
-                        name: template.templateName,
-                        description: template.description,
-                        content: template.statement,
-                      })),
-                    })
-                  } else {
-                    onSelectEditPolicy(policy)
-                  }
+                  onSelectEditPolicy(policy)
                 }}
               >
                 <Edit size={14} />
