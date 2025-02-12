@@ -1,3 +1,14 @@
 {
-  "buildCommand": "pnpm build"
+  "buildCommand": "pnpm build",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "strict-transport-security",
+          "value": "max-age=31536000"
+        }
+      ]
+    }
+  ]
 }
