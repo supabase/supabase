@@ -22,6 +22,7 @@ interface AIEditorProps {
     connectionString?: string
     includeSchemaMetadata?: boolean
   }
+  initialPrompt?: string
   readOnly?: boolean
   className?: string
   options?: monacoEditor.IStandaloneEditorConstructionOptions
@@ -35,6 +36,7 @@ const AIEditor = ({
   onChange,
   aiEndpoint,
   aiMetadata,
+  initialPrompt,
   readOnly = false,
   className = '',
   options = {},
@@ -46,17 +48,16 @@ const AIEditor = ({
   const [currentValue, setCurrentValue] = useState(value || defaultValue)
   const [isDiffMode, setIsDiffMode] = useState(false)
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
-  const [showWidget, setShowWidget] = useState(false)
   const [diffValue, setDiffValue] = useState({ original: '', modified: '' })
   const [promptState, setPromptState] = useState({
-    isOpen: false,
+    isOpen: Boolean(initialPrompt),
     selection: '',
     beforeSelection: '',
     afterSelection: '',
     startLineNumber: 0,
     endLineNumber: 0,
   })
-  const [promptInput, setPromptInput] = useState('')
+  const [promptInput, setPromptInput] = useState(initialPrompt || '')
 
   useEffect(() => {
     setCurrentValue(value || defaultValue)
@@ -65,11 +66,8 @@ const AIEditor = ({
   useEffect(() => {
     if (!isDiffMode) {
       setIsDiffEditorMounted(false)
-      setShowWidget(false)
-    } else if (diffEditorRef.current && isDiffEditorMounted) {
-      setShowWidget(true)
     }
-  }, [isDiffMode, isDiffEditorMounted])
+  }, [isDiffMode])
 
   const {
     complete,
@@ -90,7 +88,6 @@ const AIEditor = ({
   useEffect(() => {
     if (!completion) {
       setIsDiffMode(false)
-      setShowWidget(false)
       return
     }
 
@@ -145,6 +142,22 @@ const AIEditor = ({
     monaco: Monaco
   ) => {
     editorRef.current = editor
+
+    // Set prompt state to open if promptInput exists
+    if (promptInput) {
+      const model = editor.getModel()
+      if (model) {
+        const lineCount = model.getLineCount()
+        setPromptState({
+          isOpen: true,
+          selection: model.getValue(),
+          beforeSelection: '',
+          afterSelection: '',
+          startLineNumber: 1,
+          endLineNumber: lineCount,
+        })
+      }
+    }
 
     editor.addAction({
       id: 'generate-ai',
@@ -241,7 +254,7 @@ const AIEditor = ({
               renderSideBySide: false,
             }}
           />
-          {showWidget && (
+          {isDiffEditorMounted && (
             <InlineWidget
               editor={diffEditorRef.current!}
               id="ask-ai-diff"

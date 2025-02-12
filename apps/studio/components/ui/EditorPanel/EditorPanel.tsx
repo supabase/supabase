@@ -247,6 +247,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
               connectionString: project?.connectionString,
               includeSchemaMetadata: true,
             }}
+            initialPrompt={editorPanel.initialPrompt}
             options={{
               tabSize: 2,
               fontSize: 13,

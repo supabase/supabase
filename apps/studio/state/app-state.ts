@@ -45,6 +45,7 @@ type EditorPanelType = {
   onSave?: (value: string) => void
   functionName?: string
   templates?: Template[]
+  initialPrompt?: string
 }
 
 type DashboardHistoryType = {
@@ -69,6 +70,7 @@ const INITIAL_EDITOR_PANEL: EditorPanelType = {
   initialValue: '',
   label: '',
   saveLabel: '',
+  initialPrompt: '',
   templates: SQL_TEMPLATES.filter((template) => template.type === 'template').map((template) => ({
     name: template.title,
     description: template.description,
@@ -276,6 +278,10 @@ export const appState = proxy({
     // Reset templates to initial if initialValue is empty
     if (value.initialValue === '') {
       value.templates = INITIAL_EDITOR_PANEL.templates
+    }
+
+    if (!value.open) {
+      value.initialPrompt = INITIAL_EDITOR_PANEL.initialPrompt
     }
 
     appState.editorPanel = {
