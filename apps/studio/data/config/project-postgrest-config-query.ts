@@ -1,39 +1,25 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { configKeys } from './keys'
+
+import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
+import { configKeys } from './keys'
 
 export type ProjectPostgrestConfigVariables = {
   projectRef?: string
-}
-
-export type ProjectPostgrestConfigResponse = {
-  max_rows: number
-  role_claim_key: string
-  db_schema: string
-  db_anon_role: string
-  db_extra_search_path: string
-  db_pool: number | null
-  jwt_secret: string
 }
 
 export async function getProjectPostgrestConfig(
   { projectRef }: ProjectPostgrestConfigVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await get(`${API_URL}/projects/${projectRef}/config/postgrest`, {
+  const { data, error } = await get('/platform/projects/{ref}/config/postgrest', {
+    params: { path: { ref: projectRef } },
     signal,
   })
-  if (response.error) {
-    throw response.error
-  }
-
-  return response as ProjectPostgrestConfigResponse
+  if (error) handleError(error)
+  return data
 }
 
 export type ProjectPostgrestConfigData = Awaited<ReturnType<typeof getProjectPostgrestConfig>>
