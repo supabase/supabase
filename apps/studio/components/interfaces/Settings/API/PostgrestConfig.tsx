@@ -84,7 +84,6 @@ export const PostgrestConfig = () => {
   const [showModal, setShowModal] = useState(false)
 
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
-  console.log(config)
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
