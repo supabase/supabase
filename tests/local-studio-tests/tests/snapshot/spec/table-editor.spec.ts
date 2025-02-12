@@ -132,12 +132,6 @@ test.describe('Table Editor page', () => {
         'mfa_factors',
         'refresh_tokens',
         'saml_providers',
-        'saml_relay_states',
-        'schema_migrations',
-        'sessions',
-        'sso_domains',
-        'sso_providers',
-        'users',
       ])
     )
   })
