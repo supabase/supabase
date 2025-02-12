@@ -48,7 +48,7 @@ export async function getOrganizationAuditLogs(
   if (!slug) throw new Error('slug is required')
 
   const { data, error } = await get('/platform/organizations/{slug}/audit', {
-    params: { path: { slug, iso_timestamp_start, iso_timestamp_end } },
+    params: { path: { slug }, query: { iso_timestamp_start, iso_timestamp_end } },
     signal,
   })
 
