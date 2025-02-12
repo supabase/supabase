@@ -8,7 +8,7 @@ import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
-import { BASE_PATH } from 'lib/constants'
+import { IS_PLATFORM, BASE_PATH } from 'lib/constants'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -20,6 +20,7 @@ import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { isReadOnlySelect, containsUnknownFunction } from '../AIAssistantPanel/AIAssistant.utils'
 import { debounce } from 'lodash'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 
 interface EditorPanelProps {
   onChange?: (value: string) => void
@@ -32,8 +33,10 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
   const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
-  const [isSaving, setIsSaving] = useState(false)
+  const isOptedInToAI = useOrgOptedIntoAi()
+  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
+  const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<QueryResponseError>()
   const [results, setResults] = useState<undefined | any[]>(undefined)
   const [showResults, setShowResults] = useState(false)
@@ -245,7 +248,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
             aiMetadata={{
               projectRef: project?.ref,
               connectionString: project?.connectionString,
-              includeSchemaMetadata: true,
+              includeSchemaMetadata,
             }}
             initialPrompt={editorPanel.initialPrompt}
             options={{
