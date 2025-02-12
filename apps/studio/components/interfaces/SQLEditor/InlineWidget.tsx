@@ -71,7 +71,7 @@ const InlineWidget = ({
 
       containerElement.style.left = `${layoutInfo.contentLeft}px`
       containerElement.style.top = `${viewZoneTop}px`
-      containerElement.style.width = `${layoutInfo.width - layoutInfo.contentLeft}px`
+      containerElement.style.width = `${layoutInfo.width - layoutInfo.contentLeft - 20}px`
       containerElement.style.height = `${viewZoneHeight}px`
     }
 

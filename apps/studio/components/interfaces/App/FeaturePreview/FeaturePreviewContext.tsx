@@ -5,6 +5,7 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EMPTY_OBJ } from 'lib/void'
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { CLSPreview } from './CLSPreview'
+import InlineEditorPreview from './InlineEditorPreview'
 
 export const FEATURE_PREVIEWS = [
   {
@@ -20,6 +21,12 @@ export const FEATURE_PREVIEWS = [
     content: <CLSPreview />,
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
     isNew: false,
+  },
+  {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
+    name: 'Inline SQL Editor',
+    content: <InlineEditorPreview />,
+    isNew: true,
   },
 ]
 
@@ -76,4 +83,9 @@ export const useIsAPIDocsSidePanelEnabled = () => {
 export const useIsColumnLevelPrivilegesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
+}
+
+export const useIsInlineEditorEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]
 }

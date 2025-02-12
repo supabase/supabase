@@ -1,6 +1,6 @@
 'use client'
 
-import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import React, { forwardRef, useImperativeHandle } from 'react'
 import { cn } from '../../lib/utils'
 import { TextArea } from '../shadcn/ui/text-area'
 
@@ -14,31 +14,32 @@ export interface ExpandingTextAreaProps extends React.TextareaHTMLAttributes<HTM
  */
 const ExpandingTextArea = forwardRef<HTMLTextAreaElement, ExpandingTextAreaProps>(
   ({ className, value, ...props }, ref) => {
-    const textAreaRef = useRef<HTMLTextAreaElement>(null)
+    const updateTextAreaHeight = (element: HTMLTextAreaElement | null) => {
+      if (!element) return
 
-    // Expose the ref to the parent component
-    useImperativeHandle(ref, () => textAreaRef.current!)
-    /**
-     * This effect is used to resize the textarea based on the content
-     */
-    useEffect(() => {
-      if (textAreaRef) {
-        if (textAreaRef.current && !value) {
-          textAreaRef.current.style.height = '40px'
-        } else if (textAreaRef && textAreaRef.current) {
-          textAreaRef.current.style.height = 'auto'
-          const newHeight = textAreaRef.current.scrollHeight + 'px'
-          textAreaRef.current.style.height = newHeight
-        }
+      // Forward the ref to the parent component
+      if (typeof ref === 'function') {
+        ref(element)
+      } else if (ref) {
+        ref.current = element
       }
-    }, [value, textAreaRef])
+
+      // Update the height
+      if (!value) {
+        element.style.height = 'auto'
+        element.style.minHeight = '36px'
+      } else {
+        element.style.height = 'auto'
+        element.style.height = element.scrollHeight + 'px'
+      }
+    }
 
     return (
       <TextArea
-        ref={textAreaRef}
+        ref={updateTextAreaHeight}
         rows={1}
         aria-expanded={false}
-        className={cn('transition-all resize-none leading-6 box-border', className)}
+        className={cn('h-auto resize-none box-border', className)}
         value={value}
         {...props}
       />

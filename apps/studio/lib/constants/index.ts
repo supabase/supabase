@@ -33,10 +33,12 @@ export const LOCAL_STORAGE_KEYS = {
   RECENTLY_VISITED_ORGANIZATION: 'supabase-organization',
 
   AI_ASSISTANT_STATE: 'supabase-ai-assistant-state',
+  EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
 
   UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
+  UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
 
   SQL_SCRATCH_PAD_BANNER_ACKNOWLEDGED: 'supabase-sql-scratch-pad-banner-acknowledged',

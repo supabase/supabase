@@ -21,6 +21,8 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
+import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger">
@@ -59,6 +61,7 @@ const LayoutHeader = ({
   const selectedOrganization = useSelectedOrganization()
   const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganization?.slug,
@@ -163,8 +166,15 @@ const LayoutHeader = ({
         <div className="absolute md:hidden right-0 h-full w-3 bg-gradient-to-l from-background-dash-sidebar to-transparent pointer-events-none" />
       </div>
       {!!projectRef && (
-        <div className="border-l flex-0 h-full">
-          <AssistantButton />
+        <div className="flex h-full items-center">
+          {isInlineEditorEnabled && (
+            <div className="border-l flex-0 h-full">
+              <InlineEditorButton />
+            </div>
+          )}
+          <div className="border-l flex-0 h-full">
+            <AssistantButton />
+          </div>
         </div>
       )}
     </div>
