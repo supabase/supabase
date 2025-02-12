@@ -263,7 +263,6 @@ Deno.serve(async (req: Request) => {
               language="typescript"
               value={currentValue}
               onChange={handleChange}
-              initialPrompt="Write a simple hello world edge function"
               aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
               aiMetadata={{
                 projectRef: project?.ref,

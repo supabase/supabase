@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Button, Dialog, DialogContent, DialogSection, DialogTrigger } from 'ui'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Terminal, Code } from 'lucide-react'
 
 import {
   EdgeFunctionsListItem,
@@ -40,10 +40,18 @@ const FunctionsPage: NextPageWithLayout = () => {
           Deploy a new function
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-80">
         <Dialog>
           <DialogTrigger asChild>
-            <DropdownMenuItem>Via CLI</DropdownMenuItem>
+            <DropdownMenuItem className="gap-4">
+              <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
+              <div>
+                <span className="text-foreground">Via CLI</span>
+                <p>
+                  Create an edge function locally and then deploy your function via the Supabase CLI
+                </p>
+              </div>
+            </DropdownMenuItem>
           </DialogTrigger>
           <DialogContent size="large">
             <DialogSection padding="small">
@@ -51,7 +59,15 @@ const FunctionsPage: NextPageWithLayout = () => {
             </DialogSection>
           </DialogContent>
         </Dialog>
-        <DropdownMenuItem onSelect={() => setShowCreatePanel(true)}>Via Editor</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => setShowCreatePanel(true)} className="gap-4">
+          <Code className="shrink-0" size={16} strokeWidth={1.5} />
+          <div>
+            <span className="text-foreground">Via Editor</span>
+            <p>
+              Create an edge function in the Supabase Studio editor and then deploy your function
+            </p>
+          </div>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

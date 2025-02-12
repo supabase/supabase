@@ -49,7 +49,7 @@ const PageLayout = ({
           'w-full mx-auto',
           PAGE_SIZE_CLASSES[size],
           size === 'full' && (isCompact ? 'px-6 border-b' : 'pt-8 px-8 border-b'),
-          isCompact ? 'pt-4' : 'pt-8',
+          isCompact ? 'pt-4' : size === 'full' ? 'pt-8' : 'pt-12',
           navigationItems.length === 0 && size === 'full' && (isCompact ? 'pb-4' : 'pb-8'),
           className
         )}

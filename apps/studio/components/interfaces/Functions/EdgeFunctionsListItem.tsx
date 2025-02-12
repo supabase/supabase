@@ -39,17 +39,17 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
         router.push(`/project/${ref}/functions/${item.slug}`)
       }}
     >
-      <Table.td>
+      <Table.td className="whitespace-nowrap">
         <div className="flex items-center gap-2">
           <p className="text-sm text-foreground">{item.name}</p>
         </div>
       </Table.td>
       <Table.td>
-        <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
-          <p className="font-mono truncate hidden md:inline">{endpoint}</p>
+        <div className="text-xs text-foreground-light flex gap-2 items-center">
+          <p className="font-mono truncate hidden md:inline max-w-[400px]">{endpoint}</p>
           <button
             type="button"
-            className="text-foreground-lighter hover:text-foreground transition"
+            className="text-foreground-lighter hover:text-foreground transition shrink-0"
             onClick={(event: any) => {
               function onCopy(value: any) {
                 setIsCopied(true)
