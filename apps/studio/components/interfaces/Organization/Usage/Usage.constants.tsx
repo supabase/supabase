@@ -299,7 +299,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
         attributes: [
           { key: PricingMetric.REALTIME_PEAK_CONNECTIONS.toLowerCase(), color: 'white' },
         ],
-        name: 'Realtime Peak Connections',
+        name: 'Realtime Concurrent Peak Connections',
         chartPrefix: 'Max',
         unit: 'absolute',
         description:
