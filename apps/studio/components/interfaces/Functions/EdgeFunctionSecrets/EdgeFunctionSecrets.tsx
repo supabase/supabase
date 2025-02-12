@@ -59,13 +59,14 @@ const EdgeFunctionSecrets = () => {
             <>
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <Input
-                  size="small"
+                  size="tiny"
                   className="w-full md:w-80"
-                  placeholder="Search for a secret"
+                  placeholder="Search for a secret..."
                   value={searchString}
                   onChange={(e: any) => setSearchString(e.target.value)}
                   icon={<Search size={14} />}
                 />
+
                 <div className="flex items-center space-x-2">
                   <DocsButton href="https://supabase.com/docs/guides/functions/secrets" />
                   <ButtonTooltip
