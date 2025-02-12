@@ -89,7 +89,7 @@ from
           oid,
           unnest(arg_modes) as mode,
           unnest(arg_names) as name,
-          unnest(arg_types) as type_id,
+          unnest(arg_types)::int8 as type_id,
           unnest(arg_has_defaults) as has_default
         from
           functions
