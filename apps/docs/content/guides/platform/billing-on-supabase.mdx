@@ -42,17 +42,16 @@ Monthly costs for paid plans include a fixed subscription fee based on your chos
 - [Control your costs]() - For details on how you can control your costs in case unexpected high usage occurs
 
 ### Compute costs for projects
+
 An organization can have multiple projects. Each project includes a dedicated Postgres instance running on its own server. You are charged for the Compute resources of that server, independent of your database usage.
 
 <Admonition type="caution">
 
-  Each project you launch increases your monthly Compute costs.
+Each project you launch increases your monthly Compute costs.
 
 </Admonition>
 
 Read more about [Compute costs](/docs/guides/platform/manage-your-usage/compute).
-
-
 
 ## Variable Usage Fees and Quotas
 
@@ -81,8 +80,9 @@ You can find a detailed breakdown of all usage items and how they are billed on 
 
 While your subscription plan applies to your entire organization and is charged only once, you can enhance individual projects by opting into various add-ons.
 
-- [Compute](/docs/guides/platform/compute-and-disk) to scale your database up to 64 cores and 256 GB RAM
+- [Compute](/docs/guides/platform/compute-and-disk#compute) to scale your database up to 64 cores and 256 GB RAM
 - [Read Replicas](/docs/guides/platform/read-replicas) to scale read operations and provide resiliency
+- [Disk](/docs/guides/platform/compute-and-disk#disk) to provision extra IOPS/throughput or use a high-performance SSD
 - [Log Drains](/docs/guides/telemetry/log-drains) to sync Supabase logs to a logging system of your choice
 - [Custom Domains](/docs/guides/platform/custom-domains) to provide a branded experience
 - [PITR](/docs/guides/platform/backups#point-in-time-recovery) to roll back to any specific point in time, down to the minute
