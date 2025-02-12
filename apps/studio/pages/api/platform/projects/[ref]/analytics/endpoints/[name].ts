@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next'
 import apiWrapper from 'lib/api/apiWrapper'
-import { PROJECT_ANALYTICS_URL } from 'pages/api/constants'
 import { get } from 'lib/common/fetch'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { PROJECT_ANALYTICS_URL } from 'pages/api/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -35,6 +35,7 @@ const proxyRequest = async (req: NextApiRequest) => {
   const search = '?' + new URLSearchParams(payload as any).toString()
   const apiKey = process.env.LOGFLARE_API_KEY
   const url = `${PROJECT_ANALYTICS_URL}endpoints/query/${name}${search}`
+
   const result = await get(url, {
     headers: {
       'x-api-key': apiKey,

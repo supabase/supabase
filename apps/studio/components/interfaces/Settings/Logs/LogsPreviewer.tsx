@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { Rewind } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
@@ -9,20 +10,18 @@ import ShimmerLine from 'components/ui/ShimmerLine'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
+import useSingleLog from 'hooks/analytics/useSingleLog'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Button, cn } from 'ui'
+import { Button } from 'ui'
+import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import LogTable from './LogTable'
 import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
 import { ensureNoTimestampConflict, maybeShowUpgradePrompt } from './Logs.utils'
 import UpgradePrompt from './UpgradePrompt'
-import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
-import useSingleLog from 'hooks/analytics/useSingleLog'
-import { LogsBarChart } from 'ui-patterns/LogsBarChart'
-import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
-import dayjs from 'dayjs'
 
 /**
  * Acts as a container component for the entire log display
@@ -54,7 +53,7 @@ export const LogsPreviewer = ({
   filterPanelClassName,
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
-  const { s, ite, its, db } = useParams()
+  const { its, db } = useParams()
   const [showChart, setShowChart] = useState(true)
   const organization = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
