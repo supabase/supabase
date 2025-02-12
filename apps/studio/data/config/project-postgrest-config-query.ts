@@ -1,11 +1,16 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectPostgrestConfigVariables = {
   projectRef?: string
+}
+
+type PostgrestConfigResponse = components['schemas']['PostgrestConfigResponse'] & {
+  db_pool: number | null
 }
 
 export async function getProjectPostgrestConfig(
@@ -19,7 +24,9 @@ export async function getProjectPostgrestConfig(
     signal,
   })
   if (error) handleError(error)
-  return data
+  // [Joshen] Not sure why but db_pool isn't part of the API typing
+  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/projects/ref/config/postgrest.dto.ts#L6
+  return data as unknown as PostgrestConfigResponse
 }
 
 export type ProjectPostgrestConfigData = Awaited<ReturnType<typeof getProjectPostgrestConfig>>
