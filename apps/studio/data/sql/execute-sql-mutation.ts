@@ -8,6 +8,7 @@ import { databaseTriggerKeys } from 'data/database-triggers/keys'
 import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { enumeratedTypesKeys } from 'data/enumerated-types/keys'
+import { tableKeys } from 'data/tables/keys'
 import { executeSql, ExecuteSqlData, ExecuteSqlVariables } from './execute-sql-query'
 
 export type QueryResponseError = {
@@ -42,6 +43,7 @@ export const useExecuteSqlMutation = ({
         // [Joshen] Default to false for now, only used for SQL editor to dynamically invalidate
         if (contextualInvalidation && projectRef) {
           const invalidationKeys = inferInvalidationKeys(projectRef, sql)
+          console.log({ invalidationKeys })
           await Promise.all(invalidationKeys.map((key) => queryClient.invalidateQueries(key)))
         }
         await onSuccess?.(data, variables, context)
@@ -69,6 +71,7 @@ const inferInvalidationKeys = (ref: string, sql: string) => {
     sqlLower.includes('drop table')
   ) {
     keys.push(entityTypeKeys.list(ref))
+    keys.push(tableKeys.list(ref))
   }
   if (
     sqlLower.includes('create schema') ||
