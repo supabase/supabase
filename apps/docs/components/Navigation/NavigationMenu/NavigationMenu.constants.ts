@@ -1010,10 +1010,6 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg_plan_filter',
         },
         {
-          name: 'pg_stat_monitor: Extended Query Performance Monitoring',
-          url: '/guides/database/extensions/pg_stat_monitor',
-        },
-        {
           name: 'postgres_fdw: query data from an external Postgres server',
           url: '/guides/database/extensions/postgres_fdw',
         },
