@@ -14,6 +14,7 @@ export interface ChartHeaderProps {
   onChartStyleChange?: (style: string) => void
   showMaxValue?: boolean
   setShowMaxValue?: (value: boolean) => void
+  percentage?: number
 }
 
 const ChartHeader = ({
@@ -27,6 +28,7 @@ const ChartHeader = ({
   onChartStyleChange,
   showMaxValue = false,
   setShowMaxValue,
+  percentage,
 }: ChartHeaderProps) => {
   const chartTitle = (
     <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
@@ -43,6 +45,9 @@ const ChartHeader = ({
       <span className="text-lg">
         {typeof format === 'function' ? format(highlightedValue) : format}
       </span>
+      {percentage && (
+        <span className="text-[11px] text-foreground-light ml-1">({percentage.toFixed(1)}%)</span>
+      )}
     </h4>
   )
   const label = <h4 className="text-foreground-lighter text-xs">{highlightedLabel}</h4>
@@ -60,7 +65,7 @@ const ChartHeader = ({
   }
 
   return (
-    <div className="flex-grow flex justify-between items-start min-h-16">
+    <div className="flex-grow flex justify-between items-start min-h-20">
       <div className="flex flex-col">
         {title && chartTitle}
         {highlightedValue !== undefined && highlighted}

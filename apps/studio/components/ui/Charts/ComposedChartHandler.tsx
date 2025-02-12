@@ -165,29 +165,21 @@ const ComposedChartHandler = ({
   // TODO: need to update this to show total aggregate over multiple attributes in a stacked chart
   const _highlightedValue = useMemo(() => {
     if (highlightedValue !== undefined) return highlightedValue
+    const isLoading = attributeQueries.some((query) => query.isLoading)
+    if (isLoading || !combinedData || (Array.isArray(combinedData) && combinedData.length === 0))
+      return undefined
 
-    const firstAttr = attributes[0]
-    const firstQuery = attributeQueries[0]
-    const firstData = firstQuery?.data
+    // Get the last data point
+    const lastDataPoint = Array.isArray(combinedData)
+      ? combinedData[combinedData.length - 1]
+      : undefined
 
-    if (!firstData) return undefined
-
-    const shouldHighlightMaxValue =
-      firstAttr.provider === 'daily-stats' &&
-      !firstAttr.attribute.includes('ingress') &&
-      !firstAttr.attribute.includes('egress') &&
-      'maximum' in firstData
-
-    const shouldHighlightTotalGroupedValue = 'totalGrouped' in firstData
-
-    return shouldHighlightMaxValue
-      ? firstData.maximum
-      : firstAttr.provider === 'daily-stats'
-        ? firstData.total
-        : shouldHighlightTotalGroupedValue
-          ? firstData.totalGrouped?.[firstAttr.attribute as keyof typeof firstData.totalGrouped]
-          : (firstData.data[firstData.data.length - 1] as any)?.[firstAttr.attribute]
-  }, [highlightedValue, attributes, attributeQueries])
+    // Calculate total of all non-maxValue attributes
+    if (!lastDataPoint) return undefined
+    return attributes
+      .filter((attr) => !attr.isMaxValue && !attr.omitFromTotal)
+      .reduce((sum, attr) => sum + (Number(lastDataPoint[attr.attribute]) || 0), 0)
+  }, [highlightedValue, combinedData, attributes, attributeQueries])
 
   if (loading) {
     return (

@@ -56,7 +56,7 @@ const REPORT_ATTRIBUTES = [
     showLegend: true,
     hideChartType: true,
     defaultChartStyle: 'line',
-    showTotal: false,
+    // showTotal: false,
     attributes: [
       {
         attribute: 'ram_usage_max_available',
@@ -175,12 +175,19 @@ const REPORT_ATTRIBUTES = [
         label: 'IOps write',
       },
       { attribute: 'disk_iops_read', provider: 'infra-monitoring', label: 'IOps read' },
-      {
-        attribute: 'disk_iops_max',
-        provider: 'infra-monitoring',
-        label: 'IOps Max',
-        isMaxValue: true,
-      },
+      // {
+      //   attribute: 'disk_iops_max',
+      //   provider: 'infra-monitoring',
+      //   label: 'IOps Max',
+      //   isMaxValue: true,
+      // },
+      // {
+      //   attribute: 'disk_iops_usage',
+      //   provider: 'infra-monitoring',
+      //   label: 'IOps Max',
+      //   format: '%',
+      //   isMaxValue: true,
+      // },
     ],
   },
 ]
