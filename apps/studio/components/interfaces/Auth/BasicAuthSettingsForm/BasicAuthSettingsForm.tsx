@@ -10,10 +10,6 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { FormFieldWrapper } from 'components/ui/Forms'
-import { FormActions } from 'components/ui/Forms/FormActions'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
@@ -26,8 +22,6 @@ import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
-  CardTitle,
   Form_Shadcn_,
   Switch,
   WarningIcon,
@@ -45,13 +39,7 @@ const schema = object({
 
 const BasicAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
-  const {
-    data: authConfig,
-    error: authConfigError,
-    isLoading,
-    isError,
-    isSuccess,
-  } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
@@ -110,7 +98,11 @@ const BasicAuthSettingsForm = () => {
   }
 
   if (!canReadConfig) {
-    return <NoPermission resourceText="view auth configuration settings" />
+    return (
+      <div className="mt-8">
+        <NoPermission resourceText="view auth configuration settings" />
+      </div>
+    )
   }
 
   return (
