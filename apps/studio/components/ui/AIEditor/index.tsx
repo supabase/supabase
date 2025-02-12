@@ -244,8 +244,8 @@ const AIEditor = ({
             language={language}
             original={diffValue.original}
             modified={diffValue.modified}
-            onMount={(editor) => {
-              diffEditorRef.current = editor as monacoEditor.IStandaloneDiffEditor
+            onMount={(editor: monacoEditor.IStandaloneDiffEditor) => {
+              diffEditorRef.current = editor
               setIsDiffEditorMounted(true)
             }}
             options={{

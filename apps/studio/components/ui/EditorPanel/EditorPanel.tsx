@@ -255,7 +255,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
               wordWrap: 'on',
               lineNumbers: 'on',
               folding: false,
-              padding: { top: 4, right: 16 },
+              padding: { top: 4 },
               lineNumbersMinChars: 3,
             }}
           />
