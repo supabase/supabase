@@ -1,14 +1,13 @@
 import Editor, { DiffEditor, Monaco, OnMount } from '@monaco-editor/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Command, Loader2 } from 'lucide-react'
+import { Command } from 'lucide-react'
 import { useRef, useState, useEffect } from 'react'
 import { editor as monacoEditor } from 'monaco-editor'
 import { useCompletion } from 'ai/react'
 import { detectOS } from 'lib/helpers'
 import { constructHeaders } from 'data/fetchers'
 import { toast } from 'sonner'
-import InlineWidget from 'components/interfaces/SQLEditor/InlineWidget'
-import { AskAIWidget } from 'components/interfaces/SQLEditor/AskAIWidget'
+import ResizableAIWidget from './ResizableAIWidget'
 
 interface AIEditorProps {
   id?: string
@@ -255,29 +254,26 @@ const AIEditor = ({
             }}
           />
           {isDiffEditorMounted && (
-            <InlineWidget
+            <ResizableAIWidget
               editor={diffEditorRef.current!}
               id="ask-ai-diff"
-              heightInLines={3}
-              afterLineNumber={0}
-              beforeLineNumber={Math.max(0, promptState.startLineNumber - 1)}
-            >
-              <AskAIWidget
-                onSubmit={(prompt: string) => {
-                  handlePrompt(prompt, {
-                    beforeSelection: promptState.beforeSelection,
-                    selection: promptState.selection || diffValue.modified,
-                    afterSelection: promptState.afterSelection,
-                  })
-                }}
-                value={promptInput}
-                onChange={setPromptInput}
-                onAccept={handleAcceptDiff}
-                onReject={handleRejectDiff}
-                isDiffVisible={true}
-                isLoading={isCompletionLoading}
-              />
-            </InlineWidget>
+              value={promptInput}
+              onChange={setPromptInput}
+              onSubmit={(prompt: string) => {
+                handlePrompt(prompt, {
+                  beforeSelection: promptState.beforeSelection,
+                  selection: promptState.selection || diffValue.modified,
+                  afterSelection: promptState.afterSelection,
+                })
+              }}
+              onAccept={handleAcceptDiff}
+              onReject={handleRejectDiff}
+              onCancel={handleReset}
+              isDiffVisible={true}
+              isLoading={isCompletionLoading}
+              startLineNumber={Math.max(0, promptState.startLineNumber)}
+              endLineNumber={promptState.endLineNumber}
+            />
           )}
         </div>
       ) : (
@@ -296,27 +292,24 @@ const AIEditor = ({
             className={className}
           />
           {promptState.isOpen && editorRef.current && (
-            <InlineWidget
+            <ResizableAIWidget
               editor={editorRef.current}
               id="ask-ai"
-              afterLineNumber={promptState.endLineNumber}
-              beforeLineNumber={Math.max(0, promptState.startLineNumber - 1)}
-              heightInLines={2}
-            >
-              <AskAIWidget
-                value={promptInput}
-                onChange={setPromptInput}
-                onSubmit={(prompt: string) => {
-                  handlePrompt(prompt, {
-                    beforeSelection: promptState.beforeSelection,
-                    selection: promptState.selection,
-                    afterSelection: promptState.afterSelection,
-                  })
-                }}
-                isDiffVisible={false}
-                isLoading={isCompletionLoading}
-              />
-            </InlineWidget>
+              value={promptInput}
+              onChange={setPromptInput}
+              onSubmit={(prompt: string) => {
+                handlePrompt(prompt, {
+                  beforeSelection: promptState.beforeSelection,
+                  selection: promptState.selection,
+                  afterSelection: promptState.afterSelection,
+                })
+              }}
+              onCancel={handleReset}
+              isDiffVisible={false}
+              isLoading={isCompletionLoading}
+              startLineNumber={Math.max(0, promptState.startLineNumber)}
+              endLineNumber={promptState.endLineNumber}
+            />
           )}
           <AnimatePresence>
             {!promptState.isOpen && !currentValue && aiEndpoint && (
