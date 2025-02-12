@@ -1,9 +1,7 @@
-import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { databaseTriggerKeys } from './keys'
 
@@ -13,8 +11,6 @@ export type DatabaseTriggerCreateVariables = {
   payload: any
 }
 
-type CreateDatabaseTriggerResponse = PostgresTrigger & { error?: any }
-
 export async function createDatabaseTrigger({
   projectRef,
   connectionString,
@@ -23,12 +19,17 @@ export async function createDatabaseTrigger({
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const response = (await post(`${API_URL}/pg-meta/${projectRef}/triggers`, payload, {
-    headers: Object.fromEntries(headers),
-  })) as CreateDatabaseTriggerResponse
+  const { data, error } = await post('/platform/pg-meta/{ref}/triggers', {
+    params: {
+      header: { 'x-connection-encrypted': connectionString! },
+      path: { ref: projectRef },
+    },
+    body: payload,
+    headers,
+  })
 
-  if (response.error) throw response.error
-  return response as PostgresTrigger
+  if (error) handleError(error)
+  return data
 }
 
 type DatabaseTriggerCreateData = Awaited<ReturnType<typeof createDatabaseTrigger>>
