@@ -203,11 +203,6 @@ export const UsersV2 = () => {
     500
   )
 
-  const onSelectDeleteUser = (user: User) => {
-    setSelectedUsers(new Set([user.id]))
-    setShowDeleteModal(true)
-  }
-
   const handleDeleteUsers = async () => {
     if (!projectRef) return console.error('Project ref is required')
     const userIds = [...selectedUsers]
@@ -246,7 +241,7 @@ export const UsersV2 = () => {
         users: users ?? [],
         visibleColumns: selectedColumns,
         setSortByValue,
-        onSelectDeleteUser,
+        onSelectDeleteUser: setSelectedUserToDelete,
       })
       setColumns(columns)
       if (columns.length < USERS_TABLE_COLUMNS.length) {
@@ -387,7 +382,7 @@ export const UsersV2 = () => {
                       users: users ?? [],
                       visibleColumns: value,
                       setSortByValue,
-                      onSelectDeleteUser,
+                      onSelectDeleteUser: setSelectedUserToDelete,
                     })
 
                     setSelectedColumns(value)
