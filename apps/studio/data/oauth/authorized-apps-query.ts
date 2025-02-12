@@ -24,7 +24,7 @@ export async function getAuthorizedApps({ slug }: AuthorizedAppsVariables, signa
   })
 
   if (error) handleError(error)
-  return data
+  return data as AuthorizedApp[]
 }
 
 export type AuthorizedAppsData = Awaited<ReturnType<typeof getAuthorizedApps>>

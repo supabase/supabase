@@ -2,6 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import { Integration } from './integrations.types'
 import { integrationKeys } from './keys'
 
 type IntegrationsVariables = {
@@ -15,7 +16,7 @@ export async function getIntegrations({ orgSlug }: IntegrationsVariables, signal
     params: { path: { slug: orgSlug } },
   })
   if (error) handleError(error)
-  return data
+  return data as unknown as Integration[]
 }
 
 export type IntegrationsData = Awaited<ReturnType<typeof getIntegrations>>
