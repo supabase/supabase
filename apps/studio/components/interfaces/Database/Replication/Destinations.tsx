@@ -8,8 +8,13 @@ import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import DestinationRow from './DestinationRow'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { useState } from 'react'
+import NewDestinationPanel from './NewDestinationPanel'
+import { set } from 'lodash'
 
 const Destinations = () => {
+  const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
   const { ref: projectRef } = useParams()
   const {
     data: sinks_data,
@@ -35,6 +40,26 @@ const Destinations = () => {
 
   return (
     <>
+      <div className="flex">
+        <FormHeader
+          title="Destinations"
+          description="Publish data from your primary database to another"
+        />
+        <ButtonTooltip
+          type="default"
+          icon={<Plus />}
+          onClick={() => setShowNewDestinationPanel(true)}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: 'Add a new destination',
+            },
+          }}
+          className="mt-6 mb-8"
+        >
+          Add destination
+        </ButtonTooltip>
+      </div>
       <div className="py-6">
         {isSinksLoading && <GenericSkeletonLoader />}
 
@@ -85,6 +110,7 @@ const Destinations = () => {
               <ButtonTooltip
                 type="default"
                 icon={<Plus />}
+                onClick={() => setShowNewDestinationPanel(true)}
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -99,6 +125,11 @@ const Destinations = () => {
           )
         )}
       </div>
+      <NewDestinationPanel
+        visible={showNewDestinationPanel}
+        onCancel={() => setShowNewDestinationPanel(false)}
+        onConfirm={() => setShowNewDestinationPanel(false)}
+      ></NewDestinationPanel>
     </>
   )
 }
