@@ -23,9 +23,9 @@
 .sbui-tab-bar--scrollable {
   overflow: auto;
   white-space: nowrap;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}*/
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 .sbui-tab-bar--scrollable::-webkit-scrollbar {
@@ -40,4 +40,4 @@
 .sbui-tab-bar-container {
   justify-content: space-between;
   width: 100%;
-} */
+}
