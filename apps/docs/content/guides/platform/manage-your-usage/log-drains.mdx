@@ -30,7 +30,7 @@ Usage is shown as "Log Drain Hours" on your invoice.
 
 ### Pricing
 
-$0.0822 per hour ($60 per month).
+Log Drains are available as an project Add-On for all Team and Enterprise users. Each Log Drain costs $0.0822 per hour ($60 per month).
 
 ## Log Drain Events
 
@@ -40,13 +40,12 @@ Log Drain Events are billed using Package pricing, with each package representin
 
 #### Example
 
-For simplicity, let's assume a package size of 5 and a charge of $2 per package.
-
-| Events | Packages Billed | Costs |
-| --------------------- | ------------------------- | ----- |
-| 4                     | 1                         | $2    |
-| 5                     | 1                         | $2    |
-| 6                     | 2                         | $4    |
+| Events    | Packages Billed | Costs |
+| --------- | --------------- | ----- |
+| 999,999   | 1               | $0.2  |
+| 1,000,000 | 1               | $0.2  |
+| 1,000,001 | 2               | $0.4  |
+| 1,500,000 | 2               | $0.4  |
 
 #### Usage on your invoice
 
@@ -61,7 +60,7 @@ $0.2 per 1 million events.
 The project has two log drains configured throughout the entire billing cycle with 800,000 and 1.6 million events each. In this example we assume that the organization is exceeding its Unified Egress Quota, so charges for Egress apply.
 
 | Line Item                     | Units              | Costs       |
-|-------------------------------|--------------------|-------------|
+| ----------------------------- | ------------------ | ----------- |
 | Team Plan                     | 1                  | $599        |
 |                               |                    |             |
 | Compute Hours Micro Project 1 | 744 hours          | $10         |
