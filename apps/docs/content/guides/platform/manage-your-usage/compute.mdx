@@ -7,6 +7,8 @@ title: 'Manage Compute usage'
 
 Each project on the Supabase platform includes a dedicated Postgres instance running on its own server. You are charged for the [Compute](/docs/guides/platform/compute-and-disk#compute) resources of that server, independent of your database usage.
 
+Paused projects do not count towards Compute usage.
+
 ## How charges are calculated
 
 Compute is charged by the hour, meaning you are charged for the exact number of hours that a project is running and, therefore, incurring Compute usage. If a project runs for part of an hour, you are still charged for the full hour.

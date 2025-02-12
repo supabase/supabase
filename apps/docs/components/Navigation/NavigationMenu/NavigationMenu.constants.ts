@@ -1415,6 +1415,10 @@ export const functions: NavMenuConstant = {
           name: 'Limits',
           url: '/guides/functions/limits',
         },
+        {
+          name: 'Pricing',
+          url: '/guides/functions/pricing',
+        },
       ],
     },
     {
@@ -1583,6 +1587,7 @@ export const realtime: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Quotas', url: '/guides/realtime/quotas' },
+        { name: 'Pricing', url: '/guides/realtime/pricing' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
         { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
         { name: 'Benchmarks', url: '/guides/realtime/benchmarks' },
@@ -1668,6 +1673,7 @@ export const storage: NavMenuConstant = {
       items: [
         { name: 'Copy / Move Objects', url: '/guides/storage/management/copy-move-objects' },
         { name: 'Delete Objects', url: '/guides/storage/management/delete-objects' },
+        { name: 'Pricing', url: '/guides/storage/management/pricing' },
       ],
     },
     {
