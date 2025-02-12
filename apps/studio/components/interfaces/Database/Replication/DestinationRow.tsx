@@ -52,11 +52,7 @@ const DestinationRow = ({
     'None' | 'EnableRequested' | 'DisableRequested'
   >('None')
   const { mutate: startPipeline } = useStartPipelineMutation()
-  const { mutate: stopPipeline } = useStopPipelineMutation({
-    onSuccess: () => {
-      toast.success('Stop pipeline request submitted. Pipeline will stop shortly')
-    },
-  })
+  const { mutate: stopPipeline } = useStopPipelineMutation()
   const pipelineStatus = pipelineStatusData?.status
   if (
     (requestStatus === 'EnableRequested' && pipelineStatus === 'Started') ||
