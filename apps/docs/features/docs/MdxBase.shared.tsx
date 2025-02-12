@@ -29,6 +29,17 @@ import {
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
   PostgresInstallation,
+  PricingMfaPhone,
+  PricingBranching,
+  PricingEdgeFunctions,
+  PricingMau,
+  PricingMauSso,
+  PricingMauThirdParty,
+  PricingPitr,
+  PricingRealtimeMessages,
+  PricingRealtimeConnections,
+  PricingStorageImageTransformations,
+  PricingStorageSize,
 } from '~/components/MDX/partials'
 import { NavData } from '~/components/NavData'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
@@ -90,6 +101,17 @@ const components = {
   StepHikeCompact,
   Tabs,
   TabPanel,
+  PricingMfaPhone,
+  PricingBranching,
+  PricingEdgeFunctions,
+  PricingMau,
+  PricingMauSso,
+  PricingMauThirdParty,
+  PricingPitr,
+  PricingRealtimeMessages,
+  PricingRealtimeConnections,
+  PricingStorageImageTransformations,
+  PricingStorageSize,
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
       {props.children}

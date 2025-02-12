@@ -814,7 +814,7 @@ const WizardForm = () => {
                                               <Link
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                                                href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                                               >
                                                 <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
                                                   <p className="text-sm m-0">Compute Billing</p>
