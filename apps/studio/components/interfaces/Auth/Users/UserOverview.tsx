@@ -10,7 +10,6 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CopyButton from 'components/ui/CopyButton'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
-import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
 import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
@@ -24,6 +23,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { BanUserModal } from './BanUserModal'
+import { DeleteUserModal } from './DeleteUserModal'
 import { UserHeader } from './UserHeader'
 import { PANEL_PADDING } from './UserPanel'
 import { providerIconMap } from './Users.utils'
@@ -109,13 +109,6 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       toast.error(`Failed to send OTP: ${err.message}`)
     },
   })
-  const { mutate: deleteUser } = useUserDeleteMutation({
-    onSuccess: () => {
-      toast.success(`Successfully deleted ${user?.email}`)
-      setIsDeleteModalOpen(false)
-      onDeleteSuccess()
-    },
-  })
   const { mutate: deleteUserMFAFactors } = useUserDeleteMFAFactorsMutation({
     onSuccess: () => {
       toast.success("Successfully deleted the user's factors")
@@ -128,15 +121,6 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       setIsUnbanModalOpen(false)
     },
   })
-
-  const handleDelete = async () => {
-    await timeout(200)
-    if (!projectRef) return console.error('Project ref is required')
-    if (user.id === undefined) {
-      return toast.error(`Failed to delete user: User ID not found`)
-    }
-    deleteUser({ projectRef, userId: user.id })
-  }
 
   const handleDeleteFactors = async () => {
     await timeout(200)
@@ -179,7 +163,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           <Separator />
         )}
 
-        <div className={cn('flex flex-col gap-1.5', PANEL_PADDING)}>
+        <div className={cn('flex flex-col gap-y-1', PANEL_PADDING)}>
           <RowData property="User UID" value={user.id} />
           <RowData
             property="Created at"
@@ -403,23 +387,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         </div>
       </div>
 
-      <ConfirmationModal
+      <DeleteUserModal
         visible={isDeleteModalOpen}
-        variant="destructive"
-        title="Confirm to delete user"
-        confirmLabel="Delete"
-        onCancel={() => setIsDeleteModalOpen(false)}
-        onConfirm={() => handleDelete()}
-        alert={{
-          title: 'Deleting a user is irreversible',
-          description: 'This will remove the user from the project and all associated data.',
+        selectedUser={user}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onDeleteSuccess={() => {
+          setIsDeleteModalOpen(false)
+          onDeleteSuccess()
         }}
-      >
-        <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to delete the user{' '}
-          <span className="text-foreground">{user.email ?? user.phone ?? 'this user'}</span>?
-        </p>
-      </ConfirmationModal>
+      />
 
       <ConfirmationModal
         visible={isDeleteFactorsModalOpen}
@@ -466,7 +442,7 @@ export const RowData = ({ property, value }: { property: string; value?: string 
   return (
     <>
       <div className="flex items-center gap-x-2 group justify-between">
-        <p className=" text-foreground-lighter text-sm">{property}</p>
+        <p className=" text-foreground-lighter text-xs">{property}</p>
         {typeof value === 'boolean' ? (
           <div className="h-[26px] flex items-center justify-center min-w-[70px]">
             {value ? (
@@ -481,7 +457,7 @@ export const RowData = ({ property, value }: { property: string; value?: string 
           </div>
         ) : (
           <div className="flex items-center gap-x-2 h-[26px] font-mono min-w-[40px]">
-            <p className="text-sm">{!value ? '-' : value}</p>
+            <p className="text-xs">{!value ? '-' : value}</p>
             {!!value && (
               <CopyButton
                 iconOnly

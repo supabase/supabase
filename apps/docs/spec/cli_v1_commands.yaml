@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.12.0
+  version: 2.12.1
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -3006,7 +3006,7 @@ commands:
           Linked project is up to date.
       - id: self-hosted
         name: Self hosted
-        code: supabase db push --db-url "postgres://user.tenant:pass@127.0.0.1:5432"
+        code: supabase db push --db-url "postgres://user:pass@127.0.0.1:5432/postgres"
         response: |
           Pushing migration 20230410135622_create_employees_table.sql...
           Finished supabase db push.
