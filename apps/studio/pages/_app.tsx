@@ -1,4 +1,5 @@
 import 'react-data-grid/lib/styles.css'
+import 'styles/fonts.scss'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
 import 'styles/date-picker.scss'
