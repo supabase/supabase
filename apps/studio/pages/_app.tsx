@@ -1,5 +1,4 @@
 import 'react-data-grid/lib/styles.css'
-import 'styles/fonts.scss'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
 import 'styles/date-picker.scss'
@@ -27,6 +26,8 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
+import { Source_Code_Pro } from 'next/font/google'
+import localFont from 'next/font/local'
 import Head from 'next/head'
 import { ErrorInfo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -69,6 +70,57 @@ loader.config({
       ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.0/min/vs'
       : `${BASE_PATH}/monaco-editor`,
   },
+})
+
+const customFont = localFont({
+  variable: '--font-custom',
+  display: 'swap',
+  fallback: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+  src: [
+    {
+      path: '../fonts/CustomFont-Book.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/CustomFont-BookItalic.woff2',
+      weight: '400',
+      style: 'italic',
+    },
+    {
+      path: '../fonts/CustomFont-Medium.woff2',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/CustomFont-Bold.woff2',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/CustomFont-BoldItalic.woff2',
+      weight: '600',
+      style: 'italic',
+    },
+    {
+      path: '../fonts/CustomFont-Black.woff2',
+      weight: '800',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/CustomFont-BlackItalic.woff2',
+      weight: '800',
+      style: 'italic',
+    },
+  ],
+})
+
+const sourceCodePro = Source_Code_Pro({
+  subsets: ['latin'],
+  fallback: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
+  variable: '--font-source-code-pro',
+  display: 'swap',
+  weight: ['400'],
 })
 
 // [Joshen TODO] Once we settle on the new nav layout - we'll need a lot of clean up in terms of our layout components
@@ -126,7 +178,11 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       <AppBannerContextProvider>
                         <CommandProvider>
                           <FeaturePreviewContextProvider>
-                            {getLayout(<Component {...pageProps} />)}
+                            <div
+                              className={`${customFont.variable} ${sourceCodePro.variable} font-sans flex flex-col h-screen w-screen`}
+                            >
+                              {getLayout(<Component {...pageProps} />)}
+                            </div>
                             <StudioCommandMenu />
                             <GenerateSql />
                             <FeaturePreviewModal />

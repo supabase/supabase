@@ -24,20 +24,18 @@ const DefaultLayout = ({ children, showProductMenu }: PropsWithChildren<DefaultL
     <>
       <ProjectContextProvider projectRef={ref}>
         <AppBannerContextProvider>
-          <div className="flex flex-col h-screen w-screen">
-            {/* Top Banner */}
-            <AppBannerWrapper />
-            <div className="flex-shrink-0">
-              <MobileNavigationBar />
-              <LayoutHeader showProductMenu={showProductMenu} />
-            </div>
-            {/* Main Content Area */}
-            <div className="flex flex-1 w-full overflow-y-hidden">
-              {/* Sidebar */}
-              <NavigationBar />
-              {/* Main Content */}
-              <div className="flex-grow h-full overflow-y-auto">{children}</div>
-            </div>
+          {/* Top Banner */}
+          <AppBannerWrapper />
+          <div className="flex-shrink-0">
+            <MobileNavigationBar />
+            <LayoutHeader showProductMenu={showProductMenu} />
+          </div>
+          {/* Main Content Area */}
+          <div className="flex flex-1 w-full overflow-y-hidden">
+            {/* Sidebar */}
+            <NavigationBar />
+            {/* Main Content */}
+            <div className="flex-grow h-full overflow-y-auto">{children}</div>
           </div>
         </AppBannerContextProvider>
       </ProjectContextProvider>
