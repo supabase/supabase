@@ -1,44 +1,30 @@
 import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 
-import { useParams } from 'common'
 import { useAppBannerContext } from 'components/interfaces/App/AppBannerWrapperContext'
 import { useProfile } from 'lib/profile'
 import { Button } from 'ui'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { isSmtpEnabled } from 'components/interfaces/Auth/SmtpForm/SmtpForm.utils'
 
 // This file, like AppBannerWrapperContext.tsx, is meant to be dynamic - update this as and when we need to use the NoticeBanner
 
-// [Joshen] As of 19th September 24, this notice is around custom SMTP
-// https://github.com/orgs/supabase/discussions/29370
+// [Alaister] As of 11th February 2025, this notice is around Fly's Postgres offering
+// https://github.com/orgs/supabase/discussions/33413
 // Timelines TLDR:
-// - 20th September 2024: Email template customization no longer possible without setting up custom SMTP provider
-// - 24th September 2024: Projects without custom SMTP will have their custom email templates returned back to default ones
-// - 26th September 2024: If no custom SMTP, emails can only be sent to email addresses in your project's organization
-// We can probably look to disable this banner perhaps a month from 26th Sept 2024 - so maybe end of October 2024
+// - Before March 14 2025: Users will still be able to access your existing Fly Postgres projects.
+// - On March 14 2025: Your Fly Postgres projects are removed from our platform
+// We can disable this banner after 14th March 2025 as the Fly Postgres offering is no longer available
 
 export const NoticeBanner = () => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
-  const { isLoading: isLoadingProfile } = useProfile()
+  const { isLoading: isLoadingProfile, profile } = useProfile()
 
   const appBannerContext = useAppBannerContext()
-  const { authSmtpBannerAcknowledged, onUpdateAcknowledged } = appBannerContext
+  const { flyPostgresBannerAcknowledged, onUpdateAcknowledged } = appBannerContext
 
-  const { data: authConfig } = useAuthConfigQuery({ projectRef })
-  const smtpEnabled = isSmtpEnabled(authConfig)
-  const hasAuthEmailHookEnabled = authConfig?.HOOK_SEND_EMAIL_ENABLED
+  const isFlyUser = Boolean(profile?.primary_email?.endsWith('customer.fly.io'))
+  const acknowledged = flyPostgresBannerAcknowledged
 
-  const acknowledged = authSmtpBannerAcknowledged.includes(projectRef ?? '')
-
-  if (
-    isLoadingProfile ||
-    router.pathname.includes('sign-in') ||
-    smtpEnabled ||
-    hasAuthEmailHookEnabled ||
-    acknowledged
-  ) {
+  if (isLoadingProfile || !isFlyUser || router.pathname.includes('sign-in') || acknowledged) {
     return null
   }
 
@@ -48,15 +34,14 @@ export const NoticeBanner = () => {
       className="flex items-center justify-center gap-x-4 bg-surface-100 py-3 transition text-foreground box-border border-b border-default"
     >
       <p className="text-sm">
-        Action required: Set up a custom SMTP provider, further restrictions will be imposed for the
-        default email provider
+        Supabase is deprecating Fly's Postgres offering managed by Supabase on March 14, 2025
       </p>
       <div className="flex items-center gap-x-1">
         <Button asChild type="link" iconRight={<ExternalLink size={14} />}>
           <a
             target="_blank"
             rel="noreferrer"
-            href="https://github.com/orgs/supabase/discussions/29370"
+            href="https://github.com/orgs/supabase/discussions/33413"
           >
             Learn more
           </a>
@@ -65,7 +50,7 @@ export const NoticeBanner = () => {
           type="text"
           className="opacity-75"
           onClick={() => {
-            if (projectRef) onUpdateAcknowledged('auth-smtp', projectRef)
+            onUpdateAcknowledged('fly-postgres')
           }}
         >
           Dismiss

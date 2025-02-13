@@ -98,11 +98,11 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="yarn_initiate" label="yarn">
               ```bash
               yarn init -y
-              yarn install prisma typescript ts-node @types/node --save-dev
+              yarn add prisma typescript ts-node @types/node --save-dev
 
-              yarn dlx tsc --init
+              npx tsc --init
 
-              yarn dlx prisma init
+              npx prisma init
               ```
             </TabPanel>
             <TabPanel id="bun_initiate" label="bun">
@@ -241,7 +241,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             </TabPanel>
             <TabPanel id="yarn_migrate" label="yarn">
             ```bash
-            yarn dlx prisma migrate dev --name first_prisma_migration
+            npx prisma migrate dev --name first_prisma_migration
 
             ```
             </TabPanel>
@@ -318,7 +318,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
           <TabPanel id="yarn_sync" label="yarn">
             ```bash
-            yarn dlx prisma db pull
+            npx prisma db pull
             ```
 
             Create a migration file
@@ -328,7 +328,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
             Synchronize the migrations
             ```bash
-              yarn dlx prisma migrate diff \
+              npx prisma migrate diff \
               --from-empty \
               --to-schema-datamodel prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
@@ -338,7 +338,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             </Admonition>
 
             ```bash
-            yarn dlx prisma migrate resolve --applied 0_init_supabase
+            npx prisma migrate resolve --applied 0_init_supabase
             ```
           </TabPanel>
 
@@ -403,8 +403,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
       </TabPanel>
       <TabPanel id="yarn_client" label="yarn">
           ```sh
-          yarn install @prisma/client
-          yarn dlx prisma generate
+          yarn add @prisma/client
+          npx prisma generate
           ```
       </TabPanel>
       <TabPanel id="bun_client" label="bun">

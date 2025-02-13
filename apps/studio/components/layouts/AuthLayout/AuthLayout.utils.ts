@@ -19,9 +19,16 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
         ...(IS_PLATFORM
           ? [
               {
-                name: 'Providers',
-                key: 'providers',
+                name: 'Sign In / Up',
+                key: 'sign-in-up',
+                pages: ['providers', 'third-party'],
                 url: `/project/${ref}/auth/providers`,
+                items: [],
+              },
+              {
+                name: 'Sessions',
+                key: 'sessions',
+                url: `/project/${ref}/auth/sessions`,
                 items: [],
               },
               {
@@ -31,9 +38,16 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
                 items: [],
               },
               {
-                name: 'Email Templates',
-                key: 'templates',
+                name: 'Emails',
+                key: 'emails',
+                pages: ['templates', 'smtp'],
                 url: `/project/${ref}/auth/templates`,
+                items: [],
+              },
+              {
+                name: 'Multi-Factor',
+                key: 'mfa',
+                url: `/project/${ref}/auth/mfa`,
                 items: [],
               },
               {
@@ -43,11 +57,23 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
                 items: [],
               },
               {
-                name: 'Hooks',
+                name: 'Attack Protection',
+                key: 'protection',
+                url: `/project/${ref}/auth/protection`,
+                items: [],
+              },
+              {
+                name: 'Auth Hooks',
                 key: 'hooks',
                 url: `/project/${ref}/auth/hooks`,
                 items: [],
                 label: 'BETA',
+              },
+              {
+                name: 'Advanced',
+                key: 'advanced',
+                url: `/project/${ref}/auth/advanced`,
+                items: [],
               },
             ]
           : []),

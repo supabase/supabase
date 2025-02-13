@@ -1,20 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM } from 'common'
 import { isEqual } from 'lodash'
 import { ChevronDown, Clipboard, Download, Eye, EyeOff, Play } from 'lucide-react'
 import Papa from 'papaparse'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Item, Menu, useContextMenu } from 'react-contexify'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
+import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
 
+import { IS_PLATFORM } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CSVButton from 'components/ui/CSVButton'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { copyToClipboard } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { Item, Menu, useContextMenu } from 'react-contexify'
-import { createPortal } from 'react-dom'
 import { ResponseError } from 'types'
 import {
   Button,
@@ -372,6 +372,25 @@ const LogTable = ({
     onSelectedLogChange?.(row)
   }
 
+  // Keyboard navigation
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (!logDataRows.length || !selectedRow) return
+
+      const currentIndex = logDataRows.findIndex((row) => isEqual(row, selectedRow))
+      if (currentIndex === -1) return
+
+      if (event.key === 'ArrowUp' && currentIndex > 0) {
+        const prevRow = logDataRows[currentIndex - 1]
+        onRowClick(prevRow)
+      } else if (event.key === 'ArrowDown' && currentIndex < logDataRows.length - 1) {
+        const nextRow = logDataRows[currentIndex + 1]
+        onRowClick(nextRow)
+      }
+    },
+    [logDataRows, selectedRow, onRowClick]
+  )
+
   useEffect(() => {
     if (selectedLog || isSelectedLogLoading) {
       setSelectionOpen(true)
@@ -380,6 +399,13 @@ const LogTable = ({
       setSelectedRow(null)
     }
   }, [selectedLog, isSelectedLogLoading])
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [handleKeyDown])
 
   useEffect(() => {
     if (!isLoading && !selectedRow) {

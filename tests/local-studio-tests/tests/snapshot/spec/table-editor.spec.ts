@@ -108,7 +108,7 @@ test.describe('Table Editor page', () => {
       { timeout: 0 }
     )
 
-    await page.getByRole('button', { name: 'schema: public' }).click()
+    await page.getByTestId('schema-selector').click()
     await page.getByRole('option', { name: 'auth' }).click()
 
     // wait for the table data to load for the auth schema

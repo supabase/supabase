@@ -282,7 +282,9 @@ const ComputeInstanceSidePanel = () => {
                   title="Changing your compute size is only available on the Pro Plan"
                   actions={
                     <Button asChild type="default">
-                      <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                      <Link
+                        href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=computeInstanceSidePanel`}
+                      >
                         View available plans
                       </Link>
                     </Button>

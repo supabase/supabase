@@ -8,6 +8,7 @@ import { useContentIdQuery } from 'data/content/content-id-query'
 import { useAppStateSnapshot } from 'state/app-state'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -57,6 +58,10 @@ const SqlEditor: NextPageWithLayout = () => {
   )
 }
 
-SqlEditor.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
+SqlEditor.getLayout = (page) => (
+  <DefaultLayout>
+    <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
+  </DefaultLayout>
+)
 
 export default SqlEditor

@@ -1010,10 +1010,6 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg_plan_filter',
         },
         {
-          name: 'pg_stat_monitor: Extended Query Performance Monitoring',
-          url: '/guides/database/extensions/pg_stat_monitor',
-        },
-        {
           name: 'postgres_fdw: query data from an external Postgres server',
           url: '/guides/database/extensions/postgres_fdw',
         },
@@ -1748,6 +1744,10 @@ export const ai = {
           items: vectorIndexItems,
         },
         {
+          name: 'Automatic embeddings',
+          url: '/guides/ai/automatic-embeddings',
+        },
+        {
           name: 'Engineering for scale',
           url: '/guides/ai/engineering-for-scale',
         },
@@ -1917,6 +1917,22 @@ export const local_development: NavMenuConstant = {
         {
           name: 'Customizing email templates',
           url: '/guides/local-development/customizing-email-templates',
+        },
+      ],
+    },
+    {
+      name: 'Testing',
+      url: undefined,
+      items: [
+        { name: 'Getting started', url: '/guides/local-development/testing/overview' },
+        {
+          name: 'pgTAP advanced guide',
+          url: '/guides/local-development/testing/pgtap-extended',
+        },
+        { name: 'Database testing', url: '/guides/database/testing' },
+        {
+          name: 'RLS policies testing',
+          url: '/guides/database/extensions/pgtap#testing-rls-policies',
         },
       ],
     },
