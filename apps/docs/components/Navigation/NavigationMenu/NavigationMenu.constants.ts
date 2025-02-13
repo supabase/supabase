@@ -1411,6 +1411,10 @@ export const functions: NavMenuConstant = {
           name: 'Limits',
           url: '/guides/functions/limits',
         },
+        {
+          name: 'Pricing',
+          url: '/guides/functions/pricing',
+        },
       ],
     },
     {
@@ -1579,6 +1583,7 @@ export const realtime: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Quotas', url: '/guides/realtime/quotas' },
+        { name: 'Pricing', url: '/guides/realtime/pricing' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
         { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
         { name: 'Benchmarks', url: '/guides/realtime/benchmarks' },
@@ -1664,6 +1669,7 @@ export const storage: NavMenuConstant = {
       items: [
         { name: 'Copy / Move Objects', url: '/guides/storage/management/copy-move-objects' },
         { name: 'Delete Objects', url: '/guides/storage/management/delete-objects' },
+        { name: 'Pricing', url: '/guides/storage/management/pricing' },
       ],
     },
     {
@@ -2099,12 +2105,114 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'How billing works',
-          url: '/guides/platform/org-based-billing',
+          name: 'About billing on Supabase',
+          url: '/guides/platform/billing-on-supabase',
         },
         {
-          name: 'Spend caps and cost-controls',
-          url: '/guides/platform/spend-cap',
+          name: 'Get set up for billing',
+          url: '/guides/platform/get-set-up-for-billing',
+        },
+        {
+          name: 'Manage your subscription',
+          url: '/guides/platform/manage-your-subscription',
+        },
+        {
+          name: 'Manage your usage',
+          url: '/guides/platform/manage-your-usage',
+          items: [
+            {
+              name: 'Compute',
+              url: '/guides/platform/manage-your-usage/compute',
+            },
+            {
+              name: 'Egress',
+              url: '/guides/platform/manage-your-usage/egress',
+            },
+            {
+              name: 'Disk Size',
+              url: '/guides/platform/manage-your-usage/disk-size',
+            },
+            {
+              name: 'Disk Throughput',
+              url: '/guides/platform/manage-your-usage/disk-throughput',
+            },
+            {
+              name: 'Disk IOPS',
+              url: '/guides/platform/manage-your-usage/disk-iops',
+            },
+            {
+              name: 'Monthly Active Users',
+              url: '/guides/platform/manage-your-usage/monthly-active-users',
+            },
+            {
+              name: 'Monthly Active Third-Party Users',
+              url: '/guides/platform/manage-your-usage/monthly-active-users-third-party',
+            },
+            {
+              name: 'Monthly Active SSO Users',
+              url: '/guides/platform/manage-your-usage/monthly-active-users-sso',
+            },
+            {
+              name: 'Storage Size',
+              url: '/guides/platform/manage-your-usage/storage-size',
+            },
+            {
+              name: 'Storage Image Transformations',
+              url: '/guides/platform/manage-your-usage/storage-image-transformations',
+            },
+            {
+              name: 'Edge Function Invocations',
+              url: '/guides/platform/manage-your-usage/edge-function-invocations',
+            },
+            {
+              name: 'Realtime Messages',
+              url: '/guides/platform/manage-your-usage/realtime-messages',
+            },
+            {
+              name: 'Realtime Peak Connections',
+              url: '/guides/platform/manage-your-usage/realtime-peak-connections',
+            },
+            {
+              name: 'Custom Domains',
+              url: '/guides/platform/manage-your-usage/custom-domains',
+            },
+            {
+              name: 'Point-in-Time Recovery',
+              url: '/guides/platform/manage-your-usage/point-in-time-recovery',
+            },
+            {
+              name: 'IPv4',
+              url: '/guides/platform/manage-your-usage/ipv4',
+            },
+            {
+              name: 'MFA Phone',
+              url: '/guides/platform/manage-your-usage/advanced-mfa-phone',
+            },
+            {
+              name: 'Read Replicas',
+              url: '/guides/platform/manage-your-usage/read-replicas',
+            },
+            {
+              name: 'Branching',
+              url: '/guides/platform/manage-your-usage/branching',
+            },
+            {
+              name: 'Log Drains',
+              url: '/guides/platform/manage-your-usage/log-drains',
+            },
+          ],
+        },
+        {
+          name: 'Your monthly invoice',
+          url: '/guides/platform/your-monthly-invoice',
+        },
+        {
+          name: 'Control your costs',
+          url: '/guides/platform/cost-control',
+        },
+        {
+          name: 'Credits',
+          url: '/guides/platform/credits',
         },
         {
           name: 'Billing FAQ',

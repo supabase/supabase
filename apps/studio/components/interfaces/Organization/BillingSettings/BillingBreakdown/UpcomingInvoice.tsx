@@ -23,8 +23,7 @@ const feeTooltipData: TooltipData[] = [
   {
     identifier: 'COMPUTE',
     text: 'Every project is a dedicated server and database. For every hour your project is active, it incurs compute costs based on the compute size of your project. Paused projects do not incur compute costs.',
-    linkRef:
-      'https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours',
+    linkRef: 'https://supabase.com/docs/guides/platform/manage-your-usage/compute',
   },
 ]
 
@@ -244,7 +243,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                     <span className="mr-2">{computeCredits.description}</span>
                     <InvoiceTooltip
                       text="Paid plans come with $10 in Compute Credits to cover one Micro instance or parts of any other instance. Compute Credits are given to you every month and do not stack up while you are on a paid plan."
-                      linkRef="https://supabase.com/docs/guides/platform/org-based-billing#compute-credits"
+                      linkRef="https://supabase.com/docs/guides/platform/manage-your-usage/compute#compute-credits"
                     />
                   </td>
                   <td className="py-2 text-sm text-right" colSpan={3}>
