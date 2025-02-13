@@ -11,11 +11,13 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import { useDeleteSinkMutation } from 'data/replication/delete-sink-mutation'
 
 export type Pipeline = ReplicationPipelinesData['pipelines'][0]
 
 interface DestinationRowProps {
-  sink_name: string
+  sinkId: number
+  sinkName: string
   type: string
   pipeline: Pipeline | undefined
   error: ResponseError | null
@@ -25,7 +27,8 @@ interface DestinationRowProps {
 }
 
 const DestinationRow = ({
-  sink_name,
+  sinkId,
+  sinkName,
   type,
   pipeline,
   error: pipelineError,
@@ -63,18 +66,37 @@ const DestinationRow = ({
   }
 
   const onEnableClick = () => {
-    if (!projectRef || !pipeline) return
+    if (!projectRef) return
+    if (!pipeline) {
+      toast.error('No pipeline found')
+      return
+    }
 
     startPipeline({ projectRef, pipelineId: pipeline.id })
     setRequestStatus('EnableRequested')
     setRefetchInterval(5000)
   }
   const onDisableClick = () => {
-    if (!projectRef || !pipeline) return
+    if (!projectRef) return
+    if (!pipeline) {
+      toast.error('No pipeline found')
+      return
+    }
 
     stopPipeline({ projectRef, pipelineId: pipeline.id })
     setRequestStatus('DisableRequested')
     setRefetchInterval(5000)
+  }
+  const { mutate: deleteSink, isLoading: isCreating } = useDeleteSinkMutation({
+    onSuccess: (res) => {
+      toast.success('Successfully deleted destination')
+    },
+  })
+
+  const onDeleteClick = () => {
+    if (!projectRef) return console.error('Project ref is required')
+
+    deleteSink({ projectRef, sinkId })
   }
 
   return (
@@ -85,7 +107,7 @@ const DestinationRow = ({
       {isPipelineSuccess && (
         <Table.tr>
           <Table.td>
-            {isPipelineLoading ? <ShimmeringLoader></ShimmeringLoader> : sink_name}
+            {isPipelineLoading ? <ShimmeringLoader></ShimmeringLoader> : sinkName}
           </Table.td>
           <Table.td>{isPipelineLoading ? <ShimmeringLoader></ShimmeringLoader> : type}</Table.td>
           <Table.td>
@@ -110,17 +132,15 @@ const DestinationRow = ({
             )}
           </Table.td>
           <Table.td>
-            {pipeline && (
-              <RowMenu
-                pipelineStatus={pipelineStatusData?.status}
-                error={pipelineStatusError}
-                isLoading={isPipelineStatusLoading}
-                isError={isPipelineStatusError}
-                isSuccess={isPipelineStatusSuccess}
-                onEnableClick={onEnableClick}
-                onDisableClick={onDisableClick}
-              ></RowMenu>
-            )}
+            <RowMenu
+              pipelineStatus={pipelineStatusData?.status}
+              error={pipelineStatusError}
+              isLoading={isPipelineStatusLoading}
+              isError={isPipelineStatusError}
+              onEnableClick={onEnableClick}
+              onDisableClick={onDisableClick}
+              onDeleteClick={onDeleteClick}
+            ></RowMenu>
           </Table.td>
         </Table.tr>
       )}

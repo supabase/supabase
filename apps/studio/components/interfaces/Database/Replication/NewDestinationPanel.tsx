@@ -31,7 +31,7 @@ interface NewDestinationPanelProps {
 
 const NewDestinationPanel = ({ visible, onCancel, onConfirm }: NewDestinationPanelProps) => {
   const { ref: projectRef } = useParams()
-  const { mutate: createSink, isLoading: isCreating } = useCreateSinkMutation({
+  const { mutate: createSink } = useCreateSinkMutation({
     onSuccess: (res) => {
       toast.success('Successfully created destination')
     },

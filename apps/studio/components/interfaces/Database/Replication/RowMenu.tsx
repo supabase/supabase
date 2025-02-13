@@ -15,9 +15,9 @@ interface RowMenuProps {
   error: ResponseError | null
   isLoading: boolean
   isError: boolean
-  isSuccess: boolean
   onEnableClick: () => void
   onDisableClick: () => void
+  onDeleteClick: () => void
 }
 
 const RowMenu = ({
@@ -25,43 +25,42 @@ const RowMenu = ({
   error,
   isLoading,
   isError,
-  isSuccess,
   onEnableClick,
   onDisableClick,
+  onDeleteClick,
 }: RowMenuProps) => {
   const pipelineEnabled = pipelineStatus === 'Stopped' ? false : true
   return (
     <div className="flex justify-end items-center space-x-2">
       {isLoading && <ShimmeringLoader></ShimmeringLoader>}
       {isError && <AlertError error={error} subject="Failed to retrieve pipeline status" />}
-      {isSuccess && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="default" className="px-1" icon={<MoreVertical />} />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className="w-32">
-            {pipelineEnabled ? (
-              <DropdownMenuItem className="space-x-2" onClick={() => onDisableClick()}>
-                <Pause size={14} />
-                <p>Disable</p>
-              </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem className="space-x-2" onClick={() => onEnableClick()}>
-                <Play size={14} />
-                <p>Enable</p>
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem className="space-x-2">
-              <Edit size={14} />
-              <p>Edit destination</p>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button type="default" className="px-1" icon={<MoreVertical />} />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="bottom" align="end" className="w-32">
+          {pipelineEnabled ? (
+            <DropdownMenuItem className="space-x-2" onClick={onDisableClick}>
+              <Pause size={14} />
+              <p>Disable</p>
             </DropdownMenuItem>
-            <DropdownMenuItem className="space-x-2">
-              <Trash stroke="red" size={14} />
-              <p>Delete destination</p>
+          ) : (
+            <DropdownMenuItem className="space-x-2" onClick={onEnableClick}>
+              <Play size={14} />
+              <p>Enable</p>
             </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
+          )}
+          <DropdownMenuItem className="space-x-2">
+            <Edit size={14} />
+            <p>Edit destination</p>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="space-x-2" onClick={onDeleteClick}>
+            <Trash stroke="red" size={14} />
+            <p>Delete destination</p>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }
