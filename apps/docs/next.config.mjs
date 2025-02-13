@@ -74,7 +74,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Strict-Transport-Security',
-            value: '',
+            value: 'max-age=31536000',
           },
           {
             key: 'X-Robots-Tag',
@@ -97,7 +97,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Strict-Transport-Security',
-            value: '',
+            value: 'max-age=31536000',
           },
           {
             key: 'X-Robots-Tag',

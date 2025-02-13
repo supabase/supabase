@@ -59,7 +59,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Strict-Transport-Security',
-            value: '',
+            value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? 'max-age=31536000' : '',
           },
           {
             key: 'X-Robots-Tag',
