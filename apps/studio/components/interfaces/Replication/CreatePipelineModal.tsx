@@ -23,7 +23,7 @@ const CreatePipelineModal = ({ visible, onClose }: CreatePipelineModalProps) => 
     projectRef: ref,
   })
 
-  let thisProjectSource = data?.sources?.find((s) => s.name === ref)
+  let thisProjectSource = data?.sources.find((s) => s.name === ref)
 
   if (!thisProjectSource) {
     toast.error("Failed to find this project's source")
@@ -61,11 +61,11 @@ const CreatePipelineModal = ({ visible, onClose }: CreatePipelineModalProps) => 
   const onSubmit = (values: any) => {
     createPipeline({
       projectRef: ref!,
-      source_id: Number(thisProjectSource!.id),
-      sink_id: Number(values.sink_id),
-      publication_name: values.publication_name,
+      sourceId: Number(thisProjectSource!.id),
+      sinkId: Number(values.sink_id),
+      publicationName: values.publication_name,
       config: {
-        config: { max_size: Number(values.max_size), max_fill_secs: Number(values.max_fill_secs) },
+        config: { maxSize: Number(values.max_size), maxFillSecs: Number(values.max_fill_secs) },
       },
     })
   }

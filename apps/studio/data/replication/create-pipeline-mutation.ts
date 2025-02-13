@@ -7,20 +7,20 @@ import { handleError, post } from 'data/fetchers'
 
 export type CreatePipelineParams = {
   projectRef: string
-  source_id: number
-  sink_id: number
-  publication_name: string
-  config: { config: { max_size: number; max_fill_secs: number } }
+  sourceId: number
+  sinkId: number
+  publicationName: string
+  config: { config: { maxSize: number; maxFillSecs: number } }
 }
 
 async function createPipeline(
   {
     projectRef,
-    source_id,
-    sink_id,
-    publication_name,
+    sourceId,
+    sinkId,
+    publicationName,
     config: {
-      config: { max_size, max_fill_secs },
+      config: { maxSize, maxFillSecs },
     },
   }: CreatePipelineParams,
   signal?: AbortSignal
@@ -29,7 +29,12 @@ async function createPipeline(
 
   const { data, error } = await post('/platform/replication/{ref}/pipelines', {
     params: { path: { ref: projectRef } },
-    body: { source_id, sink_id, publication_name, config: { config: { max_size, max_fill_secs } } },
+    body: {
+      source_id: sourceId,
+      sink_id: sinkId,
+      publication_name: publicationName,
+      config: { config: { max_size: maxSize, max_fill_secs: maxFillSecs } },
+    },
     signal,
   })
   if (error) {

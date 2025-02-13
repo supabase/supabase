@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import { useDeleteSinkMutation } from 'data/replication/delete-sink-mutation'
+import { useDeletePipelineMutation } from 'data/replication/delete-pipeline-mutation'
 
 export type Pipeline = ReplicationPipelinesData['pipelines'][0]
 
@@ -54,8 +55,8 @@ const DestinationRow = ({
   const [requestStatus, setRequestStatus] = useState<
     'None' | 'EnableRequested' | 'DisableRequested'
   >('None')
-  const { mutate: startPipeline } = useStartPipelineMutation()
-  const { mutate: stopPipeline } = useStopPipelineMutation()
+  const { mutateAsync: startPipeline } = useStartPipelineMutation()
+  const { mutateAsync: stopPipeline } = useStopPipelineMutation()
   const pipelineStatus = pipelineStatusData?.status
   if (
     (requestStatus === 'EnableRequested' && pipelineStatus === 'Started') ||
@@ -65,38 +66,66 @@ const DestinationRow = ({
     setRequestStatus('None')
   }
 
-  const onEnableClick = () => {
-    if (!projectRef) return
+  const onEnableClick = async () => {
+    if (!projectRef) {
+      console.error('Project ref is required')
+      return
+    }
     if (!pipeline) {
       toast.error('No pipeline found')
       return
     }
 
-    startPipeline({ projectRef, pipelineId: pipeline.id })
+    try {
+      await startPipeline({ projectRef, pipelineId: pipeline.id })
+    } catch (error) {
+      toast.error('Failed to enable destination')
+    }
     setRequestStatus('EnableRequested')
     setRefetchInterval(5000)
   }
-  const onDisableClick = () => {
-    if (!projectRef) return
+  const onDisableClick = async () => {
+    if (!projectRef) {
+      console.error('Project ref is required')
+      return
+    }
     if (!pipeline) {
       toast.error('No pipeline found')
       return
     }
 
-    stopPipeline({ projectRef, pipelineId: pipeline.id })
+    try {
+      await stopPipeline({ projectRef, pipelineId: pipeline.id })
+    } catch (error) {
+      toast.error('Failed to disable destination')
+    }
     setRequestStatus('DisableRequested')
     setRefetchInterval(5000)
   }
-  const { mutate: deleteSink, isLoading: isCreating } = useDeleteSinkMutation({
+  const { mutateAsync: deleteSink } = useDeleteSinkMutation({})
+  const { mutateAsync: deletePipeline } = useDeletePipelineMutation({
     onSuccess: (res) => {
       toast.success('Successfully deleted destination')
     },
   })
 
-  const onDeleteClick = () => {
-    if (!projectRef) return console.error('Project ref is required')
+  const onDeleteClick = async () => {
+    if (!projectRef) {
+      console.error('Project ref is required')
+      return
+    }
+    if (!pipeline) {
+      toast.error('No pipeline found')
+      return
+    }
 
-    deleteSink({ projectRef, sinkId })
+    try {
+      await stopPipeline({ projectRef, pipelineId: pipeline.id })
+      await deletePipeline({ projectRef, pipelineId: pipeline.id })
+      await deleteSink({ projectRef, sinkId })
+    } catch (error) {
+      toast.error('Failed to delete destination')
+    }
   }
 
   return (
