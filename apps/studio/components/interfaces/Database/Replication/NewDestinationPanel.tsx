@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { useCreatePipelineMutation } from 'data/replication/create-pipeline-mutation'
 import { useCreateSinkMutation } from 'data/replication/create-sink-mutation'
 import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
@@ -25,17 +26,21 @@ import * as z from 'zod'
 
 interface NewDestinationPanelProps {
   visible: boolean
+  sourceId: number | undefined
   onCancel: () => void
   onConfirm: () => void
 }
 
-const NewDestinationPanel = ({ visible, onCancel, onConfirm }: NewDestinationPanelProps) => {
+const NewDestinationPanel = ({
+  visible,
+  sourceId,
+  onCancel,
+  onConfirm,
+}: NewDestinationPanelProps) => {
   const { ref: projectRef } = useParams()
-  const { mutate: createSink } = useCreateSinkMutation({
-    onSuccess: (res) => {
-      toast.success('Successfully created destination')
-    },
-  })
+  const { mutateAsync: createSink } = useCreateSinkMutation()
+  const { mutateAsync: createPipeline } = useCreatePipelineMutation()
+
   const formId = 'destination-editor'
   const types = ['BigQuery'] as const
   const TypeEnum = z.enum(types)
@@ -45,6 +50,9 @@ const NewDestinationPanel = ({ visible, onCancel, onConfirm }: NewDestinationPan
     projectId: z.string(),
     datasetId: z.string(),
     serviceAccountKey: z.string(),
+    publicationName: z.string(),
+    maxSize: z.number(),
+    maxFillSecs: z.number(),
   })
   const defaultValues = {
     type: TypeEnum.enum.BigQuery,
@@ -52,6 +60,9 @@ const NewDestinationPanel = ({ visible, onCancel, onConfirm }: NewDestinationPan
     projectId: '',
     datasetId: '',
     serviceAccountKey: '',
+    publicationName: '',
+    maxSize: 1000,
+    maxFillSecs: 10,
   }
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -59,16 +70,28 @@ const NewDestinationPanel = ({ visible, onCancel, onConfirm }: NewDestinationPan
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    console.log(`form submitted`, JSON.stringify(data))
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
-    createSink({
-      projectRef,
-      sink_name: data.name,
-      project_id: data.projectId,
-      dataset_id: data.datasetId,
-      service_account_key: data.serviceAccountKey,
-    })
+    if (!sourceId) return console.error('Source id is required')
+    try {
+      const { id } = await createSink({
+        projectRef,
+        sink_name: data.name,
+        project_id: data.projectId,
+        dataset_id: data.datasetId,
+        service_account_key: data.serviceAccountKey,
+      })
+      await createPipeline({
+        projectRef,
+        sourceId,
+        sinkId: id,
+        publicationName: data.publicationName,
+        config: { config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs } },
+      })
+      toast.success('Successfully created destination')
+    } catch (error) {
+      toast.error('Failed to create destination')
+    }
     form.reset(defaultValues)
   }
   const submitRef = useRef<HTMLButtonElement>(null)
@@ -161,6 +184,45 @@ const NewDestinationPanel = ({ visible, onCancel, onConfirm }: NewDestinationPan
                       maxLength={5000}
                       placeholder="Service account key"
                     />
+                  </FormControl_Shadcn_>
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
+              )}
+            />
+            <FormField_Shadcn_
+              control={form.control}
+              name="publicationName"
+              render={({ field }) => (
+                <FormItem_Shadcn_>
+                  <FormLabel_Shadcn_>Publication Name</FormLabel_Shadcn_>
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} placeholder="Publication name" />
+                  </FormControl_Shadcn_>
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
+              )}
+            />
+            <FormField_Shadcn_
+              control={form.control}
+              name="maxSize"
+              render={({ field }) => (
+                <FormItem_Shadcn_>
+                  <FormLabel_Shadcn_>Max Size</FormLabel_Shadcn_>
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} placeholder="Max size" />
+                  </FormControl_Shadcn_>
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
+              )}
+            />
+            <FormField_Shadcn_
+              control={form.control}
+              name="maxFillSecs"
+              render={({ field }) => (
+                <FormItem_Shadcn_>
+                  <FormLabel_Shadcn_>Max Fill Seconds</FormLabel_Shadcn_>
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} placeholder="Max fill seconds" />
                   </FormControl_Shadcn_>
                   <FormMessage_Shadcn_ />
                 </FormItem_Shadcn_>

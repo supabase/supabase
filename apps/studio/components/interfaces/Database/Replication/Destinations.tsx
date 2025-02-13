@@ -11,13 +11,26 @@ import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useState } from 'react'
 import NewDestinationPanel from './NewDestinationPanel'
-import { set } from 'lodash'
+import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 
 const Destinations = () => {
   const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
   const { ref: projectRef } = useParams()
+
   const {
-    data: sinks_data,
+    data: sourcesData,
+    error: sourcesError,
+    isLoading: isSourcesLoading,
+    isError: isSourcesError,
+    isSuccess: isSourcesSuccess,
+  } = useReplicationSourcesQuery({
+    projectRef,
+  })
+
+  let sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
+
+  const {
+    data: sinksData,
     error: sinksError,
     isLoading: isSinksLoading,
     isError: isSinksError,
@@ -27,7 +40,7 @@ const Destinations = () => {
   })
 
   const {
-    data: pipelines_data,
+    data: pipelinesData,
     error: pipelinesError,
     isLoading: isPipelinesLoading,
     isError: isPipelinesError,
@@ -36,7 +49,7 @@ const Destinations = () => {
     projectRef,
   })
 
-  const anyDestinations = isSinksSuccess && sinks_data.sinks.length > 0
+  const anySinks = isSinksSuccess && sinksData.sinks.length > 0
 
   return (
     <>
@@ -61,13 +74,17 @@ const Destinations = () => {
         </ButtonTooltip>
       </div>
       <div className="py-6">
-        {isSinksLoading && <GenericSkeletonLoader />}
+        {(isSourcesLoading || isSinksLoading) && <GenericSkeletonLoader />}
 
-        {isSinksError && (
-          <AlertError error={sinksError} subject="Failed to retrieve replication status" />
+        {isSourcesError && (
+          <AlertError error={sourcesError} subject="Failed to retrieve replication sources" />
         )}
 
-        {anyDestinations ? (
+        {isSinksError && (
+          <AlertError error={sinksError} subject="Failed to retrieve replication sinks" />
+        )}
+
+        {anySinks ? (
           <Table
             head={[
               <Table.th key="name">Name</Table.th>,
@@ -76,8 +93,8 @@ const Destinations = () => {
               <Table.th key="publication">Publication</Table.th>,
               <Table.th key="actions"></Table.th>,
             ]}
-            body={sinks_data.sinks.map((sink) => {
-              const pipeline = pipelines_data?.pipelines.find((p) => p.sink_id === sink.id)
+            body={sinksData.sinks.map((sink) => {
+              const pipeline = pipelinesData?.pipelines.find((p) => p.sink_id === sink.id)
               return (
                 <DestinationRow
                   key={sink.id}
@@ -94,7 +111,9 @@ const Destinations = () => {
             })}
           ></Table>
         ) : (
+          !isSourcesLoading &&
           !isSinksLoading &&
+          !isSourcesError &&
           !isSinksError && (
             <div
               className={cn(
@@ -128,6 +147,7 @@ const Destinations = () => {
       </div>
       <NewDestinationPanel
         visible={showNewDestinationPanel}
+        sourceId={sourceId}
         onCancel={() => setShowNewDestinationPanel(false)}
         onConfirm={() => setShowNewDestinationPanel(false)}
       ></NewDestinationPanel>

@@ -4626,7 +4626,11 @@ export interface paths {
      * @description Returns all functions you've previously added to the specified project.
      */
     get: operations['v1-list-all-functions']
-    put?: never
+    /**
+     * Bulk update functions
+     * @description Bulk update functions. It will create a new function or replace existing. The operation is idempotent. NOTE: You will need to manually bump the version.
+     */
+    put: operations['v1-bulk-update-functions']
     /**
      * Create a function
      * @description Creates a function and adds it to the specified project.
@@ -4711,6 +4715,57 @@ export interface paths {
     /** Updates a project's health status. */
     put: operations['HealthReportingController_updateStatus']
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/system/projects/{ref}/pause': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Pauses a project */
+    post: operations['SystemProjectPauseController_pauseProject']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/system/projects/{ref}/pause/validate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Validates if a project can be paused */
+    get: operations['SystemProjectPauseController_validatePauseProject']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/system/projects/{ref}/restart': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Restart project database [System API] */
+    post: operations['SystemRestartController_restartProject']
     delete?: never
     options?: never
     head?: never
@@ -8473,6 +8528,71 @@ export interface components {
       /** @enum {string} */
       name: 'GoTrue'
     }
+    AutoApiService: {
+      app: {
+        id?: number
+        name?: string
+      }
+      app_config: Record<string, never>
+      defaultApiKey: string
+      endpoint: string
+      id: number
+      name: string
+      project: {
+        ref?: string
+      }
+      protocol: string
+      restUrl: string
+      service_api_keys: components['schemas']['ServiceApiKey'][]
+      serviceApiKey: string
+    }
+    AvailableAddonResponse: {
+      name: string
+      type: components['schemas']['ProjectAddonType']
+      variants: components['schemas']['ProjectAddonVariantResponse'][]
+    }
+    AwsPartnerBillingBody: {
+      aws_customer_account_id: string
+      aws_customer_id: string
+      aws_private_offer_id: string
+      aws_product_code: string
+      aws_subscription_end: string
+      aws_subscription_start: string
+    }
+    AwsPartnerOrganizationResponse: {
+      id: number
+      name: string
+      slug: string
+    }
+    Backup: {
+      id: number
+      inserted_at: string
+      isPhysicalBackup: boolean
+      project_id: number
+      status: Record<string, never>
+    }
+    BackupId: {
+      id: number
+    }
+    BackupsResponse: {
+      backups: components['schemas']['Backup'][]
+      physicalBackupData: {
+        earliestPhysicalBackupDateUnix?: number
+        latestPhysicalBackupDateUnix?: number
+      }
+      pitr_enabled: boolean
+      region: string
+      tierKey: string
+      walg_enabled: boolean
+    }
+    BillingCustomerUpdateBody: {
+      additional_emails: string[]
+      address?: components['schemas']['CustomerBillingAddress']
+    }
+    /** @enum {string} */
+    BillingPlanChangeType: 'upgrade' | 'downgrade' | 'none'
+    /** @enum {string} */
+    BillingPlanEffectiveAt: 'now' | 'end_of_billing_period' | 'none'
     /** @enum {string} */
     BillingPlanId: 'free' | 'pro' | 'team' | 'enterprise'
     BranchDeleteResponse: {
@@ -8553,6 +8673,23 @@ export interface components {
     BulkUpdateFunctionResponse: {
       functions: components['schemas']['FunctionResponse'][]
     }
+    BulkUpdateFunctionBody: {
+      /** Format: int64 */
+      created_at?: number
+      entrypoint_path?: string
+      id: string
+      import_map?: boolean
+      import_map_path?: string
+      name: string
+      slug: string
+      /** @enum {string} */
+      status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+      verify_jwt?: boolean
+      version: number
+    }
+    BulkUpdateFunctionResponse: {
+      functions: components['schemas']['FunctionResponse'][]
+    }
     CfResponse: {
       errors: Record<string, never>[]
       messages: Record<string, never>[]
@@ -8576,6 +8713,63 @@ export interface components {
     }
     CreateOrganizationV1Dto: {
       name: string
+    }
+    CreatePipelineResponse: {
+      id: number
+    }
+    CreatePolicyBody: {
+      /** @enum {string} */
+      action?: 'PERMISSIVE' | 'RESTRICTIVE'
+      check?: string
+      /** @enum {string} */
+      command?: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'ALL'
+      definition?: string
+      name: string
+      roles?: string[]
+      schema?: string
+      table: string
+    }
+    CreateProjectBody: {
+      auth_site_url?: string
+      cloud_provider: string
+      custom_supabase_internal_requests?: components['schemas']['CustomSupabaseInternalRequests']
+      data_api_exposed_schemas?: string[]
+      data_api_use_api_schema?: boolean
+      db_pass: string
+      db_pricing_tier_id?: string
+      /**
+       * @description Provider region description
+       * @example Southeast Asia (Singapore)
+       */
+      db_region: string
+      db_sql?: string
+      desired_instance_size?: components['schemas']['DesiredInstanceSize']
+      name: string
+      /** @deprecated */
+      org_id?: number
+      organization_slug?: string
+      postgres_engine?: components['schemas']['PostgresEngine']
+      release_channel?: components['schemas']['ReleaseChannel']
+    }
+    CreateProjectResponse: {
+      anon_key: string
+      cloud_provider: string
+      disk_volume_size_gb?: number
+      endpoint: string
+      id: number
+      infra_compute_size?: components['schemas']['DbInstanceSize']
+      inserted_at: string | null
+      is_branch_enabled: boolean
+      is_physical_backups_enabled: boolean | null
+      name: string
+      organization_id: number
+      organization_slug: string
+      preview_branch_refs: string[]
+      ref: string
+      region: string
+      service_key: string
+      status: string
+      subscription_id: string | null
     }
     CreateProviderBody: {
       attribute_mapping?: components['schemas']['AttributeMapping']
@@ -8655,6 +8849,9 @@ export interface components {
       algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
       /** @enum {string} */
       status?: 'in_use' | 'standby'
+    }
+    CreateSinkResponse: {
+      id: number
     }
     CreateSourceResponse: {
       id: number
@@ -8756,6 +8953,27 @@ export interface components {
       version: number
     }
     /** @enum {string} */
+    DeployFunctionResponse: {
+      compute_multiplier?: number
+      /** Format: int64 */
+      created_at?: number
+      entrypoint_path?: string
+      id: string
+      import_map?: boolean
+      import_map_path?: string
+      name: string
+      slug: string
+      /** @enum {string} */
+      status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+      /** Format: int64 */
+      updated_at?: number
+      verify_jwt?: boolean
+      version: number
+    }
+    /**
+     * @description Desired instance size, will use default size if not defined. Paid Plans only.
+     * @enum {string}
+     */
     DesiredInstanceSize:
       | 'micro'
       | 'small'
@@ -8979,6 +9197,66 @@ export interface components {
       name: string
       type: string
       value: string
+    }
+    PasswordCheckBody: {
+      password: string
+    }
+    PasswordCheckResponse: {
+      result: {
+        feedback?: {
+          suggestions?: string[]
+          warning?: string
+        }
+        score?: number
+      }
+    }
+    PauseProjectResponseDto: {
+      message: string
+    }
+    PauseStatusResponse: {
+      can_restore: boolean
+      latest_downloadable_backup_id: number | null
+      max_days_till_restore_disabled: number
+      remaining_days_till_restore_disabled: number | null
+    }
+    Payment: {
+      card?: components['schemas']['PaymentMethodCard']
+      created: number
+      id: string
+      is_default: boolean
+      type: string
+    }
+    PaymentMethodCard: {
+      brand: string
+      exp_month: number
+      exp_year: number
+      last4: string
+    }
+    PaymentsResponse: {
+      data: components['schemas']['Payment'][]
+      defaultPaymentMethodId: string | null
+    }
+    PgbouncerConfigResponse: {
+      connectionString: string
+      db_dns_name: string
+      db_host: string
+      db_name: string
+      db_port: number
+      db_user: string
+      default_pool_size?: number
+      ignore_startup_parameters?: string
+      inserted_at: string
+      max_client_conn?: number
+      pgbouncer_enabled: boolean
+      /** @enum {string} */
+      pgbouncer_status: 'COMING_DOWN' | 'COMING_UP' | 'DISABLED' | 'ENABLED' | 'RELOADING'
+      /** @enum {string} */
+      pool_mode?: 'transaction' | 'session' | 'statement'
+      ssl_enforced: boolean
+      supavisor_enabled: boolean
+    }
+    PgbouncerStatusResponse: {
+      active: boolean
     }
     PgsodiumConfigResponse: {
       root_key: string
@@ -9502,7 +9780,7 @@ export interface components {
        */
       supabase_org_id: string
     }
-    RestartProjectInfo: {
+    RestartProjectBodyDto: {
       database_identifier?: string
     }
     RestartServiceRequest: {
@@ -9927,6 +10205,277 @@ export interface components {
         | '4_origin_setup_completed'
         | '5_services_reconfigured'
     }
+    UpdateDiskAutoscaleConfig: {
+      /**
+       * @description Growth percentage for disk autoscaling
+       * @default 50
+       */
+      growth_percent?: number
+      /**
+       * @description Maximum limit the disk size will grow to in GB
+       * @default 61440
+       */
+      max_size_gb?: number
+      /**
+       * @description Minimum increment size for disk autoscaling in GB
+       * @default 4
+       */
+      min_increment_gb?: number
+    }
+    UpdateFunctionBody: {
+      args?: string[]
+      /** @enum {string} */
+      behavior?: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
+      config_params?: Record<string, never>
+      definition?: string
+      id?: number
+      language?: string
+      name?: string
+      return_type?: string
+      schema?: string
+      security_definer?: boolean
+    }
+    UpdateGitHubConnectionsBody: {
+      branch_limit?: number
+      supabase_changes_only?: boolean
+      workdir?: string
+    }
+    UpdateGoTrueConfigBody: {
+      API_MAX_REQUEST_DURATION?: number
+      DB_MAX_POOL_SIZE?: number
+      DISABLE_SIGNUP?: boolean
+      EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean
+      EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string
+      EXTERNAL_APPLE_CLIENT_ID?: string
+      EXTERNAL_APPLE_ENABLED?: boolean
+      EXTERNAL_APPLE_SECRET?: string
+      EXTERNAL_AZURE_CLIENT_ID?: string
+      EXTERNAL_AZURE_ENABLED?: boolean
+      EXTERNAL_AZURE_SECRET?: string
+      EXTERNAL_AZURE_URL?: string
+      EXTERNAL_BITBUCKET_CLIENT_ID?: string
+      EXTERNAL_BITBUCKET_ENABLED?: boolean
+      EXTERNAL_BITBUCKET_SECRET?: string
+      EXTERNAL_DISCORD_CLIENT_ID?: string
+      EXTERNAL_DISCORD_ENABLED?: boolean
+      EXTERNAL_DISCORD_SECRET?: string
+      EXTERNAL_EMAIL_ENABLED?: boolean
+      EXTERNAL_FACEBOOK_CLIENT_ID?: string
+      EXTERNAL_FACEBOOK_ENABLED?: boolean
+      EXTERNAL_FACEBOOK_SECRET?: string
+      EXTERNAL_FIGMA_CLIENT_ID?: string
+      EXTERNAL_FIGMA_ENABLED?: boolean
+      EXTERNAL_FIGMA_SECRET?: string
+      EXTERNAL_GITHUB_CLIENT_ID?: string
+      EXTERNAL_GITHUB_ENABLED?: boolean
+      EXTERNAL_GITHUB_SECRET?: string
+      EXTERNAL_GITLAB_CLIENT_ID?: string
+      EXTERNAL_GITLAB_ENABLED?: boolean
+      EXTERNAL_GITLAB_SECRET?: string
+      EXTERNAL_GITLAB_URL?: string
+      EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string
+      EXTERNAL_GOOGLE_CLIENT_ID?: string
+      EXTERNAL_GOOGLE_ENABLED?: boolean
+      EXTERNAL_GOOGLE_SECRET?: string
+      EXTERNAL_GOOGLE_SKIP_NONCE_CHECK?: boolean
+      EXTERNAL_KAKAO_CLIENT_ID?: string
+      EXTERNAL_KAKAO_ENABLED?: boolean
+      EXTERNAL_KAKAO_SECRET?: string
+      EXTERNAL_KEYCLOAK_CLIENT_ID?: string
+      EXTERNAL_KEYCLOAK_ENABLED?: boolean
+      EXTERNAL_KEYCLOAK_SECRET?: string
+      EXTERNAL_KEYCLOAK_URL?: string
+      EXTERNAL_LINKEDIN_OIDC_CLIENT_ID?: string
+      EXTERNAL_LINKEDIN_OIDC_ENABLED?: boolean
+      EXTERNAL_LINKEDIN_OIDC_SECRET?: string
+      EXTERNAL_NOTION_CLIENT_ID?: string
+      EXTERNAL_NOTION_ENABLED?: boolean
+      EXTERNAL_NOTION_SECRET?: string
+      EXTERNAL_PHONE_ENABLED?: boolean
+      EXTERNAL_SLACK_CLIENT_ID?: string
+      EXTERNAL_SLACK_ENABLED?: boolean
+      EXTERNAL_SLACK_OIDC_CLIENT_ID?: string
+      EXTERNAL_SLACK_OIDC_ENABLED?: boolean
+      EXTERNAL_SLACK_OIDC_SECRET?: string
+      EXTERNAL_SLACK_SECRET?: string
+      EXTERNAL_SPOTIFY_CLIENT_ID?: string
+      EXTERNAL_SPOTIFY_ENABLED?: boolean
+      EXTERNAL_SPOTIFY_SECRET?: string
+      EXTERNAL_TWITCH_CLIENT_ID?: string
+      EXTERNAL_TWITCH_ENABLED?: boolean
+      EXTERNAL_TWITCH_SECRET?: string
+      EXTERNAL_TWITTER_CLIENT_ID?: string
+      EXTERNAL_TWITTER_ENABLED?: boolean
+      EXTERNAL_TWITTER_SECRET?: string
+      EXTERNAL_WORKOS_CLIENT_ID?: string
+      EXTERNAL_WORKOS_ENABLED?: boolean
+      EXTERNAL_WORKOS_SECRET?: string
+      EXTERNAL_WORKOS_URL?: string
+      EXTERNAL_ZOOM_CLIENT_ID?: string
+      EXTERNAL_ZOOM_ENABLED?: boolean
+      EXTERNAL_ZOOM_SECRET?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
+      HOOK_CUSTOM_ACCESS_TOKEN_SECRETS?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS?: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_SEND_EMAIL_ENABLED?: boolean
+      HOOK_SEND_EMAIL_SECRETS?: string
+      HOOK_SEND_EMAIL_URI?: string
+      HOOK_SEND_SMS_ENABLED?: boolean
+      HOOK_SEND_SMS_SECRETS?: string
+      HOOK_SEND_SMS_URI?: string
+      JWT_EXP?: number
+      MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS?: boolean
+      MAILER_AUTOCONFIRM?: boolean
+      MAILER_OTP_EXP?: number
+      MAILER_OTP_LENGTH?: number
+      MAILER_SECURE_EMAIL_CHANGE_ENABLED?: boolean
+      MAILER_SUBJECTS_CONFIRMATION?: string
+      MAILER_SUBJECTS_EMAIL_CHANGE?: string
+      MAILER_SUBJECTS_INVITE?: string
+      MAILER_SUBJECTS_MAGIC_LINK?: string
+      MAILER_SUBJECTS_REAUTHENTICATION?: string
+      MAILER_SUBJECTS_RECOVERY?: string
+      MAILER_TEMPLATES_CONFIRMATION_CONTENT?: string
+      MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT?: string
+      MAILER_TEMPLATES_INVITE_CONTENT?: string
+      MAILER_TEMPLATES_MAGIC_LINK_CONTENT?: string
+      MAILER_TEMPLATES_REAUTHENTICATION_CONTENT?: string
+      MAILER_TEMPLATES_RECOVERY_CONTENT?: string
+      MFA_MAX_ENROLLED_FACTORS?: number
+      MFA_PHONE_ENROLL_ENABLED?: boolean
+      MFA_PHONE_MAX_FREQUENCY?: number
+      MFA_PHONE_OTP_LENGTH?: number
+      MFA_PHONE_TEMPLATE?: string
+      MFA_PHONE_VERIFY_ENABLED?: boolean
+      MFA_TOTP_ENROLL_ENABLED?: boolean
+      MFA_TOTP_VERIFY_ENABLED?: boolean
+      MFA_WEB_AUTHN_ENROLL_ENABLED?: boolean
+      MFA_WEB_AUTHN_VERIFY_ENABLED?: boolean
+      PASSWORD_HIBP_ENABLED?: boolean
+      PASSWORD_MIN_LENGTH?: number
+      /** @enum {string} */
+      PASSWORD_REQUIRED_CHARACTERS?:
+        | 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~'
+        | ''
+      RATE_LIMIT_ANONYMOUS_USERS?: number
+      RATE_LIMIT_EMAIL_SENT?: number
+      RATE_LIMIT_OTP?: number
+      RATE_LIMIT_SMS_SENT?: number
+      RATE_LIMIT_TOKEN_REFRESH?: number
+      RATE_LIMIT_VERIFY?: number
+      REFRESH_TOKEN_ROTATION_ENABLED?: boolean
+      SAML_ALLOW_ENCRYPTED_ASSERTIONS?: boolean
+      SAML_ENABLED?: boolean
+      SAML_EXTERNAL_URL?: string
+      SECURITY_CAPTCHA_ENABLED?: boolean
+      SECURITY_CAPTCHA_PROVIDER?: string
+      SECURITY_CAPTCHA_SECRET?: string
+      SECURITY_MANUAL_LINKING_ENABLED?: boolean
+      SECURITY_REFRESH_TOKEN_REUSE_INTERVAL?: number
+      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION?: boolean
+      SESSIONS_INACTIVITY_TIMEOUT?: number
+      SESSIONS_SINGLE_PER_USER?: boolean
+      SESSIONS_TAGS?: string
+      SESSIONS_TIMEBOX?: number
+      SITE_URL?: string
+      SMS_AUTOCONFIRM?: boolean
+      SMS_MAX_FREQUENCY?: number
+      SMS_MESSAGEBIRD_ACCESS_KEY?: string
+      SMS_MESSAGEBIRD_ORIGINATOR?: string
+      SMS_OTP_EXP?: number
+      SMS_OTP_LENGTH?: number
+      SMS_PROVIDER?: string
+      SMS_TEMPLATE?: string
+      SMS_TEST_OTP?: string
+      SMS_TEST_OTP_VALID_UNTIL?: string
+      SMS_TEXTLOCAL_API_KEY?: string
+      SMS_TEXTLOCAL_SENDER?: string
+      SMS_TWILIO_ACCOUNT_SID?: string
+      SMS_TWILIO_AUTH_TOKEN?: string
+      SMS_TWILIO_CONTENT_SID?: string
+      SMS_TWILIO_MESSAGE_SERVICE_SID?: string
+      SMS_TWILIO_VERIFY_ACCOUNT_SID?: string
+      SMS_TWILIO_VERIFY_AUTH_TOKEN?: string
+      SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID?: string
+      SMS_VONAGE_API_KEY?: string
+      SMS_VONAGE_API_SECRET?: string
+      SMS_VONAGE_FROM?: string
+      SMTP_ADMIN_EMAIL?: string
+      SMTP_HOST?: string
+      SMTP_MAX_FREQUENCY?: number
+      SMTP_PASS?: string
+      SMTP_PORT?: string
+      SMTP_SENDER_NAME?: string
+      SMTP_USER?: string
+      URI_ALLOW_LIST?: string
+    }
+    UpdateGoTrueConfigHooksBody: {
+      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
+      HOOK_CUSTOM_ACCESS_TOKEN_SECRETS?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS?: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_SEND_EMAIL_ENABLED?: boolean
+      HOOK_SEND_EMAIL_SECRETS?: string
+      HOOK_SEND_EMAIL_URI?: string
+      HOOK_SEND_SMS_ENABLED?: boolean
+      HOOK_SEND_SMS_SECRETS?: string
+      HOOK_SEND_SMS_URI?: string
+    }
+    UpdateMemberBody: {
+      role_id: number
+    }
+    UpdateMemberRoleBody: {
+      description?: string
+      name: string
+      role_scoped_projects: string[]
+    }
+    UpdateNotificationBodyV2: {
+      id: string
+      /** @enum {string} */
+      status: 'new' | 'seen' | 'archived'
+    }
+    UpdateNotificationsBodyV1: {
+      ids: string[]
+    }
+    UpdateOrganizationBodyDto: {
+      additional_billing_emails?: string[]
+      /** Format: email */
+      billing_email?: string
+      name?: string
+      opt_in_tags?: 'AI_SQL_GENERATOR_OPT_IN'[]
+    }
+    UpdateOrganizationResponse: {
+      billing_email?: string
+      id: number
+      name: string
+      opt_in_tags: string[]
+      slug: string
+      stripe_customer_id?: string
+    }
+    UpdatePasswordBody: {
+      password: string
+    }
+    UpdatePgbouncerConfigBody: {
+      default_pool_size?: number
+      ignore_startup_parameters: string
+      max_client_conn?: number | null
+      pgbouncer_enabled: boolean
+      /** @enum {string} */
+      pool_mode: 'transaction' | 'session' | 'statement'
+    }
     UpdatePgsodiumConfigBody: {
       root_key: string
     }
@@ -10307,6 +10856,31 @@ export interface components {
       body?: string
       name?: string
       verify_jwt?: boolean
+    }
+    ValidateEmailBodyDto: {
+      /** Format: email */
+      email: string
+    }
+    ValidatePauseProjectResponseDto: {
+      message: string
+    }
+    ValidateQueryBody: {
+      query: string
+    }
+    ValidateQueryResponse: {
+      valid: boolean
+    }
+    ValidateSpamBodyDto: {
+      content: string
+      subject: string
+    }
+    ValidateSpamResponse: {
+      rules: components['schemas']['ValidateSpamRule'][]
+    }
+    ValidateSpamRule: {
+      desc: string
+      name: string
+      score: number
     }
     ValidationError: {
       message: string
@@ -18836,15 +19410,12 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
+      path?: never
       cookie?: never
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['RestartProjectInfo']
+        'application/json': components['schemas']['RestartProjectBodyDto']
       }
     }
     responses: {
@@ -19370,11 +19941,14 @@ export interface operations {
       }
     }
     responses: {
+      /** @description Returns the created replication pipeline id. */
       201: {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['CreatePipelineResponse']
+        }
       }
       403: {
         headers: {
@@ -19574,11 +20148,14 @@ export interface operations {
       }
     }
     responses: {
+      /** @description Returns the created replication sink id. */
       201: {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['CreateSinkResponse']
+        }
       }
       403: {
         headers: {
@@ -22168,6 +22745,45 @@ export interface operations {
       }
     }
   }
+  'v1-bulk-update-functions': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BulkUpdateFunctionBody'][]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BulkUpdateFunctionResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update functions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-create-a-function': {
     parameters: {
       query?: {
@@ -22324,6 +22940,7 @@ export interface operations {
   'v1-deploy-a-function': {
     parameters: {
       query?: {
+        bundleOnly?: boolean
         slug?: string
       }
       header?: never
@@ -22344,7 +22961,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['FunctionResponse']
+          'application/json': components['schemas']['DeployFunctionResponse']
         }
       }
       403: {
@@ -22417,6 +23034,71 @@ export interface operations {
       }
       /** @description Failed to update health status. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SystemProjectPauseController_pauseProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Project paused successfully */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PauseProjectResponseDto']
+        }
+      }
+    }
+  }
+  SystemProjectPauseController_validatePauseProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ValidatePauseProjectResponseDto']
+        }
+      }
+      /** @description Project can be paused */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ValidatePauseProjectResponseDto']
+        }
+      }
+    }
+  }
+  SystemRestartController_restartProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
         headers: {
           [name: string]: unknown
         }
@@ -28099,15 +28781,12 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
+      path?: never
       cookie?: never
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['RestartProjectInfo']
+        'application/json': components['schemas']['RestartProjectBodyDto']
       }
     }
     responses: {
