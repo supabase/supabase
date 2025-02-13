@@ -30,13 +30,18 @@ export default defineConfig({
     trace: 'on-first-retry',
     // record a video for failed tests, but only for local testing. We can't store videos on CI atm.
     video: 'retain-on-failure',
+    launchOptions: {
+      env: {
+        NODE_ENV: 'test',
+      },
+    },
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 768 } },
     },
 
     // {
