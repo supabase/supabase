@@ -7,6 +7,8 @@ import { LayoutHeader } from './ProjectLayout/LayoutHeader'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import NavigationBar from './ProjectLayout/NavigationBar/NavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
+import { Sidebar } from 'components/interfaces/Sidebar'
+import { SidebarProvider } from 'ui'
 
 export interface DefaultLayoutProps {
   title?: string
@@ -22,25 +24,28 @@ const DefaultLayout = ({ children, showProductMenu }: PropsWithChildren<DefaultL
   const { ref } = useParams()
   return (
     <>
-      <ProjectContextProvider projectRef={ref}>
-        <AppBannerContextProvider>
-          <div className="flex flex-col h-screen w-screen">
-            {/* Top Banner */}
-            <AppBannerWrapper />
-            <div className="flex-shrink-0">
-              <MobileNavigationBar />
-              <LayoutHeader showProductMenu={showProductMenu} />
+      <SidebarProvider defaultOpen={false}>
+        <ProjectContextProvider projectRef={ref}>
+          <AppBannerContextProvider>
+            <div className="flex flex-col h-screen w-screen">
+              {/* Top Banner */}
+              <AppBannerWrapper />
+              <div className="flex-shrink-0">
+                <MobileNavigationBar />
+                <LayoutHeader showProductMenu={showProductMenu} />
+              </div>
+              {/* Main Content Area */}
+              <div className="flex flex-1 w-full overflow-y-hidden">
+                {/* Sidebar */}
+                {/* <NavigationBar /> */}
+                <Sidebar />
+                {/* Main Content */}
+                <div className="flex-grow h-full overflow-y-auto">{children}</div>
+              </div>
             </div>
-            {/* Main Content Area */}
-            <div className="flex flex-1 w-full overflow-y-hidden">
-              {/* Sidebar */}
-              <NavigationBar />
-              {/* Main Content */}
-              <div className="flex-grow h-full overflow-y-auto">{children}</div>
-            </div>
-          </div>
-        </AppBannerContextProvider>
-      </ProjectContextProvider>
+          </AppBannerContextProvider>
+        </ProjectContextProvider>
+      </SidebarProvider>
     </>
   )
 }

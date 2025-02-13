@@ -15,6 +15,14 @@
   --chart-5: 27 87% 67%;
   --chart-warning: hsl(var(--warning-default));
   --chart-destructive: hsl(var(--destructive-default));
+  --sidebar-background: var(--background-dash-sidebar);
+  --sidebar-foreground: var(--foreground-default);
+  --sidebar-primary: var(--foreground-default);
+  --sidebar-primary-foreground: var(--warning-default);
+  --sidebar-accent: var(--background-selection);
+  --sidebar-accent-foreground: var(--foreground-default);
+  --sidebar-border: var(--border-default);
+  --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
 .dark {
@@ -25,6 +33,14 @@
   --chart-5: 340 75% 55%;
   --chart-warning: hsl(var(--warning-default));
   --chart-destructive: hsl(var(--destructive-default));
+  --sidebar-background: var(--background-dash-sidebar);
+  --sidebar-foreground: var(--foreground-default);
+  --sidebar-primary: var(--foreground-default);
+  --sidebar-primary-foreground: var(--warning-default);
+  --sidebar-accent: var(--background-selection);
+  --sidebar-accent-foreground: var(--foreground-default);
+  --sidebar-border: var(--border-default);
+  --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
 @layer utilities {
