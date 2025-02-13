@@ -54,9 +54,11 @@ export const LogsPreviewer = ({
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
   const { its, db } = useParams()
-  const [showChart, setShowChart] = useState(true)
   const organization = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
+
+  const [showChart, setShowChart] = useState(true)
+  const [selectedLogId, setSelectedLogId] = useSelectedLog()
 
   const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
@@ -78,7 +80,6 @@ export const LogsPreviewer = ({
     setParams,
   } = useLogsPreview({ projectRef, table, filterOverride })
 
-  const [selectedLogId, setSelectedLogId] = useSelectedLog()
   const {
     data: selectedLog,
     isLoading: isSelectedLogLoading,
@@ -132,7 +133,6 @@ export const LogsPreviewer = ({
         ...router.query,
         ite: undefined,
         its: undefined,
-        // ...whereFilters,
       },
     })
   }
