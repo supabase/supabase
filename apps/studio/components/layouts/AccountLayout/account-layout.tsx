@@ -84,9 +84,9 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
             className={cn(PADDING_CLASSES, MAX_WIDTH_CLASSES, 'border-none')}
             aria-label="Organization menu navigation"
           >
-            {accountLinks.map((item) => (
+            {accountLinks.map((item, i) => (
               <NavMenuItem
-                key={item.key}
+                key={`${item.key}-${i}`}
                 active={(item.key === currentPath || item.keys?.includes(currentPath)) ?? false}
               >
                 <Link href={item.href}>{item.label}</Link>

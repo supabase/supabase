@@ -64,6 +64,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
       // and will think the user is authenticated. Since fetching the profile happens
       // on every page load, we can check for a 401 here and sign the user out if
       // they have a bad token.
+      console.log('onError is running', err)
       if (err.code === 401) {
         signOut().then(() => router.push('/sign-in'))
       }

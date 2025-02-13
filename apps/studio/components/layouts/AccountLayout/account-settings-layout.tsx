@@ -33,8 +33,8 @@ const AccountSettingsLayout = ({ children }: PropsWithChildren) => {
     <ScaffoldContainerLegacy className="flex flex-row py-8 gap-20">
       <nav className="py-0">
         <ul className="flex flex-col gap-1">
-          {links.map((link) => (
-            <li key={link.key}>
+          {links.map((link, i) => (
+            <li key={`${link.key}-${i}`}>
               <Link href={link.href}>
                 <Button
                   type={link.isActive ? 'default' : 'text'}
