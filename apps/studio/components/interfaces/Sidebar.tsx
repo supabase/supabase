@@ -7,7 +7,7 @@ import {
 } from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, MotionProps } from 'framer-motion'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -40,7 +40,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Separator,
-  SidebarContent,
+  SidebarContent as SidebarContentPrimitive,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
@@ -52,32 +52,31 @@ import {
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
 import { UserDropdown } from './UserDropdown'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
 
-const SidebarMotion = motion(SidebarPrimitive)
+const SidebarMotion = motion(SidebarPrimitive) as React.FC<
+  React.ComponentProps<typeof SidebarPrimitive> & {
+    transition?: MotionProps['transition']
+  }
+>
 
-export function Sidebar() {
-  const snap = useAppStateSnapshot()
+export interface SidebarProps extends React.ComponentPropsWithoutRef<typeof SidebarPrimitive> {}
 
-  const { open, toggleSidebar, setOpen } = useSidebar()
-  const project = useSelectedProject()
+export function Sidebar({ className, ...props }: SidebarProps) {
+  const { setOpen } = useSidebar()
+
   const hideSideBar = useHideSidebar()
-  const setCommandMenuOpen = useSetCommandMenuOpen()
+
   const [storedAllowNavPanel] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
     true
   )
   const { sidebarBehaviour, setSidebarBehaviour } = useAppStateSnapshot()
 
-  // Don't allow the nav panel to expand in playwright tests
-  const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
-
-  console.log('sidebarBehaviour in Sidebar', sidebarBehaviour)
-
   useEffect(() => {
-    console.log('sidebarBehaviour changed:', sidebarBehaviour)
     if (sidebarBehaviour === 'open') {
       setOpen(true)
     }
@@ -91,6 +90,7 @@ export function Sidebar() {
       <AnimatePresence>
         {!hideSideBar && (
           <SidebarMotion
+            {...props}
             transition={{
               delay: 0.4,
               duration: 0.4,
@@ -109,47 +109,8 @@ export function Sidebar() {
               }
             }}
           >
-            <AnimatePresence mode="wait">
-              <SidebarContent>
-                {/* {project ? ( */}
-                <motion.div key="project-links">
-                  <ProjectLinks />
-                </motion.div>
-                {/* ) : (
-                <motion.div
-                  key="org-links"
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                >
-                  <OrganizationLinks />
-                </motion.div>
-                )} */}
-              </SidebarContent>
-            </AnimatePresence>
-            <SidebarFooter>
-              <SidebarMenu className="group-data-[state=expanded]:p-0">
-                <SidebarGroup className="p-0">
-                  <NavLink
-                    key="cmdk"
-                    route={{
-                      key: 'cmdk',
-                      label: 'Command Menu',
-                      icon: <Command size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-                    }}
-                    onClick={() => setCommandMenuOpen(true)}
-                  />
-                </SidebarGroup>
-              </SidebarMenu>
-              <SidebarMenu className="group-data-[state=expanded]:p-0">
-                <SidebarGroup className="p-0">
-                  <SidebarMenuItem className="h-10 flex items-center">
-                    <UserDropdown />
-                  </SidebarMenuItem>
-                </SidebarGroup>
-              </SidebarMenu>
-              <SidebarGroup className="p-0">
+            <SidebarContent
+              footer={
                 <div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -177,11 +138,61 @@ export function Sidebar() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-              </SidebarGroup>
-            </SidebarFooter>
+              }
+            />
           </SidebarMotion>
         )}
       </AnimatePresence>
+    </>
+  )
+}
+
+export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
+  const setCommandMenuOpen = useSetCommandMenuOpen()
+  return (
+    <>
+      <AnimatePresence mode="wait">
+        <SidebarContentPrimitive>
+          {/* {project ? ( */}
+          <motion.div key="project-links">
+            <ProjectLinks />
+          </motion.div>
+          {/* ) : (
+                <motion.div
+                  key="org-links"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                >
+                  <OrganizationLinks />
+                </motion.div>
+                )} */}
+        </SidebarContentPrimitive>
+      </AnimatePresence>
+      <SidebarFooter>
+        <SidebarMenu className="group-data-[state=expanded]:p-0">
+          <SidebarGroup className="p-0">
+            <NavLink
+              key="cmdk"
+              route={{
+                key: 'cmdk',
+                label: 'Command Menu',
+                icon: <Command size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+              }}
+              onClick={() => setCommandMenuOpen(true)}
+            />
+          </SidebarGroup>
+        </SidebarMenu>
+        <SidebarMenu className="group-data-[state=expanded]:p-0">
+          <SidebarGroup className="p-0">
+            <SidebarMenuItem className="h-10 flex items-center">
+              <UserDropdown />
+            </SidebarMenuItem>
+          </SidebarGroup>
+        </SidebarMenu>
+        <SidebarGroup className="p-0">{footer}</SidebarGroup>
+      </SidebarFooter>
     </>
   )
 }
@@ -258,43 +269,49 @@ function ProjectLinks() {
   // console.log(productRoutes)
 
   return (
-    <SidebarMenu className="">
-      <SidebarGroup className="gap-0.5">
-        <NavLink
-          key="home"
-          active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
-          route={{
-            key: 'HOME',
-            label: 'Project overview',
-            icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: `/project/${ref}`,
-            linkElement: <ProjectIndexPageLink projectRef={ref} />,
-          }}
-        />
-        {toolRoutes.map((route, i) => (
-          <NavLink key={`tools-routes-${i}`} route={route} active={activeRoute === route.key} />
-        ))}
-      </SidebarGroup>
-      <Separator className="w-[calc(100%-1rem)] mx-auto" />
+    <>
+      <SidebarMenu className="">
+        <SidebarGroup className="gap-0.5">
+          <NavLink
+            key="home"
+            active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
+            route={{
+              key: 'HOME',
+              label: 'Project overview',
+              icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+              link: `/project/${ref}`,
+              linkElement: <ProjectIndexPageLink projectRef={ref} />,
+            }}
+          />
+          {toolRoutes.map((route, i) => (
+            <NavLink key={`tools-routes-${i}`} route={route} active={activeRoute === route.key} />
+          ))}
+        </SidebarGroup>
+        <Separator className="w-[calc(100%-1rem)] mx-auto" />
 
-      <SidebarGroup className="gap-0.5">
-        {productRoutes.map((route, i) => (
-          <NavLink key={`product-routes-${i}`} route={route} active={activeRoute === route.key} />
-        ))}
-      </SidebarGroup>
+        <SidebarGroup className="gap-0.5">
+          {productRoutes.map((route, i) => (
+            <NavLink key={`product-routes-${i}`} route={route} active={activeRoute === route.key} />
+          ))}
+        </SidebarGroup>
 
-      <Separator className="w-[calc(100%-1rem)] mx-auto" />
-      <SidebarGroup className="gap-0.5">
-        {otherRoutes.map((route, i) => (
-          <NavLink key={`other-routes-${i}`} route={route} active={activeRoute === route.key} />
-        ))}
-      </SidebarGroup>
-      <SidebarGroup className="gap-0.5">
-        {settingsRoutes.map((route, i) => (
-          <NavLink key={`settings-routes-${i}`} route={route} active={activeRoute === route.key} />
-        ))}
-      </SidebarGroup>
-    </SidebarMenu>
+        <Separator className="w-[calc(100%-1rem)] mx-auto" />
+        <SidebarGroup className="gap-0.5">
+          {otherRoutes.map((route, i) => (
+            <NavLink key={`other-routes-${i}`} route={route} active={activeRoute === route.key} />
+          ))}
+        </SidebarGroup>
+        <SidebarGroup className="gap-0.5">
+          {settingsRoutes.map((route, i) => (
+            <NavLink
+              key={`settings-routes-${i}`}
+              route={route}
+              active={activeRoute === route.key}
+            />
+          ))}
+        </SidebarGroup>
+      </SidebarMenu>
+    </>
   )
 }
 

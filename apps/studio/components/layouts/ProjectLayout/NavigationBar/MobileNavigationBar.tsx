@@ -11,6 +11,7 @@ import { CommandMenuTrigger } from 'ui-patterns'
 import { NavContent } from './NavigationBar'
 import { useState } from 'react'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
+import { Sidebar, SidebarContent } from 'components/interfaces/Sidebar'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -80,8 +81,8 @@ const MobileNavigationBar = () => {
           </button>
         </div>
       </nav>
-      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <NavContent />
+      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen} data-state="expanded">
+        <SidebarContent />
       </MobileSheetNav>
     </div>
   )
