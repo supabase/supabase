@@ -113,6 +113,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <Head>
                   <title>Supabase</title>
                   <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                  {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
+                  <style
+                    dangerouslySetInnerHTML={{
+                      __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+                    }}
+                  />
                 </Head>
                 <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
                 <TooltipProvider delayDuration={0}>
@@ -126,11 +132,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       <AppBannerContextProvider>
                         <CommandProvider>
                           <FeaturePreviewContextProvider>
-                            <div
-                              className={`${customFont.variable} ${sourceCodePro.variable} font-sans flex flex-col h-screen w-screen`}
-                            >
-                              {getLayout(<Component {...pageProps} />)}
-                            </div>
+                            {getLayout(<Component {...pageProps} />)}
                             <StudioCommandMenu />
                             <GenerateSql />
                             <FeaturePreviewModal />
