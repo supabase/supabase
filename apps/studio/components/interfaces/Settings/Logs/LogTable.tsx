@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CSVButton from 'components/ui/CSVButton'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { copyToClipboard } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -93,6 +94,7 @@ const LogTable = ({
   onSelectedLogChange,
 }: Props) => {
   const { profile } = useProfile()
+  const [selectedLogId] = useSelectedLog()
   const { show: showContextMenu } = useContextMenu()
 
   const downloadCsvRef = useRef<HTMLDivElement>(null)
@@ -378,6 +380,15 @@ const LogTable = ({
       setSelectedRow(null)
     }
   }, [selectedLog, isSelectedLogLoading])
+
+  useEffect(() => {
+    if (!isLoading && !selectedRow) {
+      // [Joshen] Only want to run this once on a fresh session when log param is provided in URL
+      // Subsequently, selectedRow state is just controlled by the user's clicks on LogTable
+      const logData = data.find((x) => x.id === selectedLogId)
+      if (logData) setSelectedRow(logData)
+    }
+  }, [isLoading])
 
   if (!data) return null
 
