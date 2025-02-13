@@ -10,7 +10,7 @@ function getClient() {
   client = configcat.getClient(
     process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY ?? '',
     configcat.PollingMode.AutoPoll,
-    { pollIntervalSeconds: 600 }
+    { pollIntervalSeconds: 300 }
   )
 
   return client
