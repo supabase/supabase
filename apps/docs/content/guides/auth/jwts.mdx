@@ -96,6 +96,7 @@ You might wonder why JWTs are so popular all of a sudden. The answer is that wit
 {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 
 Note: One downside of JWTs is that they are not easily voidable, unlike session tokens. If a JWT is leaked to a malicious actor, they will be able to redeem it anywhere until the expiry date is reached – unless of course the system owner updates the `jwt_secret` (which will of course invalidate _everyone's_ existing tokens).
+
 ## JWTs in Supabase
 
 In Supabase we issue JWTs for three different purposes:

@@ -112,6 +112,7 @@ Supabase Auth prefers a JWT-based approach using access and refresh tokens are b
 It's better for cost optimization and scaling as well, as the authentication system's servers and database only handle traffic for this use case.
 
 ### How to ensure an access token (JWT) cannot be used after a user signs out
+
 Most applications rarely need such strong guarantees. Consider adjusting the JWT expiry time to an acceptable value. If this is still necessary, you should try to use this validation logic only for the most sensitive actions within your application.
 
 When a user signs out, the sessions affected by the logout are removed from the database entirely. You can check that the `session_id` claim in the JWT corresponds to a row in the `auth.sessions` table. If such a row does not exist, it means that the user has logged out.
@@ -119,6 +120,7 @@ When a user signs out, the sessions affected by the logout are removed from the 
 Note that sessions are not proactively terminated when their maximum lifetime (time-box) or inactivity timeout are reached. These sessions are cleaned up progressively 24 hours after reaching that status. This allows you to tweak the values or roll back changes without causing unintended user friction.
 
 ### Using HTTP-only cookies to store access and refresh tokens
+
 This is possible, but only for apps that use the traditional server-only web app approach where all of the application logic is implemented on the server and it returns rendered HTML only.
 
 If your app uses any client side JavaScript to build a rich user experience, using HTTP-Only cookies is not feasible since only your server will be able to read and refresh the session of the user. The browser will not have access to the access and refresh tokens.

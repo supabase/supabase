@@ -129,6 +129,7 @@ No, it doesn't. Let's break it down:
 - If a client is connected to the pooler, then at least 1 hot connection will be sustained, even if no client needs it.
 
 ### **How to change pool size**
+
 In the [Dashboard's Database Settings](https://supabase.com/dashboard/project/_/settings/database), you can configure Supavisor's "Pool Size":
 
 <img
@@ -146,6 +147,7 @@ Supabase Storage uses Supavisor internally. The other servers that communicate w
 Supavisor is primarily intended for users who do not want to rely on the Supabase Client libraries and instead prefer to work with external ORMs, such as Prisma, Drizzle, and Psycopg.
 
 ### **Whether to change Supavisor's pool size?**
+
 In an ideal scenario, Postgres would support an unlimited number of direct connections, but there's a limit to how many it can handle. If Supavisor uses most of the available connections, you risk depriving other servers, such as Auth, from accessing your database. Still, as much as possible, you want to give your pooler freedom to grow its pool as needed to service demand.
 
 It's important to note that the Storage server also uses Supavisor as a unique "user+db+mode" combination, so the pool size you set for your general application will apply to it, too.
@@ -153,11 +155,13 @@ It's important to note that the Storage server also uses Supavisor as a unique "
 As a rule of thumb, if you're using the DB REST API or multiple app-based "user+db+mode" combinations, try to keep the pooler's usage under 40% of available connections. Otherwise, you can cautiously increase usage to around 80%. These percentages are flexible and depend on your application's usage and setup. Monitor connection usage to determine the optimal allocation without depriving other servers of necessary connections.
 
 ### **How to monitor connections**
+
 > EDIT: a more in-depth [troubleshooting guide](https://github.com/orgs/supabase/discussions/27141) for connection monitoring was published
 
 Connection usage can be monitored with a Supabase Grafana Dashboard. It provides realtime visibility of over 200 database metrics, such as graphs of CPU, EBS, and active direct/pooler connections. It can be extremely useful for monitoring and debugging instances.
 
 You can check our [GitHub repo](https://github.com/supabase/supabase-grafana) for setup instructions for local deployments or free cloud deployments on [Fly.io](http://fly.io/). Refer to Supabase [documentation](https://supabase.com/docs/guides/platform/metrics) to learn more about the metrics endpoint.
+
 ### **Can Supavisor really support a million connections?**
 
 It depends.

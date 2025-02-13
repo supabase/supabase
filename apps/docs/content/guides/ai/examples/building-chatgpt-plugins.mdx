@@ -116,6 +116,7 @@ curl -X POST -F \\"file=@./postgresql-15-US.pdf\\" <http://localhost:3333/upsert
 ```
 
 The plugin will split your data and documents into smaller chunks automatically. You can view the chunks using the Supabase dashboard or any other SQL client you prefer. The entire Postgres Documentation yielded 7,904 records, which is not a lot, but we can try to add index for `embedding` column to speed things up by a little. To do so, you should run the following SQL command:
+
 ```sql
 create index on documents
 using hnsw (embedding vector_ip_ops)
