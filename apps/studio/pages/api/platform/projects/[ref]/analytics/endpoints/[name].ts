@@ -1,7 +1,7 @@
-import apiWrapper from 'lib/api/apiWrapper'
-import { get } from 'lib/common/fetch'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { PROJECT_ANALYTICS_URL } from 'pages/api/constants'
+import apiWrapper from 'lib/api/apiWrapper'
+import { get } from 'lib/common/fetch'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
