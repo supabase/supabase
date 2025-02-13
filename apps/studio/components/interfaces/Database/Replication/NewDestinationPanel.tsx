@@ -1,6 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
+import { useCreateSinkMutation } from 'data/replication/create-sink-mutation'
 import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Form_Shadcn_,
@@ -15,7 +18,6 @@ import {
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
   SidePanel,
   TextArea_Shadcn_,
 } from 'ui'
@@ -28,6 +30,12 @@ interface NewDestinationPanelProps {
 }
 
 const NewDestinationPanel = ({ visible, onCancel, onConfirm }: NewDestinationPanelProps) => {
+  const { ref: projectRef } = useParams()
+  const { mutate: createSink, isLoading: isCreating } = useCreateSinkMutation({
+    onSuccess: (res) => {
+      toast.success('Successfully created destination')
+    },
+  })
   const formId = 'destination-editor'
   const types = ['BigQuery'] as const
   const TypeEnum = z.enum(types)
@@ -52,7 +60,15 @@ const NewDestinationPanel = ({ visible, onCancel, onConfirm }: NewDestinationPan
     defaultValues,
   })
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    console.log(`Form submitted: ${JSON.stringify(data)}`)
+    console.log(`form submitted`, JSON.stringify(data))
+    if (!projectRef) return console.error('Project ref is required')
+    createSink({
+      projectRef,
+      sink_name: data.name,
+      project_id: data.projectId,
+      dataset_id: data.datasetId,
+      service_account_key: data.serviceAccountKey,
+    })
     form.reset(defaultValues)
   }
   const submitRef = useRef<HTMLButtonElement>(null)
