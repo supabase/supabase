@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { components } from 'data/api'
 import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
 
 type DownloadBucketObjectParams = {
@@ -18,9 +18,10 @@ export const downloadBucketObject = async (
 ) => {
   if (!bucketId) throw new Error('bucketId is required')
 
-  // has to use lib/common/fetch post because the other post doesn't support wrapping blobs
+  // [Joshen] JFYI we have to use lib/common/fetch post as post from openapi-fetch doesn't support receiving octet-streams
+  // Opting to hard code /platform for non platform just for this particular mutation, so that it's clear what's happening
   const response = await post(
-    `${API_URL}/storage/${projectRef}/buckets/${bucketId}/objects/download`,
+    `${API_URL}${IS_PLATFORM ? '' : '/platform'}/storage/${projectRef}/buckets/${bucketId}/objects/download`,
     {
       path,
       options,
