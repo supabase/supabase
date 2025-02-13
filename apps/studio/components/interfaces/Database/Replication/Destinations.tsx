@@ -81,7 +81,8 @@ const Destinations = () => {
               return (
                 <DestinationRow
                   key={sink.id}
-                  sink_name={sink.name}
+                  sinkId={sink.id}
+                  sinkName={sink.name}
                   type={sink.config.big_query ? 'BigQuery' : 'Other'}
                   pipeline={pipeline}
                   error={pipelinesError}
