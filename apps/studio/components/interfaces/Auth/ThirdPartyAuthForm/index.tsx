@@ -18,6 +18,7 @@ import { AddIntegrationDropdown } from './AddIntegrationDropdown'
 import { CreateAuth0IntegrationDialog } from './CreateAuth0Dialog'
 import { CreateAwsCognitoAuthIntegrationDialog } from './CreateAwsCognitoAuthDialog'
 import { CreateFirebaseAuthIntegrationDialog } from './CreateFirebaseAuthDialog'
+import { CreateClerkAuthIntegrationDialog } from './CreateClerkAuthDialog'
 import { IntegrationCard } from './IntegrationCard'
 import {
   getIntegrationType,
@@ -128,6 +129,19 @@ export const ThirdPartyAuthForm = () => {
 
       <CreateAuth0IntegrationDialog
         visible={selectedIntegration === 'auth0'}
+        onDelete={() => {}}
+        onClose={() => setSelectedIntegration(undefined)}
+      />
+
+      <CreateClerkAuthIntegrationDialog
+        prod={true}
+        visible={selectedIntegration === 'clerkProd'}
+        onDelete={() => {}}
+        onClose={() => setSelectedIntegration(undefined)}
+      />
+
+      <CreateClerkAuthIntegrationDialog
+        visible={selectedIntegration === 'clerkDev'}
         onDelete={() => {}}
         onClose={() => setSelectedIntegration(undefined)}
       />
