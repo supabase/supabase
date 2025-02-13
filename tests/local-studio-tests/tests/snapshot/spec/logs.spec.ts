@@ -1,6 +1,13 @@
 import { test, expect } from '@playwright/test'
 
-const LOGS_PAGES = ['API Gateway', 'Postgres', 'PostgREST', 'Auth', 'Storage', 'Realtime']
+const LOGS_PAGES = [
+  'API Gateway',
+  'Postgres',
+  'PostgREST',
+  // 'Auth', Wont have logs on first load
+  // 'Storage', Wont have logs on first load
+  //'Realtime' Wont have logs on first load
+]
 
 test.describe('Logs', async () => {
   for (const logPage of LOGS_PAGES) {
