@@ -146,7 +146,6 @@ test.describe('Table Editor page', () => {
         'mfa_amr_claims',
         'mfa_challenges',
         'mfa_factors',
-        'one_time_tokens',
         'refresh_tokens',
         'saml_providers',
         'saml_relay_states',
@@ -154,6 +153,7 @@ test.describe('Table Editor page', () => {
         'sessions',
         'sso_domains',
         'sso_providers',
+        'users',
       ])
     )
   })
