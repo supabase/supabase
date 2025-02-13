@@ -6,6 +6,8 @@ import { z } from 'zod'
 
 import { type Database } from 'common'
 
+import { validRevalidationTags } from '~/features/helpers.fetch'
+
 enum AuthorizationLevel {
   Unauthorized,
   Basic,
@@ -36,7 +38,7 @@ export async function _handleRevalidateRequest(request: NextRequest) {
 
   let authorizationLevel = AuthorizationLevel.Unauthorized
 
-  const token = authorization.replace(/^Bearer\s+/, '')
+  const token = authorization.replace(/^bearer\s+/i, '')
   if (overrideKeys.includes(token)) {
     authorizationLevel = AuthorizationLevel.Override
   } else if (basicKeys.includes(token)) {
@@ -56,6 +58,13 @@ export async function _handleRevalidateRequest(request: NextRequest) {
       'Malformed request body: should be a JSON object with a "tags" array of strings.',
       { status: 400 }
     )
+  }
+
+  const invalidTags = result.tags!.filter((tag) => !validRevalidationTags.includes(tag))
+  if (invalidTags.length > 0) {
+    return new Response(`Invalid request: contained invalid tags "${invalidTags.join(', ')}"`, {
+      status: 400,
+    })
   }
 
   const supabaseAdmin = createClient<Database>(

@@ -8,6 +8,12 @@
 
 import { ONE_DAY_IN_SECONDS } from './helpers.time'
 
+export const REVALIDATION_TAGS = {
+  GRAPHQL: 'graphql',
+} as const
+// Casting to string so TypeScript doesn't complain on "includes" checks
+export const validRevalidationTags: Array<string> = Object.values(REVALIDATION_TAGS)
+
 function fetchWithNextOptions({
   next,
   cache,
