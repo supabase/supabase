@@ -1,20 +1,21 @@
+import { useParams } from 'common'
+import { SidebarContent } from 'components/interfaces/Sidebar'
+import { IS_PLATFORM } from 'lib/constants'
+import { Menu, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Search, Menu } from 'lucide-react'
-
-import { useParams } from 'common'
-import { IS_PLATFORM } from 'lib/constants'
+import { useState } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
-
-import { buttonVariants, cn, Sheet, SheetContent } from 'ui'
+import { buttonVariants, cn } from 'ui'
 import { CommandMenuTrigger } from 'ui-patterns'
-// import { NavContent } from './NavigationBar'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
 const MobileNavigationBar = () => {
   const router = useRouter()
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
   const { ref: projectRef } = useParams()
   const snap = useAppStateSnapshot()
 
@@ -77,6 +78,9 @@ const MobileNavigationBar = () => {
           </button>
         </div>
       </nav>
+      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen} data-state="expanded">
+        <SidebarContent />
+      </MobileSheetNav>
     </div>
   )
 }

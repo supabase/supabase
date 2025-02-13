@@ -9,16 +9,23 @@ import {
   Label_Shadcn_,
   RadioGroup_Shadcn_,
   RadioGroupLargeItem_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
   Separator,
   singleThemes,
   Switch,
   Theme,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useAppStateSnapshot } from 'state/app-state'
 
 export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
+  const { sidebarBehaviour, setSidebarBehaviour } = useAppStateSnapshot()
 
   const [allowNavPanelToExpand, setAllowNavPanelToExpand] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
@@ -87,11 +94,20 @@ export const ThemeSettings = () => {
           layout="flex-row-reverse"
           description="Allow the Navigation panel to expand on hover"
         >
-          <Switch
-            size="large"
-            checked={allowNavPanelToExpand}
-            onCheckedChange={setAllowNavPanelToExpand}
-          />
+          <Select_Shadcn_
+            value={sidebarBehaviour}
+            onValueChange={setSidebarBehaviour}
+            aria-label="Select an option"
+          >
+            <SelectTrigger_Shadcn_>
+              <SelectValue_Shadcn_ placeholder="Choose an option" />
+            </SelectTrigger_Shadcn_>
+            <SelectContent_Shadcn_>
+              <SelectItem_Shadcn_ value="open">Expanded</SelectItem_Shadcn_>
+              <SelectItem_Shadcn_ value="closed">Collapsed</SelectItem_Shadcn_>
+              <SelectItem_Shadcn_ value="expandable">Expand on hover</SelectItem_Shadcn_>
+            </SelectContent_Shadcn_>
+          </Select_Shadcn_>
         </FormItemLayout>
       </Panel.Content>
     </Panel>
