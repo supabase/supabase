@@ -149,25 +149,27 @@ export function Sidebar({ className, ...props }: SidebarProps) {
 
 export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
   const setCommandMenuOpen = useSetCommandMenuOpen()
+  const { ref: projectRef } = useParams()
+
   return (
     <>
       <AnimatePresence mode="wait">
         <SidebarContentPrimitive>
-          {/* {project ? ( */}
-          <motion.div key="project-links">
-            <ProjectLinks />
-          </motion.div>
-          {/* ) : (
-                <motion.div
-                  key="org-links"
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                >
-                  <OrganizationLinks />
-                </motion.div>
-                )} */}
+          {projectRef ? (
+            <motion.div key="project-links">
+              <ProjectLinks />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="org-links"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <OrganizationLinks />
+            </motion.div>
+          )}
         </SidebarContentPrimitive>
       </AnimatePresence>
       <SidebarFooter>
