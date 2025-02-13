@@ -9,9 +9,9 @@ database_id = "f252ba39-e540-462b-868f-42eb31a5d40c"
 
 ### What problems do poolers solve?
 
-PostgreSQL stands out from other databases by opting to create a new process, not a new thread, for each direct connection. While this design choice brings [numerous benefits](https://www.postgresql.org/message-id/1098894087.31930.62.camel@localhost.localdomain), it introduces a startup penalty for new connections. Moreover, connections are more memory-intensive and can strain Postgres's internal schedulers, limiting the sustainable number that can be formed. Resultingly, developers must be mindful of how they allocate the resource.
+Postgres stands out from other databases by opting to create a new process, not a new thread, for each direct connection. While this design choice brings [numerous benefits](https://www.postgresql.org/message-id/1098894087.31930.62.camel@localhost.localdomain), it introduces a startup penalty for new connections. Moreover, connections are more memory-intensive and can strain Postgres's internal schedulers, limiting the sustainable number that can be formed. Resultingly, developers must be mindful of how they allocate the resource.
 
-When a client (backend server) connects to PostgreSQL, the connection is stateful and enduring, allowing clients to greedily hold onto connections without any obligation to give them up. Typically, applications do not continuously send queries to a database, so this pattern underutilizes finite connections that could have serviced other clients.
+When a client (backend server) connects to Postgres, the connection is stateful and enduring, allowing clients to greedily hold onto connections without any obligation to give them up. Typically, applications do not continuously send queries to a database, so this pattern underutilizes finite connections that could have serviced other clients.
 
 PostgreSQL's shortcomings are particularly evident when handling transient servers, like edge functions. They not only hoard connections for brief queries but also aggressively open and close connections, straining the database.
 
@@ -27,7 +27,7 @@ Note, that like databases, servers can only maintain a certain amount of connect
 
 When deploying to static architecture, such as long-standing containers or VMs, application-side poolers are satisfactory on their own.
 
-When connecting to your application from serverless/edge functions, horizontally auto-scaling servers, or in cases where you simply need more connections than what the database can manage, it's best to complement application-side poolers with a serverside one. Supabase provides Supavisor as an option, but you could use alternatives, such as Prisma's Accelerate or Cloudflare's Hyperdrive.
+When connecting to your application from serverless/edge functions, horizontally auto-scaling servers, or in cases where you need more connections than what the database can manage, it's best to complement application-side poolers with a serverside one. Supabase provides Supavisor as an option, but you could use alternatives, such as Prisma's Accelerate or Cloudflare's Hyperdrive.
 
 They sit between the database and your client servers. They are solely optimized for sustaining high numbers of client connections and queuing and triaging queries to the database. Although they add network complexity, they are necessary when managing auto-scaling servers that can hypothetically form an infinite amount of connections.
 
@@ -66,7 +66,7 @@ postgresql://postgres.ajrbwkcuthywfddihrmflo:[YOUR-PASSWORD]@aws-0-us-east-1.poo
 
 ### Supavisor: Transaction mode vs. Session mode?
 
-When a client forms a direct connection with PostgreSQL, it usually will make a few queries, but may not utilize the connection the entire time. In transaction mode, a client is allowed to make a single query before being sent back to the figurative "waiting room". This prevents greedy or sedentary clients from hoarding connections. In most cases, this increases query throughput and is optimal.
+When a client forms a direct connection with Postgres, it usually will make a few queries, but may not utilize the connection the entire time. In transaction mode, a client is allowed to make a single query before being sent back to the figurative "waiting room". This prevents greedy or sedentary clients from hoarding connections. In most cases, this increases query throughput and is optimal.
 
 In session mode, once the pooler assigns a direct connection, it stays with that client until voluntarily surrendered.
 
@@ -76,12 +76,11 @@ Depending on your application's configurations, having the pooler manage a queue
 
 ### What happens when a client library, such as Prisma, connects through Supavisor?
 
-When clients connect to either PostgreSQL or Supavisor, they do so with the PostgreSQL Wire Protocol. Because of this, clients treat connections with pooler as if they were directly connected to PostgreSQL. The pooler then smoothly acts as a messenger between the database and the client.
+When clients connect to either Postgres or Supavisor, they do so with the Postgres Wire Protocol. Because of this, clients treat connections with pooler as if they were directly connected to Postgres. The pooler then smoothly acts as a messenger between the database and the client.
 
 ### What are "client connections"?
 
-TL;DR: They have nothing to do with front-end clients. They are the amount of backend-server connections that can connect to a serverside pooler.
-
+In summary, they have nothing to do with front-end clients. They are the amount of backend-server connections that can connect to a serverside pooler.
 Imagine a chess tournament with 60 boards. Each board represents a connection in a database. When a player sits down at a board, it's like a client connecting to the database. They can take their time with their moves or just sit there, not making any.
 
 But when the tournament fills up and all the boards are taken, new players are turned away, and told to check back at a later time to see if a table becomes available.
@@ -94,7 +93,7 @@ Now, imagine the tournament organizers decide to expand the venue to house 200 p
 
 ### What is the "user+db+mode" combination?
 
-PostgreSQL is not actually a database. It is a Relational Database Management System (RDMS). Within it, you can spawn PostgreSQL databases. In Supabase, it is a common pattern to just use the default database called `postgres`, but you could create more:
+Postgres is not actually a database. It is a Relational Database Management System (RDMS). Within it, you can spawn Postgres databases. In Supabase, it is a common pattern to just use the default database called `postgres`, but you could create more:
 
 ```sql
 CREATE DATABASE postgres;
@@ -128,7 +127,7 @@ No, it doesn't. Let's break it down:
 - In transaction mode, once a direct connection is established, the pooler will keep it available for reuse for another client. However, if the connection remains unused for 5 minutes, the pooler will close it to free up database resources. In session mode, the connection will be immediately closed.
 - If a client is connected to the pooler, then at least 1 hot connection will be sustained, even if no client needs it.
 
-### **Where can I change my pool size?**
+### **How to change pool size**
 
 In the [Dashboard's Database Settings](https://supabase.com/dashboard/project/_/settings/database), you can configure Supavisor's "Pool Size":
 
@@ -146,21 +145,21 @@ Supabase Storage uses Supavisor internally. The other servers that communicate w
 
 Supavisor is primarily intended for users who do not want to rely on the Supabase Client libraries and instead prefer to work with external ORMs, such as Prisma, Drizzle, and Psycopg.
 
-### **Should I change Supavisor's pool size?**
+### **Whether to change Supavisor's pool size?**
 
-In an ideal scenario, PostgreSQL would support an unlimited number of direct connections, but there's a limit to how many it can handle. If Supavisor uses most of the available connections, you risk depriving other servers, such as Auth, from accessing your database. Still, as much as possible, you want to give your pooler freedom to grow its pool as needed to service demand.
+In an ideal scenario, Postgres would support an unlimited number of direct connections, but there's a limit to how many it can handle. If Supavisor uses most of the available connections, you risk depriving other servers, such as Auth, from accessing your database. Still, as much as possible, you want to give your pooler freedom to grow its pool as needed to service demand.
 
 It's important to note that the Storage server also uses Supavisor as a unique "user+db+mode" combination, so the pool size you set for your general application will apply to it, too.
 
 As a rule of thumb, if you're using the DB REST API or multiple app-based "user+db+mode" combinations, try to keep the pooler's usage under 40% of available connections. Otherwise, you can cautiously increase usage to around 80%. These percentages are flexible and depend on your application's usage and setup. Monitor connection usage to determine the optimal allocation without depriving other servers of necessary connections.
 
-### **How can I monitor connections?**
+### **How to monitor connections**
 
 > EDIT: a more in-depth [troubleshooting guide](https://github.com/orgs/supabase/discussions/27141) for connection monitoring was published
 
 Connection usage can be monitored with a Supabase Grafana Dashboard. It provides realtime visibility of over 200 database metrics, such as graphs of CPU, EBS, and active direct/pooler connections. It can be extremely useful for monitoring and debugging instances.
 
-You can check our [GitHub repo](https://github.com/supabase/supabase-grafana) for setup instructions for local deployments or free cloud deployments on [Fly.io](http://fly.io/). I recommend referring to our concise [documentation](https://supabase.com/docs/guides/platform/metrics) to learn more about the metrics endpoint.
+You can check our [GitHub repo](https://github.com/supabase/supabase-grafana) for setup instructions for local deployments or free cloud deployments on [Fly.io](http://fly.io/). Refer to Supabase [documentation](https://supabase.com/docs/guides/platform/metrics) to learn more about the metrics endpoint.
 
 ### **Can Supavisor really support a million connections?**
 

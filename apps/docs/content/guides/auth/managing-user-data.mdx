@@ -26,7 +26,7 @@ alter table public.profiles enable row level security;
 
 <Admonition type="caution">
 
-Only use primary keys as [foreign key references](https://www.postgresql.org/docs/current/tutorial-fk.html) for schemas and tables like `auth.users` which are managed by Supabase. PostgreSQL lets you specify a foreign key reference for columns backed by a unique index (not necessarily primary keys).
+Only use primary keys as [foreign key references](https://www.postgresql.org/docs/current/tutorial-fk.html) for schemas and tables like `auth.users` which are managed by Supabase. Postgres lets you specify a foreign key reference for columns backed by a unique index (not necessarily primary keys).
 
 Primary keys are **guaranteed not to change**. Columns, indices, constraints or other database objects managed by Supabase **may change at any time** and you should be careful when referencing them directly.
 

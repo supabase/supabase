@@ -5,7 +5,7 @@ description: 'Full Text Search for multiple languages in PostgreSQL'
 tocVideo: 'Mmmv9g_MiBA'
 ---
 
-`PGroonga` is a PostgreSQL extension adding a full text search indexing method based on [Groonga](https://groonga.org). While native PostgreSQL supports full text indexing, it is limited to alphabet and digit based languages. `PGroonga` offers a wider range of character support making it viable for a superset of languages supported by PostgreSQL including Japanese, Chinese, etc.
+`PGroonga` is a Postgres extension adding a full text search indexing method based on [Groonga](https://groonga.org). While native Postgres supports full text indexing, it is limited to alphabet and digit based languages. `PGroonga` offers a wider range of character support making it viable for a superset of languages supported by Postgres including Japanese, Chinese, etc.
 
 ## Enable the extension
 
@@ -71,7 +71,7 @@ values
   ('There is groonga command.');
 ```
 
-The PostgreSQL query planner is smart enough to know that, for extremely small tables, it's faster to scan the whole table rather than loading an index. To force the index to be used, we can disable sequential scans:
+The Postgres query planner is smart enough to know that, for extremely small tables, it's faster to scan the whole table rather than loading an index. To force the index to be used, we can disable sequential scans:
 
 {/* prettier-ignore */}
 ```sql

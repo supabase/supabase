@@ -1,0 +1,3 @@
+description = "Don't use '%s'. The sentence is more concise and/or the tone is more neutral without it."
+level = "WARNING"
+words = ["easily", "please", "simply", "that's it"]

@@ -1,0 +1,3 @@
+description = "Don't use singular first person."
+level = "ERROR"
+words = ["I", "I'm", "me", "my", "mine"]

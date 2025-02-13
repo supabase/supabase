@@ -345,15 +345,15 @@ To prevent PGAudit from monitoring the problematic roles, you'll want to change 
 
 ## FAQ
 
-#### Can I use PGAudit to debug database functions?
+#### Using PGAudit to debug database functions
 
 Technically yes, but it is not the best approach. It is better to check out our [function debugging guide](https://supabase.com/docs/guides/database/functions#general-logging) instead.
 
-#### How can I download database logs?
+#### Downloading database logs
 
 In the [Logs Dashboard](https://supabase.com/dashboard/project/_/logs/postgres-logs) you can download logs as CSVs.
 
-#### Can I log observed table rows?
+#### Logging observed table rows
 
 By default, PGAudit records queries, but not the returned rows. You can modify this behavior with the `pgaudit.log_rows` variable:
 
@@ -367,7 +367,7 @@ alter role "postgres" set pgaudit.log_rows to 'off';
 
 You should not do this unless you are _absolutely_ certain it is necessary for your use case. It can expose sensitive values to your logs that ideally should not be preserved. Furthermore, if done in excess, it can noticeably reduce database performance.
 
-#### Can I log function parameters?
+#### Logging function parameters
 
 We don't currently support configuring `pgaudit.log_parameter` because it may log secrets in encrypted columns if you are using [pgsodium](https://supabase.com/docs/guides/database/extensions/pgsodium) or[Vault](https://supabase.com/docs/guides/database/vault).
 

@@ -215,7 +215,7 @@ PostgREST has an [error reference table](https://postgrest.org/en/v12/references
 
 ### Database-level errors
 
-However, some errors that are reported through the Database API occur at the PostgreSQL level. If it is not clear which error occurred you should reference the timestamp of the error and try to see if you can find it in the Postgres logs.
+However, some errors that are reported through the Database API occur at the Postgres level. If it is not clear which error occurred you should reference the timestamp of the error and try to see if you can find it in the Postgres logs.
 
 ```sql
 select
@@ -246,7 +246,7 @@ order by
 limit 100;
 ```
 
-Like PostgREST, PostgreSQL has a [reference table](https://www.postgresql.org/docs/current/errcodes-appendix.html) for interpreting error codes.
+Like PostgREST, Postgres has a [reference table](https://www.postgresql.org/docs/current/errcodes-appendix.html) for interpreting error codes.
 
 ## PostgREST server and Cloudflare errors
 

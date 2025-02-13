@@ -1,0 +1,20 @@
+description = "Don't use '%s' as a gender-neutral pronoun."
+level = "ERROR"
+words = [
+    [
+        "s/he",
+        "they",
+    ],
+    [
+        "he/she",
+        "they",
+    ],
+    [
+        "(s)he",
+        "they",
+    ],
+    [
+        "him/her",
+        "them",
+    ],
+]

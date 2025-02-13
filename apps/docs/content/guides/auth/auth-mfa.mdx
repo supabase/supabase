@@ -175,7 +175,7 @@ Your app should sufficiently deny or allow access to tables or rows based on the
 
 <Admonition type="caution">
 
-PostgreSQL has two types of policies: permissive and restrictive. This guide uses restrictive policies. Make sure you don't omit the `as restrictive` clause.
+Postgres has two types of policies: permissive and restrictive. This guide uses restrictive policies. Make sure you don't omit the `as restrictive` clause.
 
 </Admonition>
 
@@ -328,7 +328,7 @@ For example, the following structure describes a user that first signed in with 
 
 Use the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` method to get easy access to this information in your browser app.
 
-You can use this PostgreSQL snippet in RLS policies, too:
+You can use this Postgres snippet in RLS policies, too:
 
 ```sql
 jsonb_path_query((select auth.jwt()), '$.amr[0]')
