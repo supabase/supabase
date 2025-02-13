@@ -7,37 +7,37 @@ export const customFont = localFont({
   fallback: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
   src: [
     {
-      path: '../fonts/CustomFont-Book.woff2',
+      path: './CustomFont-Book.woff2',
       weight: '400',
       style: 'normal',
     },
     {
-      path: '../fonts/CustomFont-BookItalic.woff2',
+      path: './CustomFont-BookItalic.woff2',
       weight: '400',
       style: 'italic',
     },
     {
-      path: '../fonts/CustomFont-Medium.woff2',
+      path: './CustomFont-Medium.woff2',
       weight: '500',
       style: 'normal',
     },
     {
-      path: '../fonts/CustomFont-Bold.woff2',
+      path: './CustomFont-Bold.woff2',
       weight: '600',
       style: 'normal',
     },
     {
-      path: '../fonts/CustomFont-BoldItalic.woff2',
+      path: './CustomFont-BoldItalic.woff2',
       weight: '600',
       style: 'italic',
     },
     {
-      path: '../fonts/CustomFont-Black.woff2',
+      path: './CustomFont-Black.woff2',
       weight: '800',
       style: 'normal',
     },
     {
-      path: '../fonts/CustomFont-BlackItalic.woff2',
+      path: './CustomFont-BlackItalic.woff2',
       weight: '800',
       style: 'italic',
     },
