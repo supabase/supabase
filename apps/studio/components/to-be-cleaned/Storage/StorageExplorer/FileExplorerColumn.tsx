@@ -147,7 +147,7 @@ const FileExplorerColumn = ({
       className={`
         ${fullWidth ? 'w-full' : 'w-64 border-r border-overlay'}
         ${view === STORAGE_VIEWS.COLUMNS ? '' : ''}
-        hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto
+        hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto border border-red-900
       `}
       onContextMenu={displayMenu}
       onDragOver={onDragOver}
@@ -263,13 +263,12 @@ const FileExplorerColumn = ({
         onDragLeave={() => setIsDraggedOver(false)}
         onDrop={() => setIsDraggedOver(false)}
       />
-
       {/* List interface footer */}
       {view === STORAGE_VIEWS.LIST && (
         <div
           className="
-          sticky bottom-0
-          z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 [[data-theme*=dark]_&]:bg-panel-footer-dark
+          absolute bottom-0 rounded-b-md mt-auto
+        z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 [[data-theme*=dark]_&]:bg-panel-footer-dark w-full
         "
         >
           <p className="text-sm">
