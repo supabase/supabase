@@ -10,9 +10,11 @@ import remarkMath from 'remark-math'
 import { AiPromptsIndex } from '~/app/guides/getting-started/ai-prompts/[slug]/AiPromptsIndex'
 import { preprocessMdxWithDefaults } from '~/features/directives/utils'
 import { components } from '~/features/docs/MdxBase.shared'
+import { QuotaPrice } from 'shared-data'
 
 const serverOnlyComponents = {
   AiPromptsIndex,
+  QuotaPrice,
 }
 
 const codeHikeOptions: CodeHikeConfig = {

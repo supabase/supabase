@@ -1,3 +1,5 @@
+import { getQuotaPrice } from './PricingComponents'
+
 export interface PricingInformation {
   id: string
   name: string
@@ -31,10 +33,10 @@ export const plans: PricingInformation[] = [
         partners: [],
         features: [
           'Unlimited API requests',
-          '50,000 monthly active users',
+          getQuotaPrice('mau', 'free', { longFormat: true }),
           ['500 MB database size', 'Shared CPU • 500 MB RAM'],
           '5 GB bandwidth',
-          '1 GB file storage',
+          `${getQuotaPrice('storage', 'free')} file storage`,
           'Community support',
         ],
       },
@@ -75,10 +77,13 @@ export const plans: PricingInformation[] = [
       {
         partners: [],
         features: [
-          ['100,000 monthly active users', 'then $0.00325 per MAU'],
-          ['8 GB disk size per project', 'then $0.125 per GB'],
+          getQuotaPrice('mau', 'pro', { longFormat: true, splitOverage: true }),
+          getQuotaPrice('disk', 'pro', { splitOverage: true }),
           ['250 GB bandwidth', 'then $0.09 per GB'],
-          ['100 GB file storage', 'then $0.021 per GB'],
+          [
+            `${getQuotaPrice('storage', 'pro', { splitOverage: true })[0]} file storage`,
+            getQuotaPrice('storage', 'pro', { splitOverage: true })[1],
+          ],
           'Email support',
           'Daily backups stored for 7 days',
           '7-day log retention',

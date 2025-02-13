@@ -1488,7 +1488,15 @@ importers:
         specifier: ^2.1.8
         version: 2.1.8(@types/node@22.12.0)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.37.0)
 
-  packages/shared-data: {}
+  packages/shared-data:
+    dependencies:
+      dinero.js:
+        specifier: ^1.9.1
+        version: 1.9.1
+    devDependencies:
+      '@types/dinero.js':
+        specifier: ^1.9.4
+        version: 1.9.4
 
   packages/tsconfig: {}
 
@@ -5636,6 +5644,9 @@ packages:
   '@types/diff-match-patch@1.0.36':
     resolution: {integrity: sha512-xFdR6tkm0MWvBfO8xXCSsinYxHcqkQUlcHeSpMC2ukzOb6lwQAfDmW+Qt0AvlGd8HpsS28qKsB+oPeJn9I39jg==}
 
+  '@types/dinero.js@1.9.4':
+    resolution: {integrity: sha512-mtJnan4ajy9MqvoJGVXu0tC9EAAzFjeoKc3d+8AW+H/Od9+8IiC59ymjrZF+JdTToyDvkLReacTsc50Z8eYr6Q==}
+
   '@types/doctrine@0.0.9':
     resolution: {integrity: sha512-eOIHzCUSH7SMfonMG1LsC2f8vxBFtho6NGBznK41R84YzPuvSBzrhEps33IsQiOW9+VL6NQ9DbjQJznk/S4uRA==}
 
@@ -7256,6 +7267,9 @@ packages:
   diff@5.1.0:
     resolution: {integrity: sha512-D+mk+qE8VC/PAUrlAU34N+VfXev0ghe5ywmpqrawphmVZc1bEfn56uo9qpyGp1p4xpzOHkSW4ztBd6L7Xx4ACw==}
     engines: {node: '>=0.3.1'}
+
+  dinero.js@1.9.1:
+    resolution: {integrity: sha512-1HXiF2vv3ZeRQ23yr+9lFxj/PbZqutuYWJnE0qfCB9xYBPnuaJ8lXtli1cJM0TvUXW1JTOaePldmqN5JVNxKSA==}
 
   dir-glob@3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
@@ -17809,6 +17823,8 @@ snapshots:
 
   '@types/diff-match-patch@1.0.36': {}
 
+  '@types/dinero.js@1.9.4': {}
+
   '@types/doctrine@0.0.9': {}
 
   '@types/estree-jsx@1.0.1':
@@ -19686,6 +19702,8 @@ snapshots:
     optional: true
 
   diff@5.1.0: {}
+
+  dinero.js@1.9.1: {}
 
   dir-glob@3.0.1:
     dependencies:

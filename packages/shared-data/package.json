@@ -9,5 +9,11 @@
     "clean": "rimraf node_modules"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "dinero.js": "^1.9.1"
+  },
+  "devDependencies": {
+    "@types/dinero.js": "^1.9.4"
+  }
 }
