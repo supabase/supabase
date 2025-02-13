@@ -12,6 +12,8 @@ import {
   redirectNonexistentReferenceSection,
 } from '~/features/docs/Reference.utils'
 
+export const dynamicParams = false
+
 export default async function ReferencePage({
   params: { slug },
 }: {
@@ -39,7 +41,6 @@ export default async function ReferencePage({
 
     return <ClientSdkReferencePage sdkId={sdkId} libVersion={version} />
   } else if (isCliReference) {
-    console.log('Returning CLI reference page: %o', parsedPath)
     return <CliReferencePage />
   } else if (isApiReference) {
     return <ApiReferencePage />

@@ -22,6 +22,7 @@ allow_list = [
     "[A-Za-z0-9_-]+(\\.[A-Z-a-z0-9_-]+)+(\\/[A-Za-z0-9_-]+)*",
     "[Aa]dd-ons?",
     "[Aa]llowlists?",
+    "[Aa]utomations?",
     "[Aa]utovacuum(s|ing|ed)?",
     "[Bb]ackend",
     "[Bb]ackoff",
@@ -321,9 +322,6 @@ allow_list = [
     "vecs",
     "vs",
     "watchOS",
-    # Project ref used on page with monthly invoice breakdown
-    "wsmmedyqtlrvbcesxdew",
-    "wwxdpovgtfcmcnxwsaad"
 ]
 
 prefixes = ["bi", "over", "pre", "un"]

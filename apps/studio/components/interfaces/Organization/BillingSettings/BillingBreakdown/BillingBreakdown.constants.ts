@@ -74,7 +74,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   },
   {
     key: PricingMetric.REALTIME_PEAK_CONNECTIONS,
-    name: 'Realtime Peak Connections',
+    name: 'Realtime Concurrent Peak Connections',
     units: 'absolute',
     anchor: 'realtimePeakConnections',
     category: 'Realtime',
