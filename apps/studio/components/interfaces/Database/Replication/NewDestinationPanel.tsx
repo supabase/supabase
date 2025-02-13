@@ -80,10 +80,8 @@ const NewDestinationPanel = ({ visible, onCancel, onConfirm }: NewDestinationPan
                 <FormItem_Shadcn_>
                   <FormLabel_Shadcn_>Type</FormLabel_Shadcn_>
                   <FormControl_Shadcn_>
-                    <Select_Shadcn_ {...field}>
-                      <SelectTrigger_Shadcn_>
-                        <SelectValue_Shadcn_></SelectValue_Shadcn_>
-                      </SelectTrigger_Shadcn_>
+                    <Select_Shadcn_ value={field.value}>
+                      <SelectTrigger_Shadcn_>{field.value}</SelectTrigger_Shadcn_>
                       <SelectContent_Shadcn_>
                         <SelectGroup_Shadcn_>
                           <SelectItem_Shadcn_ value="BigQuery">BigQuery</SelectItem_Shadcn_>
@@ -102,7 +100,7 @@ const NewDestinationPanel = ({ visible, onCancel, onConfirm }: NewDestinationPan
                 <FormItem_Shadcn_>
                   <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} />
+                    <Input_Shadcn_ {...field} placeholder="Name" />
                   </FormControl_Shadcn_>
                   <FormMessage_Shadcn_ />
                 </FormItem_Shadcn_>
