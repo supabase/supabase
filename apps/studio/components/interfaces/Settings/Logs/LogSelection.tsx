@@ -18,6 +18,7 @@ import type { LogData, QueryType } from './Logs.types'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { WarehouseSelectionRenderer } from './LogSelectionRenderers/WarehouseSelectionRenderer'
 import { useFlag } from 'hooks/ui/useFlag'
+import { IS_PLATFORM } from 'lib/constants'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -35,7 +36,8 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
   const LogDetails = () => {
     if (error) return <LogErrorState error={error} />
     if (!log) return <LogDetailEmptyState />
-    if (useNewLogDetail) return <DefaultPreviewSelectionRenderer log={log} />
+    if (useNewLogDetail || IS_PLATFORM === false)
+      return <DefaultPreviewSelectionRenderer log={log} />
 
     switch (queryType) {
       case 'warehouse':
