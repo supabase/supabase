@@ -23,12 +23,12 @@ export const customFont = localFont({
     },
     {
       path: './CustomFont-Bold.woff2',
-      weight: '600',
+      weight: '700',
       style: 'normal',
     },
     {
       path: './CustomFont-BoldItalic.woff2',
-      weight: '600',
+      weight: '700',
       style: 'italic',
     },
     {
