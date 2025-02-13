@@ -141,7 +141,7 @@ export const QueryPerformance = ({
               tab.id !== QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT
                 ? tabMax > 1000
                   ? (tabMax / 1000).toFixed(2)
-                  : tabMax.toLocaleString()
+                  : tabMax.toFixed(0)
                 : tabMax.toLocaleString()
 
             return (
@@ -180,7 +180,6 @@ export const QueryPerformance = ({
                   </span>
                 ) : (
                   <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
-                    {/* {Number(tab.max).toLocaleString()} */}
                     {maxValue}
                     {tab.id !== QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT
                       ? tabMax > 1000

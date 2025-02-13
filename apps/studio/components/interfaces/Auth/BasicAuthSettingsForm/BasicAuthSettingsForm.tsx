@@ -8,6 +8,7 @@ import { boolean, object, string } from 'yup'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
@@ -23,10 +24,7 @@ import {
   Toggle,
   WarningIcon,
 } from 'ui'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-
-// Use a const string to represent no chars option. Represented as empty string on the backend side.
-const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
+import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
