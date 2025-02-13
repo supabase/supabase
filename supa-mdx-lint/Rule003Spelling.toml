@@ -286,6 +286,7 @@ allow_list = [
     "node-postgres",
     "npm",
     "npmrc",
+    "npx",
     "ns",
     "pgAdmin",
     "pgAudit",
