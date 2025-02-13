@@ -9,6 +9,7 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useCreateSourceMutation } from 'data/replication/create-source-mutation'
 import { toast } from 'sonner'
 import { useRouter } from 'next/router'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -70,6 +71,10 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <ReplicationLayout title={'Replication'}>{page}</ReplicationLayout>
+PageLayout.getLayout = (page) => (
+  <DefaultLayout>
+    <ReplicationLayout title={'Replication'}>{page}</ReplicationLayout>
+  </DefaultLayout>
+)
 
 export default PageLayout
