@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useCreatePipelineMutation } from 'data/replication/create-pipeline-mutation'
 import { useCreateSinkMutation } from 'data/replication/create-sink-mutation'
+import { useCreateSourceMutation } from 'data/replication/create-source-mutation'
 import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -38,6 +39,7 @@ const NewDestinationPanel = ({
   onConfirm,
 }: NewDestinationPanelProps) => {
   const { ref: projectRef } = useParams()
+  const { mutateAsync: createSource } = useCreateSourceMutation()
   const { mutateAsync: createSink } = useCreateSinkMutation()
   const { mutateAsync: createPipeline } = useCreatePipelineMutation()
 
@@ -72,9 +74,12 @@ const NewDestinationPanel = ({
   })
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!sourceId) return console.error('Source id is required')
     try {
-      const { id } = await createSink({
+      if (!sourceId) {
+        const { id } = await createSource({ projectRef })
+        sourceId = id
+      }
+      const { id: sinkId } = await createSink({
         projectRef,
         sink_name: data.name,
         project_id: data.projectId,
@@ -84,7 +89,7 @@ const NewDestinationPanel = ({
       await createPipeline({
         projectRef,
         sourceId,
-        sinkId: id,
+        sinkId,
         publicationName: data.publicationName,
         config: { config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs } },
       })
