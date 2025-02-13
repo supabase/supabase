@@ -46,8 +46,8 @@ export const customFont = localFont({
 
 export const sourceCodePro = Source_Code_Pro({
   subsets: ['latin'],
-  fallback: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
+  fallback: ['Source Code Pro', 'Office Code Pro', 'Menlo', 'monospace'],
   variable: '--font-source-code-pro',
   display: 'swap',
-  weight: ['400'],
+  weight: ['400', '500', '600', '700'],
 })
