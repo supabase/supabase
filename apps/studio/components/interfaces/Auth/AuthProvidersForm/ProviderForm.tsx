@@ -1,8 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-// @ts-ignore
-import { Check, ChevronUp, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { Check } from 'lucide-react'
+import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
@@ -17,22 +15,10 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  Form,
-  Input,
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  WarningIcon,
-} from 'ui'
+import { Button, Form, Input, Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
+import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
 
@@ -70,51 +56,6 @@ const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
       ['EXTERNAL_SLACK_CLIENT_ID', 'EXTERNAL_SLACK_SECRET'].includes(field) ||
       shouldDisableSmsFields
     )
-  }
-
-  const showAlert = (title: string) => {
-    switch (title) {
-      // TODO (KM): Remove after 10th October 2024 when we disable the provider
-      case 'Slack (Deprecated)':
-        return (
-          <Alert_Shadcn_ variant="warning">
-            <WarningIcon />
-            <AlertTitle_Shadcn_>Slack (Deprecated) Provider</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              Recently, Slack has updated their OAuth API. Please use the new Slack (OIDC) provider
-              below. Developers using this provider should move over to the new provider. Please
-              refer to our{' '}
-              <a
-                href="https://supabase.com/docs/guides/auth/social-login/auth-slack"
-                className="underline"
-                target="_blank"
-              >
-                documentation
-              </a>{' '}
-              for more details.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        )
-      case 'Phone':
-        return (
-          config.HOOK_SEND_SMS_ENABLED && (
-            <Alert_Shadcn_>
-              <WarningIcon />
-              <AlertTitle_Shadcn_>
-                SMS provider settings are disabled while the SMS hook is enabled.
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
-                <p>The SMS hook will be used in place of the SMS provider configured</p>
-                <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
-                  <Link href={`/project/${projectRef}/auth/hooks`}>View auth hooks</Link>
-                </Button>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          )
-        )
-      default:
-        return null
-    }
   }
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
@@ -227,7 +168,11 @@ const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
                 <>
                   <div className="flex-1 overflow-y-auto group py-6 px-4 md:px-6 text-foreground">
                     <div className="mx-auto my-2 md:my-6 max-w-lg space-y-6">
-                      {showAlert(provider.title)}
+                      <AuthAlert
+                        ref={projectRef}
+                        title={provider.title}
+                        isHookSendSMSEnabled={config.HOOK_SEND_SMS_ENABLED}
+                      />
                       {Object.keys(provider.properties).map((x: string) => (
                         <FormField
                           key={x}

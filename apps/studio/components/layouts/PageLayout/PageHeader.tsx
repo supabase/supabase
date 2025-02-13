@@ -1,4 +1,5 @@
-import React, { ReactNode } from 'react'
+import { useParams } from 'common'
+import { Fragment, ReactNode } from 'react'
 import { cn } from 'ui'
 import {
   Breadcrumb,
@@ -23,7 +24,7 @@ interface PageHeaderProps {
   isCompact?: boolean
 }
 
-const PageHeader = ({
+export const PageHeader = ({
   title,
   subtitle,
   icon,
@@ -33,6 +34,8 @@ const PageHeader = ({
   className,
   isCompact = false,
 }: PageHeaderProps) => {
+  const { ref } = useParams()
+
   return (
     <div className={cn('space-y-4', className)}>
       {(breadcrumbs.length > 0 || (isCompact && (title || primaryActions || secondaryActions))) && (
@@ -41,16 +44,18 @@ const PageHeader = ({
             <Breadcrumb className={cn('text-foreground-muted', isCompact && 'text-base')}>
               <BreadcrumbList className={isCompact ? 'text-base' : 'text-xs'}>
                 {breadcrumbs.map((item, index) => (
-                  <React.Fragment key={item.label}>
+                  <Fragment key={item.label}>
                     <BreadcrumbItem>
                       {item.href ? (
-                        <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
+                        <BreadcrumbLink href={!!ref ? item.href.replace('[ref]', ref) : item.href}>
+                          {item.label}
+                        </BreadcrumbLink>
                       ) : (
                         <BreadcrumbPageItem>{item.label}</BreadcrumbPageItem>
                       )}
                     </BreadcrumbItem>
                     {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
-                  </React.Fragment>
+                  </Fragment>
                 ))}
               </BreadcrumbList>
             </Breadcrumb>

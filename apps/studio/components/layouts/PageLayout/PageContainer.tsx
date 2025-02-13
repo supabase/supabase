@@ -1,9 +1,10 @@
-import React from 'react'
+import { ReactNode } from 'react'
+
 import { cn } from 'ui'
 import { PAGE_SIZE_CLASSES, type PageSize } from 'ui/src/lib/constants'
 
 interface PageContainerProps {
-  children?: React.ReactNode
+  children?: ReactNode
   className?: string
   size?: PageSize
 }

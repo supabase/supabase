@@ -4,11 +4,12 @@ import { partition } from 'lodash'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 
-import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import Policies from 'components/interfaces/Auth/Policies/Policies'
 import { generatePolicyCreateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { getGeneralPolicyTemplates } from 'components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
+import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -23,7 +24,6 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useAppStateSnapshot } from 'state/app-state'
 
@@ -215,7 +215,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
 AuthPoliciesPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout title="Auth">
+    <AuthLayout>
       <div className="h-full p-4">{page}</div>
     </AuthLayout>
   </DefaultLayout>

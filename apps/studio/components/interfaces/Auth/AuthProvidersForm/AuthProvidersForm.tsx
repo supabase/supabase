@@ -1,23 +1,23 @@
-import { useState } from 'react'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+
+import { useParams } from 'common'
+import { SectionHeader } from 'components/layouts/PageLayout'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   WarningIcon,
 } from 'ui'
 import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
-import ProviderForm from './ProviderForm'
-import { SectionHeader } from 'components/layouts/PageLayout'
-import { useParams } from 'common'
 import type { Provider } from './AuthProvidersForm.types'
+import ProviderForm from './ProviderForm'
 
-const AuthProvidersForm = () => {
+export const AuthProvidersForm = () => {
   const { ref: projectRef } = useParams()
   const {
     isLoading,
@@ -105,5 +105,3 @@ const AuthProvidersForm = () => {
     </div>
   )
 }
-
-export default AuthProvidersForm
