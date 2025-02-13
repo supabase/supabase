@@ -39,6 +39,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Separator,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
@@ -90,11 +91,6 @@ export function Sidebar() {
       <AnimatePresence>
         {!hideSideBar && (
           <SidebarMotion
-            className={
-              cn()
-              // '!border-r-0'
-              // !open && 'pt-[38px]'
-            }
             transition={{
               delay: 0.4,
               duration: 0.4,
@@ -104,44 +100,36 @@ export function Sidebar() {
             variant="sidebar"
             onMouseEnter={() => {
               if (sidebarBehaviour === 'expandable') {
-                // snap.setNavigationPanelOpen(true)
                 setOpen(true)
               }
             }}
             onMouseLeave={() => {
               if (sidebarBehaviour === 'expandable') {
-                // !userDropdownOpen &&
                 setOpen(false)
               }
             }}
           >
             <AnimatePresence mode="wait">
-              <SidebarContent className="">
-                {project ? (
-                  <motion.div
-                    key="project-links"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.2, ease: 'easeOut' }}
-                  >
-                    <ProjectLinks />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="org-links"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.2, ease: 'easeOut' }}
-                  >
-                    <OrganizationLinks />
-                  </motion.div>
-                )}
+              <SidebarContent>
+                {/* {project ? ( */}
+                <motion.div key="project-links">
+                  <ProjectLinks />
+                </motion.div>
+                {/* ) : (
+                <motion.div
+                  key="org-links"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                >
+                  <OrganizationLinks />
+                </motion.div>
+                )} */}
               </SidebarContent>
             </AnimatePresence>
             <SidebarFooter>
-              <SidebarMenu>
+              <SidebarMenu className="group-data-[state=expanded]:p-0">
                 <SidebarGroup className="p-0">
                   <NavLink
                     key="cmdk"
@@ -154,26 +142,15 @@ export function Sidebar() {
                   />
                 </SidebarGroup>
               </SidebarMenu>
-              <SidebarMenu>
+              <SidebarMenu className="group-data-[state=expanded]:p-0">
                 <SidebarGroup className="p-0">
-                  <SidebarMenuItem>
+                  <SidebarMenuItem className="h-10 flex items-center">
                     <UserDropdown />
                   </SidebarMenuItem>
                 </SidebarGroup>
               </SidebarMenu>
               <SidebarGroup className="p-0">
                 <div>
-                  {/* <button onClick={() => toggleSidebar()}>
-                    <ChevronLeft
-                      size={14}
-                      strokeWidth={2}
-                      className={cn(
-                        'text-foreground-muted transition-transform',
-                        !open && 'rotate-180'
-                      )}
-                    />
-                  </button> */}
-
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -298,34 +275,16 @@ function ProjectLinks() {
           <NavLink key={`tools-routes-${i}`} route={route} active={activeRoute === route.key} />
         ))}
       </SidebarGroup>
+      <Separator className="w-[calc(100%-1rem)] mx-auto" />
 
       <SidebarGroup className="gap-0.5">
-        <SidebarGroupLabel
-          className={cn(
-            'text-foreground-muted text-xs uppercase font-mono text-[12px] tracking-wider',
-            (sidebarBehaviour === 'closed' || sidebarBehaviour === 'expandable') &&
-              '!-mt-8 !opacity-0'
-          )}
-        >
-          Products
-        </SidebarGroupLabel>
-
         {productRoutes.map((route, i) => (
           <NavLink key={`product-routes-${i}`} route={route} active={activeRoute === route.key} />
         ))}
       </SidebarGroup>
 
+      <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
-        <SidebarGroupLabel
-          className={cn(
-            'text-foreground-muted text-xs uppercase font-mono text-[12px] tracking-wider',
-            (sidebarBehaviour === 'closed' || sidebarBehaviour === 'expandable') &&
-              '!-mt-8 !opacity-0'
-          )}
-        >
-          Develop
-        </SidebarGroupLabel>
-
         {otherRoutes.map((route, i) => (
           <NavLink key={`other-routes-${i}`} route={route} active={activeRoute === route.key} />
         ))}
