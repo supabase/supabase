@@ -53,7 +53,7 @@ export async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signa
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get(`/v1/projects/{ref}/api-keys`, {
-    params: { path: { ref: projectRef }, query: { reveal } },
+    params: { path: { ref: projectRef }, query: { reveal: reveal.toString() } },
     signal,
   })
 
@@ -73,7 +73,7 @@ export const useAPIKeysQuery = <TData = APIKeysData>(
 ) =>
   useQuery<APIKeysData, ResponseError, TData>(
     apiKeysKeys.list(projectRef),
-    ({ signal }) => getAPIKeys({ projectRef, reveal }, signal),
+    ({ signal }) => getAPIKeys({ projectRef, reveal: reveal.toString() }, signal),
     {
       enabled: enabled && !!projectRef,
       ...options,
