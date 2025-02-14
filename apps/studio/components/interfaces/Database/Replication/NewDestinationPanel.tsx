@@ -3,6 +3,7 @@ import { useParams } from 'common'
 import { useCreatePipelineMutation } from 'data/replication/create-pipeline-mutation'
 import { useCreateSinkMutation } from 'data/replication/create-sink-mutation'
 import { useCreateSourceMutation } from 'data/replication/create-source-mutation'
+import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -21,6 +22,7 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SidePanel,
+  Switch,
   TextArea_Shadcn_,
 } from 'ui'
 import * as z from 'zod'
@@ -42,6 +44,7 @@ const NewDestinationPanel = ({
   const { mutateAsync: createSource } = useCreateSourceMutation()
   const { mutateAsync: createSink } = useCreateSinkMutation()
   const { mutateAsync: createPipeline } = useCreatePipelineMutation()
+  const { mutateAsync: startPipeline } = useStartPipelineMutation()
 
   const formId = 'destination-editor'
   const types = ['BigQuery'] as const
@@ -55,6 +58,7 @@ const NewDestinationPanel = ({
     publicationName: z.string(),
     maxSize: z.number(),
     maxFillSecs: z.number(),
+    enabled: z.boolean(),
   })
   const defaultValues = {
     type: TypeEnum.enum.BigQuery,
@@ -65,6 +69,7 @@ const NewDestinationPanel = ({
     publicationName: '',
     maxSize: 1000,
     maxFillSecs: 10,
+    enabled: true,
   }
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -86,19 +91,23 @@ const NewDestinationPanel = ({
         dataset_id: data.datasetId,
         service_account_key: data.serviceAccountKey,
       })
-      await createPipeline({
+      const { id: pipelineId } = await createPipeline({
         projectRef,
         sourceId,
         sinkId,
         publicationName: data.publicationName,
         config: { config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs } },
       })
+      if (data.enabled) {
+        await startPipeline({ projectRef, pipelineId })
+      }
       toast.success('Successfully created destination')
     } catch (error) {
       toast.error('Failed to create destination')
     }
     form.reset(defaultValues)
   }
+
   const submitRef = useRef<HTMLButtonElement>(null)
 
   return (
@@ -228,6 +237,23 @@ const NewDestinationPanel = ({
                   <FormLabel_Shadcn_>Max Fill Seconds</FormLabel_Shadcn_>
                   <FormControl_Shadcn_>
                     <Input_Shadcn_ {...field} placeholder="Max fill seconds" />
+                  </FormControl_Shadcn_>
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
+              )}
+            />
+            <FormField_Shadcn_
+              control={form.control}
+              name="enabled"
+              render={({ field }) => (
+                <FormItem_Shadcn_>
+                  <FormLabel_Shadcn_>Enabled</FormLabel_Shadcn_>
+                  <FormControl_Shadcn_>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={field.disabled}
+                    />
                   </FormControl_Shadcn_>
                   <FormMessage_Shadcn_ />
                 </FormItem_Shadcn_>
