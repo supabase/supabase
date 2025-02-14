@@ -366,12 +366,16 @@ export const gettingstarted: NavMenuConstant = {
       ],
     },
     {
-      name: 'AI Prompts',
+      name: 'AI Tools',
       url: undefined,
       items: [
         {
-          name: 'Overview',
+          name: 'Prompts',
           url: '/guides/getting-started/ai-prompts',
+        },
+        {
+          name: 'Model context protocol (MCP)',
+          url: '/guides/getting-started/mcp',
         },
       ],
     },
