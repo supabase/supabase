@@ -52,7 +52,7 @@ interface PageLayoutProps {
  * @param secondaryActions - TBD
  * @param navigationItems - Tab navigation rendered below the page header
  * @param className - Optional additional class names to be applied
- * @param size - Controls padding of the page layout (Default: 'default')
+ * @param size - Controls padding of the page header only, padding for the content to be controlled by PageContainer (Default: 'default')
  * @param isCompact - TBD (Default: false)
  */
 const PageLayout = ({
