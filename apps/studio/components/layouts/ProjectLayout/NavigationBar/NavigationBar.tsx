@@ -65,19 +65,19 @@ const NavigationBar = () => {
   )
   // Don't allow the nav panel to expand in playwright tests
   const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
-
+  const [isNavOpen, setIsNavOpen] = useState(false)
   return (
     <div className="w-14 h-full hidden md:flex flex-col">
       <nav
-        data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
+        data-state={isNavOpen ? 'expanded' : 'collapsed'}
         className={cn(
           'group py-2 z-10 h-full w-[13rem] md:w-14 md:data-[state=expanded]:w-[13rem]',
           'border-r bg-dash-sidebar border-default data-[state=expanded]:shadow-xl',
           'transition-width duration-200',
           'hide-scrollbar flex flex-col justify-between overflow-y-auto'
         )}
-        onMouseEnter={() => allowNavPanelToExpand && snap.setNavigationPanelOpen(true)}
-        onMouseLeave={() => allowNavPanelToExpand && snap.setNavigationPanelOpen(false)}
+        onMouseEnter={() => setIsNavOpen(true)}
+        onMouseLeave={() => setIsNavOpen(false)}
       >
         <NavContent />
       </nav>
