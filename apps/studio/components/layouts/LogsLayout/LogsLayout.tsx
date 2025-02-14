@@ -8,41 +8,26 @@ import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { LogsSidebarMenuV2 } from './LogsSidebarMenuV2'
 import { useRouter } from 'next/router'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useParams } from 'common'
-
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 interface LogsLayoutProps {
   title?: string
 }
 
 const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => {
   const canUseLogsExplorer = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
-  const { ref } = useParams()
 
   const router = useRouter()
   const [lastLogsPage, setLastLogsPage] = useLocalStorageQuery(
-    'supabase-last-logs-page',
-    router.pathname
+    LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
+    router.pathname.split('/').pop()
   )
 
   useEffect(() => {
     if (router.pathname.includes('/logs/')) {
-      setLastLogsPage(router.pathname)
+      const path = router.pathname.split('/').pop()
+      setLastLogsPage(path)
     }
   }, [router, setLastLogsPage])
-
-  useEffect(() => {
-    const last5chars = router.pathname.slice(-5)
-    if (last5chars === '/logs' && lastLogsPage) {
-      router.push({
-        pathname: lastLogsPage,
-        query: { ref },
-      })
-    }
-
-    if (last5chars === '/logs' && !lastLogsPage) {
-      router.push('/logs/explorer')
-    }
-  }, [router, lastLogsPage, ref])
 
   if (!canUseLogsExplorer) {
     return (
