@@ -76,12 +76,8 @@ const Destinations = () => {
       <div className="py-6">
         {(isSourcesLoading || isSinksLoading) && <GenericSkeletonLoader />}
 
-        {isSourcesError && (
-          <AlertError error={sourcesError} subject="Failed to retrieve replication sources" />
-        )}
-
-        {isSinksError && (
-          <AlertError error={sinksError} subject="Failed to retrieve replication sinks" />
+        {(isSourcesError || isSinksError) && (
+          <AlertError error={sourcesError || sinksError} subject="Failed to retrieve destinations" />
         )}
 
         {anySinks ? (
