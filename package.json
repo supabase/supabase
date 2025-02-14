@@ -15,6 +15,7 @@
     "dev": "turbo run dev --parallel",
     "dev:reference": "turbo run dev --filter=reference --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
+    "dev:studio-local": "pnpm run --dir tests/local-studio-tests codegen:setup",
     "dev:docs": "turbo run dev --filter=docs --parallel",
     "dev:www": "turbo run dev --filter=www --parallel",
     "dev:design-system": "turbo run dev --filter=design-system --parallel",

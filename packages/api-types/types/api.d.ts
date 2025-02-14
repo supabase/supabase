@@ -8255,6 +8255,7 @@ export interface components {
       walg_enabled: boolean
     }
     BillingCustomerUpdateBody: {
+      additional_emails?: string[] | undefined
       address?: components['schemas']['CustomerBillingAddress']
     }
     /** @enum {string} */
@@ -8791,6 +8792,7 @@ export interface components {
       state?: string
     }
     CustomerResponse: {
+      additional_emails: string[] | null
       address: components['schemas']['CustomerBillingAddress'] | null
       balance: number
       billing_via_partner: boolean

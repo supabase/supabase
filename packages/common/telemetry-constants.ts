@@ -1,3 +1,4 @@
+// These events are tracked only when users opt in.
 // Standardization as per document: https://www.notion.so/supabase/Event-tracking-standardization-1195004b775f80f98ee3fa9e70cf4d05
 
 export enum TelemetryActions {
