@@ -32,17 +32,12 @@ const rootPool = new Pool({
   max: 1,
 })
 
-export type DbClient = 'pg' // Remove 'postgres' option
-
-export async function createTestDatabase(_client: DbClient = 'pg') {
-  // Update default
+export async function createTestDatabase() {
   const dbName = `test_${randomUUID().replace(/-/g, '_')}`
 
   try {
-    // Create database using pg instead of postgres.js
     await rootPool.query(`CREATE DATABASE ${dbName};`)
 
-    // Remove postgres.js specific code branch and just keep the pg implementation
     const pool = new Pool({
       connectionString: `${ROOT_DB_URL}/${dbName}`,
       max: 1,

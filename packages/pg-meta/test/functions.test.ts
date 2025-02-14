@@ -136,42 +136,55 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
   const retrieve = await executeQuery(retrieveSql)
   const res = retrieveZod.parse(retrieve[0])
   const functionId = res!.id
-  expect(res).toMatchObject({
-    args: [
-      {
-        has_default: false,
-        mode: 'in',
-        name: 'a',
-        type_id: 21,
+  expect({ data: res, error: null }).toMatchInlineSnapshot(
+    { data: { id: expect.any(Number) } },
+    `
+    {
+      "data": {
+        "args": [
+          {
+            "has_default": false,
+            "mode": "in",
+            "name": "a",
+            "type_id": 21,
+          },
+          {
+            "has_default": false,
+            "mode": "in",
+            "name": "b",
+            "type_id": 21,
+          },
+        ],
+        "argument_types": "a smallint, b smallint",
+        "behavior": "STABLE",
+        "complete_statement": "CREATE OR REPLACE FUNCTION public.test_func(a smallint, b smallint)
+     RETURNS integer
+     LANGUAGE sql
+     STABLE SECURITY DEFINER
+     SET search_path TO 'hooks', 'auth'
+     SET role TO 'postgres'
+    AS $function$select a + b$function$
+    ",
+        "config_params": {
+          "role": "postgres",
+          "search_path": "hooks, auth",
+        },
+        "definition": "select a + b",
+        "id": Any<Number>,
+        "identity_argument_types": "a smallint, b smallint",
+        "is_set_returning_function": false,
+        "language": "sql",
+        "name": "test_func",
+        "return_type": "integer",
+        "return_type_id": 23,
+        "return_type_relation_id": null,
+        "schema": "public",
+        "security_definer": true,
       },
-      {
-        has_default: false,
-        mode: 'in',
-        name: 'b',
-        type_id: 21,
-      },
-    ],
-    argument_types: 'a smallint, b smallint',
-    behavior: 'STABLE',
-    complete_statement: expect.stringMatching(
-      /CREATE OR REPLACE FUNCTION public\.test_func\(a smallint, b smallint\)\s+RETURNS integer\s+LANGUAGE sql\s+STABLE SECURITY DEFINER\s+SET search_path TO 'hooks', 'auth'\s+SET role TO 'postgres'\s+AS \$function\$select a \+ b\$function\$/
-    ),
-    config_params: {
-      role: 'postgres',
-      search_path: 'hooks, auth',
-    },
-    definition: 'select a + b',
-    id: expect.any(Number),
-    identity_argument_types: 'a smallint, b smallint',
-    is_set_returning_function: false,
-    language: 'sql',
-    name: 'test_func',
-    return_type: 'integer',
-    return_type_id: 23,
-    return_type_relation_id: null,
-    schema: 'public',
-    security_definer: true,
-  })
+      "error": null,
+    }
+  `
+  )
   // create test_schema to move the function into:
   const { sql: createSchemaSql } = await pgMeta.schemas.create({ name: 'test_schema' })
   await executeQuery(createSchemaSql)
@@ -253,33 +266,42 @@ withTestDatabase('retrieve set-returning function', async ({ executeQuery }) => 
   })
   const retrieve = await executeQuery(retrieveSql)
   const res = retrieveZod.parse(retrieve[0])
-  expect(res).toMatchObject({
-    args: [],
-    argument_types: '',
-    behavior: 'STABLE',
-    complete_statement: `CREATE OR REPLACE FUNCTION public.function_returning_set_of_rows()
- RETURNS SETOF users
- LANGUAGE sql
- STABLE
-AS $function$
-  select * from public.users;
-$function$
-`,
-    config_params: null,
-    definition: `
-  select * from public.users;
-`,
-    id: expect.any(Number),
-    identity_argument_types: '',
-    is_set_returning_function: true,
-    language: 'sql',
-    name: 'function_returning_set_of_rows',
-    return_type: 'SETOF users',
-    return_type_id: expect.any(Number),
-    return_type_relation_id: expect.any(Number),
-    schema: 'public',
-    security_definer: false,
-  })
+  expect(res).toMatchInlineSnapshot(
+    {
+      id: expect.any(Number),
+      return_type_id: expect.any(Number),
+      return_type_relation_id: expect.any(Number),
+    },
+    `
+    {
+      "args": [],
+      "argument_types": "",
+      "behavior": "STABLE",
+      "complete_statement": "CREATE OR REPLACE FUNCTION public.function_returning_set_of_rows()
+     RETURNS SETOF users
+     LANGUAGE sql
+     STABLE
+    AS $function$
+      select * from public.users;
+    $function$
+    ",
+      "config_params": null,
+      "definition": "
+      select * from public.users;
+    ",
+      "id": Any<Number>,
+      "identity_argument_types": "",
+      "is_set_returning_function": true,
+      "language": "sql",
+      "name": "function_returning_set_of_rows",
+      "return_type": "SETOF users",
+      "return_type_id": Any<Number>,
+      "return_type_relation_id": Any<Number>,
+      "schema": "public",
+      "security_definer": false,
+    }
+  `
+  )
 })
 
 withTestDatabase('create function with various config_params values', async ({ executeQuery }) => {
