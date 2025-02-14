@@ -12,15 +12,11 @@ export const LogPage: NextPageWithLayout = () => {
 
   const [lastVisitedLogsPage, setLastVisitedLogsPage] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
-    ''
+    'explorer'
   )
 
   useEffect(() => {
-    if (lastVisitedLogsPage) {
-      router.replace(`/project/${ref}/logs/${lastVisitedLogsPage}`)
-    } else {
-      router.replace(`/project/${ref}/logs/explorer`)
-    }
+    router.replace(`/project/${ref}/logs/${lastVisitedLogsPage}`)
   }, [router, lastVisitedLogsPage, ref])
 
   return <div></div>
