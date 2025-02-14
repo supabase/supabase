@@ -160,10 +160,6 @@ export type IntegrationProjectConnection = {
   metadata: Imetadata
 }
 
-export type IntegrationsVariables = {
-  orgSlug?: string
-}
-
 export type IntegrationProjectConnectionPayload = {
   foreignProjectId: string
   supabaseProjectId: string
@@ -177,7 +173,6 @@ export type userDetails = {
   primary_email: string
 }
 type addedBy = userDetails
-type updatedBy = userDetails
 
 export type IntegrationName = 'Vercel' | 'GitHub' // | 'Netlify'
 export type VercelAccountType = 'Team' | 'Personal'

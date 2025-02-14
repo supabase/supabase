@@ -1,17 +1,13 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { handleError, post } from 'data/fetchers'
+import { ResponseError } from 'types'
 import { projectKeys } from './keys'
 
 export type ProjectTransferVariables = {
   projectRef?: string
   targetOrganizationSlug?: string
-}
-
-type ProjectTransferError = {
-  message: string
 }
 
 export async function transferProject({
@@ -25,10 +21,12 @@ export async function transferProject({
     target_organization_slug: targetOrganizationSlug,
   }
 
-  const response = await post(`${API_URL}/projects/${projectRef}/transfer`, payload)
-  if (response.error) throw response.error
-
-  return response
+  const { data, error } = await post('/platform/projects/{ref}/transfer', {
+    params: { path: { ref: projectRef } },
+    body: payload,
+  })
+  if (error) handleError(error)
+  return data
 }
 
 type ProjectTransferData = Awaited<ReturnType<typeof transferProject>>
@@ -38,12 +36,12 @@ export const useProjectTransferMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectTransferData, ProjectTransferError, ProjectTransferVariables>,
+  UseMutationOptions<ProjectTransferData, ResponseError, ProjectTransferVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectTransferData, ProjectTransferError, ProjectTransferVariables>(
+  return useMutation<ProjectTransferData, ResponseError, ProjectTransferVariables>(
     (vars) => transferProject(vars),
     {
       async onSuccess(data, variables, context) {

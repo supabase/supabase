@@ -1,8 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { oauthAppKeys } from './keys'
+
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import { oauthAppKeys } from './keys'
 
 export type AuthorizedAppsVariables = {
   slug?: string
@@ -19,11 +19,12 @@ export type AuthorizedApp = {
 export async function getAuthorizedApps({ slug }: AuthorizedAppsVariables, signal?: AbortSignal) {
   if (!slug) throw new Error('Organization slug is required')
 
-  const response = await get(`${API_URL}/organizations/${slug}/oauth/apps?type=authorized`, {
-    signal,
+  const { data, error } = await get('/platform/organizations/{slug}/oauth/apps', {
+    params: { path: { slug }, query: { type: 'authorized' } },
   })
-  if (response.error) throw response.error
-  return response as AuthorizedApp[]
+
+  if (error) handleError(error)
+  return data as AuthorizedApp[]
 }
 
 export type AuthorizedAppsData = Awaited<ReturnType<typeof getAuthorizedApps>>

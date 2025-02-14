@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { X } from 'lucide-react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -18,7 +19,6 @@ import DeleteAppModal from './DeleteAppModal'
 import OAuthAppRow from './OAuthAppRow'
 import PublishAppModal from './PublishAppSidePanel'
 import RevokeAppModal from './RevokeAppModal'
-import { X } from 'lucide-react'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs
@@ -45,7 +45,7 @@ const OAuthApps = () => {
   } = useOAuthAppsQuery({ slug }, { enabled: canReadOAuthApps })
 
   const sortedPublishedApps = publishedApps?.sort((a, b) => {
-    return Number(new Date(a.created_at)) - Number(new Date(b.created_at))
+    return Number(new Date(a.created_at ?? '')) - Number(new Date(b.created_at ?? ''))
   })
 
   const {

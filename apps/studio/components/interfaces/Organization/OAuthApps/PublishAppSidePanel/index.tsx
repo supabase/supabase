@@ -85,11 +85,11 @@ const PublishAppSidePanel = ({
 
       if (selectedApp !== undefined) {
         setUrls(
-          selectedApp.redirect_uris.map((url) => {
+          selectedApp.redirect_uris?.map((url) => {
             return { id: uuidv4(), value: url }
-          })
+          }) ?? []
         )
-        setScopes(selectedApp.scopes)
+        setScopes((selectedApp?.scopes ?? []) as OAuthScope[])
         setIconUrl(selectedApp.icon === null ? undefined : selectedApp.icon)
       } else {
         setUrls([{ id: uuidv4(), value: '' }])
