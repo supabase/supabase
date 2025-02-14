@@ -89,6 +89,8 @@ from
           oid,
           unnest(arg_modes) as mode,
           unnest(arg_names) as name,
+          -- Coming from: coalesce(p.proallargtypes, p.proargtypes) postgres won't automatically assume
+          -- integer, we need to cast it to be properly parsed
           unnest(arg_types)::int8 as type_id,
           unnest(arg_has_defaults) as has_default
         from
