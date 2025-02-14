@@ -40,9 +40,41 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm -C tests/local-studio-tests exec playwright install --with-deps
       - name: Run Playwright tests
+        id: playwright
         run: pnpm test:local-studio
         # mark the action as succeeded even if the tests failed. This is temporarily until we make the tests more stable.
         # continue-on-error: true
+
+      - name: Create test summary
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          echo "### Local Studio Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "#### Playwright Test Run" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.playwright.outcome }}" == "success" ]; then
+            echo "✅ All tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Some tests failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "[View detailed test report](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})" >> $GITHUB_STEP_SUMMARY
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@v3
+        if: always() && github.event_name == 'pull_request'
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Local Studio Test Results
+
+      - name: Create or Update Comment
+        uses: peter-evans/create-or-update-comment@v4
+        if: always() && github.event_name == 'pull_request'
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ env.GITHUB_STEP_SUMMARY }}
+          edit-mode: replace
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
