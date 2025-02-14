@@ -33,6 +33,6 @@
     "sql-formatter": "^15.0.0",
     "tsconfig": "workspace:*",
     "typescript": "~5.5.0",
-    "vitest": "^3.0.0"
+    "vitest": "^2.1.9"
   }
 }
