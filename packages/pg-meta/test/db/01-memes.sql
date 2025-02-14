@@ -1,4 +1,5 @@
-
+-- We apply our test seedings to template1 so every new created db will have the same structure
+\c template1
 
 CREATE TABLE public.category (
 	id serial NOT NULL PRIMARY KEY,
@@ -2431,3 +2432,5 @@ INSERT INTO public.memes (name, category, created_at) VALUES
 ('Drinking Out of Cups', 4, NOW()),
 ('Sonic the Hedgehog (2020 Film)', 4, NOW()),
 ('Art Student Owl', 4, NOW());
+
+\c postgres
