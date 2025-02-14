@@ -109,6 +109,7 @@ export function useGetProjectPermissions(
     permissions,
     organizationSlug,
     projectRef,
+    isLoading: permissionsResult.isLoading,
   }
 }
 
@@ -171,4 +172,42 @@ export function usePermissionsLoaded() {
   }
 
   return isLoggedIn && isPermissionsFetched && isOrganizationsFetched
+}
+
+// Useful when you want to avoid layout changes while waiting for permissions to load
+export function useAsyncCheckProjectPermissions(
+  action: string,
+  resource: string,
+  data?: object,
+  overrides?: {
+    organizationSlug?: string
+    projectRef?: string
+    permissions?: Permission[]
+  }
+) {
+  const isLoggedIn = useIsLoggedIn()
+  const { organizationSlug, projectRef, permissions } = overrides ?? {}
+
+  const {
+    permissions: allPermissions,
+    organizationSlug: _organizationSlug,
+    projectRef: _projectRef,
+    isLoading: isPermissionsLoading,
+  } = useGetProjectPermissions(permissions, organizationSlug, projectRef, isLoggedIn)
+
+  if (!isLoggedIn)
+    return {
+      isLoading: false,
+      can: false,
+    }
+  if (!IS_PLATFORM)
+    return {
+      isLoading: false,
+      can: true,
+    }
+
+  return {
+    isLoading: isPermissionsLoading,
+    can: doPermissionsCheck(allPermissions, action, resource, data, _organizationSlug, _projectRef),
+  }
 }
