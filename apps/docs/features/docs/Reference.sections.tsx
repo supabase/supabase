@@ -44,11 +44,9 @@ type RefSectionsProps = {
 }
 
 async function RefSections({ libraryId, version }: RefSectionsProps) {
-  console.log('[Enter] RefSections')
   let flattenedSections = await getFlattenedSections(libraryId, version)
   flattenedSections = trimIntro(flattenedSections)
 
-  console.log('[PreReturn] RefSections')
   return (
     <MDXProviderReference>
       <div className="flex flex-col my-16 gap-16">

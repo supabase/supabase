@@ -19,7 +19,6 @@ export default async function ReferencePage({
 }: {
   params: { slug: Array<string> }
 }) {
-  console.log("Generating reference page for '%o'", slug)
   if (!Object.keys(REFERENCES).includes(slug[0].replaceAll('-', '_'))) {
     notFound()
   }
