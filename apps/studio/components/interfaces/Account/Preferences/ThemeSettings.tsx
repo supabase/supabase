@@ -19,6 +19,7 @@ import {
   Theme,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { DEFAULT_SIDEBAR_BEHAVIOR } from 'components/interfaces/Sidebar'
 
 export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
