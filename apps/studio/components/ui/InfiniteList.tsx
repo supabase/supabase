@@ -1,6 +1,7 @@
 import { propsAreEqual } from 'lib/helpers'
 import memoize from 'memoize-one'
 import { CSSProperties, ComponentType, MutableRefObject, ReactNode, memo, useRef } from 'react'
+import type { Props as AutoSizerProps } from 'react-virtualized-auto-sizer'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { VariableSizeList, areEqual } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
@@ -34,7 +35,7 @@ export interface ItemProps<T, P> {
   style: CSSProperties
 }
 
-export interface InfiniteListProps<T, P> {
+export type InfiniteListProps<T, P> = AutoSizerProps & {
   items?: T[]
   itemProps?: P
   hasNextPage?: boolean
@@ -94,6 +95,7 @@ function InfiniteList<T, P>({
   onLoadNextPage = () => {},
   ItemComponent = () => null,
   LoaderComponent,
+  ...props
 }: InfiniteListProps<T, P>) {
   const listRef = useRef<VariableSizeList<any> | null>()
 
@@ -111,34 +113,32 @@ function InfiniteList<T, P>({
 
   return (
     <>
-      <div className="flex-grow">
-        <AutoSizer>
-          {({ height, width }: { height: number; width: number }) => (
-            <InfiniteLoader
-              itemCount={itemCount}
-              isItemLoaded={isItemLoaded}
-              loadMoreItems={loadMoreItems}
-            >
-              {({ onItemsRendered, ref }) => (
-                <VariableSizeList
-                  ref={(refy) => {
-                    ref(refy)
-                    listRef.current = refy
-                  }}
-                  height={height ?? 0}
-                  width={width ?? 0}
-                  itemCount={itemCount}
-                  itemData={itemData}
-                  itemSize={getItemSize}
-                  onItemsRendered={onItemsRendered}
-                >
-                  {Item}
-                </VariableSizeList>
-              )}
-            </InfiniteLoader>
-          )}
-        </AutoSizer>
-      </div>
+      <AutoSizer {...props} disableHeight={false} disableWidth={false}>
+        {({ height, width }: { height: number; width: number }) => (
+          <InfiniteLoader
+            itemCount={itemCount}
+            isItemLoaded={isItemLoaded}
+            loadMoreItems={loadMoreItems}
+          >
+            {({ onItemsRendered, ref }) => (
+              <VariableSizeList
+                ref={(refy) => {
+                  ref(refy)
+                  listRef.current = refy
+                }}
+                height={height ?? 0}
+                width={width ?? 0}
+                itemCount={itemCount}
+                itemData={itemData}
+                itemSize={getItemSize}
+                onItemsRendered={onItemsRendered}
+              >
+                {Item}
+              </VariableSizeList>
+            )}
+          </InfiniteLoader>
+        )}
+      </AutoSizer>
       <div
         style={{
           position: 'absolute',
