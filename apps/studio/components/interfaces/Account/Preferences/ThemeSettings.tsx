@@ -87,7 +87,7 @@ export const ThemeSettings = () => {
       <Panel.Content>
         <FormItemLayout
           isReactForm={false}
-          label="Sidebar behaviour"
+          label="Sidebar behavior"
           layout="flex-row-reverse"
           description="Choose your preferred sidebar behavior: open, closed, or expand on hover."
         >
