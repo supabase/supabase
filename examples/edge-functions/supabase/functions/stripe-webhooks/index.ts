@@ -3,16 +3,14 @@
 // This enables autocomplete, go to definition, etc.
 
 // Import via bare specifier thanks to the import_map.json file.
-import Stripe from 'https://esm.sh/stripe@11.1.0?target=deno'
+import Stripe from "npm:stripe@17.6.0";
 
 const stripe = new Stripe(Deno.env.get('STRIPE_API_KEY') as string, {
   // This is needed to use the Fetch API rather than relying on the Node http
   // package.
-  apiVersion: '2022-11-15',
+  apiVersion: "2025-01-27.acacia",
   httpClient: Stripe.createFetchHttpClient(),
 })
-// This is needed in order to use the Web Crypto API in Deno.
-const cryptoProvider = Stripe.createSubtleCryptoProvider()
 
 console.log('Hello from Stripe Webhook!')
 
@@ -28,8 +26,7 @@ Deno.serve(async (request) => {
       body,
       signature!,
       Deno.env.get('STRIPE_WEBHOOK_SIGNING_SECRET')!,
-      undefined,
-      cryptoProvider
+      undefined
     )
   } catch (err) {
     return new Response(err.message, { status: 400 })
