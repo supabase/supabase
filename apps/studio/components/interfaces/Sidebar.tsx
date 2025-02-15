@@ -151,21 +151,23 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
     <>
       <AnimatePresence mode="wait">
         <SidebarContentPrimitive>
+          {/* Org sidebar to be added in with project/org nav */}
           {/* {project ? ( */}
           <motion.div key="project-links">
             <ProjectLinks />
           </motion.div>
+          {/* Org sidebar to be added in with project/org nav */}
           {/* ) : (
-                <motion.div
-                  key="org-links"
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                >
-                  <OrganizationLinks />
-                </motion.div>
-                )} */}
+            <motion.div
+              key="org-links"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <OrganizationLinks />
+            </motion.div>
+            )} */}
         </SidebarContentPrimitive>
       </AnimatePresence>
       <SidebarFooter>
@@ -213,7 +215,10 @@ function NavLink({
   active?: boolean
   onClick?: () => void
 }) {
-  const { sidebarBehaviour } = useAppStateSnapshot()
+  const [sidebarBehaviour] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
+    DEFAULT_SIDEBAR_BEHAVIOR
+  )
 
   const buttonProps = {
     tooltip: sidebarBehaviour === 'closed' ? route.label : '',
