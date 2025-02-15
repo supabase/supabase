@@ -72,7 +72,7 @@ const PageLayout = ({
   const { ref } = useParams()
 
   return (
-    <div className="w-full">
+    <div className="w-full min-h-full flex flex-col items-stretch [&>*]:w-full">
       <div
         className={cn(
           'w-full mx-auto',
@@ -104,7 +104,10 @@ const PageLayout = ({
                 {item.href ? (
                   <Link
                     href={!!ref ? item.href.replace('[ref]', ref) : item.href}
-                    className="inline-flex items-center gap-2"
+                    className={cn(
+                      'inline-flex items-center gap-2',
+                      router.pathname === item.href && 'text-foreground'
+                    )}
                     onClick={item.onClick}
                   >
                     {item.icon && <span>{item.icon}</span>}
@@ -121,9 +124,8 @@ const PageLayout = ({
           </NavMenu>
         )}
       </div>
-
       {/* Content section */}
-      <main>{children}</main>
+      {children}
     </div>
   )
 }

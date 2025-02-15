@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { ChevronLeft } from 'lucide-react'
 import { Fragment, ReactNode } from 'react'
 import { cn } from 'ui'
 import {
@@ -47,11 +48,18 @@ export const PageHeader = ({
                   <Fragment key={item.label}>
                     <BreadcrumbItem>
                       {item.href ? (
-                        <BreadcrumbLink href={!!ref ? item.href.replace('[ref]', ref) : item.href}>
+                        <BreadcrumbLink
+                          className="flex items-center gap-2"
+                          href={!!ref ? item.href.replace('[ref]', ref) : item.href}
+                        >
+                          {breadcrumbs.length === 1 && <ChevronLeft size={16} strokeWidth={1.5} />}
                           {item.label}
                         </BreadcrumbLink>
                       ) : (
-                        <BreadcrumbPageItem>{item.label}</BreadcrumbPageItem>
+                        <BreadcrumbPageItem className="flex items-center gap-2">
+                          {breadcrumbs.length === 1 && <ChevronLeft size={16} strokeWidth={1.5} />}
+                          {item.label}
+                        </BreadcrumbPageItem>
                       )}
                     </BreadcrumbItem>
                     {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}

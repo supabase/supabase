@@ -9,7 +9,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 
 const SecretsPage: NextPageWithLayout = () => {
   return (
-    <PageContainer className="py-4">
+    <PageContainer className="py-4" size="large">
       <EdgeFunctionSecrets />
     </PageContainer>
   )
@@ -20,6 +20,7 @@ SecretsPage.getLayout = (page) => {
     <DefaultLayout>
       <EdgeFunctionsLayout>
         <PageLayout
+          size="large"
           title="Edge Function Secrets"
           subtitle="Manage the secrets for your project's edge functions"
         >

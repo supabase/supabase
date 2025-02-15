@@ -159,7 +159,7 @@ const PageLayout: NextPageWithLayout = () => {
     return <NoPermission isFullPage resourceText="access this edge function" />
   }
   return (
-    <PageContainer size="full" className="py-8 px-8">
+    <div className="px-8 w-full pt-6">
       <div className="space-y-6">
         <div className="flex flex-row items-center gap-2">
           <div className="flex items-center">
@@ -336,7 +336,7 @@ const PageLayout: NextPageWithLayout = () => {
           </div>
         </div>
       </div>
-    </PageContainer>
+    </div>
   )
 }
 

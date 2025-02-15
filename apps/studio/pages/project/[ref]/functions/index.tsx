@@ -78,14 +78,18 @@ const FunctionsPage: NextPageWithLayout = () => {
 
   return (
     <PageLayout
-      size="medium"
+      size="large"
       title="Edge Functions"
       subtitle="Deploy edge functions to handle complex business logic"
       primaryActions={deployButton}
       secondaryActions={secondaryActions}
     >
-      <PageContainer size="medium">
-        {isLoading && <GenericSkeletonLoader />}
+      <PageContainer size="large">
+        {isLoading && (
+          <div className="pt-8">
+            <GenericSkeletonLoader />
+          </div>
+        )}
 
         {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
 

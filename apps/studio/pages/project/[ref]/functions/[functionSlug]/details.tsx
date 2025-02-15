@@ -5,9 +5,9 @@ import { PageContainer } from 'components/layouts/PageLayout'
 import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => (
-  <PageContainer className="py-8">
+  <div className="px-8">
     <EdgeFunctionDetails />
-  </PageContainer>
+  </div>
 )
 
 PageLayout.getLayout = (page) => (
