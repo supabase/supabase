@@ -1,14 +1,12 @@
-import { PropsWithChildren } from 'react'
-
 import { useParams } from 'common'
 import { AppBannerWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
+import { Sidebar } from 'components/interfaces/Sidebar'
+import { PropsWithChildren } from 'react'
+import { SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
-import NavigationBar from './ProjectLayout/NavigationBar/NavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
-import { Sidebar } from 'components/interfaces/Sidebar'
-import { SidebarProvider } from 'ui'
 
 export interface DefaultLayoutProps {
   title?: string
@@ -37,7 +35,7 @@ const DefaultLayout = ({ children, showProductMenu }: PropsWithChildren<DefaultL
               {/* Main Content Area */}
               <div className="flex flex-1 w-full overflow-y-hidden">
                 {/* Sidebar */}
-                {/* <NavigationBar /> */}
+
                 <Sidebar />
                 {/* Main Content */}
                 <div className="flex-grow h-full overflow-y-auto">{children}</div>

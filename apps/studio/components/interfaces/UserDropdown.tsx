@@ -33,8 +33,6 @@ export function UserDropdown() {
 
   const setCommandMenuOpen = useSetCommandMenuOpen()
 
-  // const { setAiAssistantPanel, aiAssistantPanel } = useAppStateSnapshot()
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
