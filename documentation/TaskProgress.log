@@ -41,3 +41,21 @@ Next Steps:
 - Restart containers after environment configuration
 - Monitor Edge Functions health endpoint at http://localhost:9000/health
 - Verify log forwarding through updated Vector configuration
+
+## Branch Status
+
+Active Branches:
+1. config/20250215-vector-tenant-fix
+   - Initial Vector configuration updates
+   - Tenant identification fixes
+   - DNS resolution changes
+
+2. fix/edge-functions-vector
+   - Edge Functions implementation
+   - Updated Vector port configuration
+   - Complete documentation updates
+
+Next Steps:
+- Review and merge fix/edge-functions-vector into master
+- Close config/20250215-vector-tenant-fix as superseded by fix/edge-functions-vector
+- Deploy changes following environment setup instructions
