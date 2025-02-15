@@ -24,12 +24,10 @@ const OrgGeneralSettings: NextPageWithLayout = () => {
 }
 
 OrgGeneralSettings.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout>
-      <OrganizationLayout>
-        <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
-      </OrganizationLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <OrganizationLayout>
+      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
+    </OrganizationLayout>
+  </DefaultLayout>
 )
 export default OrgGeneralSettings

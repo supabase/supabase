@@ -18,7 +18,11 @@ export interface DefaultLayoutProps {
   showProductMenu?: boolean
 }
 
-const DefaultLayout = ({ children, showProductMenu }: PropsWithChildren<DefaultLayoutProps>) => {
+const DefaultLayout = ({
+  children,
+  headerTitle,
+  showProductMenu,
+}: PropsWithChildren<DefaultLayoutProps>) => {
   const { ref } = useParams()
   return (
     <>
@@ -30,7 +34,7 @@ const DefaultLayout = ({ children, showProductMenu }: PropsWithChildren<DefaultL
               <AppBannerWrapper />
               <div className="flex-shrink-0">
                 <MobileNavigationBar />
-                <LayoutHeader />
+                <LayoutHeader headerTitle={headerTitle} />
               </div>
               {/* Main Content Area */}
               <div className="flex flex-1 w-full overflow-y-hidden">

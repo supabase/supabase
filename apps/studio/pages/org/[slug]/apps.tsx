@@ -17,10 +17,8 @@ const OrgOAuthApps: NextPageWithLayout = () => {
 }
 
 OrgOAuthApps.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout>
-      <OrganizationLayout>{page}</OrganizationLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <OrganizationLayout>{page}</OrganizationLayout>
+  </DefaultLayout>
 )
 export default OrgOAuthApps

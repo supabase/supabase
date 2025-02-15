@@ -19,10 +19,8 @@ const OrgTeamSettings: NextPageWithLayout = () => {
 }
 
 OrgTeamSettings.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout>
-      <OrganizationLayout>{page}</OrganizationLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <OrganizationLayout>{page}</OrganizationLayout>
+  </DefaultLayout>
 )
 export default OrgTeamSettings

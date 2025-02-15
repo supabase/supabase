@@ -41,12 +41,10 @@ const OrgBillingSettings: NextPageWithLayout = () => {
 }
 
 OrgBillingSettings.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout>
-      <OrganizationLayout>
-        <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
-      </OrganizationLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <OrganizationLayout>
+      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
+    </OrganizationLayout>
+  </DefaultLayout>
 )
 export default OrgBillingSettings

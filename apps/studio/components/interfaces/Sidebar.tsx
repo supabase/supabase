@@ -60,6 +60,9 @@ export const ICON_STROKE_WIDTH = 1.5
 const SidebarMotion = motion(SidebarPrimitive) as React.FC<
   React.ComponentProps<typeof SidebarPrimitive> & {
     transition?: MotionProps['transition']
+    initial?: MotionProps['initial']
+    animate?: MotionProps['animate']
+    exit?: MotionProps['exit']
   }
 >
 
@@ -67,14 +70,16 @@ export interface SidebarProps extends React.ComponentPropsWithoutRef<typeof Side
 
 export function Sidebar({ className, ...props }: SidebarProps) {
   const { setOpen } = useSidebar()
-
   const hideSideBar = useHideSidebar()
+  const { sidebarBehaviour } = useAppStateSnapshot()
+
+  console.log('Sidebar render:', { hideSideBar, sidebarBehaviour })
 
   const [storedAllowNavPanel] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
     true
   )
-  const { sidebarBehaviour, setSidebarBehaviour } = useAppStateSnapshot()
+  const { setSidebarBehaviour } = useAppStateSnapshot()
 
   useEffect(() => {
     if (sidebarBehaviour === 'open') {
@@ -90,11 +95,10 @@ export function Sidebar({ className, ...props }: SidebarProps) {
       <AnimatePresence>
         {!hideSideBar && (
           <SidebarMotion
-            {...props}
             transition={{
-              delay: 0.4,
-              duration: 0.4,
+              duration: 0.1,
             }}
+            {...props}
             overflowing={sidebarBehaviour === 'expandable'}
             collapsible="icon"
             variant="sidebar"
@@ -184,13 +188,6 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
               }}
               onClick={() => setCommandMenuOpen(true)}
             />
-          </SidebarGroup>
-        </SidebarMenu>
-        <SidebarMenu className="group-data-[state=expanded]:p-0">
-          <SidebarGroup className="p-0">
-            <SidebarMenuItem className="h-10 flex items-center">
-              <UserDropdown />
-            </SidebarMenuItem>
           </SidebarGroup>
         </SidebarMenu>
         <SidebarGroup className="p-0">{footer}</SidebarGroup>

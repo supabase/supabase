@@ -18,12 +18,10 @@ const OrgAuditLogs: NextPageWithLayout = () => {
 }
 
 OrgAuditLogs.getLayout = (page) => (
-  <AppLayout>
-    <DefaultLayout>
-      <OrganizationLayout>
-        <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
-      </OrganizationLayout>
-    </DefaultLayout>
-  </AppLayout>
+  <DefaultLayout>
+    <OrganizationLayout>
+      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
+    </OrganizationLayout>
+  </DefaultLayout>
 )
 export default OrgAuditLogs
