@@ -44,7 +44,7 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
 export type SidebarBehaviourType = 'expandable' | 'open' | 'closed'
-export const DEFAULT_SIDEBAR_BEHAVIOUR = 'expandable'
+export const DEFAULT_SIDEBAR_BEHAVIOR = 'expandable'
 
 const SidebarMotion = motion(SidebarPrimitive) as React.FC<
   React.ComponentProps<typeof SidebarPrimitive> & {
@@ -61,7 +61,7 @@ export function Sidebar({ className, ...props }: SidebarProps) {
 
   const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
-    DEFAULT_SIDEBAR_BEHAVIOUR
+    DEFAULT_SIDEBAR_BEHAVIOR
   )
 
   useEffect(() => {

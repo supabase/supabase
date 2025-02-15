@@ -16,12 +16,9 @@ import {
   SelectValue_Shadcn_,
   Separator,
   singleThemes,
-  Switch,
   Theme,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useAppStateSnapshot } from 'state/app-state'
-import { DEFAULT_SIDEBAR_BEHAVIOUR } from 'components/interfaces/Sidebar'
 
 export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
@@ -29,7 +26,7 @@ export const ThemeSettings = () => {
 
   const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
-    DEFAULT_SIDEBAR_BEHAVIOUR
+    DEFAULT_SIDEBAR_BEHAVIOR
   )
   /**
    * Avoid Hydration Mismatch
