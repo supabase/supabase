@@ -61,18 +61,18 @@ For usage items without a quota, such as [Compute](/docs/guides/platform/manage-
 
 The quota is applied to your entire organization, independent of how many projects you launch within that organization. For billing purposes, we sum the usage across all projects in a monthly invoice.
 
-| Usage Item                       | Free                     | Pro/Team                                           | Enterprise |
-| -------------------------------- | ------------------------ | -------------------------------------------------- | ---------- |
-| Egress                           | 5 GB                     | 250 GB included, then $0.09 per GB                 | Custom     |
-| Database Size                    | 500 MB                   | 8 GB disk per project included, then $0.125 per GB | Custom     |
-| Monthly Active Users             | 50,000 MAU               | 100,000 MAU included, then $0.00325 per MAU        | Custom     |
-| Monthly Active Third-Party Users | 50 MAU                   | 50 MAU included, then $0.00325 per MAU             | Custom     |
-| Monthly Active SSO Users         | Unavailable on Free Plan | 50 MAU included, then $0.015 per MAU               | Custom     |
-| Storage Size                     | 1 GB                     | 100 GB included, then $0.021 per GB                | Custom     |
-| Storage Images Transformed       | Unavailable on Free Plan | 100 included, then $5 per 1000                     | Custom     |
-| Edge Function Invocations        | 500,000                  | 2 million included, then $2 per million            | Custom     |
-| Realtime Message Count           | 2 million                | 5 million included, then $2.5 per million          | Custom     |
-| Realtime Peak Connections        | 200                      | 500 included, then $10 per 1000                    | Custom     |
+| Usage Item                       | Free                                                     | Pro/Team                                                | Enterprise                                                     |
+| -------------------------------- | -------------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------------------- |
+| Egress                           | <QuotaPrice product="egress" tier="free" />              | <QuotaPrice product="egress" tier="pro" />              | <QuotaPrice product="egress" tier="enterprise" />              |
+| Database Size                    | <QuotaPrice product="disk" tier="free" />                | <QuotaPrice product="disk" tier="pro" />                | <QuotaPrice product="disk" tier="enterprise" />                |
+| Monthly Active Users             | <QuotaPrice product="mau" tier="free" />                 | <QuotaPrice product="mau" tier="pro" />                 | <QuotaPrice product="mau" tier="enterprise" />                 |
+| Monthly Active Third-Party Users | <QuotaPrice product="thirdPartyMau" tier="free" />       | <QuotaPrice product="thirdPartyMau" tier="pro" />       | <QuotaPrice product="thirdPartyMau" tier="enterprise" />       |
+| Monthly Active SSO Users         | <QuotaPrice product="ssoMau" tier="free" />              | <QuotaPrice product="ssoMau" tier="pro" />              | <QuotaPrice product="ssoMau" tier="enterprise" />              |
+| Storage Size                     | <QuotaPrice product="storage" tier="free" />             | <QuotaPrice product="storage" tier="pro" />             | <QuotaPrice product="storage" tier="enterprise" />             |
+| Storage Images Transformed       | <QuotaPrice product="imageTransforms" tier="free" />     | <QuotaPrice product="imageTransforms" tier="pro" />     | <QuotaPrice product="imageTransforms" tier="enterprise" />     |
+| Edge Function Invocations        | <QuotaPrice product="functionInvocations" tier="free" /> | <QuotaPrice product="functionInvocations" tier="pro" /> | <QuotaPrice product="functionInvocations" tier="enterprise" /> |
+| Realtime Message Count           | <QuotaPrice product="rtMessages" tier="free" />          | <QuotaPrice product="rtMessages" tier="pro" />          | <QuotaPrice product="rtMessages" tier="enterprise" />          |
+| Realtime Peak Connections        | <QuotaPrice product="rtPeakConns" tier="free" />         | <QuotaPrice product="rtPeakConns" tier="pro" />         | <QuotaPrice product="rtPeakConns" tier="enterprise" />         |
 
 You can find a detailed breakdown of all usage items and how they are billed on the [Manage your usage](/docs/guides/platform/manage-your-usage) page.
 
