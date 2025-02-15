@@ -1,5 +1,3 @@
-<div style="direction: rtl;" dir="rtl">
-
 <p align="center">
 <img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
 <img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
@@ -9,176 +7,115 @@
 
 # Supabase
 
-[Supabase](https://supabase.com)هو بديل مفتوح المصدر لـ(Firebase). نحن نبني ميزات (Firebase) باستخدام أدوات مفتوحة المصدر عالية الجودة تستخدمها الشركات.
+[Supabase](https://supabase.com) هي بديل مفتوح المصدر لـ Firebase.  نحن نبني ميزات Firebase باستخدام أدوات مفتوحة المصدر على مستوى المؤسسات.
 
-- [x] قاعدة بيانات (Postgres) مستضافة. [الشرح](https://supabase.com/docs/guides/database)
-- [x] [الشرح](https://supabase.com/docs/guides/auth) المصادقة والترخيص
-- [x] واجهات برمجة التطبيقات التي يتم إنشاؤها تلقائيا.
-  - [x] REST. [الشرح](https://supabase.com/docs/guides/api)
-  - [x] GraphQL. [الشرح](https://supabase.com/docs/guides/graphql)
-  - [x] اشتراكات الوقت الفعلي (Realtime subscriptions). [الشرح](https://supabase.com/docs/guides/realtime)
-- [x] الدوال.
-  - [x] دوال قاعدة البيانات (Database Functions). [الشرح](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions [الشرح](https://supabase.com/docs/guides/functions)
-- [x] [الشرح](https://supabase.com/docs/guides/storage) التخزين.
-- [x] ذكاء اصطناعي + مجموعة أدوات المتجهات/التضمينات (AI + Vector/Embeddings Toolkit). [الشرح](https://supabase.com/docs/guides/ai)
-- [x] لوحة الإدارة.
+**الميزات الرئيسية:**
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+- [x] **قاعدة بيانات Postgres مُدارة:** [التوثيق](https://supabase.com/docs/guides/database)
+- [x] **المصادقة والتفويض:** [التوثيق](https://supabase.com/docs/guides/auth)
+- [x] **واجهات برمجة التطبيقات (APIs) التي يتم إنشاؤها تلقائيًا:**
+    - [x] REST: [التوثيق](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [التوثيق](https://supabase.com/docs/guides/graphql)
+    - [x] الاشتراكات في الوقت الفعلي: [التوثيق](https://supabase.com/docs/guides/realtime)
+- [x] **الوظائف:**
+    - [x]  وظائف قاعدة البيانات: [التوثيق](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (وظائف على حافة الشبكة): [التوثيق](https://supabase.com/docs/guides/functions)
+- [x] **تخزين الملفات:** [التوثيق](https://supabase.com/docs/guides/storage)
+- [x] **أدوات الذكاء الاصطناعي, المتجهات, والتضمينات (Vectors & Embeddings):** [التوثيق](https://supabase.com/docs/guides/ai)
+- [x] **لوحة التحكم**
 
-شاهد "الإصدارات" من هذا المشروع للحصول على إشعار بالتحديثات الرئيسية.
+![لوحة تحكم Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
+اشترك في "الإصدارات" (releases) لهذا المستودع لتلقي إشعارات بالتحديثات الرئيسية.  سيسمح لك هذا بالبقاء على اطلاع بأحدث التغييرات والتحسينات.
 
-## الشرح
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="مراقبة المستودع"/></kbd>
 
-للحصول على الشرح الكامل، قم بزيارة [supabase.com/docs](https://supabase.com/docs).
+## التوثيق
 
-لمعرفه كيفية دعم المشروع قم بزيارة [Getting Started](./DEVELOPERS.md).
+التوثيق الكامل متاح على [supabase.com/docs](https://supabase.com/docs).  ستجد هناك جميع الأدلة والمواد المرجعية اللازمة.
+
+إذا كنت ترغب في المساهمة في تطوير المشروع، فراجع قسم [البدء](./../DEVELOPERS.md).
 
 ## المجتمع والدعم
 
-- [منتدى المجتمع](https://github.com/supabase/supabase/discussions). الأفضل لـ: المساعدة في البناء، والنقاش حول أفضل ممارسات قاعدة البيانات.
-- [مشاكل GitHub](https://github.com/supabase/supabase/issues). الأفضل لـ: المشاكل والأخطاء التي تواجهها عند استخدامك لـ(Supabase).
-- [دعم البريد الإلكتروني](https://supabase.com/docs/support#business-support). الأفضل لـ: مشاكل مع قاعدة بياناتك أو البنية التحتية.
-- [ديسكورد](https://discord.supabase.com/). الأفضل لـ: مشاركة التطبيقات الخاصه بك وقضاء بعض الوقت مع المجتمع.
+*   **منتدى المجتمع:** [https://github.com/supabase/supabase/discussions](https://github.com/supabase/supabase/discussions).  مثالي للحصول على المساعدة في التطوير ومناقشة أفضل ممارسات العمل مع قواعد البيانات.
+*   **GitHub Issues:** [https://github.com/supabase/supabase/issues](https://github.com/supabase/supabase/issues).  استخدمه للإبلاغ عن الأخطاء والمشاكل التي تواجهها عند استخدام Supabase.
+*   **دعم البريد الإلكتروني:** [https://supabase.com/docs/support#business-support](https://supabase.com/docs/support#business-support).  أفضل خيار لحل المشكلات المتعلقة بقاعدة البيانات أو البنية التحتية.
+*   **Discord:** [https://discord.supabase.com](https://discord.supabase.com).  مكان رائع لمشاركة تطبيقاتك والتواصل مع المجتمع.
 
-## كيف يعمل (Supabase)؟
+## مبدأ العمل
 
-Supabase عبارة عن مجموعة من الأدوات مفتوحة المصدر. نحن نبني ميزات (Firebase) باستخدام أدوات مفتوحة المصدر عالية الجودة تستخدمها الشركات. إذا كانت الأدوات والمجتمعات موجودة ، باستخدام MIT أو Apache 2 أو ترخيص مفتوح مكافئ ، فسنستخدم هذه الأداة وندعمها. إذا لم تكن الأداة موجودة ، فإننا نبنيها ونفتح مصدرها بأنفسنا. (Supabase) ليس تعيين 1 إلى 1 لـ(Firebase). هدفنا هو منح المطورين تجربة مطور تشبه (Firebase) باستخدام أدوات مفتوحة المصدر.
+تجمع Supabase بين العديد من الأدوات مفتوحة المصدر.  نحن نبني ميزات مماثلة لـ Firebase باستخدام منتجات مجربة على مستوى المؤسسات.  إذا كانت الأداة أو المجتمع موجودًا ولديه ترخيص MIT أو Apache 2 أو ترخيص مفتوح مماثل، فسنستخدم هذه الأداة وندعمها.  إذا لم تكن هذه الأداة موجودة، فسننشئها بأنفسنا ونفتح مصدرها.  Supabase ليست نسخة طبق الأصل من Firebase.  هدفنا هو تزويد المطورين بتجربة مريحة مماثلة لـ Firebase، ولكن باستخدام أدوات مفتوحة المصدر.
 
-**الهيكلة الحالية**
+**البنية**
 
-(supabase) هي [منصة مستضافة](https://supabase.com/dashboard), يمكنك التسجيل والبدأ باستخدامها دون الحاجة لتثبيت أي شئ. يمكنك أيضا [استضافتها ذاتيا](https://supabase.com/docs/guides/hosting/overview) و [تطويرها داخليا](https://supabase.com/docs/guides/local-development).
+Supabase هي [منصة مُدارة](https://supabase.com/dashboard). يمكنك التسجيل والبدء في استخدام Supabase على الفور، دون الحاجة إلى تثبيت أي شيء.  يمكنك أيضًا [نشر بنيتك التحتية الخاصة](https://supabase.com/docs/guides/hosting/overview) و[التطوير محليًا](https://supabase.com/docs/guides/local-development).
 
-![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
+![البنية](./../apps/docs/public/img/supabase-architecture.svg)
 
-- [PostgreSQL](https://www.postgresql.org/) هي قاعدة بيانات قائمة على العلاقات الشيئية مع ٣٠ سنة من التطوير النشط التي اكسبتها سمعة وموثقية قوية وتمتاز بالمتانة والأداء.
-- [Realtime](https://github.com/supabase/realtime) هو خادم بلغة (Elixir) يمكنك من الاستماع لقاعدة البيانات لأي تغيرات سواء أنشاء أو تعديل أو مسح باستخدام ال(websocket).
-- [PostgREST](http://postgrest.org/) هو خادم ويب يستطيع تحويل قاعدة بيانات PostgreSQL مباشرة ألي RESTful API
-- [Storage](https://github.com/supabase/storage-api) يقدم واجهة RESTful لأدارة الملفات المخزنة فس S3, باستخدام Postgres لأدارة الصلاحيات
-- [postgres-meta](https://github.com/supabase/postgres-meta) هو RESTful API لأدارة قاعدة البيانات الخاصة بك, تمكنك من الإستعلام عن الجداول, إضافة أدوار (مفرد دور), وتشغيل الأوامر.. الخ
-- [GoTrue](https://github.com/netlify/gotrue) هو API مبني على SWT لأدارة المستخدمين وإنشاء رمز SWT.
-- [Kong](https://github.com/Kong/kong) هو بوابة API لـcloud-native
+*   **PostgreSQL:** نظام إدارة قواعد بيانات علائقية كائنية (Object-Relational Database) مع أكثر من 30 عامًا من التطوير النشط.  وهي معروفة بموثوقيتها ووظائفها وأدائها.
+*   **Realtime:** خادم Elixir الذي يسمح لك بالاستماع إلى تغييرات PostgreSQL (الإدراجات والتحديثات والحذف) عبر WebSockets.  يستخدم Realtime وظيفة النسخ المتماثل المضمنة في Postgres، ويحول التغييرات إلى JSON، وينقلها إلى العملاء المصرح لهم.
+*   **PostgREST:** خادم ويب يحول قاعدة بيانات PostgreSQL الخاصة بك إلى واجهة برمجة تطبيقات RESTful.
+*   **GoTrue:** واجهة برمجة تطبيقات قائمة على JWT لإدارة المستخدمين وإصدار رموز JWT.
+*   **Storage:** يوفر واجهة RESTful لإدارة الملفات المخزنة في S3، باستخدام Postgres لإدارة الأذونات.
+*   **pg_graphql:** امتداد PostgreSQL يوفر واجهة برمجة تطبيقات GraphQL.
+*   **postgres-meta:** واجهة برمجة تطبيقات RESTful لإدارة Postgres الخاص بك، مما يسمح لك بالحصول على الجداول وإضافة الأدوار وتنفيذ الاستعلامات وما إلى ذلك.
+*   **Kong:** بوابة واجهة برمجة تطبيقات سحابية (Cloud API gateway).
 
-#### مكتبات العميل
+#### مكتبات العميل (Client Libraries)
 
-مكتباتنا معيارية. كل مكتبة فرعية هي تطبيق مستقل لنظام خارجي واحد. هذه إحدى الطرق التي ندعم بها الأدوات الحالية.
+نحن نستخدم نهجًا معياريًا لمكتبات العميل.  تم تصميم كل مكتبة فرعية للعمل مع نظام خارجي واحد.  هذه إحدى طرق دعم الأدوات الحالية.
 
-<table style="table-layout:fixed; white-space: nowrap;">
-  <tr>
-    <th>اللغة</th>
-    <th>العميل</th>
-    <th colspan="4">مميزات العميل</th>
-  </tr>
-  <tr>
-    <th></th>
-    <th>Supabase</th>
-    <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
-    <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
-    <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
-    <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
-  </tr>
-  <!-- TEMPLATE FOR NEW ROW -->
-  <!-- START ROW
-  <tr>
-    <td>lang</td>
-    <td><a href="https://github.com/supabase-community/supabase-lang" target="_blank" rel="noopener noreferrer">supabase-lang</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-lang" target="_blank" rel="noopener noreferrer">postgrest-lang</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-lang" target="_blank" rel="noopener noreferrer">gotrue-lang</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-lang" target="_blank" rel="noopener noreferrer">realtime-lang</a></td>
-    <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
-  </tr>
-  END ROW -->
-  <th colspan="6">⚡️ الرسمي ⚡️</th>
-  <tr>
-    <td>JavaScript (TypeScript)</td>
-    <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
-    <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
-    <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
-    <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
-    <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
-  </tr>
-  <th colspan="6">💚 المجتمعي 💚</th>
-  <tr>
-    <td>C#</td>
-    <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-csharp" target="_blank" rel="noopener noreferrer">postgrest-csharp</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Flutter</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
-    <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
-    <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
-    <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
-    <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
-  </tr>
-  <tr>
-    <td>Go</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Java</td>
-    <td>-</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
-    <td>-</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Kotlin</td>
-    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
-    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
-  </tr>
-  <tr>
-    <td>Python</td>
-    <td><a href="https://github.com/supabase-community/supabase-py" target="_blank" rel="noopener noreferrer">supabase-py</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Ruby</td>
-    <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Rust</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-rs" target="_blank" rel="noopener noreferrer">postgrest-rs</a></td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Swift</td>
-    <td><a href="https://github.com/supabase-community/supabase-swift" target="_blank" rel="noopener noreferrer">supabase-swift</a></td>
-    <td><a href="https://github.com/supabase-community/postgrest-swift" target="_blank" rel="noopener noreferrer">postgrest-swift</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
-    <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
-    <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
-  </tr>
-</table>
+(جدول بمكتبات العميل، كما في الأصل، ولكن بأسماء عربية وتوضيحات عند الضرورة).
+
+| اللغة                       | العميل Supabase                                                     | [PostgREST](https://www.postgresql.org/)                                                                         | [GoTrue](https://github.com/supabase/gotrue)                                                                                | [Realtime](https://github.com/supabase/realtime)                                                                              | [Storage](https://github.com/supabase/storage-api)                                                                                 | Functions                                                                               |
+| :-------------------------- | :------------------------------------------------------------------ | :-------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------- |
+| **⚡️رسمية⚡️**      |                                                                     |                                                                                   |                                                                                      |                                                                                     |                                                                                        |                                                                                      |
+| JavaScript (TypeScript)     | [supabase-js](https://github.com/supabase/supabase-js)               | [postgrest-js](https://github.com/supabase/postgrest-js)                             | [gotrue-js](https://github.com/supabase/gotrue-js)                                     | [realtime-js](https://github.com/supabase/realtime-js)                                 | [storage-js](https://github.com/supabase/storage-js)                                   | [functions-js](https://github.com/supabase/functions-js)                             |
+| Flutter                     | [supabase-flutter](https://github.com/supabase/supabase-flutter)     | [postgrest-dart](https://github.com/supabase/postgrest-dart)                         | [gotrue-dart](https://github.com/supabase/gotrue-dart)                                 | [realtime-dart](https://github.com/supabase/realtime-dart)                             | [storage-dart](https://github.com/supabase/storage-dart)                               | [functions-dart](https://github.com/supabase/functions-dart)                         |
+| Swift                      | [supabase-swift](https://github.com/supabase/supabase-swift)          | [postgrest-swift](https://github.com/supabase/supabase-swift/tree/main/Sources/PostgREST) | [auth-swift](https://github.com/supabase/supabase-swift/tree/main/Sources/Auth)     | [realtime-swift](https://github.com/supabase/supabase-swift/tree/main/Sources/Realtime) | [storage-swift](https://github.com/supabase/supabase-swift/tree/main/Sources/Storage) | [functions-swift](https://github.com/supabase/supabase-swift/tree/main/Sources/Functions) |
+| Python                      | [supabase-py](https://github.com/supabase/supabase-py)               | [postgrest-py](https://github.com/supabase/postgrest-py)                             | [gotrue-py](https://github.com/supabase/gotrue-py)                                     | [realtime-py](https://github.com/supabase/realtime-py)                                 | [storage-py](https://github.com/supabase/storage-py)                                   | [functions-py](https://github.com/supabase/functions-py)                             |
+| **💚مدعومة من المجتمع💚** |                                                                     |                                                                                   |                                                                                      |                                                                                     |                                                                                        |                                                                                      |
+| C#                          | [supabase-csharp](https://github.com/supabase-community/supabase-csharp) | [postgrest-csharp](https://github.com/supabase-community/postgrest-csharp)           | [gotrue-csharp](https://github.com/supabase-community/gotrue-csharp)                 | [realtime-csharp](https://github.com/supabase-community/realtime-csharp)             | [storage-csharp](https://github.com/supabase-community/storage-csharp)                 | [functions-csharp](https://github.com/supabase-community/functions-csharp)           |
+| Go                          | -                                                                   | [postgrest-go](https://github.com/supabase-community/postgrest-go)                     | [gotrue-go](https://github.com/supabase-community/gotrue-go)                           | -                                                                                   | [storage-go](https://github.com/supabase-community/storage-go)                       | [functions-go](https://github.com/supabase-community/functions-go)                   |
+| Java                        | -                                                                   | -                                                                                   | [gotrue-java](https://github.com/supabase-community/gotrue-java)                       | -                                                                                   | [storage-java](https://github.com/supabase-community/storage-java)                   | -                                                                                   |
+| Kotlin                      | [supabase-kt](https://github.com/supabase-community/supabase-kt)       | [postgrest-kt](https://github.com/supabase-community/supabase-kt/tree/master/Postgrest) | [auth-kt](https://github.com/supabase-community/supabase-kt/tree/master/Auth)         | [realtime-kt](https://github.com/supabase-community/supabase-kt/tree/master/Realtime)   | [storage-kt](https://github.com/supabase-community/supabase-kt/tree/master/Storage)   | [functions-kt](https://github.com/supabase-community/supabase-kt/tree/master/Functions) |
+| Ruby                      | [supabase-rb](https://github.com/supabase-community/supabase-rb)      |      [postgrest-rb](https://github.com/supabase-community/postgrest-rb)                                                                             |    -                                                                                  |        -                                                                            |     -                                                                                 |          -                                                                          |
+| Rust                      |      -                                                                 |       [postgrest-rs](https://github.com/supabase-community/postgrest-rs)                                                                            |      -                                                                                 |       -                                                                             |       -                                                                                |         -                                                                           |
+| Godot Engine (GDScript)      |   [supabase-gdscript](https://github.com/supabase-community/godot-engine.supabase)                                                                  |        [postgrest-gdscript](https://github.com/supabase-community/postgrest-gdscript)                                                                            |        [gotrue-gdscript](https://github.com/supabase-community/gotrue-gdscript)                                                                                |    [realtime-gdscript](https://github.com/supabase-community/realtime-gdscript)                                                                                  |         [storage-gdscript](https://github.com/supabase-community/storage-gdscript)                                                                                 |  [functions-gdscript](https://github.com/supabase-community/functions-gdscript)                                                                                       |
+
+## الشارات (Badges)
+
+يمكنك استخدام هذه الشارات لإظهار أن تطبيقك قد تم إنشاؤه باستخدام Supabase:
+
+**فاتح:**
+
+![تم إنشاؤه باستخدام Supabase](./../apps/www/public/badge-made-with-supabase.svg)
+
+```md
+[![تم إنشاؤه باستخدام Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img width="168" height="30" src="https://supabase.com/badge-made-with-supabase.svg" alt="تم إنشاؤه باستخدام Supabase" />
+</a>
+```
+
+**داكن:**
+
+![تم إنشاؤه باستخدام Supabase (إصدار داكن)](./../apps/www/public/badge-made-with-supabase-dark.svg)
+
+```md
+[![تم إنشاؤه باستخدام Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img width="168" height="30" src="https://supabase.com/badge-made-with-supabase-dark.svg" alt="تم إنشاؤه باستخدام Supabase" />
+</a>
+```
+
 ## الترجمات
 
-- [قائمة الترجمات](/i18n/languages.md) <!--- Keep only this -->
-
-## الرعاة
-
-[![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
-
-</div>
+[قائمة الترجمات](./languages.md)
