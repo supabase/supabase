@@ -1,0 +1,18 @@
+# Task Progress Log
+
+## Session 20250215-0746
+
+Changes Made:
+- Updated Vector configuration (volumes/logs/vector.toml):
+  - Added tenant identification "ArivantOne" to metadata
+  - Fixed DNS resolution issue by changing logflare sink URI to use localhost
+  - Maintained existing docker_logs source configuration
+
+Issues Addressed:
+- TenantNotFound errors resolved by adding proper tenant identification
+- DNS resolution errors fixed by updating logflare endpoint
+- JSON parsing errors should be properly handled by existing error handling in parse_docker transform
+
+Next Steps:
+- Monitor Vector logs to confirm resolution of tenant and DNS issues
+- Verify proper log forwarding to analytics service
