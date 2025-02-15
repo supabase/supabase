@@ -21,17 +21,16 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useAppStateSnapshot } from 'state/app-state'
+import { DEFAULT_SIDEBAR_BEHAVIOUR } from 'components/interfaces/Sidebar'
 
 export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
-  const { sidebarBehaviour, setSidebarBehaviour } = useAppStateSnapshot()
 
-  const [allowNavPanelToExpand, setAllowNavPanelToExpand] = useLocalStorageQuery(
+  const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
-    true
+    DEFAULT_SIDEBAR_BEHAVIOUR
   )
-
   /**
    * Avoid Hydration Mismatch
    * https://github.com/pacocoursey/next-themes?tab=readme-ov-file#avoid-hydration-mismatch
@@ -90,9 +89,9 @@ export const ThemeSettings = () => {
       <Panel.Content>
         <FormItemLayout
           isReactForm={false}
-          label="Expand Navigation menu"
+          label="Sidebar behaviour"
           layout="flex-row-reverse"
-          description="Allow the Navigation panel to expand on hover"
+          description="Choose your preferred sidebar behavior: open, closed, or expand on hover."
         >
           <Select_Shadcn_
             value={sidebarBehaviour}

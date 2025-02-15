@@ -35,8 +35,6 @@ type DashboardHistoryType = {
   editor?: string
 }
 
-export type SidebarBehaviourType = 'expandable' | 'open' | 'closed'
-
 const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
   open: false,
   messages: [],
@@ -48,8 +46,6 @@ const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
   entity: undefined,
   tables: [],
 }
-
-const INITIAL_SIDEBAR_BEHAVIOUR = 'expandable' as const
 
 const EMPTY_DASHBOARD_HISTORY: DashboardHistoryType = {
   sql: undefined,
@@ -70,23 +66,17 @@ const getInitialState = () => {
       selectedFeaturePreview: '',
       showAiSettingsModal: false,
       showGenerateSqlModal: false,
-      navigationPanelOpen: false,
-      navigationPanelJustClosed: false,
       ongoingQueriesPanelOpen: false,
       mobileMenuOpen: false,
-      sidebarBehaviour: INITIAL_SIDEBAR_BEHAVIOUR,
     }
   }
 
   const storedAiAssistantState = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE)
-  const storedSidebarBehaviour = localStorage.getItem(LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOUR)
-  console.log('Initial load - stored sidebar behaviour:', storedSidebarBehaviour)
 
   const urlParams = new URLSearchParams(window.location.search)
   const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
 
   let parsedAiAssistant = INITIAL_AI_ASSISTANT
-  let parsedSidebarBehaviour: SidebarBehaviourType = INITIAL_SIDEBAR_BEHAVIOUR
 
   try {
     if (storedAiAssistantState) {
@@ -96,10 +86,6 @@ const getInitialState = () => {
         }
         return value
       })
-    }
-
-    if (storedSidebarBehaviour) {
-      parsedSidebarBehaviour = storedSidebarBehaviour as SidebarBehaviourType
     }
   } catch {
     // Ignore parsing errors
@@ -123,11 +109,8 @@ const getInitialState = () => {
     selectedFeaturePreview: '',
     showAiSettingsModal: false,
     showGenerateSqlModal: false,
-    navigationPanelOpen: false,
-    navigationPanelJustClosed: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
-    sidebarBehaviour: parsedSidebarBehaviour,
   }
 }
 
@@ -190,27 +173,6 @@ export const appState = proxy({
     appState.showGenerateSqlModal = value
   },
 
-  navigationPanelOpen: false,
-  navigationPanelJustClosed: false,
-  setNavigationPanelOpen: (value: boolean, trackJustClosed: boolean = false) => {
-    if (value === false) {
-      if (trackJustClosed) {
-        appState.navigationPanelOpen = false
-        appState.navigationPanelJustClosed = true
-      } else {
-        appState.navigationPanelOpen = false
-        appState.navigationPanelJustClosed = false
-      }
-    } else {
-      if (appState.navigationPanelJustClosed === false) {
-        appState.navigationPanelOpen = true
-      }
-    }
-  },
-  setNavigationPanelJustClosed: (value: boolean) => {
-    appState.navigationPanelJustClosed = value
-  },
-
   resetAiAssistantPanel: () => {
     appState.aiAssistantPanel = {
       ...INITIAL_AI_ASSISTANT,
@@ -243,14 +205,6 @@ export const appState = proxy({
   mobileMenuOpen: false,
   setMobileMenuOpen: (value: boolean) => {
     appState.mobileMenuOpen = value
-  },
-
-  sidebarBehaviour: INITIAL_SIDEBAR_BEHAVIOUR as SidebarBehaviourType,
-  setSidebarBehaviour: (value: SidebarBehaviourType) => {
-    appState.sidebarBehaviour = value
-    if (typeof window !== 'undefined' && value !== null) {
-      localStorage.setItem(LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOUR, value)
-    }
   },
 })
 

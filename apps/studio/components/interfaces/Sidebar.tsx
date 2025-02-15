@@ -38,9 +38,13 @@ import {
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
 import { UserDropdown } from './UserDropdown'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
+export type SidebarBehaviourType = 'expandable' | 'open' | 'closed'
+export const DEFAULT_SIDEBAR_BEHAVIOUR = 'expandable'
 
 const SidebarMotion = motion(SidebarPrimitive) as React.FC<
   React.ComponentProps<typeof SidebarPrimitive> & {
@@ -53,7 +57,12 @@ export interface SidebarProps extends React.ComponentPropsWithoutRef<typeof Side
 export function Sidebar({ className, ...props }: SidebarProps) {
   const { setOpen } = useSidebar()
   const hideSideBar = useHideSidebar()
-  const { sidebarBehaviour, setSidebarBehaviour } = useAppStateSnapshot()
+  // const { sidebarBehaviour, setSidebarBehaviour } = useAppStateSnapshot()
+
+  const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
+    DEFAULT_SIDEBAR_BEHAVIOUR
+  )
 
   useEffect(() => {
     // logic to toggle sidebar open based on sidebarBehaviour state
