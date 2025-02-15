@@ -1,13 +1,13 @@
+import { ProfileImage } from 'components/ui/ProfileImage'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { Command, FlaskConical, Settings, User } from 'lucide-react'
+import { Command, FlaskConical, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -50,11 +50,13 @@ export function UserDropdown() {
           isActive={false}
         >
           <button>
-            <img
-              className="aspect-square h-7 w-7 rounded-md border flex-shrink-0"
-              alt="shadcn"
-              src="https://avatars.githubusercontent.com/u/8291514?s=96&v=4"
-            />
+            <div className="aspect-square h-7 w-7 rounded-md border flex-shrink-0">
+              <ProfileImage
+                alt={profile?.username}
+                src={profile?.profileImageUrl}
+                className="w-7 h-7 rounded-md"
+              />
+            </div>
             <span className="flex flex-col gap-0">
               {profile?.username}
               <span className="text-foreground-lighter text-xs">{profile?.primary_email}</span>
