@@ -42,20 +42,35 @@ Next Steps:
 - Monitor Edge Functions health endpoint at http://localhost:9000/health
 - Verify log forwarding through updated Vector configuration
 
-## Branch Status
+## Branch Status (as of 20250215-0815)
 
 Active Branches:
 1. config/20250215-vector-tenant-fix
-   - Initial Vector configuration updates
-   - Tenant identification fixes
-   - DNS resolution changes
+   Latest: "fix: Edge Functions and Vector configuration" (03627aafdf)
+   Status: In Progress
+   - Initial Vector tenant and DNS configuration
+   - Partially overlaps with fix/edge-functions-vector
+   - Contains environment-specific changes
+   - Needs review for unique changes to preserve
 
-2. fix/edge-functions-vector
-   - Edge Functions implementation
-   - Updated Vector port configuration
-   - Complete documentation updates
+2. feature/ads-customization
+   Latest: "fix: enhance vector log parsing with explicit error handling" (762f76d953)
+   Status: In Progress
+   - Vector log parsing enhancements
+   - Docker network and naming updates
+   - Documentation improvements
+   - Independent feature branch, should continue
+
+3. fix/edge-functions-vector (current branch)
+   Latest: "docs: Add branch status to TaskProgress.log" (9f65c0f365)
+   Status: Ready for Review
+   - Complete Edge Functions implementation
+   - Updated Vector configuration
+   - Full documentation updates
+   - Incorporates and extends config/20250215-vector-tenant-fix changes
 
 Next Steps:
-- Review and merge fix/edge-functions-vector into master
-- Close config/20250215-vector-tenant-fix as superseded by fix/edge-functions-vector
-- Deploy changes following environment setup instructions
+1. Review config/20250215-vector-tenant-fix for any unique changes not in fix/edge-functions-vector
+2. Continue independent development on feature/ads-customization
+3. Create pull request for fix/edge-functions-vector to master
+4. After merge and verification, close config/20250215-vector-tenant-fix
