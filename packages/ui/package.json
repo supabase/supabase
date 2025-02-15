@@ -114,7 +114,7 @@
     "tsconfig": "workspace:*",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
     "typescript": "~5.5.0",
-    "vitest": "^3.0.0"
+    "vitest": "^2.1.9"
   },
   "peerDependencies": {
     "next": "catalog:",
