@@ -1,6 +1,6 @@
-import { boolean, number, object, string } from 'yup'
-import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
+import { NO_REQUIRED_CHARACTERS, urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { ProjectAuthConfigData } from 'data/auth/auth-config-query'
+import { boolean, number, object, string } from 'yup'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
@@ -56,7 +56,7 @@ const PROVIDER_EMAIL = {
       enum: [
         {
           label: 'No required characters (default)',
-          value: 'NO_REQUIRED_CHARS',
+          value: NO_REQUIRED_CHARACTERS,
         },
         {
           label: 'Letters and digits',

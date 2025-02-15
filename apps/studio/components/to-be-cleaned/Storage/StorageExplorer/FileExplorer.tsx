@@ -46,7 +46,7 @@ const FileExplorer = ({
   return (
     <div
       ref={fileExplorerRef}
-      className="file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full"
+      className="file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full relative"
     >
       <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
       <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />

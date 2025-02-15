@@ -1,20 +1,14 @@
+import { useParams } from 'common'
+import { SidebarContent } from 'components/interfaces/Sidebar'
+import { IS_PLATFORM } from 'lib/constants'
+import { Menu, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Search, Menu } from 'lucide-react'
-
-import { useParams } from 'common'
-import { IS_PLATFORM } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
-
-import { buttonVariants, cn, Sheet, SheetContent } from 'ui'
-import { CommandMenuTrigger } from 'ui-patterns'
-import { NavContent } from './NavigationBar'
 import { useState } from 'react'
+import { useAppStateSnapshot } from 'state/app-state'
+import { buttonVariants, cn } from 'ui'
+import { CommandMenuTrigger } from 'ui-patterns'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import { Sidebar, SidebarContent } from 'components/interfaces/Sidebar'
-
-export const ICON_SIZE = 20
-export const ICON_STROKE_WIDTH = 1.5
 
 const MobileNavigationBar = () => {
   const router = useRouter()

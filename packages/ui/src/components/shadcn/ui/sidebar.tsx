@@ -205,7 +205,6 @@ const Sidebar = React.forwardRef<
     }
 
     return (
-      // <div className=":w-[--sidebar-width-icon]">
       <div
         ref={ref}
         className={cn(
@@ -253,7 +252,6 @@ const Sidebar = React.forwardRef<
           </div>
         </div>
       </div>
-      // </div>
     )
   }
 )
