@@ -16,3 +16,28 @@ Issues Addressed:
 Next Steps:
 - Monitor Vector logs to confirm resolution of tenant and DNS issues
 - Verify proper log forwarding to analytics service
+
+## Session 20250215-0812
+
+Changes Made:
+- Created Edge Functions service (volumes/functions/node-function/):
+  - Implemented Express server with health check endpoint
+  - Added package.json with required dependencies
+  - Set up proper error handling and logging
+  - Configured for port 9000 with Docker compatibility
+
+- Updated Vector configuration (volumes/logs/vector.toml):
+  - Changed logflare sink port from 4000 to 9001 to match analytics service
+  - Maintained existing tenant identification and transforms
+  - Ensured proper container monitoring configuration
+
+Issues Addressed:
+- MODULE_NOT_FOUND error resolved by creating missing Edge Functions files
+- Connection refused errors fixed by updating logflare port in Vector config
+- Out of order log messages being properly handled by existing configuration
+
+Next Steps:
+- Set up environment variables using docker/.env.example or .env.reference
+- Restart containers after environment configuration
+- Monitor Edge Functions health endpoint at http://localhost:9000/health
+- Verify log forwarding through updated Vector configuration
