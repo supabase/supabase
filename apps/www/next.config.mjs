@@ -82,9 +82,7 @@ const nextConfig = {
       },
       {
         source: "/(.*)",
-        headers: [{ key: 'Strict-Transport-Security', value: process.env.VERCEL === '1' ? 'max-age=31536000' : '' },
-          { key: 'Test-Header', value: 'test header' }
-        ],
+        headers: [{ key: 'Strict-Transport-Security', value: process.env.VERCEL === '1' ? 'max-age=31536000' : '' }],
       },
     ]
   },
