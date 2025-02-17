@@ -1,11 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { ArrowRight, ExternalLink, Info, RefreshCw } from 'lucide-react'
+import { ArrowRight, BookOpen, ExternalLink, Info, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Image } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Image, cn } from 'ui'
 
 import { useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
@@ -29,6 +29,10 @@ import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { title } from 'process'
+import { TelemetryActions } from 'common/telemetry-constants'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -172,22 +176,14 @@ const DatabaseUsage = () => {
 
         <div className="flex flex-col md:flex-row gap-2 mt-1">
           <AlertTitle_Shadcn_ className="flex-grow">Advanced observability</AlertTitle_Shadcn_>
-          <Button className="hidden md:block" type="default" size="tiny" asChild>
-            <Link href="https://github.com/supabase/supabase-grafana" target="_blank">
-              Learn more
-            </Link>
-          </Button>
+          <GrafanaBannerActions className="hidden xl:flex" />
         </div>
-        <AlertDescription_Shadcn_ className="relative flex flex-col md:flex-row gap-2 md:max-w-lg">
+        <AlertDescription_Shadcn_ className="relative flex flex-col xl:flex-row gap-2 md:max-w-lg">
           <p className="flex-grow">
-            Set up the <i>Supabase Grafana Dashboard</i> to visualize over 200 database performance
-            and health metrics on your Supabase project.
+            Set up the Supabase Grafana Dashboard to visualize over 200 database performance and
+            health metrics on your Supabase project.
           </p>
-          <Button className="md:hidden mt-2" type="default" size="tiny" asChild>
-            <Link href="https://github.com/supabase/supabase-grafana" target="_blank">
-              Learn more
-            </Link>
-          </Button>
+          <GrafanaBannerActions className="xl:hidden" />
         </AlertDescription_Shadcn_>
       </Alert_Shadcn_>
       <section>
@@ -382,5 +378,44 @@ const DatabaseUsage = () => {
         />
       </section>
     </>
+  )
+}
+
+const GrafanaBannerActions = ({ className }: { className?: string }) => {
+  const { ref } = useParams()
+  const org = useSelectedOrganization()
+  const { mutate: sendEvent } = useSendEventMutation()
+
+  return (
+    <div className={cn('flex gap-2', className)}>
+      <Button type="outline" size="tiny" icon={<BookOpen />} asChild>
+        <Link
+          href="https://supabase.com/docs/guides/telemetry/metrics"
+          target="_blank"
+          onClick={() =>
+            sendEvent({
+              action: TelemetryActions.STUDIO_REPORTS_DATABASE_GRAFANA_BANNER_CLICKED,
+              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+            })
+          }
+        >
+          Docs
+        </Link>
+      </Button>
+      <Button type="default" size="tiny" asChild>
+        <Link
+          href="https://github.com/supabase/supabase-grafana"
+          target="_blank"
+          onClick={() =>
+            sendEvent({
+              action: TelemetryActions.STUDIO_REPORTS_DATABASE_GRAFANA_BANNER_CLICKED,
+              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+            })
+          }
+        >
+          Configure Grafana
+        </Link>
+      </Button>
+    </div>
   )
 }
