@@ -19,13 +19,6 @@ const MobileNavigationBar = () => {
   const { ref: projectRef } = useParams()
   const snap = useAppStateSnapshot()
 
-  const onCloseNavigationIconLink = (event: any) => {
-    snap.setNavigationPanelOpen(
-      false,
-      event.target.id === 'icon-link' || ['svg', 'path'].includes(event.target.localName)
-    )
-  }
-
   return (
     <div className="h-14 w-full flex flex-row md:hidden">
       <nav
@@ -39,7 +32,6 @@ const MobileNavigationBar = () => {
         <Link
           href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
           className="flex items-center h-[26px] w-[26px] min-w-[26px]"
-          onClick={onCloseNavigationIconLink}
         >
           <img
             alt="Supabase"

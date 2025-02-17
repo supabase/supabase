@@ -11,27 +11,15 @@ import { AnimatePresence, motion, MotionProps } from 'framer-motion'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { isUndefined } from 'lodash'
-import {
-  Blocks,
-  Boxes,
-  ChartArea,
-  ChevronLeft,
-  Command,
-  PanelLeftDashed,
-  Settings,
-  Users,
-} from 'lucide-react'
+import { Blocks, Boxes, ChartArea, Command, PanelLeftDashed, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { useAppStateSnapshot, type SidebarBehaviourType } from 'state/app-state'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
@@ -43,7 +31,6 @@ import {
   SidebarContent as SidebarContentPrimitive,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -51,11 +38,11 @@ import {
   useSidebar,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
-import { UserDropdown } from './UserDropdown'
-import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
+export type SidebarBehaviourType = 'expandable' | 'open' | 'closed'
+export const DEFAULT_SIDEBAR_BEHAVIOR = 'expandable'
 
 const SidebarMotion = motion(SidebarPrimitive) as React.FC<
   React.ComponentProps<typeof SidebarPrimitive> & {
@@ -71,17 +58,15 @@ export interface SidebarProps extends React.ComponentPropsWithoutRef<typeof Side
 export function Sidebar({ className, ...props }: SidebarProps) {
   const { setOpen } = useSidebar()
   const hideSideBar = useHideSidebar()
-  const { sidebarBehaviour } = useAppStateSnapshot()
+  // const { sidebarBehaviour, setSidebarBehaviour } = useAppStateSnapshot()
 
-  console.log('Sidebar render:', { hideSideBar, sidebarBehaviour })
-
-  const [storedAllowNavPanel] = useLocalStorageQuery(
+  const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
-    true
+    DEFAULT_SIDEBAR_BEHAVIOR
   )
-  const { setSidebarBehaviour } = useAppStateSnapshot()
 
   useEffect(() => {
+    // logic to toggle sidebar open based on sidebarBehaviour state
     if (sidebarBehaviour === 'open') {
       setOpen(true)
     }
@@ -205,7 +190,10 @@ function NavLink({
   active?: boolean
   onClick?: () => void
 }) {
-  const { sidebarBehaviour } = useAppStateSnapshot()
+  const [sidebarBehaviour] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
+    DEFAULT_SIDEBAR_BEHAVIOR
+  )
 
   const buttonProps = {
     tooltip: sidebarBehaviour === 'closed' ? route.label : '',
@@ -239,7 +227,6 @@ function ProjectLinks() {
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
-  const { sidebarBehaviour } = useAppStateSnapshot()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -265,8 +252,6 @@ function ProjectLinks() {
   const otherRoutes = generateOtherRoutes(ref, project)
   const settingsRoutes = generateSettingsRoutes(ref, project)
 
-  // console.log(productRoutes)
-
   return (
     <>
       <SidebarMenu className="">
@@ -287,13 +272,11 @@ function ProjectLinks() {
           ))}
         </SidebarGroup>
         <Separator className="w-[calc(100%-1rem)] mx-auto" />
-
         <SidebarGroup className="gap-0.5">
           {productRoutes.map((route, i) => (
             <NavLink key={`product-routes-${i}`} route={route} active={activeRoute === route.key} />
           ))}
         </SidebarGroup>
-
         <Separator className="w-[calc(100%-1rem)] mx-auto" />
         <SidebarGroup className="gap-0.5">
           {otherRoutes.map((route, i) => (
@@ -317,7 +300,6 @@ function ProjectLinks() {
 const OrganizationLinks = () => {
   const router = useRouter()
   const { slug } = useParams()
-  const { open } = useSidebar()
 
   const activeRoute = router.pathname.split('/')[3]
 

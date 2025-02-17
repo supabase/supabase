@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import type { components } from 'data/api'
@@ -24,11 +25,11 @@ import {
   Input,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
-import { Markdown } from 'components/interfaces/Markdown'
-import { Admonition } from 'ui-patterns'
 
 export interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
@@ -174,6 +175,11 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
       if (doubleNegativeKeys.includes(x)) payload[x] = !values[x]
       if (payload[x] === '') payload[x] = null
     })
+
+    // The backend uses empty string to represent no required characters in the password
+    if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
+      payload.PASSWORD_REQUIRED_CHARACTERS = ''
+    }
 
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
