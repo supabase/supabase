@@ -105,7 +105,7 @@ const LayoutHeader = ({
             {projectRef && (
               <Link
                 href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
-                className="mx-1 hidden md:flex items-center w-[40px] h-[40px]"
+                className="hidden md:flex items-center w-[40px] h-[40px]"
               >
                 <img
                   alt="Supabase"

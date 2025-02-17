@@ -31,6 +31,7 @@ export const USAGE_APPROACHING_THRESHOLD = 0.75
 
 export const LOCAL_STORAGE_KEYS = {
   AI_ASSISTANT_STATE: 'supabase-ai-assistant-state',
+  SIDEBAR_BEHAVIOUR: 'supabase-sidebar-behaviour',
 
   UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',

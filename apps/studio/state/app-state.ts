@@ -66,14 +66,12 @@ const getInitialState = () => {
       selectedFeaturePreview: '',
       showAiSettingsModal: false,
       showGenerateSqlModal: false,
-      navigationPanelOpen: false,
-      navigationPanelJustClosed: false,
       ongoingQueriesPanelOpen: false,
       mobileMenuOpen: false,
     }
   }
 
-  const stored = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE)
+  const storedAiAssistantState = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE)
 
   const urlParams = new URLSearchParams(window.location.search)
   const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
@@ -81,8 +79,8 @@ const getInitialState = () => {
   let parsedAiAssistant = INITIAL_AI_ASSISTANT
 
   try {
-    if (stored) {
-      parsedAiAssistant = JSON.parse(stored, (key, value) => {
+    if (storedAiAssistantState) {
+      parsedAiAssistant = JSON.parse(storedAiAssistantState, (key, value) => {
         if (key === 'createdAt' && value) {
           return new Date(value)
         }
@@ -111,8 +109,6 @@ const getInitialState = () => {
     selectedFeaturePreview: '',
     showAiSettingsModal: false,
     showGenerateSqlModal: false,
-    navigationPanelOpen: false,
-    navigationPanelJustClosed: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
   }
@@ -175,27 +171,6 @@ export const appState = proxy({
   showGenerateSqlModal: false,
   setShowGenerateSqlModal: (value: boolean) => {
     appState.showGenerateSqlModal = value
-  },
-
-  navigationPanelOpen: false,
-  navigationPanelJustClosed: false,
-  setNavigationPanelOpen: (value: boolean, trackJustClosed: boolean = false) => {
-    if (value === false) {
-      if (trackJustClosed) {
-        appState.navigationPanelOpen = false
-        appState.navigationPanelJustClosed = true
-      } else {
-        appState.navigationPanelOpen = false
-        appState.navigationPanelJustClosed = false
-      }
-    } else {
-      if (appState.navigationPanelJustClosed === false) {
-        appState.navigationPanelOpen = true
-      }
-    }
-  },
-  setNavigationPanelJustClosed: (value: boolean) => {
-    appState.navigationPanelJustClosed = value
   },
 
   resetAiAssistantPanel: () => {
