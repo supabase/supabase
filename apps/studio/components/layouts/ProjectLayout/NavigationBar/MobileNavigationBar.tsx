@@ -5,7 +5,6 @@ import { Menu, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import { buttonVariants, cn } from 'ui'
 import { CommandMenuTrigger } from 'ui-patterns'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
@@ -14,14 +13,6 @@ const MobileNavigationBar = () => {
   const router = useRouter()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const { ref: projectRef } = useParams()
-  const snap = useAppStateSnapshot()
-
-  const onCloseNavigationIconLink = (event: any) => {
-    snap.setNavigationPanelOpen(
-      false,
-      event.target.id === 'icon-link' || ['svg', 'path'].includes(event.target.localName)
-    )
-  }
 
   return (
     <div className="h-14 w-full flex flex-row md:hidden">
@@ -36,7 +27,6 @@ const MobileNavigationBar = () => {
         <Link
           href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
           className="flex items-center h-[26px] w-[26px] min-w-[26px]"
-          onClick={onCloseNavigationIconLink}
         >
           <img
             alt="Supabase"
