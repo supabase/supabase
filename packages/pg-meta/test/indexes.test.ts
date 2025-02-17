@@ -38,8 +38,12 @@ withTestDatabase('list indexes', async ({ executeQuery }) => {
     {
       "access_method": "btree",
       "check_xmin": false,
-      "class": "3124",
-      "collation": "0",
+      "class": [
+        3124,
+      ],
+      "collation": [
+        0,
+      ],
       "comment": null,
       "id": 16399,
       "index_attributes": [
@@ -60,10 +64,14 @@ withTestDatabase('list indexes', async ({ executeQuery }) => {
       "is_replica_identity": false,
       "is_unique": true,
       "is_valid": true,
-      "key_attributes": "1",
+      "key_attributes": [
+        1,
+      ],
       "number_of_attributes": 1,
       "number_of_key_attributes": 1,
-      "options": "0",
+      "options": [
+        0,
+      ],
       "schema": "public",
       "table_id": 16393,
     }
@@ -82,8 +90,12 @@ withTestDatabase('retrieve index', async ({ executeQuery }) => {
     {
       "access_method": "btree",
       "check_xmin": false,
-      "class": "3124",
-      "collation": "0",
+      "class": [
+        3124,
+      ],
+      "collation": [
+        0,
+      ],
       "comment": null,
       "id": 16399,
       "index_attributes": [
@@ -104,10 +116,14 @@ withTestDatabase('retrieve index', async ({ executeQuery }) => {
       "is_replica_identity": false,
       "is_unique": true,
       "is_valid": true,
-      "key_attributes": "1",
+      "key_attributes": [
+        1,
+      ],
       "number_of_attributes": 1,
       "number_of_key_attributes": 1,
-      "options": "0",
+      "options": [
+        0,
+      ],
       "schema": "public",
       "table_id": 16393,
     }
