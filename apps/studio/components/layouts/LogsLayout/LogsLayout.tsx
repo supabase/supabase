@@ -1,12 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useEffect } from 'react'
 
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { LogsSidebarMenuV2 } from './LogsSidebarMenuV2'
-
+import { useRouter } from 'next/router'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 interface LogsLayoutProps {
   title?: string
 }
@@ -17,23 +19,38 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
     'logflare'
   )
 
-  if (isLoading) {
-    return <ProjectLayout isLoading></ProjectLayout>
-  }
+  const router = useRouter()
+  const [lastLogsPage, setLastLogsPage] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
+    router.pathname.split('/').pop()
+  )
 
-  if (!isLoading && !canUseLogsExplorer) {
+  useEffect(() => {
+    if (router.pathname.includes('/logs/')) {
+      const path = router.pathname.split('/').pop()
+      setLastLogsPage(path)
+    }
+  }, [router, setLastLogsPage])
+
+  if (!canUseLogsExplorer) {
+    if (isLoading) {
+      return <ProjectLayout isLoading></ProjectLayout>
+    }
+
+    if (!isLoading && !canUseLogsExplorer) {
+      return (
+        <ProjectLayout>
+          <NoPermission isFullPage resourceText="access your project's logs" />
+        </ProjectLayout>
+      )
+    }
+
     return (
-      <ProjectLayout>
-        <NoPermission isFullPage resourceText="access your project's logs" />
+      <ProjectLayout title={title} product="Logs & Analytics" productMenu={<LogsSidebarMenuV2 />}>
+        {children}
       </ProjectLayout>
     )
   }
-
-  return (
-    <ProjectLayout title={title} product="Logs & Analytics" productMenu={<LogsSidebarMenuV2 />}>
-      {children}
-    </ProjectLayout>
-  )
 }
 
 export default withAuth(LogsLayout)

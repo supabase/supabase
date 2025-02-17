@@ -133,7 +133,7 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
       key: 'logs',
       label: 'Logs',
       icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs/explorer`),
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs`),
     },
     {
       key: 'api',
