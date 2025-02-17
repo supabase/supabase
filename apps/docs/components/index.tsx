@@ -9,6 +9,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import InfoPopUp from '~/features/ui/InfoPopUp'
 
 // Common components
 import { CH } from '@code-hike/mdx/components'
@@ -154,6 +155,7 @@ const components = {
   OAuthPkceFlow,
   Options,
   Param,
+  InfoPopUp,
   ProjectConfigVariables,
   ProjectSetup,
   QuickstartIntro,

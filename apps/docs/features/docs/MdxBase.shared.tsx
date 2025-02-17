@@ -52,6 +52,7 @@ import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import * as CH from '~/features/ui/CodeHike'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import InfoPopUp from '~/features/ui/InfoPopUp'
 
 const components = {
   Accordion,
@@ -101,6 +102,7 @@ const components = {
   StepHikeCompact,
   Tabs,
   TabPanel,
+  InfoPopUp,
   PricingMfaPhone,
   PricingBranching,
   PricingEdgeFunctions,
