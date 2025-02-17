@@ -11,6 +11,7 @@ import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
+import { post } from 'data/fetchers'
 
 const WHITELIST_ERRORS = ['No SSO provider assigned for this domain']
 
@@ -54,6 +55,11 @@ const SignInSSOForm = () => {
 
     if (!error) {
       sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
+      await post('/platform/profile/audit-login').catch((e) => {
+        Sentry.captureException(
+          new Error("Failed to add login event to user's audit log", { cause: e })
+        )
+      })
       await queryClient.resetQueries()
       setLastSignInUsed('sso')
       if (data) {
