@@ -9,10 +9,16 @@ import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button } from 'ui'
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { LastSignInWrapper } from './LastSignInWrapper'
+import { TelemetryActions } from 'common/telemetry-constants'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { post } from 'data/fetchers'
 
 const SignInWithGitHub = () => {
   const [loading, setLoading] = useState(false)
   const [lastSignInUsed, setLastSignInUsed] = useLastSignIn()
+
+  const { mutate: sendEvent } = useSendEventMutation()
+
   async function handleGithubSignIn() {
     setLoading(true)
 
@@ -35,6 +41,12 @@ const SignInWithGitHub = () => {
       if (error) throw error
       else {
         setLastSignInUsed('github')
+        sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
+        await post('/platform/profile/audit-login').catch((e) => {
+          Sentry.captureException(
+            new Error("Failed to add login event to user's audit log", { cause: e })
+          )
+        })
       }
     } catch (error: any) {
       toast.error(`Failed to sign in via GitHub: ${error.message}`)

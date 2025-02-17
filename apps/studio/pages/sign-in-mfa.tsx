@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -10,6 +11,7 @@ import { Loading } from 'components/ui/Loading'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import type { NextPageWithLayout } from 'types'
+import { post } from 'data/fetchers'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -44,6 +46,11 @@ const SignInMfaPage: NextPageWithLayout = () => {
 
           if (data.currentLevel === data.nextLevel) {
             sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
+            await post('/platform/profile/audit-login').catch((e) => {
+              Sentry.captureException(
+                new Error("Failed to add login event to user's audit log", { cause: e })
+              )
+            })
             await queryClient.resetQueries()
             router.push(getReturnToPath())
             return
