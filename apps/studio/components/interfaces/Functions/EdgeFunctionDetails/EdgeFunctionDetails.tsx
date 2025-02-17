@@ -129,7 +129,7 @@ const EdgeFunctionDetails = () => {
   return (
     <>
       <SectionHeader title="Function Configuration" />
-      <div className="mx-auto flex flex-col xl:flex-row gap-8">
+      <div className="mx-auto flex flex-col xl:flex-row gap-8 pb-8">
         <div className="flex-1 min-w-0 overflow-hidden">
           <Form_Shadcn_ {...form}>
             <form onSubmit={form.handleSubmit(onUpdateFunction)}>

@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm, useFieldArray } from 'react-hook-form'
+import * as z from 'zod'
 import {
   Sheet,
   SheetContent,
@@ -20,7 +23,13 @@ import {
   TabsTrigger_Shadcn_ as TabsTrigger,
   Badge,
   CodeBlock,
+  Form_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormControl_Shadcn_,
+  FormMessage_Shadcn_,
 } from 'ui'
+import { FormFieldWrapper } from 'components/ui/Forms'
 import { constructHeaders } from 'data/fetchers'
 import { useParams } from 'common'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
@@ -54,6 +63,28 @@ type ResponseData = {
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'] as const
 type HttpMethod = (typeof HTTP_METHODS)[number]
 
+const FormSchema = z.object({
+  method: z.enum(HTTP_METHODS),
+  body: z
+    .string()
+    .optional()
+    .transform((str) => str || '{}'),
+  headers: z.array(
+    z.object({
+      key: z.string(),
+      value: z.string(),
+    })
+  ),
+  queryParams: z.array(
+    z.object({
+      key: z.string(),
+      value: z.string(),
+    })
+  ),
+})
+
+type FormValues = z.infer<typeof FormSchema>
+
 const EdgeFunctionTesterSheet = ({
   visible,
   onClose,
@@ -61,10 +92,6 @@ const EdgeFunctionTesterSheet = ({
   apiKey,
 }: EdgeFunctionTesterSheetProps) => {
   const { ref: projectRef } = useParams()
-  const [method, setMethod] = useState<HttpMethod>('POST')
-  const [body, setBody] = useState('{ "name": "Functions" }')
-  const [headers, setHeaders] = useState<KeyValuePair[]>([{ key: '', value: '' }])
-  const [queryParams, setQueryParams] = useState<KeyValuePair[]>([{ key: '', value: '' }])
   const [response, setResponse] = useState<ResponseData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -75,40 +102,51 @@ const EdgeFunctionTesterSheet = ({
   const getImpersonatedRole = useGetImpersonatedRole()
   const { serviceKey } = getAPIKeys(settings)
 
+  const form = useForm<FormValues>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      method: 'POST',
+      body: '{ "name": "Functions" }',
+      headers: [{ key: '', value: '' }],
+      queryParams: [{ key: '', value: '' }],
+    },
+  })
+
+  const {
+    fields: headerFields,
+    append: appendHeader,
+    remove: removeHeader,
+  } = useFieldArray({
+    control: form.control,
+    name: 'headers',
+  })
+
+  const {
+    fields: queryParamFields,
+    append: appendQueryParam,
+    remove: removeQueryParam,
+  } = useFieldArray({
+    control: form.control,
+    name: 'queryParams',
+  })
+
   const addKeyValuePair = (type: 'headers' | 'queryParams') => {
     if (type === 'headers') {
-      setHeaders([...headers, { key: '', value: '' }])
+      appendHeader({ key: '', value: '' })
     } else {
-      setQueryParams([...queryParams, { key: '', value: '' }])
+      appendQueryParam({ key: '', value: '' })
     }
   }
 
   const removeKeyValuePair = (index: number, type: 'headers' | 'queryParams') => {
     if (type === 'headers') {
-      setHeaders(headers.filter((_, i) => i !== index))
+      removeHeader(index)
     } else {
-      setQueryParams(queryParams.filter((_, i) => i !== index))
+      removeQueryParam(index)
     }
   }
 
-  const updateKeyValuePair = (
-    index: number,
-    field: 'key' | 'value',
-    value: string,
-    type: 'headers' | 'queryParams'
-  ) => {
-    if (type === 'headers') {
-      const newHeaders = [...headers]
-      newHeaders[index][field] = value
-      setHeaders(newHeaders)
-    } else {
-      const newQueryParams = [...queryParams]
-      newQueryParams[index][field] = value
-      setQueryParams(newQueryParams)
-    }
-  }
-
-  const sendRequest = async () => {
+  const onSubmit = async (values: FormValues) => {
     try {
       setIsLoading(true)
       setError(null)
@@ -116,9 +154,10 @@ const EdgeFunctionTesterSheet = ({
 
       let requestBody: any
       try {
-        requestBody = JSON.parse(body)
+        requestBody = JSON.parse(values.body)
       } catch (e) {
-        throw new Error('Invalid JSON in request body')
+        form.setError('body', { message: 'Must be a valid JSON string' })
+        return
       }
 
       let testAuthorization: string | undefined
@@ -138,21 +177,20 @@ const EdgeFunctionTesterSheet = ({
             error: err.message,
             roleDetails: role,
           })
-          // Don't throw, fall back to service key
           console.log('Falling back to service key')
         }
       }
 
       // Construct custom headers
       const customHeaders: Record<string, string> = {}
-      headers.forEach(({ key, value }) => {
+      headerFields.forEach(({ key, value }) => {
         if (key && value) {
           customHeaders[key] = value
         }
       })
 
       // Construct query parameters
-      const queryString = queryParams
+      const queryString = queryParamFields
         .filter(({ key, value }) => key && value)
         .map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
         .join('&')
@@ -168,7 +206,7 @@ const EdgeFunctionTesterSheet = ({
         },
         body: JSON.stringify({
           url: finalUrl,
-          method,
+          method: values.method,
           body: requestBody,
           headers: {
             ...(accessToken && {
@@ -194,14 +232,10 @@ const EdgeFunctionTesterSheet = ({
     }
   }
 
-  const renderKeyValuePairs = (
-    type: 'headers' | 'queryParams',
-    items: KeyValuePair[],
-    label: string
-  ) => (
+  const renderKeyValuePairs = (type: 'headers' | 'queryParams', label: string) => (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <Label className="text-foreground-light text-sm">{label}</Label>
+        <Label className="text-foreground text-sm">{label}</Label>
         <Button
           type="default"
           size="tiny"
@@ -212,26 +246,40 @@ const EdgeFunctionTesterSheet = ({
         </Button>
       </div>
       <div className="border rounded-md bg-surface-200">
-        {items.map((item, index) => (
-          <div key={index} className="grid grid-cols-[1fr,1fr,32px] border-b last:border-b-0">
-            <Input
-              size="tiny"
-              placeholder="Enter key..."
-              value={item.key}
-              onChange={(e) => updateKeyValuePair(index, 'key', e.target.value, type)}
-              disabled={isLoading}
-              className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-l-0 border-r-1 border-t-0 border-b-0 border-border"
+        {(type === 'headers' ? headerFields : queryParamFields).map((field, index) => (
+          <div key={field.id} className="grid grid-cols-[1fr,1fr,32px] border-b last:border-b-0">
+            <FormField_Shadcn_
+              control={form.control}
+              name={`${type}.${index}.key`}
+              render={({ field }) => (
+                <FormControl_Shadcn_>
+                  <Input
+                    {...field}
+                    size="tiny"
+                    placeholder="Enter key..."
+                    disabled={isLoading}
+                    className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-l-0 border-r-1 border-t-0 border-b-0 border-border"
+                  />
+                </FormControl_Shadcn_>
+              )}
             />
-            <Input
-              size="tiny"
-              placeholder="Enter value..."
-              value={item.value}
-              onChange={(e) => updateKeyValuePair(index, 'value', e.target.value, type)}
-              disabled={isLoading}
-              className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-none"
+            <FormField_Shadcn_
+              control={form.control}
+              name={`${type}.${index}.value`}
+              render={({ field }) => (
+                <FormControl_Shadcn_>
+                  <Input
+                    {...field}
+                    size="tiny"
+                    placeholder="Enter value..."
+                    disabled={isLoading}
+                    className="h-auto py-2 font-mono rounded-none shadow-none bg-transparent border-none"
+                  />
+                </FormControl_Shadcn_>
+              )}
             />
             <div className="flex items-center justify-center">
-              {items.length > 1 && (
+              {(type === 'headers' ? headerFields : queryParamFields).length > 1 && (
                 <Button
                   type="text"
                   size="tiny"
@@ -254,104 +302,115 @@ const EdgeFunctionTesterSheet = ({
           <SheetTitle>Test Edge Function</SheetTitle>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto flex flex-col">
-          <div className="space-y-4 p-5">
-            <div>
-              <Label className="text-foreground-light mb-2 block text-sm">Method</Label>
-              <Select
-                value={method}
-                onValueChange={(value) => setMethod(value as HttpMethod)}
-                disabled={isLoading}
+        <Form_Shadcn_ {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex-1 overflow-y-auto flex flex-col"
+          >
+            <div className="space-y-4 p-5">
+              <FormFieldWrapper
+                control={form.control}
+                name="method"
+                label="Method"
+                description="Select the HTTP method for your request"
               >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select method" />
-                </SelectTrigger>
-                <SelectContent>
-                  {HTTP_METHODS.map((m) => (
-                    <SelectItem key={m} value={m}>
-                      {m}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                {(field) => (
+                  <Select value={field.value} onValueChange={field.onChange} disabled={isLoading}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {HTTP_METHODS.map((m) => (
+                        <SelectItem key={m} value={m}>
+                          {m}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </FormFieldWrapper>
+              <FormFieldWrapper
+                control={form.control}
+                name="body"
+                label="Body"
+                description="Enter the JSON request body"
+              >
+                {(field) => (
+                  <Textarea
+                    {...field}
+                    placeholder="Request body (JSON)"
+                    rows={3}
+                    disabled={isLoading}
+                    className="font-mono text-xs"
+                  />
+                )}
+              </FormFieldWrapper>
+
+              {renderKeyValuePairs('headers', 'Headers')}
+              {renderKeyValuePairs('queryParams', 'Query Parameters')}
             </div>
 
-            {renderKeyValuePairs('headers', headers, 'Headers')}
-            {renderKeyValuePairs('queryParams', queryParams, 'Query Parameters')}
-
-            <div>
-              <Label className="text-foreground-light mb-2 block text-sm">Body</Label>
-              <Textarea
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
-                placeholder="Request body (JSON)"
-                rows={3}
-                disabled={isLoading}
-                className="font-mono text-xs"
-              />
-            </div>
-          </div>
-
-          <div className="h-full bg-surface-100 border-t flex-1 flex flex-col overflow-hidden">
-            {response ? (
-              <div className="h-full bg-surface-100 flex flex-col overflow-hidden">
-                <div className="flex gap-2 items-center p-5 text-sm pb-3">
-                  Function responded with
-                  <Badge variant={response.status >= 400 ? 'destructive' : 'success'}>
-                    {response.status}
-                  </Badge>
+            <div className="h-full bg-surface-100 border-t flex-1 flex flex-col overflow-hidden">
+              {response ? (
+                <div className="h-full bg-surface-100 flex flex-col overflow-hidden">
+                  <div className="flex gap-2 items-center p-5 text-sm pb-3">
+                    Function responded with
+                    <Badge variant={response.status >= 400 ? 'destructive' : 'success'}>
+                      {response.status}
+                    </Badge>
+                  </div>
+                  <Tabs defaultValue="body" className="h-full flex-1 flex flex-col overflow-hidden">
+                    <TabsList className="gap-4 px-5">
+                      <div className="flex items-center gap-4 flex-1">
+                        <TabsTrigger className="text-sm" value="body">
+                          Body
+                        </TabsTrigger>
+                        <TabsTrigger className="text-sm" value="headers">
+                          Headers
+                        </TabsTrigger>
+                      </div>
+                    </TabsList>
+                    <TabsContent value="body" className="mt-0 px-5 pb-4 flex-1 overflow-auto">
+                      <CodeBlock
+                        language="json"
+                        hideLineNumbers
+                        className="rounded-md !border-none !px-4 !py-3 h-full"
+                        value={prettifyJSON(response.body)}
+                      />
+                    </TabsContent>
+                    <TabsContent value="headers" className="mt-0 px-4 pb-4 flex-1 overflow-auto">
+                      <CodeBlock
+                        language="json"
+                        hideLineNumbers
+                        className="rounded-md !border-none !px-4 !py-3 h-full"
+                        value={prettifyJSON(JSON.stringify(response.headers, null, 2))}
+                      />
+                    </TabsContent>
+                  </Tabs>
                 </div>
-                <Tabs defaultValue="body" className="h-full flex-1 flex flex-col overflow-hidden">
-                  <TabsList className="gap-4 px-5">
-                    <div className="flex items-center gap-4 flex-1">
-                      <TabsTrigger className="text-sm" value="body">
-                        Body
-                      </TabsTrigger>
-                      <TabsTrigger className="text-sm" value="headers">
-                        Headers
-                      </TabsTrigger>
-                    </div>
-                  </TabsList>
-                  <TabsContent value="body" className="mt-0 px-5 pb-4 flex-1 overflow-auto">
-                    <CodeBlock
-                      language="json"
-                      hideLineNumbers
-                      className="rounded-md !border-none !px-4 !py-3 h-full"
-                      value={prettifyJSON(response.body)}
-                    />
-                  </TabsContent>
-                  <TabsContent value="headers" className="mt-0 px-4 pb-4 flex-1 overflow-auto">
-                    <CodeBlock
-                      language="json"
-                      hideLineNumbers
-                      className="rounded-md !border-none !px-4 !py-3 h-full"
-                      value={prettifyJSON(JSON.stringify(response.headers, null, 2))}
-                    />
-                  </TabsContent>
-                </Tabs>
-              </div>
-            ) : error ? (
-              <div className="p-5 space-y-2">
-                <Label>Error</Label>
-                <p className="text-sm text-foreground-light">{error}</p>
-              </div>
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center gap-2">
-                <Send size={24} className="text-foreground-muted" />
-                <p className="text-sm text-foreground-light">Send your first test request</p>
-              </div>
-            )}
-          </div>
-        </div>
+              ) : error ? (
+                <div className="p-5 space-y-2">
+                  <Label>Error</Label>
+                  <p className="text-sm text-foreground-light">{error}</p>
+                </div>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center gap-2">
+                  <Send size={24} className="text-foreground-muted" />
+                  <p className="text-sm text-foreground-light">Send your first test request</p>
+                </div>
+              )}
+            </div>
 
-        <SheetFooter className="px-5 py-3 border-t">
-          <div className="flex items-center gap-2">
-            <RoleImpersonationPopover />
-            <Button type="primary" onClick={sendRequest} loading={isLoading} disabled={isLoading}>
-              Send Request
-            </Button>
-          </div>
-        </SheetFooter>
+            <SheetFooter className="px-5 py-3 border-t">
+              <div className="flex items-center gap-2">
+                <RoleImpersonationPopover />
+                <Button type="primary" htmlType="submit" loading={isLoading} disabled={isLoading}>
+                  Send Request
+                </Button>
+              </div>
+            </SheetFooter>
+          </form>
+        </Form_Shadcn_>
       </SheetContent>
     </Sheet>
   )
