@@ -1,11 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { ArrowRight, BookOpen, ExternalLink, Info, RefreshCw } from 'lucide-react'
+import { ArrowRight, BookOpen, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Image, cn } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 
 import { useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
@@ -149,14 +149,15 @@ const DatabaseUsage = () => {
       <ReportHeader showDatabaseSelector title="Database" />
       <Alert_Shadcn_ className="relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image
-            src={{
-              dark: `${BASE_PATH}/img/reports/bg-grafana-dark.svg`,
-              light: `${BASE_PATH}/img/reports/bg-grafana-light.svg`,
-            }}
+          <img
+            src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
             alt="Supabase Grafana"
-            fill
-            className="w-full h-full object-cover object-right"
+            className="w-full h-full object-cover object-right hidden dark:block"
+          />
+          <img
+            src={`${BASE_PATH}/img/reports/bg-grafana-light.svg`}
+            alt="Supabase Grafana"
+            className="w-full h-full object-cover object-right dark:hidden"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
         </div>
