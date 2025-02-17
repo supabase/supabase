@@ -1,26 +1,28 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
-import { X, Book, CornerDownLeft, Loader2, Save } from 'lucide-react'
+import { useParams } from 'common'
+import {
+  createSqlSnippetSkeletonV2,
+  suffixWithLimit,
+} from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
+import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { debounce } from 'lodash'
+import { Book, CornerDownLeft, Loader2, Save, X } from 'lucide-react'
+import Link from 'next/link'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { useAppStateSnapshot } from 'state/app-state'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { AiIconAnimation, Button, cn, Input_Shadcn_, SQL_ICON } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { useParams } from 'common'
-import { suffixWithLimit } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
-import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useAppStateSnapshot } from 'state/app-state'
-import { IS_PLATFORM, BASE_PATH } from 'lib/constants'
-import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { useProfile } from 'lib/profile'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { uuidv4 } from 'lib/helpers'
-import { toast } from 'sonner'
-import Link from 'next/link'
+import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import AIEditor from '../AIEditor'
-import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { isReadOnlySelect, containsUnknownFunction } from '../AIAssistantPanel/AIAssistant.utils'
-import { debounce } from 'lodash'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 
 interface EditorPanelProps {
   onChange?: (value: string) => void
@@ -192,7 +194,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
             }}
             size="tiny"
             type="default"
-            className="h-7"
+            className="w-7 h-7"
             loading={isSaving}
             icon={<Save size={16} />}
             onClick={async () => {
