@@ -136,7 +136,7 @@ Some entities like views and enums expect columns to be declared in a specific o
     <StepHikeCompact.Code>
 
 ```bash Terminal
-supabase diff -f add_age
+supabase db diff -f add_age
 ```
 
     </StepHikeCompact.Code>
@@ -155,6 +155,23 @@ supabase diff -f add_age
 
 ```sql supabase/migrations/<timestamp>_add_age.sql
 alter table "public"."employees" add column "age" smallint not null;
+```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+<StepHikeCompact>
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Apply the pending migration">
+      Start the database locally and apply the pending migration.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash Terminal
+supabase start && supabase migration up
 ```
 
     </StepHikeCompact.Code>
