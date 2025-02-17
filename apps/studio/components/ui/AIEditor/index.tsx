@@ -28,7 +28,6 @@ interface AIEditorProps {
 }
 
 const AIEditor = ({
-  id,
   language = 'javascript',
   value,
   defaultValue = '',

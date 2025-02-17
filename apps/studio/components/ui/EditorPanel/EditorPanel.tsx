@@ -42,7 +42,6 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<QueryResponseError>()
   const [results, setResults] = useState<undefined | any[]>(undefined)
-  const [showResults, setShowResults] = useState(false)
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
   const [currentValue, setCurrentValue] = useState(editorPanel.initialValue || '')
   const [showTemplates, setShowTemplates] = useState(false)
@@ -59,7 +58,6 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
 
   const { mutate: executeSql, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: async (res) => {
-      setShowResults(true)
       setResults(res.result)
     },
     onError: (error) => {
