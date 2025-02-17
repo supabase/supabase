@@ -49,6 +49,13 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
   const [savedCode, setSavedCode] = useState<string>('')
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
 
+  const errorHeader = error?.formattedError?.split('\n')?.filter((x: string) => x.length > 0)?.[0]
+  const errorContent =
+    error?.formattedError
+      ?.split('\n')
+      ?.filter((x: string) => x.length > 0)
+      ?.slice(1) ?? []
+
   const { mutate: executeSql, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: async (res) => {
       setShowResults(true)
@@ -59,20 +66,6 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
       setResults([])
     },
   })
-
-  useEffect(() => {
-    if (editorPanel.initialValue !== undefined && editorPanel.initialValue !== currentValue) {
-      setCurrentValue(editorPanel.initialValue)
-    }
-  }, [editorPanel.initialValue])
-
-  useEffect(() => {
-    if (editorPanel.initialValue !== currentValue) {
-      setEditorPanel({
-        initialValue: currentValue,
-      })
-    }
-  }, [currentValue, setEditorPanel])
 
   const handleChat = () => {
     setAiAssistantPanel({
@@ -141,13 +134,6 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
     [savedCode]
   )
 
-  // Cleanup debounce on unmount
-  useEffect(() => {
-    return () => {
-      debouncedRevertCode.cancel()
-    }
-  }, [debouncedRevertCode])
-
   const handleTemplateMouseEnter = (templateContent: string) => {
     // Cancel any pending revert
     debouncedRevertCode.cancel()
@@ -165,12 +151,26 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
     }
   }
 
-  const errorHeader = error?.formattedError?.split('\n')?.filter((x: string) => x.length > 0)?.[0]
-  const errorContent =
-    error?.formattedError
-      ?.split('\n')
-      ?.filter((x: string) => x.length > 0)
-      ?.slice(1) ?? []
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      debouncedRevertCode.cancel()
+    }
+  }, [debouncedRevertCode])
+
+  useEffect(() => {
+    if (editorPanel.initialValue !== undefined && editorPanel.initialValue !== currentValue) {
+      setCurrentValue(editorPanel.initialValue)
+    }
+  }, [editorPanel.initialValue])
+
+  useEffect(() => {
+    if (editorPanel.initialValue !== currentValue) {
+      setEditorPanel({
+        initialValue: currentValue,
+      })
+    }
+  }, [currentValue, setEditorPanel])
 
   return (
     <div className="flex flex-col h-full bg-surface-100">
