@@ -1,7 +1,7 @@
 import { type PropsWithChildren } from 'react'
 
 import { FeatureFlagProvider, IS_PLATFORM, ThemeProvider } from 'common'
-import { SonnerToaster } from 'ui'
+import { SonnerToaster, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL } from '~/lib/constants'
@@ -23,16 +23,18 @@ function GlobalProviders({ children }: PropsWithChildren) {
           <PageTelemetry />
           <ScrollRestoration />
           <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-            <CommandProvider>
-              <div className="flex flex-col">
-                <SiteLayout>
-                  {children}
-                  <DocsCommandMenu />
-                </SiteLayout>
-                <ThemeSandbox />
-              </div>
-            </CommandProvider>
-            <SonnerToaster position="top-right" />
+            <TooltipProvider delayDuration={0}>
+              <CommandProvider>
+                <div className="flex flex-col">
+                  <SiteLayout>
+                    {children}
+                    <DocsCommandMenu />
+                  </SiteLayout>
+                  <ThemeSandbox />
+                </div>
+              </CommandProvider>
+              <SonnerToaster position="top-right" />
+            </TooltipProvider>
           </ThemeProvider>
         </FeatureFlagProvider>
       </AuthContainer>
