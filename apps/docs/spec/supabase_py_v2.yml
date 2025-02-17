@@ -78,7 +78,7 @@ functions:
       - id: create-client
         name: create_client()
         code: |
-          ```
+          ```python
           import os
           from supabase import create_client, Client
 
@@ -89,7 +89,7 @@ functions:
       - id: with-timeout-option
         name: With timeout option
         code: |
-          ```
+          ```python
           import os
           from supabase import create_client, Client
           from supabase.client import ClientOptions
@@ -593,7 +593,7 @@ functions:
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
-      - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
@@ -624,7 +624,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.sign_in_with_otp({
-            "phone": '+13334445555',
+            "phone": "+13334445555",
           })
           ```
       - id: sign-in-with-whatsapp-otp
@@ -675,9 +675,9 @@ functions:
         name: Sign in using a third-party provider
         isSpotlight: true
         code: |
-          ```
+          ```python
           response = supabase.auth.sign_in_with_oauth({
-            "provider": 'github'
+            "provider": "github"
           })
           ```
       - id: sign-in-using-a-third-party-provider-with-redirect
@@ -685,13 +685,13 @@ functions:
         isSpotlight: false
         description: |
           - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls). It does not redirect the user immediately after invoking this method.
-          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
-          ```
+          ```python
           response = supabase.auth.sign_in_with_oauth({
-            "provider": 'github',
+            "provider": "github",
             "options": {
-              "redirect_to": 'https://example.com/welcome'
+              "redirect_to": "https://example.com/welcome"
             }
           })
           ```
@@ -702,11 +702,11 @@ functions:
           If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider. The list of scopes will be documented by the third-party provider you are using and specifying scopes will enable you to use the OAuth provider token to call additional APIs supported by the third-party provider to get more information.
         code: |
-          ```
+          ```python
           response = supabase.auth.sign_in_with_oauth({
-            "provider": 'github',
+            "provider": "github",
             "options": {
-              "scopes": 'repo gist notifications'
+              "scopes": "repo gist notifications"
             }
           })
           ```
@@ -1355,7 +1355,7 @@ functions:
         code: |
           ```python
           response = supabase.auth.link_identity({
-            provider: 'github'
+            provider: "github"
           })
           ```
         response: |
@@ -1408,7 +1408,7 @@ functions:
         code: |
           ```python
           # retrieve all identites linked to a user
-          res = supabase.auth.get_user_identities()
+          response = supabase.auth.get_user_identities()
 
           # find the google identity
           google_identity = list(
@@ -1714,7 +1714,9 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          response = supabase.auth.exchange_code_for_session("auth_code": "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          response = supabase.auth.exchange_code_for_session({
+            "auth_code": "34e770dd-9ff9-416c-87fa-43b31d7ef225"
+          })
           ```
         response: |
           ```json
@@ -1889,8 +1891,8 @@ functions:
         name: Enroll a time-based, one-time password (TOTP) factor
         isSpotlight: true
         code: |
-          ```
-          res = supabase.auth.mfa.enroll({
+          ```python
+          response = supabase.auth.mfa.enroll({
             "factor_type": "totp",
             "friendly_name": "your_friendly_name"
           })
@@ -1905,9 +1907,9 @@ functions:
         name: Create a challenge for a factor
         isSpotlight: true
         code: |
-          ```
-          res = supabase.auth.mfa.challenge({
-            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225'
+          ```python
+          response = supabase.auth.mfa.challenge({
+            "factor_id": "34e770dd-9ff9-416c-87fa-43b31d7ef225"
           })
           ```
   - id: mfa-verify
@@ -1919,11 +1921,11 @@ functions:
         name: Verify a challenge for a factor
         isSpotlight: true
         code: |
-          ```
-          res = supabase.auth.mfa.verify({
-            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
-            "challenge_id": '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15',
-            "code": '123456'
+          ```python
+          response = supabase.auth.mfa.verify({
+            "factor_id": "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+            "challenge_id": "4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15",
+            "code": "123456"
           })
           ```
   - id: mfa-challenge-and-verify
@@ -1936,10 +1938,10 @@ functions:
         name: Create and verify a challenge for a factor
         isSpotlight: true
         code: |
-          ```
-          res = supabase.auth.mfa.challenge_and_verify({
-            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
-            "code": '123456'
+          ```python
+          response = supabase.auth.mfa.challenge_and_verify({
+            "factor_id": "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+            "code": "123456"
           })
           ```
   - id: mfa-unenroll
@@ -1949,9 +1951,9 @@ functions:
         name: Unenroll a factor
         isSpotlight: true
         code: |
-          ```
-          res = supabase.auth.mfa.unenroll({
-            "factor_id": '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          ```python
+          response = supabase.auth.mfa.unenroll({
+            "factor_id": "34e770dd-9ff9-416c-87fa-43b31d7ef225",
           })
           ```
   - id: mfa-get-authenticator-assurance-level
@@ -1965,8 +1967,8 @@ functions:
         name: Get the AAL details of a session
         isSpotlight: true
         code: |
-          ```
-          res = supabase.auth.mfa.get_authenticator_assurance_level()
+          ```python
+          response = supabase.auth.mfa.get_authenticator_assurance_level()
           ```
   - id: admin-api
     title: 'Overview'
@@ -2062,7 +2064,7 @@ functions:
         isOptional: true
         type: PageParams
         description: |
-          An object which supports page and perPage as numbers, to alter the paginated results.
+          An object which supports page and per_page as numbers, to alter the paginated results.
         subContent:
           - name: page
             isOptional: true
@@ -2089,7 +2091,7 @@ functions:
           ```python
           response = supabase.auth.admin.list_users(
             page=1,
-            perPage=1000
+            per_page=1000
           )
           ```
   - id: create-user
@@ -2688,7 +2690,7 @@ functions:
       To update the user's password, see [`update_user()`](/docs/reference/python/auth-updateuser).
       - When the user clicks the reset link in the email they are redirected back to your application.
       You can configure the URL that the user is redirected to with the `redirectTo` parameter.
-      See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      See [redirect URLs and wildcards](docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - After the user has been redirected successfully, prompt them for a new password and call `update_user()`:
       ```python
       response = supabase.auth.update_user({
@@ -2765,7 +2767,7 @@ functions:
       - id: selecting-specific-columns
         name: Selecting specific columns
         code: |
-          ```
+          ```python
           response = supabase.table("planets").select("name").execute()
           ```
         data:
@@ -3623,7 +3625,7 @@ functions:
         name: Delete records
         code: |
           ```python
-          response = supabase.table('countries').delete().eq('id', 1).execute()
+          response = supabase.table("countries").delete().eq("id", 1).execute()
           ```
         data:
           sql: |
@@ -3833,7 +3835,7 @@ functions:
         name: Call a read-only Postgres function
         code: |
           ```python
-          response = supabase.rpc('hello_world', get=True).execute()
+          response = supabase.rpc("hello_world", get=True).execute()
           ```
         data:
           sql: |
@@ -5863,6 +5865,7 @@ functions:
           ```
         data:
           sql: |
+            ```sql
             create table
               orchestral_sections (id int8 primary key, name text);
             create table
@@ -5882,6 +5885,7 @@ functions:
             values
               (1, 1, 'harp'),
               (2, 1, 'violin');
+            ```
         response: |
           ```json
           {
@@ -6495,14 +6499,14 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          channel = supabase.channel('room1')
+          channel = supabase.channel("room1")
 
           def on_subscribe(status, err):
             if status == RealtimeSubscribeStates.SUBSCRIBED:
               channel.track({ "online_at": datetime.datetime.now().isoformat() })
 
           def handle_presence_sync():
-            print('Synced presence state: ', channel.presence.state)
+            print("Synced presence state: ", channel.presence.state)
 
           channel.on_presence_sync(callback=handle_presence_sync).subscribe(on_subscribe)
           ```
@@ -6511,10 +6515,10 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          channel = supabase.channel('room1')
+          channel = supabase.channel("room1")
 
           def handle_presence_join(key, current_presence, new_presence):
-            print('Newly joined presences: ', new_presence)
+            print("Newly joined presences: ", new_presence)
 
           def on_subscribe(status, err):
             if status == RealtimeSubscribeStates.SUBSCRIBED:
@@ -6527,10 +6531,10 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          channel = supabase.channel('room1')
+          channel = supabase.channel("room1")
 
           def handle_presence_leave(key, current_presence, left_presence):
-            print('Newly left presences: ', left_presence)
+            print("Newly left presences: ", left_presence)
 
           def on_subscribe(status, err):
             if status == RealtimeSubscribeStates.SUBSCRIBED:
@@ -6545,7 +6549,7 @@ functions:
         code: |
           ```python
           supabase
-            .channel('room1')
+            .channel("room1")
             .on_postgres_changes("*", schema="*", callback=handle_record_updated)
             .subscribe()
           ```
@@ -6554,7 +6558,7 @@ functions:
         code: |
           ```python
           supabase
-            .channel('room1')
+            .channel("room1")
             .on_postgres_changes("*", schema="public", table="countries", callback=handle_record_updated)
             .subscribe()
           ```
@@ -6563,7 +6567,7 @@ functions:
         code: |
           ```python
           supabase
-            .channel('room1')
+            .channel("room1")
             .on_postgres_changes("INSERT", schema="public", table="countries", callback=handle_record_inserted)
             .subscribe()
           ```
@@ -6579,7 +6583,7 @@ functions:
         code: |
           ```python
           supabase
-            .channel('room1')
+            .channel("room1")
             .on_postgres_changes("UPDATE", schema="public", table="countries", callback=handle_record_updated)
             .subscribe()
           ```
@@ -6595,7 +6599,7 @@ functions:
         code: |
           ```python
           supabase
-            .channel('room1')
+            .channel("room1")
             .on_postgres_changes("DELETE", schema="public", table="countries", callback=handle_record_deleted)
             .subscribe()
           ```
@@ -6605,7 +6609,7 @@ functions:
         code: |
           ```python
           supabase
-            .channel('room1')
+            .channel("room1")
             .on_postgres_changes("INSERT", schema="public", table="countries", callback=handle_record_inserted)
             .on_postgres_changes("DELETE", schema="public", table="countries", callback=handle_record_deleted)
             .subscribe()
@@ -6618,7 +6622,7 @@ functions:
         code: |
           ```python
           supabase
-            .channel('room1')
+            .channel("room1")
             .on_postgres_changes("UPDATE", schema="public", table="countries", filter="id=eq.200", callback=handle_record_updated)
             .subscribe()
           ```
@@ -6632,7 +6636,7 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          channel = supabase.channel('room1')
+          channel = supabase.channel("room1")
 
           def on_subscribe(status, err):
             if status == RealtimeSubscribeStates.SUBSCRIBED:
@@ -6734,7 +6738,7 @@ functions:
         name: Get bucket
         code: |
           ```python
-          response = supabase.storage.get_bucket('avatars')
+          response = supabase.storage.get_bucket("avatars")
           ```
         response: |
           ```json
@@ -6787,7 +6791,7 @@ functions:
         name: Create bucket
         code: |
           ```python
-          response = supabase.storage.create_bucket('avatars',
+          response = supabase.storage.create_bucket("avatars",
             options={
               "public": False,
               "allowed_mime_types": ["image/png"],
@@ -6821,7 +6825,7 @@ functions:
         name: Empty bucket
         code: |
           ```python
-          response = supabase.storage.empty_bucket('avatars')
+          response = supabase.storage.empty_bucket("avatars")
           ```
         response: |
           ```json
@@ -6864,7 +6868,7 @@ functions:
         name: Update bucket
         code: |
           ```python
-          response = supabase.storage.update_bucket('avatars',
+          response = supabase.storage.update_bucket("avatars",
             options={
               "public": False,
               "allowed_mime_types": ["image/png"],
@@ -6898,7 +6902,7 @@ functions:
         name: Delete bucket
         code: |
           ```python
-          response = supabase.storage.delete_bucket('avatars')
+          response = supabase.storage.delete_bucket("avatars")
           ```
         response: |
           ```json
@@ -6948,7 +6952,7 @@ functions:
         name: Upload file using filepath
         code: |
           ```py
-          with open('./public/avatar1.png', 'rb') as f:
+          with open("./public/avatar1.png", "rb") as f:
             response = supabase.storage.from_("avatars").upload(
                 file=f,
                 path="public/avatar1.png",
@@ -7002,7 +7006,7 @@ functions:
         name: Update file
         code: |
           ```python
-          with open('./public/avatar1.png', 'rb') as f:
+          with open("./public/avatar1.png", "rb") as f:
             response = supabase.storage.from_("avatars").update(
                 file=f,
                 path="public/avatar1.png",
@@ -7094,7 +7098,7 @@ functions:
         isOptional: false
         type: list[string]
         description: |
-          The file paths to be downloaded, including the current file names. For example `['folder/image.png', 'folder2/image2.png']`.
+          The file paths to be downloaded, including the current file names. For example `["folder/image.png", "folder2/image2.png"]`.
       - name: expires_in
         isOptional: false
         type: number
@@ -7148,7 +7152,7 @@ functions:
         isOptional: false
         type: string
         description: |
-          The file path, including the file name. For example `'folder/image.png'`.
+          The file path, including the file name. For example `"folder/image.png"`.
       - name: expires_in
         isOptional: false
         type: number
@@ -7235,7 +7239,7 @@ functions:
         isOptional: false
         type: string
         description: |
-          The file path, including the current file name. For example `'folder/image.png'`.
+          The file path, including the current file name. For example `"folder/image.png"`.
     examples:
       - id: create-signed-url
         name: Create Signed URL
@@ -7477,13 +7481,13 @@ functions:
         isOptional: false
         type: list[string]
         description: |
-          An array of files to delete, including the path and file name. For example `['folder/image.png']`.
+          An array of files to delete, including the path and file name. For example `["folder/image.png"]`.
     examples:
       - id: delete-file
         name: Delete file
         code: |
           ```py
-          response = supabase.storage.from_('avatars').remove(['folder/avatar1.png'])
+          response = supabase.storage.from_("avatars").remove(["folder/avatar1.png"])
           ```
         response: |
           ```json
