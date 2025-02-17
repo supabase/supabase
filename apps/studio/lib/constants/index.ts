@@ -3,7 +3,7 @@
 export * from './infrastructure'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
-export const DEFAULT_HOME = IS_PLATFORM ? '/projects' : '/project/default'
+export const DEFAULT_HOME = IS_PLATFORM ? '/organizations' : '/project/default'
 
 // TODO: Replace PG_META_URL with STUDIO_PG_META_URL and remove all references to PLATFORM_PG_META_URL
 export const API_URL = IS_PLATFORM ? process.env.NEXT_PUBLIC_API_URL! : '/api'
@@ -31,11 +31,15 @@ export const USAGE_APPROACHING_THRESHOLD = 0.75
 
 export const LOCAL_STORAGE_KEYS = {
   AI_ASSISTANT_STATE: 'supabase-ai-assistant-state',
+  SIDEBAR_BEHAVIOUR: 'supabase-sidebar-behaviour',
 
   UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
+
+  UI_TABLE_EDITOR_TABS: 'supabase-ui-table-editor-tabs',
+  UI_SQL_EDITOR_TABS: 'supabase-ui-sql-editor-tabs',
 
   SQL_SCRATCH_PAD_BANNER_ACKNOWLEDGED: 'supabase-sql-scratch-pad-banner-acknowledged',
 
@@ -78,6 +82,7 @@ export const LOCAL_STORAGE_KEYS = {
   FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
 
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
+  STORAGE_BUCKETS_COLUMN_CONFIG: (ref: string) => `supabase-storage-buckets-columns-${ref}`,
 
   // api keys view switcher for new and legacy api keys
   API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,

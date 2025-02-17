@@ -2,6 +2,13 @@ import { QueryClient, useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstac
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
 import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
+import {
+  getRecentItemsStore,
+  RecentItem,
+  removeRecentItem,
+  removeRecentItems,
+} from 'state/recent-items'
+import { getTabsStore, removeTabs } from 'state/tabs'
 
 export type EntityTypesVariables = {
   projectRef?: string

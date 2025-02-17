@@ -1,19 +1,18 @@
-import { ChevronRight } from 'lucide-react'
-
 import { useParams } from 'common'
 import { ColumnList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
+import { ChevronRight } from 'lucide-react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const snap = useTableEditorStateSnapshot()
@@ -61,7 +60,7 @@ const DatabaseTables: NextPageWithLayout = () => {
 }
 
 DatabaseTables.getLayout = (page) => (
-  <DefaultLayout>
+  <DefaultLayout product="Tables">
     <DatabaseLayout title="Database">{page}</DatabaseLayout>
   </DefaultLayout>
 )

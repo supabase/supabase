@@ -23,6 +23,7 @@ test.describe('Table Editor page', () => {
 
     // The page has been loaded with the table data, we can now interact with the page
     await page.getByRole('button', { name: 'New table', exact: true }).click()
+
     await page.getByTestId('table-name-input').waitFor({ state: 'visible' })
     await page.getByTestId('table-name-input').click()
     await page.getByTestId('table-name-input').fill(tableName)
@@ -101,7 +102,7 @@ test.describe('Table Editor page', () => {
     await expect(rows.nth(1)).toContainText('2')
     await expect(rows.nth(2)).toContainText('100')
     // remove the sorting
-    await page.getByRole('button', { name: 'Sorted by 1 rule' }).click()
+    await page.getByTestId('table-editor-sort-button').click()
     await page.getByRole('dialog').getByRole('button').nth(1).click()
 
     // filter by a column

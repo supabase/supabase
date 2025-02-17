@@ -144,7 +144,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     </ThemeProvider>
                   </RouteValidationWrapper>
                 </TooltipProvider>
-
                 <PageTelemetry
                   API_URL={API_URL}
                   hasAcceptedConsent={hasAcceptedConsent}

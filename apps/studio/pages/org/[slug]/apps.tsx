@@ -1,4 +1,6 @@
 import { OAuthApps } from 'components/interfaces/Organization'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { Loading } from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -14,5 +16,9 @@ const OrgOAuthApps: NextPageWithLayout = () => {
   )
 }
 
-OrgOAuthApps.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+OrgOAuthApps.getLayout = (page) => (
+  <DefaultLayout>
+    <OrganizationLayout>{page}</OrganizationLayout>
+  </DefaultLayout>
+)
 export default OrgOAuthApps

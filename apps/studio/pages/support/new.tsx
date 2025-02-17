@@ -5,6 +5,8 @@ import SVG from 'react-inlinesvg'
 
 import Success from 'components/interfaces/Support/Success'
 import { SupportFormV2 } from 'components/interfaces/Support/SupportFormV2'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import CopyButton from 'components/ui/CopyButton'
 import InformationBox from 'components/ui/InformationBox'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
@@ -12,9 +14,10 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 import { toast } from 'sonner'
+import { NextPageWithLayout } from 'types'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-const SupportPage = () => {
+const SupportPage: NextPageWithLayout = () => {
   const [sentCategory, setSentCategory] = useState<string>()
   const [selectedProject, setSelectedProject] = useState<string>('no-project')
   const { data, isLoading } = usePlatformStatusQuery()
@@ -161,5 +164,11 @@ const SupportPage = () => {
     </div>
   )
 }
+
+SupportPage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout product="Support">{page}</DefaultLayout>
+  </AppLayout>
+)
 
 export default withAuth(SupportPage, { useHighestAAL: false })
