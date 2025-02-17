@@ -1,8 +1,9 @@
+import { PropsWithChildren } from 'react'
+
 import { useParams } from 'common'
 import { AppBannerWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { Sidebar } from 'components/interfaces/Sidebar'
-import { PropsWithChildren } from 'react'
 import { SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'

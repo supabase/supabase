@@ -1,11 +1,12 @@
-import { ProfileImage } from 'components/ui/ProfileImage'
-import { useSignOut } from 'lib/auth'
-import { IS_PLATFORM } from 'lib/constants'
-import { useProfile } from 'lib/profile'
 import { Command, FlaskConical, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+
+import { ProfileImage } from 'components/ui/ProfileImage'
+import { useSignOut } from 'lib/auth'
+import { IS_PLATFORM } from 'lib/constants'
+import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   DropdownMenu,

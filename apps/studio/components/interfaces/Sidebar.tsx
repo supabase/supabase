@@ -1,3 +1,10 @@
+import { AnimatePresence, motion, MotionProps } from 'framer-motion'
+import { isUndefined } from 'lodash'
+import { Blocks, Boxes, ChartArea, Command, PanelLeftDashed, Settings, Users } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ComponentProps, ComponentPropsWithoutRef, FC, useEffect } from 'react'
+
 import { useParams } from 'common'
 import {
   generateOtherRoutes,
@@ -7,17 +14,11 @@ import {
 } from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
-import { AnimatePresence, motion, MotionProps } from 'framer-motion'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { Home } from 'icons'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { isUndefined } from 'lodash'
-import { Blocks, Boxes, ChartArea, Command, PanelLeftDashed, Settings, Users } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -45,15 +46,15 @@ export const ICON_STROKE_WIDTH = 1.5
 export type SidebarBehaviourType = 'expandable' | 'open' | 'closed'
 export const DEFAULT_SIDEBAR_BEHAVIOR = 'expandable'
 
-const SidebarMotion = motion(SidebarPrimitive) as React.FC<
-  React.ComponentProps<typeof SidebarPrimitive> & {
+const SidebarMotion = motion(SidebarPrimitive) as FC<
+  ComponentProps<typeof SidebarPrimitive> & {
     transition?: MotionProps['transition']
   }
 >
 
-export interface SidebarProps extends React.ComponentPropsWithoutRef<typeof SidebarPrimitive> {}
+export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPrimitive> {}
 
-export function Sidebar({ className, ...props }: SidebarProps) {
+export const Sidebar = ({ className, ...props }: SidebarProps) => {
   const { setOpen } = useSidebar()
   const hideSideBar = useHideSidebar()
 
@@ -64,73 +65,59 @@ export function Sidebar({ className, ...props }: SidebarProps) {
 
   useEffect(() => {
     // logic to toggle sidebar open based on sidebarBehaviour state
-    if (sidebarBehaviour === 'open') {
-      setOpen(true)
-    }
-    if (sidebarBehaviour === 'closed') {
-      setOpen(false)
-    }
+    if (sidebarBehaviour === 'open') setOpen(true)
+    if (sidebarBehaviour === 'closed') setOpen(false)
   }, [sidebarBehaviour, setOpen])
 
   return (
-    <>
-      <AnimatePresence>
-        {!hideSideBar && (
-          <SidebarMotion
-            {...props}
-            transition={{
-              delay: 0.4,
-              duration: 0.4,
-            }}
-            overflowing={sidebarBehaviour === 'expandable'}
-            collapsible="icon"
-            variant="sidebar"
-            onMouseEnter={() => {
-              if (sidebarBehaviour === 'expandable') {
-                setOpen(true)
-              }
-            }}
-            onMouseLeave={() => {
-              if (sidebarBehaviour === 'expandable') {
-                setOpen(false)
-              }
-            }}
-          >
-            <SidebarContent
-              footer={
-                <div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        type="text"
-                        className="px-1.5 mx-0.5 group-data-[state=expanded]:px-2"
-                        icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
-                      ></Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="top" align="start" className="w-40">
-                      <DropdownMenuRadioGroup
-                        value={sidebarBehaviour}
-                        onValueChange={(value) =>
-                          setSidebarBehaviour(value as SidebarBehaviourType)
-                        }
-                      >
-                        <DropdownMenuLabel>Sidebar control</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuRadioItem value="open">Expanded</DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="closed">Collapsed</DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="expandable">
-                          Expand on hover
-                        </DropdownMenuRadioItem>
-                      </DropdownMenuRadioGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              }
-            />
-          </SidebarMotion>
-        )}
-      </AnimatePresence>
-    </>
+    <AnimatePresence>
+      {!hideSideBar && (
+        <SidebarMotion
+          {...props}
+          transition={{
+            delay: 0.4,
+            duration: 0.4,
+          }}
+          overflowing={sidebarBehaviour === 'expandable'}
+          collapsible="icon"
+          variant="sidebar"
+          onMouseEnter={() => {
+            if (sidebarBehaviour === 'expandable') setOpen(true)
+          }}
+          onMouseLeave={() => {
+            if (sidebarBehaviour === 'expandable') setOpen(false)
+          }}
+        >
+          <SidebarContent
+            footer={
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="text"
+                    className="w-min px-1.5 mx-0.5 group-data-[state=expanded]:px-2"
+                    icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" align="start" className="w-40">
+                  <DropdownMenuRadioGroup
+                    value={sidebarBehaviour}
+                    onValueChange={(value) => setSidebarBehaviour(value as SidebarBehaviourType)}
+                  >
+                    <DropdownMenuLabel>Sidebar control</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuRadioItem value="open">Expanded</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="closed">Collapsed</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="expandable">
+                      Expand on hover
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            }
+          />
+        </SidebarMotion>
+      )}
+    </AnimatePresence>
   )
 }
 
@@ -171,9 +158,9 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
       <SidebarFooter>
         <SidebarMenu className="group-data-[state=expanded]:p-0">
           <SidebarGroup className="p-0 gap-0.5">
-            {settingsRoutes.map((route, i) => (
+            {settingsRoutes.map((route) => (
               <NavLink
-                key={`settings-routes-${i}`}
+                key={`settings-routes-${route.key}`}
                 route={route}
                 active={activeRoute === route.key}
               />
@@ -278,38 +265,37 @@ function ProjectLinks() {
   // const settingsRoutes = generateSettingsRoutes(ref, project)
 
   return (
-    <>
-      <SidebarMenu className="">
-        <SidebarGroup className="gap-0.5">
-          <NavLink
-            key="home"
-            active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
-            route={{
-              key: 'HOME',
-              label: 'Project overview',
-              icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-              link: `/project/${ref}`,
-              linkElement: <ProjectIndexPageLink projectRef={ref} />,
-            }}
-          />
-          {toolRoutes.map((route, i) => (
-            <NavLink key={`tools-routes-${i}`} route={route} active={activeRoute === route.key} />
-          ))}
-        </SidebarGroup>
-        <Separator className="w-[calc(100%-1rem)] mx-auto" />
-        <SidebarGroup className="gap-0.5">
-          {productRoutes.map((route, i) => (
-            <NavLink key={`product-routes-${i}`} route={route} active={activeRoute === route.key} />
-          ))}
-        </SidebarGroup>
-        <Separator className="w-[calc(100%-1rem)] mx-auto" />
-        <SidebarGroup className="gap-0.5">
-          {otherRoutes.map((route, i) => (
-            <NavLink key={`other-routes-${i}`} route={route} active={activeRoute === route.key} />
-          ))}
-        </SidebarGroup>
-        {/* Settings routes to be added in with project/org nav */}
-        {/* <SidebarGroup className="gap-0.5">
+    <SidebarMenu>
+      <SidebarGroup className="gap-0.5">
+        <NavLink
+          key="home"
+          active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
+          route={{
+            key: 'HOME',
+            label: 'Project overview',
+            icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: `/project/${ref}`,
+            linkElement: <ProjectIndexPageLink projectRef={ref} />,
+          }}
+        />
+        {toolRoutes.map((route, i) => (
+          <NavLink key={`tools-routes-${i}`} route={route} active={activeRoute === route.key} />
+        ))}
+      </SidebarGroup>
+      <Separator className="w-[calc(100%-1rem)] mx-auto" />
+      <SidebarGroup className="gap-0.5">
+        {productRoutes.map((route, i) => (
+          <NavLink key={`product-routes-${i}`} route={route} active={activeRoute === route.key} />
+        ))}
+      </SidebarGroup>
+      <Separator className="w-[calc(100%-1rem)] mx-auto" />
+      <SidebarGroup className="gap-0.5">
+        {otherRoutes.map((route, i) => (
+          <NavLink key={`other-routes-${i}`} route={route} active={activeRoute === route.key} />
+        ))}
+      </SidebarGroup>
+      {/* Settings routes to be added in with project/org nav */}
+      {/* <SidebarGroup className="gap-0.5">
           {settingsRoutes.map((route, i) => (
             <NavLink
               key={`settings-routes-${i}`}
@@ -318,11 +304,11 @@ function ProjectLinks() {
             />
           ))}
         </SidebarGroup> */}
-      </SidebarMenu>
-    </>
+    </SidebarMenu>
   )
 }
 
+// Not currently used, will be part of org layout PR
 const OrganizationLinks = () => {
   const router = useRouter()
   const { slug } = useParams()
