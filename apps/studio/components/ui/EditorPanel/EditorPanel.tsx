@@ -189,6 +189,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
           <ButtonTooltip
             tooltip={{
               content: {
+                side: 'bottom',
                 text: 'Save as snippet',
               },
             }}
