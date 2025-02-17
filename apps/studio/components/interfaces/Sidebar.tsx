@@ -38,6 +38,7 @@ import {
   useSidebar,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
+import { UserDropdown } from './UserDropdown'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -58,7 +59,6 @@ export interface SidebarProps extends React.ComponentPropsWithoutRef<typeof Side
 export function Sidebar({ className, ...props }: SidebarProps) {
   const { setOpen } = useSidebar()
   const hideSideBar = useHideSidebar()
-  // const { sidebarBehaviour, setSidebarBehaviour } = useAppStateSnapshot()
 
   const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,

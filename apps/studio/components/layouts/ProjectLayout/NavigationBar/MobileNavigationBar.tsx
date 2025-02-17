@@ -5,7 +5,6 @@ import { Menu, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import { buttonVariants, cn } from 'ui'
 import { CommandMenuTrigger } from 'ui-patterns'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
@@ -17,7 +16,6 @@ const MobileNavigationBar = () => {
   const router = useRouter()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const { ref: projectRef } = useParams()
-  const snap = useAppStateSnapshot()
 
   return (
     <div className="h-14 w-full flex flex-row md:hidden">
@@ -64,7 +62,6 @@ const MobileNavigationBar = () => {
               buttonVariants({ type: 'default' }),
               'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30'
             )}
-            onClick={() => snap.setMobileMenuOpen(true)}
           >
             <Menu size={18} strokeWidth={1} />
           </button>

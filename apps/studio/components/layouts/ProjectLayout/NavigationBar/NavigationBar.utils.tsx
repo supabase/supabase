@@ -1,3 +1,4 @@
+import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
 import { generateAuthMenu } from 'components/layouts/AuthLayout/AuthLayout.utils'
 import { generateDatabaseMenu } from 'components/layouts/DatabaseLayout/DatabaseMenu.utils'
 import { generateSettingsMenu } from 'components/layouts/ProjectSettingsLayout/SettingsMenu.utils'
@@ -16,7 +17,6 @@ import {
 } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
-import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
 
 export const generateToolRoutes = (
   ref?: string,
@@ -61,7 +61,7 @@ export const generateProductRoutes = (
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
 
-  const databaseMenu = generateDatabaseMenu(ref as string)
+  const databaseMenu = generateDatabaseMenu(project)
   const authMenu = generateAuthMenu(ref as string)
 
   return [
