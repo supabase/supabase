@@ -8,7 +8,7 @@ interface PopUpProps extends PropsWithChildren {
   contentContainerClassName?: string
 }
 
-const InfoPopUp = ({
+const InfoTooltip = ({
   children,
   className,
   tooltipContent,
@@ -32,4 +32,4 @@ const InfoPopUp = ({
   )
 }
 
-export default InfoPopUp
+export default InfoTooltip
