@@ -30,8 +30,6 @@ export const STRIPE_PUBLIC_KEY =
 export const USAGE_APPROACHING_THRESHOLD = 0.75
 
 export const LOCAL_STORAGE_KEYS = {
-  RECENTLY_VISITED_ORGANIZATION: 'supabase-organization',
-
   AI_ASSISTANT_STATE: 'supabase-ai-assistant-state',
 
   UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
@@ -77,7 +75,7 @@ export const LOCAL_STORAGE_KEYS = {
   EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
-  AUTH_SMTP_CHANGES_WARNING: 'auth-smtp-changes-warning-dismissed',
+  FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
 
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
 

@@ -1,4 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { partition } from 'lodash'
+import { Filter, Plus } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useState } from 'react'
+
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
@@ -15,10 +20,6 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
-import { partition } from 'lodash'
-import { Filter, Plus } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   AlertDescription_Shadcn_,
@@ -123,7 +124,7 @@ const TableEditorMenu = () => {
             onSelectSchema={(name: string) => {
               setSearchText('')
               setSelectedSchema(name)
-              router.push(`/project/${project?.ref}/editor`)
+              router.push(`/project/${project?.ref}/editor?schema=${name}`)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
           />
