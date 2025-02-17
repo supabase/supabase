@@ -1310,7 +1310,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets the Stripe customer */
+    /** Gets the Billing customer */
     get: operations['CustomerController_getCustomer']
     /** Updates the billing customer */
     put: operations['updateCustomerV2']
@@ -1660,7 +1660,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets the given organization's roles */
-    get: operations['OrganizationRolesController_getAllRolesV2']
+    get: operations['OrganizationRolesController_getAllRoles']
     put?: never
     post?: never
     delete?: never
@@ -2674,6 +2674,24 @@ export interface paths {
     patch: operations['PostgrestConfigController_updatePostgRESTConfig']
     trace?: never
   }
+  '/platform/projects/{ref}/config/realtime': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets realtime configuration */
+    get: operations['RealtimeConfigController_getConfig']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Updates realtime configuration */
+    patch: operations['RealtimeConfigController_updateConfig']
+    trace?: never
+  }
   '/platform/projects/{ref}/config/secrets': {
     parameters: {
       query?: never
@@ -3311,6 +3329,197 @@ export interface paths {
      * @deprecated
      */
     get: operations['PropsSettingsController_getProjectApi']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/pipelines': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets replication pipelines */
+    get: operations['ReplicationPipelinesController_getPipelines']
+    put?: never
+    /** Creates a pipeline */
+    post: operations['ReplicationPipelinesController_createPipeline']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Deletes a pipeline */
+    delete: operations['ReplicationPipelinesController_deletePipeline']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/start': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Starts a pipeline */
+    post: operations['ReplicationPipelinesController_startPipeline']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets status of a pipeline */
+    get: operations['ReplicationPipelinesController_getPipelineStatus']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/stop': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Stops a pipeline */
+    post: operations['ReplicationPipelinesController_stopPipeline']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/sinks': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets replication sinks */
+    get: operations['ReplicationSinksController_getSinks']
+    put?: never
+    /** Creates a sink */
+    post: operations['ReplicationSinksController_createSink']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/sinks/{sink_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Deletes a sink */
+    delete: operations['ReplicationSinksController_deleteSink']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/sources': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Returns replication sources. */
+    get: operations['ReplicationSourcesController_getSources']
+    put?: never
+    /** Creates a replication source. */
+    post: operations['ReplicationSourcesController_createSource']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/sources/{source_id}/publications': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Returns source publications. */
+    get: operations['ReplicationSourcesController_getPublications']
+    put?: never
+    /** Creates a publication. */
+    post: operations['ReplicationSourcesController_createPublication']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/sources/{source_id}/publications/{publication_name}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Deletes a publication. */
+    delete: operations['ReplicationSourcesController_deletePublication']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/sources/{source_id}/tables': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Returns source tables. */
+    get: operations['ReplicationSourcesController_getTables']
     put?: never
     post?: never
     delete?: never
@@ -4400,7 +4609,11 @@ export interface paths {
      * @description Returns all functions you've previously added to the specified project.
      */
     get: operations['v1-list-all-functions']
-    put?: never
+    /**
+     * Bulk update functions
+     * @description Bulk update functions. It will create a new function or replace existing. The operation is idempotent. NOTE: You will need to manually bump the version.
+     */
+    put: operations['v1-bulk-update-functions']
     /**
      * Create a function
      * @description Creates a function and adds it to the specified project.
@@ -4485,6 +4698,57 @@ export interface paths {
     /** Updates a project's health status. */
     put: operations['HealthReportingController_updateStatus']
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/system/projects/{ref}/pause': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Pauses a project */
+    post: operations['SystemProjectPauseController_pauseProject']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/system/projects/{ref}/pause/validate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Validates if a project can be paused */
+    get: operations['SystemProjectPauseController_validatePauseProject']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/system/projects/{ref}/restart': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Restart project database [System API] */
+    post: operations['SystemRestartController_restartProject']
     delete?: never
     options?: never
     head?: never
@@ -5183,7 +5447,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets the given organization's roles */
-    get: operations['OrganizationRolesController_getAllRolesV2']
+    get: operations['OrganizationRolesController_getAllRoles']
     put?: never
     post?: never
     delete?: never
@@ -5998,6 +6262,24 @@ export interface paths {
     head?: never
     /** Updates project's postgrest config */
     patch: operations['PostgrestConfigController_updatePostgRESTConfig']
+    trace?: never
+  }
+  '/v0/projects/{ref}/config/realtime': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets realtime configuration */
+    get: operations['RealtimeConfigController_getConfig']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Updates realtime configuration */
+    patch: operations['RealtimeConfigController_updateConfig']
     trace?: never
   }
   '/v0/projects/{ref}/config/secrets': {
@@ -7374,7 +7656,11 @@ export interface paths {
      * @description Returns all functions you've previously added to the specified project.
      */
     get: operations['v1-list-all-functions']
-    put?: never
+    /**
+     * Bulk update functions
+     * @description Bulk update functions. It will create a new function or replace existing. The operation is idempotent. NOTE: You will need to manually bump the version.
+     */
+    put: operations['v1-bulk-update-functions']
     /**
      * Create a function
      * @description Creates a function and adds it to the specified project.
@@ -8255,7 +8541,7 @@ export interface components {
       walg_enabled: boolean
     }
     BillingCustomerUpdateBody: {
-      additional_emails?: string[] | undefined
+      additional_emails: string[]
       address?: components['schemas']['CustomerBillingAddress']
     }
     /** @enum {string} */
@@ -8342,6 +8628,23 @@ export interface components {
     Buffer: Record<string, never>
     BulkDeleteUserContentResponse: {
       id: string
+    }
+    BulkUpdateFunctionBody: {
+      /** Format: int64 */
+      created_at?: number
+      entrypoint_path?: string
+      id: string
+      import_map?: boolean
+      import_map_path?: string
+      name: string
+      slug: string
+      /** @enum {string} */
+      status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+      verify_jwt?: boolean
+      version: number
+    }
+    BulkUpdateFunctionResponse: {
+      functions: components['schemas']['FunctionResponse'][]
     }
     CfResponse: {
       errors: Record<string, never>[]
@@ -8546,6 +8849,9 @@ export interface components {
     CreateOrganizationV1Dto: {
       name: string
     }
+    CreatePipelineResponse: {
+      id: number
+    }
     CreatePolicyBody: {
       /** @enum {string} */
       action?: 'PERMISSIVE' | 'RESTRICTIVE'
@@ -8627,6 +8933,40 @@ export interface components {
       publish_update?: boolean
       tables?: string[] | null
     }
+    CreateReplicationPipelineBody: {
+      /** @description Pipeline config */
+      config: {
+        config: {
+          max_fill_secs: number
+          max_size: number
+        }
+      }
+      /** @description Publication name */
+      publication_name: string
+      /** @description Sink id */
+      sink_id: number
+      /** @description Source id */
+      source_id: number
+    }
+    CreateReplicationPublicationBody: {
+      /** @description Publication name */
+      name: string
+      /** @description Publication tables */
+      tables: {
+        name: string
+        schema: string
+      }[]
+    }
+    CreateReplicationSinkBody: {
+      /** @description BigQuery dataset id */
+      dataset_id: string
+      /** @description BigQuery project id */
+      project_id: string
+      /** @description BigQuery service account key */
+      service_account_key: string
+      /** @description Sink name */
+      sink_name: string
+    }
     CreateSchemaBody: {
       name: string
       owner: string
@@ -8638,6 +8978,12 @@ export interface components {
        */
       name: string
       value: string
+    }
+    CreateSinkResponse: {
+      id: number
+    }
+    CreateSourceResponse: {
+      id: number
     }
     CreateStorageBucketBody: {
       allowed_mime_types: string[]
@@ -8945,6 +9291,23 @@ export interface components {
     DeleteVercelConnectionResponse: {
       id: string
     }
+    DeployFunctionResponse: {
+      compute_multiplier?: number
+      /** Format: int64 */
+      created_at?: number
+      entrypoint_path?: string
+      id: string
+      import_map?: boolean
+      import_map_path?: string
+      name: string
+      slug: string
+      /** @enum {string} */
+      status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+      /** Format: int64 */
+      updated_at?: number
+      verify_jwt?: boolean
+      version: number
+    }
     /**
      * @description Desired instance size, will use default size if not defined. Paid Plans only.
      * @enum {string}
@@ -9118,14 +9481,15 @@ export interface components {
       query: string
     }
     FunctionDeployBody: {
-      file: Record<string, never>[]
-      metadata: {
-        entrypoint_path?: string
-        import_map_path?: string
-        name?: string
-        static_patterns?: string[]
-        verify_jwt?: boolean
-      }
+      file: string[]
+      metadata: components['schemas']['FunctionDeployMetadata']
+    }
+    FunctionDeployMetadata: {
+      entrypoint_path: string
+      import_map_path?: string
+      name?: string
+      static_patterns?: string[]
+      verify_jwt?: boolean
     }
     FunctionResponse: {
       compute_multiplier?: number
@@ -10071,6 +10435,9 @@ export interface components {
         score?: number
       }
     }
+    PauseProjectResponseDto: {
+      message: string
+    }
     PauseStatusResponse: {
       can_restore: boolean
       latest_downloadable_backup_id: number | null
@@ -10436,7 +10803,7 @@ export interface components {
     }
     ProjectAvailableRestoreVersion: {
       /** @enum {string} */
-      postgres_engine: '13' | '14' | '15' | '17-oriole'
+      postgres_engine: '13' | '14' | '15' | '17' | '17-oriole'
       /** @enum {string} */
       release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       version: string
@@ -10659,7 +11026,7 @@ export interface components {
     }
     ProjectUnpauseVersionInfo: {
       /** @enum {string} */
-      postgres_engine: '13' | '14' | '15' | '17-oriole'
+      postgres_engine: '13' | '14' | '15' | '17' | '17-oriole'
       /** @enum {string} */
       release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       version: string
@@ -10721,6 +11088,22 @@ export interface components {
       override_active_until: string
       override_enabled: boolean
     }
+    RealtimeConfigResponseDto: {
+      /** @description Sets connection pool size for Realtime Authorization */
+      connection_pool: number | null
+      /** @description Sets maximum number of bytes per second rate per channel limit */
+      max_bytes_per_second: number | null
+      /** @description Sets maximum number of channels per client rate limit */
+      max_channels_per_client: number | null
+      /** @description Sets maximum number of concurrent users rate limit */
+      max_concurrent_users: number | null
+      /** @description Sets maximum number of events per second rate per channel limit */
+      max_events_per_second: number | null
+      /** @description Sets maximum number of joins per second rate limit */
+      max_joins_per_second: number | null
+      /** @description Whether to only allow private channels */
+      private_only: boolean | null
+    }
     RealtimeHealthResponse: {
       connected_cluster: number
     }
@@ -10741,6 +11124,73 @@ export interface components {
     }
     RemoveReadReplicaBody: {
       database_identifier: string
+    }
+    ReplicationPipelinesResponse: {
+      pipelines: {
+        config: {
+          config: {
+            max_fill_secs: number
+            max_size: number
+          }
+        }
+        id: number
+        publication_name: string
+        replicator_id: number
+        sink_id: number
+        sink_name: string
+        source_id: number
+        source_name: string
+        tenant_id: string
+      }[]
+    }
+    ReplicationPipelinesStatusResponse: {
+      pipeline_id: number
+      status: string
+    }
+    ReplicationPublicationsResponse: {
+      publications: {
+        name: string
+        tables: {
+          name: string
+          schema: string
+        }[]
+      }[]
+    }
+    ReplicationSinksResponse: {
+      sinks: {
+        config: {
+          big_query: {
+            dataset_id: string
+            project_id: string
+            service_account_key: string
+          }
+        }
+        id: number
+        name: string
+        tenant_id: string
+      }[]
+    }
+    ReplicationSourcesResponse: {
+      sources: {
+        config: {
+          postgres: {
+            host: string
+            name: string
+            port: number
+            slot_name: string
+            username: string
+          }
+        }
+        id: number
+        name: string
+        tenant_id: string
+      }[]
+    }
+    ReplicationTablesResponse: {
+      tables: {
+        name: string
+        schema: string
+      }[]
     }
     ReportStatusBody: {
       databaseIdentifier: string
@@ -10849,7 +11299,7 @@ export interface components {
        */
       supabase_org_id: string
     }
-    RestartProjectInfo: {
+    RestartProjectBodyDto: {
       database_identifier?: string
     }
     RestartServiceRequest: {
@@ -11935,6 +12385,7 @@ export interface components {
       ids: string[]
     }
     UpdateOrganizationBodyDto: {
+      additional_billing_emails?: string[]
       /** Format: email */
       billing_email?: string
       name?: string
@@ -12041,6 +12492,22 @@ export interface components {
       publish_truncate?: boolean
       publish_update?: boolean
       tables?: string[] | null
+    }
+    UpdateRealtimeConfigBodyDto: {
+      /** @description Sets connection pool size for Realtime Authorization */
+      connection_pool?: number
+      /** @description Sets maximum number of bytes per second rate per channel limit */
+      max_bytes_per_second?: number
+      /** @description Sets maximum number of channels per client rate limit */
+      max_channels_per_client?: number
+      /** @description Sets maximum number of concurrent users rate limit */
+      max_concurrent_users?: number
+      /** @description Sets maximum number of events per second rate per channel limit */
+      max_events_per_second?: number
+      /** @description Sets maximum number of joins per second rate limit */
+      max_joins_per_second?: number
+      /** @description Whether to only allow private channels */
+      private_only?: boolean
     }
     UpdateRestrictionsBody: {
       no_notification?: boolean
@@ -12542,6 +13009,9 @@ export interface components {
     ValidateEmailBodyDto: {
       /** Format: email */
       email: string
+    }
+    ValidatePauseProjectResponseDto: {
+      message: string
     }
     ValidateQueryBody: {
       query: string
@@ -15386,7 +15856,7 @@ export interface operations {
           'application/json': components['schemas']['CustomerResponse']
         }
       }
-      /** @description Failed to retrieve the Stripe customer */
+      /** @description Failed to retrieve the Billing customer */
       500: {
         headers: {
           [name: string]: unknown
@@ -16296,7 +16766,7 @@ export interface operations {
       }
     }
   }
-  OrganizationRolesController_getAllRolesV2: {
+  OrganizationRolesController_getAllRoles: {
     parameters: {
       query?: never
       header?: never
@@ -19991,6 +20461,59 @@ export interface operations {
       }
     }
   }
+  RealtimeConfigController_getConfig: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Gets project's realtime configuration */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RealtimeConfigResponseDto']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  RealtimeConfigController_updateConfig: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateRealtimeConfigBodyDto']
+      }
+    }
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   SecretsConfigController_updateConfig: {
     parameters: {
       query?: never
@@ -21056,15 +21579,12 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
+      path?: never
       cookie?: never
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['RestartProjectInfo']
+        'application/json': components['schemas']['RestartProjectBodyDto']
       }
     }
     responses: {
@@ -21533,6 +22053,540 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's settings */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_getPipelines: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationPipelinesResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get replication pipeline */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_createPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationPipelineBody']
+      }
+    }
+    responses: {
+      /** @description Returns the created replication pipeline id. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreatePipelineResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create pipeline */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_deletePipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        pipeline_id: number
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete pipeline */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_startPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        pipeline_id: number
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to start pipeline */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_getPipelineStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        pipeline_id: number
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationPipelinesStatusResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get pipeline status */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_stopPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        pipeline_id: number
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to stop pipeline */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSinksController_getSinks: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationSinksResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get replication sinks */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSinksController_createSink: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationSinkBody']
+      }
+    }
+    responses: {
+      /** @description Returns the created replication sink id. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateSinkResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create sink */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSinksController_deleteSink: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+        sink_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete sink */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSourcesController_getSources: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returns all sources. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationSourcesResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to get replication sources. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSourcesController_createSource: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returns the created replication source id. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateSourceResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to create the replication source. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSourcesController_getPublications: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+        source_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returns all publications. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationPublicationsResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to get source publications. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSourcesController_createPublication: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+        source_id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationPublicationBody']
+      }
+    }
+    responses: {
+      /** @description Returned when the publication is created. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to create the publication. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSourcesController_deletePublication: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        publication_name: string
+        ref: string
+        source_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returned when the publication is deleted. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to delete the publication. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSourcesController_getTables: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+        source_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returns all tables. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationTablesResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to get source tables. */
       500: {
         headers: {
           [name: string]: unknown
@@ -23860,6 +24914,45 @@ export interface operations {
       }
     }
   }
+  'v1-bulk-update-functions': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BulkUpdateFunctionBody'][]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BulkUpdateFunctionResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update functions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-create-a-function': {
     parameters: {
       query?: {
@@ -24016,6 +25109,7 @@ export interface operations {
   'v1-deploy-a-function': {
     parameters: {
       query?: {
+        bundleOnly?: boolean
         slug?: string
       }
       header?: never
@@ -24036,7 +25130,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['FunctionResponse']
+          'application/json': components['schemas']['DeployFunctionResponse']
         }
       }
       403: {
@@ -24109,6 +25203,71 @@ export interface operations {
       }
       /** @description Failed to update health status. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SystemProjectPauseController_pauseProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Project paused successfully */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PauseProjectResponseDto']
+        }
+      }
+    }
+  }
+  SystemProjectPauseController_validatePauseProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ValidatePauseProjectResponseDto']
+        }
+      }
+      /** @description Project can be paused */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ValidatePauseProjectResponseDto']
+        }
+      }
+    }
+  }
+  SystemRestartController_restartProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
         headers: {
           [name: string]: unknown
         }
@@ -25746,7 +26905,7 @@ export interface operations {
       }
     }
   }
-  OrganizationRolesController_getAllRolesV2: {
+  OrganizationRolesController_getAllRoles: {
     parameters: {
       query?: never
       header?: never
@@ -28910,6 +30069,59 @@ export interface operations {
       }
     }
   }
+  RealtimeConfigController_getConfig: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Gets project's realtime configuration */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RealtimeConfigResponseDto']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  RealtimeConfigController_updateConfig: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateRealtimeConfigBodyDto']
+      }
+    }
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   SecretsConfigController_updateConfig: {
     parameters: {
       query?: never
@@ -29738,15 +30950,12 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
+      path?: never
       cookie?: never
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['RestartProjectInfo']
+        'application/json': components['schemas']['RestartProjectBodyDto']
       }
     }
     responses: {
@@ -32430,6 +33639,45 @@ export interface operations {
       }
     }
   }
+  'v1-bulk-update-functions': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BulkUpdateFunctionBody'][]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BulkUpdateFunctionResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update functions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-create-a-function': {
     parameters: {
       query?: {
@@ -32638,6 +33886,7 @@ export interface operations {
   'v1-deploy-a-function': {
     parameters: {
       query?: {
+        bundleOnly?: boolean
         slug?: string
       }
       header?: never
@@ -32658,7 +33907,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['FunctionResponse']
+          'application/json': components['schemas']['DeployFunctionResponse']
         }
       }
       403: {
