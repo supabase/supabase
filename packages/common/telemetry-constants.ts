@@ -72,6 +72,7 @@ export enum TelemetryActions {
   SQL_EDITOR_QUERY_RUN_BUTTON_CLICKED = 'sql_editor_query_run_button_clicked',
   STUDIO_PRICING_PLAN_CTA_CLICKED = 'studio_pricing_plan_cta_clicked',
   STUDIO_PRICING_SIDE_PANEL_OPENED = 'studio_pricing_side_panel_opened',
+  STUDIO_REPORTS_DATABASE_GRAFANA_BANNER_CLICKED = 'studio_reports_database_grafana_banner_clicked',
 }
 
 /**
@@ -1080,6 +1081,21 @@ export interface StudioPricingSidePanelOpenedEvent {
   groups: { organization: string }
 }
 
+/**
+ * User clicks on grafana banner in studio Reports page.
+ *
+ * @group Events
+ * @source studio
+ * @page /reports/database
+ */
+export interface StudioReportsDatabaseGrafanaBannerClickedEvent {
+  action: TelemetryActions.STUDIO_REPORTS_DATABASE_GRAFANA_BANNER_CLICKED
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
@@ -1141,3 +1157,4 @@ export type TelemetryEvent =
   | SqlEditorQueryRunButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
+  | StudioReportsDatabaseGrafanaBannerClickedEvent
