@@ -1,14 +1,14 @@
 import { useParams } from 'common'
-import { Button, Dialog, DialogContent, DialogSection, DialogTrigger } from 'ui'
+import { AiIconAnimation, Button, Dialog, DialogContent, DialogSection, DialogTrigger } from 'ui'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 import { ChevronDown, Terminal, Code } from 'lucide-react'
+import { useRouter } from 'next/router'
 
 import {
   EdgeFunctionsListItem,
   FunctionsEmptyState,
   TerminalInstructions,
 } from 'components/interfaces/Functions'
-import EdgeFunctionPanel from 'components/interfaces/Functions/EdgeFunctionPanel'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageContainer, PageLayout } from 'components/layouts/PageLayout'
@@ -18,11 +18,13 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import type { NextPageWithLayout } from 'types'
 import { DocsButton } from 'components/ui/DocsButton'
-import { useState } from 'react'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useAppStateSnapshot } from 'state/app-state'
 
 const FunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const [showCreatePanel, setShowCreatePanel] = useState(false)
+  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const router = useRouter()
   const {
     data: functions,
     error,
@@ -43,7 +45,7 @@ const FunctionsPage: NextPageWithLayout = () => {
       <DropdownMenuContent align="end" className="w-80">
         <Dialog>
           <DialogTrigger asChild>
-            <DropdownMenuItem className="gap-4">
+            <DropdownMenuItem className="gap-4" onSelect={(e) => e.preventDefault()}>
               <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
               <div>
                 <span className="text-foreground">Via CLI</span>
@@ -59,7 +61,10 @@ const FunctionsPage: NextPageWithLayout = () => {
             </DialogSection>
           </DialogContent>
         </Dialog>
-        <DropdownMenuItem onSelect={() => setShowCreatePanel(true)} className="gap-4">
+        <DropdownMenuItem
+          onSelect={() => router.push(`/project/${ref}/functions/new`)}
+          className="gap-4"
+        >
           <Code className="shrink-0" size={16} strokeWidth={1.5} />
           <div>
             <span className="text-foreground">Via Editor</span>
@@ -74,6 +79,32 @@ const FunctionsPage: NextPageWithLayout = () => {
 
   const secondaryActions = [
     <DocsButton key="docs" href="https://supabase.com/docs/guides/functions" />,
+    <ButtonTooltip
+      type="default"
+      className="px-1 pointer-events-auto"
+      icon={<AiIconAnimation size={16} />}
+      onClick={() =>
+        setAiAssistantPanel({
+          open: true,
+          initialInput: `Create a new edge function that ...`,
+          suggestions: {
+            title:
+              'I can help you create a new edge function. Here are a few example prompts to get you started:',
+            prompts: [
+              'Create a new edge function that processes payments with Stripe',
+              'Create a new edge function that sends emails with Resend',
+              'Create a new edge function that generates PDFs from HTML templates',
+            ],
+          },
+        })
+      }
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: 'Create with Supabase Assistant',
+        },
+      }}
+    />,
   ]
 
   return (
@@ -122,8 +153,6 @@ const FunctionsPage: NextPageWithLayout = () => {
             )}
           </>
         )}
-
-        <EdgeFunctionPanel visible={showCreatePanel} onClose={() => setShowCreatePanel(false)} />
       </PageContainer>
     </PageLayout>
   )

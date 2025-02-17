@@ -28,30 +28,77 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     )
 
     // Get auth headers from the request to forward them
-    const headers = await constructHeaders(incomingHeaders)
-    const requestHeaders = {
+    const constructedHeaders = await constructHeaders(incomingHeaders)
+
+    // Convert Headers object to plain object
+    const headers: Record<string, string> = {}
+    if (constructedHeaders instanceof Headers) {
+      constructedHeaders.forEach((value, key) => {
+        headers[key] = value
+      })
+    } else {
+      Object.entries(constructedHeaders).forEach(([key, value]) => {
+        if (typeof value === 'string') headers[key] = value
+      })
+    }
+
+    // Remove any undefined or null values from custom headers
+    const sanitizedCustomHeaders = Object.entries(customHeaders || {}).reduce(
+      (acc, [key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          acc[key] = value as string
+        }
+        return acc
+      },
+      {} as Record<string, string>
+    )
+
+    const requestHeaders: Record<string, string> = {
       ...headers,
       'Content-Type': 'application/json',
-      ...customHeaders,
+      ...sanitizedCustomHeaders,
     }
 
     // Use the test authorization header if provided, otherwise use the default authorization
-    if (customHeaders['x-test-authorization']) {
-      requestHeaders['Authorization'] = customHeaders['x-test-authorization']
+    if (sanitizedCustomHeaders['x-test-authorization']) {
+      requestHeaders['Authorization'] = sanitizedCustomHeaders['x-test-authorization']
+      // Remove the x-test-authorization header as we've moved it to Authorization
+      delete requestHeaders['x-test-authorization']
       console.log('Using test authorization header')
     }
 
     console.log('Forwarding request with headers:', requestHeaders)
 
+    // The URL already includes query parameters from the frontend
     const response = await fetch(url, {
       method,
       headers: requestHeaders,
-      body: method !== 'GET' && method !== 'HEAD' ? body : undefined,
+      body: method !== 'GET' && method !== 'HEAD' ? JSON.stringify(body) : undefined,
     })
 
+    // Handle non-JSON responses
+    let responseBody: string
+    const contentType = response.headers.get('content-type')
+    if (contentType?.includes('application/json')) {
+      // If JSON, parse and stringify to ensure it's valid JSON
+      const jsonBody = await response.json()
+      responseBody = JSON.stringify(jsonBody)
+    } else {
+      // For non-JSON responses, get raw text
+      responseBody = await response.text()
+    }
+
     if (!response.ok) {
-      const error = await response.json()
-      return handleError(error)
+      // Try to parse error response if it's JSON
+      try {
+        const errorBody = JSON.parse(responseBody)
+        return handleError(errorBody)
+      } catch {
+        // If not JSON, return the raw error
+        return res.status(response.status).json({
+          error: { message: responseBody || 'Edge function returned an error' },
+        })
+      }
     }
 
     console.log('Edge function response status:', response.status)
@@ -60,8 +107,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     response.headers.forEach((value, key) => {
       responseHeaders[key] = value
     })
-
-    const responseBody = await response.text()
 
     console.log('Edge function response:', {
       status: response.status,
@@ -81,7 +126,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       cause: error.cause,
     })
     return res.status(500).json({
-      error: error.message || 'Failed to test edge function',
+      error: { message: error.message || 'Failed to test edge function' },
     })
   }
 }

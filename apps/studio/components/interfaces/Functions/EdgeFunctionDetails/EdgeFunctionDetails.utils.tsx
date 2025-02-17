@@ -21,7 +21,7 @@ export const generateCLICommands = ({
           </>
         )
       },
-      comment: 'Deploy a new version',
+      comment: '2. Make a change and deploy it',
     },
     {
       command: `supabase functions delete ${selectedFunction?.slug}`,
@@ -34,7 +34,7 @@ export const generateCLICommands = ({
           </>
         )
       },
-      comment: 'Delete the function',
+      comment: '3. Delete the function if needed',
     },
   ]
 

@@ -20,6 +20,8 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
   const { project } = useProjectContext()
   const [isCopied, setIsCopied] = useState(false)
 
+  console.log(item)
+
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
 
   // get the .co or .net TLD from the restUrl

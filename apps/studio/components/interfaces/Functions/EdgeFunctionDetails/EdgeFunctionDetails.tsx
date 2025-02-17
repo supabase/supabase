@@ -28,6 +28,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  CodeBlock,
   CriticalIcon,
   Form_Shadcn_,
   Input,
@@ -129,7 +130,7 @@ const EdgeFunctionDetails = () => {
     <>
       <SectionHeader title="Function Configuration" />
       <div className="mx-auto flex flex-col xl:flex-row gap-8">
-        <div className="flex-1 space-y-6">
+        <div className="flex-1 min-w-0 overflow-hidden">
           <Form_Shadcn_ {...form}>
             <form onSubmit={form.handleSubmit(onUpdateFunction)}>
               <Card>
@@ -180,35 +181,68 @@ const EdgeFunctionDetails = () => {
             </form>
           </Form_Shadcn_>
 
-          <div
-            className="space-y-6 rounded border bg-surface-100 px-6 py-4 drop-shadow-sm transition-all overflow-hidden"
-            style={{ maxHeight: showInstructions ? 800 : 66 }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded border bg-foreground p-2 text-background">
-                  <Terminal size={18} strokeWidth={2} />
+          <SectionHeader title="Invoke function" />
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Invoke via cURL</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <CodeBlock
+                    language="bash"
+                    className="text-xs !mt-0 border-none"
+                    value={`curl -L -X POST '${functionUrl}' \\
+  -H 'Authorization: Bearer ${apiKey}' \\
+  -H 'Content-Type: application/json' \\
+  --data '{"name":"Functions"}'`}
+                  />
                 </div>
-                <h4>Command line access</h4>
-              </div>
-              <div
-                className="cursor-pointer"
-                onClick={() => setShowInstructions(!showInstructions)}
-              >
-                {showInstructions ? (
-                  <Minimize2 size={14} strokeWidth={1.5} />
-                ) : (
-                  <Maximize2 size={14} strokeWidth={1.5} />
-                )}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
-            <h5 className="text-base">Deployment management</h5>
-            <CommandRender commands={managementCommands} />
-            <h5 className="text-base">Invoke </h5>
-            <CommandRender commands={invokeCommands} />
-            <h5 className="text-base">Secrets management</h5>
-            <CommandRender commands={secretCommands} />
+            <Card>
+              <CardHeader>
+                <CardTitle>Invoke via supabase-js</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <CodeBlock
+                    language="js"
+                    hideLineNumbers
+                    className="text-xs !mt-0 border-none"
+                    value={`import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
+const { data, error } = await supabase.functions.invoke('${selectedFunction?.name}', {
+  body: { name: 'Functions' },
+})`}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <SectionHeader title="Develop locally" />
+          <div className="rounded border bg-surface-100 px-6 py-4 drop-shadow-sm">
+            <div className="space-y-6">
+              <CommandRender
+                commands={[
+                  {
+                    command: `supabase functions download ${selectedFunction?.slug}`,
+                    description: 'Download the function to your local machine',
+                    jsx: () => (
+                      <>
+                        <span className="text-brand-600">supabase</span> functions download{' '}
+                        {selectedFunction?.slug}
+                      </>
+                    ),
+                    comment: '1. Download the function',
+                  },
+                ]}
+              />
+              <CommandRender commands={[managementCommands[0]]} />
+              <CommandRender commands={[managementCommands[1]]} />
+            </div>
           </div>
 
           <div className="!mt-8">
@@ -234,13 +268,13 @@ const EdgeFunctionDetails = () => {
           </div>
         </div>
 
-        <div className="flex-1 max-w-xl">
+        <div className="w-full xl:max-w-[600px] shrink-0">
           <Card>
             <CardHeader>
               <CardTitle>Details</CardTitle>
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
-              <dl className="grid grid-cols-1 xl:grid-cols-[12rem_1fr] gap-y-6">
+              <dl className="grid grid-cols-1 xl:grid-cols-[auto_1fr] gap-y-6 gap-x-10">
                 <dt className="text-sm text-foreground-light">Slug</dt>
                 <dd className="text-sm lg:text-left">{selectedFunction?.slug}</dd>
 

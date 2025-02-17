@@ -21,77 +21,27 @@ import FunctionsNav from '../../interfaces/Functions/FunctionsNav'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { PageLayout } from 'components/layouts/PageLayout'
 import EdgeFunctionsLayout from '../EdgeFunctionsLayout/EdgeFunctionsLayout'
-import EdgeFunctionTester from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTester'
+import EdgeFunctionTesterSheet from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
 
 interface FunctionsLayoutProps {
   title?: string
-}
-
-const InvokePopover = ({
-  functionName,
-  url,
-  apiKey,
-}: {
-  functionName: string
-  url: string
-  apiKey: string
-}) => {
-  return (
-    <Popover_Shadcn_>
-      <PopoverTrigger_Shadcn_ asChild>
-        <Button type="default" icon={<Terminal size={16} />}>
-          Invoke
-        </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ align="end" className="w-xl w-full max-w-[500px] space-y-4">
-        <div>
-          <h4 className="text-sm mb-2">Invoke via CLI</h4>
-          <CodeBlock
-            language="bash"
-            className="text-xs !mt-0"
-            value={`curl -L -X POST '${url}' \\
-  -H 'Authorization: Bearer ${apiKey}' \\
-  -H 'Content-Type: application/json' \\
-  --data '{"name":"Functions"}'`}
-          />
-        </div>
-        <div>
-          <h4 className="text-sm mb-2">Invoke via supabase-js</h4>
-          <CodeBlock
-            language="js"
-            hideLineNumbers
-            className="text-xs !mt-0 leading-3"
-            value={`import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
-const { data, error } = await supabase.functions.invoke('${functionName}', {
-  body: { name: 'Functions' },
-})`}
-          />
-        </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
-  )
 }
 
 const TestPopover = ({ url, apiKey }: { url: string; apiKey: string }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
-        <Button type="default" size="tiny" icon={<Send size={16} />}>
-          Test
-        </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[500px]" align="end">
-        <div className="space-y-4">
-          <div>
-            <p className="text-sm mb-4">Send test requests to your edge function</p>
-            <EdgeFunctionTester url={url} anonKey={apiKey} />
-          </div>
-        </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+    <>
+      <Button type="default" size="tiny" icon={<Send size={16} />} onClick={() => setIsOpen(true)}>
+        Test
+      </Button>
+      <EdgeFunctionTesterSheet
+        visible={isOpen}
+        onClose={() => setIsOpen(false)}
+        url={url}
+        apiKey={apiKey}
+      />
+    </>
   )
 }
 
@@ -170,6 +120,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
   return (
     <EdgeFunctionsLayout>
       <PageLayout
+        isCompact
         size="full"
         title={functionSlug ? name : 'Edge Functions'}
         subtitle={
@@ -191,7 +142,6 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
             <DocsButton href="https://supabase.com/docs/guides/functions" />
             {functionSlug && (
               <>
-                <InvokePopover functionName={functionSlug} url={functionUrl} apiKey={apiKey} />
                 <TestPopover url={functionUrl} apiKey={apiKey} />
               </>
             )}
