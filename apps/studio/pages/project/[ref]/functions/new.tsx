@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { CornerDownLeft, Loader2, Book, Check, ChevronsUpDown } from 'lucide-react'
+import { CornerDownLeft, Loader2, Book, Check, ChevronsUpDown, Plus, File } from 'lucide-react'
 import { Button, Input_Shadcn_, Label_Shadcn_, cn } from 'ui'
 import { AiIconAnimation } from 'ui'
 import AIEditor from 'components/ui/AIEditor'
@@ -25,6 +25,9 @@ import {
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  TreeView,
+  TreeViewItem,
+  flattenTree,
 } from 'ui'
 import { BreadcrumbSeparator } from 'ui/src/components/shadcn/ui/breadcrumb'
 
@@ -127,6 +130,47 @@ app.listen(8000);`,
   },
 ]
 
+interface TreeNode {
+  id: string
+  name: string
+  metadata?: {
+    isEditing?: boolean
+    originalId: number
+  }
+  children?: TreeNode[]
+}
+
+interface TreeNodeRendererProps {
+  element: TreeNode
+  isBranch: boolean
+  isExpanded: boolean
+  isSelected: boolean
+  level: number
+  getNodeProps: () => React.HTMLAttributes<HTMLDivElement>
+}
+
+const getLanguageFromFileName = (fileName: string): string => {
+  const extension = fileName.split('.').pop()?.toLowerCase()
+  switch (extension) {
+    case 'ts':
+    case 'tsx':
+      return 'typescript'
+    case 'js':
+    case 'jsx':
+      return 'javascript'
+    case 'json':
+      return 'json'
+    case 'html':
+      return 'html'
+    case 'css':
+      return 'css'
+    case 'md':
+      return 'markdown'
+    default:
+      return 'typescript' // Default to typescript
+  }
+}
+
 const NewFunctionPage = () => {
   const router = useRouter()
   const { ref } = useParams()
@@ -135,8 +179,11 @@ const NewFunctionPage = () => {
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
   const { setAiAssistantPanel } = useAppStateSnapshot()
 
-  const [currentValue, setCurrentValue] =
-    useState(`// Setup type definitions for built-in Supabase Runtime APIs
+  const [files, setFiles] = useState<{ id: number; name: string; content: string }[]>([
+    {
+      id: 1,
+      name: 'index.ts',
+      content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 console.info('server started');
@@ -150,7 +197,10 @@ Deno.serve(async (req: Request) => {
     JSON.stringify(data),
     { headers: { 'Content-Type': 'application/json', 'Connection': 'keep-alive' }}
   );
-});`)
+});`,
+    },
+  ])
+  const [selectedFileId, setSelectedFileId] = useState<number>(1)
   const [functionName, setFunctionName] = useState('')
   const [open, setOpen] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState('')
@@ -167,11 +217,13 @@ Deno.serve(async (req: Request) => {
   })
 
   const handleChange = (value: string) => {
-    setCurrentValue(value)
+    setFiles((prev) =>
+      prev.map((file) => (file.id === selectedFileId ? { ...file, content: value } : file))
+    )
   }
 
   const onDeploy = async () => {
-    if (!currentValue || isDeploying || !ref || !functionName) return
+    if (isDeploying || !ref || !functionName) return
 
     try {
       await deployFunction({
@@ -181,7 +233,7 @@ Deno.serve(async (req: Request) => {
           name: functionName,
           verify_jwt: true,
         },
-        files: [{ name: 'index.ts', content: currentValue }],
+        files: files.map(({ name, content }) => ({ name, content })),
       })
     } catch (error) {
       toast.error(
@@ -191,9 +243,10 @@ Deno.serve(async (req: Request) => {
   }
 
   const handleChat = () => {
+    const currentFile = files.find((f) => f.id === selectedFileId)
     setAiAssistantPanel({
       open: true,
-      sqlSnippets: currentValue ? [currentValue] : [],
+      sqlSnippets: currentFile ? [currentFile.content] : [],
       initialInput: 'Help me understand and improve this edge function...',
       suggestions: {
         title:
@@ -211,7 +264,11 @@ Deno.serve(async (req: Request) => {
   const onSelectTemplate = (templateValue: string) => {
     const template = EDGE_FUNCTION_TEMPLATES.find((t) => t.value === templateValue)
     if (template) {
-      setCurrentValue(template.content)
+      setFiles((prev) =>
+        prev.map((file) =>
+          file.id === selectedFileId ? { ...file, content: template.content } : file
+        )
+      )
       setSelectedTemplate(templateValue)
       setOpen(false)
     }
@@ -219,16 +276,58 @@ Deno.serve(async (req: Request) => {
 
   const handleTemplateMouseEnter = (content: string) => {
     if (!isPreviewingTemplate) {
-      setSavedCode(currentValue)
+      const currentFile = files.find((f) => f.id === selectedFileId)
+      setSavedCode(currentFile?.content || '')
     }
     setIsPreviewingTemplate(true)
-    setCurrentValue(content)
+    setFiles((prev) =>
+      prev.map((file) => (file.id === selectedFileId ? { ...file, content } : file))
+    )
   }
 
   const handleTemplateMouseLeave = () => {
     if (isPreviewingTemplate) {
       setIsPreviewingTemplate(false)
-      setCurrentValue(savedCode)
+      setFiles((prev) =>
+        prev.map((file) => (file.id === selectedFileId ? { ...file, content: savedCode } : file))
+      )
+    }
+  }
+
+  const addNewFile = () => {
+    const newId = Math.max(...files.map((f) => f.id)) + 1
+    setFiles((prev) => [
+      ...prev,
+      {
+        id: newId,
+        name: `file${newId}.ts`,
+        content: '',
+      },
+    ])
+    setSelectedFileId(newId)
+  }
+
+  const treeData = {
+    name: '',
+    children: files.map((file) => ({
+      id: file.id.toString(),
+      name: file.name,
+      metadata: {
+        isEditing: false,
+        originalId: file.id,
+      },
+    })),
+  }
+
+  const handleFileNameChange = (id: number, newName: string) => {
+    if (!newName.trim()) return // Don't allow empty names
+    setFiles((prev) => prev.map((file) => (file.id === id ? { ...file, name: newName } : file)))
+  }
+
+  const handleDoubleClick = (id: number, currentName: string) => {
+    const newName = prompt('Enter new file name:', currentName)
+    if (newName && newName !== currentName) {
+      handleFileNameChange(id, newName)
     }
   }
 
@@ -321,11 +420,61 @@ Deno.serve(async (req: Request) => {
         </>
       }
     >
-      <div className="flex-1 overflow-hidden flex flex-col h-full">
+      <div className="flex-1 overflow-hidden flex h-full">
+        <div className="w-64 border-r bg-surface-200 flex flex-col">
+          <div className="p-4 border-b flex items-center justify-between">
+            <h3 className="text-sm font-medium">Files</h3>
+            <Button size="tiny" type="default" icon={<Plus size={14} />} onClick={addNewFile}>
+              Add File
+            </Button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-2">
+            <TreeView
+              data={flattenTree(treeData)}
+              aria-label="files tree"
+              nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level }) => {
+                const nodeProps = getNodeProps()
+                const originalId =
+                  typeof element.metadata?.originalId === 'number'
+                    ? element.metadata.originalId
+                    : null
+
+                return (
+                  <div
+                    onDoubleClick={(e) => {
+                      e.stopPropagation()
+                      if (originalId !== null) handleDoubleClick(originalId, element.name)
+                    }}
+                  >
+                    <TreeViewItem
+                      {...nodeProps}
+                      isExpanded={isExpanded}
+                      isBranch={isBranch}
+                      isSelected={originalId === selectedFileId}
+                      level={level}
+                      xPadding={16}
+                      name={element.name}
+                      icon={<File size={14} className="text-foreground-light" />}
+                      isEditing={Boolean(element.metadata?.isEditing)}
+                      onEditSubmit={(value) => {
+                        if (originalId !== null) handleFileNameChange(originalId, value)
+                      }}
+                      onClick={() => {
+                        if (originalId !== null) setSelectedFileId(originalId)
+                      }}
+                    />
+                  </div>
+                )
+              }}
+            />
+          </div>
+        </div>
         <div className="flex-1 min-h-0 relative px-3 bg-surface-200">
           <AIEditor
-            language="typescript"
-            value={currentValue}
+            language={getLanguageFromFileName(
+              files.find((f) => f.id === selectedFileId)?.name || 'index.ts'
+            )}
+            value={files.find((f) => f.id === selectedFileId)?.content}
             onChange={handleChange}
             aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
             aiMetadata={{
@@ -345,32 +494,32 @@ Deno.serve(async (req: Request) => {
             }}
           />
         </div>
+      </div>
 
-        <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100">
-          <Button
-            loading={isDeploying}
-            size="medium"
-            disabled={!functionName || !currentValue}
-            onClick={onDeploy}
-            iconRight={
-              isDeploying ? (
-                <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-              ) : (
-                <div className="flex items-center space-x-1">
-                  <CornerDownLeft size={10} strokeWidth={1.5} />
-                </div>
-              )
-            }
-          >
-            Deploy function
-          </Button>
-        </div>
+      <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100">
+        <Button
+          loading={isDeploying}
+          size="medium"
+          disabled={!functionName || files.length === 0}
+          onClick={onDeploy}
+          iconRight={
+            isDeploying ? (
+              <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
+            ) : (
+              <div className="flex items-center space-x-1">
+                <CornerDownLeft size={10} strokeWidth={1.5} />
+              </div>
+            )
+          }
+        >
+          Deploy function
+        </Button>
       </div>
     </PageLayout>
   )
 }
 
-NewFunctionPage.getLayout = (page) => {
+NewFunctionPage.getLayout = (page: React.ReactNode) => {
   return (
     <DefaultLayout>
       <EdgeFunctionsLayout>{page}</EdgeFunctionsLayout>
