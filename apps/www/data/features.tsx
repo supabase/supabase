@@ -1550,7 +1550,7 @@ By utilizing the Supabase Management API, you can create more efficient, scalabl
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '/images/features/management-api.png',
     heroImageLight: '/images/features/management-api-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/project-management/api',
+    docsUrl: 'https://supabase.com/docs/reference/api/introduction',
     slug: 'management-api',
     status: {
       stage: PRODUCT_STAGES.GA,
