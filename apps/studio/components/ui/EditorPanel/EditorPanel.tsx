@@ -387,7 +387,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
             </div>
           </div>
         )}
-        <div className="z-10 bg-surface-100 flex items-center gap-2 !justify-between px-5 py-4 w-full border-t shrink-0">
+        <div className="bg-surface-100 flex items-center gap-2 !justify-between px-5 py-4 w-full border-t shrink-0">
           <Button
             size="tiny"
             type="default"
