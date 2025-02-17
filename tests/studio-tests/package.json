@@ -17,12 +17,7 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.49.0",
-    "lodash": "^4.17.21"
-  },
-  "dependencies": {
-    "dotenv": "^16.4.7",
-    "playwright-extra": "^4.3.6",
-    "puppeteer-extra": "^3.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
+    "lodash": "^4.17.21",
+    "dotenv": "^16.4.7"
   }
 }
