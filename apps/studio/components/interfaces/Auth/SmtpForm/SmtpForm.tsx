@@ -346,6 +346,7 @@ const SmtpForm = () => {
                         icon={hidden ? <Eye /> : <EyeOff />}
                         type="default"
                         onClick={() => setHidden(!hidden)}
+                        className={authConfig?.SMTP_PASS !== null ? 'hidden' : ''}
                       />
                     }
                     disabled={!canUpdateConfig}
