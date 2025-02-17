@@ -33,23 +33,24 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   }, [router, setLastLogsPage])
 
   if (!canUseLogsExplorer) {
-  if (isLoading) {
-    return <ProjectLayout isLoading></ProjectLayout>
-  }
+    if (isLoading) {
+      return <ProjectLayout isLoading></ProjectLayout>
+    }
 
-  if (!isLoading && !canUseLogsExplorer) {
+    if (!isLoading && !canUseLogsExplorer) {
+      return (
+        <ProjectLayout>
+          <NoPermission isFullPage resourceText="access your project's logs" />
+        </ProjectLayout>
+      )
+    }
+
     return (
-      <ProjectLayout>
-        <NoPermission isFullPage resourceText="access your project's logs" />
+      <ProjectLayout title={title} product="Logs & Analytics" productMenu={<LogsSidebarMenuV2 />}>
+        {children}
       </ProjectLayout>
     )
   }
-
-  return (
-    <ProjectLayout title={title} product="Logs & Analytics" productMenu={<LogsSidebarMenuV2 />}>
-      {children}
-    </ProjectLayout>
-  )
 }
 
 export default withAuth(LogsLayout)
