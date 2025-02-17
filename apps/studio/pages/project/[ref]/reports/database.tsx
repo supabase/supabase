@@ -5,7 +5,7 @@ import { ArrowRight, BookOpen, ExternalLink, Info, RefreshCw } from 'lucide-reac
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Image, cn } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 
 import { useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
@@ -32,6 +32,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import Image from 'next/image'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -149,13 +150,16 @@ const DatabaseUsage = () => {
       <Alert_Shadcn_ className="relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src={{
-              dark: '/img/reports/bg-grafana-dark.svg',
-              light: '/img/reports/bg-grafana-light.svg',
-            }}
+            src="/img/reports/bg-grafana-dark.svg"
             alt="Supabase Grafana"
             fill
-            className="w-full h-full object-cover object-right"
+            className="w-full h-full object-cover object-right hidden dark:block"
+          />
+          <Image
+            src="/img/reports/bg-grafana-light.svg"
+            alt="Supabase Grafana"
+            fill
+            className="w-full h-full object-cover object-right dark:hidden"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background-alternative to-transparent" />
         </div>
