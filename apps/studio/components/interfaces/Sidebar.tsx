@@ -10,13 +10,14 @@ import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { Home } from 'icons'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { isUndefined } from 'lodash'
 import { Blocks, Boxes, ChartArea, Command, PanelLeftDashed, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { useAppStateSnapshot, type SidebarBehaviourType } from 'state/app-state'
 import {
   Button,
   DropdownMenu,
@@ -38,8 +39,6 @@ import {
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
 import { UserDropdown } from './UserDropdown'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -57,7 +56,6 @@ export interface SidebarProps extends React.ComponentPropsWithoutRef<typeof Side
 export function Sidebar({ className, ...props }: SidebarProps) {
   const { setOpen } = useSidebar()
   const hideSideBar = useHideSidebar()
-  // const { sidebarBehaviour, setSidebarBehaviour } = useAppStateSnapshot()
 
   const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
