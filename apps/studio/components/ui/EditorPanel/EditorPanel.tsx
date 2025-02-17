@@ -1,3 +1,8 @@
+import { debounce } from 'lodash'
+import { Book, CornerDownLeft, Loader2, Save, X } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
 import {
   createSqlSnippetSkeletonV2,
@@ -11,10 +16,6 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { debounce } from 'lodash'
-import { Book, CornerDownLeft, Loader2, Save, X } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { AiIconAnimation, Button, cn, Input_Shadcn_, SQL_ICON } from 'ui'
