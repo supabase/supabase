@@ -13,7 +13,6 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { debounce } from 'lodash'
 import { Book, CornerDownLeft, Loader2, Save, X } from 'lucide-react'
-import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -23,6 +22,7 @@ import { Admonition } from 'ui-patterns'
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
+import { InlineLink } from '../InlineLink'
 
 interface EditorPanelProps {
   onChange?: (value: string) => void
@@ -218,9 +218,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
                 toast.success(
                   <div>
                     Saved snippet! View it{' '}
-                    <Link href={`/project/${ref}/sql/${snippet.id}`} className="underline">
-                      here
-                    </Link>
+                    <InlineLink href={`/project/${ref}/sql/${snippet.id}`}>here</InlineLink>
                   </div>
                 )
               } catch (error: any) {
