@@ -3,10 +3,12 @@ import { useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
 
 import { useParams } from 'common'
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Connect from 'components/interfaces/Connect/Connect'
 import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
 import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
+import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
 import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
@@ -21,8 +23,6 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
-import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger">
@@ -105,26 +105,27 @@ const LayoutHeader = ({
       <div className="relative flex flex-1 overflow-hidden">
         <div className="flex w-full items-center justify-between py-2 pl-1 pr-3 md:px-3 flex-nowrap overflow-x-auto no-scrollbar">
           <div className="flex items-center text-sm">
-            {projectRef && (
-              <Link
-                href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
-                className="mx-1 hidden md:flex items-center w-[40px] h-[40px]"
-              >
-                <img
-                  alt="Supabase"
-                  src={`${router.basePath}/img/supabase-logo.svg`}
-                  className="absolute h-[40px] w-6 cursor-pointer rounded"
-                />
-              </Link>
+            <Link
+              href={IS_PLATFORM ? '/projects' : `/project/default`}
+              className="mx-1 hidden md:flex items-center w-[40px] h-[40px]"
+            >
+              <img
+                alt="Supabase"
+                src={`${router.basePath}/img/supabase-logo.svg`}
+                className="absolute h-[40px] w-6 cursor-pointer rounded"
+              />
+            </Link>
+
+            {!IS_PLATFORM && (
+              <div className="ml-3 text-xs text-foreground-light">Default project</div>
             )}
 
-            {projectRef && (
+            {projectRef && IS_PLATFORM && (
               <>
                 <div className="flex items-center">
                   <OrganizationDropdown />
                   <LayoutHeaderDivider />
                   <ProjectDropdown />
-
                   {exceedingLimits && (
                     <div className="ml-2">
                       <Link href={`/org/${selectedOrganization?.slug}/usage`}>
@@ -132,7 +133,6 @@ const LayoutHeader = ({
                       </Link>
                     </div>
                   )}
-
                   {selectedProject && isBranchingEnabled && (
                     <>
                       <LayoutHeaderDivider />
@@ -147,7 +147,6 @@ const LayoutHeader = ({
                 </div>
               </>
             )}
-
             {/* Additional breadcrumbs are supplied */}
             <BreadcrumbsView defaultValue={breadcrumbs} />
           </div>

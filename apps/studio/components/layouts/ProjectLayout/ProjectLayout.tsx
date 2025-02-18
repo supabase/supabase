@@ -25,7 +25,6 @@ import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
-import { ProjectContextProvider } from './ProjectContext'
 import { ResizingState } from './ResizingState'
 import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
@@ -63,8 +62,6 @@ export interface ProjectLayoutProps {
   isBlocking?: boolean
   product?: string
   productMenu?: ReactNode
-  hideHeader?: boolean
-  hideIconBar?: boolean
   selectedTable?: string
   resizableSidebar?: boolean
 }
@@ -78,8 +75,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       product = '',
       productMenu,
       children,
-      hideHeader = false,
-      hideIconBar = false,
       selectedTable,
       resizableSidebar = false,
     },
@@ -87,7 +82,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
   ) => {
     const router = useRouter()
     const [isClient, setIsClient] = useState(false)
-    const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
     const {
