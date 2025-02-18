@@ -246,6 +246,3 @@ export default {
   remove,
   zod: pgRoleZod,
 }
-
-export type { RoleIdentifier }
-export { getIdentifierWhereClause }
