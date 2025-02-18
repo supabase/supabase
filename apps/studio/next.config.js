@@ -65,7 +65,7 @@ const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_UR
 const FRAME_SRC_URLS = `${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL}`
 const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL} ${GITHUB_USER_AVATAR_URL} ${GOOGLE_USER_AVATAR_URL} ${SUPABASE_ASSETS_URL}`
 const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${SUPABASE_ASSETS_URL}`
-const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
+const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${SUPABASE_ASSETS_URL}`
 
 const csp = [
   ...(process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' ||
@@ -506,14 +506,6 @@ const nextConfig = {
       },
       {
         source: '/img/:slug*',
-        headers: [{ key: 'cache-control', value: 'public, max-age=2592000' }],
-      },
-      {
-        source: '/css/fonts.css',
-        headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
-      },
-      {
-        source: '/fonts/:slug*',
         headers: [{ key: 'cache-control', value: 'public, max-age=2592000' }],
       },
       {
