@@ -16,6 +16,11 @@ import {
 import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import type { Provider } from './AuthProvidersForm.types'
 import ProviderForm from './ProviderForm'
+import {
+  ScaffoldSection,
+  ScaffoldSectionDescription,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 
 export const AuthProvidersForm = () => {
   const { ref: projectRef } = useParams()
@@ -28,11 +33,11 @@ export const AuthProvidersForm = () => {
   } = useAuthConfigQuery({ projectRef })
 
   return (
-    <div>
-      <SectionHeader
-        title="Auth Providers"
-        subtitle="Authenticate your users through a suite of providers and login methods"
-      />
+    <ScaffoldSection isFullWidth>
+      <ScaffoldSectionTitle>Auth Providers</ScaffoldSectionTitle>
+      <ScaffoldSectionDescription className="mb-4">
+        Authenticate your users through a suite of providers and login methods
+      </ScaffoldSectionDescription>
 
       <div className="-space-y-px">
         {authConfig?.EXTERNAL_EMAIL_ENABLED && authConfig?.MAILER_OTP_EXP > 3600 && (
@@ -102,6 +107,6 @@ export const AuthProvidersForm = () => {
           )}
         </ResourceList>
       </div>
-    </div>
+    </ScaffoldSection>
   )
 }

@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useRouter } from 'next/router'
 import { Fragment, ReactNode } from 'react'
 import { cn } from 'ui'
 import {
@@ -36,14 +37,17 @@ export const PageHeader = ({
 }: PageHeaderProps) => {
   const { ref } = useParams()
 
+  const displayBreadcrumbs = isCompact && title ? [...breadcrumbs, { label: title }] : breadcrumbs
+
   return (
     <div className={cn('space-y-4', className)}>
-      {(breadcrumbs.length > 0 || (isCompact && (title || primaryActions || secondaryActions))) && (
+      {(displayBreadcrumbs.length > 0 ||
+        (isCompact && (title || primaryActions || secondaryActions))) && (
         <div className={cn('flex items-center gap-4', isCompact ? 'justify-between' : 'mb-4')}>
-          {breadcrumbs.length > 0 ? (
+          {displayBreadcrumbs.length > 0 ? (
             <Breadcrumb className={cn('text-foreground-muted', isCompact && 'text-base')}>
               <BreadcrumbList className={isCompact ? 'text-base' : 'text-xs'}>
-                {breadcrumbs.map((item, index) => (
+                {displayBreadcrumbs.map((item, index) => (
                   <Fragment key={item.label}>
                     <BreadcrumbItem>
                       {item.href ? (
@@ -54,7 +58,7 @@ export const PageHeader = ({
                         <BreadcrumbPageItem>{item.label}</BreadcrumbPageItem>
                       )}
                     </BreadcrumbItem>
-                    {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+                    {index < displayBreadcrumbs.length - 1 && <BreadcrumbSeparator />}
                   </Fragment>
                 ))}
               </BreadcrumbList>
