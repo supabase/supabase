@@ -1,12 +1,13 @@
 import Editor, { DiffEditor, Monaco, OnMount } from '@monaco-editor/react'
+import { useCompletion } from 'ai/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Command } from 'lucide-react'
-import { useRef, useState, useEffect, useCallback } from 'react'
 import { editor as monacoEditor } from 'monaco-editor'
-import { useCompletion } from 'ai/react'
-import { detectOS } from 'lib/helpers'
-import { constructHeaders } from 'data/fetchers'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+
+import { constructHeaders } from 'data/fetchers'
+import { detectOS } from 'lib/helpers'
 import ResizableAIWidget from './ResizableAIWidget'
 
 interface AIEditorProps {
@@ -14,7 +15,6 @@ interface AIEditorProps {
   language?: string
   value?: string
   defaultValue?: string
-  onChange?: (value: string) => void
   aiEndpoint?: string
   aiMetadata?: {
     projectRef?: string
@@ -25,23 +25,33 @@ interface AIEditorProps {
   readOnly?: boolean
   className?: string
   options?: monacoEditor.IStandaloneEditorConstructionOptions
+  onChange?: (value: string) => void
+  executeQuery?: () => void
 }
 
+// [Joshen] This has overlap with components/interfaces/SQLEditor/MonacoEditor
+// Can we try to de-dupe accordingly? Perhaps the SQL Editor could use this AIEditor
+// We have a tendency to create multiple versions of the monaco editor like RLSCodeEditor
+// so hoping to prevent that from snowballing
 const AIEditor = ({
   language = 'javascript',
   value,
   defaultValue = '',
-  onChange,
   aiEndpoint,
   aiMetadata,
   initialPrompt,
   readOnly = false,
   className = '',
   options = {},
+  onChange,
+  executeQuery,
 }: AIEditorProps) => {
   const os = detectOS()
   const editorRef = useRef<monacoEditor.IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<monacoEditor.IStandaloneDiffEditor | null>(null)
+
+  const executeQueryRef = useRef(executeQuery)
+  executeQueryRef.current = executeQuery
 
   const [currentValue, setCurrentValue] = useState(value || defaultValue)
   const [isDiffMode, setIsDiffMode] = useState(false)
@@ -56,16 +66,6 @@ const AIEditor = ({
     endLineNumber: 0,
   })
   const [promptInput, setPromptInput] = useState(initialPrompt || '')
-
-  useEffect(() => {
-    setCurrentValue(value || defaultValue)
-  }, [value, defaultValue])
-
-  useEffect(() => {
-    if (!isDiffMode) {
-      setIsDiffEditorMounted(false)
-    }
-  }, [isDiffMode])
 
   const {
     complete,
@@ -82,20 +82,6 @@ const AIEditor = ({
       toast.error(`Failed to generate: ${error.message}`)
     },
   })
-
-  useEffect(() => {
-    if (!completion) {
-      setIsDiffMode(false)
-      return
-    }
-
-    const original =
-      promptState.beforeSelection + promptState.selection + promptState.afterSelection
-    const modified = promptState.beforeSelection + completion + promptState.afterSelection
-
-    setDiffValue({ original, modified })
-    setIsDiffMode(true)
-  }, [completion, promptState.beforeSelection, promptState.selection, promptState.afterSelection])
 
   const handleReset = useCallback(() => {
     setCompletion('')
@@ -118,25 +104,7 @@ const AIEditor = ({
     handleReset()
   }
 
-  useEffect(() => {
-    const handleKeyboard = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        handleReset()
-      } else if (
-        event.key === 'Enter' &&
-        (os === 'macos' ? event.metaKey : event.ctrlKey) &&
-        isDiffMode
-      ) {
-        event.preventDefault()
-        handleAcceptDiff()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyboard)
-    return () => window.removeEventListener('keydown', handleKeyboard)
-  }, [os, isDiffMode, handleAcceptDiff, handleReset])
-
-  const handleEditorDidMount: OnMount = (
+  const handleEditorOnMount: OnMount = (
     editor: monacoEditor.IStandaloneCodeEditor,
     monaco: Monaco
   ) => {
@@ -155,6 +123,17 @@ const AIEditor = ({
           endLineNumber: lineCount,
         })
       }
+    }
+
+    if (!!executeQueryRef.current) {
+      editor.addAction({
+        id: 'run-query',
+        label: 'Run Query',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
+        contextMenuGroupId: 'operation',
+        contextMenuOrder: 0,
+        run: () => executeQueryRef.current?.(),
+      })
     }
 
     editor.addAction({
@@ -234,6 +213,48 @@ const AIEditor = ({
     ...options,
   }
 
+  useEffect(() => {
+    setCurrentValue(value || defaultValue)
+  }, [value, defaultValue])
+
+  useEffect(() => {
+    if (!isDiffMode) {
+      setIsDiffEditorMounted(false)
+    }
+  }, [isDiffMode])
+
+  useEffect(() => {
+    if (!completion) {
+      setIsDiffMode(false)
+      return
+    }
+
+    const original =
+      promptState.beforeSelection + promptState.selection + promptState.afterSelection
+    const modified = promptState.beforeSelection + completion + promptState.afterSelection
+
+    setDiffValue({ original, modified })
+    setIsDiffMode(true)
+  }, [completion, promptState.beforeSelection, promptState.selection, promptState.afterSelection])
+
+  useEffect(() => {
+    const handleKeyboard = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        handleReset()
+      } else if (
+        event.key === 'Enter' &&
+        (os === 'macos' ? event.metaKey : event.ctrlKey) &&
+        isDiffMode
+      ) {
+        event.preventDefault()
+        handleAcceptDiff()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyboard)
+    return () => window.removeEventListener('keydown', handleKeyboard)
+  }, [os, isDiffMode, handleAcceptDiff, handleReset])
+
   return (
     <div className="flex-1 overflow-hidden flex flex-col h-full relative">
       {isDiffMode ? (
@@ -245,7 +266,6 @@ const AIEditor = ({
             modified={diffValue.modified}
             onMount={(editor: monacoEditor.IStandaloneDiffEditor) => {
               diffEditorRef.current = editor
-              console.log('mount diff editor')
               setIsDiffEditorMounted(true)
             }}
             options={{
@@ -288,7 +308,7 @@ const AIEditor = ({
               setCurrentValue(newValue)
               onChange?.(newValue)
             }}
-            onMount={handleEditorDidMount}
+            onMount={handleEditorOnMount}
             className={className}
           />
           {promptState.isOpen && editorRef.current && (

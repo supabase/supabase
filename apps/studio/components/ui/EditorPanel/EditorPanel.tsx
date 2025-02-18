@@ -1,5 +1,5 @@
 import { debounce } from 'lodash'
-import { Book, CornerDownLeft, Loader2, Save, X } from 'lucide-react'
+import { Book, Save, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -9,6 +9,7 @@ import {
   suffixWithLimit,
 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
+import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunButton'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
@@ -264,6 +265,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
               padding: { top: 4 },
               lineNumbersMinChars: 3,
             }}
+            executeQuery={onExecuteSql}
           />
         </div>
 
@@ -309,8 +311,10 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
                 <Results rows={results} />
               </div>
             )}
-            <p className="text-xs text-foreground-light border-t font-mono py-2 px-5 flex items-center">
-              {results.length} rows{results.length >= 100 && ` (Limited to only 100 rows)`}
+            <p className="text-xs text-foreground-light border-t py-2 px-5 flex items-center justify-between">
+              <span className="font-mono">
+                {results.length} rows{results.length >= 100 && ` (Limited to only 100 rows)`}
+              </span>
               <Button
                 size="tiny"
                 type="default"
@@ -382,9 +386,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
           >
             {showTemplates ? 'Templates' : 'Templates'}
           </Button>
-          <Button loading={isExecuting} onClick={() => onExecuteSql()}>
-            Run query
-          </Button>
+          <SqlRunButton isDisabled={isExecuting} isExecuting={isExecuting} onClick={onExecuteSql} />
         </div>
       </div>
     </div>
