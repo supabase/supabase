@@ -118,6 +118,7 @@ allow_list = [
     "ClickHouse",
     "Clippy",
     "Cloudflare",
+    "Codium",
     "Cognito",
     "Colab",
     "DBeaver",
