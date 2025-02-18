@@ -707,6 +707,7 @@ export const getTools = ({
 
         Below is the complete field reference for each log source. To access nested fields, you'll need to use the appropriate UNNEST joins as shown in the examples above.
 
+        
         ### Function Edge Logs (\`function_edge_logs\`)
 
         | Field | Type |
@@ -837,6 +838,105 @@ export const getTools = ({
         | metadata.remote_addr | string |
         | metadata.status | number |
         | metadata.timestamp | string |
+
+        ### Storage Logs (\`storage_logs\`)
+
+        | Field | Type |
+        |-------|------|
+        | event_message | string |
+        | id | string |
+        | timestamp | datetime |
+        | metadata.context.host | string |
+        | metadata.context.pid | number |
+        | metadata.level | string |
+        | metadata.project | string |
+        | metadata.req.headers.accept | string |
+        | metadata.req.headers.cf_connecting_ip | string |
+        | metadata.req.headers.cf_ray | string |
+        | metadata.req.headers.content_length | string |
+        | metadata.req.headers.content_type | string |
+        | metadata.req.headers.host | string |
+        | metadata.req.headers.referer | string |
+        | metadata.req.headers.user_agent | string |
+        | metadata.req.headers.x_client_info | string |
+        | metadata.req.headers.x_forwarded_proto | string |
+        | metadata.req.hostname | string |
+        | metadata.req.method | string |
+        | metadata.req.remoteAddress | string |
+        | metadata.req.remotePort | number |
+        | metadata.req.url | string |
+        | metadata.reqId | string |
+        | metadata.res.statusCode | number |
+        | metadata.res.headers.content_length | number |
+        | metadata.res.headers.content_type | string |
+        | metadata.responseTime | number |
+        | metadata.tenantId | string |
+        | metadata.rawError | string |
+
+        ### Function Runtime Logs (\`function_logs\`)
+
+        | Field | Type |
+        |-------|------|
+        | event_message | string |
+        | id | string |
+        | timestamp | datetime |
+        | metadata.deployment_id | string |
+        | metadata.event_type | string |
+        | metadata.execution_id | string |
+        | metadata.function_id | string |
+        | metadata.level | string |
+        | metadata.project_ref | string |
+        | metadata.region | string |
+        | metadata.timestamp | string |
+        | metadata.version | string |
+
+        ### Postgres Logs (\`postgres_logs\`)
+
+        | Field | Type |
+        |-------|------|
+        | event_message | string |
+        | id | string |
+        | timestamp | datetime |
+        | identifier | string |
+        | metadata.host | string |
+        | metadata.parsed.backend_type | string |
+        | metadata.parsed.command_tag | string |
+        | metadata.parsed.connection_from | string |
+        | metadata.parsed.database_name | string |
+        | metadata.parsed.error_severity | string |
+        | metadata.parsed.process_id | number |
+        | metadata.parsed.query_id | number |
+        | metadata.parsed.session_id | string |
+        | metadata.parsed.session_line_num | number |
+        | metadata.parsed.session_start_time | string |
+        | metadata.parsed.sql_state_code | string |
+        | metadata.parsed.timestamp | string |
+        | metadata.parsed.transaction_id | number |
+        | metadata.parsed.user_name | string |
+        | metadata.parsed.virtual_transaction_id | string |
+
+        ### Realtime Logs (\`realtime_logs\`)
+
+        | Field | Type |
+        |-------|------|
+        | event_message | string |
+        | id | string |
+        | timestamp | datetime |
+        | metadata.level | string |
+        | metadata.measurements.connected | number |
+        | metadata.measurements.connected_cluster | number |
+        | metadata.measurements.limit | number |
+        | metadata.measurements.sum | number |
+        | metadata.external_id | string |
+
+        ### Supavisor Logs (\`supavisor_logs\`)
+
+        | Field | Type |
+        |-------|------|
+        | event_message | string |
+        | id | string |
+        | timestamp | datetime |
+        | metadata.host | string |
 
         Example query using nested fields:
         \`\`\`sql
