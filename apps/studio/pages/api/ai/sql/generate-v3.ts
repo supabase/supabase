@@ -37,7 +37,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 
+  const cookie = req.headers.cookie
   const authorization = req.headers.authorization
+
+  const isVercelSelfHostedPreview =
+    !!process.env.VERCEL_URL && process.env.VERCEL_URL.includes('studio-self-hosted')
 
   try {
     const { result: schemas } = includeSchemaMetadata
@@ -50,6 +54,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           undefined,
           {
             'Content-Type': 'application/json',
+            ...(cookie && { cookie }),
             ...(authorization && { Authorization: authorization }),
           }
         )
