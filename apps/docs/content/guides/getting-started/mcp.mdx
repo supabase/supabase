@@ -12,6 +12,7 @@ There are a number of popular AI tools that support MCP, including:
 - [Cursor](https://www.cursor.com/)
 - [Claude desktop](https://claude.ai/download)
 - [Cline](https://github.com/cline/cline) (VS Code extension)
+- [Windsurf](https://docs.codeium.com/windsurf) (Codium)
 
 Connecting these tools to Supabase will allow you to query your database and perform other SQL operations using natural language commands.
 
@@ -84,18 +85,22 @@ Below are some ways to connect to the Postgres MCP server using popular AI tools
 1. Under the **Developer** tab, tap **Edit Config** to open the configuration file.
 1. Add the following configuration:
 
-```json
-{
-  "mcpServers": {
-    "supabase": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "<connection-string>"]
-    }
-  }
-}
-```
+   ```json
+   {
+     "mcpServers": {
+       "supabase": {
+         "command": "npx",
+         "args": ["-y", "@modelcontextprotocol/server-postgres", "<connection-string>"]
+       }
+     }
+   }
+   ```
 
-Replace `<connection-string>` with your connection string.
+   Replace `<connection-string>` with your connection string.
+
+1. Save the configuration file and restart Claude desktop.
+
+1. From the new chat screen, you should see a hammer (MCP) icon appear with the new MCP server available.
 
 #### Cline
 
@@ -103,16 +108,45 @@ Replace `<connection-string>` with your connection string.
 1. Tap **Configure MCP Servers** to open the configuration file.
 1. Add the following configuration:
 
-```json
-{
-  "supabase": {
-    "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-postgres", "<connection-string>"]
-  }
-}
-```
+   ```json
+   {
+     "mcpServers": {
+       "supabase": {
+         "command": "npx",
+         "args": ["-y", "@modelcontextprotocol/server-postgres", "<connection-string>"]
+       }
+     }
+   }
+   ```
 
-Replace `<connection-string>` with your connection string.
+   Replace `<connection-string>` with your connection string.
+
+1. Save the configuration file. Cline should automatically reload the configuration.
+
+1. You should see a green active status after the server is successfully connected.
+
+#### Windsurf
+
+1. Open Windsurf and navigate to the Cascade assistant.
+1. Tap on the hammer (MCP) icon, then **Configure** to open the configuration file.
+1. Add the following configuration:
+
+   ```json
+   {
+     "mcpServers": {
+       "supabase": {
+         "command": "npx",
+         "args": ["-y", "@modelcontextprotocol/server-postgres", "<connection-string>"]
+       }
+     }
+   }
+   ```
+
+   Replace `<connection-string>` with your connection string.
+
+1. Save the configuration file and reload by tapping **Refresh** in the Cascade assistant.
+
+1. You should see a green active status after the server is successfully connected.
 
 ## Next steps
 
