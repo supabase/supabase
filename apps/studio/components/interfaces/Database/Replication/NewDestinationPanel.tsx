@@ -115,6 +115,7 @@ const NewDestinationPanel = ({
   }
 
   // const submitRef = useRef<HTMLButtonElement>(null)
+  const { enabled } = form.watch()
 
   return (
     <>
@@ -129,7 +130,12 @@ const NewDestinationPanel = ({
                     <div className="text-xs">Send data to a new destination</div>
                   </div>
                   <div className="flex">
-                    <Switch />
+                    <Switch
+                      checked={enabled}
+                      onCheckedChange={(checked) => {
+                        form.setValue('enabled', checked)
+                      }}
+                    />
                     <div className="text-sm mx-2">Enable</div>
                   </div>
                 </div>
@@ -270,7 +276,7 @@ const NewDestinationPanel = ({
                       control={form.control}
                       name="maxFillSecs"
                       render={({ field }) => (
-                        <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
+                        <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4">
                           <FormLabel_Shadcn_>Max Fill Seconds</FormLabel_Shadcn_>
                           <div className="w-96">
                             <FormControl_Shadcn_>
@@ -281,23 +287,25 @@ const NewDestinationPanel = ({
                         </FormItem_Shadcn_>
                       )}
                     />
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="enabled"
-                      render={({ field }) => (
-                        <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4">
-                          <FormLabel_Shadcn_>Enabled</FormLabel_Shadcn_>
-                          <FormControl_Shadcn_>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              disabled={field.disabled}
-                            />
-                          </FormControl_Shadcn_>
-                          <FormMessage_Shadcn_ />
-                        </FormItem_Shadcn_>
-                      )}
-                    />
+                    <div className="hidden">
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="enabled"
+                        render={({ field }) => (
+                          <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4">
+                            <FormLabel_Shadcn_>Enabled</FormLabel_Shadcn_>
+                            <FormControl_Shadcn_>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={field.disabled}
+                              />
+                            </FormControl_Shadcn_>
+                            <FormMessage_Shadcn_ />
+                          </FormItem_Shadcn_>
+                        )}
+                      />
+                    </div>
                     {/* <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
                       Hidden form submit button
                     </Button> */}
