@@ -45,7 +45,6 @@ import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
-import { TablesData } from '../../../data/tables/tables-query'
 
 const MemoizedMessage = memo(
   ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
@@ -141,6 +140,10 @@ export const AIAssistant = ({
       table: currentTable?.name,
     },
     onFinish: (message) => saveLatestMessage(message),
+    onError: (error) => {
+      const errorMessage = JSON.parse(error.message).message
+      toast.error(errorMessage)
+    },
   })
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
@@ -381,62 +384,58 @@ export const AIAssistant = ({
             </div>
           ) : (tables ?? [])?.length > 0 ? (
             <AIOnboarding setMessages={setMessages} onSendMessage={sendMessageToAssistant} />
-          ) : (
-            <>
-              {isApiKeySet && (
-                <div className="w-full flex flex-col justify-end flex-1 h-full p-5">
-                  <h2 className="text-base mb-2">Welcome to Supabase!</h2>
-                  <p className="text-sm text-foreground-lighter mb-6">
-                    This is the Supabase assistant which will help you create, debug and modify
-                    tables, policies, functions and more. You can even use it to query your data
-                    using just your words. It looks like we have a blank canvas though, so what are
-                    you looking to build? Here are some ideas.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      onClick={() => setValue('Generate a database schema for ...')}
-                      className="rounded-full"
-                    >
-                      Generate a ...
-                    </Button>
-                    {SQL_TEMPLATES.filter((t) => t.type === 'quickstart').map((qs) => (
-                      <TooltipProvider key={qs.title}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              type="outline"
-                              className="rounded-full"
-                              onClick={() => {
-                                setMessages([
-                                  {
-                                    id: uuidv4(),
-                                    role: 'user',
-                                    createdAt: new Date(Date.now() - 3000),
-                                    content: qs.description,
-                                  },
-                                  {
-                                    id: uuidv4(),
-                                    role: 'assistant',
-                                    createdAt: new Date(),
-                                    content: `Sure! I can help you with that. Here is a starting point you can run directly or customize further. Would you like to make any changes?  \n\n\`\`\`sql\n-- props: {"title": "${qs.title}"}\n${qs.sql}\n\`\`\``,
-                                  },
-                                ])
-                              }}
-                            >
-                              {qs.title}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>{qs.description}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
+          ) : isApiKeySet ? (
+            <div className="w-full flex flex-col justify-end flex-1 h-full p-5">
+              <h2 className="text-base mb-2">Welcome to Supabase!</h2>
+              <p className="text-sm text-foreground-lighter mb-6">
+                This is the Supabase assistant which will help you create, debug and modify tables,
+                policies, functions and more. You can even use it to query your data using just your
+                words. It looks like we have a blank canvas though, so what are you looking to
+                build? Here are some ideas.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  onClick={() => setValue('Generate a database schema for ...')}
+                  className="rounded-full"
+                >
+                  Generate a ...
+                </Button>
+                {SQL_TEMPLATES.filter((t) => t.type === 'quickstart').map((qs) => (
+                  <TooltipProvider key={qs.title}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="outline"
+                          className="rounded-full"
+                          onClick={() => {
+                            setMessages([
+                              {
+                                id: uuidv4(),
+                                role: 'user',
+                                createdAt: new Date(Date.now() - 3000),
+                                content: qs.description,
+                              },
+                              {
+                                id: uuidv4(),
+                                role: 'assistant',
+                                createdAt: new Date(),
+                                content: `Sure! I can help you with that. Here is a starting point you can run directly or customize further. Would you like to make any changes?  \n\n\`\`\`sql\n-- props: {"title": "${qs.title}"}\n${qs.sql}\n\`\`\``,
+                              },
+                            ])
+                          }}
+                        >
+                          {qs.title}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{qs.description}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
 
         <AnimatePresence>
