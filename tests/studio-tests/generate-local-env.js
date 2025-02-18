@@ -21,7 +21,7 @@ const defaultEnv = {
   SENTRY_IGNORE_API_RESOLUTION_ERROR: '1',
   LOGFLARE_URL: 'http://localhost:54329',
   LOGFLARE_API_KEY: 'api-key',
-  NEXT_PUBLIC_SITE_URL: 'http://localhost:3000',
+  NEXT_PUBLIC_SITE_URL: 'http://localhost:8082',
   NEXT_PUBLIC_GOTRUE_URL: '$SUPABASE_PUBLIC_URL/auth/v1',
   NEXT_PUBLIC_HCAPTCHA_SITE_KEY: '10000000-ffff-ffff-ffff-000000000001',
   NEXT_PUBLIC_NODE_ENV: 'test',

@@ -21,7 +21,6 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
-
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger">
     <svg
@@ -104,7 +103,7 @@ const LayoutHeader = ({
           <div className="flex items-center text-sm">
             {projectRef && (
               <Link
-                href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
+                href={IS_PLATFORM ? '/projects' : `/project/default`}
                 className="mx-1 hidden md:flex items-center w-[40px] h-[40px]"
               >
                 <img
@@ -115,13 +114,16 @@ const LayoutHeader = ({
               </Link>
             )}
 
-            {projectRef && (
+            {!IS_PLATFORM && (
+              <div className="ml-3 text-xs text-foreground-light">Default project</div>
+            )}
+
+            {projectRef && IS_PLATFORM && (
               <>
                 <div className="flex items-center">
                   <OrganizationDropdown />
                   <LayoutHeaderDivider />
                   <ProjectDropdown />
-
                   {exceedingLimits && (
                     <div className="ml-2">
                       <Link href={`/org/${selectedOrganization?.slug}/usage`}>
@@ -129,7 +131,6 @@ const LayoutHeader = ({
                       </Link>
                     </div>
                   )}
-
                   {selectedProject && isBranchingEnabled && (
                     <>
                       <LayoutHeaderDivider />
@@ -144,7 +145,6 @@ const LayoutHeader = ({
                 </div>
               </>
             )}
-
             {/* Additional breadcrumbs are supplied */}
             <BreadcrumbsView defaultValue={breadcrumbs} />
           </div>
