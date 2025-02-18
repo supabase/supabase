@@ -147,7 +147,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         ${table !== undefined && includeSchemaMetadata ? `The user is currently looking at the ${table} table.` : ''}
         `,
       messages,
-      tools: getTools({ projectRef, connectionString, authorization, includeSchemaMetadata }),
+      tools: getTools({
+        projectRef,
+        connectionString,
+        cookie,
+        authorization,
+        includeSchemaMetadata,
+      }),
     })
 
     // write the data stream to the response
