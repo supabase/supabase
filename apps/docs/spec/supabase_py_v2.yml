@@ -712,7 +712,7 @@ functions:
                   "provider": "github",
                   "options": {
                       "redirect_to": "https://example.com/welcome",
-                  },
+                  }
               }
           )
           ```
@@ -729,7 +729,7 @@ functions:
                   "provider": "github",
                   "options": {
                       "scopes": "repo gist notifications",
-                  },
+                  }
               }
           )
           ```
@@ -2604,7 +2604,7 @@ functions:
               "11111111-1111-1111-1111-111111111111",
               {
                   "email": "new@email.com",
-              },
+              }
           )
           ```
         response: |
@@ -2665,7 +2665,7 @@ functions:
               "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
               {
                   "password": "new_password",
-              },
+              }
           )
           ```
       - id: updates-a-users-metadata
@@ -2677,7 +2677,7 @@ functions:
               "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
               {
                   "user_metadata": {"hello": "world"},
-              },
+              }
           )
           ```
       - id: updates-a-users-app-metadata
@@ -2689,7 +2689,7 @@ functions:
               "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
               {
                   "app_metadata": {"plan": "trial"},
-              },
+              }
           )
           ```
       - id: confirms-a-users-email-address
@@ -2701,7 +2701,7 @@ functions:
               "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
               {
                   "email_confirm": True,
-              },
+              }
           )
           ```
       - id: confirms-a-users-phone-number
@@ -2713,7 +2713,7 @@ functions:
               "6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4",
               {
                   "phone_confirm": True,
-              },
+              }
           )
           ```
   - id: mfa-delete-factor
@@ -2742,7 +2742,7 @@ functions:
           response = supabase.auth.admin.mfa.delete_factor(
               {
                   "id": "34e770dd-9ff9-416c-87fa-43b31d7ef225",
-                  "user_id": "a89baba7-b1b7-440f-b4bb-91026967f66b",
+                  "user_id": "a89baba7-b1b7-440f-b4bb-91026967f66b"
               }
           )
           ```
@@ -2797,7 +2797,7 @@ functions:
               email,
               {
                   "redirect_to": "https://example.com/update-password",
-              },
+              }
           )
           ```
 
@@ -7042,7 +7042,7 @@ functions:
                       "public": False,
                       "allowed_mime_types": ["image/png"],
                       "file_size_limit": 1024,
-                  },
+                  }
               )
           )
           ```
@@ -7123,7 +7123,7 @@ functions:
                       "public": False,
                       "allowed_mime_types": ["image/png"],
                       "file_size_limit": 1024,
-                  },
+                  }
               )
           )
           ```
@@ -7210,7 +7210,7 @@ functions:
                   .upload(
                       file=f,
                       path="public/avatar1.png",
-                      file_options={"cache-control": "3600", "upsert": "false"},
+                      file_options={"cache-control": "3600", "upsert": "false"}
                   )
               )
           ```
@@ -7268,7 +7268,7 @@ functions:
                   .update(
                       file=f,
                       path="public/avatar1.png",
-                      file_options={"cache-control": "3600", "upsert": "true"},
+                      file_options={"cache-control": "3600", "upsert": "true"}
                   )
               )
           ```
@@ -7891,7 +7891,7 @@ functions:
                       "limit": 100,
                       "offset": 0,
                       "sortBy": {"column": "name", "order": "desc"},
-                  },
+                  }
               )
           )
           ```
@@ -7930,7 +7930,7 @@ functions:
                       "offset": 0,
                       "sortBy": {"column": "name", "order": "desc"},
                       "search": "jon",
-                  },
+                  }
               )
           )
           ```
