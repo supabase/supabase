@@ -1,18 +1,25 @@
 import dayjs from 'dayjs'
-import { UserIcon } from 'lucide-react'
+import { Clipboard, Trash, UserIcon } from 'lucide-react'
 import { UIEvent } from 'react'
 import { Column, useRowSelection } from 'react-data-grid'
 
 import { User } from 'data/auth/users-infinite-query'
 import { BASE_PATH } from 'lib/constants'
-import { Checkbox_Shadcn_, cn } from 'ui'
-import { HeaderCell, SelectHeaderCell } from './UsersGridComponents'
+import { copyToClipboard } from 'lib/helpers'
+import {
+  Checkbox_Shadcn_,
+  cn,
+  ContextMenu_Shadcn_,
+  ContextMenuContent_Shadcn_,
+  ContextMenuItem_Shadcn_,
+  ContextMenuSeparator_Shadcn_,
+  ContextMenuTrigger_Shadcn_,
+} from 'ui'
+import { HeaderCell } from './UsersGridComponents'
 import { ColumnConfiguration, USERS_TABLE_COLUMNS } from './UsersV2'
 
-const SUPPORTED_CSP_AVATAR_URLS = [
-  'https://avatars.githubusercontent.com',
-  'https://lh3.googleusercontent.com',
-]
+const GITHUB_AVATAR_URL = 'https://avatars.githubusercontent.com'
+const SUPPORTED_CSP_AVATAR_URLS = [GITHUB_AVATAR_URL, 'https://lh3.googleusercontent.com']
 
 export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean => {
   return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
@@ -21,7 +28,7 @@ export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean 
 export const formatUsersData = (users: User[]) => {
   return users.map((user) => {
     const provider: string = user.raw_app_meta_data?.provider ?? ''
-    const providers: string[] = (user.raw_app_meta_data?.providers ?? []).map((x: string) => {
+    const providers: string[] = user.providers.map((x: string) => {
       if (x.startsWith('sso')) return 'SAML'
       return x
     })
@@ -234,7 +241,15 @@ export function getAvatarUrl(user: User): string | undefined {
 
   if (typeof url !== 'string') return undefined
   const isSupported = SUPPORTED_CSP_AVATAR_URLS.some((x) => url.startsWith(x))
-  return isSupported ? url : undefined
+
+  // [Joshen] Only for GH, not entirely sure whats the image transformation equiv for Google
+  try {
+    const _url = new URL(url)
+    _url.searchParams.set('s', '24')
+    return isSupported ? (url.startsWith(GITHUB_AVATAR_URL) ? _url.href : url) : undefined
+  } catch (error) {
+    return isSupported ? url : undefined
+  }
 }
 
 export const formatUserColumns = ({
@@ -242,11 +257,13 @@ export const formatUserColumns = ({
   users,
   visibleColumns = [],
   setSortByValue,
+  onSelectDeleteUser,
 }: {
   config: ColumnConfiguration[]
   users: User[]
   visibleColumns?: string[]
   setSortByValue: (val: string) => void
+  onSelectDeleteUser: (user: User) => void
 }) => {
   const columnOrder = config.map((c) => c.id) ?? USERS_TABLE_COLUMNS.map((c) => c.id)
 
@@ -313,42 +330,70 @@ export const formatUserColumns = ({
         }
 
         return (
-          <div
-            className={cn(
-              'w-full flex items-center text-xs',
-              col.id.includes('provider') ? 'capitalize' : ''
-            )}
-          >
-            {/* [Joshen] Not convinced this is the ideal way to display the icons, but for now */}
-            {col.id === 'providers' &&
-              row.provider_icons.map((icon: string, idx: number) => {
-                const provider = row.providers[idx]
-                return (
-                  <div
-                    className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
-                    style={{
-                      marginLeft: idx === 0 ? 0 : `-8px`,
-                      zIndex: row.provider_icons.length - idx,
-                    }}
-                  >
-                    <img
-                      key={`${user?.id}-${provider}`}
-                      width={16}
-                      src={icon}
-                      alt={`${provider} auth icon`}
-                      className={cn(provider === 'github' && 'dark:invert')}
-                    />
-                  </div>
-                )
-              })}
-            {col.id === 'last_sign_in_at' && !isConfirmed ? (
-              <p className="text-foreground-lighter">Waiting for verification</p>
-            ) : (
-              <p className={cn(col.id === 'providers' && 'ml-1')}>
-                {formattedValue === null ? '-' : formattedValue}
-              </p>
-            )}
-          </div>
+          <ContextMenu_Shadcn_>
+            <ContextMenuTrigger_Shadcn_ asChild>
+              <div
+                className={cn(
+                  'w-full flex items-center text-xs',
+                  col.id.includes('provider') ? 'capitalize' : ''
+                )}
+              >
+                {/* [Joshen] Not convinced this is the ideal way to display the icons, but for now */}
+                {col.id === 'providers' &&
+                  row.provider_icons.map((icon: string, idx: number) => {
+                    const provider = row.providers[idx]
+                    return (
+                      <div
+                        className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
+                        style={{
+                          marginLeft: idx === 0 ? 0 : `-8px`,
+                          zIndex: row.provider_icons.length - idx,
+                        }}
+                      >
+                        <img
+                          key={`${user?.id}-${provider}`}
+                          width={16}
+                          src={icon}
+                          alt={`${provider} auth icon`}
+                          className={cn(provider === 'github' && 'dark:invert')}
+                        />
+                      </div>
+                    )
+                  })}
+                {col.id === 'last_sign_in_at' && !isConfirmed ? (
+                  <p className="text-foreground-lighter">Waiting for verification</p>
+                ) : (
+                  <p className={cn(col.id === 'providers' && 'ml-1')}>
+                    {formattedValue === null ? '-' : formattedValue}
+                  </p>
+                )}
+              </div>
+            </ContextMenuTrigger_Shadcn_>
+            <ContextMenuContent_Shadcn_ onClick={(e) => e.stopPropagation()}>
+              <ContextMenuItem_Shadcn_
+                className="gap-x-2"
+                onFocusCapture={(e) => e.stopPropagation()}
+                onSelect={() => {
+                  const value = col.id === 'providers' ? row.providers.join(', ') : formattedValue
+                  copyToClipboard(value)
+                }}
+              >
+                <Clipboard size={12} />
+                <span>Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}</span>
+              </ContextMenuItem_Shadcn_>
+              <ContextMenuSeparator_Shadcn_ />
+              <ContextMenuItem_Shadcn_
+                className="gap-x-2"
+                onFocusCapture={(e) => e.stopPropagation()}
+                onSelect={() => {
+                  if (user) onSelectDeleteUser(user)
+                }}
+              >
+                <Trash size={12} />
+                <span>Delete user</span>
+              </ContextMenuItem_Shadcn_>
+            </ContextMenuContent_Shadcn_>
+          </ContextMenu_Shadcn_>
         )
       },
     }

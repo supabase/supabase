@@ -89,10 +89,10 @@ const TriggersList = ({
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex items-center gap-x-2">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2">
               <SchemaSelector
-                className="w-[180px]"
+                className="w-full lg:w-[180px]"
                 size="tiny"
                 showError={false}
                 selectedSchemaName={selectedSchema}
@@ -103,7 +103,7 @@ const TriggersList = ({
                 size="tiny"
                 icon={<Search size="14" />}
                 value={filterString}
-                className="w-52"
+                className="w-full lg:w-52"
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>
@@ -112,6 +112,7 @@ const TriggersList = ({
                 <ButtonTooltip
                   disabled={!canCreateTriggers}
                   onClick={() => createTrigger()}
+                  className="flex-grow"
                   tooltip={{
                     content: {
                       side: 'bottom',
@@ -158,30 +159,32 @@ const TriggersList = ({
 
           {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
-          <Table
-            head={
-              <>
-                <Table.th key="name">Name</Table.th>
-                <Table.th key="table">Table</Table.th>
-                <Table.th key="function">Function</Table.th>
-                <Table.th key="events">Events</Table.th>
-                <Table.th key="orientation">Orientation</Table.th>
-                <Table.th key="enabled" className="w-20">
-                  Enabled
-                </Table.th>
-                <Table.th key="buttons" className="w-1/12"></Table.th>
-              </>
-            }
-            body={
-              <TriggerList
-                schema={selectedSchema}
-                filterString={filterString}
-                isLocked={isLocked}
-                editTrigger={editTrigger}
-                deleteTrigger={deleteTrigger}
-              />
-            }
-          />
+          <div className="w-full overflow-hidden overflow-x-auto">
+            <Table
+              head={
+                <>
+                  <Table.th key="name">Name</Table.th>
+                  <Table.th key="table">Table</Table.th>
+                  <Table.th key="function">Function</Table.th>
+                  <Table.th key="events">Events</Table.th>
+                  <Table.th key="orientation">Orientation</Table.th>
+                  <Table.th key="enabled" className="w-20">
+                    Enabled
+                  </Table.th>
+                  <Table.th key="buttons" className="w-1/12"></Table.th>
+                </>
+              }
+              body={
+                <TriggerList
+                  schema={selectedSchema}
+                  filterString={filterString}
+                  isLocked={isLocked}
+                  editTrigger={editTrigger}
+                  deleteTrigger={deleteTrigger}
+                />
+              }
+            />
+          </div>
         </div>
       )}
     </>

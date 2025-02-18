@@ -1,17 +1,14 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { FileText } from 'lucide-react'
+import { DocsButton } from 'components/ui/DocsButton'
+import { useFlag } from 'hooks/ui/useFlag'
+import { BASE_PATH } from 'lib/constants'
+import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
-
-import { useFlag } from 'hooks/ui/useFlag'
-import { BASE_PATH } from 'lib/constants'
-import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import { tweets } from 'shared-data'
-import { Button } from 'ui'
-import { DocsButton } from 'components/ui/DocsButton'
 
 type SignInLayoutProps = {
   heading: string
@@ -85,7 +82,7 @@ const SignInLayout = ({
 
   return (
     <>
-      <div className="flex flex-col flex-1 bg-alternative">
+      <div className="relative flex flex-col bg-alternative h-screen">
         <div
           className={`absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8 ${
             ongoingIncident ? 'mt-14' : 'mt-6'
@@ -115,7 +112,7 @@ const SignInLayout = ({
           </nav>
         </div>
 
-        <div className="flex flex-1">
+        <div className="flex flex-1 h-full">
           <main className="flex flex-col items-center flex-1 flex-shrink-0 px-5 pt-16 pb-8 border-r shadow-lg bg-studio border-default">
             <div className="flex-1 flex flex-col justify-center w-[330px] sm:w-[384px]">
               <div className="mb-10">

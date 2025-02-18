@@ -167,7 +167,7 @@ functions:
       - id: signup
         name: Sign up with an email and password
         code: |
-          ```python          
+          ```python
           response = supabase.auth.sign_up(
               {"email": "email@example.com", "password": "password"}
           )
@@ -1410,7 +1410,7 @@ functions:
           # retrieve all identites linked to a user
           res = supabase.auth.get_user_identities()
 
-          # find the google identity 
+          # find the google identity
           google_identity = list(
             filter(lambda identity: identity.provider == "google", res.identities)
           ).pop()
@@ -1983,7 +1983,7 @@ functions:
           from supabase.lib.client_options import ClientOptions
 
           supabase = create_client(
-            supabase_url, 
+            supabase_url,
             service_role_key,
             options=ClientOptions(
               auto_refresh_token=False,
@@ -2727,20 +2727,20 @@ functions:
         name: Getting your data
         code: |
           ```python
-          response = supabase.table("countries").select("*").execute()
+          response = supabase.table("planets").select("*").execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -2748,15 +2748,15 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Mercury"
               },
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -2766,33 +2766,33 @@ functions:
         name: Selecting specific columns
         code: |
           ```
-          response = supabase.table("countries").select("name").execute()
+          response = supabase.table("planets").select("name").execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Mercury"
               },
               {
-                "name": "Albania"
+                "name": "Earth"
               },
               {
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -2804,48 +2804,48 @@ functions:
           If your database has foreign key relationships, you can query related tables too.
         code: |
           ```python
-          response = supabase.table("countries").select("name, cities(name)").execute()
+          response = supabase.table("orchestral_sections").select("name, instruments(name)").execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Germany",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "Munich"
+                    "name": "violin"
                   }
                 ]
               },
               {
-                "name": "Indonesia",
-                "cities": [
+                "name": "woodwinds",
+                "instruments": [
                   {
-                    "name": "Bali"
+                    "name": "flute"
                   }
                 ]
               }
@@ -2992,9 +2992,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("cities")
-              .select("name, countries(*)")
-              .eq("countries.name", "Estonia")
+              supabase.table("orchestral_sections")
+              .select("name, instruments(*)")
+              .eq("instruments.name", "guqin")
               .execute()
           )
           ```
@@ -3002,36 +3002,36 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Bali",
-                "countries": null
+                "name": "strings",
+                "instruments": null
               },
               {
-                "name": "Munich",
-                "countries": null
+                "name": "woodwinds",
+                "instruments": null
               }
             ],
             "count": null
@@ -3046,31 +3046,31 @@ functions:
         name: Querying referenced table with count
         code: |
           ```python
-          response = supabase.table("countries").select("*, cities(count)").execute()
+          response = supabase.table("orchestral_sections").select("*, instruments(count)").execute()
           ```
         data:
           sql: |
             ```sql
-            create table countries (
+            create table orchestral_sections (
               "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text
             );
 
-            create table cities (
+            create table instruments (
               "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text,
-              "country_id" "uuid" references public.countries on delete cascade
+              "section_id" "uuid" references public.orchestral_sections on delete cascade
             );
 
-            with country as (
-              insert into countries (name)
-              values ('united kingdom') returning id
+            with section as (
+              insert into orchestral_sections (name)
+              values ('strings') returning id
             )
-            insert into cities (name, country_id) values
-            ('London', (select id from country)),
-            ('Manchester', (select id from country)),
-            ('Liverpool', (select id from country)),
-            ('Bristol', (select id from country));
+            insert into instruments (name, section_id) values
+            ('violin', (select id from section)),
+            ('viola', (select id from section)),
+            ('cello', (select id from section)),
+            ('double bass', (select id from section));
             ```
         response: |
           ```json
@@ -3078,8 +3078,8 @@ functions:
             "data": [
               {
                 "id": "c31e7151-5a6f-453c-915b-caf31ec9a0a0",
-                "name": "united kingdom",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
                     "count": 4
                   }
@@ -3097,20 +3097,20 @@ functions:
         name: Querying with count option
         code: |
           ```python
-          response = supabase.table("countries").select("*", count="exact").execute()
+          response = supabase.table("planets").select("*", count="exact").execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -3118,15 +3118,15 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Mercury"
               },
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": 3
@@ -3181,9 +3181,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("cities")
-              .select("name, countries!inner(name)")
-              .eq("countries.name", "Indonesia")
+              supabase.table("instruments")
+              .select("name, orchestral_sections!inner(name)")
+              .eq("orchestral_sections.name", "woodwinds")
               .execute()
           )
           ```
@@ -3191,33 +3191,33 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Bali",
-                "countries": {
-                  "name": "Indonesia"
+                "name": "flute",
+                "orchestral_sections": {
+                  "name": "woodwinds"
                 }
               }
             ],
@@ -3226,7 +3226,7 @@ functions:
           ```
         description: |
           If you don't want to return the referenced table contents, you can leave the parenthesis empty.
-          Like `.select('name, countries!inner()')`.
+          Like `.select('name, orchestral_sections!inner()')`.
         hideCodeBlock: true
       - id: switching-schemas-per-query
         name: Switching schemas per query
@@ -3288,8 +3288,8 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .insert({"id": 1, "name": "Denmark"})
+              supabase.table("planets")
+              .insert({"id": 1, "name": "Pluto"})
               .execute()
           )
           ```
@@ -3297,7 +3297,7 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
             ```
         response: |
           ```json
@@ -3305,7 +3305,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Denmark"
+                "name": "Pluto"
               }
             ],
             "count": null
@@ -3318,10 +3318,10 @@ functions:
         code: |
           ```python
           try:
-            response = supabase.table("countries")
+            response = supabase.table("characters")
               .insert([
-                { "id": 1, "name": "Nepal" },
-                { "id": 1, "name": "Vietnam" },
+                { "id": 1, "name": "Frodo" },
+                { "id": 1, "name": "Sam" },
               ])
               .execute()
             return response
@@ -3332,7 +3332,7 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
             ```
         response: |
           ```json
@@ -3341,9 +3341,9 @@ functions:
               "code": "23505",
               "details": "Key (id)=(1) already exists.",
               "hint": null,
-              "message": "duplicate key value violates unique constraint \"countries_pkey\""
+              "message": "duplicate key value violates unique constraint \"characters_pkey\""
             },
-            "message": "duplicate key value violates unique constraint \"countries_pkey\"",
+            "message": "duplicate key value violates unique constraint \"characters_pkey\"",
             "code": "23505",
             "hint": null,
             "details": "Key (id)=(1) already exists."
@@ -3372,8 +3372,8 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .update({"name": "Australia"})
+              supabase.table("instruments")
+              .update({"name": "piano"})
               .eq("id", 1)
               .execute()
           )
@@ -3382,12 +3382,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Denmark');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -3395,7 +3395,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Australia"
+                "name": "piano"
               }
             ],
             "count": null
@@ -3483,8 +3483,8 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .upsert({"id": 1, "name": "Australia"})
+              supabase.table("instruments")
+              .upsert({"id": 1, "name": "piano"})
               .execute()
           )
           ```
@@ -3492,12 +3492,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -3505,7 +3505,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Australia"
+                "name": "piano"
               }
             ],
             "count": null
@@ -3518,8 +3518,8 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .upsert([{"id": 1, "name": "Albania"}, {"id": 2, "name": "Algeria"}])
+              supabase.table("instruments")
+              .upsert([{"id": 1, "name": "piano"}, {"id": 2, "name": "guitar"}])
               .execute()
           )
           ```
@@ -3527,12 +3527,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -3540,11 +3540,11 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Albania"
+                "name": "piano"
               },
               {
                 "id": 2,
-                "name": "Algeria"
+                "name": "guitar"
               }
             ],
             "count": null
@@ -3634,7 +3634,7 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Spain');
+              (1, 'Mordor');
             ```
         response: |
           ```
@@ -3642,7 +3642,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Spain"
+                "name": "Mordor"
               }
             ],
             "count": null
@@ -3660,12 +3660,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Spain'), (2, 'France'), (3, 'Germany');
+              (1, 'Harry'), (2, 'Hermione'), (3, 'Ron');
             ```
         response: |
           ```json
@@ -3673,15 +3673,15 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Spain"
+                "name": "Harry"
               },
               {
                 "id": 2,
-                "name": "France"
+                "name": "Hermione"
               },
               {
                 "id": 3,
-                "name": "Germany"
+                "name": "Ron"
               }
             ],
             "count": null
@@ -3798,22 +3798,22 @@ functions:
         name: Call a Postgres function with filters
         code: |
           ```python
-          response = supabase.rpc("list_stored_countries").eq("id", 1).single().execute()
+          response = supabase.rpc("list_stored_planets").eq("id", 1).single().execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'France'),
-              (2, 'United Kingdom');
+              (1, 'Earth'),
+              (2, 'Mars');
 
-            create function list_stored_countries() returns setof countries as $$
-              select * from countries;
+            create function list_stored_planets() returns setof planets as $$
+              select * from planets;
             $$ language sql;
             ```
         response: |
@@ -3821,7 +3821,7 @@ functions:
           {
             "data": {
               "id": 1,
-              "name": "France"
+              "name": "Earth"
             },
             "count": null
           }
@@ -3870,17 +3870,17 @@ functions:
           ```python
           # Correct
           response = (
-              supabase.table("cities")
-              .select("name, country_id")
-              .eq("name", "Bali")
+              supabase.table("instruments")
+              .select("name, section_id")
+              .eq("name", "flute")
               .execute()
           )
 
           # Incorrect
           response = (
-              supabase.table("cities")
-              .eq("name", "Bali")
-              .select("name, country_id")
+              supabase.table("instruments")
+              .eq("name", "flute")
+              .select("name, section_id")
               .execute()
           )
           ```
@@ -3888,37 +3888,37 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
       - id: chaining-filters
         name: Chaining
         description: |
           Filters can be chained together to produce advanced queries. For example,
-          to query cities with population between 1,000 and 10,000.
+          to query instruments with octave ranges between 3 and 7 (non-inclusive).
         code: |
           ```python
           response = (
-              supabase.table("cities")
-              .select("name, country_id")
-              .gte("population", 1000)
-              .lt("population", 10000)
+              supabase.table("instruments")
+              .select("name, section_id")
+              .gte("octave_range", 3)
+              .lt("octave_range", 7)
               .execute()
           )
           ```
@@ -3926,33 +3926,33 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                secttion_id int8 not null references orchestral_sections,
                 name text,
-                population int8
+                octave_range int8
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'percussion'),
+              (2, 'strings');
             insert into
-              cities (id, country_id, name, population)
+              instruments (id, section_id, name, octave_range)
             values
-              (1, 2, 'Bali', 9980),
-              (2, 1, 'Munich', 250000);
+              (1, 2, 'violin', 4),
+              (2, 1, 'piano', 7);
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Bali",
-                "country_id": 2
+                "name": "violin",
+                "section_id": 2
               }
             ],
             "count": null
@@ -3965,19 +3965,19 @@ functions:
         code: |
           ```python
           filterByName = None
-          filterPopLow = 1000
-          filterPopHigh = 10000
+          filterOctaveLow = 3
+          filterOctaveHigh = 7
 
-          query = supabase.table("cities").select("name, country_id")
+          query = supabase.table("instruments").select("name, section_id")
 
           if filterByName:
               query = query.eq("name", filterByName)
 
-          if filterPopLow:
-              query = query.gte("population", filterPopLow)
+          if filterAgeLow:
+              query = query.gte("octave_range", filterOctaveLow)
 
-          if filterPopHigh:
-              query = query.lt("population", filterPopHigh)
+          if filterAgeHigh:
+              query = query.lt("octave_range", filterOctaveHigh)
 
           response = query.execute()
           ```
@@ -3985,33 +3985,33 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text,
-                population int8
+                octave_range int8
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'percussion'),
+              (2, 'strings');
             insert into
-              cities (id, country_id, name, population)
+              instruments (id, section_id, name, octave_range)
             values
-              (1, 2, 'Bali', 9980),
-              (2, 1, 'Munich', 250000);
+              (1, 2, 'violin', 4),
+              (2, 1, 'piano', 7);
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Bali",
-                "country_id": 2
+                "name": "violin",
+                "section_id": 2
               }
             ],
             "count": null
@@ -4064,9 +4064,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .select("name, cities!inner(name)")
-              .eq("cities.name", "Bali")
+              supabase.table("orchestral_sections")
+              .select("name, instruments!inner(name)")
+              .eq("instruments.name", "flute")
               .execute()
           )
           ```
@@ -4074,34 +4074,34 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Indonesia",
-                "cities": [
+                "name": "woodwinds",
+                "instruments": [
                   {
-                    "name": "Bali"
+                    "name": "flute"
                   }
                 ]
               }
@@ -4131,20 +4131,20 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").eq("name", "Albania").execute()
+          response = supabase.table("planets").select("*").eq("name", "Earth").execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -4152,7 +4152,7 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               }
             ],
             "count": null
@@ -4178,20 +4178,20 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").neq("name", "Albania").execute()
+          response = supabase.table("planets").select("*").neq("name", "Earth").execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -4199,11 +4199,11 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Mercury"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -4229,20 +4229,20 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").gt("id", 2).execute()
+          response = supabase.table("planets").select("*").gt("id", 2).execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -4250,7 +4250,7 @@ functions:
             "data": [
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -4279,20 +4279,20 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").gte("id", 2).execute()
+          response = supabase.table("planets").select("*").gte("id", 2).execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -4300,11 +4300,11 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -4330,20 +4330,20 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").lt("id", 2).execute()
+          response = supabase.table("planets").select("*").lt("id", 2).execute()
           ```
         data:
           sql: |
             ```sql
             create table
-            countries (id int8 primary key, name text);
+            planets (id int8 primary key, name text);
 
             insert into
-            countries (id, name)
+            planets (id, name)
             values
-            (1, 'Afghanistan'),
-            (2, 'Albania'),
-            (3, 'Algeria');
+            (1, 'Mercury'),
+            (2, 'Earth'),
+            (3, 'Mars');
             ```
         response: |
           ```json
@@ -4351,7 +4351,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Mercury"
               }
             ],
             "count": null
@@ -4377,20 +4377,20 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").lte("id", 2).execute()
+          response = supabase.table("planets").select("*").lte("id", 2).execute()
           ```
         data:
           sql: |
             ```sql
             create table
-            countries (id int8 primary key, name text);
+            planets (id int8 primary key, name text);
 
             insert into
-            countries (id, name)
+            planets (id, name)
             values
-            (1, 'Afghanistan'),
-            (2, 'Albania'),
-            (3, 'Algeria');
+            (1, 'Mercury'),
+            (2, 'Earth'),
+            (3, 'Mars');
             ```
         response: |
           ```json
@@ -4398,11 +4398,11 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Mercury"
               },
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               }
             ],
             "count": null
@@ -4428,20 +4428,20 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").like("name", "%Alba%").execute()
+          response = supabase.table("planets").select("*").like("name", "%Ea%").execute()
           ```
         data:
           sql: |
             ```sql
             create table
-            countries (id int8 primary key, name text);
+            planets (id int8 primary key, name text);
 
             insert into
-            countries (id, name)
+            planets (id, name)
             values
-            (1, 'Afghanistan'),
-            (2, 'Albania'),
-            (3, 'Algeria');
+            (1, 'Mercury'),
+            (2, 'Earth'),
+            (3, 'Mars');
             ```
         response: |
           ```json
@@ -4449,7 +4449,7 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               }
             ],
             "count": null
@@ -4475,20 +4475,20 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("*").ilike("name", "%alba%").execute()
+          response = supabase.table("planets").select("*").ilike("name", "%ea%").execute()
           ```
         data:
           sql: |
             ```sql
             create table
-            countries (id int8 primary key, name text);
+            planets (id int8 primary key, name text);
 
             insert into
-            countries (id, name)
+            planets (id, name)
             values
-            (1, 'Afghanistan'),
-            (2, 'Albania'),
-            (3, 'Algeria');
+            (1, 'Mercury'),
+            (2, 'Earth'),
+            (3, 'Mars');
             ```
         response: |
           ```json
@@ -4496,7 +4496,7 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               }
             ],
             "count": null
@@ -4522,18 +4522,18 @@ functions:
         name: Checking for nullness, True or False
         code: |
           ```python
-          response = supabase.table("countries").select("*").is_("name", "null").execute()
+          response = supabase.table("planets").select("*").is_("name", "null").execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Germany'),
+              (1, 'Earth'),
               (2, null);
             ```
         response: |
@@ -4575,9 +4575,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("*")
-              .in_("name", ["Albania", "Algeria"])
+              .in_("name", ["Earth", "Mars"])
               .execute()
           )
           ```
@@ -4585,14 +4585,14 @@ functions:
           sql: |
             ```sql
             create table
-            countries (id int8 primary key, name text);
+            planets (id int8 primary key, name text);
 
             insert into
-            countries (id, name)
+            planets (id, name)
             values
-            (1, 'Afghanistan'),
-            (2, 'Albania'),
-            (3, 'Algeria');
+            (1, 'Mercury'),
+            (2, 'Earth'),
+            (3, 'Mars');
             ```
         response: |
           ```json
@@ -4600,11 +4600,11 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -5010,7 +5010,7 @@ functions:
               }
             ],
             "count": null
-          }  
+          }
           ```
         description: |
           Postgres supports a number of [range types](https://www.postgresql.org/docs/current/rangetypes.html). You can filter on range columns using the string representation of range values.
@@ -5432,9 +5432,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("*")
-              .match({"id": 2, "name": "Albania"})
+              .match({"id": 2, "name": "Earth"})
               .execute()
           )
           ```
@@ -5442,14 +5442,14 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -5457,7 +5457,7 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Earth"
               }
             ],
             "count": null
@@ -5480,7 +5480,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("*")
               .not_.is_("name", "null")
               .execute()
@@ -5490,12 +5490,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Albania'),
+              (1, 'Mercury'),
               (2, null);
             ```
         response: |
@@ -5504,7 +5504,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Albania"
+                "name": "Mercury"
               }
             ],
             "count": null
@@ -5536,9 +5536,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("name")
-              .or_("id.eq.2,name.eq.Algeria")
+              .or_("id.eq.2,name.eq.Mars")
               .execute()
           )
           ```
@@ -5546,24 +5546,24 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Albania"
+                "name": "Earth"
               },
               {
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -5576,9 +5576,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("name")
-              .or_("id.gt.3,and(id.eq.1,name.eq.Afghanistan)")
+              .or_("id.gt.3,and(id.eq.1,name.eq.Mercury)")
               .execute()
           )
           ```
@@ -5586,21 +5586,21 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         reponse: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Mercury"
               }
             ],
             "count": null
@@ -5612,9 +5612,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .select("name, cities!inner(name)")
-              .or_("country_id.eq.1,name.eq.Beijing", reference_table="cities")
+              supabase.table("orchestral_sections")
+              .select("name, instruments!inner(name)")
+              .or_("book_id.eq.1,name.eq.guqin", reference_table="instruments")
               .execute()
           )
           ```
@@ -5622,34 +5622,34 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Germany",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "Munich"
+                    "name": "violin"
                   }
                 ]
               }
@@ -5687,9 +5687,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("*")
-              .filter("name", "in", '("Algeria","Japan")')
+              .filter("name", "in", '("Mars","Tatooine")')
               .execute()
           )
           ```
@@ -5697,14 +5697,14 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -5712,7 +5712,7 @@ functions:
             "data": [
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
               }
             ],
             "count": null
@@ -5725,9 +5725,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .select("name, cities!inner(name)")
-              .filter("cities.name", "eq", "Bali")
+              supabase.table("orchestral_sections")
+              .select("name, instruments!inner(name)")
+              .filter("instruments.name", "eq", "flute")
               .execute()
           )
           ```
@@ -5735,34 +5735,34 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Indonesia",
-                "cities": [
+                "name": "woodwinds",
+                "instruments": [
                   {
-                    "name": "Bali"
+                    "name": "flute"
                   }
                 ]
               }
@@ -5809,7 +5809,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("*")
               .order("name", desc=True)
               .execute()
@@ -5819,14 +5819,14 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
@@ -5834,15 +5834,15 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
-              },
-              {
-                "id": 2,
-                "name": "Albania"
+                "name": "Mercury"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Mars"
+              },
+              {
+                "id": 2,
+                "name": "Earth"
               }
             ],
             "count": null
@@ -5855,51 +5855,51 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .select("name, cities(name)")
-              .order("name", desc=True, foreign_table="cities")
+              supabase.table("orchestral_sections")
+              .select("name, instruments(name)")
+              .order("name", desc=True, foreign_table="instruments")
               .execute()
           )
           ```
         data:
           sql: |
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'United States'),
-              (2, 'Vanuatu');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
+              (1, 1, 'harp'),
+              (2, 1, 'violin');
         response: |
           ```json
           {
             "data": [
               {
-                "name": "United States",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "New York City"
+                    "name": "violin"
                   },
                   {
-                    "name": "Atlanta"
+                    "name": "harp"
                   }
                 ]
               },
               {
-                "name": "Vanuatu",
-                "cities": []
+                "name": "woodwinds",
+                "instruments": []
               }
             ],
             "count": null
@@ -5908,6 +5908,60 @@ functions:
         description: |
           Ordering on foreign tables doesn't affect the ordering of
           the parent table.
+        hideCodeBlock: true
+      - id: order-parent-table-by-a-referenced-table
+        name: Order parent table by a referenced table
+        code: |
+          ```python
+          response = (
+              supabase.table("instruments")
+              .select("name, section:orchestral_sections(name)")
+              .order("section(name)", desc=False)
+          )
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              orchestral_sections (id int8 primary key, name text);
+            create table
+              instruments (
+                id int8 primary key,
+                section_id int8 not null references orchestral_sections,
+                name text
+              );
+
+            insert into
+              orchestral_sections (id, name)
+            values
+              (1, 'strings'),
+              (2, 'woodwinds');
+            insert into
+              instruments (id, section_id, name)
+            values
+              (1, 1, 'violin'),
+              (2, 2, 'flute');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "violin",
+                "section": { "name": "strings" }
+              },
+              {
+                "name": "flute",
+                "section": { "name": "woodwinds" }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Ordering with `referenced_table(col)` affects the ordering of the
+          parent table.
         hideCodeBlock: true
   - id: limit
     title: limit()
@@ -5925,27 +5979,27 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("name").limit(1).execute()
+          response = supabase.table("planets").select("name").limit(1).execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Mercury"
               }
             ],
             "count": null
@@ -5958,9 +6012,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .select("name, cities(name)")
-              .limit(1, foreign_table="cities")
+              supabase.table("orchestral_sections")
+              .select("name, instruments(name)")
+              .limit(1, foreign_table="instruments")
               .execute()
           )
           ```
@@ -5968,33 +6022,33 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'United States');
+              (1, 'strings');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
+              (1, 1, 'harp'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "United States",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "Atlanta"
+                    "name": "harp"
                   }
                 ]
               }
@@ -6027,30 +6081,30 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("name").range(0, 1).execute()
+          response = supabase.table("planets").select("name").range(0, 1).execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Mercury"
               },
               {
-                "name": "Albania"
+                "name": "Earth"
               }
             ],
             "count": null
@@ -6063,9 +6117,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
-              .select("name, cities(name)")
-              .range(0, 1, foreign_table="cities")
+              supabase.table("orchestral_sections")
+              .select("name, instruments(name)")
+              .range(0, 1, foreign_table="instruments")
               .execute()
           )
           ```
@@ -6073,53 +6127,53 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'brass'),
+              (2, 'strings'),
+              (3, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Kabul'),
-              (2, 1, 'Herat'),
-              (3, 2, 'Berat');
+              (1, 1, 'horn'),
+              (2, 1, 'tuba'),
+              (3, 2, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan",
-                "cities": [
+                "name": "brass",
+                "instruments": [
                   {
-                    "name": "Kabul"
+                    "name": "horn"
                   },
                   {
-                    "name": "Herat"
+                    "name": "tuba"
                   }
                 ]
               },
               {
-                "name": "Albania",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "Berat"
+                    "name": "violin"
                   }
                 ]
               },
               {
-                "name": "Algeria",
-                "cities": []
+                "name": "woodwinds",
+                "instruments": []
               }
             ],
             "count": null
@@ -6134,26 +6188,26 @@ functions:
         name: With `select()`
         code: |
           ```python
-          response = supabase.table("countries").select("name").limit(1).single().execute()
+          response = supabase.table("planets").select("name").limit(1).single().execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           {
             "data": {
-              "name": "Afghanistan"
+              "name": "Mercury"
             },
             "count": null
           }
@@ -6169,9 +6223,9 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("*")
-              .eq("name", "Albania")
+              .eq("name", "Earth")
               .maybe_single()
               .execute()
           )
@@ -6180,21 +6234,21 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           {
             "data": {
               "id": 2,
-              "name": "Albania"
+              "name": "Earth"
             },
             "count": null
           }
@@ -6210,25 +6264,25 @@ functions:
         name: Return data as CSV
         code: |
           ```python
-          response = supabase.table("countries").select("*").csv().execute()
+          response = supabase.table("planets").select("*").csv().execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           {
-            "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
+            "data": "id,name\n1,Mercury\n2,Earth\n3,Mars",
             "count": null
           }
           ```
@@ -6281,26 +6335,26 @@ functions:
         name: Get the execution plan
         code: |
           ```python
-          response = supabase.table("countries").select("*").explain().execute()
+          response = supabase.table("planets").select("*").explain().execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```
           Aggregate  (cost=33.34..33.36 rows=1 width=112)
             ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
-                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+                  ->  Seq Scan on planets  (cost=0.00..22.00 rows=1200 width=40)
           ```
         description: |
           By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
@@ -6312,7 +6366,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.table("countries")
+              supabase.table("planets")
               .select("*")
               .explain(analyze=True, verbose=True)
               .execute()
@@ -6322,23 +6376,23 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```
           Aggregate  (cost=33.34..33.36 rows=1 width=112) (actual time=0.041..0.041 rows=1 loops=1)
-            Output: NULL::bigint, count(ROW(countries.id, countries.name)), COALESCE(json_agg(ROW(countries.id, countries.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
+            Output: NULL::bigint, count(ROW(planets.id, planets.name)), COALESCE(json_agg(ROW(planets.id, planets.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
             ->  Limit  (cost=0.00..18.33 rows=1000 width=40) (actual time=0.005..0.006 rows=3 loops=1)
-                  Output: countries.id, countries.name
-                  ->  Seq Scan on public.countries  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
-                        Output: countries.id, countries.name
+                  Output: planets.id, planets.name
+                  ->  Seq Scan on public.planets  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
+                        Output: planets.id, planets.name
           Query Identifier: -4730654291623321173
           Planning Time: 0.407 ms
           Execution Time: 0.119 ms
@@ -6395,14 +6449,14 @@ functions:
       - id: passing-custom-headers
         name: Passing custom headers
         description: |
-          The library accepts custom headers via the `headers` option. 
+          The library accepts custom headers via the `headers` option.
 
           Note: `supabase-py` automatically populates the `Authorization` header if there is a signed in user.
         isSpotlight: true
         code: |
           ```python
           response = supabase.functions.invoke(
-            "hello-world", 
+            "hello-world",
             invoke_options={
               "headers": {
                 "my-custom-header": "my-custom-header-value"
@@ -6733,7 +6787,7 @@ functions:
         name: Create bucket
         code: |
           ```python
-          response = supabase.storage.create_bucket('avatars',   
+          response = supabase.storage.create_bucket('avatars',
             options={
               "public": False,
               "allowed_mime_types": ["image/png"],
@@ -6810,7 +6864,7 @@ functions:
         name: Update bucket
         code: |
           ```python
-          response = supabase.storage.update_bucket('avatars',   
+          response = supabase.storage.update_bucket('avatars',
             options={
               "public": False,
               "allowed_mime_types": ["image/png"],
@@ -6871,7 +6925,7 @@ functions:
         isOptional: false
         type: BufferedReader | bytes | FileIO | string | Path
         description: The body of the file to be stored in the bucket.
-      - name: options
+      - name: file_options
         isOptional: false
         type: FileOptions
         subContent:
@@ -6925,7 +6979,7 @@ functions:
         isOptional: false
         type: BufferedReader | bytes | FileIO | string | Path
         description: The body of the file to be stored in the bucket.
-      - name: options
+      - name: file_options
         isOptional: false
         type: FileOptions
         subContent:

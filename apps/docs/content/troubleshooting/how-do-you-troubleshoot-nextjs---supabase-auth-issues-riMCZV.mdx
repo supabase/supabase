@@ -1,0 +1,34 @@
+---
+title = "How do you troubleshoot Next.js - Supabase Auth issues?"
+github_url = "https://github.com/orgs/supabase/discussions/27606"
+date_created = "2024-06-28T03:26:44+00:00"
+topics = [ "auth" ]
+keywords = [ "Next.js", "SSR", "authentication", "client" ]
+database_id = "4017d331-0b24-439a-9231-793801395ca2"
+---
+
+Authentication is hard. SSR is harder. At Supabase, we try to address these together by providing`@supabase/ssr` package to help implement authentication with Supabase conveniently. While I’m targeting to address Next.js-related issues, you can probably apply these concepts to other SSR frameworks such as Nuxt, SvelteKit, and Remix. This is a living document, and we plan to update it regularly as Next.js and its APIs + `@supabase/ssr` evolve.
+
+If you are experiencing issues with Supabase Auth and SSR, the following checklist will help you troubleshoot the issues.
+
+✅ You’re on the latest version of `@supabase/ssr` package. Note that the `@supabase/auth-helpers` package is being deprecated, and all the bug fixes and feature releases will be focused on the `@supabase/ssr` package.
+✅ Do you have all the client utility functions implemented? This way, you can easily import them into your components that need access to Supabase auth functions. Make sure to follow the [guide available here](https://supabase.com/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs&queryGroups=environment&environment=client-component#creating-a-client) carefully to avoid running into unexpected errors.
+✅ Do you have the `middleware.ts` file correctly implemented? This lets you refresh expired sessions before loading server components that require a user session for authorization.
+
+This documentation will help you validate that you’re on the correct path.
+
+- Setting up Server-Side Auth for Next.js - https://supabase.com/docs/guides/auth/server-side/nextjs?queryGroups=router&router=app
+- SSR advanced guide - https://supabase.com/docs/guides/auth/server-side/advanced-guide
+- Creating a Supabase client for SSR - https://supabase.com/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs&queryGroups=environment&environment=middleware
+
+Another way to identify any potential issues with your code is to compare it with the Supabase Next.js quickstart. Use the command `npx create-next-app -e with-supabase` to download a copy to your local machine of the quickstart application.
+
+Our YouTube channel has great videos to help you implement Supabase Auth with Next.js.
+
+- The Right Way to do Auth with the Next.js App Router - https://youtu.be/v6UvgfSIjQ0?si=TBUN9dD4pmjRg78a
+
+Also, please take some time to get familiar with some concepts on authentication with Next.js, such as https://nextjs.org/docs/app/building-your-application/authentication.
+
+We know your requirements vary, and you might run into an edge case. In that scenario, please use our amazing community channels ([GitHub](https://github.com/orgs/supabase/discussions), [Discord](https://discord.gg/rxTfewPvys)) to get help troubleshooting the issue. You can post your issues to the `@supabase/ssr` [GitHub repo](https://github.com/supabase/ssr/issues). We always welcome your contributions!
+
+If none of the above works, please don’t hesitate to reach out to [Supabase support](https://supabase.help); consider adding more information, such as your use case, code snippets, a copy of your `package.json`, `middleware.ts` and a HAR file, to help the support team triage your issue.

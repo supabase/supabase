@@ -1,4 +1,3 @@
-import { isNil } from 'lodash'
 import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
@@ -12,7 +11,7 @@ import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
-import { Popover, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Popover, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { BlockKeys } from '../common/BlockKeys'
 import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
@@ -65,8 +64,15 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   })
 
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
-  const initialValue = row[column.key as keyof TRow] as string
-  const jsonString = prettifyJSON(!isNil(initialValue) ? tryFormatInitialValue(initialValue) : '')
+
+  const rawInitialValue = row[column.key as keyof TRow] as unknown
+  const initialValue =
+    rawInitialValue === null || rawInitialValue === undefined || typeof rawInitialValue === 'string'
+      ? rawInitialValue
+      : JSON.stringify(rawInitialValue)
+
+  const jsonString = prettifyJSON(initialValue ? tryFormatInitialValue(initialValue) : '')
+
   const isTruncated =
     typeof initialValue === 'string' &&
     initialValue.endsWith('...') &&
@@ -198,8 +204,8 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                   </div>
                 </div>
               )}
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <div
                     className={[
                       'border border-strong rounded p-1 flex items-center justify-center',
@@ -209,11 +215,11 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                   >
                     <Maximize size={12} strokeWidth={2} />
                   </div>
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="bottom" align="center">
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="center">
                   <span>Expand editor</span>
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </BlockKeys>
         )

@@ -1,32 +1,58 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
-import type { PropsWithChildren } from 'react'
+import { useEffect, type PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
-import { Code, ExternalLink } from 'lucide-react'
-import { Button } from 'ui'
+import { Code } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { toast } from 'sonner'
+import { Button, cn } from 'ui'
 import FunctionsNav from '../../interfaces/Functions/FunctionsNav'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
-import { DocsButton } from 'components/ui/DocsButton'
 
 interface FunctionsLayoutProps {
   title?: string
 }
 
 const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutProps>) => {
+  const router = useRouter()
   const { functionSlug, ref } = useParams()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+
   const { data: functions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
-  const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
+  const {
+    data: selectedFunction,
+    error,
+    isError,
+  } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
 
   const canReadFunctions = useCheckPermissions(PermissionAction.FUNCTIONS_READ, '*')
+
+  const name = selectedFunction?.name || ''
+  const hasFunctions = (functions ?? []).length > 0
+  const centered = !hasFunctions
+
+  useEffect(() => {
+    let cancel = false
+
+    if (!!functionSlug && isError && error.code === 404 && !cancel) {
+      toast('Edge function cannot be found in your project')
+      router.push(`/project/${ref}/functions`)
+    }
+
+    return () => {
+      cancel = true
+    }
+  }, [isError])
+
   if (!canReadFunctions) {
     return (
       <ProjectLayout title={title || 'Edge Functions'} product="Edge Functions">
@@ -35,15 +61,11 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
     )
   }
 
-  const name = selectedFunction?.name || ''
-  const hasFunctions = (functions ?? []).length > 0
-  const centered = !hasFunctions
-
   return (
     <ProjectLayout isLoading={isLoading} title={title || 'Edge Functions'} product="Edge Functions">
       {centered ? (
         <>
-          <div className="mx-auto max-w-5xl py-24 px-5">
+          <div className="mx-auto max-w-full md:max-w-5xl py-12 md:py-20 px-4 md:px-5">
             <div
               className="item-center
             flex
@@ -65,18 +87,18 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
       ) : (
         <div className="flex h-full flex-grow flex-col py-6">
           <div
-            className={[
+            className={cn(
               'mx-auto flex w-full flex-col transition-all',
-              '1xl:px-28 gap-4 px-5 lg:px-16 xl:px-24 2xl:px-32',
-            ].join(' ')}
+              '1xl:px-28 gap-4 px-5 lg:px-16 xl:px-24 2xl:px-32'
+            )}
           >
             <div className="item-center flex flex-col justify-between gap-y-4 xl:flex-row">
               <div className="flex items-center gap-3 w-full">
                 <div
-                  className={[
+                  className={cn(
                     'h-6 w-6 rounded border border-brand-600 bg-brand-300',
-                    'flex items-center justify-center text-brand',
-                  ].join(' ')}
+                    'flex items-center justify-center text-brand'
+                  )}
                 >
                   <Code size={14} strokeWidth={3} />
                 </div>
@@ -122,10 +144,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                         }
                       />
                     )}
-                    <DocsButton
-                      className="translate-y-[1px]"
-                      href="https://supabase.com/docs/guides/functions"
-                    />
+                    <DocsButton href="https://supabase.com/docs/guides/functions" />
                   </div>
                 </div>
               </div>

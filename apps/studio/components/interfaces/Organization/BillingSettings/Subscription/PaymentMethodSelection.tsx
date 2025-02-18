@@ -1,16 +1,16 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import { Button, Listbox } from 'ui'
-import { Loader, AlertCircle, CreditCard, Plus } from 'lucide-react'
+import { AlertCircle, CreditCard, Loader, Plus } from 'lucide-react'
+import { Listbox } from 'ui'
 
 export interface PaymentMethodSelectionProps {
   selectedPaymentMethod?: string
@@ -70,37 +70,28 @@ const PaymentMethodSelection = ({
               <p className="text-sm">No saved payment methods</p>
             </div>
 
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button
-                  type="default"
-                  disabled={!canUpdatePaymentMethods}
-                  icon={<CreditCard />}
-                  onClick={() => setShowAddNewPaymentMethodModal(true)}
-                  htmlType="button"
-                >
-                  Add new
-                </Button>
-              </Tooltip.Trigger>
-              {!canUpdatePaymentMethods && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                        'w-48 border border-background text-center', //border
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
+            <ButtonTooltip
+              type="default"
+              disabled={!canUpdatePaymentMethods}
+              icon={<CreditCard />}
+              onClick={() => setShowAddNewPaymentMethodModal(true)}
+              htmlType="button"
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canUpdatePaymentMethods ? (
+                    <div className="w-48 text-center">
+                      <span>
                         You need additional permissions to add new payment methods to this
                         organization
                       </span>
                     </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
+                  ) : undefined,
+                },
+              }}
+            >
+              Add new
+            </ButtonTooltip>
           </div>
         ) : (
           <Listbox
@@ -148,7 +139,7 @@ const PaymentMethodSelection = ({
 
       <AddNewPaymentMethodModal
         visible={showAddNewPaymentMethodModal}
-        returnUrl={`${getURL()}/org/${selectedOrganization?.slug}/billing?panel=subscriptionPlan`}
+        returnUrl={`${getURL()}/org/${selectedOrganization?.slug}/billing?panel=subscriptionPlan&source=paymentMethod`}
         onCancel={() => setShowAddNewPaymentMethodModal(false)}
         autoMarkAsDefaultPaymentMethod={true}
         onConfirm={async () => {

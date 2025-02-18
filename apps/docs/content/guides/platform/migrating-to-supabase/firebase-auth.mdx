@@ -12,7 +12,7 @@ Supabase provides several [tools](https://github.com/supabase-community/firebase
 
 ## Set up the migration tool [#set-up-migration-tool]
 
-1. Clone the [firebase-to-supabase](https://github.com/supabase-community/firebase-to-supabase) repository:
+1. Clone the [`firebase-to-supabase`](https://github.com/supabase-community/firebase-to-supabase) repository:
 
    ```bash
    git clone https://github.com/supabase-community/firebase-to-supabase.git
@@ -73,12 +73,12 @@ hash_config {
 
 `node import_users.js <path_to_json_file> [<batch_size>]`
 
-- `path_to_json_file`: full local path and filename of .json input file (of users)
+- `path_to_json_file`: full local path and filename of JSON input file (of users)
 - `batch_size`: (optional) number of users to process in a batch (defaults to 100)
 
 ## Notes
 
-For more advanced migrations, including the use of a middleware server component for verifying a user's existing Firebase password and updating that password in your Supabase project the first time a user logs in, see the [firebase-to-supabase repo](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth).
+For more advanced migrations, including the use of a middleware server component for verifying a user's existing Firebase password and updating that password in your Supabase project the first time a user logs in, see the [`firebase-to-supabase` repo](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth).
 
 ## Resources
 

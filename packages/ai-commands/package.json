@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@serafin/schema-builder": "^0.18.5",
-    "@supabase/supabase-js": "*",
+    "@supabase/supabase-js": "catalog:",
     "ai": "^3.4.33",
     "common-tags": "^1.8.2",
     "config": "workspace:*",
@@ -24,14 +24,15 @@
   "devDependencies": {
     "@ai-sdk/openai": "^0.0.72",
     "@types/common-tags": "^1.8.4",
+    "@types/node": "catalog:",
     "api-types": "workspace:*",
     "chalk": "^5.3.0",
     "dotenv": "^16.3.1",
     "libpg-query": "15.2.0",
     "mdast-util-from-markdown": "^2.0.0",
-    "sql-formatter": "^15.0.2",
+    "sql-formatter": "^15.0.0",
     "tsconfig": "workspace:*",
     "typescript": "~5.5.0",
-    "vitest": "^2.0.0"
+    "vitest": "^3.0.0"
   }
 }

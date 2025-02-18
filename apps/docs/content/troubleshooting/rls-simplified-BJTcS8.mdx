@@ -1,0 +1,128 @@
+---
+title = "RLS Simplified"
+github_url = "https://github.com/orgs/supabase/discussions/29114"
+date_created = "2024-09-05T15:20:13+00:00"
+topics = [ "database", "auth" ]
+keywords = [ "rls", "sql", "policy" ]
+database_id = "5b8a5115-f81a-4a1f-bcc3-fdc2a2672e80"
+---
+
+### TL;DR: Basic summary
+
+Row-Level Security (RLS) Policy: A `WHERE` or `CHECK` condition applied automatically to database queries
+
+Key features:
+
+- Applies without being explicitly added to each query, which makes it good for policing row access from unknown entities, such as those leveraging the anon or authenticated roles.
+- Can be set for specific actions (e.g., SELECT, INSERT)
+- Can target particular database roles (e.g., "anon", "authenticated")
+
+Contrast with regular conditions:
+
+- Regular conditions: Apply to all roles and must be added manually to each query
+- RLS policies: Applied automatically to specified actions and roles
+
+## Hands on walk-through for conditions
+
+### USING:
+
+The `USING` keyword inspects the value of row to see if it should be made visible to the query.
+
+When you SELECT, UPDATE, or DELETE, you have to use a WHERE statement to search for specific rows:
+
+```sql
+-- select
+select *
+from some_table
+where id = 5;
+
+-- update
+update some_table
+set id = 6
+where id = 5;
+
+-- delete
+delete from some_table
+where id = 6;
+```
+
+Even when you don't use a WHERE statement, there's still an implicit one:
+
+```sql
+-- ...your query
+WHERE true;
+```
+
+The `USING` clause appends more to the WHERE statement:
+
+```sql
+-- Your Using condition
+USING (
+  (select auth.uid()) = user_id
+);
+
+-- Your query without RLS:
+SELECT * FROM some_table
+WHERE id = 5 OR id = 6;
+
+-- Your query after RLS
+SELECT * FROM some_table
+WHERE
+  (id = 5 OR id = 6)
+    AND
+  (select auth.uid()) = user_id) -- <--- added by the USING clause;
+```
+
+### WITH CHECK:
+
+Let's say you have a profile table. Well, you don't want user's to be able to modify their user_id when they make an insert, do you?
+
+The `WITH CHECK` condition inspects values that are being added or modified. For INSERT you'd use it by itself. There's no need for a using clause:
+
+```sql
+-- Allow users to add to table, but make sure their user_id matches the one in their JWT:
+
+create policy "Allow user to add posts"
+on "public"."posts"
+as PERMISSIVE
+for INSERT
+to authenticated
+with check(
+  (select auth.uid()) = user_id
+);
+
+-- Example: failing insert
+INSERT INTO posts
+VALUES (<false id>, <comment>);
+
+-- Example: successful insert
+INSERT INTO posts
+VALUES (<real id>, <comment>);
+```
+
+INSERTs do not rely on WHERE clauses, but they can have constraints. In this case, the RLS acts as a CHECK constraint against a column, e.g.:
+
+```sql
+ALTER TABLE table_name
+ADD CONSTRAINT constraint_name CHECK (condition);
+```
+
+What distinguishes it from normal `CHECK` constraints is that it is only activate for certain roles or methods.
+
+### UPDATEs:
+
+UPDATE both filters for rows to change and then adds new values to the table, so it requires both USING and WITH CHECK conditions:
+
+```sql
+create policy "Allow user to edit their stuff"
+on "public"."<SOME TABLE NAME>"
+as RESTRICTIVE
+for UPDATE
+to authenticated
+using (
+  (select auth.uid()) = user_id
+)
+with check(
+  (select auth.uid()) = user_id
+);
+```

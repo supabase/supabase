@@ -8,15 +8,9 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
-import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
-import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
-import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
-import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
-import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 import type { LogData, QueryType } from './Logs.types'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { WarehouseSelectionRenderer } from './LogSelectionRenderers/WarehouseSelectionRenderer'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -32,30 +26,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
   const LogDetails = () => {
     if (error) return <LogErrorState error={error} />
     if (!log) return <LogDetailEmptyState />
-    // if (!log.metadata) return <DefaultPreviewSelectionRenderer log={log} />
-
-    switch (queryType) {
-      case 'warehouse':
-        return <WarehouseSelectionRenderer log={log} />
-      case 'api':
-        return <DatabaseApiSelectionRender log={log} />
-
-      case 'database':
-        return <DatabasePostgresSelectionRender log={log} />
-      case 'pg_cron':
-        return <DatabasePostgresSelectionRender log={log} />
-
-      case 'fn_edge':
-        return <FunctionInvocationSelectionRender log={log} />
-
-      case 'functions':
-        return <FunctionLogsSelectionRender log={log} />
-
-      case 'auth':
-        return <AuthSelectionRenderer log={log} />
-      default:
-        return <DefaultPreviewSelectionRenderer log={log} />
-    }
+    return <DefaultPreviewSelectionRenderer log={log} />
   }
 
   return (

@@ -5,7 +5,6 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from '
 import {
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
-  genQueryParams,
   getDefaultHelper,
 } from 'components/interfaces/Settings/Logs/Logs.constants'
 import type {
@@ -22,11 +21,10 @@ import {
   genCountQuery,
   genDefaultQuery,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
-import { get, isResponseOk } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get } from 'data/fetchers'
+import { parseAsString, useQueryStates } from 'nuqs'
 import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
-import { parseAsString, useQueryStates } from 'nuqs'
 
 interface LogsPreviewHook {
   logData: LogData[]
@@ -82,18 +80,28 @@ function useLogsPreview({
     refetch,
   } = useInfiniteQuery(
     ['projects', projectRef, 'logs', params],
-    ({ signal, pageParam }) => {
-      const uri = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
-        ...params,
-        // don't overwrite unless user has already clicked on load older
-        iso_timestamp_end: pageParam || params.iso_timestamp_end,
-      } as any)}`
-      return get<Logs>(uri, { signal })
+    async ({ signal, pageParam }) => {
+      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+        params: {
+          path: { ref: projectRef },
+          query: {
+            ...params,
+            // don't overwrite unless user has already clicked on load older
+            iso_timestamp_end: pageParam || params.iso_timestamp_end,
+          },
+        },
+        signal,
+      })
+      if (error) {
+        throw error
+      }
+
+      return data as unknown as Logs
     },
     {
       refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
-        if (!isResponseOk(lastPage) || (lastPage.result?.length ?? 0) === 0) {
+        if ((lastPage.result?.length ?? 0) === 0) {
           return undefined
         }
         const len = lastPage.result.length
@@ -120,7 +128,7 @@ function useLogsPreview({
 
     let error: null | string | object = rqError ? (rqError as any).message : null
     data?.pages.forEach((response) => {
-      if (isResponseOk(response) && response.result) {
+      if (response.result) {
         logData = [...logData, ...response.result]
       }
       if (!error && response && response.error) {
@@ -133,14 +141,6 @@ function useLogsPreview({
     return { logData, error, oldestTimestamp }
   }, [data?.pages])
 
-  const countUrl = () => {
-    return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
-      ...params,
-      sql: genCountQuery(table, filters),
-      iso_timestamp_start: latestRefresh,
-    } as any)}`
-  }
-
   const { data: countData } = useQuery(
     [
       'projects',
@@ -148,7 +148,24 @@ function useLogsPreview({
       'logs-count',
       { ...params, sql: genCountQuery(table, filters), iso_timestamp_start: latestRefresh },
     ],
-    ({ signal }) => get<Count>(countUrl(), { signal }),
+    async ({ signal }) => {
+      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+        params: {
+          path: { ref: projectRef },
+          query: {
+            ...params,
+            sql: genCountQuery(table, filters),
+            iso_timestamp_start: latestRefresh,
+          },
+        },
+        signal,
+      })
+      if (error) {
+        throw error
+      }
+
+      return data as unknown as Count
+    },
     {
       refetchOnWindowFocus: false,
       // refresh each minute only
@@ -158,19 +175,13 @@ function useLogsPreview({
     }
   )
 
-  const newCount = isResponseOk(countData) ? countData.result?.[0]?.count ?? 0 : 0
+  const newCount = countData?.result?.[0]?.count ?? 0
 
   // chart data
-
-  const chartQuery = useMemo(() => genChartQuery(table, params, filters), [params, filters])
-  const chartUrl = useMemo(() => {
-    return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
-      iso_timestamp_end: params.iso_timestamp_end,
-      project: params.project,
-      sql: chartQuery,
-    } as any)}`
-  }, [params, chartQuery])
-
+  const chartQuery = useMemo(
+    () => genChartQuery(table, params, filters),
+    [table, params.iso_timestamp_end, params.project, filters]
+  )
   const { data: eventChartResponse, refetch: refreshEventChart } = useQuery(
     [
       'projects',
@@ -178,7 +189,25 @@ function useLogsPreview({
       'logs-chart',
       { iso_timestamp_end: params.iso_timestamp_end, project: params.project, sql: chartQuery },
     ],
-    ({ signal }) => get<EventChart>(chartUrl, { signal }),
+    async ({ signal }) => {
+      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+        params: {
+          path: { ref: projectRef },
+          query: {
+            iso_timestamp_start: params.iso_timestamp_start ?? '',
+            iso_timestamp_end: params.iso_timestamp_end ?? '',
+            project: params.project ?? '',
+            sql: chartQuery,
+          },
+        },
+        signal,
+      })
+      if (error) {
+        throw error
+      }
+
+      return data as unknown as EventChart
+    },
     { refetchOnWindowFocus: false }
   )
 
@@ -203,7 +232,7 @@ function useLogsPreview({
   }
 
   const normalizedEventChartData = useTimeseriesUnixToIso(
-    (isResponseOk(eventChartResponse) && eventChartResponse.result) || [],
+    eventChartResponse?.result ?? [],
     'timestamp'
   )
 

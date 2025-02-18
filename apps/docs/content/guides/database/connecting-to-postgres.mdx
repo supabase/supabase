@@ -10,7 +10,8 @@ How you connect to your database depends on where you're connecting from:
 
 - For frontend applications, use the [Data API](#data-apis-and-client-libraries)
 - For Postgres clients, use a connection string
-  - For persistent clients (for example, long-running servers or database GUIs) use the [direct connection string](#direct-connection) if your environment supports IPv6, and [Supavisor session mode](#supavisor-session-mode) if not
+  - For single sessions (for example, database GUIs) or Postgres native commands (for example, using client applications like [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) or specifying connections for [replication](/docs/guides/database/postgres/setup-replication-external)) use the [direct connection string](#direct-connection) if your environment supports IPv6
+  - For persistent clients, and support for both IPv4 and IPv6, use [Supavisor session mode](#supavisor-session-mode)
   - For temporary clients (for example, serverless or edge functions) use [Supavisor transaction mode](#supavisor-transaction-mode)
 
 ## Quickstarts
@@ -66,7 +67,7 @@ The direct connection string connects directly to your Postgres instance. It is 
 
 <Admonition type="caution">
 
-Direct connections use IPv6 by default. If your environment doesn't support IPv6, use [Supavisor session mode](#supavisor-session-mode) or get the [IPv4 addon](/docs/guides/platform/ipv4-address).
+Direct connections use IPv6 by default. If your environment doesn't support IPv6, use [Supavisor session mode](#supavisor-session-mode) or get the [IPv4 add-on](/docs/guides/platform/ipv4-address).
 
 </Admonition>
 
@@ -100,7 +101,7 @@ Get your project's session mode string from the [Database Settings](/dashboard/p
 
 ## Supavisor transaction mode
 
-The transaction mode connection string connects to your Postgres instance via a proxy which serves as a connection pooler. This is deal for serverless or edge functions, which require many transient connections.
+The transaction mode connection string connects to your Postgres instance via a proxy which serves as a connection pooler. This is ideal for serverless or edge functions, which require many transient connections.
 
 <Admonition type="caution">
 

@@ -238,6 +238,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-deploy-a-function",
+        "title": "Deploy a function",
+        "slug": "v1-deploy-a-function",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-a-function",
         "title": "Get a function",
         "slug": "v1-get-a-function",
@@ -376,6 +382,12 @@
     "title": "Projects",
     "items": [
       {
+        "id": "v1-cancel-a-project-restoration",
+        "title": "Cancel a project restoration",
+        "slug": "v1-cancel-a-project-restoration",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-a-project",
         "title": "Create a project",
         "slug": "v1-create-a-project",
@@ -436,9 +448,21 @@
         "type": "operation"
       },
       {
+        "id": "v1-list-available-restore-versions",
+        "title": "List available restore versions",
+        "slug": "v1-list-available-restore-versions",
+        "type": "operation"
+      },
+      {
         "id": "v1-pause-a-project",
         "title": "Pause a project",
         "slug": "v1-pause-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-restore-a-project",
+        "title": "Restore a project",
+        "slug": "v1-restore-a-project",
         "type": "operation"
       },
       {

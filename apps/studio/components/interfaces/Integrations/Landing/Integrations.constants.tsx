@@ -56,7 +56,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     id: 'queues',
     type: 'postgres_extension' as const,
     requiredExtensions: ['pgmq'],
-    missingExtensionsAlert: <UpgradeDatabaseAlert />,
+    missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
     name: `Queues`,
     icon: ({ className, ...props } = {}) => (
       <Layers className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
@@ -173,6 +173,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     id: 'vault',
     type: 'postgres_extension' as const,
     requiredExtensions: ['supabase_vault'],
+    missingExtensionsAlert: <UpgradeDatabaseAlert />,
     name: `Vault`,
     status: 'alpha',
     icon: ({ className, ...props } = {}) => (

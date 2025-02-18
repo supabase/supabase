@@ -68,6 +68,8 @@ const getInitialState = () => {
       showGenerateSqlModal: false,
       navigationPanelOpen: false,
       navigationPanelJustClosed: false,
+      ongoingQueriesPanelOpen: false,
+      mobileMenuOpen: false,
     }
   }
 
@@ -111,6 +113,8 @@ const getInitialState = () => {
     showGenerateSqlModal: false,
     navigationPanelOpen: false,
     navigationPanelJustClosed: false,
+    ongoingQueriesPanelOpen: false,
+    mobileMenuOpen: false,
   }
 }
 
@@ -209,6 +213,23 @@ export const appState = proxy({
       content: hasEntityChanged ? '' : appState.aiAssistantPanel.content,
       ...value,
     }
+  },
+
+  saveLatestMessage: (message: any) => {
+    appState.aiAssistantPanel = {
+      ...appState.aiAssistantPanel,
+      messages: [...appState.aiAssistantPanel.messages, message],
+    }
+  },
+
+  showOngoingQueriesPanelOpen: false,
+  setOnGoingQueriesPanelOpen: (value: boolean) => {
+    appState.ongoingQueriesPanelOpen = value
+  },
+
+  mobileMenuOpen: false,
+  setMobileMenuOpen: (value: boolean) => {
+    appState.mobileMenuOpen = value
   },
 })
 

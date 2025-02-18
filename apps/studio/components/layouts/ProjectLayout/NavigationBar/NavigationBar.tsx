@@ -1,4 +1,4 @@
-import { Home, User } from 'icons'
+import { Home } from 'icons'
 import { isUndefined } from 'lodash'
 import { Command, FileText, FlaskConical, Search, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -8,6 +8,7 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ProfileImage } from 'components/ui/ProfileImage'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -34,9 +35,9 @@ import {
   HoverCard_Shadcn_,
   Separator,
   Theme,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
   singleThemes,
 } from 'ui'
@@ -58,12 +59,12 @@ export const ICON_STROKE_WIDTH = 1.5
 const NavigationBar = () => {
   const snap = useAppStateSnapshot()
 
-  const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
-
-  const [allowNavPanelToExpand] = useLocalStorageQuery(
+  const [storedAllowNavPanel] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
     true
   )
+  // Don't allow the nav panel to expand in playwright tests
+  const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
 
   return (
     <div className="w-14 h-full hidden md:flex flex-col">
@@ -76,9 +77,7 @@ const NavigationBar = () => {
           'hide-scrollbar flex flex-col justify-between overflow-y-auto'
         )}
         onMouseEnter={() => allowNavPanelToExpand && snap.setNavigationPanelOpen(true)}
-        onMouseLeave={() => {
-          if (!userDropdownOpen && allowNavPanelToExpand) snap.setNavigationPanelOpen(false)
-        }}
+        onMouseLeave={() => allowNavPanelToExpand && snap.setNavigationPanelOpen(false)}
       >
         <NavContent />
       </nav>
@@ -98,12 +97,15 @@ export const NavContent = () => {
   const signOut = useSignOut()
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const [hasInvalidImg, setHasInvalidImg] = useState(false)
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
-  const [allowNavPanelToExpand] = useLocalStorageQuery(
+  const [storedAllowNavPanel] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
     true
   )
+  // Don't allow the nav panel to expand in playwright tests
+  const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
 
   const {
     projectAuthAll: authEnabled,
@@ -185,17 +187,19 @@ export const NavContent = () => {
 
   const UserAccountButton = (
     <Button
+      block
       type="text"
       size="tiny"
       className={cn(
         'mt-3 h-10 [&>span]:relative [&>span]:flex [&>span]:w-full [&>span]:h-full p-0'
       )}
-      block
     >
       <div className="relative w-full h-full flex items-center justify-center">
-        <figure className="absolute left-1.5 min-h-6 min-w-6 bg-foreground rounded-full flex items-center justify-center">
-          <User size={ICON_SIZE - 2} strokeWidth={ICON_STROKE_WIDTH} className="text-background" />
-        </figure>
+        <ProfileImage
+          alt={profile?.username}
+          src={profile?.profileImageUrl}
+          className="absolute left-1.5 w-6 h-6"
+        />
         <span
           className={cn(
             'w-full md:w-[8rem] flex flex-col items-start text-sm truncate',
@@ -227,17 +231,6 @@ export const NavContent = () => {
   return (
     <>
       <ul className="flex flex-col gap-y-1 justify-start px-2 relative">
-        <Link
-          href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
-          className="mx-2 hidden md:flex items-center w-[40px] h-[40px]"
-          onClick={onCloseNavigationIconLink}
-        >
-          <img
-            alt="Supabase"
-            src={`${router.basePath}/img/supabase-logo.svg`}
-            className="absolute h-[40px] w-6 cursor-pointer rounded"
-          />
-        </Link>
         <NavigationIconLink
           isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
           route={{
@@ -340,12 +333,12 @@ export const NavContent = () => {
         {IS_PLATFORM && (
           <>
             {!allowNavPanelToExpand && (
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>{CommandButton}</TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="right">
+              <Tooltip>
+                <TooltipTrigger asChild>{CommandButton}</TooltipTrigger>
+                <TooltipContent side="right">
                   <span>Commands</span>
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             )}
             {allowNavPanelToExpand && CommandButton}
           </>
@@ -361,14 +354,14 @@ export const NavContent = () => {
           {allowNavPanelToExpand ? (
             <DropdownMenuTrigger asChild>{UserAccountButton}</DropdownMenuTrigger>
           ) : (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>{UserAccountButton}</DropdownMenuTrigger>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="right">
+              </TooltipTrigger>
+              <TooltipContent side="right">
                 <span>Account settings</span>
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+              </TooltipContent>
+            </Tooltip>
           )}
 
           <DropdownMenuContent side="top" align="start">

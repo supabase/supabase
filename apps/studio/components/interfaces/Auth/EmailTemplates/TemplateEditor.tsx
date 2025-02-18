@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { debounce } from 'lodash'
 import { Code, Monitor } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
@@ -167,7 +166,7 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
         return (
           <>
-            <FormSection className="!border-t-0 pb-8 pt-4">
+            <FormSection className="!border-t-0 pb-8 !pt-4">
               <FormSectionContent loading={false}>
                 {Object.keys(properties).map((x: string) => {
                   const property = properties[x]

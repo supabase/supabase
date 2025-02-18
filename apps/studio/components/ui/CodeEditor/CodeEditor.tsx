@@ -4,8 +4,8 @@ import { editor } from 'monaco-editor'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { formatQuery } from 'data/sql/format-sql-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { formatSql } from 'lib/formatSql'
 import { timeout } from 'lib/helpers'
 import { cn } from 'ui'
 import { Loading } from '../Loading'
@@ -93,21 +93,6 @@ const CodeEditor = ({
     },
     options
   )
-
-  const formatPgsql = async (value: string) => {
-    try {
-      if (!project) throw new Error('No project')
-      const formatted = await formatQuery({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        sql: value,
-      })
-      return formatted.result
-    } catch (error) {
-      console.error('formatPgsql error:', error)
-      return value
-    }
-  }
 
   const onMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
@@ -234,7 +219,7 @@ const CodeEditor = ({
       const formatProvider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
         async provideDocumentFormattingEdits(model: any) {
           const value = model.getValue()
-          const formatted = await formatPgsql(value)
+          const formatted = formatSql(value)
           formatDocument.callback(formatted)
           return [{ range: model.getFullModelRange(), text: formatted }]
         },

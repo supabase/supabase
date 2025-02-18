@@ -1919,6 +1919,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "multi-select-combobox-creatable": {
+      name: "multi-select-combobox-creatable",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-combobox-creatable")),
+      source: "",
+      files: ["registry/default/example/multi-select-combobox-creatable.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "multi-select-deletable-badge": {
       name: "multi-select-deletable-badge",
       type: "components:example",
@@ -2157,6 +2168,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/expanding-textarea-demo")),
       source: "",
       files: ["registry/default/example/expanding-textarea-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "logs-bar-chart": {
+      name: "logs-bar-chart",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/logs-bar-chart")),
+      source: "",
+      files: ["registry/default/example/logs-bar-chart.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

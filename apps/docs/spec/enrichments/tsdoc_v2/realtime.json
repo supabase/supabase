@@ -7,14 +7,14 @@
   "originalName": "",
   "children": [
     {
-      "id": 588,
+      "id": 614,
       "name": "REALTIME_LISTEN_TYPES",
       "kind": 8,
       "kindString": "Enumeration",
       "flags": {},
       "children": [
         {
-          "id": 589,
+          "id": 615,
           "name": "BROADCAST",
           "kind": 16,
           "kindString": "Enumeration Member",
@@ -22,7 +22,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 93,
+              "line": 98,
               "character": 2
             }
           ],
@@ -33,18 +33,15 @@
           "defaultValue": "\"broadcast\""
         },
         {
-          "id": 591,
+          "id": 617,
           "name": "POSTGRES_CHANGES",
           "kind": 16,
           "kindString": "Enumeration Member",
           "flags": {},
-          "comment": {
-            "shortText": "listen to Postgres changes."
-          },
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 98,
+              "line": 100,
               "character": 2
             }
           ],
@@ -55,8 +52,88 @@
           "defaultValue": "\"postgres_changes\""
         },
         {
-          "id": 590,
+          "id": 616,
           "name": "PRESENCE",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/RealtimeChannel.ts",
+              "line": 99,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "presence"
+          },
+          "defaultValue": "\"presence\""
+        },
+        {
+          "id": 618,
+          "name": "SYSTEM",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/RealtimeChannel.ts",
+              "line": 101,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "system"
+          },
+          "defaultValue": "\"system\""
+        }
+      ],
+      "groups": [
+        {
+          "title": "Enumeration Members",
+          "kind": 16,
+          "children": [615, 617, 616, 618]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "src/RealtimeChannel.ts",
+          "line": 97,
+          "character": 12
+        }
+      ]
+    },
+    {
+      "id": 619,
+      "name": "REALTIME_POSTGRES_CHANGES_LISTEN_EVENT",
+      "kind": 8,
+      "kindString": "Enumeration",
+      "flags": {},
+      "children": [
+        {
+          "id": 620,
+          "name": "ALL",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/RealtimeChannel.ts",
+              "line": 91,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "*"
+          },
+          "defaultValue": "\"*\""
+        },
+        {
+          "id": 623,
+          "name": "DELETE",
           "kind": 16,
           "kindString": "Enumeration Member",
           "flags": {},
@@ -69,73 +146,12 @@
           ],
           "type": {
             "type": "literal",
-            "value": "presence"
-          },
-          "defaultValue": "\"presence\""
-        }
-      ],
-      "groups": [
-        {
-          "title": "Enumeration Members",
-          "kind": 16,
-          "children": [589, 591, 590]
-        }
-      ],
-      "sources": [
-        {
-          "fileName": "src/RealtimeChannel.ts",
-          "line": 92,
-          "character": 12
-        }
-      ]
-    },
-    {
-      "id": 592,
-      "name": "REALTIME_POSTGRES_CHANGES_LISTEN_EVENT",
-      "kind": 8,
-      "kindString": "Enumeration",
-      "flags": {},
-      "children": [
-        {
-          "id": 593,
-          "name": "ALL",
-          "kind": 16,
-          "kindString": "Enumeration Member",
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "src/RealtimeChannel.ts",
-              "line": 86,
-              "character": 2
-            }
-          ],
-          "type": {
-            "type": "literal",
-            "value": "*"
-          },
-          "defaultValue": "\"*\""
-        },
-        {
-          "id": 596,
-          "name": "DELETE",
-          "kind": 16,
-          "kindString": "Enumeration Member",
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "src/RealtimeChannel.ts",
-              "line": 89,
-              "character": 2
-            }
-          ],
-          "type": {
-            "type": "literal",
             "value": "DELETE"
           },
           "defaultValue": "\"DELETE\""
         },
         {
-          "id": 594,
+          "id": 621,
           "name": "INSERT",
           "kind": 16,
           "kindString": "Enumeration Member",
@@ -143,7 +159,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 87,
+              "line": 92,
               "character": 2
             }
           ],
@@ -154,7 +170,7 @@
           "defaultValue": "\"INSERT\""
         },
         {
-          "id": 595,
+          "id": 622,
           "name": "UPDATE",
           "kind": 16,
           "kindString": "Enumeration Member",
@@ -162,7 +178,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 88,
+              "line": 93,
               "character": 2
             }
           ],
@@ -177,26 +193,26 @@
         {
           "title": "Enumeration Members",
           "kind": 16,
-          "children": [593, 596, 594, 595]
+          "children": [620, 623, 621, 622]
         }
       ],
       "sources": [
         {
           "fileName": "src/RealtimeChannel.ts",
-          "line": 85,
+          "line": 90,
           "character": 12
         }
       ]
     },
     {
-      "id": 597,
+      "id": 624,
       "name": "REALTIME_PRESENCE_LISTEN_EVENTS",
       "kind": 8,
       "kindString": "Enumeration",
       "flags": {},
       "children": [
         {
-          "id": 599,
+          "id": 626,
           "name": "JOIN",
           "kind": 16,
           "kindString": "Enumeration Member",
@@ -215,7 +231,7 @@
           "defaultValue": "\"join\""
         },
         {
-          "id": 600,
+          "id": 627,
           "name": "LEAVE",
           "kind": 16,
           "kindString": "Enumeration Member",
@@ -234,7 +250,7 @@
           "defaultValue": "\"leave\""
         },
         {
-          "id": 598,
+          "id": 625,
           "name": "SYNC",
           "kind": 16,
           "kindString": "Enumeration Member",
@@ -257,7 +273,7 @@
         {
           "title": "Enumeration Members",
           "kind": 16,
-          "children": [599, 600, 598]
+          "children": [626, 627, 625]
         }
       ],
       "sources": [
@@ -269,15 +285,53 @@
       ]
     },
     {
-      "id": 601,
+      "id": 628,
       "name": "REALTIME_SUBSCRIBE_STATES",
       "kind": 8,
       "kindString": "Enumeration",
       "flags": {},
       "children": [
         {
-          "id": 605,
+          "id": 632,
           "name": "CHANNEL_ERROR",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/RealtimeChannel.ts",
+              "line": 108,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "CHANNEL_ERROR"
+          },
+          "defaultValue": "\"CHANNEL_ERROR\""
+        },
+        {
+          "id": 631,
+          "name": "CLOSED",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/RealtimeChannel.ts",
+              "line": 107,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "CLOSED"
+          },
+          "defaultValue": "\"CLOSED\""
+        },
+        {
+          "id": 629,
+          "name": "SUBSCRIBED",
           "kind": 16,
           "kindString": "Enumeration Member",
           "flags": {},
@@ -290,50 +344,12 @@
           ],
           "type": {
             "type": "literal",
-            "value": "CHANNEL_ERROR"
-          },
-          "defaultValue": "\"CHANNEL_ERROR\""
-        },
-        {
-          "id": 604,
-          "name": "CLOSED",
-          "kind": 16,
-          "kindString": "Enumeration Member",
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "src/RealtimeChannel.ts",
-              "line": 104,
-              "character": 2
-            }
-          ],
-          "type": {
-            "type": "literal",
-            "value": "CLOSED"
-          },
-          "defaultValue": "\"CLOSED\""
-        },
-        {
-          "id": 602,
-          "name": "SUBSCRIBED",
-          "kind": 16,
-          "kindString": "Enumeration Member",
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "src/RealtimeChannel.ts",
-              "line": 102,
-              "character": 2
-            }
-          ],
-          "type": {
-            "type": "literal",
             "value": "SUBSCRIBED"
           },
           "defaultValue": "\"SUBSCRIBED\""
         },
         {
-          "id": 603,
+          "id": 630,
           "name": "TIMED_OUT",
           "kind": 16,
           "kindString": "Enumeration Member",
@@ -341,7 +357,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 103,
+              "line": 106,
               "character": 2
             }
           ],
@@ -356,13 +372,13 @@
         {
           "title": "Enumeration Members",
           "kind": 16,
-          "children": [605, 604, 602, 603]
+          "children": [632, 631, 629, 630]
         }
       ],
       "sources": [
         {
           "fileName": "src/RealtimeChannel.ts",
-          "line": 101,
+          "line": 104,
           "character": 12
         }
       ]
@@ -386,7 +402,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 134,
+              "line": 147,
               "character": 2
             }
           ],
@@ -417,7 +433,7 @@
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 347,
+                    "id": 358,
                     "name": "RealtimeChannelOptions"
                   },
                   "defaultValue": "..."
@@ -430,7 +446,7 @@
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 359,
+                    "id": 371,
                     "name": "default"
                   }
                 }
@@ -452,7 +468,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 116,
+              "line": 128,
               "character": 2
             }
           ],
@@ -502,7 +518,7 @@
                           "sources": [
                             {
                               "fileName": "src/RealtimeChannel.ts",
-                              "line": 120,
+                              "line": 132,
                               "character": 6
                             }
                           ],
@@ -522,7 +538,7 @@
                           "sources": [
                             {
                               "fileName": "src/RealtimeChannel.ts",
-                              "line": 119,
+                              "line": 131,
                               "character": 6
                             }
                           ],
@@ -537,7 +553,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/RealtimeChannel.ts",
-                                  "line": 119,
+                                  "line": 131,
                                   "character": 14
                                 }
                               ],
@@ -578,7 +594,7 @@
                           "sources": [
                             {
                               "fileName": "src/RealtimeChannel.ts",
-                              "line": 121,
+                              "line": 133,
                               "character": 6
                             }
                           ],
@@ -596,7 +612,7 @@
                           "sources": [
                             {
                               "fileName": "src/RealtimeChannel.ts",
-                              "line": 118,
+                              "line": 130,
                               "character": 6
                             }
                           ],
@@ -616,7 +632,7 @@
                       "sources": [
                         {
                           "fileName": "src/RealtimeChannel.ts",
-                          "line": 117,
+                          "line": 129,
                           "character": 19
                         }
                       ]
@@ -637,7 +653,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 131,
+              "line": 143,
               "character": 2
             }
           ],
@@ -655,7 +671,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 127,
+              "line": 139,
               "character": 2
             }
           ],
@@ -673,7 +689,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 126,
+              "line": 138,
               "character": 2
             }
           ],
@@ -684,7 +700,7 @@
           "defaultValue": "false"
         },
         {
-          "id": 102,
+          "id": 103,
           "name": "params",
           "kind": 1024,
           "kindString": "Property",
@@ -693,7 +709,7 @@
           },
           "type": {
             "type": "reference",
-            "id": 347,
+            "id": 358,
             "name": "RealtimeChannelOptions"
           },
           "defaultValue": "..."
@@ -707,7 +723,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 130,
+              "line": 142,
               "character": 2
             }
           ],
@@ -715,6 +731,24 @@
             "type": "reference",
             "id": 1,
             "name": "default"
+          }
+        },
+        {
+          "id": 101,
+          "name": "private",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/RealtimeChannel.ts",
+              "line": 145,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "boolean"
           }
         },
         {
@@ -726,7 +760,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 129,
+              "line": 141,
               "character": 2
             }
           ],
@@ -748,7 +782,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 128,
+              "line": 140,
               "character": 2
             }
           ],
@@ -758,7 +792,7 @@
           }
         },
         {
-          "id": 103,
+          "id": 104,
           "name": "socket",
           "kind": 1024,
           "kindString": "Property",
@@ -767,7 +801,7 @@
           },
           "type": {
             "type": "reference",
-            "id": 359,
+            "id": 371,
             "name": "default"
           }
         },
@@ -780,7 +814,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 125,
+              "line": 137,
               "character": 2
             }
           ],
@@ -799,7 +833,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 132,
+              "line": 144,
               "character": 2
             }
           ],
@@ -817,7 +851,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 124,
+              "line": 136,
               "character": 2
             }
           ],
@@ -827,7 +861,7 @@
           }
         },
         {
-          "id": 101,
+          "id": 102,
           "name": "topic",
           "kind": 1024,
           "kindString": "Property",
@@ -840,108 +874,7 @@
           }
         },
         {
-          "id": 269,
-          "name": "_fetchWithTimeout",
-          "kind": 2048,
-          "kindString": "Method",
-          "flags": {},
-          "sources": [
-            {
-              "fileName": "src/RealtimeChannel.ts",
-              "line": 538,
-              "character": 8
-            }
-          ],
-          "signatures": [
-            {
-              "id": 270,
-              "name": "_fetchWithTimeout",
-              "kind": 4096,
-              "kindString": "Call signature",
-              "flags": {},
-              "parameters": [
-                {
-                  "id": 271,
-                  "name": "url",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "intrinsic",
-                    "name": "string"
-                  }
-                },
-                {
-                  "id": 272,
-                  "name": "options",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "reflection",
-                    "declaration": {
-                      "id": 273,
-                      "name": "__type",
-                      "kind": 65536,
-                      "kindString": "Type literal",
-                      "flags": {},
-                      "indexSignature": {
-                        "id": 274,
-                        "name": "__index",
-                        "kind": 8192,
-                        "kindString": "Index signature",
-                        "flags": {},
-                        "parameters": [
-                          {
-                            "id": 275,
-                            "name": "key",
-                            "kind": 32768,
-                            "flags": {},
-                            "type": {
-                              "type": "intrinsic",
-                              "name": "string"
-                            }
-                          }
-                        ],
-                        "type": {
-                          "type": "intrinsic",
-                          "name": "any"
-                        }
-                      }
-                    }
-                  }
-                },
-                {
-                  "id": 276,
-                  "name": "timeout",
-                  "kind": 32768,
-                  "kindString": "Parameter",
-                  "flags": {},
-                  "type": {
-                    "type": "intrinsic",
-                    "name": "number"
-                  }
-                }
-              ],
-              "type": {
-                "type": "reference",
-                "typeArguments": [
-                  {
-                    "type": "reference",
-                    "qualifiedName": "Response",
-                    "package": "typescript",
-                    "name": "Response"
-                  }
-                ],
-                "qualifiedName": "Promise",
-                "package": "typescript",
-                "name": "Promise"
-              }
-            }
-          ]
-        },
-        {
-          "id": 135,
+          "id": 136,
           "name": "on",
           "kind": 2048,
           "kindString": "Method",
@@ -955,7 +888,7 @@
           ],
           "signatures": [
             {
-              "id": 136,
+              "id": 137,
               "name": "on",
               "kind": 4096,
               "kindString": "Call signature",
@@ -965,7 +898,7 @@
               },
               "parameters": [
                 {
-                  "id": 137,
+                  "id": 138,
                   "name": "type",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -976,7 +909,7 @@
                   }
                 },
                 {
-                  "id": 138,
+                  "id": 139,
                   "name": "filter",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -984,14 +917,14 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 139,
+                      "id": 140,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
-                          "id": 140,
+                          "id": 141,
                           "name": "event",
                           "kind": 1024,
                           "kindString": "Property",
@@ -1013,14 +946,14 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [140]
+                          "children": [141]
                         }
                       ]
                     }
                   }
                 },
                 {
-                  "id": 141,
+                  "id": 142,
                   "name": "callback",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1028,14 +961,14 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 142,
+                      "id": 143,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "signatures": [
                         {
-                          "id": 143,
+                          "id": 144,
                           "name": "__type",
                           "kind": 4096,
                           "kindString": "Call signature",
@@ -1057,14 +990,14 @@
               }
             },
             {
-              "id": 144,
+              "id": 145,
               "name": "on",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "typeParameter": [
                 {
-                  "id": 148,
+                  "id": 149,
                   "name": "T",
                   "kind": 131072,
                   "kindString": "Type parameter",
@@ -1072,20 +1005,20 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 145,
+                      "id": 146,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "indexSignature": {
-                        "id": 146,
+                        "id": 147,
                         "name": "__index",
                         "kind": 8192,
                         "kindString": "Index signature",
                         "flags": {},
                         "parameters": [
                           {
-                            "id": 147,
+                            "id": 148,
                             "name": "key",
                             "kind": 32768,
                             "flags": {},
@@ -1106,7 +1039,7 @@
               ],
               "parameters": [
                 {
-                  "id": 149,
+                  "id": 150,
                   "name": "type",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1117,7 +1050,7 @@
                   }
                 },
                 {
-                  "id": 150,
+                  "id": 151,
                   "name": "filter",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1125,14 +1058,14 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 151,
+                      "id": 152,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
-                          "id": 152,
+                          "id": 153,
                           "name": "event",
                           "kind": 1024,
                           "kindString": "Property",
@@ -1154,14 +1087,14 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [152]
+                          "children": [153]
                         }
                       ]
                     }
                   }
                 },
                 {
-                  "id": 153,
+                  "id": 154,
                   "name": "callback",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1169,32 +1102,32 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 154,
+                      "id": 155,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "signatures": [
                         {
-                          "id": 155,
+                          "id": 156,
                           "name": "__type",
                           "kind": 4096,
                           "kindString": "Call signature",
                           "flags": {},
                           "parameters": [
                             {
-                              "id": 156,
+                              "id": 157,
                               "name": "payload",
                               "kind": 32768,
                               "kindString": "Parameter",
                               "flags": {},
                               "type": {
                                 "type": "reference",
-                                "id": 558,
+                                "id": 584,
                                 "typeArguments": [
                                   {
                                     "type": "reference",
-                                    "id": 148,
+                                    "id": 149,
                                     "name": "T"
                                   }
                                 ],
@@ -1219,14 +1152,14 @@
               }
             },
             {
-              "id": 157,
+              "id": 158,
               "name": "on",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "typeParameter": [
                 {
-                  "id": 161,
+                  "id": 162,
                   "name": "T",
                   "kind": 131072,
                   "kindString": "Type parameter",
@@ -1234,20 +1167,20 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 158,
+                      "id": 159,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "indexSignature": {
-                        "id": 159,
+                        "id": 160,
                         "name": "__index",
                         "kind": 8192,
                         "kindString": "Index signature",
                         "flags": {},
                         "parameters": [
                           {
-                            "id": 160,
+                            "id": 161,
                             "name": "key",
                             "kind": 32768,
                             "flags": {},
@@ -1268,7 +1201,7 @@
               ],
               "parameters": [
                 {
-                  "id": 162,
+                  "id": 163,
                   "name": "type",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1279,7 +1212,7 @@
                   }
                 },
                 {
-                  "id": 163,
+                  "id": 164,
                   "name": "filter",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1287,14 +1220,14 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 164,
+                      "id": 165,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
-                          "id": 165,
+                          "id": 166,
                           "name": "event",
                           "kind": 1024,
                           "kindString": "Property",
@@ -1316,14 +1249,14 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [165]
+                          "children": [166]
                         }
                       ]
                     }
                   }
                 },
                 {
-                  "id": 166,
+                  "id": 167,
                   "name": "callback",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1331,32 +1264,32 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 167,
+                      "id": 168,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "signatures": [
                         {
-                          "id": 168,
+                          "id": 169,
                           "name": "__type",
                           "kind": 4096,
                           "kindString": "Call signature",
                           "flags": {},
                           "parameters": [
                             {
-                              "id": 169,
+                              "id": 170,
                               "name": "payload",
                               "kind": 32768,
                               "kindString": "Parameter",
                               "flags": {},
                               "type": {
                                 "type": "reference",
-                                "id": 568,
+                                "id": 594,
                                 "typeArguments": [
                                   {
                                     "type": "reference",
-                                    "id": 161,
+                                    "id": 162,
                                     "name": "T"
                                   }
                                 ],
@@ -1381,14 +1314,14 @@
               }
             },
             {
-              "id": 170,
+              "id": 171,
               "name": "on",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "typeParameter": [
                 {
-                  "id": 174,
+                  "id": 175,
                   "name": "T",
                   "kind": 131072,
                   "kindString": "Type parameter",
@@ -1396,20 +1329,20 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 171,
+                      "id": 172,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "indexSignature": {
-                        "id": 172,
+                        "id": 173,
                         "name": "__index",
                         "kind": 8192,
                         "kindString": "Index signature",
                         "flags": {},
                         "parameters": [
                           {
-                            "id": 173,
+                            "id": 174,
                             "name": "key",
                             "kind": 32768,
                             "flags": {},
@@ -1430,7 +1363,7 @@
               ],
               "parameters": [
                 {
-                  "id": 175,
+                  "id": 176,
                   "name": "type",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1441,14 +1374,14 @@
                   }
                 },
                 {
-                  "id": 176,
+                  "id": 177,
                   "name": "filter",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 517,
+                    "id": 543,
                     "typeArguments": [
                       {
                         "type": "literal",
@@ -1459,7 +1392,7 @@
                   }
                 },
                 {
-                  "id": 177,
+                  "id": 178,
                   "name": "callback",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1467,32 +1400,32 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 178,
+                      "id": 179,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "signatures": [
                         {
-                          "id": 179,
+                          "id": 180,
                           "name": "__type",
                           "kind": 4096,
                           "kindString": "Call signature",
                           "flags": {},
                           "parameters": [
                             {
-                              "id": 180,
+                              "id": 181,
                               "name": "payload",
                               "kind": 32768,
                               "kindString": "Parameter",
                               "flags": {},
                               "type": {
                                 "type": "reference",
-                                "id": 524,
+                                "id": 550,
                                 "typeArguments": [
                                   {
                                     "type": "reference",
-                                    "id": 174,
+                                    "id": 175,
                                     "name": "T"
                                   }
                                 ],
@@ -1517,14 +1450,14 @@
               }
             },
             {
-              "id": 181,
+              "id": 182,
               "name": "on",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "typeParameter": [
                 {
-                  "id": 185,
+                  "id": 186,
                   "name": "T",
                   "kind": 131072,
                   "kindString": "Type parameter",
@@ -1532,20 +1465,20 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 182,
+                      "id": 183,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "indexSignature": {
-                        "id": 183,
+                        "id": 184,
                         "name": "__index",
                         "kind": 8192,
                         "kindString": "Index signature",
                         "flags": {},
                         "parameters": [
                           {
-                            "id": 184,
+                            "id": 185,
                             "name": "key",
                             "kind": 32768,
                             "flags": {},
@@ -1566,7 +1499,7 @@
               ],
               "parameters": [
                 {
-                  "id": 186,
+                  "id": 187,
                   "name": "type",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1577,14 +1510,14 @@
                   }
                 },
                 {
-                  "id": 187,
+                  "id": 188,
                   "name": "filter",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 517,
+                    "id": 543,
                     "typeArguments": [
                       {
                         "type": "literal",
@@ -1595,7 +1528,7 @@
                   }
                 },
                 {
-                  "id": 188,
+                  "id": 189,
                   "name": "callback",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1603,32 +1536,32 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 189,
+                      "id": 190,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "signatures": [
                         {
-                          "id": 190,
+                          "id": 191,
                           "name": "__type",
                           "kind": 4096,
                           "kindString": "Call signature",
                           "flags": {},
                           "parameters": [
                             {
-                              "id": 191,
+                              "id": 192,
                               "name": "payload",
                               "kind": 32768,
                               "kindString": "Parameter",
                               "flags": {},
                               "type": {
                                 "type": "reference",
-                                "id": 529,
+                                "id": 555,
                                 "typeArguments": [
                                   {
                                     "type": "reference",
-                                    "id": 185,
+                                    "id": 186,
                                     "name": "T"
                                   }
                                 ],
@@ -1653,14 +1586,14 @@
               }
             },
             {
-              "id": 192,
+              "id": 193,
               "name": "on",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "typeParameter": [
                 {
-                  "id": 196,
+                  "id": 197,
                   "name": "T",
                   "kind": 131072,
                   "kindString": "Type parameter",
@@ -1668,20 +1601,20 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 193,
+                      "id": 194,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "indexSignature": {
-                        "id": 194,
+                        "id": 195,
                         "name": "__index",
                         "kind": 8192,
                         "kindString": "Index signature",
                         "flags": {},
                         "parameters": [
                           {
-                            "id": 195,
+                            "id": 196,
                             "name": "key",
                             "kind": 32768,
                             "flags": {},
@@ -1702,7 +1635,7 @@
               ],
               "parameters": [
                 {
-                  "id": 197,
+                  "id": 198,
                   "name": "type",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1713,14 +1646,14 @@
                   }
                 },
                 {
-                  "id": 198,
+                  "id": 199,
                   "name": "filter",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 517,
+                    "id": 543,
                     "typeArguments": [
                       {
                         "type": "literal",
@@ -1731,7 +1664,7 @@
                   }
                 },
                 {
-                  "id": 199,
+                  "id": 200,
                   "name": "callback",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1739,32 +1672,32 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 200,
+                      "id": 201,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "signatures": [
                         {
-                          "id": 201,
+                          "id": 202,
                           "name": "__type",
                           "kind": 4096,
                           "kindString": "Call signature",
                           "flags": {},
                           "parameters": [
                             {
-                              "id": 202,
+                              "id": 203,
                               "name": "payload",
                               "kind": 32768,
                               "kindString": "Parameter",
                               "flags": {},
                               "type": {
                                 "type": "reference",
-                                "id": 539,
+                                "id": 565,
                                 "typeArguments": [
                                   {
                                     "type": "reference",
-                                    "id": 196,
+                                    "id": 197,
                                     "name": "T"
                                   }
                                 ],
@@ -1789,14 +1722,14 @@
               }
             },
             {
-              "id": 203,
+              "id": 204,
               "name": "on",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "typeParameter": [
                 {
-                  "id": 207,
+                  "id": 208,
                   "name": "T",
                   "kind": 131072,
                   "kindString": "Type parameter",
@@ -1804,20 +1737,20 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 204,
+                      "id": 205,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "indexSignature": {
-                        "id": 205,
+                        "id": 206,
                         "name": "__index",
                         "kind": 8192,
                         "kindString": "Index signature",
                         "flags": {},
                         "parameters": [
                           {
-                            "id": 206,
+                            "id": 207,
                             "name": "key",
                             "kind": 32768,
                             "flags": {},
@@ -1838,7 +1771,7 @@
               ],
               "parameters": [
                 {
-                  "id": 208,
+                  "id": 209,
                   "name": "type",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1849,14 +1782,14 @@
                   }
                 },
                 {
-                  "id": 209,
+                  "id": 210,
                   "name": "filter",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 517,
+                    "id": 543,
                     "typeArguments": [
                       {
                         "type": "literal",
@@ -1867,7 +1800,7 @@
                   }
                 },
                 {
-                  "id": 210,
+                  "id": 211,
                   "name": "callback",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1875,32 +1808,32 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 211,
+                      "id": 212,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "signatures": [
                         {
-                          "id": 212,
+                          "id": 213,
                           "name": "__type",
                           "kind": 4096,
                           "kindString": "Call signature",
                           "flags": {},
                           "parameters": [
                             {
-                              "id": 213,
+                              "id": 214,
                               "name": "payload",
                               "kind": 32768,
                               "kindString": "Parameter",
                               "flags": {},
                               "type": {
                                 "type": "reference",
-                                "id": 548,
+                                "id": 574,
                                 "typeArguments": [
                                   {
                                     "type": "reference",
-                                    "id": 207,
+                                    "id": 208,
                                     "name": "T"
                                   }
                                 ],
@@ -1925,7 +1858,7 @@
               }
             },
             {
-              "id": 214,
+              "id": 215,
               "name": "on",
               "kind": 4096,
               "kindString": "Call signature",
@@ -1935,7 +1868,7 @@
               },
               "parameters": [
                 {
-                  "id": 215,
+                  "id": 216,
                   "name": "type",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1949,7 +1882,7 @@
                   }
                 },
                 {
-                  "id": 216,
+                  "id": 217,
                   "name": "filter",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1960,14 +1893,14 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 217,
+                      "id": 218,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
-                          "id": 218,
+                          "id": 219,
                           "name": "event",
                           "kind": 1024,
                           "kindString": "Property",
@@ -1989,14 +1922,14 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [218]
+                          "children": [219]
                         }
                       ]
                     }
                   }
                 },
                 {
-                  "id": 219,
+                  "id": 220,
                   "name": "callback",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2007,21 +1940,21 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 220,
+                      "id": 221,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "signatures": [
                         {
-                          "id": 221,
+                          "id": 222,
                           "name": "__type",
                           "kind": 4096,
                           "kindString": "Call signature",
                           "flags": {},
                           "parameters": [
                             {
-                              "id": 222,
+                              "id": 223,
                               "name": "payload",
                               "kind": 32768,
                               "kindString": "Parameter",
@@ -2029,14 +1962,14 @@
                               "type": {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 223,
+                                  "id": 224,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
                                   "flags": {},
                                   "children": [
                                     {
-                                      "id": 225,
+                                      "id": 226,
                                       "name": "event",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -2054,7 +1987,7 @@
                                       }
                                     },
                                     {
-                                      "id": 224,
+                                      "id": 225,
                                       "name": "type",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -2076,18 +2009,18 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [225, 224]
+                                      "children": [226, 225]
                                     }
                                   ],
                                   "indexSignature": {
-                                    "id": 226,
+                                    "id": 227,
                                     "name": "__index",
                                     "kind": 8192,
                                     "kindString": "Index signature",
                                     "flags": {},
                                     "parameters": [
                                       {
-                                        "id": 227,
+                                        "id": 228,
                                         "name": "key",
                                         "kind": 32768,
                                         "flags": {},
@@ -2123,14 +2056,14 @@
               }
             },
             {
-              "id": 228,
+              "id": 229,
               "name": "on",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "typeParameter": [
                 {
-                  "id": 232,
+                  "id": 233,
                   "name": "T",
                   "kind": 131072,
                   "kindString": "Type parameter",
@@ -2138,20 +2071,20 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 229,
+                      "id": 230,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "indexSignature": {
-                        "id": 230,
+                        "id": 231,
                         "name": "__index",
                         "kind": 8192,
                         "kindString": "Index signature",
                         "flags": {},
                         "parameters": [
                           {
-                            "id": 231,
+                            "id": 232,
                             "name": "key",
                             "kind": 32768,
                             "flags": {},
@@ -2172,7 +2105,7 @@
               ],
               "parameters": [
                 {
-                  "id": 233,
+                  "id": 234,
                   "name": "type",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2183,7 +2116,7 @@
                   }
                 },
                 {
-                  "id": 234,
+                  "id": 235,
                   "name": "filter",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2191,14 +2124,14 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 235,
+                      "id": 236,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
-                          "id": 236,
+                          "id": 237,
                           "name": "event",
                           "kind": 1024,
                           "kindString": "Property",
@@ -2220,14 +2153,14 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [236]
+                          "children": [237]
                         }
                       ]
                     }
                   }
                 },
                 {
-                  "id": 237,
+                  "id": 238,
                   "name": "callback",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2235,21 +2168,21 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 238,
+                      "id": 239,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "signatures": [
                         {
-                          "id": 239,
+                          "id": 240,
                           "name": "__type",
                           "kind": 4096,
                           "kindString": "Call signature",
                           "flags": {},
                           "parameters": [
                             {
-                              "id": 240,
+                              "id": 241,
                               "name": "payload",
                               "kind": 32768,
                               "kindString": "Parameter",
@@ -2257,14 +2190,14 @@
                               "type": {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 241,
+                                  "id": 242,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
                                   "flags": {},
                                   "children": [
                                     {
-                                      "id": 243,
+                                      "id": 244,
                                       "name": "event",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -2282,7 +2215,7 @@
                                       }
                                     },
                                     {
-                                      "id": 244,
+                                      "id": 245,
                                       "name": "payload",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -2296,12 +2229,12 @@
                                       ],
                                       "type": {
                                         "type": "reference",
-                                        "id": 232,
+                                        "id": 233,
                                         "name": "T"
                                       }
                                     },
                                     {
-                                      "id": 242,
+                                      "id": 243,
                                       "name": "type",
                                       "kind": 1024,
                                       "kindString": "Property",
@@ -2323,10 +2256,137 @@
                                     {
                                       "title": "Properties",
                                       "kind": 1024,
-                                      "children": [243, 244, 242]
+                                      "children": [244, 245, 243]
                                     }
                                   ]
                                 }
+                              }
+                            }
+                          ],
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "void"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "id": 64,
+                "name": "default"
+              }
+            },
+            {
+              "id": 246,
+              "name": "on",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "typeParameter": [
+                {
+                  "id": 250,
+                  "name": "T",
+                  "kind": 131072,
+                  "kindString": "Type parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reflection",
+                    "declaration": {
+                      "id": 247,
+                      "name": "__type",
+                      "kind": 65536,
+                      "kindString": "Type literal",
+                      "flags": {},
+                      "indexSignature": {
+                        "id": 248,
+                        "name": "__index",
+                        "kind": 8192,
+                        "kindString": "Index signature",
+                        "flags": {},
+                        "parameters": [
+                          {
+                            "id": 249,
+                            "name": "key",
+                            "kind": 32768,
+                            "flags": {},
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            }
+                          }
+                        ],
+                        "type": {
+                          "type": "intrinsic",
+                          "name": "any"
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "parameters": [
+                {
+                  "id": 251,
+                  "name": "type",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "literal",
+                    "value": "system"
+                  }
+                },
+                {
+                  "id": 252,
+                  "name": "filter",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reflection",
+                    "declaration": {
+                      "id": 253,
+                      "name": "__type",
+                      "kind": 65536,
+                      "kindString": "Type literal",
+                      "flags": {}
+                    }
+                  }
+                },
+                {
+                  "id": 254,
+                  "name": "callback",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "reflection",
+                    "declaration": {
+                      "id": 255,
+                      "name": "__type",
+                      "kind": 65536,
+                      "kindString": "Type literal",
+                      "flags": {},
+                      "signatures": [
+                        {
+                          "id": 256,
+                          "name": "__type",
+                          "kind": 4096,
+                          "kindString": "Call signature",
+                          "flags": {},
+                          "parameters": [
+                            {
+                              "id": 257,
+                              "name": "payload",
+                              "kind": 32768,
+                              "kindString": "Parameter",
+                              "flags": {},
+                              "type": {
+                                "type": "intrinsic",
+                                "name": "any"
                               }
                             }
                           ],
@@ -2349,7 +2409,7 @@
           ]
         },
         {
-          "id": 112,
+          "id": 113,
           "name": "presenceState",
           "kind": 2048,
           "kindString": "Method",
@@ -2363,14 +2423,14 @@
           ],
           "signatures": [
             {
-              "id": 113,
+              "id": 114,
               "name": "presenceState",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "typeParameter": [
                 {
-                  "id": 118,
+                  "id": 119,
                   "name": "T",
                   "kind": 131072,
                   "kindString": "Type parameter",
@@ -2378,20 +2438,20 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 114,
+                      "id": 115,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "indexSignature": {
-                        "id": 115,
+                        "id": 116,
                         "name": "__index",
                         "kind": 8192,
                         "kindString": "Index signature",
                         "flags": {},
                         "parameters": [
                           {
-                            "id": 116,
+                            "id": 117,
                             "name": "key",
                             "kind": 32768,
                             "flags": {},
@@ -2411,7 +2471,7 @@
                   "default": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 117,
+                      "id": 118,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
@@ -2422,11 +2482,11 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 578,
+                "id": 604,
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "id": 118,
+                    "id": 119,
                     "name": "T"
                   }
                 ],
@@ -2436,7 +2496,7 @@
           ]
         },
         {
-          "id": 245,
+          "id": 258,
           "name": "send",
           "kind": 2048,
           "kindString": "Method",
@@ -2444,13 +2504,13 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 425,
+              "line": 430,
               "character": 8
             }
           ],
           "signatures": [
             {
-              "id": 246,
+              "id": 259,
               "name": "send",
               "kind": 4096,
               "kindString": "Call signature",
@@ -2460,7 +2520,7 @@
               },
               "parameters": [
                 {
-                  "id": 247,
+                  "id": 260,
                   "name": "args",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2471,14 +2531,14 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 248,
+                      "id": 261,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "children": [
                         {
-                          "id": 250,
+                          "id": 263,
                           "name": "event",
                           "kind": 1024,
                           "kindString": "Property",
@@ -2489,7 +2549,7 @@
                           "sources": [
                             {
                               "fileName": "src/RealtimeChannel.ts",
-                              "line": 428,
+                              "line": 433,
                               "character": 6
                             }
                           ],
@@ -2499,7 +2559,7 @@
                           }
                         },
                         {
-                          "id": 251,
+                          "id": 264,
                           "name": "payload",
                           "kind": 1024,
                           "kindString": "Property",
@@ -2512,7 +2572,7 @@
                           "sources": [
                             {
                               "fileName": "src/RealtimeChannel.ts",
-                              "line": 429,
+                              "line": 434,
                               "character": 6
                             }
                           ],
@@ -2522,7 +2582,7 @@
                           }
                         },
                         {
-                          "id": 249,
+                          "id": 262,
                           "name": "type",
                           "kind": 1024,
                           "kindString": "Property",
@@ -2533,7 +2593,7 @@
                           "sources": [
                             {
                               "fileName": "src/RealtimeChannel.ts",
-                              "line": 427,
+                              "line": 432,
                               "character": 6
                             }
                           ],
@@ -2560,18 +2620,18 @@
                         {
                           "title": "Properties",
                           "kind": 1024,
-                          "children": [250, 251, 249]
+                          "children": [263, 264, 262]
                         }
                       ],
                       "indexSignature": {
-                        "id": 252,
+                        "id": 265,
                         "name": "__index",
                         "kind": 8192,
                         "kindString": "Index signature",
                         "flags": {},
                         "parameters": [
                           {
-                            "id": 253,
+                            "id": 266,
                             "name": "key",
                             "kind": 32768,
                             "flags": {},
@@ -2590,7 +2650,7 @@
                   }
                 },
                 {
-                  "id": 254,
+                  "id": 267,
                   "name": "opts",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2601,20 +2661,20 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 255,
+                      "id": 268,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "indexSignature": {
-                        "id": 256,
+                        "id": 269,
                         "name": "__index",
                         "kind": 8192,
                         "kindString": "Index signature",
                         "flags": {},
                         "parameters": [
                           {
-                            "id": 257,
+                            "id": 270,
                             "name": "key",
                             "kind": 32768,
                             "flags": {},
@@ -2639,7 +2699,7 @@
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "id": 358,
+                    "id": 370,
                     "name": "RealtimeChannelSendResponse"
                   }
                 ],
@@ -2651,7 +2711,7 @@
           ]
         },
         {
-          "id": 104,
+          "id": 105,
           "name": "subscribe",
           "kind": 2048,
           "kindString": "Method",
@@ -2659,13 +2719,13 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 198,
+              "line": 213,
               "character": 2
             }
           ],
           "signatures": [
             {
-              "id": 105,
+              "id": 106,
               "name": "subscribe",
               "kind": 4096,
               "kindString": "Call signature",
@@ -2675,7 +2735,7 @@
               },
               "parameters": [
                 {
-                  "id": 106,
+                  "id": 107,
                   "name": "callback",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2685,49 +2745,33 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 107,
+                      "id": 108,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "signatures": [
                         {
-                          "id": 108,
+                          "id": 109,
                           "name": "__type",
                           "kind": 4096,
                           "kindString": "Call signature",
                           "flags": {},
                           "parameters": [
                             {
-                              "id": 109,
+                              "id": 110,
                               "name": "status",
                               "kind": 32768,
                               "kindString": "Parameter",
                               "flags": {},
                               "type": {
-                                "type": "union",
-                                "types": [
-                                  {
-                                    "type": "literal",
-                                    "value": "SUBSCRIBED"
-                                  },
-                                  {
-                                    "type": "literal",
-                                    "value": "TIMED_OUT"
-                                  },
-                                  {
-                                    "type": "literal",
-                                    "value": "CLOSED"
-                                  },
-                                  {
-                                    "type": "literal",
-                                    "value": "CHANNEL_ERROR"
-                                  }
-                                ]
+                                "type": "reference",
+                                "id": 628,
+                                "name": "REALTIME_SUBSCRIBE_STATES"
                               }
                             },
                             {
-                              "id": 110,
+                              "id": 111,
                               "name": "err",
                               "kind": 32768,
                               "kindString": "Parameter",
@@ -2752,7 +2796,7 @@
                   }
                 },
                 {
-                  "id": 111,
+                  "id": 112,
                   "name": "timeout",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2773,7 +2817,7 @@
           ]
         },
         {
-          "id": 119,
+          "id": 120,
           "name": "track",
           "kind": 2048,
           "kindString": "Method",
@@ -2787,14 +2831,14 @@
           ],
           "signatures": [
             {
-              "id": 120,
+              "id": 121,
               "name": "track",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 121,
+                  "id": 122,
                   "name": "payload",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2802,20 +2846,20 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 122,
+                      "id": 123,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "indexSignature": {
-                        "id": 123,
+                        "id": 124,
                         "name": "__index",
                         "kind": 8192,
                         "kindString": "Index signature",
                         "flags": {},
                         "parameters": [
                           {
-                            "id": 124,
+                            "id": 125,
                             "name": "key",
                             "kind": 32768,
                             "flags": {},
@@ -2834,7 +2878,7 @@
                   }
                 },
                 {
-                  "id": 125,
+                  "id": 126,
                   "name": "opts",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2842,20 +2886,20 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 126,
+                      "id": 127,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "indexSignature": {
-                        "id": 127,
+                        "id": 128,
                         "name": "__index",
                         "kind": 8192,
                         "kindString": "Index signature",
                         "flags": {},
                         "parameters": [
                           {
-                            "id": 128,
+                            "id": 129,
                             "name": "key",
                             "kind": 32768,
                             "flags": {},
@@ -2880,7 +2924,7 @@
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "id": 358,
+                    "id": 370,
                     "name": "RealtimeChannelSendResponse"
                   }
                 ],
@@ -2892,7 +2936,7 @@
           ]
         },
         {
-          "id": 264,
+          "id": 277,
           "name": "unsubscribe",
           "kind": 2048,
           "kindString": "Method",
@@ -2900,13 +2944,13 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 495,
+              "line": 507,
               "character": 2
             }
           ],
           "signatures": [
             {
-              "id": 265,
+              "id": 278,
               "name": "unsubscribe",
               "kind": 4096,
               "kindString": "Call signature",
@@ -2917,7 +2961,7 @@
               },
               "parameters": [
                 {
-                  "id": 266,
+                  "id": 279,
                   "name": "timeout",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2958,7 +3002,7 @@
           ]
         },
         {
-          "id": 129,
+          "id": 130,
           "name": "untrack",
           "kind": 2048,
           "kindString": "Method",
@@ -2972,14 +3016,14 @@
           ],
           "signatures": [
             {
-              "id": 130,
+              "id": 131,
               "name": "untrack",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 131,
+                  "id": 132,
                   "name": "opts",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -2987,20 +3031,20 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 132,
+                      "id": 133,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "indexSignature": {
-                        "id": 133,
+                        "id": 134,
                         "name": "__index",
                         "kind": 8192,
                         "kindString": "Index signature",
                         "flags": {},
                         "parameters": [
                           {
-                            "id": 134,
+                            "id": 135,
                             "name": "key",
                             "kind": 32768,
                             "flags": {},
@@ -3025,7 +3069,7 @@
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "id": 358,
+                    "id": 370,
                     "name": "RealtimeChannelSendResponse"
                   }
                 ],
@@ -3037,7 +3081,7 @@
           ]
         },
         {
-          "id": 258,
+          "id": 271,
           "name": "updateJoinPayload",
           "kind": 2048,
           "kindString": "Method",
@@ -3045,20 +3089,20 @@
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 482,
+              "line": 494,
               "character": 2
             }
           ],
           "signatures": [
             {
-              "id": 259,
+              "id": 272,
               "name": "updateJoinPayload",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 260,
+                  "id": 273,
                   "name": "payload",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3066,20 +3110,20 @@
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 261,
+                      "id": 274,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
                       "flags": {},
                       "indexSignature": {
-                        "id": 262,
+                        "id": 275,
                         "name": "__index",
                         "kind": 8192,
                         "kindString": "Index signature",
                         "flags": {},
                         "parameters": [
                           {
-                            "id": 263,
+                            "id": 276,
                             "name": "key",
                             "kind": 32768,
                             "flags": {},
@@ -3115,31 +3159,31 @@
         {
           "title": "Properties",
           "kind": 1024,
-          "children": [80, 99, 95, 94, 102, 98, 97, 96, 103, 93, 100, 92, 101]
+          "children": [80, 99, 95, 94, 103, 98, 101, 97, 96, 104, 93, 100, 92, 102]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [269, 135, 112, 245, 104, 119, 264, 129, 258]
+          "children": [136, 113, 258, 105, 120, 277, 130, 271]
         }
       ],
       "sources": [
         {
           "fileName": "src/RealtimeChannel.ts",
-          "line": 115,
+          "line": 127,
           "character": 21
         }
       ]
     },
     {
-      "id": 359,
+      "id": 371,
       "name": "RealtimeClient",
       "kind": 128,
       "kindString": "Class",
       "flags": {},
       "children": [
         {
-          "id": 360,
+          "id": 372,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -3147,13 +3191,13 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 112,
+              "line": 137,
               "character": 2
             }
           ],
           "signatures": [
             {
-              "id": 361,
+              "id": 373,
               "name": "new RealtimeClient",
               "kind": 16384,
               "kindString": "Constructor signature",
@@ -3163,7 +3207,7 @@
               },
               "parameters": [
                 {
-                  "id": 362,
+                  "id": 374,
                   "name": "endPoint",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3177,7 +3221,7 @@
                   }
                 },
                 {
-                  "id": 363,
+                  "id": 375,
                   "name": "options",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -3186,21 +3230,21 @@
                   },
                   "type": {
                     "type": "reference",
-                    "id": 491,
+                    "id": 513,
                     "name": "RealtimeClientOptions"
                   }
                 }
               ],
               "type": {
                 "type": "reference",
-                "id": 359,
+                "id": 371,
                 "name": "default"
               }
             }
           ]
         },
         {
-          "id": 364,
+          "id": 417,
           "name": "accessToken",
           "kind": 1024,
           "kindString": "Property",
@@ -3208,7 +3252,71 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 65,
+              "line": 115,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "union",
+            "types": [
+              {
+                "type": "literal",
+                "value": null
+              },
+              {
+                "type": "reflection",
+                "declaration": {
+                  "id": 418,
+                  "name": "__type",
+                  "kind": 65536,
+                  "kindString": "Type literal",
+                  "flags": {},
+                  "signatures": [
+                    {
+                      "id": 419,
+                      "name": "__type",
+                      "kind": 4096,
+                      "kindString": "Call signature",
+                      "flags": {},
+                      "type": {
+                        "type": "reference",
+                        "typeArguments": [
+                          {
+                            "type": "union",
+                            "types": [
+                              {
+                                "type": "literal",
+                                "value": null
+                              },
+                              {
+                                "type": "intrinsic",
+                                "name": "string"
+                              }
+                            ]
+                          }
+                        ],
+                        "qualifiedName": "Promise",
+                        "package": "typescript",
+                        "name": "Promise"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "defaultValue": "null"
+        },
+        {
+          "id": 376,
+          "name": "accessTokenValue",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/RealtimeClient.ts",
+              "line": 82,
               "character": 2
             }
           ],
@@ -3228,7 +3336,7 @@
           "defaultValue": "null"
         },
         {
-          "id": 365,
+          "id": 377,
           "name": "apiKey",
           "kind": 1024,
           "kindString": "Property",
@@ -3236,7 +3344,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 66,
+              "line": 83,
               "character": 2
             }
           ],
@@ -3256,7 +3364,7 @@
           "defaultValue": "null"
         },
         {
-          "id": 366,
+          "id": 378,
           "name": "channels",
           "kind": 1024,
           "kindString": "Property",
@@ -3264,7 +3372,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 67,
+              "line": 84,
               "character": 2
             }
           ],
@@ -3279,7 +3387,7 @@
           "defaultValue": "[]"
         },
         {
-          "id": 387,
+          "id": 400,
           "name": "conn",
           "kind": 1024,
           "kindString": "Property",
@@ -3287,7 +3395,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 82,
+              "line": 100,
               "character": 2
             }
           ],
@@ -3307,7 +3415,7 @@
           "defaultValue": "null"
         },
         {
-          "id": 385,
+          "id": 398,
           "name": "decode",
           "kind": 1024,
           "kindString": "Property",
@@ -3315,7 +3423,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 80,
+              "line": 98,
               "character": 2
             }
           ],
@@ -3327,7 +3435,7 @@
           }
         },
         {
-          "id": 384,
+          "id": 397,
           "name": "encode",
           "kind": 1024,
           "kindString": "Property",
@@ -3335,7 +3443,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 79,
+              "line": 97,
               "character": 2
             }
           ],
@@ -3347,7 +3455,7 @@
           }
         },
         {
-          "id": 367,
+          "id": 379,
           "name": "endPoint",
           "kind": 1024,
           "kindString": "Property",
@@ -3355,7 +3463,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 68,
+              "line": 85,
               "character": 2
             }
           ],
@@ -3366,7 +3474,7 @@
           "defaultValue": "''"
         },
         {
-          "id": 396,
+          "id": 409,
           "name": "fetch",
           "kind": 1024,
           "kindString": "Property",
@@ -3374,28 +3482,28 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 96,
+              "line": 114,
               "character": 2
             }
           ],
           "type": {
             "type": "reflection",
             "declaration": {
-              "id": 397,
+              "id": 410,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "signatures": [
                 {
-                  "id": 398,
+                  "id": 411,
                   "name": "__type",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 399,
+                      "id": 412,
                       "name": "input",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -3419,7 +3527,7 @@
                       }
                     },
                     {
-                      "id": 400,
+                      "id": 413,
                       "name": "init",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -3450,14 +3558,14 @@
                   }
                 },
                 {
-                  "id": 401,
+                  "id": 414,
                   "name": "__type",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 402,
+                      "id": 415,
                       "name": "input",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -3485,7 +3593,7 @@
                       }
                     },
                     {
-                      "id": 403,
+                      "id": 416,
                       "name": "init",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -3520,7 +3628,7 @@
           }
         },
         {
-          "id": 368,
+          "id": 381,
           "name": "headers",
           "kind": 1024,
           "kindString": "Property",
@@ -3530,27 +3638,27 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 69,
+              "line": 87,
               "character": 2
             }
           ],
           "type": {
             "type": "reflection",
             "declaration": {
-              "id": 369,
+              "id": 382,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "indexSignature": {
-                "id": 370,
+                "id": 383,
                 "name": "__index",
                 "kind": 8192,
                 "kindString": "Index signature",
                 "flags": {},
                 "parameters": [
                   {
-                    "id": 371,
+                    "id": 384,
                     "name": "key",
                     "kind": 32768,
                     "flags": {},
@@ -3570,7 +3678,7 @@
           "defaultValue": "DEFAULT_HEADERS"
         },
         {
-          "id": 378,
+          "id": 391,
           "name": "heartbeatIntervalMs",
           "kind": 1024,
           "kindString": "Property",
@@ -3578,7 +3686,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 73,
+              "line": 91,
               "character": 2
             }
           ],
@@ -3589,7 +3697,7 @@
           "defaultValue": "30000"
         },
         {
-          "id": 379,
+          "id": 392,
           "name": "heartbeatTimer",
           "kind": 1024,
           "kindString": "Property",
@@ -3597,7 +3705,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 74,
+              "line": 92,
               "character": 2
             }
           ],
@@ -3619,7 +3727,26 @@
           "defaultValue": "undefined"
         },
         {
-          "id": 383,
+          "id": 380,
+          "name": "httpEndpoint",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/RealtimeClient.ts",
+              "line": 86,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "string"
+          },
+          "defaultValue": "''"
+        },
+        {
+          "id": 396,
           "name": "logger",
           "kind": 1024,
           "kindString": "Property",
@@ -3627,7 +3754,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 78,
+              "line": 96,
               "character": 2
             }
           ],
@@ -3640,7 +3767,7 @@
           "defaultValue": "noop"
         },
         {
-          "id": 372,
+          "id": 385,
           "name": "params",
           "kind": 1024,
           "kindString": "Property",
@@ -3650,27 +3777,27 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 70,
+              "line": 88,
               "character": 2
             }
           ],
           "type": {
             "type": "reflection",
             "declaration": {
-              "id": 373,
+              "id": 386,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "indexSignature": {
-                "id": 374,
+                "id": 387,
                 "name": "__index",
                 "kind": 8192,
                 "kindString": "Index signature",
                 "flags": {},
                 "parameters": [
                   {
-                    "id": 375,
+                    "id": 388,
                     "name": "key",
                     "kind": 32768,
                     "flags": {},
@@ -3690,7 +3817,7 @@
           "defaultValue": "{}"
         },
         {
-          "id": 380,
+          "id": 393,
           "name": "pendingHeartbeatRef",
           "kind": 1024,
           "kindString": "Property",
@@ -3698,7 +3825,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 75,
+              "line": 93,
               "character": 2
             }
           ],
@@ -3718,7 +3845,7 @@
           "defaultValue": "null"
         },
         {
-          "id": 386,
+          "id": 399,
           "name": "reconnectAfterMs",
           "kind": 1024,
           "kindString": "Property",
@@ -3726,7 +3853,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 81,
+              "line": 99,
               "character": 2
             }
           ],
@@ -3738,7 +3865,7 @@
           }
         },
         {
-          "id": 382,
+          "id": 395,
           "name": "reconnectTimer",
           "kind": 1024,
           "kindString": "Property",
@@ -3746,7 +3873,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 77,
+              "line": 95,
               "character": 2
             }
           ],
@@ -3756,7 +3883,7 @@
           }
         },
         {
-          "id": 381,
+          "id": 394,
           "name": "ref",
           "kind": 1024,
           "kindString": "Property",
@@ -3764,7 +3891,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 76,
+              "line": 94,
               "character": 2
             }
           ],
@@ -3775,7 +3902,7 @@
           "defaultValue": "0"
         },
         {
-          "id": 388,
+          "id": 401,
           "name": "sendBuffer",
           "kind": 1024,
           "kindString": "Property",
@@ -3783,7 +3910,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 83,
+              "line": 101,
               "character": 2
             }
           ],
@@ -3799,7 +3926,7 @@
           "defaultValue": "[]"
         },
         {
-          "id": 389,
+          "id": 402,
           "name": "serializer",
           "kind": 1024,
           "kindString": "Property",
@@ -3807,7 +3934,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 84,
+              "line": 102,
               "character": 2
             }
           ],
@@ -3818,7 +3945,7 @@
           "defaultValue": "..."
         },
         {
-          "id": 390,
+          "id": 403,
           "name": "stateChangeCallbacks",
           "kind": 1024,
           "kindString": "Property",
@@ -3826,21 +3953,21 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 85,
+              "line": 103,
               "character": 2
             }
           ],
           "type": {
             "type": "reflection",
             "declaration": {
-              "id": 391,
+              "id": 404,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "children": [
                 {
-                  "id": 393,
+                  "id": 406,
                   "name": "close",
                   "kind": 1024,
                   "kindString": "Property",
@@ -3848,7 +3975,7 @@
                   "sources": [
                     {
                       "fileName": "src/RealtimeClient.ts",
-                      "line": 87,
+                      "line": 105,
                       "character": 4
                     }
                   ],
@@ -3863,7 +3990,7 @@
                   }
                 },
                 {
-                  "id": 394,
+                  "id": 407,
                   "name": "error",
                   "kind": 1024,
                   "kindString": "Property",
@@ -3871,7 +3998,7 @@
                   "sources": [
                     {
                       "fileName": "src/RealtimeClient.ts",
-                      "line": 88,
+                      "line": 106,
                       "character": 4
                     }
                   ],
@@ -3886,7 +4013,7 @@
                   }
                 },
                 {
-                  "id": 395,
+                  "id": 408,
                   "name": "message",
                   "kind": 1024,
                   "kindString": "Property",
@@ -3894,7 +4021,7 @@
                   "sources": [
                     {
                       "fileName": "src/RealtimeClient.ts",
-                      "line": 89,
+                      "line": 107,
                       "character": 4
                     }
                   ],
@@ -3909,7 +4036,7 @@
                   }
                 },
                 {
-                  "id": 392,
+                  "id": 405,
                   "name": "open",
                   "kind": 1024,
                   "kindString": "Property",
@@ -3917,7 +4044,7 @@
                   "sources": [
                     {
                       "fileName": "src/RealtimeClient.ts",
-                      "line": 86,
+                      "line": 104,
                       "character": 4
                     }
                   ],
@@ -3936,7 +4063,7 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [393, 394, 395, 392]
+                  "children": [406, 407, 408, 405]
                 }
               ]
             }
@@ -3944,7 +4071,7 @@
           "defaultValue": "..."
         },
         {
-          "id": 376,
+          "id": 389,
           "name": "timeout",
           "kind": 1024,
           "kindString": "Property",
@@ -3952,7 +4079,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 71,
+              "line": 89,
               "character": 2
             }
           ],
@@ -3963,7 +4090,7 @@
           "defaultValue": "DEFAULT_TIMEOUT"
         },
         {
-          "id": 377,
+          "id": 390,
           "name": "transport",
           "kind": 1024,
           "kindString": "Property",
@@ -3971,7 +4098,7 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 72,
+              "line": 90,
               "character": 2
             }
           ],
@@ -3990,7 +4117,120 @@
           }
         },
         {
-          "id": 426,
+          "id": 420,
+          "name": "worker",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "src/RealtimeClient.ts",
+              "line": 116,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "boolean"
+          }
+        },
+        {
+          "id": 422,
+          "name": "workerRef",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "src/RealtimeClient.ts",
+              "line": 118,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "qualifiedName": "Worker",
+            "package": "typescript",
+            "name": "Worker"
+          }
+        },
+        {
+          "id": 421,
+          "name": "workerUrl",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isOptional": true
+          },
+          "sources": [
+            {
+              "fileName": "src/RealtimeClient.ts",
+              "line": 117,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "intrinsic",
+            "name": "string"
+          }
+        },
+        {
+          "id": 510,
+          "name": "_workerObjectUrl",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {
+            "isPrivate": true
+          },
+          "sources": [
+            {
+              "fileName": "src/RealtimeClient.ts",
+              "line": 611,
+              "character": 10
+            }
+          ],
+          "signatures": [
+            {
+              "id": 511,
+              "name": "_workerObjectUrl",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "parameters": [
+                {
+                  "id": 512,
+                  "name": "url",
+                  "kind": 32768,
+                  "kindString": "Parameter",
+                  "flags": {},
+                  "type": {
+                    "type": "union",
+                    "types": [
+                      {
+                        "type": "intrinsic",
+                        "name": "undefined"
+                      },
+                      {
+                        "type": "intrinsic",
+                        "name": "string"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            }
+          ]
+        },
+        {
+          "id": 447,
           "name": "channel",
           "kind": 2048,
           "kindString": "Method",
@@ -3998,20 +4238,20 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 274,
+              "line": 319,
               "character": 2
             }
           ],
           "signatures": [
             {
-              "id": 427,
+              "id": 448,
               "name": "channel",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 428,
+                  "id": 449,
                   "name": "topic",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4022,14 +4262,14 @@
                   }
                 },
                 {
-                  "id": 429,
+                  "id": 450,
                   "name": "params",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 347,
+                    "id": 358,
                     "name": "RealtimeChannelOptions"
                   },
                   "defaultValue": "..."
@@ -4044,7 +4284,7 @@
           ]
         },
         {
-          "id": 404,
+          "id": 423,
           "name": "connect",
           "kind": 2048,
           "kindString": "Method",
@@ -4052,13 +4292,13 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 157,
+              "line": 190,
               "character": 2
             }
           ],
           "signatures": [
             {
-              "id": 405,
+              "id": 424,
               "name": "connect",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4074,7 +4314,7 @@
           ]
         },
         {
-          "id": 422,
+          "id": 443,
           "name": "connectionState",
           "kind": 2048,
           "kindString": "Method",
@@ -4082,13 +4322,13 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 254,
+              "line": 299,
               "character": 2
             }
           ],
           "signatures": [
             {
-              "id": 423,
+              "id": 444,
               "name": "connectionState",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4104,7 +4344,7 @@
           ]
         },
         {
-          "id": 406,
+          "id": 427,
           "name": "disconnect",
           "kind": 2048,
           "kindString": "Method",
@@ -4112,13 +4352,13 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 195,
+              "line": 240,
               "character": 2
             }
           ],
           "signatures": [
             {
-              "id": 407,
+              "id": 428,
               "name": "disconnect",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4128,7 +4368,7 @@
               },
               "parameters": [
                 {
-                  "id": 408,
+                  "id": 429,
                   "name": "code",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4144,7 +4384,7 @@
                   }
                 },
                 {
-                  "id": 409,
+                  "id": 430,
                   "name": "reason",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4168,7 +4408,68 @@
           ]
         },
         {
-          "id": 410,
+          "id": 425,
+          "name": "endpointURL",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/RealtimeClient.ts",
+              "line": 227,
+              "character": 2
+            }
+          ],
+          "signatures": [
+            {
+              "id": 426,
+              "name": "endpointURL",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Returns the URL of the websocket.",
+                "returns": "string The URL of the websocket.\n"
+              },
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            }
+          ]
+        },
+        {
+          "id": 459,
+          "name": "flushSendBuffer",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/RealtimeClient.ts",
+              "line": 423,
+              "character": 2
+            }
+          ],
+          "signatures": [
+            {
+              "id": 460,
+              "name": "flushSendBuffer",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Flushes send buffer"
+              },
+              "type": {
+                "type": "intrinsic",
+                "name": "void"
+              }
+            }
+          ]
+        },
+        {
+          "id": 431,
           "name": "getChannels",
           "kind": 2048,
           "kindString": "Method",
@@ -4176,13 +4477,13 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 213,
+              "line": 258,
               "character": 2
             }
           ],
           "signatures": [
             {
-              "id": 411,
+              "id": 432,
               "name": "getChannels",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4202,7 +4503,7 @@
           ]
         },
         {
-          "id": 424,
+          "id": 445,
           "name": "isConnected",
           "kind": 2048,
           "kindString": "Method",
@@ -4210,13 +4511,13 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 270,
+              "line": 315,
               "character": 2
             }
           ],
           "signatures": [
             {
-              "id": 425,
+              "id": 446,
               "name": "isConnected",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4232,7 +4533,7 @@
           ]
         },
         {
-          "id": 417,
+          "id": 438,
           "name": "log",
           "kind": 2048,
           "kindString": "Method",
@@ -4240,13 +4541,13 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 247,
+              "line": 292,
               "character": 2
             }
           ],
           "signatures": [
             {
-              "id": 418,
+              "id": 439,
               "name": "log",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4257,7 +4558,7 @@
               },
               "parameters": [
                 {
-                  "id": 419,
+                  "id": 440,
                   "name": "kind",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4268,7 +4569,7 @@
                   }
                 },
                 {
-                  "id": 420,
+                  "id": 441,
                   "name": "msg",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4279,7 +4580,7 @@
                   }
                 },
                 {
-                  "id": 421,
+                  "id": 442,
                   "name": "data",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4300,7 +4601,7 @@
           ]
         },
         {
-          "id": 430,
+          "id": 451,
           "name": "push",
           "kind": 2048,
           "kindString": "Method",
@@ -4308,13 +4609,13 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 288,
+              "line": 333,
               "character": 2
             }
           ],
           "signatures": [
             {
-              "id": 431,
+              "id": 452,
               "name": "push",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4325,14 +4626,14 @@
               },
               "parameters": [
                 {
-                  "id": 432,
+                  "id": 453,
                   "name": "data",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "type": {
                     "type": "reference",
-                    "id": 510,
+                    "id": 536,
                     "name": "RealtimeMessage"
                   }
                 }
@@ -4345,7 +4646,7 @@
           ]
         },
         {
-          "id": 415,
+          "id": 436,
           "name": "removeAllChannels",
           "kind": 2048,
           "kindString": "Method",
@@ -4353,13 +4654,13 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 234,
+              "line": 279,
               "character": 8
             }
           ],
           "signatures": [
             {
-              "id": 416,
+              "id": 437,
               "name": "removeAllChannels",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4374,7 +4675,7 @@
                     "type": "array",
                     "elementType": {
                       "type": "reference",
-                      "id": 587,
+                      "id": 613,
                       "name": "RealtimeRemoveChannelResponse"
                     }
                   }
@@ -4387,7 +4688,7 @@
           ]
         },
         {
-          "id": 412,
+          "id": 433,
           "name": "removeChannel",
           "kind": 2048,
           "kindString": "Method",
@@ -4395,13 +4696,13 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 221,
+              "line": 266,
               "character": 8
             }
           ],
           "signatures": [
             {
-              "id": 413,
+              "id": 434,
               "name": "removeChannel",
               "kind": 4096,
               "kindString": "Call signature",
@@ -4411,7 +4712,7 @@
               },
               "parameters": [
                 {
-                  "id": 414,
+                  "id": 435,
                   "name": "channel",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -4431,7 +4732,7 @@
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "id": 587,
+                    "id": 613,
                     "name": "RealtimeRemoveChannelResponse"
                   }
                 ],
@@ -4443,7 +4744,45 @@
           ]
         },
         {
-          "id": 433,
+          "id": 457,
+          "name": "sendHeartbeat",
+          "kind": 2048,
+          "kindString": "Method",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/RealtimeClient.ts",
+              "line": 397,
+              "character": 8
+            }
+          ],
+          "signatures": [
+            {
+              "id": 458,
+              "name": "sendHeartbeat",
+              "kind": 4096,
+              "kindString": "Call signature",
+              "flags": {},
+              "comment": {
+                "shortText": "Sends a heartbeat message if the socket is connected."
+              },
+              "type": {
+                "type": "reference",
+                "typeArguments": [
+                  {
+                    "type": "intrinsic",
+                    "name": "void"
+                  }
+                ],
+                "qualifiedName": "Promise",
+                "package": "typescript",
+                "name": "Promise"
+              }
+            }
+          ]
+        },
+        {
+          "id": 454,
           "name": "setAuth",
           "kind": 2048,
           "kindString": "Method",
@@ -4451,29 +4790,30 @@
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 308,
-              "character": 2
+              "line": 357,
+              "character": 8
             }
           ],
           "signatures": [
             {
-              "id": 434,
+              "id": 455,
               "name": "setAuth",
               "kind": 4096,
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Sets the JWT access token used for channel subscription authorization and Realtime RLS."
+                "shortText": "Sets the JWT access token used for channel subscription authorization and Realtime RLS.",
+                "text": "If param is null it will use the `accessToken` callback function or the token set on the client.\n\nOn callback used, it will set the value of the token internal to the client.\n"
               },
               "parameters": [
                 {
-                  "id": 435,
+                  "id": 456,
                   "name": "token",
                   "kind": 32768,
                   "kindString": "Parameter",
                   "flags": {},
                   "comment": {
-                    "shortText": "A JWT string.\n"
+                    "shortText": "A JWT string to override the token set on the client.\n"
                   },
                   "type": {
                     "type": "union",
@@ -4487,12 +4827,21 @@
                         "name": "string"
                       }
                     ]
-                  }
+                  },
+                  "defaultValue": "null"
                 }
               ],
               "type": {
-                "type": "intrinsic",
-                "name": "void"
+                "type": "reference",
+                "typeArguments": [
+                  {
+                    "type": "intrinsic",
+                    "name": "void"
+                  }
+                ],
+                "qualifiedName": "Promise",
+                "package": "typescript",
+                "name": "Promise"
               }
             }
           ]
@@ -4502,26 +4851,26 @@
         {
           "title": "Constructors",
           "kind": 512,
-          "children": [360]
+          "children": [372]
         },
         {
           "title": "Properties",
           "kind": 1024,
           "children": [
-            364, 365, 366, 387, 385, 384, 367, 396, 368, 378, 379, 383, 372, 380, 386, 382, 381,
-            388, 389, 390, 376, 377
+            417, 376, 377, 378, 400, 398, 397, 379, 409, 381, 391, 392, 380, 396, 385, 393, 399,
+            395, 394, 401, 402, 403, 389, 390, 420, 422, 421
           ]
         },
         {
           "title": "Methods",
           "kind": 2048,
-          "children": [426, 404, 422, 406, 410, 424, 417, 430, 415, 412, 433]
+          "children": [510, 447, 423, 443, 427, 425, 459, 431, 445, 438, 451, 436, 433, 457, 454]
         }
       ],
       "sources": [
         {
           "fileName": "src/RealtimeClient.ts",
-          "line": 64,
+          "line": 81,
           "character": 21
         }
       ]
@@ -4784,7 +5133,7 @@
           ],
           "type": {
             "type": "reference",
-            "id": 578,
+            "id": 604,
             "typeArguments": [
               {
                 "type": "reflection",
@@ -4823,7 +5172,7 @@
       ]
     },
     {
-      "id": 347,
+      "id": 358,
       "name": "RealtimeChannelOptions",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -4831,21 +5180,21 @@
       "sources": [
         {
           "fileName": "src/RealtimeChannel.ts",
-          "line": 15,
+          "line": 16,
           "character": 12
         }
       ],
       "type": {
         "type": "reflection",
         "declaration": {
-          "id": 348,
+          "id": 359,
           "name": "__type",
           "kind": 65536,
           "kindString": "Type literal",
           "flags": {},
           "children": [
             {
-              "id": 349,
+              "id": 360,
               "name": "config",
               "kind": 1024,
               "kindString": "Property",
@@ -4853,21 +5202,21 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeChannel.ts",
-                  "line": 16,
+                  "line": 17,
                   "character": 2
                 }
               ],
               "type": {
                 "type": "reflection",
                 "declaration": {
-                  "id": 350,
+                  "id": 361,
                   "name": "__type",
                   "kind": 65536,
                   "kindString": "Type literal",
                   "flags": {},
                   "children": [
                     {
-                      "id": 351,
+                      "id": 362,
                       "name": "broadcast",
                       "kind": 1024,
                       "kindString": "Property",
@@ -4880,21 +5229,21 @@
                       "sources": [
                         {
                           "fileName": "src/RealtimeChannel.ts",
-                          "line": 21,
+                          "line": 22,
                           "character": 4
                         }
                       ],
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 352,
+                          "id": 363,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "children": [
                             {
-                              "id": 354,
+                              "id": 365,
                               "name": "ack",
                               "kind": 1024,
                               "kindString": "Property",
@@ -4904,7 +5253,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/RealtimeChannel.ts",
-                                  "line": 21,
+                                  "line": 22,
                                   "character": 34
                                 }
                               ],
@@ -4914,7 +5263,7 @@
                               }
                             },
                             {
-                              "id": 353,
+                              "id": 364,
                               "name": "self",
                               "kind": 1024,
                               "kindString": "Property",
@@ -4924,7 +5273,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/RealtimeChannel.ts",
-                                  "line": 21,
+                                  "line": 22,
                                   "character": 18
                                 }
                               ],
@@ -4938,13 +5287,13 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [354, 353]
+                              "children": [365, 364]
                             }
                           ],
                           "sources": [
                             {
                               "fileName": "src/RealtimeChannel.ts",
-                              "line": 21,
+                              "line": 22,
                               "character": 16
                             }
                           ]
@@ -4952,7 +5301,7 @@
                       }
                     },
                     {
-                      "id": 355,
+                      "id": 366,
                       "name": "presence",
                       "kind": 1024,
                       "kindString": "Property",
@@ -4965,21 +5314,21 @@
                       "sources": [
                         {
                           "fileName": "src/RealtimeChannel.ts",
-                          "line": 25,
+                          "line": 26,
                           "character": 4
                         }
                       ],
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 356,
+                          "id": 367,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "children": [
                             {
-                              "id": 357,
+                              "id": 368,
                               "name": "key",
                               "kind": 1024,
                               "kindString": "Property",
@@ -4989,7 +5338,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/RealtimeChannel.ts",
-                                  "line": 25,
+                                  "line": 26,
                                   "character": 17
                                 }
                               ],
@@ -5003,17 +5352,40 @@
                             {
                               "title": "Properties",
                               "kind": 1024,
-                              "children": [357]
+                              "children": [368]
                             }
                           ],
                           "sources": [
                             {
                               "fileName": "src/RealtimeChannel.ts",
-                              "line": 25,
+                              "line": 26,
                               "character": 15
                             }
                           ]
                         }
+                      }
+                    },
+                    {
+                      "id": 369,
+                      "name": "private",
+                      "kind": 1024,
+                      "kindString": "Property",
+                      "flags": {
+                        "isOptional": true
+                      },
+                      "comment": {
+                        "shortText": "defines if the channel is private or not and if RLS policies will be used to check data"
+                      },
+                      "sources": [
+                        {
+                          "fileName": "src/RealtimeChannel.ts",
+                          "line": 30,
+                          "character": 4
+                        }
+                      ],
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "boolean"
                       }
                     }
                   ],
@@ -5021,13 +5393,13 @@
                     {
                       "title": "Properties",
                       "kind": 1024,
-                      "children": [351, 355]
+                      "children": [362, 366, 369]
                     }
                   ],
                   "sources": [
                     {
                       "fileName": "src/RealtimeChannel.ts",
-                      "line": 16,
+                      "line": 17,
                       "character": 10
                     }
                   ]
@@ -5039,13 +5411,13 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [349]
+              "children": [360]
             }
           ],
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 15,
+              "line": 16,
               "character": 37
             }
           ]
@@ -5053,7 +5425,7 @@
       }
     },
     {
-      "id": 358,
+      "id": 370,
       "name": "RealtimeChannelSendResponse",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -5061,7 +5433,7 @@
       "sources": [
         {
           "fileName": "src/RealtimeChannel.ts",
-          "line": 83,
+          "line": 88,
           "character": 12
         }
       ],
@@ -5084,7 +5456,7 @@
       }
     },
     {
-      "id": 491,
+      "id": 513,
       "name": "RealtimeClientOptions",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -5092,21 +5464,21 @@
       "sources": [
         {
           "fileName": "src/RealtimeClient.ts",
-          "line": 20,
+          "line": 29,
           "character": 12
         }
       ],
       "type": {
         "type": "reflection",
         "declaration": {
-          "id": 492,
+          "id": 514,
           "name": "__type",
           "kind": 65536,
           "kindString": "Type literal",
           "flags": {},
           "children": [
             {
-              "id": 498,
+              "id": 520,
               "name": "decode",
               "kind": 1024,
               "kindString": "Property",
@@ -5116,7 +5488,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 26,
+                  "line": 35,
                   "character": 2
                 }
               ],
@@ -5128,7 +5500,7 @@
               }
             },
             {
-              "id": 497,
+              "id": 519,
               "name": "encode",
               "kind": 1024,
               "kindString": "Property",
@@ -5138,7 +5510,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 25,
+                  "line": 34,
                   "character": 2
                 }
               ],
@@ -5150,7 +5522,7 @@
               }
             },
             {
-              "id": 509,
+              "id": 531,
               "name": "fetch",
               "kind": 1024,
               "kindString": "Property",
@@ -5160,7 +5532,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 31,
+                  "line": 40,
                   "character": 2
                 }
               ],
@@ -5170,7 +5542,7 @@
               }
             },
             {
-              "id": 500,
+              "id": 522,
               "name": "headers",
               "kind": 1024,
               "kindString": "Property",
@@ -5180,14 +5552,14 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 28,
+                  "line": 37,
                   "character": 2
                 }
               ],
               "type": {
                 "type": "reflection",
                 "declaration": {
-                  "id": 501,
+                  "id": 523,
                   "name": "__type",
                   "kind": 65536,
                   "kindString": "Type literal",
@@ -5195,19 +5567,19 @@
                   "sources": [
                     {
                       "fileName": "src/RealtimeClient.ts",
-                      "line": 28,
+                      "line": 37,
                       "character": 12
                     }
                   ],
                   "indexSignature": {
-                    "id": 502,
+                    "id": 524,
                     "name": "__index",
                     "kind": 8192,
                     "kindString": "Index signature",
                     "flags": {},
                     "parameters": [
                       {
-                        "id": 503,
+                        "id": 525,
                         "name": "key",
                         "kind": 32768,
                         "flags": {},
@@ -5226,7 +5598,7 @@
               }
             },
             {
-              "id": 495,
+              "id": 517,
               "name": "heartbeatIntervalMs",
               "kind": 1024,
               "kindString": "Property",
@@ -5236,7 +5608,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 23,
+                  "line": 32,
                   "character": 2
                 }
               ],
@@ -5246,7 +5618,7 @@
               }
             },
             {
-              "id": 508,
+              "id": 530,
               "name": "log_level",
               "kind": 1024,
               "kindString": "Property",
@@ -5256,7 +5628,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 30,
+                  "line": 39,
                   "character": 2
                 }
               ],
@@ -5283,7 +5655,7 @@
               }
             },
             {
-              "id": 496,
+              "id": 518,
               "name": "logger",
               "kind": 1024,
               "kindString": "Property",
@@ -5293,7 +5665,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 24,
+                  "line": 33,
                   "character": 2
                 }
               ],
@@ -5305,7 +5677,7 @@
               }
             },
             {
-              "id": 504,
+              "id": 526,
               "name": "params",
               "kind": 1024,
               "kindString": "Property",
@@ -5315,14 +5687,14 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 29,
+                  "line": 38,
                   "character": 2
                 }
               ],
               "type": {
                 "type": "reflection",
                 "declaration": {
-                  "id": 505,
+                  "id": 527,
                   "name": "__type",
                   "kind": 65536,
                   "kindString": "Type literal",
@@ -5330,19 +5702,19 @@
                   "sources": [
                     {
                       "fileName": "src/RealtimeClient.ts",
-                      "line": 29,
+                      "line": 38,
                       "character": 11
                     }
                   ],
                   "indexSignature": {
-                    "id": 506,
+                    "id": 528,
                     "name": "__index",
                     "kind": 8192,
                     "kindString": "Index signature",
                     "flags": {},
                     "parameters": [
                       {
-                        "id": 507,
+                        "id": 529,
                         "name": "key",
                         "kind": 32768,
                         "flags": {},
@@ -5361,7 +5733,7 @@
               }
             },
             {
-              "id": 499,
+              "id": 521,
               "name": "reconnectAfterMs",
               "kind": 1024,
               "kindString": "Property",
@@ -5371,7 +5743,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 27,
+                  "line": 36,
                   "character": 2
                 }
               ],
@@ -5383,7 +5755,7 @@
               }
             },
             {
-              "id": 494,
+              "id": 516,
               "name": "timeout",
               "kind": 1024,
               "kindString": "Property",
@@ -5393,7 +5765,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 22,
+                  "line": 31,
                   "character": 2
                 }
               ],
@@ -5403,7 +5775,7 @@
               }
             },
             {
-              "id": 493,
+              "id": 515,
               "name": "transport",
               "kind": 1024,
               "kindString": "Property",
@@ -5413,7 +5785,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 21,
+                  "line": 30,
                   "character": 2
                 }
               ],
@@ -5421,57 +5793,39 @@
                 "type": "reference",
                 "name": "WebSocketLikeConstructor"
               }
-            }
-          ],
-          "groups": [
+            },
             {
-              "title": "Properties",
-              "kind": 1024,
-              "children": [498, 497, 509, 500, 495, 508, 496, 504, 499, 494, 493]
-            }
-          ],
-          "sources": [
-            {
-              "fileName": "src/RealtimeClient.ts",
-              "line": 20,
-              "character": 36
-            }
-          ]
-        }
-      }
-    },
-    {
-      "id": 510,
-      "name": "RealtimeMessage",
-      "kind": 4194304,
-      "kindString": "Type alias",
-      "flags": {},
-      "sources": [
-        {
-          "fileName": "src/RealtimeClient.ts",
-          "line": 34,
-          "character": 12
-        }
-      ],
-      "type": {
-        "type": "reflection",
-        "declaration": {
-          "id": 511,
-          "name": "__type",
-          "kind": 65536,
-          "kindString": "Type literal",
-          "flags": {},
-          "children": [
-            {
-              "id": 513,
-              "name": "event",
+              "id": 532,
+              "name": "worker",
               "kind": 1024,
               "kindString": "Property",
-              "flags": {},
+              "flags": {
+                "isOptional": true
+              },
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 36,
+                  "line": 41,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "boolean"
+              }
+            },
+            {
+              "id": 533,
+              "name": "workerUrl",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/RealtimeClient.ts",
+                  "line": 42,
                   "character": 2
                 }
               ],
@@ -5481,7 +5835,116 @@
               }
             },
             {
-              "id": 516,
+              "id": 534,
+              "name": "accessToken",
+              "kind": 2048,
+              "kindString": "Method",
+              "flags": {
+                "isOptional": true
+              },
+              "sources": [
+                {
+                  "fileName": "src/RealtimeClient.ts",
+                  "line": 43,
+                  "character": 2
+                }
+              ],
+              "signatures": [
+                {
+                  "id": 535,
+                  "name": "accessToken",
+                  "kind": 4096,
+                  "kindString": "Call signature",
+                  "flags": {},
+                  "type": {
+                    "type": "reference",
+                    "typeArguments": [
+                      {
+                        "type": "union",
+                        "types": [
+                          {
+                            "type": "literal",
+                            "value": null
+                          },
+                          {
+                            "type": "intrinsic",
+                            "name": "string"
+                          }
+                        ]
+                      }
+                    ],
+                    "qualifiedName": "Promise",
+                    "package": "typescript",
+                    "name": "Promise"
+                  }
+                }
+              ]
+            }
+          ],
+          "groups": [
+            {
+              "title": "Properties",
+              "kind": 1024,
+              "children": [520, 519, 531, 522, 517, 530, 518, 526, 521, 516, 515, 532, 533]
+            },
+            {
+              "title": "Methods",
+              "kind": 2048,
+              "children": [534]
+            }
+          ],
+          "sources": [
+            {
+              "fileName": "src/RealtimeClient.ts",
+              "line": 29,
+              "character": 36
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 536,
+      "name": "RealtimeMessage",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "src/RealtimeClient.ts",
+          "line": 46,
+          "character": 12
+        }
+      ],
+      "type": {
+        "type": "reflection",
+        "declaration": {
+          "id": 537,
+          "name": "__type",
+          "kind": 65536,
+          "kindString": "Type literal",
+          "flags": {},
+          "children": [
+            {
+              "id": 539,
+              "name": "event",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/RealtimeClient.ts",
+                  "line": 48,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "intrinsic",
+                "name": "string"
+              }
+            },
+            {
+              "id": 542,
               "name": "join_ref",
               "kind": 1024,
               "kindString": "Property",
@@ -5491,7 +5954,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 39,
+                  "line": 51,
                   "character": 2
                 }
               ],
@@ -5501,7 +5964,7 @@
               }
             },
             {
-              "id": 514,
+              "id": 540,
               "name": "payload",
               "kind": 1024,
               "kindString": "Property",
@@ -5509,7 +5972,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 37,
+                  "line": 49,
                   "character": 2
                 }
               ],
@@ -5519,7 +5982,7 @@
               }
             },
             {
-              "id": 515,
+              "id": 541,
               "name": "ref",
               "kind": 1024,
               "kindString": "Property",
@@ -5527,7 +5990,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 38,
+                  "line": 50,
                   "character": 2
                 }
               ],
@@ -5537,7 +6000,7 @@
               }
             },
             {
-              "id": 512,
+              "id": 538,
               "name": "topic",
               "kind": 1024,
               "kindString": "Property",
@@ -5545,7 +6008,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeClient.ts",
-                  "line": 35,
+                  "line": 47,
                   "character": 2
                 }
               ],
@@ -5559,13 +6022,13 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [513, 516, 514, 515, 512]
+              "children": [539, 542, 540, 541, 538]
             }
           ],
           "sources": [
             {
               "fileName": "src/RealtimeClient.ts",
-              "line": 34,
+              "line": 46,
               "character": 30
             }
           ]
@@ -5573,7 +6036,7 @@
       }
     },
     {
-      "id": 517,
+      "id": 543,
       "name": "RealtimePostgresChangesFilter",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -5581,13 +6044,13 @@
       "sources": [
         {
           "fileName": "src/RealtimeChannel.ts",
-          "line": 62,
+          "line": 67,
           "character": 12
         }
       ],
       "typeParameter": [
         {
-          "id": 523,
+          "id": 549,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
@@ -5599,7 +6062,7 @@
               [
                 {
                   "type": "reference",
-                  "id": 592,
+                  "id": 619,
                   "name": "REALTIME_POSTGRES_CHANGES_LISTEN_EVENT"
                 },
                 ""
@@ -5611,14 +6074,14 @@
       "type": {
         "type": "reflection",
         "declaration": {
-          "id": 518,
+          "id": 544,
           "name": "__type",
           "kind": 65536,
           "kindString": "Type literal",
           "flags": {},
           "children": [
             {
-              "id": 519,
+              "id": 545,
               "name": "event",
               "kind": 1024,
               "kindString": "Property",
@@ -5629,18 +6092,18 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeChannel.ts",
-                  "line": 68,
+                  "line": 73,
                   "character": 2
                 }
               ],
               "type": {
                 "type": "reference",
-                "id": 523,
+                "id": 549,
                 "name": "T"
               }
             },
             {
-              "id": 522,
+              "id": 548,
               "name": "filter",
               "kind": 1024,
               "kindString": "Property",
@@ -5653,7 +6116,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeChannel.ts",
-                  "line": 80,
+                  "line": 85,
                   "character": 2
                 }
               ],
@@ -5663,7 +6126,7 @@
               }
             },
             {
-              "id": 520,
+              "id": 546,
               "name": "schema",
               "kind": 1024,
               "kindString": "Property",
@@ -5674,7 +6137,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeChannel.ts",
-                  "line": 72,
+                  "line": 77,
                   "character": 2
                 }
               ],
@@ -5684,7 +6147,7 @@
               }
             },
             {
-              "id": 521,
+              "id": 547,
               "name": "table",
               "kind": 1024,
               "kindString": "Property",
@@ -5697,7 +6160,7 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeChannel.ts",
-                  "line": 76,
+                  "line": 81,
                   "character": 2
                 }
               ],
@@ -5711,13 +6174,13 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [519, 522, 520, 521]
+              "children": [545, 548, 546, 547]
             }
           ],
           "sources": [
             {
               "fileName": "src/RealtimeChannel.ts",
-              "line": 64,
+              "line": 69,
               "character": 4
             }
           ]
@@ -5725,7 +6188,7 @@
       }
     },
     {
-      "id": 524,
+      "id": 550,
       "name": "RealtimePostgresChangesPayload",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -5733,13 +6196,13 @@
       "sources": [
         {
           "fileName": "src/RealtimeChannel.ts",
-          "line": 57,
+          "line": 62,
           "character": 12
         }
       ],
       "typeParameter": [
         {
-          "id": 528,
+          "id": 554,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
@@ -5747,7 +6210,7 @@
           "type": {
             "type": "reflection",
             "declaration": {
-              "id": 525,
+              "id": 551,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
@@ -5755,19 +6218,19 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeChannel.ts",
-                  "line": 57,
+                  "line": 62,
                   "character": 53
                 }
               ],
               "indexSignature": {
-                "id": 526,
+                "id": 552,
                 "name": "__index",
                 "kind": 8192,
                 "kindString": "Index signature",
                 "flags": {},
                 "parameters": [
                   {
-                    "id": 527,
+                    "id": 553,
                     "name": "key",
                     "kind": 32768,
                     "flags": {},
@@ -5791,11 +6254,11 @@
         "types": [
           {
             "type": "reference",
-            "id": 529,
+            "id": 555,
             "typeArguments": [
               {
                 "type": "reference",
-                "id": 528,
+                "id": 554,
                 "name": "T"
               }
             ],
@@ -5803,11 +6266,11 @@
           },
           {
             "type": "reference",
-            "id": 539,
+            "id": 565,
             "typeArguments": [
               {
                 "type": "reference",
-                "id": 528,
+                "id": 554,
                 "name": "T"
               }
             ],
@@ -5815,11 +6278,11 @@
           },
           {
             "type": "reference",
-            "id": 548,
+            "id": 574,
             "typeArguments": [
               {
                 "type": "reference",
-                "id": 528,
+                "id": 554,
                 "name": "T"
               }
             ],
@@ -5829,7 +6292,7 @@
       }
     },
     {
-      "id": 548,
+      "id": 574,
       "name": "RealtimePostgresDeletePayload",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -5837,13 +6300,13 @@
       "sources": [
         {
           "fileName": "src/RealtimeChannel.ts",
-          "line": 50,
+          "line": 55,
           "character": 12
         }
       ],
       "typeParameter": [
         {
-          "id": 557,
+          "id": 583,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
@@ -5851,7 +6314,7 @@
           "type": {
             "type": "reflection",
             "declaration": {
-              "id": 554,
+              "id": 580,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
@@ -5859,19 +6322,19 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeChannel.ts",
-                  "line": 50,
+                  "line": 55,
                   "character": 52
                 }
               ],
               "indexSignature": {
-                "id": 555,
+                "id": 581,
                 "name": "__index",
                 "kind": 8192,
                 "kindString": "Index signature",
                 "flags": {},
                 "parameters": [
                   {
-                    "id": 556,
+                    "id": 582,
                     "name": "key",
                     "kind": 32768,
                     "flags": {},
@@ -5900,14 +6363,14 @@
           {
             "type": "reflection",
             "declaration": {
-              "id": 549,
+              "id": 575,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "children": [
                 {
-                  "id": 550,
+                  "id": 576,
                   "name": "eventType",
                   "kind": 1024,
                   "kindString": "Property",
@@ -5915,7 +6378,7 @@
                   "sources": [
                     {
                       "fileName": "src/RealtimeChannel.ts",
-                      "line": 52,
+                      "line": 57,
                       "character": 4
                     }
                   ],
@@ -5926,7 +6389,7 @@
                       [
                         {
                           "type": "reference",
-                          "id": 596,
+                          "id": 623,
                           "name": "REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.DELETE"
                         },
                         ""
@@ -5935,7 +6398,7 @@
                   }
                 },
                 {
-                  "id": 551,
+                  "id": 577,
                   "name": "new",
                   "kind": 1024,
                   "kindString": "Property",
@@ -5943,14 +6406,14 @@
                   "sources": [
                     {
                       "fileName": "src/RealtimeChannel.ts",
-                      "line": 53,
+                      "line": 58,
                       "character": 4
                     }
                   ],
                   "type": {
                     "type": "reflection",
                     "declaration": {
-                      "id": 552,
+                      "id": 578,
                       "name": "__type",
                       "kind": 65536,
                       "kindString": "Type literal",
@@ -5958,7 +6421,7 @@
                       "sources": [
                         {
                           "fileName": "src/RealtimeChannel.ts",
-                          "line": 53,
+                          "line": 58,
                           "character": 9
                         }
                       ]
@@ -5966,7 +6429,7 @@
                   }
                 },
                 {
-                  "id": 553,
+                  "id": 579,
                   "name": "old",
                   "kind": 1024,
                   "kindString": "Property",
@@ -5974,7 +6437,7 @@
                   "sources": [
                     {
                       "fileName": "src/RealtimeChannel.ts",
-                      "line": 54,
+                      "line": 59,
                       "character": 4
                     }
                   ],
@@ -5983,7 +6446,7 @@
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "id": 557,
+                        "id": 583,
                         "name": "T"
                       }
                     ],
@@ -5997,13 +6460,13 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [550, 551, 553]
+                  "children": [576, 577, 579]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/RealtimeChannel.ts",
-                  "line": 51,
+                  "line": 56,
                   "character": 39
                 }
               ]
@@ -6013,7 +6476,7 @@
       }
     },
     {
-      "id": 529,
+      "id": 555,
       "name": "RealtimePostgresInsertPayload",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -6021,13 +6484,13 @@
       "sources": [
         {
           "fileName": "src/RealtimeChannel.ts",
-          "line": 36,
+          "line": 41,
           "character": 12
         }
       ],
       "typeParameter": [
         {
-          "id": 538,
+          "id": 564,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
@@ -6035,7 +6498,7 @@
           "type": {
             "type": "reflection",
             "declaration": {
-              "id": 535,
+              "id": 561,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
@@ -6043,19 +6506,19 @@
               "sources": [
                 {
                   "fileName": "src/RealtimeChannel.ts",
-                  "line": 36,
+                  "line": 41,
                   "character": 52
                 }
               ],
               "indexSignature": {
-                "id": 536,
+                "id": 562,
                 "name": "__index",
                 "kind": 8192,
                 "kindString": "Index signature",
                 "flags": {},
                 "parameters": [
                   {
-                    "id": 537,
+                    "id": 563,
                     "name": "key",
                     "kind": 32768,
                     "flags": {},
@@ -6084,14 +6547,14 @@
           {
             "type": "reflection",
             "declaration": {
-              "id": 530,
+              "id": 556,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "children": [
                 {
-                  "id": 531,
+                  "id": 557,
                   "name": "eventType",
                   "kind": 1024,
                   "kindString": "Property",
@@ -6099,7 +6562,7 @@
                   "sources": [
                     {
                       "fileName": "src/RealtimeChannel.ts",
-                      "line": 38,
+                      "line": 43,
                       "character": 4
                     }
                   ],
@@ -6110,7 +6573,7 @@
                       [
                         {
                           "type": "reference",
-                          "id": 594,
+                          "id": 621,
                           "name": "REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.INSERT"
                         },
                         ""
@@ -6119,7 +6582,7 @@
                   }
                 },
                 {
-                  "id": 532,
+                  "id": 558,
                   "name": "new",
                   "kind": 1024,
                   "kindString": "Property",
@@ -6127,148 +6590,19 @@
                   "sources": [
                     {
                       "fileName": "src/RealtimeChannel.ts",
-                      "line": 39,
+                      "line": 44,
                       "character": 4
                     }
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 538,
+                    "id": 564,
                     "name": "T"
                   }
                 },
                 {
-                  "id": 533,
+                  "id": 559,
                   "name": "old",
-                  "kind": 1024,
-                  "kindString": "Property",
-                  "flags": {},
-                  "sources": [
-                    {
-                      "fileName": "src/RealtimeChannel.ts",
-                      "line": 40,
-                      "character": 4
-                    }
-                  ],
-                  "type": {
-                    "type": "reflection",
-                    "declaration": {
-                      "id": 534,
-                      "name": "__type",
-                      "kind": 65536,
-                      "kindString": "Type literal",
-                      "flags": {},
-                      "sources": [
-                        {
-                          "fileName": "src/RealtimeChannel.ts",
-                          "line": 40,
-                          "character": 9
-                        }
-                      ]
-                    }
-                  }
-                }
-              ],
-              "groups": [
-                {
-                  "title": "Properties",
-                  "kind": 1024,
-                  "children": [531, 532, 533]
-                }
-              ],
-              "sources": [
-                {
-                  "fileName": "src/RealtimeChannel.ts",
-                  "line": 37,
-                  "character": 39
-                }
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "id": 539,
-      "name": "RealtimePostgresUpdatePayload",
-      "kind": 4194304,
-      "kindString": "Type alias",
-      "flags": {},
-      "sources": [
-        {
-          "fileName": "src/RealtimeChannel.ts",
-          "line": 43,
-          "character": 12
-        }
-      ],
-      "typeParameter": [
-        {
-          "id": 547,
-          "name": "T",
-          "kind": 131072,
-          "kindString": "Type parameter",
-          "flags": {},
-          "type": {
-            "type": "reflection",
-            "declaration": {
-              "id": 544,
-              "name": "__type",
-              "kind": 65536,
-              "kindString": "Type literal",
-              "flags": {},
-              "sources": [
-                {
-                  "fileName": "src/RealtimeChannel.ts",
-                  "line": 43,
-                  "character": 52
-                }
-              ],
-              "indexSignature": {
-                "id": 545,
-                "name": "__index",
-                "kind": 8192,
-                "kindString": "Index signature",
-                "flags": {},
-                "parameters": [
-                  {
-                    "id": 546,
-                    "name": "key",
-                    "kind": 32768,
-                    "flags": {},
-                    "type": {
-                      "type": "intrinsic",
-                      "name": "string"
-                    }
-                  }
-                ],
-                "type": {
-                  "type": "intrinsic",
-                  "name": "any"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "type": {
-        "type": "intersection",
-        "types": [
-          {
-            "type": "reference",
-            "name": "RealtimePostgresChangesPayloadBase"
-          },
-          {
-            "type": "reflection",
-            "declaration": {
-              "id": 540,
-              "name": "__type",
-              "kind": 65536,
-              "kindString": "Type literal",
-              "flags": {},
-              "children": [
-                {
-                  "id": 541,
-                  "name": "eventType",
                   "kind": 1024,
                   "kindString": "Property",
                   "flags": {},
@@ -6280,13 +6614,142 @@
                     }
                   ],
                   "type": {
+                    "type": "reflection",
+                    "declaration": {
+                      "id": 560,
+                      "name": "__type",
+                      "kind": 65536,
+                      "kindString": "Type literal",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/RealtimeChannel.ts",
+                          "line": 45,
+                          "character": 9
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "groups": [
+                {
+                  "title": "Properties",
+                  "kind": 1024,
+                  "children": [557, 558, 559]
+                }
+              ],
+              "sources": [
+                {
+                  "fileName": "src/RealtimeChannel.ts",
+                  "line": 42,
+                  "character": 39
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": 565,
+      "name": "RealtimePostgresUpdatePayload",
+      "kind": 4194304,
+      "kindString": "Type alias",
+      "flags": {},
+      "sources": [
+        {
+          "fileName": "src/RealtimeChannel.ts",
+          "line": 48,
+          "character": 12
+        }
+      ],
+      "typeParameter": [
+        {
+          "id": 573,
+          "name": "T",
+          "kind": 131072,
+          "kindString": "Type parameter",
+          "flags": {},
+          "type": {
+            "type": "reflection",
+            "declaration": {
+              "id": 570,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "sources": [
+                {
+                  "fileName": "src/RealtimeChannel.ts",
+                  "line": 48,
+                  "character": 52
+                }
+              ],
+              "indexSignature": {
+                "id": 571,
+                "name": "__index",
+                "kind": 8192,
+                "kindString": "Index signature",
+                "flags": {},
+                "parameters": [
+                  {
+                    "id": 572,
+                    "name": "key",
+                    "kind": 32768,
+                    "flags": {},
+                    "type": {
+                      "type": "intrinsic",
+                      "name": "string"
+                    }
+                  }
+                ],
+                "type": {
+                  "type": "intrinsic",
+                  "name": "any"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "type": {
+        "type": "intersection",
+        "types": [
+          {
+            "type": "reference",
+            "name": "RealtimePostgresChangesPayloadBase"
+          },
+          {
+            "type": "reflection",
+            "declaration": {
+              "id": 566,
+              "name": "__type",
+              "kind": 65536,
+              "kindString": "Type literal",
+              "flags": {},
+              "children": [
+                {
+                  "id": 567,
+                  "name": "eventType",
+                  "kind": 1024,
+                  "kindString": "Property",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/RealtimeChannel.ts",
+                      "line": 50,
+                      "character": 4
+                    }
+                  ],
+                  "type": {
                     "type": "template-literal",
                     "head": "",
                     "tail": [
                       [
                         {
                           "type": "reference",
-                          "id": 595,
+                          "id": 622,
                           "name": "REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.UPDATE"
                         },
                         ""
@@ -6295,7 +6758,7 @@
                   }
                 },
                 {
-                  "id": 542,
+                  "id": 568,
                   "name": "new",
                   "kind": 1024,
                   "kindString": "Property",
@@ -6303,18 +6766,18 @@
                   "sources": [
                     {
                       "fileName": "src/RealtimeChannel.ts",
-                      "line": 46,
+                      "line": 51,
                       "character": 4
                     }
                   ],
                   "type": {
                     "type": "reference",
-                    "id": 547,
+                    "id": 573,
                     "name": "T"
                   }
                 },
                 {
-                  "id": 543,
+                  "id": 569,
                   "name": "old",
                   "kind": 1024,
                   "kindString": "Property",
@@ -6322,7 +6785,7 @@
                   "sources": [
                     {
                       "fileName": "src/RealtimeChannel.ts",
-                      "line": 47,
+                      "line": 52,
                       "character": 4
                     }
                   ],
@@ -6331,7 +6794,7 @@
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "id": 547,
+                        "id": 573,
                         "name": "T"
                       }
                     ],
@@ -6345,13 +6808,13 @@
                 {
                   "title": "Properties",
                   "kind": 1024,
-                  "children": [541, 542, 543]
+                  "children": [567, 568, 569]
                 }
               ],
               "sources": [
                 {
                   "fileName": "src/RealtimeChannel.ts",
-                  "line": 44,
+                  "line": 49,
                   "character": 39
                 }
               ]
@@ -6361,7 +6824,7 @@
       }
     },
     {
-      "id": 558,
+      "id": 584,
       "name": "RealtimePresenceJoinPayload",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -6375,7 +6838,7 @@
       ],
       "typeParameter": [
         {
-          "id": 567,
+          "id": 593,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
@@ -6383,7 +6846,7 @@
           "type": {
             "type": "reflection",
             "declaration": {
-              "id": 564,
+              "id": 590,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
@@ -6396,14 +6859,14 @@
                 }
               ],
               "indexSignature": {
-                "id": 565,
+                "id": 591,
                 "name": "__index",
                 "kind": 8192,
                 "kindString": "Index signature",
                 "flags": {},
                 "parameters": [
                   {
-                    "id": 566,
+                    "id": 592,
                     "name": "key",
                     "kind": 32768,
                     "flags": {},
@@ -6425,14 +6888,14 @@
       "type": {
         "type": "reflection",
         "declaration": {
-          "id": 559,
+          "id": 585,
           "name": "__type",
           "kind": 65536,
           "kindString": "Type literal",
           "flags": {},
           "children": [
             {
-              "id": 562,
+              "id": 588,
               "name": "currentPresences",
               "kind": 1024,
               "kindString": "Property",
@@ -6451,7 +6914,7 @@
                   "typeArguments": [
                     {
                       "type": "reference",
-                      "id": 567,
+                      "id": 593,
                       "name": "T"
                     }
                   ],
@@ -6460,7 +6923,7 @@
               }
             },
             {
-              "id": 560,
+              "id": 586,
               "name": "event",
               "kind": 1024,
               "kindString": "Property",
@@ -6479,7 +6942,7 @@
                   [
                     {
                       "type": "reference",
-                      "id": 599,
+                      "id": 626,
                       "name": "REALTIME_PRESENCE_LISTEN_EVENTS.JOIN"
                     },
                     ""
@@ -6488,7 +6951,7 @@
               }
             },
             {
-              "id": 561,
+              "id": 587,
               "name": "key",
               "kind": 1024,
               "kindString": "Property",
@@ -6506,7 +6969,7 @@
               }
             },
             {
-              "id": 563,
+              "id": 589,
               "name": "newPresences",
               "kind": 1024,
               "kindString": "Property",
@@ -6525,7 +6988,7 @@
                   "typeArguments": [
                     {
                       "type": "reference",
-                      "id": 567,
+                      "id": 593,
                       "name": "T"
                     }
                   ],
@@ -6538,7 +7001,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [562, 560, 561, 563]
+              "children": [588, 586, 587, 589]
             }
           ],
           "sources": [
@@ -6552,7 +7015,7 @@
       }
     },
     {
-      "id": 568,
+      "id": 594,
       "name": "RealtimePresenceLeavePayload",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -6566,7 +7029,7 @@
       ],
       "typeParameter": [
         {
-          "id": 577,
+          "id": 603,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
@@ -6574,7 +7037,7 @@
           "type": {
             "type": "reflection",
             "declaration": {
-              "id": 574,
+              "id": 600,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
@@ -6587,14 +7050,14 @@
                 }
               ],
               "indexSignature": {
-                "id": 575,
+                "id": 601,
                 "name": "__index",
                 "kind": 8192,
                 "kindString": "Index signature",
                 "flags": {},
                 "parameters": [
                   {
-                    "id": 576,
+                    "id": 602,
                     "name": "key",
                     "kind": 32768,
                     "flags": {},
@@ -6616,14 +7079,14 @@
       "type": {
         "type": "reflection",
         "declaration": {
-          "id": 569,
+          "id": 595,
           "name": "__type",
           "kind": 65536,
           "kindString": "Type literal",
           "flags": {},
           "children": [
             {
-              "id": 572,
+              "id": 598,
               "name": "currentPresences",
               "kind": 1024,
               "kindString": "Property",
@@ -6642,7 +7105,7 @@
                   "typeArguments": [
                     {
                       "type": "reference",
-                      "id": 577,
+                      "id": 603,
                       "name": "T"
                     }
                   ],
@@ -6651,7 +7114,7 @@
               }
             },
             {
-              "id": 570,
+              "id": 596,
               "name": "event",
               "kind": 1024,
               "kindString": "Property",
@@ -6670,7 +7133,7 @@
                   [
                     {
                       "type": "reference",
-                      "id": 600,
+                      "id": 627,
                       "name": "REALTIME_PRESENCE_LISTEN_EVENTS.LEAVE"
                     },
                     ""
@@ -6679,7 +7142,7 @@
               }
             },
             {
-              "id": 571,
+              "id": 597,
               "name": "key",
               "kind": 1024,
               "kindString": "Property",
@@ -6697,7 +7160,7 @@
               }
             },
             {
-              "id": 573,
+              "id": 599,
               "name": "leftPresences",
               "kind": 1024,
               "kindString": "Property",
@@ -6716,7 +7179,7 @@
                   "typeArguments": [
                     {
                       "type": "reference",
-                      "id": 577,
+                      "id": 603,
                       "name": "T"
                     }
                   ],
@@ -6729,7 +7192,7 @@
             {
               "title": "Properties",
               "kind": 1024,
-              "children": [572, 570, 571, 573]
+              "children": [598, 596, 597, 599]
             }
           ],
           "sources": [
@@ -6743,7 +7206,7 @@
       }
     },
     {
-      "id": 578,
+      "id": 604,
       "name": "RealtimePresenceState",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -6757,7 +7220,7 @@
       ],
       "typeParameter": [
         {
-          "id": 586,
+          "id": 612,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
@@ -6765,7 +7228,7 @@
           "type": {
             "type": "reflection",
             "declaration": {
-              "id": 582,
+              "id": 608,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
@@ -6778,14 +7241,14 @@
                 }
               ],
               "indexSignature": {
-                "id": 583,
+                "id": 609,
                 "name": "__index",
                 "kind": 8192,
                 "kindString": "Index signature",
                 "flags": {},
                 "parameters": [
                   {
-                    "id": 584,
+                    "id": 610,
                     "name": "key",
                     "kind": 32768,
                     "flags": {},
@@ -6805,7 +7268,7 @@
           "default": {
             "type": "reflection",
             "declaration": {
-              "id": 585,
+              "id": 611,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
@@ -6824,7 +7287,7 @@
       "type": {
         "type": "reflection",
         "declaration": {
-          "id": 579,
+          "id": 605,
           "name": "__type",
           "kind": 65536,
           "kindString": "Type literal",
@@ -6837,14 +7300,14 @@
             }
           ],
           "indexSignature": {
-            "id": 580,
+            "id": 606,
             "name": "__index",
             "kind": 8192,
             "kindString": "Index signature",
             "flags": {},
             "parameters": [
               {
-                "id": 581,
+                "id": 607,
                 "name": "key",
                 "kind": 32768,
                 "flags": {},
@@ -6861,7 +7324,7 @@
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "id": 586,
+                    "id": 612,
                     "name": "T"
                   }
                 ],
@@ -6873,7 +7336,7 @@
       }
     },
     {
-      "id": 587,
+      "id": 613,
       "name": "RealtimeRemoveChannelResponse",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -6881,7 +7344,7 @@
       "sources": [
         {
           "fileName": "src/RealtimeClient.ts",
-          "line": 42,
+          "line": 54,
           "character": 12
         }
       ],
@@ -6904,7 +7367,7 @@
       }
     },
     {
-      "id": 606,
+      "id": 633,
       "name": "REALTIME_CHANNEL_STATES",
       "kind": 32,
       "kindString": "Variable",
@@ -6914,7 +7377,7 @@
       "sources": [
         {
           "fileName": "src/RealtimeChannel.ts",
-          "line": 108,
+          "line": 111,
           "character": 13
         }
       ],
@@ -6932,22 +7395,22 @@
     {
       "title": "Enumerations",
       "kind": 8,
-      "children": [588, 592, 597, 601]
+      "children": [614, 619, 624, 628]
     },
     {
       "title": "Classes",
       "kind": 128,
-      "children": [64, 359, 1]
+      "children": [64, 371, 1]
     },
     {
       "title": "Type Aliases",
       "kind": 4194304,
-      "children": [347, 358, 491, 510, 517, 524, 548, 529, 539, 558, 568, 578, 587]
+      "children": [358, 370, 513, 536, 543, 550, 574, 555, 565, 584, 594, 604, 613]
     },
     {
       "title": "Variables",
       "kind": 32,
-      "children": [606]
+      "children": [633]
     }
   ],
   "sources": [

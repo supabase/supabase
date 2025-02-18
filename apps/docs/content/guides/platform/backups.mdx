@@ -35,7 +35,7 @@ Once a project satisfies at least one of the requirements for physical backups t
 
 </Admonition>
 
-You can confirm your project's backup type by navigating to [Database Backups > Scheduled backups](https://supabase.com/dashboard/project/_/backups/scheduled) and if you can download a backup then it is logical, otherwise it is physical.
+You can confirm your project's backup type by navigating to [Database Backups > Scheduled backups](https://supabase.com/dashboard/project/_/database/backups/scheduled) and if you can download a backup then it is logical, otherwise it is physical.
 
 However, if your project has the Point-in-Time Recovery (PITR) add-on then the backups are physical and you can view them in [Database Backups > Point in time](https://supabase.com/dashboard/project/_/database/backups/pitr).
 
@@ -134,6 +134,12 @@ A date and time picker will be provided upon pressing the `Start a restore` butt
 ![PITR: Confirmation modal](/docs/img/backups-pitr-confirmation-modal.png)
 
 After locking in the desired point in time to recover to, The Dashboard will then prompt for a review and confirmation before proceeding with the restoration. The project will be inaccessible following this. As such, do ensure to allot for downtime beforehand. This is dependent on the size of the database. The larger it is, the longer the downtime will be. Once the confirmation has been given, the latest physical backup available is downloaded to the project and the database is partially restored. WAL files generated after this physical backup up to the specified point-in-time are then downloaded. The underlying records of transactions in these files are replayed against the database to complete the restoration. The Dashboard will display a notification once the restoration completes.
+
+### Pricing
+
+<PricingPitr />
+
+For a detailed breakdown of how charges are calculated, refer to [Manage Point-in-Time Recovery usage](/docs/guides/platform/manage-your-usage/point-in-time-recovery).
 
 ## Restore to a new project
 

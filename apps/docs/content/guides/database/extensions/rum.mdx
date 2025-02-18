@@ -4,7 +4,7 @@ title: 'RUM: improved inverted index for full-text search based on GIN index'
 description: 'A GIN-like index with additional tree-organized data for each index entry'
 ---
 
-[RUM](https://github.com/postgrespro/rum) is an extension which adds a RUM index to Postgresql.
+[RUM](https://github.com/postgrespro/rum) is an extension which adds a RUM index to Postgres.
 
 RUM index is based on GIN that stores additional per-entry information in a posting tree. For example, positional information of lexemes or timestamps. In comparison to GIN it can use this information to make faster index-only scans for:
 
@@ -18,10 +18,10 @@ combinations or phrases.
 
 Main operators for ordering are:
 
-tsvector `<=>` tsquery | float4 | Distance between tsvector and tsquery.
-value `<=>` value | float8 | Distance between two values.
+`tsvector` `<=>` `tsquery` | `float4` | Distance between `tsvector` and `tsquery`.
+value `<=>` value | `float8` | Distance between two values.
 
-Where value is timestamp, timestamptz, int2, int4, int8, float4, float8, money and oid
+Where value is `timestamp`, `timestamptz`, `int2`, `int4`, `int8`, `float4`, `float8`, `money` and `oid`
 
 ## Usage
 
@@ -120,7 +120,7 @@ SELECT id, d, d `<=>` '2016-05-16 14:21:25' FROM tsts WHERE t @@ 'wr&qh' ORDER B
 
 `rum_anyarray_ops`
 
-This operator class stores anyarray elements with length of the array. It supports operators `&&`, `@>`, `<@`, `=`, `%` operators. It also supports ordering by `<=>` operator.
+This operator class stores `anyarray` elements with length of the array. It supports operators `&&`, `@>`, `<@`, `=`, `%` operators. It also supports ordering by `<=>` operator.
 
 ```sql
 CREATE TABLE test_array (i int2[]);
@@ -143,7 +143,7 @@ SELECT * FROM test_array WHERE i && '{1}' ORDER BY i `<=>` '{1}' ASC;
 
 `rum_anyarray_addon_ops`
 
-The does the same with anyarray index as `rum_tsvector_addon_ops` i.e. allows to order select results using distance
+The does the same with `anyarray` index as `rum_tsvector_addon_ops` i.e. allows to order select results using distance
 operator by attached column.
 
 ## Limitations

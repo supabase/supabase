@@ -7,6 +7,7 @@ import Table from 'components/to-be-cleaned/Table'
 import type { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { copyToClipboard } from 'lib/helpers'
+import { toast } from 'sonner'
 import {
   Button,
   DropdownMenu,
@@ -14,9 +15,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 export interface OAuthAppRowProps {
@@ -56,11 +57,15 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
             icon={isCopied ? <Check className="text-brand" strokeWidth={3} /> : <Clipboard />}
             className="ml-2 px-1"
             onClick={() => {
-              copyToClipboard(app.client_id)
-              setIsCopied(true)
-              setTimeout(() => {
-                setIsCopied(false)
-              }, 3000)
+              if (app.client_id) {
+                copyToClipboard(app.client_id)
+                setIsCopied(true)
+                setTimeout(() => {
+                  setIsCopied(false)
+                }, 3000)
+              } else {
+                toast('Unable to retrieve app client ID')
+              }
             }}
           />
         </div>
@@ -77,8 +82,8 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
             <Button type="default" icon={<MoreVertical />} className="px-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="bottom">
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <DropdownMenuItem
                   key="edit"
                   disabled={!canUpdateOAuthApps}
@@ -90,16 +95,16 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
                   <Edit size={16} />
                   <p>Edit app</p>
                 </DropdownMenuItem>
-              </TooltipTrigger_Shadcn_>
+              </TooltipTrigger>
               {!canUpdateOAuthApps && (
-                <TooltipContent_Shadcn_ side="left">
+                <TooltipContent side="left">
                   You need additional permissions to edit apps
-                </TooltipContent_Shadcn_>
+                </TooltipContent>
               )}
-            </Tooltip_Shadcn_>
+            </Tooltip>
             <DropdownMenuSeparator />
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <DropdownMenuItem
                   disabled={!canDeleteOAuthApps}
                   className="space-x-2 !pointer-events-auto"
@@ -111,13 +116,13 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
                   <Trash size={16} />
                   <p>Delete app</p>
                 </DropdownMenuItem>
-              </TooltipTrigger_Shadcn_>
+              </TooltipTrigger>
               {!canDeleteOAuthApps && (
-                <TooltipContent_Shadcn_ side="left">
+                <TooltipContent side="left">
                   You need additional permissions to delete apps
-                </TooltipContent_Shadcn_>
+                </TooltipContent>
               )}
-            </Tooltip_Shadcn_>
+            </Tooltip>
           </DropdownMenuContent>
         </DropdownMenu>
       </Table.td>

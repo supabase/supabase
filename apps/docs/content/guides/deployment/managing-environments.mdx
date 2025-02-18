@@ -146,7 +146,7 @@ Commit the new migration script to git and you are ready to deploy.
 
 <Admonition type="tip">
 
-Alternatively, you may pass in the `--use-migra` experimental flag to generate a more concise migration using [migra](https://github.com/djrobstep/migra).
+Alternatively, you may pass in the `--use-migra` experimental flag to generate a more concise migration using [`migra`](https://github.com/djrobstep/migra).
 
 Without the `-f` file flag, the output is written to stdout by default.
 
@@ -360,7 +360,7 @@ Once pushed, check that the migration version is up to date for both local and r
 supabase migration list
 ```
 
-### Permission denied on db pull
+### Permission denied on `db pull`
 
 If you have been using Supabase hosted projects for a long time, you might encounter the following permission error when executing `db pull`.
 
@@ -378,7 +378,7 @@ grant all on all functions in schema graphql to postgres, anon, authenticated, s
 grant all on all sequences in schema graphql to postgres, anon, authenticated, service_role;
 ```
 
-### Permission denied on db push
+### Permission denied on `db push`
 
 If you created a table through Supabase dashboard, and your new migration script contains `ALTER TABLE` statements, you might run into permission error when applying them on staging or production databases.
 

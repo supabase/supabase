@@ -1,0 +1,90 @@
+---
+title = "Using SQLAlchemy with Supabase"
+github_url = "https://github.com/orgs/supabase/discussions/27071"
+date_created = "2024-06-06T16:27:43+00:00"
+topics = [ "database", "supavisor", "self-hosting", "functions" ]
+keywords = [ "sqlalchemy", "ipv6", "pool", "database", "connection" ]
+database_id = "da4efcda-cd02-4001-965b-f0294300152f"
+---
+
+## Deploying to auto-scaling servers:
+
+If you are deploying to:
+
+- edge functions
+- serverless functions
+- horizontally auto-scaling deployments
+
+It is recommended that you connect with the pooler in transaction mode (port 6543), which can be found in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database):
+
+```sh
+# Example transaction mode string:
+postgres://[db-user].[project-ref]:[db-password]@aws-0-[aws-region].pooler.supabase.com:6543
+```
+
+When using transaction mode, you should use the[ `NullPool` setting:](https://docs.sqlalchemy.org/en/20/core/pooling.html#switching-pool-implementations)
+
+```py
+from sqlalchemy.pool import NullPool
+
+con = sqlalchemy.create_engine(url, client_encoding='utf8', poolclass=NullPool)
+```
+
+When relying on Supavisor, it's important to pick an adequate pool size. This guide can walk you through the process:
+
+- https://github.com/orgs/supabase/discussions/21566
+
+## Deploying to stationary servers
+
+For stationary servers, such as VMs and long-running containers, it is recommended to use your direct connection string, which can be found in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
+
+```
+# Example DB string:
+postgresql://postgres:[PASSWORD]@db.[PROJECT REF].supabase.co:5432/postgres
+```
+
+The connection maps to an IPv6 address, and cannot operate in an IPv4 environment.
+
+### Checking IPv6 support:
+
+The majority of services are IPv6 compatible. However, there are a few prominent services that only accept IPv4 connections:
+
+- [Retool](https://retool.com/)
+- [Vercel](https://vercel.com/)
+- [GitHub Actions](https://docs.github.com/en/actions)
+- [Render](https://render.com/)
+
+If you're still unsure if your network supports IPv6, you can run this cURL command on your deployment server:
+
+```sh
+curl -6 https://ifconfig.co/ip
+```
+
+If the command returns an IPv6 address, the network is IPv6 compatible.
+
+If your deployment environment is not IPv6 compatible, then consider:
+
+- Using the Supavisor pooler in session (port 5432)
+- Enabling the [IPv4 Add-On](https://supabase.com/dashboard/project/_/settings/addons) if you're on a pro or above plan
+
+### Choosing an internal pool size
+
+**Key Pool Settings:**
+
+- pool_size: This sets the maximum number of permanent connections in the pool. SQLAlchemy will create connections as needed up to this limit.
+  max_overflow: Allows creating additional connections beyond pool_size for temporary bursts in demand. These temporary connections close after use.
+
+```python
+# Example configurations
+engine = create_engine(
+    "postgresql+psycopg2://me@localhost/mydb", pool_size=20, max_overflow=15
+)
+```
+
+As a rule of thumb, if you're using the Supabase Database REST Client, try to limit the connections used by your deployment to 40% of available connections. Otherwise, you can cautiously increase usage to around 80%. These percentages are flexible and depend on your application's usage and setup. Monitor connection usage to determine the optimal allocation without depriving other servers of necessary connections.
+
+## How to monitor live connections
+
+Connection usage can be monitored with a Supabase Grafana Dashboard. It provides realtime visibility of over 200 database metrics, such as graphs of CPU, EBS, and active direct/pooler connections. It can be extremely useful for monitoring and debugging instances.
+
+You can check our [GitHub repo](https://github.com/supabase/supabase-grafana) for setup instructions for local deployments or free cloud deployments on [Fly.io](http://fly.io/). For a complete explainer on connection monitoring, you can check out this [guide](https://github.com/orgs/supabase/discussions/27141)
