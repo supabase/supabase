@@ -1,7 +1,7 @@
 import Editor, { DiffEditor, Monaco, OnMount } from '@monaco-editor/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Command } from 'lucide-react'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { editor as monacoEditor } from 'monaco-editor'
 import { useCompletion } from 'ai/react'
 import { detectOS } from 'lib/helpers'
@@ -97,22 +97,22 @@ const AIEditor = ({
     setIsDiffMode(true)
   }, [completion, promptState.beforeSelection, promptState.selection, promptState.afterSelection])
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setCompletion('')
     setIsDiffMode(false)
     setPromptState((prev) => ({ ...prev, isOpen: false }))
     setPromptInput('')
     editorRef.current?.focus()
-  }
+  }, [setCompletion])
 
-  const handleAcceptDiff = () => {
+  const handleAcceptDiff = useCallback(() => {
     if (diffValue.modified) {
       const newValue = diffValue.modified
       setCurrentValue(newValue)
       onChange?.(newValue)
       handleReset()
     }
-  }
+  }, [diffValue.modified, onChange, handleReset])
 
   const handleRejectDiff = () => {
     handleReset()
@@ -127,20 +127,20 @@ const AIEditor = ({
         (os === 'macos' ? event.metaKey : event.ctrlKey) &&
         isDiffMode
       ) {
+        event.preventDefault()
         handleAcceptDiff()
       }
     }
 
     window.addEventListener('keydown', handleKeyboard)
     return () => window.removeEventListener('keydown', handleKeyboard)
-  }, [os, isDiffMode])
+  }, [os, isDiffMode, handleAcceptDiff, handleReset])
 
   const handleEditorDidMount: OnMount = (
     editor: monacoEditor.IStandaloneCodeEditor,
     monaco: Monaco
   ) => {
     editorRef.current = editor
-
     // Set prompt state to open if promptInput exists
     if (promptInput) {
       const model = editor.getModel()
@@ -245,6 +245,7 @@ const AIEditor = ({
             modified={diffValue.modified}
             onMount={(editor: monacoEditor.IStandaloneDiffEditor) => {
               diffEditorRef.current = editor
+              console.log('mount diff editor')
               setIsDiffEditorMounted(true)
             }}
             options={{

@@ -26,7 +26,6 @@ export const AskAIWidget = ({
   isLoading = false,
   onHeightChange,
 }: AskAIWidgetProps) => {
-  const os = detectOS()
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Auto focus input
@@ -74,11 +73,11 @@ export const AskAIWidget = ({
         ref={inputRef}
         className="bg-transparent border-0 outline-0 ring-0 ring-offset-0 focus:outline-0 focus:ring-0 focus:ring-offset-0 focus-visible:outline-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-within:outline-0 focus-within:ring-0 focus-within:ring-offset-0 shadow-none rounded-none gap-4 text-xs md:text-xs py-2 pl-3 !leading-[20px]"
         placeholder={isDiffVisible ? 'Make an edit...' : 'Edit via the Assistant...'}
-        autoFocus
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
+          if (e.key === 'Enter' && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
+            e.preventDefault()
             handleSubmit()
           }
         }}
