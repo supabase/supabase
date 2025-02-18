@@ -568,5 +568,294 @@ export const getTools = ({
         `
       },
     }),
+    getLogsExplorerKnowledge: tool({
+      description: 'Get knowledge about how to write queries for the Supabase Logs Explorer',
+      parameters: z.object({}),
+      execute: async ({}) => {
+        return stripIndent`
+        # Querying Logs in Supabase Logs Explorer
+
+        You're an expert in writing SQL queries for the Supabase Logs Explorer. The Logs Explorer uses BigQuery and supports all available SQL functions and operators.
+
+        ## Available Log Sources
+
+        The following log sources are available from the Sources drop-down:
+
+        * \`auth_logs\`: GoTrue server logs containing authentication/authorization activity
+        * \`edge_logs\`: Edge network logs containing request and response metadata from Cloudflare
+        * \`function_edge_logs\`: Edge network logs for edge functions, containing network requests and response metadata
+        * \`function_logs\`: Function internal logs containing any console logging from edge functions
+        * \`postgres_logs\`: Postgres database logs containing statements executed by connected applications
+        * \`realtime_logs\`: Realtime server logs containing client connection information
+        * \`storage_logs\`: Storage server logs containing object upload and retrieval information
+
+        ## Working with Timestamps
+
+        Each log entry has a \`timestamp\` field of type \`TIMESTAMP\`. Important considerations:
+
+        1. Raw timestamps are displayed in unix microseconds
+        2. Use \`DATETIME()\` to convert timestamps to human-readable ISO-8601 format:
+
+        \`\`\`sql
+        -- Raw timestamp (unix microseconds)
+        SELECT timestamp FROM edge_logs;
+        -- Returns: 1664270180000
+
+        -- Formatted timestamp
+        SELECT DATETIME(timestamp) FROM edge_logs;
+        -- Returns: 2022-09-27T09:17:10.439Z
+        \`\`\`
+
+        ## Working with Nested Arrays
+
+        Log events store metadata as nested arrays of objects. To query nested data:
+
+        1. Use \`UNNEST()\` for each array level you want to access
+        2. Add joins for each level of nesting
+        3. Reference nested objects using aliases
+
+        Example querying edge logs:
+
+        \`\`\`sql
+        SELECT 
+          DATETIME(timestamp),
+          request.method,
+          header.cf_ipcountry
+        FROM
+          edge_logs AS t
+          CROSS JOIN UNNEST(t.metadata) AS metadata
+          CROSS JOIN UNNEST(metadata.request) AS request
+          CROSS JOIN UNNEST(request.headers) AS header;
+        \`\`\`
+
+        ## Best Practices
+
+        1. Always include a filter on \`timestamp\` to optimize query performance
+        2. Avoid selecting large nested objects - select individual values instead
+        3. Use \`LIMIT\` to reduce returned rows (max 1000 rows per query)
+
+        Examples:
+
+        ### Edge function 500 error
+        \`\`\`sql
+        select id, function_edge_logs.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from function_edge_logs
+        cross join unnest(metadata) as m
+        cross join unnest(m.response) as response
+        cross join unnest(m.request) as request
+        where (response.status_code between 500 and 599)
+        order by timestamp desc
+        limit 100
+        \`\`\`
+        ### ❌ Avoid selecting entire metadata objects
+        \`\`\`sql
+        SELECT
+          DATETIME(timestamp),
+          m AS metadata  -- Selects entire metadata object
+        FROM
+          edge_logs AS t
+          CROSS JOIN UNNEST(t.metadata) AS m;
+        \`\`\`
+
+        ### ✅ Select specific needed values
+        \`\`\`sql
+        SELECT
+          DATETIME(timestamp),
+          r.method  -- Select only required fields
+        FROM
+          edge_logs AS t
+          CROSS JOIN UNNEST(t.metadata) AS m
+          CROSS JOIN UNNEST(m.request) AS r;
+        \`\`\`
+
+        ## Common Query Examples
+
+        ### Get user IP addresses from edge logs:
+        \`\`\`sql
+        SELECT 
+          DATETIME(timestamp),
+          h.x_real_ip
+        FROM
+          edge_logs
+          CROSS JOIN UNNEST(metadata) AS m
+          CROSS JOIN UNNEST(m.request) AS r
+          CROSS JOIN UNNEST(r.headers) AS h
+        WHERE 
+          h.x_real_ip IS NOT NULL 
+          AND r.method = "GET"
+        LIMIT 1000;
+        \`\`\`
+
+        ### Filter logs by time range:
+        \`\`\`sql
+        SELECT 
+          DATETIME(timestamp) as time,
+          event_message
+        FROM postgres_logs
+        WHERE 
+          timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR)
+        ORDER BY timestamp DESC
+        LIMIT 1000;
+        \`\`\`
+
+        Remember:
+        - The Logs Explorer has a maximum of 1000 rows per query
+        - Log retention depends on your project's pricing plan
+        - Use appropriate timestamp filters to optimize performance
+        - Avoid selecting entire nested objects when possible
+
+        ## Logs Field Reference
+
+        Below is the complete field reference for each log source. To access nested fields, you'll need to use the appropriate UNNEST joins as shown in the examples above.
+
+        ### Function Edge Logs (\`function_edge_logs\`)
+
+        | Field | Type |
+        |-------|------|
+        | event_message | string |
+        | id | string |
+        | timestamp | datetime |
+        | metadata.deployment_id | string |
+        | metadata.execution_time_ms | number |
+        | metadata.function_id | string |
+        | metadata.project_ref | string |
+        | metadata.request.headers.accept | string |
+        | metadata.request.headers.content_length | string |
+        | metadata.request.headers.host | string |
+        | metadata.request.headers.user_agent | string |
+        | metadata.request.host | string |
+        | metadata.request.method | string |
+        | metadata.request.pathname | string |
+        | metadata.request.protocol | string |
+        | metadata.request.url | string |
+        | metadata.response.headers.content_length | string |
+        | metadata.response.headers.content_type | string |
+        | metadata.response.headers.date | string |
+        | metadata.response.headers.server | string |
+        | metadata.response.headers.vary | string |
+        | metadata.response.status_code | number |
+        | metadata.version | string |
+
+        ### API Edge Logs (\`edge_logs\`)
+
+        | Field | Type |
+        |-------|------|
+        | id | string |
+        | timestamp | datetime |
+        | event_message | string |
+        | identifier | string |
+        | metadata.load_balancer_redirect_identifier | string |
+        | metadata.request.cf.asOrganization | string |
+        | metadata.request.cf.asn | number |
+        | metadata.request.cf.botManagement.corporateProxy | boolean |
+        | metadata.request.cf.botManagement.detectionIds | number[] |
+        | metadata.request.cf.botManagement.ja3Hash | string |
+        | metadata.request.cf.botManagement.score | number |
+        | metadata.request.cf.botManagement.staticResource | boolean |
+        | metadata.request.cf.botManagement.verifiedBot | boolean |
+        | metadata.request.cf.city | string |
+        | metadata.request.cf.clientTcpRtt | number |
+        | metadata.request.cf.clientTrustScore | number |
+        | metadata.request.cf.colo | string |
+        | metadata.request.cf.continent | string |
+        | metadata.request.cf.country | string |
+        | metadata.request.cf.edgeRequestKeepAliveStatus | number |
+        | metadata.request.cf.httpProtocol | string |
+        | metadata.request.cf.latitude | string |
+        | metadata.request.cf.longitude | string |
+        | metadata.request.cf.metroCode | string |
+        | metadata.request.cf.postalCode | string |
+        | metadata.request.cf.region | string |
+        | metadata.request.cf.timezone | string |
+        | metadata.request.cf.tlsCipher | string |
+        | metadata.request.cf.tlsClientAuth.certPresented | string |
+        | metadata.request.cf.tlsClientAuth.certRevoked | string |
+        | metadata.request.cf.tlsClientAuth.certVerified | string |
+        | metadata.request.cf.tlsExportedAuthenticator.clientFinished | string |
+        | metadata.request.cf.tlsExportedAuthenticator.clientHandshake | string |
+        | metadata.request.cf.tlsExportedAuthenticator.serverFinished | string |
+        | metadata.request.cf.tlsExportedAuthenticator.serverHandshake | string |
+        | metadata.request.cf.tlsVersion | string |
+        | metadata.request.headers.cf_connecting_ip | string |
+        | metadata.request.headers.cf_ipcountry | string |
+        | metadata.request.headers.cf_ray | string |
+        | metadata.request.headers.host | string |
+        | metadata.request.headers.referer | string |
+        | metadata.request.headers.x_client_info | string |
+        | metadata.request.headers.x_forwarded_proto | string |
+        | metadata.request.headers.x_real_ip | string |
+        | metadata.request.host | string |
+        | metadata.request.method | string |
+        | metadata.request.path | string |
+        | metadata.request.protocol | string |
+        | metadata.request.search | string |
+        | metadata.request.url | string |
+        | metadata.response.headers.cf_cache_status | string |
+        | metadata.response.headers.cf_ray | string |
+        | metadata.response.headers.content_location | string |
+        | metadata.response.headers.content_range | string |
+        | metadata.response.headers.content_type | string |
+        | metadata.response.headers.date | string |
+        | metadata.response.headers.sb_gateway_version | string |
+        | metadata.response.headers.transfer_encoding | string |
+        | metadata.response.headers.x_kong_proxy_latency | string |
+        | metadata.response.origin_time | number |
+        | metadata.response.status_code | number |
+
+        ### PostgREST Logs (\`postgrest_logs\`)
+
+        | Field | Type |
+        |-------|------|
+        | event_message | string |
+        | id | string |
+        | identifier | string |
+        | timestamp | datetime |
+        | metadata.host | string |
+
+        ### Auth Logs (\`auth_logs\`)
+
+        | Field | Type |
+        |-------|------|
+        | event_message | string |
+        | id | string |
+        | timestamp | datetime |
+        | metadata.auth_event.action | string |
+        | metadata.auth_event.actor_id | string |
+        | metadata.auth_event.actor_username | string |
+        | metadata.auth_event.log_type | string |
+        | metadata.auth_event.traits.provider | string |
+        | metadata.auth_event.traits.user_email | string |
+        | metadata.auth_event.traits.user_id | string |
+        | metadata.auth_event.traits.user_phone | string |
+        | metadata.component | string |
+        | metadata.duration | number |
+        | metadata.host | string |
+        | metadata.level | string |
+        | metadata.method | string |
+        | metadata.msg | string |
+        | metadata.path | string |
+        | metadata.referer | string |
+        | metadata.remote_addr | string |
+        | metadata.status | number |
+        | metadata.timestamp | string |
+
+        Example query using nested fields:
+        \`\`\`sql
+        -- Query auth logs for specific user actions
+        SELECT
+          DATETIME(timestamp) as time,
+          metadata.auth_event.action,
+          metadata.auth_event.actor_username,
+          metadata.auth_event.traits.user_email
+        FROM auth_logs
+        CROSS JOIN UNNEST(metadata.auth_event) as auth_event
+        WHERE 
+          metadata.auth_event.action = 'login'
+          AND timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+        ORDER BY timestamp DESC
+        LIMIT 1000;
+        \`\`\`
+        `
+      },
+    }),
   }
 }

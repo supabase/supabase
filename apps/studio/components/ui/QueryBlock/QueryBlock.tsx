@@ -9,6 +9,7 @@ import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartC
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { Parameter, parseParameters } from 'lib/sql-parameters'
 import { Dashboards } from 'types'
 import {
@@ -28,6 +29,7 @@ import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
 import { ParametersPopover } from './ParametersPopover'
 import { getCumulativeResults } from './QueryBlock.utils'
+import dayjs from 'dayjs'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
@@ -60,6 +62,8 @@ interface QueryBlockProps {
   isLoading?: boolean
   /** Override to prevent running the SQL query provided */
   runQuery?: boolean
+  /** Whether this is a logs query */
+  logs?: boolean
   /** Prevent updating of columns for X and Y axes in the chart view */
   lockColumns?: boolean
   /** Max height set to render results / charts (Defaults to 250) */
@@ -109,6 +113,7 @@ export const QueryBlock = ({
   isChart = false,
   isLoading = false,
   runQuery = false,
+  logs = false,
   lockColumns = false,
   draggable = false,
   isRefreshing = false,
@@ -143,22 +148,40 @@ export const QueryBlock = ({
     onSuccess: (data) => setQueryResult(data.result),
   })
 
+  const {
+    logData,
+    error: logsError,
+    isLoading: isLoadingLogs,
+    runQuery: runLogsQuery,
+  } = useLogsQuery(
+    ref || '',
+    {
+      sql: sql || '',
+      iso_timestamp_start: dayjs().subtract(7, 'day').toISOString(),
+      iso_timestamp_end: dayjs().toISOString(),
+    },
+    logs && runQuery && Boolean(ref)
+  )
+
   const handleExecute = () => {
     if (!sql || isLoading) return
 
-    if (!isReadOnlySelectSQL) {
+    // Skip SQL validation for log queries since they use BigQuery
+    if (!logs && !isReadOnlySelectSQL) {
       const hasUnknownFunctions = containsUnknownFunction(sql)
       return setShowWarning(hasUnknownFunctions ? 'hasUnknownFunctions' : 'hasWriteOperation')
     }
 
     try {
-      // [Joshen] This is for when we introduced the concept of parameters into our reports
-      // const processedSql = processParameterizedSql(sql, combinedParameterValues)
-      execute({
-        projectRef: ref,
-        connectionString: project?.connectionString,
-        sql,
-      })
+      if (logs) {
+        runLogsQuery()
+      } else {
+        execute({
+          projectRef: ref,
+          connectionString: project?.connectionString,
+          sql,
+        })
+      }
     } catch (error: any) {
       toast.error(`Failed to execute query: ${error.message}`)
     }
@@ -168,21 +191,28 @@ export const QueryBlock = ({
     setChartSettings(chartConfig)
   }, [chartConfig])
 
+  useEffect(() => {
+    if (logs && logData && !isLoading) {
+      setQueryResult(logData)
+    }
+  }, [logData, isLoading])
+
   // Run once on mount to parse parameters and notify parent
   useEffect(() => {
     if (!!sql && onSetParameter) {
       const params = parseParameters(sql)
       onSetParameter(params)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sql])
+  }, [sql, onSetParameter])
 
   useEffect(() => {
-    if (!!sql && !isLoading && runQuery && isReadOnlySelect(sql) && !!project) {
+    const shouldExecute = !!sql && !isLoading && runQuery && !!project
+    const isValidQuery = logs || (!logs && isReadOnlySelect(sql ?? ''))
+
+    if (shouldExecute && isValidQuery) {
       handleExecute()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sql, isLoading, runQuery, project])
+  }, [sql, isLoading, runQuery, project?.connectionString])
 
   useEffect(() => {
     if (isRefreshing) handleExecute()
@@ -193,7 +223,7 @@ export const QueryBlock = ({
       draggable={draggable}
       showDragHandle={draggable}
       tooltip={tooltip}
-      loading={isExecuting}
+      loading={isExecuting || isLoadingLogs}
       onDragStart={(e: DragEvent<Element>) => onDragStart?.(e)}
       icon={
         <SQL_ICON
@@ -257,7 +287,7 @@ export const QueryBlock = ({
               size="tiny"
               className="w-7 h-7"
               icon={<Play size={14} />}
-              loading={isExecuting || isLoading}
+              loading={isExecuting || isLoadingLogs || isLoading}
               disabled={isLoading}
               onClick={() => {
                 handleExecute()

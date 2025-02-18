@@ -5,6 +5,7 @@ export interface AssistantSnippetProps {
   title?: string
   isChart?: string
   runQuery?: string
+  logs?: string
   xAxis?: string
   yAxis?: string
   name?: string
