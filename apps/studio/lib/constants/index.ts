@@ -5,12 +5,13 @@ export * from './infrastructure'
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 export const DEFAULT_HOME = IS_PLATFORM ? '/projects' : '/project/default'
 
-// TODO: Replace PG_META_URL with STUDIO_PG_META_URL and remove all references to PLATFORM_PG_META_URL
 export const API_URL = IS_PLATFORM
   ? process.env.NEXT_PUBLIC_API_URL!
-  : !!process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}/api`
-    : `${process.env.NEXT_PUBLIC_SITE_URL}/api`
+  : !!process.env.NEXT_PUBLIC_VERCEL_URL
+    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api`
+    : !!process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}/api`
+      : `${process.env.NEXT_PUBLIC_SITE_URL}/api`
 export const PG_META_URL = IS_PLATFORM
   ? process.env.PLATFORM_PG_META_URL
   : process.env.STUDIO_PG_META_URL
