@@ -7,7 +7,7 @@
     "preinstall": "npx only-allow pnpm",
     "env:setup": "supabase start -x studio && supabase status --output json > keys.json && node generate-local-env.js",
     "pretest:local": "pnpm env:setup",
-    "test:local": "pnpm env:setup && export ENV=local && PROJECT_REF=default && playwright test",
+    "test:local": "pnpm env:setup && export ENV=local && export PROJECT_REF=default && playwright test",
     "posttest:local": "supabase stop --no-backup",
     "test:staging": "export ENV=staging && playwright test",
     "clean": "rimraf node_modules"
