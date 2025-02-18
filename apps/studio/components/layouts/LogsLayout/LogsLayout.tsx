@@ -32,6 +32,9 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
     }
   }, [router, setLastLogsPage])
 
+  console.log('🔴 canUseLogsExplorer', canUseLogsExplorer)
+  console.log('🔴 isLoading', isLoading)
+
   if (!canUseLogsExplorer) {
     if (isLoading) {
       return <ProjectLayout isLoading></ProjectLayout>
@@ -44,13 +47,12 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
         </ProjectLayout>
       )
     }
-
-    return (
-      <ProjectLayout title={title} product="Logs & Analytics" productMenu={<LogsSidebarMenuV2 />}>
-        {children}
-      </ProjectLayout>
-    )
   }
+  return (
+    <ProjectLayout title={title} product="Logs & Analytics" productMenu={<LogsSidebarMenuV2 />}>
+      {children}
+    </ProjectLayout>
+  )
 }
 
 export default withAuth(LogsLayout)
