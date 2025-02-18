@@ -24,6 +24,7 @@ import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/A
 import AIEditor from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { InlineLink } from '../InlineLink'
+import SqlWarningAdmonition from '../SqlWarningAdmonition'
 
 interface EditorPanelProps {
   onChange?: (value: string) => void
@@ -290,40 +291,15 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
         )}
 
         {showWarning && (
-          <div className="shrink-0">
-            <Admonition type="warning" className="m-0 rounded-none border-x-0 border-b-0">
-              <p>
-                {showWarning === 'hasWriteOperation'
-                  ? 'This query contains write operations.'
-                  : 'This query involves running a function.'}{' '}
-                Are you sure you want to execute it?
-              </p>
-              <p className="text-foreground-light">
-                Make sure you are not accidentally removing something important.
-              </p>
-              <div className="flex justify-stretch mt-2 gap-2">
-                <Button
-                  type="outline"
-                  size="tiny"
-                  className="w-full flex-1"
-                  onClick={() => setShowWarning(undefined)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="danger"
-                  size="tiny"
-                  className="w-full flex-1"
-                  onClick={() => {
-                    setShowWarning(undefined)
-                    onExecuteSql(true)
-                  }}
-                >
-                  Run
-                </Button>
-              </div>
-            </Admonition>
-          </div>
+          <SqlWarningAdmonition
+            className="border-t"
+            warningType={showWarning}
+            onCancel={() => setShowWarning(undefined)}
+            onConfirm={() => {
+              setShowWarning(undefined)
+              onExecuteSql(true)
+            }}
+          />
         )}
 
         {results !== undefined && results.length > 0 && (

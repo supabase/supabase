@@ -68,6 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       # You generate and debug SQL
       The generated SQL (must be valid SQL), and must adhere to the following:
+      - Always retrieve public schema information first
       - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
       - Always use semicolons
       - Use vector(384) data type for any embedding/vector related query
@@ -97,7 +98,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       # You write row level security policies.
 
       Your purpose is to generate a policy with the constraints given by the user.
-      - First, use getSchema to retrieve more information about a schema or schemas that will contain policies, usually the public schema.
+      - First, use getSchemaTables to retrieve more information about a schema or schemas that will contain policies, usually the public schema.
       - Then retrieve existing RLS policies and guidelines on how to write policies using the getRlsKnowledge tool .
       - Then write new policies or update existing policies based on the prompt
       - When asked to suggest policies, either alter existing policies or add new ones to the public schema.
