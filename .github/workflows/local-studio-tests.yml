@@ -35,6 +35,8 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
       - uses: supabase/setup-cli@v1
+        with:
+          version: latest
       - name: Install dependencies
         run: pnpm i
       - name: Install Playwright Browsers
