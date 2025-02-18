@@ -19,7 +19,7 @@ test.describe('Table Editor page', () => {
   test('should create a new table, view its definition, add new rows, sort and filter', async ({
     page,
   }, testInfo) => {
-    const tableName = `${kebabCase(testInfo.title).slice(0, 24)}-${testInfo.retry}-${Math.floor(Math.random() * 100)}`
+    const tableName = `${kebabCase(testInfo.title).slice(0, 24)}-${testInfo.retry}-${Math.floor(Math.random() * 10000)}`
 
     // The page has been loaded with the table data, we can now interact with the page
     await page.getByRole('button', { name: 'New table', exact: true }).click()
@@ -46,6 +46,14 @@ test.describe('Table Editor page', () => {
     await page.getByRole('button', { name: 'Save' }).click()
     await dismissToast(page)
 
+    // hide React Query DevTools if present
+    await page.evaluate(() => {
+      const devtools = document.querySelector('.ReactQueryDevtools')
+      if (devtools) {
+        devtools.remove()
+      }
+    })
+
     // view its definition
     await page.getByText('definition').click()
     await expect(page.locator('div.view-lines')).toContainText(
@@ -69,8 +77,16 @@ test.describe('Table Editor page', () => {
     await page.getByTestId('action-bar-save-row').click()
     await dismissToast(page)
 
+    // Wait for both rows to be visible in the grid
+    await page.waitForResponse((response) =>
+      response.url().includes('/api/platform/pg-meta/default/query')
+    )
     await expect(page.getByRole('grid')).toContainText('2')
     await expect(page.getByRole('grid')).toContainText('100')
+
+    // Make sure we can see both rows in the grid before sorting
+    const rows = page.getByRole('row')
+    await expect(rows).toHaveCount(3) // header row + 2 data rows
 
     // sort by the a column
     await page.getByRole('button', { name: 'Sort' }).click()
@@ -82,8 +98,8 @@ test.describe('Table Editor page', () => {
     await page.locator('#spec-click-target').click()
 
     // expect the row to be sorted by defaultValueColumn. They're inserted in the order 100, 2
-    await expect(page.locator('div.rdg-row:nth-child(2)')).toContainText('2')
-    await expect(page.locator('div.rdg-row:nth-child(3)')).toContainText('100')
+    await expect(rows.nth(1)).toContainText('2')
+    await expect(rows.nth(2)).toContainText('100')
     // remove the sorting
     await page.getByRole('button', { name: 'Sorted by 1 rule' }).click()
     await page.getByRole('dialog').getByRole('button').nth(1).click()
