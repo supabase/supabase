@@ -48,6 +48,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
   const [templateSearch, setTemplateSearch] = useState('')
   const [savedCode, setSavedCode] = useState<string>('')
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
+  const [showResults, setShowResults] = useState(true)
 
   const errorHeader = error?.formattedError?.split('\n')?.filter((x: string) => x.length > 0)?.[0]
   const errorContent =
@@ -110,6 +111,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
       handleError: (error) => {
         throw error
       },
+      contextualInvalidation: true,
     })
   }
 
@@ -325,13 +327,22 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
         )}
 
         {results !== undefined && results.length > 0 && (
-          <div className="h-72 shrink-0 flex flex-col">
-            <div className="border-t flex-1 overflow-auto">
-              <Results rows={results} />
-            </div>
-            <p className="shrink-0 text-xs text-foreground-light font-mono py-2 px-5">
-              {results.length} rows
-              {results.length >= 100 && ` (Limited to only 100 rows)`}
+          <div className={`max-h-72 shrink-0 flex flex-col`}>
+            {showResults && (
+              <div className="border-t flex-1 overflow-auto">
+                <Results rows={results} />
+              </div>
+            )}
+            <p className="text-xs text-foreground-light border-t font-mono py-2 px-5 flex items-center">
+              {results.length} rows{results.length >= 100 && ` (Limited to only 100 rows)`}
+              <Button
+                size="tiny"
+                type="default"
+                className="ml-2"
+                onClick={() => setShowResults((prev) => !prev)}
+              >
+                {showResults ? 'Hide Results' : 'Show Results'}
+              </Button>
             </p>
           </div>
         )}
@@ -395,20 +406,8 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
           >
             {showTemplates ? 'Templates' : 'Templates'}
           </Button>
-          <Button
-            loading={isExecuting}
-            onClick={() => onExecuteSql()}
-            iconRight={
-              isExecuting ? (
-                <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-              ) : (
-                <div className="flex items-center space-x-1">
-                  <CornerDownLeft size={10} strokeWidth={1.5} />
-                </div>
-              )
-            }
-          >
-            Run
+          <Button loading={isExecuting} onClick={() => onExecuteSql()}>
+            Run query
           </Button>
         </div>
       </div>
