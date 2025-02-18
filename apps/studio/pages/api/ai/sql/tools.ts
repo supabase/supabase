@@ -2,23 +2,31 @@ import { tool } from 'ai'
 import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
+import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
+import { getDatabaseFunctions } from 'data/database-functions/database-functions-query'
 import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
 import { getEntityDefinitionsSql } from 'data/database/entity-definitions-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
-import { getDatabaseFunctions } from 'data/database-functions/database-functions-query'
 
 export const getTools = ({
   projectRef,
   connectionString,
+  cookie,
   authorization,
   includeSchemaMetadata,
 }: {
   projectRef: string
   connectionString: string
+  cookie?: string
   authorization?: string
   includeSchemaMetadata: boolean
 }) => {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(cookie && { cookie }),
+    ...(authorization && { Authorization: authorization }),
+  }
+
   return {
     getSchema: tool({
       description: 'Get more information about one or more schemas',
@@ -35,10 +43,7 @@ export const getTools = ({
                   sql: getEntityDefinitionsSql({ schemas }),
                 },
                 undefined,
-                {
-                  'Content-Type': 'application/json',
-                  ...(authorization && { Authorization: authorization }),
-                }
+                headers
               )
             : { result: [] }
 
@@ -82,10 +87,7 @@ export const getTools = ({
                 connectionString,
               },
               undefined,
-              {
-                'Content-Type': 'application/json',
-                ...(authorization && { Authorization: authorization }),
-              }
+              headers
             )
           : []
 
@@ -357,10 +359,7 @@ export const getTools = ({
                   connectionString,
                 },
                 undefined,
-                {
-                  'Content-Type': 'application/json',
-                  ...(authorization && { Authorization: authorization }),
-                }
+                headers
               )
             : []
 
