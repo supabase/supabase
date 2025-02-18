@@ -14,7 +14,7 @@ export interface ExpandingTextAreaProps extends React.TextareaHTMLAttributes<HTM
  */
 const ExpandingTextArea = forwardRef<HTMLTextAreaElement, ExpandingTextAreaProps>(
   ({ className, value, ...props }, ref) => {
-    const internalRef = useRef<HTMLTextAreaElement>(null)
+    const internalRef = useRef<HTMLTextAreaElement | null>(null)
 
     useImperativeHandle(ref, () => internalRef.current as HTMLTextAreaElement, [])
 
