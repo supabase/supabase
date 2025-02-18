@@ -8,16 +8,9 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
-import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
-import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
-import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
-import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
-import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 import type { LogData, QueryType } from './Logs.types'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { WarehouseSelectionRenderer } from './LogSelectionRenderers/WarehouseSelectionRenderer'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -30,12 +23,9 @@ export interface LogSelectionProps {
 }
 
 const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectionProps) => {
-  const useNewLogDetail = useFlag('logsDetailV2')
-
   const LogDetails = () => {
     if (error) return <LogErrorState error={error} />
     if (!log) return <LogDetailEmptyState />
-    // if (useNewLogDetail) return <DefaultPreviewSelectionRenderer log={log} />
 
     switch (queryType) {
       // case 'warehouse':

@@ -91,7 +91,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   const selectedQuery =
     selectedRow !== undefined ? queryPerformanceQuery.data?.[selectedRow]?.['query'] : undefined
   const query = (selectedQuery ?? '').trim().toLowerCase()
-  const showIndexSuggestions = query.startsWith('select') || query.startsWith('with pgrst_source')
+  const showIndexSuggestions =
+    query.startsWith('select') ||
+    query.startsWith('with pgrst_source') ||
+    query.startsWith('with pgrst_payload')
 
   const onSortChange = (column: string) => {
     let updatedSort = undefined

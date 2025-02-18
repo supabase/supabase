@@ -18,7 +18,15 @@ import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 
 const LogRowSeparator = () => <Separator className="bg-border my-1" />
 
-const PropertyRow = ({ keyName, value }: { keyName: string; value: any }) => {
+const PropertyRow = ({
+  keyName,
+  value,
+  dataTestId,
+}: {
+  keyName: string
+  value: any
+  dataTestId?: string
+}) => {
   const { search, setSearch } = useLogsUrlState()
   const handleSearch: LogSearchCallback = async (event: string, { query }: { query?: string }) => {
     setSearch(query || '')
@@ -93,7 +101,7 @@ const PropertyRow = ({ keyName, value }: { keyName: string; value: any }) => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="group w-full">
+      <DropdownMenuTrigger className="group w-full" data-testid={dataTestId}>
         <div className="rounded-md w-full overflow-hidden">
           <div
             className={cn('flex h-10 w-full', {
@@ -164,11 +172,16 @@ const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
   const { timestamp, event_message, metadata, id, status, ...rest } = log
 
   return (
-    <div className={`p-2 flex flex-col`}>
+    <div data-testid="log-selection" className={`p-2 flex flex-col`}>
       {log?.id && <PropertyRow key={'id'} keyName={'id'} value={log.id} />}
       {log?.status && <PropertyRow key={'status'} keyName={'status'} value={log.status} />}
       {log?.timestamp && (
-        <PropertyRow key={'timestamp'} keyName={'timestamp'} value={log.timestamp} />
+        <PropertyRow
+          dataTestId="log-selection-timestamp"
+          key={'timestamp'}
+          keyName={'timestamp'}
+          value={log.timestamp}
+        />
       )}
       {Object.entries(rest).map(([key, value]) => {
         return <PropertyRow key={key} keyName={key} value={value} />

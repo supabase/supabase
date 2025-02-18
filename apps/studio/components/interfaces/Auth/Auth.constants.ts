@@ -41,3 +41,6 @@ export function urlRegex(
     'i'
   )
 }
+
+// Use a const string to represent no chars option. Represented as empty string on the backend side.
+export const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'

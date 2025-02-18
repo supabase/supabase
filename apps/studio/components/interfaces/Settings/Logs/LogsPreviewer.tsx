@@ -1,6 +1,7 @@
+import dayjs from 'dayjs'
 import { Rewind } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useState, useRef } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
@@ -22,8 +23,6 @@ import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import useSingleLog from 'hooks/analytics/useSingleLog'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
-import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
-import dayjs from 'dayjs'
 
 /**
  * Acts as a container component for the entire log display
@@ -63,6 +62,8 @@ export const LogsPreviewer = ({
   const { search, setSearch, timestampStart, timestampEnd, setTimeRange, filters, setFilters } =
     useLogsUrlState()
 
+  const [selectedLogId, setSelectedLogId] = useSelectedLog()
+
   const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
@@ -80,7 +81,6 @@ export const LogsPreviewer = ({
     refresh,
   } = useLogsPreview({ projectRef, table, filterOverride })
 
-  const [selectedLogId, setSelectedLogId] = useSelectedLog()
   const {
     data: selectedLog,
     isLoading: isSelectedLogLoading,
