@@ -1,6 +1,6 @@
 import { detectOS } from 'lib/helpers'
 import { ArrowDownLeft, Loader2, Wand } from 'lucide-react'
-import { useCallback, useRef, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { Input, Button, ExpandingTextArea } from 'ui'
 
 interface AskAIWidgetProps {
@@ -12,7 +12,6 @@ interface AskAIWidgetProps {
   onCancel?: () => void
   isDiffVisible: boolean
   isLoading?: boolean
-  onHeightChange?: (height: number) => void
 }
 
 export const AskAIWidget = ({
@@ -24,63 +23,48 @@ export const AskAIWidget = ({
   onCancel,
   isDiffVisible,
   isLoading = false,
-  onHeightChange,
 }: AskAIWidgetProps) => {
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  // Auto focus input
-  const inputRef = useCallback((input: HTMLTextAreaElement | null) => {
-    setTimeout(() => {
-      if (input) {
-        input.focus()
-        input.setSelectionRange(input.value.length, input.value.length)
-      }
-    }, 0)
-  }, [])
+  const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    const updateHeight = () => {
-      if (containerRef.current) {
-        const height = containerRef.current.offsetHeight
-        onHeightChange?.(height)
-      }
-    }
+    setTimeout(() => {
+      textAreaRef.current?.focus()
+      textAreaRef.current?.setSelectionRange(value.length, value.length)
+    }, 100)
+  }, [])
 
-    // Update height on value change
-    updateHeight()
-
-    // Set up resize observer to track height changes
-    const resizeObserver = new ResizeObserver(updateHeight)
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current)
-    }
-
-    return () => resizeObserver.disconnect()
-  }, [value, onHeightChange])
-
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (value.trim() && !isLoading) {
       onSubmit(value)
     }
-  }
+  }, [value, isLoading, onSubmit])
+
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      onChange(e.target.value)
+    },
+    [onChange]
+  )
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Enter' && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault()
+        handleSubmit()
+      }
+    },
+    [handleSubmit]
+  )
 
   return (
-    <div
-      ref={containerRef}
-      className="overflow-hidden rounded-md p-0 bg-popover border border-foreground/20 focus-within:border-foreground/30 shadow-xl text-sm max-w-xl"
-    >
+    <div className="overflow-hidden rounded-md p-0 bg-popover border border-foreground/20 focus-within:border-foreground/30 shadow-xl text-sm max-w-xl">
       <ExpandingTextArea
-        ref={inputRef}
+        ref={textAreaRef}
         className="bg-transparent border-0 outline-0 ring-0 ring-offset-0 focus:outline-0 focus:ring-0 focus:ring-offset-0 focus-visible:outline-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-within:outline-0 focus-within:ring-0 focus-within:ring-offset-0 shadow-none rounded-none gap-4 text-xs md:text-xs py-2 pl-3 !leading-[20px]"
         placeholder={isDiffVisible ? 'Make an edit...' : 'Edit via the Assistant...'}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
-            e.preventDefault()
-            handleSubmit()
-          }
-        }}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
         disabled={isLoading}
       />
       {isDiffVisible ? (
