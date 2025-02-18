@@ -58,7 +58,15 @@ const DisplayApiSettings = ({
           )
         }
       >
-        {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
+        {!canReadAPIKeys ? (
+          <div className="flex items-center py-8 px-8 space-x-2">
+            <AlertCircle size={16} strokeWidth={1.5} />
+            <p className="text-sm text-foreground-light">
+              You don't have permission to view API keys. These keys restricted to users with higher
+              access levels.
+            </p>
+          </div>
+        ) : isProjectSettingsError || isJwtSecretUpdateStatusError ? (
           <div className="flex items-center justify-center py-8 space-x-2">
             <AlertCircle size={16} strokeWidth={1.5} />
             <p className="text-sm text-foreground-light">
@@ -137,8 +145,8 @@ const DisplayApiSettings = ({
               className="border-t"
               title="API keys have moved"
               badgeLabel={'Changelog'}
-              description={` 
-  \`anon\` and \`service_role\` API keys can now be replaced with \`publishable\` and \`secret\` API keys.   
+              description={`
+  \`anon\` and \`service_role\` API keys can now be replaced with \`publishable\` and \`secret\` API keys.
   `}
               href="https://github.com/orgs/supabase/discussions/29260"
               buttonText="Read the announcement"
@@ -148,7 +156,7 @@ const DisplayApiSettings = ({
               className="border-t"
               title="New API keys coming Q4 2024"
               description={`
-\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.    
+\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.
 `}
               href="https://github.com/orgs/supabase/discussions/29260"
               buttonText="Read the announcement"
