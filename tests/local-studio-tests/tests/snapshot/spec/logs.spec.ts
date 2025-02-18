@@ -14,7 +14,7 @@ test.describe('Logs', async () => {
     test.describe(`${logPage} logs page`, () => {
       test('can navigate to logs page', async ({ page }) => {
         await page.goto('http://localhost:8082/project/default')
-        await page.locator('a', { hasText: 'Logs' }).click({ timeout: 4000 })
+        await page.locator('a', { hasText: 'Logs' }).click()
         // wait for 2 secs in case the page needs to redirect.
         await page.waitForTimeout(2000)
 
@@ -39,13 +39,13 @@ test.describe('Logs', async () => {
       test('shows logs data without errors', async ({ page }) => {
         // Navigate to page first
         await page.goto('http://localhost:8082/project/default')
-        await page.locator('a', { hasText: 'Logs' }).click({ timeout: 4000 })
+        await page.locator('a', { hasText: 'Logs' }).click()
         await page.click('body')
         await page.getByRole('link', { name: logPage, exact: true }).click()
 
         // Wait a bit and check for errors with a longer timeout
         const error = page.getByText('Error fetching logs')
-        await expect(error).not.toBeVisible({ timeout: 10000 })
+        await expect(error).not.toBeVisible()
 
         // Check if the logs table has any rows
         const gridcells = page.getByRole('gridcell')
@@ -55,7 +55,7 @@ test.describe('Logs', async () => {
       test('can select and view log details', async ({ page }) => {
         // Navigate to page first
         await page.goto('http://localhost:8082/project/default')
-        await page.locator('a', { hasText: 'Logs' }).click({ timeout: 4000 })
+        await page.locator('a', { hasText: 'Logs' }).click()
         await page.click('body')
         await page.getByRole('link', { name: logPage, exact: true }).click()
 
@@ -64,7 +64,7 @@ test.describe('Logs', async () => {
         // Click first row and verify details
         await gridcells.first().click()
         const tabPanel = page.getByTestId('log-selection')
-        await expect(tabPanel).toBeVisible({ timeout: 2000 })
+        await expect(tabPanel).toBeVisible()
 
         const selectionPanelTimestamp = tabPanel.getByTestId('log-selection-timestamp')
         await expect(selectionPanelTimestamp).toBeVisible()
