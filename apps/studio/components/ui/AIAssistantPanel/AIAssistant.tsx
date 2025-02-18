@@ -96,7 +96,7 @@ export const AIAssistant = ({
   const [lastSentMessage, setLastSentMessage] = useState<MessageType>()
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
 
-  const { data: check } = useCheckOpenAIKeyQuery()
+  const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
 
   const isInSQLEditor = router.pathname.includes('/sql/[id]')
@@ -502,7 +502,7 @@ export const AIAssistant = ({
             />
           )}
 
-          {!isApiKeySet && (
+          {isSuccess && !isApiKeySet && (
             <Admonition
               type="default"
               title="OpenAI API key not set"
