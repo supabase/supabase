@@ -39,7 +39,7 @@ export default defineConfig({
       name: 'Common Functionality',
       use: {
         ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/user.json',
+        ...(process.env.ENV !== 'local' ? { storageState: 'playwright/.auth/user.json' } : {}),
         viewport: { width: 1366, height: 768 },
       },
       testDir: './tests/common-functionality',
