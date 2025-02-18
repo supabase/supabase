@@ -114,7 +114,7 @@ const NewDestinationPanel = ({
     form.reset(defaultValues)
   }
 
-  const submitRef = useRef<HTMLButtonElement>(null)
+  // const submitRef = useRef<HTMLButtonElement>(null)
 
   return (
     <>
@@ -298,9 +298,9 @@ const NewDestinationPanel = ({
                         </FormItem_Shadcn_>
                       )}
                     />
-                    <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
+                    {/* <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
                       Hidden form submit button
-                    </Button>
+                    </Button> */}
                   </div>
                 </form>
               </Form_Shadcn_>
