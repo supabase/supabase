@@ -14,6 +14,7 @@ export const API_URL = (() => {
   if (!!process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}/api`
   // If running on self-hosted, use NEXT_PUBLIC_SITE_URL
   if (!!process.env.NEXT_PUBLIC_SITE_URL) return `${process.env.NEXT_PUBLIC_SITE_URL}/api`
+  return '/api'
 })()
 
 export const PG_META_URL = IS_PLATFORM
