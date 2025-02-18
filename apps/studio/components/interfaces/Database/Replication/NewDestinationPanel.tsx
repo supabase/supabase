@@ -137,164 +137,171 @@ const NewDestinationPanel = ({
             </SheetHeader>
             <SheetSection className="flex-grow overflow-auto">
               <Form_Shadcn_ {...form}>
-                <form
-                  id={formId}
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="flex flex-col border border-border rounded-md"
-                >
-                  <FormField_Shadcn_
-                    name="type"
-                    control={form.control}
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
-                        <FormLabel_Shadcn_>Type</FormLabel_Shadcn_>
-                        <div className="w-96">
+                <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+                  <p className="mb-2">Where to send</p>
+                  <div className="flex flex-col border border-border rounded-md">
+                    <FormField_Shadcn_
+                      name="type"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
+                          <FormLabel_Shadcn_>Type</FormLabel_Shadcn_>
+                          <div className="w-96">
+                            <FormControl_Shadcn_>
+                              <Select_Shadcn_ value={field.value}>
+                                <SelectTrigger_Shadcn_>{field.value}</SelectTrigger_Shadcn_>
+                                <SelectContent_Shadcn_>
+                                  <SelectGroup_Shadcn_>
+                                    <SelectItem_Shadcn_ value="BigQuery">
+                                      BigQuery
+                                    </SelectItem_Shadcn_>
+                                  </SelectGroup_Shadcn_>
+                                </SelectContent_Shadcn_>
+                              </Select_Shadcn_>
+                            </FormControl_Shadcn_>
+                          </div>
+                          <FormMessage_Shadcn_ />
+                        </FormItem_Shadcn_>
+                      )}
+                    ></FormField_Shadcn_>
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
+                          <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
+                          <div className="w-96">
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_ {...field} placeholder="Name" />
+                            </FormControl_Shadcn_>
+                          </div>
+                          <FormMessage_Shadcn_ />
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="projectId"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
+                          <FormLabel_Shadcn_>Project Id</FormLabel_Shadcn_>
+                          <div className="w-96">
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_ {...field} placeholder="Project id" />
+                            </FormControl_Shadcn_>
+                          </div>
+                          <FormMessage_Shadcn_ />
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="datasetId"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
+                          <FormLabel_Shadcn_>Dataset Id</FormLabel_Shadcn_>
+                          <div className="w-96">
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_ {...field} placeholder="Dataset id" />
+                            </FormControl_Shadcn_>
+                          </div>
+                          <FormMessage_Shadcn_ />
+                          <FormMessage_Shadcn_ />
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="serviceAccountKey"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4">
+                          <FormLabel_Shadcn_>Service Account Key</FormLabel_Shadcn_>
+                          <div className="w-96">
+                            <FormControl_Shadcn_>
+                              <TextArea_Shadcn_
+                                {...field}
+                                rows={4}
+                                maxLength={5000}
+                                placeholder="Service account key"
+                              />
+                            </FormControl_Shadcn_>
+                          </div>
+                          <FormMessage_Shadcn_ />
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                  </div>
+                  <p className="mt-6 mb-2">What to send</p>
+                  <div className="flex flex-col border border-border rounded-md">
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="publicationName"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4">
+                          <FormLabel_Shadcn_>Publication Name</FormLabel_Shadcn_>
+                          <div className="w-96">
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_ {...field} placeholder="Publication name" />
+                            </FormControl_Shadcn_>
+                          </div>
+                          <FormMessage_Shadcn_ />
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                  </div>
+                  <p className="mt-6 mb-2">Advanced Settings</p>
+                  <div className="flex flex-col border border-border rounded-md">
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="maxSize"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
+                          <FormLabel_Shadcn_>Max Size</FormLabel_Shadcn_>
+                          <div className="w-96">
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_ {...field} placeholder="Max size" />
+                            </FormControl_Shadcn_>
+                          </div>
+                          <FormMessage_Shadcn_ />
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="maxFillSecs"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
+                          <FormLabel_Shadcn_>Max Fill Seconds</FormLabel_Shadcn_>
+                          <div className="w-96">
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_ {...field} placeholder="Max fill seconds" />
+                            </FormControl_Shadcn_>
+                          </div>
+                          <FormMessage_Shadcn_ />
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="enabled"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4">
+                          <FormLabel_Shadcn_>Enabled</FormLabel_Shadcn_>
                           <FormControl_Shadcn_>
-                            <Select_Shadcn_ value={field.value}>
-                              <SelectTrigger_Shadcn_>{field.value}</SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
-                                <SelectGroup_Shadcn_>
-                                  <SelectItem_Shadcn_ value="BigQuery">BigQuery</SelectItem_Shadcn_>
-                                </SelectGroup_Shadcn_>
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
-                          </FormControl_Shadcn_>
-                        </div>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
-                    )}
-                  ></FormField_Shadcn_>
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
-                        <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
-                        <div className="w-96">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_ {...field} placeholder="Name" />
-                          </FormControl_Shadcn_>
-                        </div>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
-                    )}
-                  />
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="projectId"
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
-                        <FormLabel_Shadcn_>Project Id</FormLabel_Shadcn_>
-                        <div className="w-96">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_ {...field} placeholder="Project id" />
-                          </FormControl_Shadcn_>
-                        </div>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
-                    )}
-                  />
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="datasetId"
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
-                        <FormLabel_Shadcn_>Dataset Id</FormLabel_Shadcn_>
-                        <div className="w-96">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_ {...field} placeholder="Dataset id" />
-                          </FormControl_Shadcn_>
-                        </div>
-                        <FormMessage_Shadcn_ />
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
-                    )}
-                  />
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="serviceAccountKey"
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
-                        <FormLabel_Shadcn_>Service Account Key</FormLabel_Shadcn_>
-                        <div className="w-96">
-                          <FormControl_Shadcn_>
-                            <TextArea_Shadcn_
-                              {...field}
-                              rows={4}
-                              maxLength={5000}
-                              placeholder="Service account key"
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={field.disabled}
                             />
                           </FormControl_Shadcn_>
-                        </div>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
-                    )}
-                  />
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="publicationName"
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
-                        <FormLabel_Shadcn_>Publication Name</FormLabel_Shadcn_>
-                        <div className="w-96">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_ {...field} placeholder="Publication name" />
-                          </FormControl_Shadcn_>
-                        </div>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
-                    )}
-                  />
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="maxSize"
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
-                        <FormLabel_Shadcn_>Max Size</FormLabel_Shadcn_>
-                        <div className="w-96">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_ {...field} placeholder="Max size" />
-                          </FormControl_Shadcn_>
-                        </div>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
-                    )}
-                  />
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="maxFillSecs"
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4 border-b">
-                        <FormLabel_Shadcn_>Max Fill Seconds</FormLabel_Shadcn_>
-                        <div className="w-96">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_ {...field} placeholder="Max fill seconds" />
-                          </FormControl_Shadcn_>
-                        </div>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
-                    )}
-                  />
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="enabled"
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4">
-                        <FormLabel_Shadcn_>Enabled</FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={field.disabled}
-                          />
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
-                    )}
-                  />
-                  <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
-                    Hidden form submit button
-                  </Button>
+                          <FormMessage_Shadcn_ />
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                    <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
+                      Hidden form submit button
+                    </Button>
+                  </div>
                 </form>
               </Form_Shadcn_>
             </SheetSection>
