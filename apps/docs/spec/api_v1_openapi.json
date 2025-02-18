@@ -4501,7 +4501,7 @@
             "type": "string",
             "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           },
-          "postgres_engine": { "type": "string", "enum": ["13", "14", "15", "17-oriole"] }
+          "postgres_engine": { "type": "string", "enum": ["13", "14", "15", "17", "17-oriole"] }
         },
         "required": ["version", "release_channel", "postgres_engine"]
       },

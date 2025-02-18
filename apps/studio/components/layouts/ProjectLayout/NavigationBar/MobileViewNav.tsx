@@ -2,9 +2,6 @@ import { PropsWithChildren } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
 
-export const ICON_SIZE = 20
-export const ICON_STROKE_WIDTH = 1.5
-
 interface Props {
   title?: string
 }
