@@ -15,6 +15,9 @@ test.describe('Logs', async () => {
       test('can navigate to logs page', async ({ page }) => {
         await page.goto('http://localhost:8082/project/default')
         await page.locator('a', { hasText: 'Logs' }).click({ timeout: 4000 })
+        // wait for 2 secs in case the page needs to redirect.
+        await page.waitForTimeout(2000)
+
         await expect(page.getByText('Logs & Analytics')).toBeVisible()
 
         // Click anywhere on the screen to close the sidebar
