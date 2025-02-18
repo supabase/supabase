@@ -4,7 +4,7 @@ import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import { Input } from 'ui'
@@ -32,8 +32,10 @@ const DisplayApiSettings = ({
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
-
+  const { isLoading, can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'service_api_keys'
+  )
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
   const apiKeys = settings?.service_api_keys ?? []
@@ -58,7 +60,12 @@ const DisplayApiSettings = ({
           )
         }
       >
-        {!canReadAPIKeys ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8 space-x-2">
+            <Loader2 className="animate-spin" size={16} strokeWidth={1.5} />
+            <p className="text-sm text-foreground-light">Retrieving API keys</p>
+          </div>
+        ) : !canReadAPIKeys ? (
           <div className="flex items-center py-8 px-8 space-x-2">
             <AlertCircle size={16} strokeWidth={1.5} />
             <p className="text-sm text-foreground-light">
