@@ -35,6 +35,10 @@ import {
   Switch,
   Toggle,
   cn,
+  Tabs_Shadcn_ as Tabs,
+  TabsContent_Shadcn_ as TabsContent,
+  TabsList_Shadcn_ as TabsList,
+  TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
@@ -44,6 +48,75 @@ const schema = object({
   name: string().required('Name is required'),
   verify_jwt: boolean().required(),
 })
+
+interface InvocationTab {
+  id: string
+  label: string
+  language: 'bash' | 'js' | 'ts' | 'dart' | 'python'
+  hideLineNumbers?: boolean
+  code: (functionUrl: string, functionName: string, apiKey: string) => string
+}
+
+const INVOCATION_TABS: InvocationTab[] = [
+  {
+    id: 'curl',
+    label: 'cURL',
+    language: 'bash',
+    code: (functionUrl, _, apiKey) => `curl -L -X POST '${functionUrl}' \\
+  -H 'Authorization: Bearer ${apiKey}' \\
+  -H 'Content-Type: application/json' \\
+  --data '{"name":"Functions"}'`,
+  },
+  {
+    id: 'supabase-js',
+    label: 'JavaScript',
+    language: 'js',
+    hideLineNumbers: true,
+    code: (_, functionName) => `import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
+const { data, error } = await supabase.functions.invoke('${functionName}', {
+  body: { name: 'Functions' },
+})`,
+  },
+  {
+    id: 'swift',
+    label: 'Swift',
+    language: 'ts',
+    hideLineNumbers: true,
+    code: (_, functionName) => `struct Response: Decodable {
+  // Expected response definition
+}
+
+let response: Response = try await supabase.functions
+  .invoke(
+    "${functionName}",
+    options: FunctionInvokeOptions(
+      body: ["name": "Functions"]
+    )
+  )`,
+  },
+  {
+    id: 'flutter',
+    label: 'Flutter',
+    language: 'dart',
+    hideLineNumbers: true,
+    code: (
+      _,
+      functionName
+    ) => `final res = await supabase.functions.invoke('${functionName}', body: {'name': 'Functions'});
+final data = res.data;`,
+  },
+  {
+    id: 'python',
+    label: 'Python',
+    language: 'python',
+    hideLineNumbers: true,
+    code: (_, functionName) => `response = supabase.functions.invoke(
+    "${functionName}",
+    invoke_options={"body": {"name": "Functions"}}
+)`,
+  },
+]
 
 const EdgeFunctionDetails = () => {
   const router = useRouter()
@@ -183,45 +256,31 @@ const EdgeFunctionDetails = () => {
         </ScaffoldSection>
         <ScaffoldSection isFullWidth>
           <ScaffoldSectionTitle className="mb-4">Invoke function</ScaffoldSectionTitle>
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Invoke via cURL</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <CodeBlock
-                    language="bash"
-                    className="text-xs !mt-0 border-none"
-                    value={`curl -L -X POST '${functionUrl}' \\
-  -H 'Authorization: Bearer ${apiKey}' \\
-  -H 'Content-Type: application/json' \\
-  --data '{"name":"Functions"}'`}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Invoke via supabase-js</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <CodeBlock
-                    language="js"
-                    hideLineNumbers
-                    className="text-xs !mt-0 border-none"
-                    value={`import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
-const { data, error } = await supabase.functions.invoke('${selectedFunction?.name}', {
-  body: { name: 'Functions' },
-})`}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <Card>
+            <CardContent>
+              <Tabs defaultValue="curl" className="w-full">
+                <TabsList className="flex flex-wrap gap-4">
+                  {INVOCATION_TABS.map((tab) => (
+                    <TabsTrigger key={tab.id} value={tab.id}>
+                      {tab.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+                {INVOCATION_TABS.map((tab) => (
+                  <TabsContent key={tab.id} value={tab.id} className="mt-4">
+                    <div className="overflow-x-auto">
+                      <CodeBlock
+                        language={tab.language}
+                        hideLineNumbers={tab.hideLineNumbers}
+                        className="p-0 text-xs !mt-0 border-none"
+                        value={tab.code(functionUrl, selectedFunction?.name ?? '', apiKey)}
+                      />
+                    </div>
+                  </TabsContent>
+                ))}
+              </Tabs>
+            </CardContent>
+          </Card>
         </ScaffoldSection>
         <ScaffoldSection isFullWidth>
           <ScaffoldSectionTitle className="mb-4">Develop locally</ScaffoldSectionTitle>
