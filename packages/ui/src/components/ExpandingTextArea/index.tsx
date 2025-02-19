@@ -1,6 +1,6 @@
 'use client'
 
-import React, { forwardRef, useImperativeHandle } from 'react'
+import React, { forwardRef, useImperativeHandle, useRef } from 'react'
 import { cn } from '../../lib/utils'
 import { TextArea } from '../shadcn/ui/text-area'
 
@@ -14,15 +14,12 @@ export interface ExpandingTextAreaProps extends React.TextareaHTMLAttributes<HTM
  */
 const ExpandingTextArea = forwardRef<HTMLTextAreaElement, ExpandingTextAreaProps>(
   ({ className, value, ...props }, ref) => {
+    const internalRef = useRef<HTMLTextAreaElement | null>(null)
+
+    useImperativeHandle(ref, () => internalRef.current as HTMLTextAreaElement, [])
+
     const updateTextAreaHeight = (element: HTMLTextAreaElement | null) => {
       if (!element) return
-
-      // Forward the ref to the parent component
-      if (typeof ref === 'function') {
-        ref(element)
-      } else if (ref) {
-        ref.current = element
-      }
 
       // Update the height
       if (!value) {
@@ -36,7 +33,12 @@ const ExpandingTextArea = forwardRef<HTMLTextAreaElement, ExpandingTextAreaProps
 
     return (
       <TextArea
-        ref={updateTextAreaHeight}
+        ref={(element) => {
+          if (element) {
+            internalRef.current = element
+            updateTextAreaHeight(element)
+          }
+        }}
         rows={1}
         aria-expanded={false}
         className={cn('h-auto resize-none box-border', className)}

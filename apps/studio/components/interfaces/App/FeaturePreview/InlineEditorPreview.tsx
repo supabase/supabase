@@ -1,5 +1,7 @@
-import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
+
+import { BASE_PATH } from 'lib/constants'
+import { Admonition } from 'ui-patterns'
 
 const InlineEditorPreview = () => {
   return (
@@ -11,11 +13,15 @@ const InlineEditorPreview = () => {
         alt="api-docs-side-panel-preview"
         className="rounded border mb-4"
       />
-      <p className="text-sm text-foreground-light mb-2">
-        The inline editor allows you to quickly edit SQL queries directly in the interface without
-        opening a new tab or window. This feature streamlines your workflow by providing immediate
-        access to query editing capabilities wherever you see SQL code.
+      <p className="text-sm text-foreground-light">
+        Access an inline SQL editor where you can write and run queries wherever you are in the
+        dashboard. Use the inline Assistant to generate or modify queries without leaving the
+        editor.
       </p>
+      <Admonition type="note" className="my-4">
+        With the inline editor enabled, editing policies, triggers and database functions will all
+        be done using the editor.
+      </Admonition>
       <p className="text-sm text-foreground-light">
         You can access the inline editor by clicking the code editor icon in the top right corner of
         your dashboard.

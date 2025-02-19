@@ -1,26 +1,31 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
-import { X, Book, CornerDownLeft, Loader2, Save } from 'lucide-react'
+import { debounce } from 'lodash'
+import { Book, Save, X } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
+
+import { useParams } from 'common'
+import {
+  createSqlSnippetSkeletonV2,
+  suffixWithLimit,
+} from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
+import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunButton'
+import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useAppStateSnapshot } from 'state/app-state'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { AiIconAnimation, Button, cn, Input_Shadcn_, SQL_ICON } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { useParams } from 'common'
-import { suffixWithLimit } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
-import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useAppStateSnapshot } from 'state/app-state'
-import { IS_PLATFORM, BASE_PATH } from 'lib/constants'
-import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { useProfile } from 'lib/profile'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { uuidv4 } from 'lib/helpers'
-import { toast } from 'sonner'
-import Link from 'next/link'
+import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import AIEditor from '../AIEditor'
-import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { isReadOnlySelect, containsUnknownFunction } from '../AIAssistantPanel/AIAssistant.utils'
-import { debounce } from 'lodash'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { InlineLink } from '../InlineLink'
+import SqlWarningAdmonition from '../SqlWarningAdmonition'
 
 interface EditorPanelProps {
   onChange?: (value: string) => void
@@ -39,17 +44,23 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<QueryResponseError>()
   const [results, setResults] = useState<undefined | any[]>(undefined)
-  const [showResults, setShowResults] = useState(false)
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
   const [currentValue, setCurrentValue] = useState(editorPanel.initialValue || '')
   const [showTemplates, setShowTemplates] = useState(false)
   const [templateSearch, setTemplateSearch] = useState('')
   const [savedCode, setSavedCode] = useState<string>('')
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
+  const [showResults, setShowResults] = useState(true)
+
+  const errorHeader = error?.formattedError?.split('\n')?.filter((x: string) => x.length > 0)?.[0]
+  const errorContent =
+    error?.formattedError
+      ?.split('\n')
+      ?.filter((x: string) => x.length > 0)
+      ?.slice(1) ?? []
 
   const { mutate: executeSql, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: async (res) => {
-      setShowResults(true)
       setResults(res.result)
     },
     onError: (error) => {
@@ -57,20 +68,6 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
       setResults([])
     },
   })
-
-  useEffect(() => {
-    if (editorPanel.initialValue !== undefined && editorPanel.initialValue !== currentValue) {
-      setCurrentValue(editorPanel.initialValue)
-    }
-  }, [editorPanel.initialValue])
-
-  useEffect(() => {
-    if (editorPanel.initialValue !== currentValue) {
-      setEditorPanel({
-        initialValue: currentValue,
-      })
-    }
-  }, [currentValue, setEditorPanel])
 
   const handleChat = () => {
     setAiAssistantPanel({
@@ -116,6 +113,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
       handleError: (error) => {
         throw error
       },
+      contextualInvalidation: true,
     })
   }
 
@@ -139,13 +137,6 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
     [savedCode]
   )
 
-  // Cleanup debounce on unmount
-  useEffect(() => {
-    return () => {
-      debouncedRevertCode.cancel()
-    }
-  }, [debouncedRevertCode])
-
   const handleTemplateMouseEnter = (templateContent: string) => {
     // Cancel any pending revert
     debouncedRevertCode.cancel()
@@ -163,12 +154,26 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
     }
   }
 
-  const errorHeader = error?.formattedError?.split('\n')?.filter((x: string) => x.length > 0)?.[0]
-  const errorContent =
-    error?.formattedError
-      ?.split('\n')
-      ?.filter((x: string) => x.length > 0)
-      ?.slice(1) ?? []
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      debouncedRevertCode.cancel()
+    }
+  }, [debouncedRevertCode])
+
+  useEffect(() => {
+    if (editorPanel.initialValue !== undefined && editorPanel.initialValue !== currentValue) {
+      setCurrentValue(editorPanel.initialValue)
+    }
+  }, [editorPanel.initialValue])
+
+  useEffect(() => {
+    if (editorPanel.initialValue !== currentValue) {
+      setEditorPanel({
+        initialValue: currentValue,
+      })
+    }
+  }, [currentValue, setEditorPanel])
 
   return (
     <div className="flex flex-col h-full bg-surface-100">
@@ -187,12 +192,13 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
           <ButtonTooltip
             tooltip={{
               content: {
+                side: 'bottom',
                 text: 'Save as snippet',
               },
             }}
             size="tiny"
             type="default"
-            className="h-7"
+            className="w-7 h-7"
             loading={isSaving}
             icon={<Save size={16} />}
             onClick={async () => {
@@ -215,9 +221,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
                 toast.success(
                   <div>
                     Saved snippet! View it{' '}
-                    <Link href={`/project/${ref}/sql/${snippet.id}`} className="underline">
-                      here
-                    </Link>
+                    <InlineLink href={`/project/${ref}/sql/${snippet.id}`}>here</InlineLink>
                   </div>
                 )
               } catch (error: any) {
@@ -261,6 +265,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
               padding: { top: 4 },
               lineNumbersMinChars: 3,
             }}
+            executeQuery={onExecuteSql}
           />
         </div>
 
@@ -288,50 +293,36 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
         )}
 
         {showWarning && (
-          <div className="shrink-0">
-            <Admonition type="warning" className="m-0 rounded-none border-x-0 border-b-0">
-              <p>
-                {showWarning === 'hasWriteOperation'
-                  ? 'This query contains write operations.'
-                  : 'This query involves running a function.'}{' '}
-                Are you sure you want to execute it?
-              </p>
-              <p className="text-foreground-light">
-                Make sure you are not accidentally removing something important.
-              </p>
-              <div className="flex justify-stretch mt-2 gap-2">
-                <Button
-                  type="outline"
-                  size="tiny"
-                  className="w-full flex-1"
-                  onClick={() => setShowWarning(undefined)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="danger"
-                  size="tiny"
-                  className="w-full flex-1"
-                  onClick={() => {
-                    setShowWarning(undefined)
-                    onExecuteSql(true)
-                  }}
-                >
-                  Run
-                </Button>
-              </div>
-            </Admonition>
-          </div>
+          <SqlWarningAdmonition
+            className="border-t"
+            warningType={showWarning}
+            onCancel={() => setShowWarning(undefined)}
+            onConfirm={() => {
+              setShowWarning(undefined)
+              onExecuteSql(true)
+            }}
+          />
         )}
 
         {results !== undefined && results.length > 0 && (
-          <div className="h-72 shrink-0 flex flex-col">
-            <div className="border-t flex-1 overflow-auto">
-              <Results rows={results} />
-            </div>
-            <p className="shrink-0 text-xs text-foreground-light font-mono py-2 px-5">
-              {results.length} rows
-              {results.length >= 100 && ` (Limited to only 100 rows)`}
+          <div className={`max-h-72 shrink-0 flex flex-col`}>
+            {showResults && (
+              <div className="border-t flex-1 overflow-auto">
+                <Results rows={results} />
+              </div>
+            )}
+            <p className="text-xs text-foreground-light border-t py-2 px-5 flex items-center justify-between">
+              <span className="font-mono">
+                {results.length} rows{results.length >= 100 && ` (Limited to only 100 rows)`}
+              </span>
+              <Button
+                size="tiny"
+                type="default"
+                className="ml-2"
+                onClick={() => setShowResults((prev) => !prev)}
+              >
+                {showResults ? 'Hide Results' : 'Show Results'}
+              </Button>
             </p>
           </div>
         )}
@@ -386,7 +377,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
             </div>
           </div>
         )}
-        <div className="z-10 bg-surface-100 flex items-center gap-2 !justify-between px-5 py-4 w-full border-t shrink-0">
+        <div className="bg-surface-100 flex items-center gap-2 !justify-between px-5 py-4 w-full border-t shrink-0">
           <Button
             size="tiny"
             type="default"
@@ -395,21 +386,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
           >
             {showTemplates ? 'Templates' : 'Templates'}
           </Button>
-          <Button
-            loading={isExecuting}
-            onClick={() => onExecuteSql()}
-            iconRight={
-              isExecuting ? (
-                <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-              ) : (
-                <div className="flex items-center space-x-1">
-                  <CornerDownLeft size={10} strokeWidth={1.5} />
-                </div>
-              )
-            }
-          >
-            Run
-          </Button>
+          <SqlRunButton isDisabled={isExecuting} isExecuting={isExecuting} onClick={onExecuteSql} />
         </div>
       </div>
     </div>

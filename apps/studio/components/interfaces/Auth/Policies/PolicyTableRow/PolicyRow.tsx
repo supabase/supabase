@@ -105,12 +105,7 @@ const PolicyRow = ({
               <Button type="default" className="px-1.5" icon={<MoreVertical />} />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-52">
-              <DropdownMenuItem
-                className="gap-x-2"
-                onClick={() => {
-                  onSelectEditPolicy(policy)
-                }}
-              >
+              <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>
                 <Edit size={14} />
                 <p>Edit policy</p>
               </DropdownMenuItem>
