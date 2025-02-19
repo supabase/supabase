@@ -685,6 +685,25 @@ export const getTools = ({
         LIMIT 1000;
         \`\`\`
 
+        ### Slowest queries
+
+        \`\`\`sql
+        SELECT 
+          DATETIME(pl.timestamp) AS time,
+          p.command_tag,
+          p.backend_type,
+          p.connection_from
+      FROM 
+        postgres_logs AS pl
+      CROSS JOIN UNNEST(pl.metadata) AS m
+      CROSS JOIN UNNEST(m.parsed) AS p
+      WHERE 
+        p.command_tag IS NOT NULL
+        ORDER BY 
+          pl.timestamp DESC
+        LIMIT 1000;
+        \`\`\`
+
         ### Filter logs by time range:
         \`\`\`sql
         SELECT 

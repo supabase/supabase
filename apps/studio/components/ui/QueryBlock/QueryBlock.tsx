@@ -1,7 +1,8 @@
-import { Code, Play } from 'lucide-react'
+import { Code, ExternalLink, Play } from 'lucide-react'
 import { DragEvent, ReactNode, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 import { toast } from 'sonner'
+import Link from 'next/link'
 
 import { useParams } from 'common'
 import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
@@ -29,7 +30,6 @@ import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
 import { ParametersPopover } from './ParametersPopover'
 import { getCumulativeResults } from './QueryBlock.utils'
-import dayjs from 'dayjs'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
@@ -144,11 +144,16 @@ export const QueryBlock = ({
   // const combinedParameterValues = { ...extParameterValues, ...parameterValues }
   const isReadOnlySelectSQL = isReadOnlySelect(sql ?? '')
 
-  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
+  const {
+    mutate: execute,
+    isLoading: isExecuting,
+    error: sqlError,
+  } = useExecuteSqlMutation({
     onSuccess: (data) => setQueryResult(data.result),
   })
 
   const {
+    params,
     logData,
     error: logsError,
     isLoading: isLoadingLogs,
@@ -157,17 +162,23 @@ export const QueryBlock = ({
     ref || '',
     {
       sql: sql || '',
-      iso_timestamp_start: dayjs().subtract(7, 'day').toISOString(),
-      iso_timestamp_end: dayjs().toISOString(),
     },
     logs && runQuery && Boolean(ref)
   )
 
+  const error = logs ? logsError : sqlError
+  const errorMessage = error
+    ? typeof error === 'string'
+      ? error
+      : Array.isArray((error as any)?.error)
+        ? (error as any).error[0]?.message
+        : (error as any)?.message ?? 'An error occurred'
+    : undefined
+
   const handleExecute = () => {
     if (!sql || isLoading) return
 
-    // Skip SQL validation for log queries since they use BigQuery
-    if (!logs && !isReadOnlySelectSQL) {
+    if (!isReadOnlySelectSQL) {
       const hasUnknownFunctions = containsUnknownFunction(sql)
       return setShowWarning(hasUnknownFunctions ? 'hasUnknownFunctions' : 'hasWriteOperation')
     }
@@ -183,7 +194,7 @@ export const QueryBlock = ({
         })
       }
     } catch (error: any) {
-      toast.error(`Failed to execute query: ${error.message}`)
+      console.error(error.message)
     }
   }
 
@@ -191,6 +202,7 @@ export const QueryBlock = ({
     setChartSettings(chartConfig)
   }, [chartConfig])
 
+  // Monitor the logData and set the queryResult
   useEffect(() => {
     if (logs && logData && !isLoading) {
       setQueryResult(logData)
@@ -206,13 +218,13 @@ export const QueryBlock = ({
   }, [sql, onSetParameter])
 
   useEffect(() => {
-    const shouldExecute = !!sql && !isLoading && runQuery && !!project
-    const isValidQuery = logs || (!logs && isReadOnlySelect(sql ?? ''))
+    const shouldExecute = !!sql && !isLoading && !isLoadingLogs && runQuery && !!project
+    const isValidQuery = isReadOnlySelect(sql ?? '')
 
     if (shouldExecute && isValidQuery) {
       handleExecute()
     }
-  }, [sql, isLoading, runQuery, project?.connectionString])
+  }, [sql, isLoading, isLoadingLogs, runQuery, project?.connectionString])
 
   useEffect(() => {
     if (isRefreshing) handleExecute()
@@ -220,7 +232,7 @@ export const QueryBlock = ({
 
   return (
     <ReportBlockContainer
-      draggable={draggable}
+      draggable={!logs && draggable}
       showDragHandle={draggable}
       tooltip={tooltip}
       loading={isExecuting || isLoadingLogs}
@@ -279,7 +291,26 @@ export const QueryBlock = ({
             </>
           )}
 
-          <EditQueryButton id={id} title={label} sql={sql} />
+          {logs && sql ? (
+            <ButtonTooltip
+              type="text"
+              size="tiny"
+              className="w-7 h-7"
+              icon={<ExternalLink size={14} />}
+              asChild
+              tooltip={{
+                content: { side: 'bottom', text: 'Open in Logs Explorer' },
+              }}
+            >
+              <Link
+                href={`/project/${ref}/logs/explorer?q=${encodeURIComponent(sql)}&its=${encodeURIComponent(
+                  params?.iso_timestamp_start || ''
+                )}&ite=${encodeURIComponent(params?.iso_timestamp_end || '')}`}
+              />
+            </ButtonTooltip>
+          ) : (
+            <EditQueryButton id={id} title={label} sql={sql} />
+          )}
 
           {(isReadOnlySelectSQL || (!isReadOnlySelectSQL && !disableRunIfMutation)) && (
             <ButtonTooltip
@@ -344,11 +375,15 @@ export const QueryBlock = ({
                 // const processedSql = processParameterizedSql(sql!, combinedParameterValues)
                 if (sql) {
                   setShowWarning(undefined)
-                  execute({
-                    projectRef: ref,
-                    connectionString: project?.connectionString,
-                    sql,
-                  })
+                  if (logs) {
+                    runLogsQuery()
+                  } else {
+                    execute({
+                      projectRef: ref,
+                      connectionString: project?.connectionString,
+                      sql,
+                    })
+                  }
                   onRunQuery?.('mutation')
                 }
               }}
@@ -431,7 +466,12 @@ export const QueryBlock = ({
         </>
       ) : (
         <>
-          {queryResult ? (
+          {error ? (
+            <Admonition type="danger" className="mb-0 rounded-none border-0">
+              <p>Failed to execute {logs ? 'logs' : 'SQL'} query</p>
+              <p className="text-foreground-light">{errorMessage}</p>
+            </Admonition>
+          ) : queryResult ? (
             <div
               className={cn('flex-1 w-full overflow-auto relative')}
               style={{ maxHeight: maxHeight ? `${maxHeight}px` : undefined }}

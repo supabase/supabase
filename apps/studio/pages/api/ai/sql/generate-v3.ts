@@ -147,6 +147,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           - When outputting queries, always include a props comment in the first line where logs is set to true:
             -- props: {"title": "Log Query", "logs": "true", "runQuery": "true"}
         - The Logs Explorer uses BigQuery syntax and supports all BigQuery functions and operators
+        - The Logs Explorer will show the last one hour of logs by default.
         - Available log sources include:
           - auth_logs: Authentication/authorization activity
           - edge_logs: Edge network requests and responses

@@ -167,8 +167,6 @@ export const MarkdownPre = ({ children }: { children: any }) => {
   const runQuery = snippetProps.runQuery === 'true'
   const isLogs = snippetProps.logs === 'true'
 
-  console.log('raw:', rawContent, snippetProps, isLogs)
-
   // Strip props from the content for both SQL and edge functions
   const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
 
@@ -227,7 +225,12 @@ export const MarkdownPre = ({ children }: { children: any }) => {
             onDragStart={(e: DragEvent<Element>) => {
               e.dataTransfer.setData(
                 'application/json',
-                JSON.stringify({ label: title, sql: cleanContent, config: chartConfig.current })
+                JSON.stringify({
+                  label: title,
+                  sql: cleanContent,
+                  isLogs,
+                  config: chartConfig.current,
+                })
               )
             }}
           />
