@@ -5,9 +5,6 @@ import { toast } from 'sonner'
 
 import { BASE_PATH } from 'lib/constants'
 
-import { TelemetryActions } from 'common/telemetry-constants'
-import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button } from 'ui'
@@ -16,9 +13,6 @@ import { LastSignInWrapper } from './LastSignInWrapper'
 const SignInWithGitHub = () => {
   const [loading, setLoading] = useState(false)
   const [_, setLastSignInUsed] = useLastSignIn()
-
-  const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: addLoginEvent } = useAddLoginEvent()
 
   async function handleGithubSignIn() {
     setLoading(true)
@@ -39,11 +33,7 @@ const SignInWithGitHub = () => {
       })
 
       if (error) throw error
-      else {
-        setLastSignInUsed('github')
-        sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
-        addLoginEvent({})
-      }
+      else setLastSignInUsed('github')
     } catch (error: any) {
       toast.error(`Failed to sign in via GitHub: ${error.message}`)
       Sentry.captureMessage('[CRITICAL] Failed to sign in via GH: ' + error.message)
