@@ -18,7 +18,7 @@ import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { Home } from 'icons'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -39,7 +39,7 @@ import {
   useSidebar,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
-import { UserDropdown } from './UserDropdown'
+import { ThemeDropdown, UserDropdown } from './UserDropdown'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -180,13 +180,11 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
             />
           </SidebarGroup>
         </SidebarMenu>
-        {process.env.NEXT_PUBLIC_IS_PLATFORM && (
-          <SidebarMenu className="group-data-[state=expanded]:p-0">
-            <SidebarGroup className="p-0">
-              <UserDropdown />
-            </SidebarGroup>
-          </SidebarMenu>
-        )}
+        <SidebarMenu className="group-data-[state=expanded]:p-0">
+          <SidebarGroup className="p-0">
+            {IS_PLATFORM ? <UserDropdown /> : <ThemeDropdown />}
+          </SidebarGroup>
+        </SidebarMenu>
         <SidebarGroup className="p-0">{footer}</SidebarGroup>
       </SidebarFooter>
     </>

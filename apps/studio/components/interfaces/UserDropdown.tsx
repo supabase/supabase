@@ -26,15 +26,7 @@ import {
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { ICON_SIZE, ICON_STROKE_WIDTH, SideBarNavLink } from './Sidebar'
 
-export function UserDropdown() {
-  if (process.env.NEXT_PUBLIC_IS_PLATFORM) {
-    return <UserDropdownMenu />
-  } else {
-    return <ThemeDropdown />
-  }
-}
-
-const UserDropdownMenu = () => {
+export const UserDropdown = () => {
   const { profile } = useProfile()
   const appStateSnapshot = useAppStateSnapshot()
   const { theme, setTheme } = useTheme()
@@ -153,7 +145,7 @@ const UserDropdownMenu = () => {
   )
 }
 
-const ThemeDropdown = () => {
+export const ThemeDropdown = () => {
   const { theme, setTheme } = useTheme()
 
   return (
