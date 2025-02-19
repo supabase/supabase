@@ -1,14 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { LogsSidebarMenuV2 } from './LogsSidebarMenuV2'
-import { useRouter } from 'next/router'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+
 interface LogsLayoutProps {
   title?: string
 }
@@ -20,7 +21,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   )
 
   const router = useRouter()
-  const [lastLogsPage, setLastLogsPage] = useLocalStorageQuery(
+  const [_, setLastLogsPage] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
     router.pathname.split('/').pop()
   )
@@ -31,9 +32,6 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
       setLastLogsPage(path)
     }
   }, [router, setLastLogsPage])
-
-  console.log('🔴 canUseLogsExplorer', canUseLogsExplorer)
-  console.log('🔴 isLoading', isLoading)
 
   if (!canUseLogsExplorer) {
     if (isLoading) {
@@ -48,6 +46,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
       )
     }
   }
+
   return (
     <ProjectLayout title={title} product="Logs & Analytics" productMenu={<LogsSidebarMenuV2 />}>
       {children}
