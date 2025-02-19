@@ -19,7 +19,7 @@ import {
 } from 'ui'
 import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import type { Provider } from './AuthProvidersForm.types'
-import ProviderForm from './ProviderForm'
+import { ProviderForm } from './ProviderForm'
 
 export const AuthProvidersForm = () => {
   const { ref: projectRef } = useParams()

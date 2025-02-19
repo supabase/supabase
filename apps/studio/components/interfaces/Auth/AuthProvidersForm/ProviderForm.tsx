@@ -28,7 +28,7 @@ export interface ProviderFormProps {
   isActive: boolean
 }
 
-const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
+export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
   const [open, setOpen] = useState(false)
   const { ref: projectRef, provider: urlProvider } = useParams()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
@@ -196,25 +196,23 @@ const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
                       )}
 
                       {provider.misc.requiresRedirect && (
-                        <>
-                          <Input
-                            copy
-                            readOnly
-                            disabled
-                            label="Callback URL (for OAuth)"
-                            value={
-                              customDomainData?.customDomain?.status === 'active'
-                                ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
-                                : `${apiUrl}/auth/v1/callback`
-                            }
-                            descriptionText={
-                              <Markdown
-                                content={provider.misc.helper}
-                                className="text-foreground-lighter"
-                              />
-                            }
-                          />
-                        </>
+                        <Input
+                          copy
+                          readOnly
+                          disabled
+                          label="Callback URL (for OAuth)"
+                          value={
+                            customDomainData?.customDomain?.status === 'active'
+                              ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
+                              : `${apiUrl}/auth/v1/callback`
+                          }
+                          descriptionText={
+                            <Markdown
+                              content={provider.misc.helper}
+                              className="text-foreground-lighter"
+                            />
+                          }
+                        />
                       )}
                     </div>
                   </div>
@@ -260,5 +258,3 @@ const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
     </>
   )
 }
-
-export default ProviderForm
