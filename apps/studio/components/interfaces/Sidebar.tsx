@@ -178,13 +178,15 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
             />
           </SidebarGroup>
         </SidebarMenu>
-        <SidebarMenu className="group-data-[state=expanded]:p-0">
-          <SidebarGroup className="p-0">
-            <SidebarMenuItem className="h-10 flex items-center">
-              <UserDropdown />
-            </SidebarMenuItem>
-          </SidebarGroup>
-        </SidebarMenu>
+        {process.env.NEXT_PUBLIC_IS_PLATFORM && (
+          <SidebarMenu className="group-data-[state=expanded]:p-0">
+            <SidebarGroup className="p-0">
+              <SidebarMenuItem className="h-10 flex items-center">
+                <UserDropdown />
+              </SidebarMenuItem>
+            </SidebarGroup>
+          </SidebarMenu>
+        )}
         <SidebarGroup className="p-0">{footer}</SidebarGroup>
       </SidebarFooter>
     </>
