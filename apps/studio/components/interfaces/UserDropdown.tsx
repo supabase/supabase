@@ -24,9 +24,18 @@ import {
   singleThemes,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
-import { ICON_SIZE, ICON_STROKE_WIDTH } from './Sidebar'
+import { ICON_SIZE, ICON_STROKE_WIDTH, SideBarNavLink } from './Sidebar'
+import { useState } from 'react'
 
 export function UserDropdown() {
+  if (process.env.NEXT_PUBLIC_IS_PLATFORM) {
+    return <UserDropdownMenu />
+  } else {
+    return <ThemeDropdown />
+  }
+}
+
+const UserDropdownMenu = () => {
   const { profile } = useProfile()
   const appStateSnapshot = useAppStateSnapshot()
   const { theme, setTheme } = useTheme()
@@ -34,48 +43,6 @@ export function UserDropdown() {
   const router = useRouter()
 
   const setCommandMenuOpen = useSetCommandMenuOpen()
-
-  if (!process.env.NEXT_PUBLIC_IS_PLATFORM) {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <SidebarMenuButton
-            className={cn(
-              'text-sm',
-              'group-data-[state=expanded]:h-10',
-              'p-0.5 group-data-[state=expanded]:pr-2 group-data-[state=expanded]:pl-1'
-            )}
-            size={'default'}
-            hasIcon={false}
-            asChild
-            isActive={false}
-          >
-            <button>
-              <Palette className="w-7 h-7" size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />
-            </button>
-          </SidebarMenuButton>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="top" align="start">
-          <DropdownMenuGroup>
-            <DropdownMenuLabel>Theme</DropdownMenuLabel>
-            <DropdownMenuRadioGroup
-              value={theme}
-              onValueChange={(value) => {
-                setTheme(value)
-              }}
-            >
-              {singleThemes.map((theme: Theme) => (
-                <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                  {theme.name}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    )
-  }
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -183,6 +150,42 @@ export function UserDropdown() {
             </DropdownMenuGroup>
           </>
         )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+const ThemeDropdown = () => {
+  const { theme, setTheme } = useTheme()
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <SideBarNavLink
+          key="palette"
+          route={{
+            key: 'palette',
+            label: 'Theme',
+            icon: <Palette size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+          }}
+        />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="top" align="start">
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Theme</DropdownMenuLabel>
+          <DropdownMenuRadioGroup
+            value={theme}
+            onValueChange={(value) => {
+              setTheme(value)
+            }}
+          >
+            {singleThemes.map((theme: Theme) => (
+              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                {theme.name}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )

@@ -161,7 +161,7 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
         <SidebarMenu className="group-data-[state=expanded]:p-0">
           <SidebarGroup className="p-0 gap-0.5">
             {settingsRoutes.map((route) => (
-              <NavLink
+              <SideBarNavLink
                 key={`settings-routes-${route.key}`}
                 route={route}
                 active={activeRoute === route.key}
@@ -169,7 +169,7 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
             ))}
           </SidebarGroup>
           <SidebarGroup className="p-0">
-            <NavLink
+            <SideBarNavLink
               key="cmdk"
               route={{
                 key: 'cmdk',
@@ -183,9 +183,7 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
         {process.env.NEXT_PUBLIC_IS_PLATFORM && (
           <SidebarMenu className="group-data-[state=expanded]:p-0">
             <SidebarGroup className="p-0">
-              <SidebarMenuItem className="h-10 flex items-center">
-                <UserDropdown />
-              </SidebarMenuItem>
+              <UserDropdown />
             </SidebarGroup>
           </SidebarMenu>
         )}
@@ -195,15 +193,16 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
   )
 }
 
-function NavLink({
+export function SideBarNavLink({
   route,
   active,
   onClick,
+  ...props
 }: {
   route: any
   active?: boolean
   onClick?: () => void
-}) {
+} & ComponentPropsWithoutRef<typeof SidebarMenuButton>) {
   const [sidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
     DEFAULT_SIDEBAR_BEHAVIOR
@@ -217,7 +216,9 @@ function NavLink({
     onClick: onClick,
   }
 
-  const content = (
+  const content = props.children ? (
+    props.children
+  ) : (
     <>
       {route.icon}
       <span>{route.label}</span>
@@ -271,7 +272,7 @@ function ProjectLinks() {
   return (
     <SidebarMenu>
       <SidebarGroup className="gap-0.5">
-        <NavLink
+        <SideBarNavLink
           key="home"
           active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
           route={{
@@ -283,25 +284,37 @@ function ProjectLinks() {
           }}
         />
         {toolRoutes.map((route, i) => (
-          <NavLink key={`tools-routes-${i}`} route={route} active={activeRoute === route.key} />
+          <SideBarNavLink
+            key={`tools-routes-${i}`}
+            route={route}
+            active={activeRoute === route.key}
+          />
         ))}
       </SidebarGroup>
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
         {productRoutes.map((route, i) => (
-          <NavLink key={`product-routes-${i}`} route={route} active={activeRoute === route.key} />
+          <SideBarNavLink
+            key={`product-routes-${i}`}
+            route={route}
+            active={activeRoute === route.key}
+          />
         ))}
       </SidebarGroup>
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
         {otherRoutes.map((route, i) => (
-          <NavLink key={`other-routes-${i}`} route={route} active={activeRoute === route.key} />
+          <SideBarNavLink
+            key={`other-routes-${i}`}
+            route={route}
+            active={activeRoute === route.key}
+          />
         ))}
       </SidebarGroup>
       {/* Settings routes to be added in with project/org nav */}
       {/* <SidebarGroup className="gap-0.5">
           {settingsRoutes.map((route, i) => (
-            <NavLink
+            <SideBarNavLink
               key={`settings-routes-${i}`}
               route={route}
               active={activeRoute === route.key}
@@ -356,7 +369,7 @@ const OrganizationLinks = () => {
     <SidebarMenu className="flex flex-col gap-1 items-start">
       <SidebarGroup className="gap-0.5">
         {navMenuItems.map((item, i) => (
-          <NavLink
+          <SideBarNavLink
             active={i === 0 ? activeRoute === undefined : activeRoute === item.key}
             route={{
               label: item.label,
