@@ -52,7 +52,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          context: '{{defaultContext}}'
+          context: .
           file: apps/studio/Dockerfile
           target: production
           platforms: linux/${{ env.arch }}
