@@ -117,7 +117,7 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
   return (
     <>
       <Sheet open={visible} onOpenChange={onClose}>
-        <SheetContent showClose={false} size="lg">
+        <SheetContent showClose={false} size="default">
           <div className="flex flex-col h-full" tabIndex={-1}>
             <SheetHeader>
               <SheetTitle>
