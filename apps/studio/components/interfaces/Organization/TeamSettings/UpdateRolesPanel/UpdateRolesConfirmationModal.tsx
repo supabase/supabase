@@ -112,7 +112,7 @@ export const UpdateRolesConfirmationModal = ({
         await removeRole({ slug, gotrueId, roleId })
       }
       for (const { roleId, projectIds } of toUpdate) {
-        updateRole({
+        await updateRole({
           slug,
           gotrueId,
           roleId,
