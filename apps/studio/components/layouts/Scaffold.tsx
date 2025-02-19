@@ -59,13 +59,22 @@ const ScaffoldDivider = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HT
   }
 )
 
-const ScaffoldSection = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => {
+interface ScaffoldSectionProps extends React.HTMLAttributes<HTMLDivElement> {
+  isFullWidth?: boolean
+  topPadding?: boolean
+}
+
+const ScaffoldSection = React.forwardRef<HTMLDivElement, ScaffoldSectionProps>(
+  ({ className, isFullWidth, topPadding, ...props }, ref) => {
     return (
       <div
         ref={ref}
         {...props}
-        className={cn('flex flex-col gap-3 py-6', 'lg:grid md:grid-cols-12 lg:py-12', className)}
+        className={cn(
+          'flex flex-col first:pt-12 py-6',
+          isFullWidth ? 'w-full' : 'gap-3 lg:grid md:grid-cols-12',
+          className
+        )}
       />
     )
   }
@@ -145,6 +154,20 @@ const ScaffoldContainerLegacy = React.forwardRef<
   )
 })
 
+const ScaffoldSectionTitle = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => {
+  return <h3 ref={ref} {...props} className={cn('text-foreground text-xl', className)} />
+})
+
+const ScaffoldSectionDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => {
+  return <p ref={ref} {...props} className={cn('text-sm text-foreground-light', className)} />
+})
+
 ScaffoldHeader.displayName = 'ScaffoldHeader'
 ScaffoldTitle.displayName = 'ScaffoldTitle'
 ScaffoldDescription.displayName = 'ScaffoldDescription'
@@ -158,6 +181,8 @@ ScaffoldFilterAndContent.displayName = 'ScaffoldFilterAndContent'
 ScaffoldActionsContainer.displayName = 'ScaffoldActionsContainer'
 ScaffoldActionsGroup.displayName = 'ScaffoldActionsGroup'
 ScaffoldContainerLegacy.displayName = 'ScaffoldContainerLegacy'
+ScaffoldSectionTitle.displayName = 'ScaffoldSectionTitle'
+ScaffoldSectionDescription.displayName = 'ScaffoldSectionDescription'
 
 export {
   ScaffoldHeader,
@@ -169,6 +194,8 @@ export {
   ScaffoldColumn,
   ScaffoldSectionDetail,
   ScaffoldSectionContent,
+  ScaffoldSectionTitle,
+  ScaffoldSectionDescription,
   ScaffoldFilterAndContent,
   ScaffoldActionsContainer,
   ScaffoldActionsGroup,
