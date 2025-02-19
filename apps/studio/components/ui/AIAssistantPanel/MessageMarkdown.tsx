@@ -151,7 +151,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
 
   const language = children[0].props.className?.replace('language-', '') || 'sql'
   const rawContent = children[0].props.children[0]
-  const propsMatch = rawContent.match(/--\s*props:\s*(\{[^}]+\})/)
+  const propsMatch = rawContent.match(/(?:--|\/\/)\s*props:\s*(\{[^}]+\})/)
 
   const snippetProps: AssistantSnippetProps = useMemo(
     () => (propsMatch ? JSON.parse(propsMatch[1]) : {}),
@@ -164,7 +164,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
   const runQuery = snippetProps.runQuery === 'true'
 
   // Strip props from the content for both SQL and edge functions
-  const cleanContent = rawContent.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
+  const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
 
   const isDraggableToReports =
     supportSQLBlocks && canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
