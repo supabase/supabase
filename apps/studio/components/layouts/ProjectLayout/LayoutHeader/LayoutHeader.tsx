@@ -3,10 +3,12 @@ import { useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
 
 import { useParams } from 'common'
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Connect from 'components/interfaces/Connect/Connect'
 import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
 import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
+import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
 import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
@@ -21,6 +23,7 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
+
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger">
     <svg
@@ -58,6 +61,7 @@ const LayoutHeader = ({
   const selectedOrganization = useSelectedOrganization()
   const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganization?.slug,
@@ -101,16 +105,18 @@ const LayoutHeader = ({
       <div className="relative flex flex-1 overflow-hidden">
         <div className="flex w-full items-center justify-between py-2 pl-1 pr-3 md:px-3 flex-nowrap overflow-x-auto no-scrollbar">
           <div className="flex items-center text-sm">
-            <Link
-              href={IS_PLATFORM ? '/projects' : `/project/default`}
-              className="mx-1 hidden md:flex items-center w-[40px] h-[40px]"
-            >
-              <img
-                alt="Supabase"
-                src={`${router.basePath}/img/supabase-logo.svg`}
-                className="absolute h-[40px] w-6 cursor-pointer rounded"
-              />
-            </Link>
+            {projectRef && (
+              <Link
+                href={IS_PLATFORM ? '/projects' : `/project/default`}
+                className="mx-1 hidden md:flex items-center w-[40px] h-[40px]"
+              >
+                <img
+                  alt="Supabase"
+                  src={`${router.basePath}/img/supabase-logo.svg`}
+                  className="absolute h-[40px] w-6 cursor-pointer rounded"
+                />
+              </Link>
+            )}
 
             {!IS_PLATFORM && (
               <div className="ml-3 text-xs text-foreground-light">Default project</div>
@@ -161,8 +167,15 @@ const LayoutHeader = ({
         <div className="absolute md:hidden right-0 h-full w-3 bg-gradient-to-l from-background-dash-sidebar to-transparent pointer-events-none" />
       </div>
       {!!projectRef && (
-        <div className="border-l flex-0 h-full">
-          <AssistantButton />
+        <div className="flex h-full items-center">
+          {isInlineEditorEnabled && (
+            <div className="border-l flex-0 h-full">
+              <InlineEditorButton />
+            </div>
+          )}
+          <div className="border-l flex-0 h-full">
+            <AssistantButton />
+          </div>
         </div>
       )}
     </div>
