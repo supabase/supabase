@@ -41,10 +41,12 @@ interface NewDestinationPanelProps {
 
 const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanelProps) => {
   const { ref: projectRef } = useParams()
-  const { mutateAsync: createSource } = useCreateSourceMutation()
-  const { mutateAsync: createSink } = useCreateSinkMutation()
-  const { mutateAsync: createPipeline } = useCreatePipelineMutation()
-  const { mutateAsync: startPipeline } = useStartPipelineMutation()
+  const { mutateAsync: createSource, isLoading: creatingSource } = useCreateSourceMutation()
+  const { mutateAsync: createSink, isLoading: creatingSink } = useCreateSinkMutation()
+  const { mutateAsync: createPipeline, isLoading: creatingPipeline } = useCreatePipelineMutation()
+  const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
+
+  const isLoading = creatingSource || creatingSink || creatingPipeline || startingPipeline
 
   const formId = 'destination-editor'
   const types = ['BigQuery'] as const
@@ -309,10 +311,10 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
               </Form_Shadcn_>
             </SheetSection>
             <SheetFooter>
-              <Button type="default" onClick={onClose}>
+              <Button disabled={isLoading} type="default" onClick={onClose}>
                 Cancel
               </Button>
-              <Button form={formId} htmlType="submit">
+              <Button disabled={isLoading} loading={isLoading} form={formId} htmlType="submit">
                 Create
               </Button>
             </SheetFooter>
