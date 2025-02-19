@@ -68,6 +68,7 @@ const EdgeFunctionSecrets = () => {
                     icon={<Search size={14} />}
                   />
                 </div>
+
                 <Table
                   head={[
                     <Table.th key="secret-name">Name</Table.th>,
@@ -77,6 +78,7 @@ const EdgeFunctionSecrets = () => {
                         SHA256
                       </Badge>
                     </Table.th>,
+                    <Table.th key="secret-updated-at">Updated</Table.th>,
                     <Table.th key="actions" />,
                   ]}
                   body={
