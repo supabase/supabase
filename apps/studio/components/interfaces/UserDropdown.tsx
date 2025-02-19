@@ -1,4 +1,4 @@
-import { Command, FlaskConical, Settings } from 'lucide-react'
+import { Command, FlaskConical, Palette, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -24,6 +24,7 @@ import {
   singleThemes,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import { ICON_SIZE, ICON_STROKE_WIDTH } from './Sidebar'
 
 export function UserDropdown() {
   const { profile } = useProfile()
@@ -33,6 +34,47 @@ export function UserDropdown() {
   const router = useRouter()
 
   const setCommandMenuOpen = useSetCommandMenuOpen()
+
+  if (!process.env.NEXT_PUBLIC_IS_PLATFORM) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <SidebarMenuButton
+            className={cn(
+              'text-sm',
+              'group-data-[state=expanded]:h-10',
+              'p-0.5 group-data-[state=expanded]:pr-2 group-data-[state=expanded]:pl-1'
+            )}
+            size={'default'}
+            hasIcon={false}
+            asChild
+            isActive={false}
+          >
+            <button>
+              <Palette className="w-7 h-7" size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />
+            </button>
+          </SidebarMenuButton>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="top" align="start">
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Theme</DropdownMenuLabel>
+            <DropdownMenuRadioGroup
+              value={theme}
+              onValueChange={(value) => {
+                setTheme(value)
+              }}
+            >
+              {singleThemes.map((theme: Theme) => (
+                <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                  {theme.name}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
+  }
 
   return (
     <DropdownMenu>
