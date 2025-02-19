@@ -28,7 +28,7 @@ interface PageLayoutProps {
   secondaryActions?: ReactNode
   navigationItems?: NavigationItem[]
   className?: string
-  size?: 'default' | 'full'
+  size?: 'default' | 'full' | 'large' | 'small'
   isCompact?: boolean
 }
 
@@ -73,6 +73,7 @@ const PageLayout = ({
   return (
     <div className="w-full">
       <ScaffoldContainer
+        size={size}
         className={cn(
           'w-full mx-auto',
           size === 'full' &&
