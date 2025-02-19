@@ -174,7 +174,7 @@ const PageLayout: NextPageWithLayout = () => {
 
   return (
     <>
-      <div className="px-8 w-full pt-6">
+      <div className="px-6 w-full pt-6">
         <div className="space-y-6">
           <div className="flex flex-row items-center gap-2">
             <div className="flex items-center">

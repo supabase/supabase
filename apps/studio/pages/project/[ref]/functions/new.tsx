@@ -422,7 +422,7 @@ Deno.serve(async (req: Request) => {
     >
       <div className="flex-1 overflow-hidden flex h-full">
         <div className="w-64 border-r bg-surface-200 flex flex-col">
-          <div className="p-4 border-b flex items-center justify-between">
+          <div className="py-4 px-6 border-b flex items-center justify-between">
             <h3 className="text-sm font-medium">Files</h3>
             <Button size="tiny" type="default" icon={<Plus size={14} />} onClick={addNewFile}>
               Add File

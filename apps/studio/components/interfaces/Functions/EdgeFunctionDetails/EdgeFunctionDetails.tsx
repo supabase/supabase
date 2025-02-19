@@ -11,7 +11,6 @@ import { yupResolver } from '@hookform/resolvers/yup'
 
 import { useParams } from 'common'
 import { FormFieldWrapper } from 'components/ui/Forms'
-import { SectionHeader } from 'components/layouts/PageLayout'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
@@ -39,6 +38,7 @@ import {
 } from 'ui'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 
 const schema = object({
   name: string().required('Name is required'),
@@ -127,10 +127,10 @@ const EdgeFunctionDetails = () => {
   )
 
   return (
-    <>
-      <SectionHeader title="Function Configuration" />
-      <div className="mx-auto flex flex-col xl:flex-row gap-8 pb-8">
-        <div className="flex-1 min-w-0 overflow-hidden">
+    <div className="mx-auto flex flex-col xl:flex-row gap-8 pb-8">
+      <div className="flex-1 min-w-0 overflow-hidden">
+        <ScaffoldSection isFullWidth>
+          <ScaffoldSectionTitle className="mb-4">Function Configuration</ScaffoldSectionTitle>
           <Form_Shadcn_ {...form}>
             <form onSubmit={form.handleSubmit(onUpdateFunction)}>
               <Card>
@@ -180,8 +180,9 @@ const EdgeFunctionDetails = () => {
               </Card>
             </form>
           </Form_Shadcn_>
-
-          <SectionHeader title="Invoke function" />
+        </ScaffoldSection>
+        <ScaffoldSection isFullWidth>
+          <ScaffoldSectionTitle className="mb-4">Invoke function</ScaffoldSectionTitle>
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -221,8 +222,9 @@ const { data, error } = await supabase.functions.invoke('${selectedFunction?.nam
               </CardContent>
             </Card>
           </div>
-
-          <SectionHeader title="Develop locally" />
+        </ScaffoldSection>
+        <ScaffoldSection isFullWidth>
+          <ScaffoldSectionTitle className="mb-4">Develop locally</ScaffoldSectionTitle>
           <div className="rounded border bg-surface-100 px-6 py-4 drop-shadow-sm">
             <div className="space-y-6">
               <CommandRender
@@ -266,9 +268,31 @@ const { data, error } = await supabase.functions.invoke('${selectedFunction?.nam
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
           </div>
-        </div>
+        </ScaffoldSection>
 
-        <div className="w-full xl:max-w-[600px] shrink-0">
+        <Modal
+          size="small"
+          alignFooter="right"
+          header={<h3>Confirm to delete {selectedFunction?.name}</h3>}
+          visible={showDeleteModal}
+          loading={isDeleting}
+          onCancel={() => setShowDeleteModal(false)}
+          onConfirm={onConfirmDelete}
+        >
+          <Modal.Content>
+            <Alert_Shadcn_ variant="warning">
+              <CriticalIcon />
+              <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                Ensure that you have made a backup if you want to restore your edge function
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          </Modal.Content>
+        </Modal>
+      </div>
+
+      <div className="w-full xl:max-w-[600px] shrink-0">
+        <ScaffoldSection isFullWidth>
           <Card>
             <CardHeader>
               <CardTitle>Details</CardTitle>
@@ -338,29 +362,9 @@ const { data, error } = await supabase.functions.invoke('${selectedFunction?.nam
               </dl>
             </CardContent>
           </Card>
-        </div>
+        </ScaffoldSection>
       </div>
-
-      <Modal
-        size="small"
-        alignFooter="right"
-        header={<h3>Confirm to delete {selectedFunction?.name}</h3>}
-        visible={showDeleteModal}
-        loading={isDeleting}
-        onCancel={() => setShowDeleteModal(false)}
-        onConfirm={onConfirmDelete}
-      >
-        <Modal.Content>
-          <Alert_Shadcn_ variant="warning">
-            <CriticalIcon />
-            <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              Ensure that you have made a backup if you want to restore your edge function
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        </Modal.Content>
-      </Modal>
-    </>
+    </div>
   )
 }
 

@@ -74,7 +74,7 @@ const PageLayout = ({
   const router = useRouter()
 
   return (
-    <div className="w-full">
+    <div className="w-full min-h-full flex flex-col items-stretch">
       <ScaffoldContainer
         className={cn(
           'w-full mx-auto',
