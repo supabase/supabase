@@ -26,6 +26,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const Home: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
@@ -140,6 +142,10 @@ const Home: NextPageWithLayout = () => {
   )
 }
 
-Home.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+Home.getLayout = (page) => (
+  <DefaultLayout showProductMenu={false}>
+    <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+  </DefaultLayout>
+)
 
 export default Home

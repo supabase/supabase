@@ -16,7 +16,7 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUsersCountQuery } from 'data/auth/users-count-query'
-import { useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
+import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
@@ -44,6 +44,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import AddUserDropdown from './AddUserDropdown'
+import { DeleteUserModal } from './DeleteUserModal'
 import { UserPanel } from './UserPanel'
 import { MAX_BULK_DELETE, PROVIDER_FILTER_OPTIONS } from './Users.constants'
 import { formatUserColumns, formatUsersData, isAtBottom } from './Users.utils'
@@ -83,13 +84,16 @@ export const UsersV2 = () => {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
   const [filterKeywords, setFilterKeywords] = useState('')
-  const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [selectedProviders, setSelectedProviders] = useState<string[]>([])
-  const [selectedUser, setSelectedUser] = useState<string>()
   const [sortByValue, setSortByValue] = useState<string>('created_at:desc')
+
+  const [selectedUser, setSelectedUser] = useState<string>()
+  const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
+  const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
+
   const [
     columnConfiguration,
     setColumnConfiguration,
@@ -124,6 +128,9 @@ export const UsersV2 = () => {
     },
     {
       keepPreviousData: Boolean(filterKeywords),
+      // [Joshen] This is to prevent the dashboard from invalidating when refocusing as it may create
+      // a barrage of requests to invalidate each page esp when the project has many many users.
+      staleTime: Infinity,
     }
   )
 
@@ -140,7 +147,7 @@ export const UsersV2 = () => {
   const totalUsers = countData ?? 0
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
   // [Joshen] Only relevant for when selecting one user only
-  const selectedUserToDelete = users.find((u) => u.id === [...selectedUsers][0])
+  const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
@@ -234,6 +241,7 @@ export const UsersV2 = () => {
         users: users ?? [],
         visibleColumns: selectedColumns,
         setSortByValue,
+        onSelectDeleteUser: setSelectedUserToDelete,
       })
       setColumns(columns)
       if (columns.length < USERS_TABLE_COLUMNS.length) {
@@ -374,6 +382,7 @@ export const UsersV2 = () => {
                       users: users ?? [],
                       visibleColumns: value,
                       setSortByValue,
+                      onSelectDeleteUser: setSelectedUserToDelete,
                     })
 
                     setSelectedColumns(value)
@@ -577,12 +586,20 @@ export const UsersV2 = () => {
           {selectedUsers.size === 1 ? (
             <span className="text-foreground">
               {' '}
-              {selectedUserToDelete?.email ?? selectedUserToDelete?.phone ?? 'this user'}
+              {selectedUserFromCheckbox?.email ?? selectedUserFromCheckbox?.phone ?? 'this user'}
             </span>
           ) : null}
           ?
         </p>
       </ConfirmationModal>
+
+      {/* [Joshen] For deleting via context menu, the dialog above is dependent on the selectedUsers state */}
+      <DeleteUserModal
+        visible={!!selectedUserToDelete}
+        selectedUser={selectedUserToDelete}
+        onClose={() => setSelectedUserToDelete(undefined)}
+        onDeleteSuccess={() => setSelectedUserToDelete(undefined)}
+      />
     </>
   )
 }

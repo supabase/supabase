@@ -69,9 +69,9 @@ const WarningIcon = () => (
 const admonitionSVG = cva('', {
   variants: {
     type: {
-      default: `[&>svg]:bg-foreground-muted [&>svg]:text-background-muted`,
-      warning: `[&>svg]:bg-warning [&>svg]:text-warning-100`,
-      destructive: `[&>svg]:bg-destructive [&>svg]:text-white`,
+      default: `[&>svg]:bg-foreground-muted`,
+      warning: ``,
+      destructive: ``,
     },
   },
 })
@@ -80,7 +80,7 @@ const admonitionBase = cva('', {
   variants: {
     type: {
       default: `bg-surface-200/25 border border-default`,
-      warning: `bg-alternative border border-default ![&_p]:text-background-muted`,
+      warning: `bg-alternative border border-default`,
       destructive: `bg-alternative border border-default`,
     },
   },
@@ -96,14 +96,15 @@ export const Admonition = forwardRef<
   ) => {
     const typeMapped = variant ? admonitionToAlertMapping[variant] : admonitionToAlertMapping[type]
 
+
     return (
       <Alert_Shadcn_
         ref={ref}
         variant={typeMapped}
         {...props}
         className={cn(
-          'not-prose',
           'mb-2',
+          '[&_a]:underline',
           admonitionSVG({ type: typeMapped }),
           admonitionBase({ type: typeMapped }),
           props.className

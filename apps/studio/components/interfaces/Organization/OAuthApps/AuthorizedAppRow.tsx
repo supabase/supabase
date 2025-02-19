@@ -1,7 +1,8 @@
-import Table from 'components/to-be-cleaned/Table'
-import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
 import dayjs from 'dayjs'
 import { Trash } from 'lucide-react'
+
+import Table from 'components/to-be-cleaned/Table'
+import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
 import { Button } from 'ui'
 
 export interface AuthorizedAppRowProps {
