@@ -42,3 +42,4 @@ jobs:
         run: |
           echo "Applying triage label for new issue"
           gh issue edit "$NUMBER" --add-label "$LABELS"
+
