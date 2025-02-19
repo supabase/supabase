@@ -5,14 +5,15 @@ import { toast } from 'sonner'
 
 import { BASE_PATH } from 'lib/constants'
 
+import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button } from 'ui'
-import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { LastSignInWrapper } from './LastSignInWrapper'
 
 const SignInWithGitHub = () => {
   const [loading, setLoading] = useState(false)
-  const [lastSignInUsed, setLastSignInUsed] = useLastSignIn()
+  const [_, setLastSignInUsed] = useLastSignIn()
+
   async function handleGithubSignIn() {
     setLoading(true)
 
@@ -28,14 +29,11 @@ const SignInWithGitHub = () => {
 
       const { error } = await auth.signInWithOAuth({
         provider: 'github',
-        options: {
-          redirectTo,
-        },
+        options: { redirectTo },
       })
+
       if (error) throw error
-      else {
-        setLastSignInUsed('github')
-      }
+      else setLastSignInUsed('github')
     } catch (error: any) {
       toast.error(`Failed to sign in via GitHub: ${error.message}`)
       Sentry.captureMessage('[CRITICAL] Failed to sign in via GH: ' + error.message)
