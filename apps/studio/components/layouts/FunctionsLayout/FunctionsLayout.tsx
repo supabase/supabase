@@ -17,6 +17,7 @@ import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-setti
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { PageLayout } from 'components/layouts/PageLayout'
 import EdgeFunctionsLayout from '../EdgeFunctionsLayout/EdgeFunctionsLayout'
+import { useFlag } from 'hooks/ui/useFlag'
 
 interface FunctionsLayoutProps {
   title?: string
@@ -25,9 +26,9 @@ interface FunctionsLayoutProps {
 const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutProps>) => {
   const router = useRouter()
   const { functionSlug, ref } = useParams()
+  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
-  const { data: functions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
   const {
     data: selectedFunction,
     error,
@@ -81,15 +82,18 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
           href: `/project/${ref}/functions/${functionSlug}/logs`,
         },
         {
-          label: 'Code',
-          href: `/project/${ref}/functions/${functionSlug}/code`,
-        },
-        {
           label: 'Details',
           href: `/project/${ref}/functions/${functionSlug}/details`,
         },
       ]
     : []
+
+  if (edgeFunctionCreate) {
+    navigationItems.splice(navigationItems.length - 1, 0, {
+      label: 'Code',
+      href: `/project/${ref}/functions/${functionSlug}/code`,
+    })
+  }
 
   return (
     <EdgeFunctionsLayout>

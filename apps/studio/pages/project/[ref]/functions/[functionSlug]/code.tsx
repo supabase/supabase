@@ -14,6 +14,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import FunctionsLayout from 'components/layouts/FunctionsLayout/FunctionsLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const CodePage = () => {
   const router = useRouter()
@@ -22,6 +23,14 @@ const CodePage = () => {
   const isOptedInToAI = useOrgOptedIntoAi()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
   const { setAiAssistantPanel } = useAppStateSnapshot()
+  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
+
+  // TODO (Saxon): Remove this once the flag is fully launched
+  useEffect(() => {
+    if (!edgeFunctionCreate) {
+      router.push(`/project/${ref}/functions`)
+    }
+  }, [edgeFunctionCreate, ref, router])
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
   const [files, setFiles] = useState<
