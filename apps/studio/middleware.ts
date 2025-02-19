@@ -10,6 +10,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/sql/suggest',
   '/ai/sql/generate-v2',
   '/ai/sql/generate-v3',
+  '/edge-functions/test',
   '/ai/onboarding/design',
   '/ai/sql/complete',
   '/ai/sql/title',
