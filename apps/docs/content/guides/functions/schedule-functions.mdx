@@ -19,7 +19,7 @@ In combination with the [`pg_net` extension](/docs/guides/database/extensions/pg
 
 <Admonition type="caution">
 
-To access the authentication token securely, we recommend storing them in [Supabase Vault](https://supabase.com/docs/guides/database/vault).
+To access the authentication token securely, we recommend storing them in [Supabase Vault](/docs/guides/database/vault).
 
 </Admonition>
 
@@ -27,7 +27,14 @@ To access the authentication token securely, we recommend storing them in [Supab
 
 ### Invoke an Edge Function every minute
 
-Make a POST request to a Supabase Edge Function every minute:
+1. Store `project_url` and `anon_key` in Supabase Vault:
+
+```sql
+select vault.create_secret('https://your-project-ref.supabase.co', 'project_url');
+select vault.create_secret('YOUR_SUPABASE_ANON_KEY', 'anon_key');
+```
+
+2. Make a POST request to a Supabase Edge Function every minute:
 
 ```sql
 select
