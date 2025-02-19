@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 import { CreateTrigger, DeleteTrigger } from 'components/interfaces/Database'
 import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/TriggersList'
+import { generateTriggerCreateSQL } from 'components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -10,23 +11,51 @@ import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useAppStateSnapshot } from 'state/app-state'
 
 const TriggersPage: NextPageWithLayout = () => {
   const [selectedTrigger, setSelectedTrigger] = useState<any>()
   const [showCreateTriggerForm, setShowCreateTriggerForm] = useState<boolean>(false)
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
+  const { setEditorPanel } = useAppStateSnapshot()
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const canReadTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
   const isPermissionsLoaded = usePermissionsLoaded()
 
   const createTrigger = () => {
-    setSelectedTrigger(undefined)
-    setShowCreateTriggerForm(true)
+    if (isInlineEditorEnabled) {
+      setEditorPanel({
+        open: true,
+        initialValue: `create trigger trigger_name
+after insert or update or delete on table_name
+for each row
+execute function function_name();`,
+        label: 'Create new database trigger',
+        saveLabel: 'Create trigger',
+        initialPrompt: 'Create a new database trigger that...',
+      })
+    } else {
+      setSelectedTrigger(undefined)
+      setShowCreateTriggerForm(true)
+    }
   }
 
   const editTrigger = (trigger: any) => {
-    setSelectedTrigger(trigger)
-    setShowCreateTriggerForm(true)
+    if (isInlineEditorEnabled) {
+      const sql = generateTriggerCreateSQL(trigger)
+      setEditorPanel({
+        open: true,
+        initialValue: sql,
+        label: `Edit trigger "${trigger.name}"`,
+        saveLabel: 'Update trigger',
+        initialPrompt: `Update the database trigger "${trigger.name}" to...`,
+      })
+    } else {
+      setSelectedTrigger(trigger)
+      setShowCreateTriggerForm(true)
+    }
   }
 
   const deleteTrigger = (trigger: any) => {
