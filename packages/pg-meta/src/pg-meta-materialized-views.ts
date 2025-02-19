@@ -42,23 +42,32 @@ export type PGMaterializedView = z.infer<typeof pgMaterializedViewZod>
 export const pgMaterializedViewArrayZod = z.array(pgMaterializedViewZod)
 export const pgMaterializedViewOptionalZod = z.optional(pgMaterializedViewZod)
 
-export function list({
-  includeSystemSchemas = false,
-  includedSchemas,
-  excludedSchemas,
-  limit,
-  offset,
-  includeColumns = true,
-}: {
-  includeSystemSchemas?: boolean
-  includedSchemas?: string[]
-  excludedSchemas?: string[]
-  limit?: number
-  offset?: number
-  includeColumns?: boolean
-} = {}): {
+type MaterializedViewWithoutColumns = Omit<PGMaterializedView, 'columns'>
+type MaterializedViewWithColumns = PGMaterializedView
+
+type MaterializedViewBasedOnIncludeColumns<T extends boolean | undefined> = T extends true
+  ? MaterializedViewWithColumns
+  : MaterializedViewWithoutColumns
+
+export function list<T extends boolean | undefined = true>(
+  {
+    includeSystemSchemas = false,
+    includedSchemas,
+    excludedSchemas,
+    limit,
+    offset,
+    includeColumns = true as T,
+  }: {
+    includeSystemSchemas?: boolean
+    includedSchemas?: string[]
+    excludedSchemas?: string[]
+    limit?: number
+    offset?: number
+    includeColumns?: T
+  } = {} as any
+): {
   sql: string
-  zod: typeof pgMaterializedViewArrayZod
+  zod: z.ZodType<MaterializedViewBasedOnIncludeColumns<T>[]>
 } {
   let sql = generateEnrichedMaterializedViewsSql({ includeColumns })
   const filter = filterByList(
@@ -108,7 +117,7 @@ export function retrieve(identifier: MaterializedViewIdentifier): {
   }
 }
 
-const generateEnrichedMaterializedViewsSql = ({ includeColumns }: { includeColumns: boolean }) => `
+const generateEnrichedMaterializedViewsSql = ({ includeColumns }: { includeColumns?: boolean }) => `
 with materialized_views as (${MATERIALIZED_VIEWS_SQL})
   ${includeColumns ? `, columns as (${COLUMNS_SQL})` : ''}
 select
