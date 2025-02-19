@@ -25,7 +25,6 @@ import {
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { ICON_SIZE, ICON_STROKE_WIDTH, SideBarNavLink } from './Sidebar'
-import { useState } from 'react'
 
 export function UserDropdown() {
   if (process.env.NEXT_PUBLIC_IS_PLATFORM) {
@@ -72,7 +71,6 @@ const UserDropdownMenu = () => {
           </button>
         </SidebarMenuButton>
       </DropdownMenuTrigger>
-
       <DropdownMenuContent side="top" align="start">
         {IS_PLATFORM && (
           <>
