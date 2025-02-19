@@ -156,7 +156,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             if (isInlineEditorEnabled) {
               setEditorPanel({
                 open: true,
-                initialValue: `create policy "policy_name"
+                initialValue: `create policy "replace_with_policy_name"
   on ${schema}.${table}
   for select
   to authenticated
@@ -165,7 +165,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 );`,
                 label: `Create new RLS policy on "${table}"`,
                 saveLabel: 'Create policy',
-                initialPrompt: `Create a new RLS policy for the "${table}" table in the ${schema} schema. The policy should...`,
+                initialPrompt: `Create and name a entirely new RLS policy for the "${table}" table in the ${schema} schema. The policy should...`,
               })
             } else {
               setSelectedTable(table)

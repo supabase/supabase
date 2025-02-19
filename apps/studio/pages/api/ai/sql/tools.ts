@@ -85,6 +85,7 @@ export const getTools = ({
               {
                 projectRef,
                 connectionString,
+                schema: schemas[0] || '',
               },
               undefined,
               headers
