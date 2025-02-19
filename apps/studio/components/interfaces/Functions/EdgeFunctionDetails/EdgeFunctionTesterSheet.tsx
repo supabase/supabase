@@ -25,9 +25,7 @@ import {
   CodeBlock,
   Form_Shadcn_,
   FormField_Shadcn_,
-  FormItem_Shadcn_,
   FormControl_Shadcn_,
-  FormMessage_Shadcn_,
 } from 'ui'
 import { FormFieldWrapper } from 'components/ui/Forms'
 import { constructHeaders } from 'data/fetchers'
@@ -40,18 +38,12 @@ import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-setti
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { prettifyJSON } from 'lib/helpers'
-import { Plus, Send, X } from 'lucide-react'
+import { Loader2, Plus, Send, X } from 'lucide-react'
 
 interface EdgeFunctionTesterSheetProps {
   visible: boolean
   onClose: () => void
   url: string
-  apiKey: string
-}
-
-interface KeyValuePair {
-  key: string
-  value: string
 }
 
 type ResponseData = {
@@ -67,7 +59,6 @@ type ErrorWithStatus = Error & {
 }
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'] as const
-type HttpMethod = (typeof HTTP_METHODS)[number]
 
 const FormSchema = z.object({
   method: z.enum(HTTP_METHODS),
@@ -91,12 +82,7 @@ const FormSchema = z.object({
 
 type FormValues = z.infer<typeof FormSchema>
 
-const EdgeFunctionTesterSheet = ({
-  visible,
-  onClose,
-  url,
-  apiKey,
-}: EdgeFunctionTesterSheetProps) => {
+const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSheetProps) => {
   const { ref: projectRef } = useParams()
   const [response, setResponse] = useState<ResponseData | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -183,7 +169,6 @@ const EdgeFunctionTesterSheet = ({
             error: err.message,
             roleDetails: role,
           })
-          console.log('Falling back to service key')
         }
       }
 
@@ -392,7 +377,7 @@ const EdgeFunctionTesterSheet = ({
                           </TabsTrigger>
                         </div>
                       </TabsList>
-                      <TabsContent value="body" className="mt-0 px-5 pb-4 flex-1 overflow-auto">
+                      <TabsContent value="body" className="mt-0 flex-1 overflow-auto p-0">
                         <CodeBlock
                           language="json"
                           hideLineNumbers
@@ -400,7 +385,7 @@ const EdgeFunctionTesterSheet = ({
                           value={prettifyJSON(response.body)}
                         />
                       </TabsContent>
-                      <TabsContent value="headers" className="mt-0 px-4 pb-4 flex-1 overflow-auto">
+                      <TabsContent value="headers" className="mt-0 flex-1 overflow-auto p-0">
                         <CodeBlock
                           language="json"
                           hideLineNumbers
@@ -410,6 +395,11 @@ const EdgeFunctionTesterSheet = ({
                       </TabsContent>
                     </Tabs>
                   )}
+                </div>
+              ) : isLoading ? (
+                <div className="h-full flex flex-col items-center justify-center gap-2">
+                  <Loader2 size={24} className="text-foreground-muted" />
+                  <p className="text-sm text-foreground-light">Sending request...</p>
                 </div>
               ) : (
                 <div className="h-full flex flex-col items-center justify-center gap-2">

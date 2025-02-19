@@ -22,6 +22,7 @@ import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { PageLayout } from 'components/layouts/PageLayout'
 import EdgeFunctionsLayout from '../EdgeFunctionsLayout/EdgeFunctionsLayout'
 import EdgeFunctionTesterSheet from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
+import { useFlag } from 'hooks/ui/useFlag'
 
 interface FunctionsLayoutProps {
   title?: string
@@ -49,6 +50,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
   const router = useRouter()
   const { functionSlug, ref } = useParams()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
 
   const { data: functions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
   const {
@@ -144,7 +146,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
               />
             )}
             <DocsButton href="https://supabase.com/docs/guides/functions" />
-            {functionSlug && (
+            {functionSlug && edgeFunctionCreate && (
               <>
                 <TestPopover url={functionUrl} apiKey={apiKey} />
               </>
