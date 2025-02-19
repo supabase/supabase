@@ -28,7 +28,7 @@ interface FunctionsLayoutProps {
   title?: string
 }
 
-const TestPopover = ({ url, apiKey }: { url: string; apiKey: string }) => {
+const TestPopover = ({ url }: { url: string }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -36,12 +36,7 @@ const TestPopover = ({ url, apiKey }: { url: string; apiKey: string }) => {
       <Button type="default" size="tiny" icon={<Send size={16} />} onClick={() => setIsOpen(true)}>
         Test
       </Button>
-      <EdgeFunctionTesterSheet
-        visible={isOpen}
-        onClose={() => setIsOpen(false)}
-        url={url}
-        apiKey={apiKey}
-      />
+      <EdgeFunctionTesterSheet visible={isOpen} onClose={() => setIsOpen(false)} url={url} />
     </>
   )
 }
@@ -148,7 +143,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
             <DocsButton href="https://supabase.com/docs/guides/functions" />
             {functionSlug && edgeFunctionCreate && (
               <>
-                <TestPopover url={functionUrl} apiKey={apiKey} />
+                <TestPopover url={functionUrl} />
               </>
             )}
           </div>
