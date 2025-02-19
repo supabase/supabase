@@ -40,9 +40,12 @@ export const PageHeader = ({
 }: PageHeaderProps) => {
   const { ref } = useParams()
 
+  const displayBreadcrumbs = isCompact && title ? [...breadcrumbs, { label: title }] : breadcrumbs
+
   return (
     <div className={cn('space-y-4', className)}>
-      {(breadcrumbs.length > 0 || (isCompact && (title || primaryActions || secondaryActions))) && (
+      {(displayBreadcrumbs.length > 0 ||
+        (isCompact && (title || primaryActions || secondaryActions))) && (
         <div className={cn('flex items-center gap-4', isCompact ? 'justify-between' : 'mb-4')}>
           <div className="flex items-center gap-4">
             {breadcrumbs.length > 0 ? (

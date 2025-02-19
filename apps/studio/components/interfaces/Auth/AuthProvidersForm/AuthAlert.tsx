@@ -10,11 +10,11 @@ import {
 } from 'ui'
 
 export const AuthAlert = ({
-  ref,
+  projectRef,
   title,
   isHookSendSMSEnabled,
 }: {
-  ref?: string
+  projectRef: string
   title: string
   isHookSendSMSEnabled: boolean
 }) => {
@@ -51,7 +51,7 @@ export const AuthAlert = ({
             <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
               <p>The SMS hook will be used in place of the SMS provider configured</p>
               <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
-                <Link href={`/project/${ref}/auth/hooks`}>View auth hooks</Link>
+                <Link href={`/project/${projectRef}/auth/hooks`}>View auth hooks</Link>
               </Button>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>

@@ -26,9 +26,9 @@ import {
   Switch,
   WarningIcon,
 } from 'ui'
-import { SectionHeader } from 'components/layouts/PageLayout'
 
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
@@ -106,8 +106,8 @@ const BasicAuthSettingsForm = () => {
   }
 
   return (
-    <div>
-      <SectionHeader title="User Signups" />
+    <ScaffoldSection isFullWidth>
+      <ScaffoldSectionTitle className="mb-4">User Signups</ScaffoldSectionTitle>
 
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -252,7 +252,7 @@ const BasicAuthSettingsForm = () => {
           </Card>
         </form>
       </Form_Shadcn_>
-    </div>
+    </ScaffoldSection>
   )
 }
 

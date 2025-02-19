@@ -4,8 +4,8 @@ import { ReactNode } from 'react'
 
 import { useParams } from 'common'
 import { Button, cn, NavMenu, NavMenuItem } from 'ui'
-import { PAGE_SIZE_CLASSES, type PageSize } from 'ui/src/lib/constants'
 import { PageHeader } from '.'
+import { ScaffoldContainer } from '../Scaffold'
 
 export interface NavigationItem {
   id?: string
@@ -29,7 +29,7 @@ interface PageLayoutProps {
   secondaryActions?: ReactNode
   navigationItems?: NavigationItem[]
   className?: string
-  size?: PageSize
+  size?: 'default' | 'full'
   isCompact?: boolean
   pageMeta?: ReactNode
 }
@@ -54,7 +54,7 @@ interface PageLayoutProps {
  * @param secondaryActions - TBD
  * @param navigationItems - Tab navigation rendered below the page header
  * @param className - Optional additional class names to be applied
- * @param size - Controls padding of the page layout (Default: 'default')
+ * @param size - Controls padding of the page header only, padding for the content to be controlled by PageContainer (Default: 'default')
  * @param isCompact - TBD (Default: false)
  */
 const PageLayout = ({
@@ -72,16 +72,15 @@ const PageLayout = ({
   pageMeta,
 }: PageLayoutProps) => {
   const router = useRouter()
-  const { ref } = useParams()
 
   return (
-    <div className="w-full min-h-full flex flex-col items-stretch [&>*]:w-full">
-      <div
+    <div className="w-full">
+      <ScaffoldContainer
         className={cn(
           'w-full mx-auto',
-          PAGE_SIZE_CLASSES[size],
-          size === 'full' && (isCompact ? 'px-6 border-b' : 'pt-8 px-8 border-b'),
-          isCompact ? 'pt-4' : size === 'full' ? 'pt-8' : 'pt-12',
+          size === 'full' &&
+            (isCompact ? 'max-w-none !px-6 border-b' : 'max-w-none p!x-8 border-b'),
+          isCompact ? 'pt-4' : 'pt-12',
           navigationItems.length === 0 && size === 'full' && (isCompact ? 'pb-4' : 'pb-8'),
           className
         )}
@@ -104,13 +103,13 @@ const PageLayout = ({
         {navigationItems.length > 0 && (
           <NavMenu className={cn(isCompact ? 'mt-2' : 'mt-4', size === 'full' && 'border-none')}>
             {navigationItems.map((item) => (
-              <NavMenuItem key={item.label} active={router.pathname === item.href}>
+              <NavMenuItem key={item.label} active={router.asPath === item.href}>
                 {item.href ? (
                   <Link
-                    href={!!ref ? item.href.replace('[ref]', ref) : item.href}
+                    href={item.href}
                     className={cn(
                       'inline-flex items-center gap-2',
-                      router.pathname === item.href && 'text-foreground'
+                      router.asPath === item.href && 'text-foreground'
                     )}
                     onClick={item.onClick}
                   >
@@ -118,7 +117,11 @@ const PageLayout = ({
                     {item.label}
                   </Link>
                 ) : (
-                  <Button type="link" onClick={item.onClick}>
+                  <Button
+                    type="link"
+                    onClick={item.onClick}
+                    className={cn(router.pathname === item.href && 'text-foreground font-medium')}
+                  >
                     {item.icon && <span className="mr-2">{item.icon}</span>}
                     {item.label}
                   </Button>
@@ -127,7 +130,8 @@ const PageLayout = ({
             ))}
           </NavMenu>
         )}
-      </div>
+      </ScaffoldContainer>
+
       {/* Content section */}
       {children}
     </div>
