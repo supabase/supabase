@@ -11,7 +11,7 @@ import {
 } from 'components/interfaces/Functions'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageContainer, PageLayout } from 'components/layouts/PageLayout'
+import { PageLayout } from 'components/layouts/PageLayout'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -20,6 +20,7 @@ import type { NextPageWithLayout } from 'types'
 import { DocsButton } from 'components/ui/DocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAppStateSnapshot } from 'state/app-state'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 
 const FunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -109,13 +110,12 @@ const FunctionsPage: NextPageWithLayout = () => {
 
   return (
     <PageLayout
-      size="large"
       title="Edge Functions"
       subtitle="Deploy edge functions to handle complex business logic"
       primaryActions={deployButton}
       secondaryActions={secondaryActions}
     >
-      <PageContainer size="large">
+      <ScaffoldContainer>
         {isLoading && (
           <div className="pt-8">
             <GenericSkeletonLoader />
@@ -153,7 +153,7 @@ const FunctionsPage: NextPageWithLayout = () => {
             )}
           </>
         )}
-      </PageContainer>
+      </ScaffoldContainer>
     </PageLayout>
   )
 }
