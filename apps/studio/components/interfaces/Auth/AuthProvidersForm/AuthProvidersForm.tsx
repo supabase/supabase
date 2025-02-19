@@ -64,7 +64,10 @@ export const AuthProvidersForm = () => {
         <ResourceList>
           {isLoading &&
             PROVIDERS_SCHEMAS.map((provider) => (
-              <div key={`provider_${provider.title}`}>
+              <div
+                key={`provider_${provider.title}`}
+                className="py-4 px-6 border-b last:border-b-none"
+              >
                 <HorizontalShimmerWithIcon />
               </div>
             ))}
