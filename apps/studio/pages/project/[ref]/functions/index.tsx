@@ -21,6 +21,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAppStateSnapshot } from 'state/app-state'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const FunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -33,6 +34,7 @@ const FunctionsPage: NextPageWithLayout = () => {
     isError,
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })
+  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
 
   const hasFunctions = (functions ?? []).length > 0
 
@@ -62,18 +64,20 @@ const FunctionsPage: NextPageWithLayout = () => {
             </DialogSection>
           </DialogContent>
         </Dialog>
-        <DropdownMenuItem
-          onSelect={() => router.push(`/project/${ref}/functions/new`)}
-          className="gap-4"
-        >
-          <Code className="shrink-0" size={16} strokeWidth={1.5} />
-          <div>
-            <span className="text-foreground">Via Editor</span>
-            <p>
-              Create an edge function in the Supabase Studio editor and then deploy your function
-            </p>
-          </div>
-        </DropdownMenuItem>
+        {edgeFunctionCreate && (
+          <DropdownMenuItem
+            onSelect={() => router.push(`/project/${ref}/functions/new`)}
+            className="gap-4"
+          >
+            <Code className="shrink-0" size={16} strokeWidth={1.5} />
+            <div>
+              <span className="text-foreground">Via Editor</span>
+              <p>
+                Create an edge function in the Supabase Studio editor and then deploy your function
+              </p>
+            </div>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )
