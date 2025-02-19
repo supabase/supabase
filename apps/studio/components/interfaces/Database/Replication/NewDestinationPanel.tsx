@@ -3,9 +3,9 @@ import { useParams } from 'common'
 import { useCreatePipelineMutation } from 'data/replication/create-pipeline-mutation'
 import { useCreateSinkMutation } from 'data/replication/create-sink-mutation'
 import { useCreateSourceMutation } from 'data/replication/create-source-mutation'
+import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -27,11 +27,11 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  SidePanel,
   Switch,
   TextArea_Shadcn_,
 } from 'ui'
 import * as z from 'zod'
+import PublicationsComboBox from './PublicationsComboBox'
 
 interface NewDestinationPanelProps {
   visible: boolean
@@ -45,6 +45,10 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
   const { mutateAsync: createSink, isLoading: creatingSink } = useCreateSinkMutation()
   const { mutateAsync: createPipeline, isLoading: creatingPipeline } = useCreatePipelineMutation()
   const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
+  const { data: publications, isLoading: loadingPublications } = useReplicationPublicationsQuery({
+    projectRef,
+    sourceId,
+  })
 
   const isLoading = creatingSource || creatingSink || creatingPipeline || startingPipeline
 
@@ -240,10 +244,14 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                       name="publicationName"
                       render={({ field }) => (
                         <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4">
-                          <FormLabel_Shadcn_>Publication Name</FormLabel_Shadcn_>
+                          <FormLabel_Shadcn_>Publication</FormLabel_Shadcn_>
                           <div className="w-96">
                             <FormControl_Shadcn_>
-                              <Input_Shadcn_ {...field} placeholder="Publication name" />
+                              <PublicationsComboBox
+                                publications={publications?.map((pub) => pub.name) || []}
+                                loading={loadingPublications}
+                                onSelectPublication={field.onChange}
+                              />
                             </FormControl_Shadcn_>
                           </div>
                           <FormMessage_Shadcn_ />
