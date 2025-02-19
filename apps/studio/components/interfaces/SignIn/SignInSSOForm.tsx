@@ -6,12 +6,12 @@ import { toast } from 'sonner'
 import { object, string } from 'yup'
 
 import { TelemetryActions } from 'common/telemetry-constants'
+import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
-import { post } from 'data/fetchers'
 
 const WHITELIST_ERRORS = ['No SSO provider assigned for this domain']
 
@@ -26,6 +26,7 @@ const SignInSSOForm = () => {
   })
 
   const { mutate: sendEvent } = useSendEventMutation()
+  const { mutate: addLoginEvent } = useAddLoginEvent()
 
   const onSignIn = async ({ email }: { email: string }) => {
     const toastId = toast.loading('Signing in...')
@@ -55,11 +56,8 @@ const SignInSSOForm = () => {
 
     if (!error) {
       sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
-      await post('/platform/profile/audit-login').catch((e) => {
-        Sentry.captureException(
-          new Error("Failed to add login event to user's audit log", { cause: e })
-        )
-      })
+      addLoginEvent({})
+
       await queryClient.resetQueries()
       setLastSignInUsed('sso')
       if (data) {

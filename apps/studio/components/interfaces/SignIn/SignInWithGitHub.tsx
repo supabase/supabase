@@ -5,19 +5,20 @@ import { toast } from 'sonner'
 
 import { BASE_PATH } from 'lib/constants'
 
+import { TelemetryActions } from 'common/telemetry-constants'
+import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button } from 'ui'
-import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { LastSignInWrapper } from './LastSignInWrapper'
-import { TelemetryActions } from 'common/telemetry-constants'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { post } from 'data/fetchers'
 
 const SignInWithGitHub = () => {
   const [loading, setLoading] = useState(false)
-  const [lastSignInUsed, setLastSignInUsed] = useLastSignIn()
+  const [_, setLastSignInUsed] = useLastSignIn()
 
   const { mutate: sendEvent } = useSendEventMutation()
+  const { mutate: addLoginEvent } = useAddLoginEvent()
 
   async function handleGithubSignIn() {
     setLoading(true)
@@ -34,19 +35,14 @@ const SignInWithGitHub = () => {
 
       const { error } = await auth.signInWithOAuth({
         provider: 'github',
-        options: {
-          redirectTo,
-        },
+        options: { redirectTo },
       })
+
       if (error) throw error
       else {
         setLastSignInUsed('github')
         sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
-        await post('/platform/profile/audit-login').catch((e) => {
-          Sentry.captureException(
-            new Error("Failed to add login event to user's audit log", { cause: e })
-          )
-        })
+        addLoginEvent({})
       }
     } catch (error: any) {
       toast.error(`Failed to sign in via GitHub: ${error.message}`)
