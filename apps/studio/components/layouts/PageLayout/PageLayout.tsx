@@ -38,7 +38,7 @@ interface PageLayoutProps {
  *
  * Pages that would deviate from this are those with dedicated UI, for example: Table Editor, SQL Editor, etc
  *
- * Handles rendering the following UI behaviours:
+ * Handles rendering the following UI behaviors:
  * - Page padding depending on the size property
  * - Top level breadcrumbs (If applicable)
  * - Top level page header (If applicable)
