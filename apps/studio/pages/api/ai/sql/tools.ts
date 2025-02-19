@@ -28,7 +28,7 @@ export const getTools = ({
   }
 
   return {
-    getSchema: tool({
+    getSchemaTables: tool({
       description: 'Get more information about one or more schemas',
       parameters: z.object({
         schemas: z.array(z.string()).describe('The schema names to get the definitions for'),
@@ -85,6 +85,7 @@ export const getTools = ({
               {
                 projectRef,
                 connectionString,
+                schema: schemas?.join(','),
               },
               undefined,
               headers
