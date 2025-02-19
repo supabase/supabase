@@ -1,7 +1,6 @@
-import { detectOS } from 'lib/helpers'
-import { ArrowDownLeft, Loader2, Wand } from 'lucide-react'
-import { useCallback, useEffect, useRef } from 'react'
-import { Input, Button, ExpandingTextArea } from 'ui'
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef } from 'react'
+
+import { Button, ExpandingTextArea } from 'ui'
 
 interface AskAIWidgetProps {
   value: string
@@ -40,14 +39,14 @@ export const AskAIWidget = ({
   }, [value, isLoading, onSubmit])
 
   const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    (e: ChangeEvent<HTMLTextAreaElement>) => {
       onChange(e.target.value)
     },
     [onChange]
   )
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    (e: KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === 'Enter' && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
         e.preventDefault()
         handleSubmit()
