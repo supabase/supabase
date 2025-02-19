@@ -1,6 +1,10 @@
-import { expect, test } from 'vitest'
+import { expect, test, afterAll } from 'vitest'
 import pgMeta from '../src/index'
-import { createTestDatabase } from './db/utils'
+import { createTestDatabase, cleanupRoot } from './db/utils'
+
+afterAll(async () => {
+  await cleanupRoot()
+})
 
 const withTestDatabase = (
   name: string,
