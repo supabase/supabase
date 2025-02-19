@@ -62,8 +62,6 @@ export interface ProjectLayoutProps {
   isBlocking?: boolean
   product?: string
   productMenu?: ReactNode
-  hideHeader?: boolean
-  hideIconBar?: boolean
   selectedTable?: string
   resizableSidebar?: boolean
 }
@@ -77,8 +75,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       product = '',
       productMenu,
       children,
-      hideHeader = false,
-      hideIconBar = false,
       selectedTable,
       resizableSidebar = false,
     },
@@ -86,7 +82,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
   ) => {
     const router = useRouter()
     const [isClient, setIsClient] = useState(false)
-    const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
     const {
