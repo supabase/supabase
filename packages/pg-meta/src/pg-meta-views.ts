@@ -42,23 +42,32 @@ export type PGView = z.infer<typeof pgViewZod>
 export const pgViewArrayZod = z.array(pgViewZod)
 export const pgViewOptionalZod = z.optional(pgViewZod)
 
-export function list({
-  includeSystemSchemas = false,
-  includedSchemas,
-  excludedSchemas,
-  limit,
-  offset,
-  includeColumns = true,
-}: {
-  includeSystemSchemas?: boolean
-  includedSchemas?: string[]
-  excludedSchemas?: string[]
-  limit?: number
-  offset?: number
-  includeColumns?: boolean
-} = {}): {
+type ViewWithoutColumns = Omit<PGView, 'columns'>
+type ViewWithColumns = PGView
+
+type ViewBasedOnIncludeColumns<T extends boolean | undefined> = T extends true
+  ? ViewWithColumns
+  : ViewWithoutColumns
+
+export function list<T extends boolean | undefined = true>(
+  {
+    includeSystemSchemas = false,
+    includedSchemas,
+    excludedSchemas,
+    limit,
+    offset,
+    includeColumns = true as T,
+  }: {
+    includeSystemSchemas?: boolean
+    includedSchemas?: string[]
+    excludedSchemas?: string[]
+    limit?: number
+    offset?: number
+    includeColumns?: T
+  } = {} as any
+): {
   sql: string
-  zod: typeof pgViewArrayZod
+  zod: z.ZodType<ViewBasedOnIncludeColumns<T>[]>
 } {
   let sql = generateEnrichedViewsSql({ includeColumns })
   const filter = filterByList(
@@ -106,7 +115,7 @@ export function retrieve(identifier: ViewIdentifier): {
   }
 }
 
-const generateEnrichedViewsSql = ({ includeColumns }: { includeColumns: boolean }) => `
+const generateEnrichedViewsSql = ({ includeColumns }: { includeColumns?: boolean }) => `
 with views as (${VIEWS_SQL})
   ${includeColumns ? `, columns as (${COLUMNS_SQL})` : ''}
 select
