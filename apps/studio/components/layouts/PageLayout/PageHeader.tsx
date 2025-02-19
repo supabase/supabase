@@ -1,6 +1,6 @@
-import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { Fragment, ReactNode } from 'react'
+
+import { useParams } from 'common'
 import { cn } from 'ui'
 import {
   Breadcrumb,
@@ -10,6 +10,7 @@ import {
   BreadcrumbPage as BreadcrumbPageItem,
   BreadcrumbSeparator,
 } from 'ui/src/components/shadcn/ui/breadcrumb'
+import { ScaffoldDescription, ScaffoldTitle } from '../Scaffold'
 
 interface PageHeaderProps {
   title?: string
@@ -83,8 +84,12 @@ export const PageHeader = ({
             <div className="flex items-center gap-4">
               {icon && <div className="text-foreground-light">{icon}</div>}
               <div className="space-y-1">
-                {title && <h1 className="text-2xl text-foreground">{title}</h1>}
-                {subtitle && <p className="text-sm text-foreground-light">{subtitle}</p>}
+                {title && <ScaffoldTitle>{title}</ScaffoldTitle>}
+                {subtitle && (
+                  <ScaffoldDescription className="text-sm text-foreground-light">
+                    {subtitle}
+                  </ScaffoldDescription>
+                )}
               </div>
             </div>
           </div>
@@ -97,5 +102,3 @@ export const PageHeader = ({
     </div>
   )
 }
-
-export default PageHeader

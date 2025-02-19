@@ -2,7 +2,11 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import { SectionHeader } from 'components/layouts/PageLayout'
+import {
+  ScaffoldSection,
+  ScaffoldSectionDescription,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
@@ -16,11 +20,6 @@ import {
 import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import type { Provider } from './AuthProvidersForm.types'
 import ProviderForm from './ProviderForm'
-import {
-  ScaffoldSection,
-  ScaffoldSectionDescription,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
 
 export const AuthProvidersForm = () => {
   const { ref: projectRef } = useParams()
