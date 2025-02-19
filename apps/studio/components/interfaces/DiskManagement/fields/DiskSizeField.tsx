@@ -44,7 +44,6 @@ export function DiskSizeField({
   } = useDiskAttributesQuery({ projectRef })
   const {
     data: subscription,
-    isLoading: isSubscriptionLoading,
     error: subscriptionError,
     isError: isSubscriptionError,
   } = useOrgSubscriptionQuery({
@@ -52,16 +51,12 @@ export function DiskSizeField({
   })
   const {
     data: diskUtil,
-    isLoading: isDiskUtilizationLoading,
     error: diskUtilError,
     isError: isDiskUtilizationError,
   } = useDiskUtilizationQuery({
     projectRef: projectRef,
   })
 
-  console.log(data)
-
-  const isLoading = isSubscriptionLoading || isDiskUtilizationLoading || isLoadingDiskAttributes
   const error = subscriptionError || diskUtilError || diskAttributesError
   const isError = isSubscriptionError || isDiskUtilizationError || isDiskAttributesError
 
