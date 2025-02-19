@@ -1,7 +1,6 @@
 import { Code, ExternalLink, Play } from 'lucide-react'
 import { DragEvent, ReactNode, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
-import { toast } from 'sonner'
 import Link from 'next/link'
 
 import { useParams } from 'common'
