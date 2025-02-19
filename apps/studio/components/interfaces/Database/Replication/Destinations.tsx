@@ -77,7 +77,10 @@ const Destinations = () => {
         {(isSourcesLoading || isSinksLoading) && <GenericSkeletonLoader />}
 
         {(isSourcesError || isSinksError) && (
-          <AlertError error={sourcesError || sinksError} subject="Failed to retrieve destinations" />
+          <AlertError
+            error={sourcesError || sinksError}
+            subject="Failed to retrieve destinations"
+          />
         )}
 
         {anySinks ? (
@@ -144,8 +147,7 @@ const Destinations = () => {
       <NewDestinationPanel
         visible={showNewDestinationPanel}
         sourceId={sourceId}
-        onCancel={() => setShowNewDestinationPanel(false)}
-        onConfirm={() => setShowNewDestinationPanel(false)}
+        onClose={() => setShowNewDestinationPanel(false)}
       ></NewDestinationPanel>
     </>
   )

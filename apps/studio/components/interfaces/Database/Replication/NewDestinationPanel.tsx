@@ -36,16 +36,10 @@ import * as z from 'zod'
 interface NewDestinationPanelProps {
   visible: boolean
   sourceId: number | undefined
-  onCancel: () => void
-  onConfirm: () => void
+  onClose: () => void
 }
 
-const NewDestinationPanel = ({
-  visible,
-  sourceId,
-  onCancel,
-  onConfirm,
-}: NewDestinationPanelProps) => {
+const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanelProps) => {
   const { ref: projectRef } = useParams()
   const { mutateAsync: createSource } = useCreateSourceMutation()
   const { mutateAsync: createSink } = useCreateSinkMutation()
@@ -108,6 +102,7 @@ const NewDestinationPanel = ({
         await startPipeline({ projectRef, pipelineId })
       }
       toast.success('Successfully created destination')
+      onClose()
     } catch (error) {
       toast.error('Failed to create destination')
     }
@@ -119,7 +114,7 @@ const NewDestinationPanel = ({
 
   return (
     <>
-      <Sheet open={visible} onOpenChange={onCancel}>
+      <Sheet open={visible} onOpenChange={onClose}>
         <SheetContent showClose={false} size="lg">
           <div className="flex flex-col h-full" tabIndex={-1}>
             <SheetHeader>
@@ -314,7 +309,7 @@ const NewDestinationPanel = ({
               </Form_Shadcn_>
             </SheetSection>
             <SheetFooter>
-              <Button type="default" onClick={onCancel}>
+              <Button type="default" onClick={onClose}>
                 Cancel
               </Button>
               <Button form={formId} htmlType="submit">
