@@ -106,10 +106,11 @@ export const UpdateRolesConfirmationModal = ({
           gotrueId,
           roleId,
           projects: projectIds.map((id) => projects?.find((p) => p.id === id)?.ref) as string[],
+          skipInvalidation: true,
         })
       }
       for (const roleId of toRemove) {
-        await removeRole({ slug, gotrueId, roleId })
+        await removeRole({ slug, gotrueId, roleId, skipInvalidation: true })
       }
       for (const { roleId, projectIds } of toUpdate) {
         await updateRole({
@@ -118,6 +119,7 @@ export const UpdateRolesConfirmationModal = ({
           roleId,
           roleName: project_scoped_roles.find((r) => r.id === roleId)?.name as string,
           projects: projectIds.map((id) => projects?.find((p) => p.id === id)?.ref) as string[],
+          skipInvalidation: true,
         })
       }
 
