@@ -261,7 +261,14 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                           <FormLabel_Shadcn_>Max Size</FormLabel_Shadcn_>
                           <div className="w-96">
                             <FormControl_Shadcn_>
-                              <Input_Shadcn_ {...field} placeholder="Max size" />
+                              <Input_Shadcn_
+                                {...field}
+                                type="number"
+                                {...form.register('maxSize', {
+                                  valueAsNumber: true, // Ensure the value is handled as a number
+                                })}
+                                placeholder="Max size"
+                              />
                             </FormControl_Shadcn_>
                           </div>
                           <FormMessage_Shadcn_ />
@@ -276,7 +283,14 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                           <FormLabel_Shadcn_>Max Fill Seconds</FormLabel_Shadcn_>
                           <div className="w-96">
                             <FormControl_Shadcn_>
-                              <Input_Shadcn_ {...field} placeholder="Max fill seconds" />
+                              <Input_Shadcn_
+                                {...field}
+                                type="number"
+                                {...form.register('maxFillSecs', {
+                                  valueAsNumber: true, // Ensure the value is handled as a number
+                                })}
+                                placeholder="Max fill seconds"
+                              />
                             </FormControl_Shadcn_>
                           </div>
                           <FormMessage_Shadcn_ />
