@@ -21,8 +21,6 @@ import {
   useFunctionsResourceUsageQuery,
 } from 'data/analytics/functions-resource-usage-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { getAPIKeys } from 'data/config/project-settings-v2-query'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ChartIntervals, NextPageWithLayout } from 'types'
