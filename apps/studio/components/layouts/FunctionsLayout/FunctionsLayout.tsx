@@ -81,6 +81,10 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
           href: `/project/${ref}/functions/${functionSlug}/logs`,
         },
         {
+          label: 'Code',
+          href: `/project/${ref}/functions/${functionSlug}/code`,
+        },
+        {
           label: 'Details',
           href: `/project/${ref}/functions/${functionSlug}/details`,
         },
