@@ -70,54 +70,56 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
   }, [sidebarBehaviour, setOpen])
 
   return (
-    <AnimatePresence>
-      {!hideSideBar && (
-        <SidebarMotion
-          {...props}
-          transition={{
-            delay: 0.4,
-            duration: 0.4,
-          }}
-          overflowing={sidebarBehaviour === 'expandable'}
-          collapsible="icon"
-          variant="sidebar"
-          onMouseEnter={() => {
-            if (sidebarBehaviour === 'expandable') setOpen(true)
-          }}
-          onMouseLeave={() => {
-            if (sidebarBehaviour === 'expandable') setOpen(false)
-          }}
-        >
-          <SidebarContent
-            footer={
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    type="text"
-                    className="w-min px-1.5 mx-0.5 group-data-[state=expanded]:px-2"
-                    icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
-                  />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="top" align="start" className="w-40">
-                  <DropdownMenuRadioGroup
-                    value={sidebarBehaviour}
-                    onValueChange={(value) => setSidebarBehaviour(value as SidebarBehaviourType)}
-                  >
-                    <DropdownMenuLabel>Sidebar control</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuRadioItem value="open">Expanded</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="closed">Collapsed</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="expandable">
-                      Expand on hover
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            }
-          />
-        </SidebarMotion>
-      )}
-    </AnimatePresence>
+    <>
+      <AnimatePresence>
+        {!hideSideBar && (
+          <SidebarMotion
+            {...props}
+            transition={{
+              delay: 0.4,
+              duration: 0.4,
+            }}
+            overflowing={sidebarBehaviour === 'expandable'}
+            collapsible="icon"
+            variant="sidebar"
+            onMouseEnter={() => {
+              if (sidebarBehaviour === 'expandable') setOpen(true)
+            }}
+            onMouseLeave={() => {
+              if (sidebarBehaviour === 'expandable') setOpen(false)
+            }}
+          >
+            <SidebarContent
+              footer={
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="text"
+                      className="w-min px-1.5 mx-0.5 group-data-[state=expanded]:px-2"
+                      icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="top" align="start" className="w-40">
+                    <DropdownMenuRadioGroup
+                      value={sidebarBehaviour}
+                      onValueChange={(value) => setSidebarBehaviour(value as SidebarBehaviourType)}
+                    >
+                      <DropdownMenuLabel>Sidebar control</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuRadioItem value="open">Expanded</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="closed">Collapsed</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="expandable">
+                        Expand on hover
+                      </DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              }
+            />
+          </SidebarMotion>
+        )}
+      </AnimatePresence>
+    </>
   )
 }
 
