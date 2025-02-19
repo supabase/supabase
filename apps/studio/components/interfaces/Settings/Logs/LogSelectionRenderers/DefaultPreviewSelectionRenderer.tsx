@@ -16,7 +16,15 @@ import { useState, useEffect } from 'react'
 
 const LogRowSeparator = () => <Separator className="bg-border my-1" />
 
-const PropertyRow = ({ keyName, value }: { keyName: string; value: any }) => {
+const PropertyRow = ({
+  keyName,
+  value,
+  dataTestId,
+}: {
+  keyName: string
+  value: any
+  dataTestId?: string
+}) => {
   const isTimestamp =
     keyName === 'timestamp' || keyName === 'created_at' || keyName === 'updated_at'
 
@@ -83,7 +91,7 @@ const PropertyRow = ({ keyName, value }: { keyName: string; value: any }) => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="group w-full">
+      <DropdownMenuTrigger className="group w-full" data-testid={dataTestId}>
         <div className="rounded-md w-full overflow-hidden">
           <div
             className={cn('flex py-2 w-full', {
@@ -131,10 +139,15 @@ const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
   const { timestamp, event_message, metadata, id, ...rest } = log
 
   return (
-    <div className={`p-2 flex flex-col`}>
+    <div data-testid="log-selection" className={`p-2 flex flex-col`}>
       {log?.id && <PropertyRow key={'id'} keyName={'id'} value={log.id} />}
       {log?.timestamp && (
-        <PropertyRow key={'timestamp'} keyName={'timestamp'} value={log.timestamp} />
+        <PropertyRow
+          dataTestId="log-selection-timestamp"
+          key={'timestamp'}
+          keyName={'timestamp'}
+          value={log.timestamp}
+        />
       )}
 
       {log?.event_message && (
