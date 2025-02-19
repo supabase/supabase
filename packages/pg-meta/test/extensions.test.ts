@@ -43,10 +43,8 @@ withTestDatabase('list extensions', async ({ executeQuery }) => {
 })
 
 withTestDatabase('retrieve, create, update, delete extension', async ({ executeQuery }) => {
-  // Create test schema
-  const { sql: createSchemaSql } = await pgMeta.schemas.create({ name: 'extensions' })
-  await executeQuery(createSchemaSql)
-
+  // Create extensions schema
+  await executeQuery('CREATE SCHEMA extensions;')
   // Create extension
   const { sql: createSql } = await pgMeta.extensions.create({ name: 'hstore', version: '1.4' })
   await executeQuery(createSql)
@@ -117,8 +115,4 @@ withTestDatabase('retrieve, create, update, delete extension', async ({ executeQ
     }
   `
   )
-
-  // Cleanup schema
-  const { sql: removeSchemaSql } = await pgMeta.schemas.remove({ name: 'extensions' })
-  await executeQuery(removeSchemaSql)
 })
