@@ -6,7 +6,7 @@ import { useIsLoggedIn, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import useLatest from 'hooks/misc/useLatest'
-import { DEFAULT_HOME, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { DEFAULT_HOME, IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 
 // Ideally these could all be within a _middleware when we use Next 12
@@ -84,30 +84,6 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       }
     }
   }, [projectsInitialized])
-
-  useEffect(() => {
-    if (orgsInitialized && slug) {
-      // Save organization slug to local storage
-      const organizations = organizationsRef.current ?? []
-      const organization = organizations.find((org) => org.slug === slug)
-      if (organization) {
-        localStorage.setItem(LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION, organization.slug)
-      }
-    }
-  }, [slug, orgsInitialized])
-
-  useEffect(() => {
-    if (projectsInitialized && ref) {
-      // Save organization slug to local storage
-      const projects = projectsRef.current ?? []
-      const project = projects.find((project) => project.ref === ref)
-      const organizationId = project?.organization_id
-      const organization = organizations?.find((organization) => organization.id === organizationId)
-      if (organization) {
-        localStorage.setItem(LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION, organization.slug)
-      }
-    }
-  }, [ref, projectsInitialized])
 
   useEffect(() => {
     if (ref !== undefined && id !== undefined) {

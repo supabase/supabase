@@ -8,7 +8,7 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    
+
     <QuickstartDbSetup />
 
   </StepHikeCompact.Step>
@@ -58,7 +58,7 @@ hideToc: true
     <ProjectConfigVariables variable="url" />
     <ProjectConfigVariables variable="anonKey" />
 
-    Add a `getCountries` function to fetch the data and display the query result to the page.
+    Add a `getInstruments` function to fetch the data and display the query result to the page.
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
@@ -71,21 +71,21 @@ hideToc: true
         const supabase = createClient("https://<project>.supabase.co", "<your-anon-key>");
 
         function App() {
-          const [countries, setCountries] = useState([]);
+          const [instruments, setInstruments] = useState([]);
 
           useEffect(() => {
-            getCountries();
+            getInstruments();
           }, []);
 
-          async function getCountries() {
-            const { data } = await supabase.from("countries").select();
-            setCountries(data);
+          async function getInstruments() {
+            const { data } = await supabase.from("instruments").select();
+            setInstruments(data);
           }
 
           return (
             <ul>
-              {countries.map((country) => (
-                <li key={country.name}>{country.name}</li>
+              {instruments.map((instrument) => (
+                <li key={instrument.name}>{instrument.name}</li>
               ))}
             </ul>
           );
@@ -101,7 +101,7 @@ hideToc: true
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Start the app">
 
-    Start the app, go to http://localhost:5173 in a browser, and open the browser console and you should see the list of countries.
+    Start the app, go to http://localhost:5173 in a browser, and open the browser console and you should see the list of instruments.
 
     </StepHikeCompact.Details>
 

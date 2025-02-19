@@ -238,6 +238,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-deploy-a-function",
+        "title": "Deploy a function",
+        "slug": "v1-deploy-a-function",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-a-function",
         "title": "Get a function",
         "slug": "v1-get-a-function",

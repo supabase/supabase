@@ -51,6 +51,7 @@ export type ColumnType =
   | 'text'
   | 'citext'
   | 'time'
+  | 'binary'
   | 'unknown'
 
 export interface GridForeignKey {

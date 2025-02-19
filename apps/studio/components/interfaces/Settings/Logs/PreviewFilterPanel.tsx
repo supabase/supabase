@@ -8,6 +8,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
+import { IS_PLATFORM } from 'lib/constants'
 import { Button, Input, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import DatePickers from './Logs.DatePickers'
 import {
@@ -72,7 +73,8 @@ const PreviewFilterPanel = ({
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
   // [Joshen] These are the routes tested that can show replica logs
-  const showDatabaseSelector = LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)
+  const showDatabaseSelector =
+    IS_PLATFORM && LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)
 
   const hasEdits = search !== defaultSearchValue
 
@@ -206,6 +208,9 @@ const PreviewFilterPanel = ({
                   }
                 }
 
+                const lastItemIndex = Object.values(FILTER_OPTIONS[table]).length - 1
+                const align = i === 0 ? 'start' : i === lastItemIndex ? 'end' : 'center'
+
                 return (
                   <LogsFilterPopover
                     buttonClassName={classes.join(' ')}
@@ -213,6 +218,7 @@ const PreviewFilterPanel = ({
                     options={x}
                     onFiltersChange={onFiltersChange}
                     filters={filters}
+                    align={align}
                   />
                 )
               })}

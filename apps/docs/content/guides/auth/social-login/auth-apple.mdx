@@ -63,7 +63,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     6. Create a signing **Key** in the [Keys](https://developer.apple.com/account/resources/authkeys/list) section of the Apple Developer Console. You can use this key to generate a secret key using the tool below, which is added to your Supabase project's Auth configuration. Make sure you safely store the `AuthKey_XXXXXXXXXX.p8` file. If you ever lose access to it, or make it public accidentally please revoke it from the Apple Developer Console and create a new one immediately. You will have to generate a new secret key using this file every 6 months, so make sure you schedule a recurring meeting in your calendar!
     7. Finally, add the information you configured above to the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers).
 
-    <Admonition>
+    <Admonition type="tip">
 
     Use this tool to generate a new Apple client secret. No keys leave your browser! Be aware that this tool does not currently work in Safari, so please use Firefox or a Chrome-based browser instead.
 
@@ -280,7 +280,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     6. Create a signing **Key** in the [Keys](https://developer.apple.com/account/resources/authkeys/list) section of the Apple Developer Console. You can use this key to generate a secret key using the tool below, which is added to your Supabase project's Auth configuration. Make sure you safely store the `AuthKey_XXXXXXXXXX.p8` file. If you ever lose access to it, or make it public accidentally please revoke it from the Apple Developer Console and create a new one immediately. You will have to generate a new secret key using this file every 6 months, so make sure you schedule a recurring reminder in your calendar!
     7. Finally, add the information you configured above to the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers).
 
-    <Admonition>
+    <Admonition type="tip">
 
     Use this tool to generate a new Apple client secret. No keys leave your browser! Be aware that this tool does not currently work in Safari, so please use Firefox or a Chrome-based browser instead.
 
@@ -348,12 +348,12 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     </Admonition>
 
   </TabPanel>
-  
+
   <TabPanel id="kotlin" label="Kotlin">
-  
+
     ## Using native sign in with Apple in Kotlin
-  
-	When using [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/), you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On iOS it uses Native Apple Login automatically and on other platforms it uses `gotrue.signInWith(Apple)`.
+
+    When using [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/), you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On iOS it uses Native Apple Login automatically and on other platforms it uses `gotrue.signInWith(Apple)`.
 
     **Initialize the Supabase Client**
 

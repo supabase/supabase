@@ -74,7 +74,7 @@ This behavior mirrors a direct connection, allowing greedy clients to monopolize
 
 Depending on your application's configurations, having the pooler manage a queue of patient clients is preferable to the alternative of constantly polling the database to check for an available connection. Session mode can queue clients for up to a minute. If this isn't particularly relevant to your application design, then the primary benefit is that it is [IPv4 compatible](https://github.com/orgs/supabase/discussions/27034). Also, unlike transaction mode, it supports prepared statements.
 
-### What happens when a client library, such as prisma, connects through Supavisor?
+### What happens when a client library, such as Prisma, connects through Supavisor?
 
 When clients connect to either PostgreSQL or Supavisor, they do so with the PostgreSQL Wire Protocol. Because of this, clients treat connections with pooler as if they were directly connected to PostgreSQL. The pooler then smoothly acts as a messenger between the database and the client.
 
@@ -94,14 +94,14 @@ Now, imagine the tournament organizers decide to expand the venue to house 200 p
 
 ### What is the "user+db+mode" combination?
 
-PostgreSQL is not actually a database. It is a Relational Database Management System (RDMS). Within it, you can spawn PostgreSQL databases. In Supabase, it is a common pattern to just use the default database called postgres, but you could create more:
+PostgreSQL is not actually a database. It is a Relational Database Management System (RDMS). Within it, you can spawn PostgreSQL databases. In Supabase, it is a common pattern to just use the default database called `postgres`, but you could create more:
 
 ```sql
 CREATE DATABASE postgres;
 CREATE DATABASE another_database;
 ```
 
-Similarly, a database can have many database users, but most people just rely on the default user "postgres".
+Similarly, a database can have many database users, but most people just rely on the default user `postgres`.
 
 ```sql
 CREATE USER postgres WITH PASSWORD 'super-secret-password;
@@ -144,7 +144,7 @@ You can also change the pool size for PostgREST's (DB API) internal pooler at th
 
 Supabase Storage uses Supavisor internally. The other servers that communicate with Postgres (PostgREST, Realtime, and Auth) all rely on internal application poolers.
 
-Supavisor is primarily intended for users who do not want to rely on the Supase Client libraries and instead prefer to work with external ORMs, such as Prisma, Drizzle, and Psycopg.
+Supavisor is primarily intended for users who do not want to rely on the Supabase Client libraries and instead prefer to work with external ORMs, such as Prisma, Drizzle, and Psycopg.
 
 ### **Should I change Supavisor's pool size?**
 

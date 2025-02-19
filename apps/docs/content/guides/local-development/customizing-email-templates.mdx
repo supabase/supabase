@@ -44,12 +44,12 @@ There are several Auth email templates which can be configured:
 
 The templating system provides the following variables for use:
 
-### ConfirmationURL
+### `ConfirmationURL`
 
 Contains the confirmation URL. For example, a signup confirmation URL would look like:
 
 ```
-https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=signup&redirect_to=https://example.com/path
+https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=email&redirect_to=https://example.com/path
 ```
 
 **Usage**
@@ -58,7 +58,7 @@ https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=signu
 <p>Click here to confirm: {{ .ConfirmationURL }}</p>
 ```
 
-### Token
+### `Token`
 
 Contains a 6-digit One-Time-Password (OTP) that can be used instead of the `ConfirmationURL`.
 
@@ -68,7 +68,7 @@ Contains a 6-digit One-Time-Password (OTP) that can be used instead of the `Conf
 <p>Here is your one time password: {{ .Token }}</p>
 ```
 
-### TokenHash
+### `TokenHash`
 
 Contains a hashed version of the `Token`. This is useful for constructing your own email link in the email template.
 
@@ -83,7 +83,7 @@ Contains a hashed version of the `Token`. This is useful for constructing your o
 </p>
 ```
 
-### SiteURL
+### `SiteURL`
 
 Contains your application's Site URL. This can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration).
 
@@ -93,7 +93,7 @@ Contains your application's Site URL. This can be configured in your project's [
 <p>Visit <a href="{{ .SiteURL }}">here</a> to log in.</p>
 ```
 
-### Email
+### `Email`
 
 Contains the user's email address.
 
@@ -103,7 +103,7 @@ Contains the user's email address.
 <p>A recovery request was sent to {{ .Email }}.</p>
 ```
 
-### NewEmail
+### `NewEmail`
 
 Contains the new user's email address. This is only available in the `email_change` email template.
 
