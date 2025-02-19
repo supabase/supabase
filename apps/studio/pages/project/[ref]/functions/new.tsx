@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { CornerDownLeft, Loader2, Book, Check, ChevronsUpDown, Plus, File } from 'lucide-react'
 import { Button, Input_Shadcn_, Label_Shadcn_, cn } from 'ui'
 import { AiIconAnimation } from 'ui'
-import AIEditor from 'components/ui/AIEditor'
 import { BASE_PATH } from 'lib/constants'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
@@ -15,6 +14,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout'
+import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
 import {
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
@@ -178,10 +178,13 @@ const NewFunctionPage = () => {
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
   const { setAiAssistantPanel } = useAppStateSnapshot()
 
-  const [files, setFiles] = useState<{ id: number; name: string; content: string }[]>([
+  const [files, setFiles] = useState<
+    { id: number; name: string; content: string; selected?: boolean }[]
+  >([
     {
       id: 1,
       name: 'index.ts',
+      selected: true,
       content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
@@ -199,12 +202,10 @@ Deno.serve(async (req: Request) => {
 });`,
     },
   ])
-  const [selectedFileId, setSelectedFileId] = useState<number>(1)
   const [functionName, setFunctionName] = useState('')
   const [open, setOpen] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState('')
-  const [savedCode, setSavedCode] = useState<string>('')
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
+  const [savedCode, setSavedCode] = useState<string>('')
 
   const { mutateAsync: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
@@ -214,12 +215,6 @@ Deno.serve(async (req: Request) => {
       }
     },
   })
-
-  const handleChange = (value: string) => {
-    setFiles((prev) =>
-      prev.map((file) => (file.id === selectedFileId ? { ...file, content: value } : file))
-    )
-  }
 
   const onDeploy = async () => {
     if (isDeploying || !ref || !functionName) return
@@ -242,10 +237,10 @@ Deno.serve(async (req: Request) => {
   }
 
   const handleChat = () => {
-    const currentFile = files.find((f) => f.id === selectedFileId)
+    const selectedFile = files.find((f) => f.selected) ?? files[0]
     setAiAssistantPanel({
       open: true,
-      sqlSnippets: currentFile ? [currentFile.content] : [],
+      sqlSnippets: [selectedFile.content],
       initialInput: 'Help me understand and improve this edge function...',
       suggestions: {
         title:
@@ -264,69 +259,27 @@ Deno.serve(async (req: Request) => {
     const template = EDGE_FUNCTION_TEMPLATES.find((t) => t.value === templateValue)
     if (template) {
       setFiles((prev) =>
-        prev.map((file) =>
-          file.id === selectedFileId ? { ...file, content: template.content } : file
-        )
+        prev.map((file) => (file.selected ? { ...file, content: template.content } : file))
       )
-      setSelectedTemplate(templateValue)
       setOpen(false)
     }
   }
 
   const handleTemplateMouseEnter = (content: string) => {
     if (!isPreviewingTemplate) {
-      const currentFile = files.find((f) => f.id === selectedFileId)
-      setSavedCode(currentFile?.content || '')
+      const selectedFile = files.find((f) => f.selected) ?? files[0]
+      setSavedCode(selectedFile.content)
     }
     setIsPreviewingTemplate(true)
-    setFiles((prev) =>
-      prev.map((file) => (file.id === selectedFileId ? { ...file, content } : file))
-    )
+    setFiles((prev) => prev.map((file) => (file.selected ? { ...file, content } : file)))
   }
 
   const handleTemplateMouseLeave = () => {
     if (isPreviewingTemplate) {
       setIsPreviewingTemplate(false)
       setFiles((prev) =>
-        prev.map((file) => (file.id === selectedFileId ? { ...file, content: savedCode } : file))
+        prev.map((file) => (file.selected ? { ...file, content: savedCode } : file))
       )
-    }
-  }
-
-  const addNewFile = () => {
-    const newId = Math.max(...files.map((f) => f.id)) + 1
-    setFiles((prev) => [
-      ...prev,
-      {
-        id: newId,
-        name: `file${newId}.ts`,
-        content: '',
-      },
-    ])
-    setSelectedFileId(newId)
-  }
-
-  const treeData = {
-    name: '',
-    children: files.map((file) => ({
-      id: file.id.toString(),
-      name: file.name,
-      metadata: {
-        isEditing: false,
-        originalId: file.id,
-      },
-    })),
-  }
-
-  const handleFileNameChange = (id: number, newName: string) => {
-    if (!newName.trim()) return // Don't allow empty names
-    setFiles((prev) => prev.map((file) => (file.id === id ? { ...file, name: newName } : file)))
-  }
-
-  const handleDoubleClick = (id: number, currentName: string) => {
-    const newName = prompt('Enter new file name:', currentName)
-    if (newName && newName !== currentName) {
-      handleFileNameChange(id, newName)
     }
   }
 
@@ -392,7 +345,9 @@ Deno.serve(async (req: Request) => {
                             <Check
                               className={cn(
                                 'mr-2 h-4 w-4',
-                                selectedTemplate === template.value ? 'opacity-100' : 'opacity-0'
+                                files.some((f) => f.selected && f.content === template.content)
+                                  ? 'opacity-100'
+                                  : 'opacity-0'
                               )}
                             />
                             <span className="text-foreground">{template.name}</span>
@@ -419,81 +374,16 @@ Deno.serve(async (req: Request) => {
         </>
       }
     >
-      <div className="flex-1 overflow-hidden flex h-full">
-        <div className="w-64 border-r bg-surface-200 flex flex-col">
-          <div className="py-4 px-6 border-b flex items-center justify-between">
-            <h3 className="text-sm font-medium">Files</h3>
-            <Button size="tiny" type="default" icon={<Plus size={14} />} onClick={addNewFile}>
-              Add File
-            </Button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-2">
-            <TreeView
-              data={flattenTree(treeData)}
-              aria-label="files tree"
-              nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level }) => {
-                const nodeProps = getNodeProps()
-                const originalId =
-                  typeof element.metadata?.originalId === 'number'
-                    ? element.metadata.originalId
-                    : null
-
-                return (
-                  <div
-                    onDoubleClick={(e) => {
-                      e.stopPropagation()
-                      if (originalId !== null) handleDoubleClick(originalId, element.name)
-                    }}
-                  >
-                    <TreeViewItem
-                      {...nodeProps}
-                      isExpanded={isExpanded}
-                      isBranch={isBranch}
-                      isSelected={originalId === selectedFileId}
-                      level={level}
-                      xPadding={16}
-                      name={element.name}
-                      icon={<File size={14} className="text-foreground-light" />}
-                      isEditing={Boolean(element.metadata?.isEditing)}
-                      onEditSubmit={(value) => {
-                        if (originalId !== null) handleFileNameChange(originalId, value)
-                      }}
-                      onClick={() => {
-                        if (originalId !== null) setSelectedFileId(originalId)
-                      }}
-                    />
-                  </div>
-                )
-              }}
-            />
-          </div>
-        </div>
-        <div className="flex-1 min-h-0 relative px-3 bg-surface-200">
-          <AIEditor
-            language={getLanguageFromFileName(
-              files.find((f) => f.id === selectedFileId)?.name || 'index.ts'
-            )}
-            value={files.find((f) => f.id === selectedFileId)?.content}
-            onChange={handleChange}
-            aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
-            aiMetadata={{
-              projectRef: project?.ref,
-              connectionString: project?.connectionString,
-              includeSchemaMetadata,
-            }}
-            options={{
-              tabSize: 2,
-              fontSize: 12,
-              minimap: { enabled: false },
-              wordWrap: 'on',
-              lineNumbers: 'on',
-              folding: false,
-              padding: { top: 20, bottom: 20 },
-              lineNumbersMinChars: 3,
-            }}
-          />
-        </div>
-      </div>
+      <FileExplorerAndEditor
+        files={files}
+        onFilesChange={setFiles}
+        aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
+        aiMetadata={{
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          includeSchemaMetadata,
+        }}
+      />
 
       <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100">
         <Button
