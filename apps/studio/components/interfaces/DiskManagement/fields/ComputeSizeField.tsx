@@ -122,6 +122,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
             layout="horizontal"
             label={'Compute size'}
             id={field.name}
+            className="md:flex lg:grid gap-4 lg:gap-2"
             labelOptional={
               <>
                 <BillingChangeBadge
