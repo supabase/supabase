@@ -75,7 +75,7 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 1.  Get your Auth 0 user export and password hash export lists.
 1.  Filter for users who use password login.
     - Under the `identities` field in the user object, these users will have `auth0` as a provider. In the same identity object, you can find their Auth0 `user_id`.
-    - Check that the user has a corresponding password hash by comapring their Auth0 `user_id` to the `oid` field in the password hash export.
+    - Check that the user has a corresponding password hash by comparing their Auth0 `user_id` to the `oid` field in the password hash export.
 1.  Use Supabase Auth's [admin create user](/docs/reference/javascript/auth-admin-createuser) method to recreate the user in Supabase Auth. If the user has a confirmed email address or phone number, set `email_confirm` or `phone_confirm` to `true`.
 
     ```ts
@@ -88,7 +88,7 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 
     <Admonition type="note" label="Supported password hashing algorithms">
 
-    Supabase supports BCrypt and Argon2 password hashes.
+    Supabase supports bcrypt and Argon2 password hashes.
 
     </Admonition>
 
@@ -161,7 +161,7 @@ const { data, error } = await supabase.auth.admin.createUser({
 })
 ```
 
-<Admonition type="warning">
+<Admonition type="caution">
 
 These fields will be exposed in the user's access token JWT so it is recommended not to store excessive metadata in these fields.
 
@@ -218,7 +218,7 @@ header={<span className="text-foreground">How can I allow my users to retain the
 id="existing-password"
 >
 
-Supabase Auth never stores passwords as plaintext. Since Supabase Auth supports reading BCrypt and argon2 password hashes, you can import your users passwords if they use the same hashing algorithm. New users in Supabase Auth who use password-based sign-in methods will always use a BCrypt hash. Passwords are stored in the `auth.users.encrypted_password` column.
+Supabase Auth never stores passwords as plaintext. Since Supabase Auth supports reading bcrypt and argon2 password hashes, you can import your users passwords if they use the same hashing algorithm. New users in Supabase Auth who use password-based sign-in methods will always use a bcrypt hash. Passwords are stored in the `auth.users.encrypted_password` column.
 
 </AccordionItem>
 

@@ -7,6 +7,7 @@ import {
 import { Key } from 'lucide-react'
 import DataGrid, { Column } from 'react-data-grid'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { convertByteaToHex } from '../RowEditor.utils'
 
 export interface SelectorGridProps {
   table: SupaTable
@@ -33,8 +34,13 @@ const columnRender = (name: string, isPrimaryKey = false) => {
   )
 }
 
-const formatter = (column: string, row: SupaRow) => {
-  const formattedValue = typeof row[column] === 'object' ? JSON.stringify(row[column]) : row[column]
+const formatter = ({ column, format, row }: { column: string; format: string; row: SupaRow }) => {
+  const formattedValue =
+    format === 'bytea'
+      ? convertByteaToHex(row[column])
+      : typeof row[column] === 'object'
+        ? JSON.stringify(row[column])
+        : row[column]
   return (
     <div className="group sb-grid-select-cell__formatter overflow-hidden">
       <span className="text-sm truncate">{formattedValue}</span>
@@ -53,7 +59,8 @@ const SelectorGrid = ({ table, rows, onRowSelect }: SelectorGridProps) => {
     const result: Column<SupaRow> = {
       key: column.name,
       name: column.name,
-      renderCell: (props) => formatter(column.name, props.row),
+      renderCell: (props) =>
+        formatter({ column: column.name, format: column.format, row: props.row }),
       renderHeaderCell: () => columnRender(column.name, column.isPrimaryKey),
       resizable: true,
       width: columnWidth,

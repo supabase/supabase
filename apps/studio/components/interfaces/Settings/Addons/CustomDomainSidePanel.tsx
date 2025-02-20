@@ -229,7 +229,9 @@ const CustomDomainSidePanel = () => {
               title="Custom domains are unavailable on the Free Plan"
               actions={
                 <Button asChild type="default">
-                  <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                  <Link
+                    href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=customDomainSidePanel`}
+                  >
                     View available plans
                   </Link>
                 </Button>

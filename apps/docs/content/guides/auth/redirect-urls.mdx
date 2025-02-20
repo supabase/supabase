@@ -86,10 +86,10 @@ For example, change the following:
 
 ```html
 <!-- Old -->
-<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup">Confirm your mail</a>
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Confirm your mail</a>
 
 <!-- New -->
-<a href="{{ .RedirectTo }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup"
+<a href="{{ .RedirectTo }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
   >Confirm your mail</a
 >
 ```

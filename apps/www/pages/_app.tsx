@@ -13,7 +13,7 @@ import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { SonnerToaster, themes } from 'ui'
+import { SonnerToaster, themes, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
@@ -91,12 +91,14 @@ export default function App({ Component, pageProps }: AppProps) {
             disableTransitionOnChange
             forcedTheme={forceDarkMode ? 'dark' : undefined}
           >
-            <CommandProvider>
-              <SonnerToaster position="top-right" />
-              <Component {...pageProps} />
-              <WwwCommandMenu />
-              <PageTelemetry API_URL={API_URL} hasAcceptedConsent={hasAcceptedConsent} />
-            </CommandProvider>
+            <TooltipProvider delayDuration={0}>
+              <CommandProvider>
+                <SonnerToaster position="top-right" />
+                <Component {...pageProps} />
+                <WwwCommandMenu />
+                <PageTelemetry API_URL={API_URL} hasAcceptedConsent={hasAcceptedConsent} />
+              </CommandProvider>
+            </TooltipProvider>
           </ThemeProvider>
         </FeatureFlagProvider>
       </AuthProvider>

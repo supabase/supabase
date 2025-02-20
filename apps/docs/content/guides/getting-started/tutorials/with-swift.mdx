@@ -33,6 +33,7 @@ These variables will be exposed on the application, and that's completely fine s
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on your database.
 
 ```swift Supabase.swift
+import Foundation
 import Supabase
 
 let supabase = SupabaseClient(
@@ -182,7 +183,8 @@ struct ProfileView: View {
     do {
       let currentUser = try await supabase.auth.session.user
 
-      let profile: Profile = try await supabase
+      let profile: Profile =
+      try await supabase
         .from("profiles")
         .select()
         .eq("id", value: currentUser.id)
@@ -295,7 +297,7 @@ photos and videos.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-### Add PhotosPicker
+### Add `PhotosPicker`
 
 Let's add support for the user to pick an image from the library and upload it.
 Start by creating a new type to hold the picked avatar image:
@@ -336,9 +338,14 @@ enum TransferError: Error {
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-#### Add PhotosPicker to profile page
+#### Add `PhotosPicker` to profile page
 
 ```swift ProfileView.swift
++ import PhotosUI
++ import Storage
++ import Supabase
+import SwiftUI
+
 struct ProfileView: View {
   @State var username = ""
   @State var fullName = ""
@@ -421,7 +428,8 @@ struct ProfileView: View {
     do {
       let currentUser = try await supabase.auth.session.user
 
-      let profile: Profile = try await supabase.database
+      let profile: Profile =
+      try await supabase
         .from("profiles")
         .select()
         .eq("id", value: currentUser.id)
@@ -458,7 +466,7 @@ struct ProfileView: View {
 +          avatarURL: imageURL
         )
 
-        try await supabase.database
+        try await supabase
           .from("profiles")
           .update(updatedProfile)
           .eq("id", value: currentUser.id)
@@ -492,8 +500,8 @@ struct ProfileView: View {
 +    try await supabase.storage
 +      .from("avatars")
 +      .upload(
-+        path: filePath,
-+        file: data,
++        filePath,
++        data: data,
 +        options: FileOptions(contentType: "image/jpeg")
 +      )
 +

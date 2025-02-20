@@ -58,9 +58,9 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Query Supabase data from Next.js">
 
-    Create a new file at `app/countries/page.tsx` and populate with the following.
+    Create a new file at `app/instruments/page.tsx` and populate with the following.
 
-    This will select all the rows from the `countries` table in Supabase and render them on the page.
+    This will select all the rows from the `instruments` table in Supabase and render them on the page.
 
     </StepHikeCompact.Details>
 
@@ -68,14 +68,14 @@ hideToc: true
 
     <CH.Code className="min-h-[34rem]">
 
-      ```ts app/countries/page.tsx
+      ```ts app/instruments/page.tsx
         import { createClient } from '@/utils/supabase/server';
 
-        export default async function Countries() {
+        export default async function Instruments() {
           const supabase = await createClient();
-          const { data: countries } = await supabase.from("countries").select();
+          const { data: instruments } = await supabase.from("instruments").select();
 
-          return <pre>{JSON.stringify(countries, null, 2)}</pre>
+          return <pre>{JSON.stringify(instruments, null, 2)}</pre>
         }
       ```
 
@@ -120,7 +120,7 @@ hideToc: true
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Start the app">
 
-    Run the development server, go to http://localhost:3000/countries in a browser and you should see the list of countries.
+    Run the development server, go to http://localhost:3000/instruments in a browser and you should see the list of instruments.
 
     </StepHikeCompact.Details>
 

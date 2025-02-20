@@ -47,7 +47,7 @@ export const environment = {
 }
 ```
 
-Now that we have the API credentials in place, let's create a **SupabaseService** with `ng g s supabase` to initialize the Supabase client and implement functions to communicate with the Supabase API.
+Now that we have the API credentials in place, let's create a `SupabaseService` with `ng g s supabase` to initialize the Supabase client and implement functions to communicate with the Supabase API.
 
 ```ts src/app/supabase.service.ts
 import { Injectable } from '@angular/core'
@@ -130,7 +130,7 @@ Optionally, update [src/styles.css](https://raw.githubusercontent.com/supabase/s
 ### Set up a login component
 
 Let's set up an Angular component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
-Create an **AuthComponent** with `ng g c auth` Angular CLI command.
+Create an `AuthComponent` with `ng g c auth` Angular CLI command.
 
 ```ts src/app/auth/auth.component.ts
 import { Component } from '@angular/core'
@@ -202,7 +202,7 @@ export class AuthComponent {
 ### Account page
 
 Users also need a way to edit their profile details and manage their accounts after signing in.
-Create an **AccountComponent** with the `ng g c account` Angular CLI command.
+Create an `AccountComponent` with the `ng g c account` Angular CLI command.
 
 ```ts src/app/account/account.component.ts
 import { Component, Input, OnInit } from '@angular/core'
@@ -326,7 +326,7 @@ export class AccountComponent implements OnInit {
 
 ### Launch!
 
-Now that we have all the components in place, let's update **AppComponent**:
+Now that we have all the components in place, let's update `AppComponent`:
 
 ```ts src/app/app.component.ts
 import { Component, OnInit } from '@angular/core'
@@ -397,7 +397,7 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 ### Create an upload widget
 
 Let's create an avatar for the user so that they can upload a profile photo.
-Create an **AvatarComponent** with `ng g c avatar` Angular CLI command.
+Create an `AvatarComponent` with `ng g c avatar` Angular CLI command.
 
 ```ts src/app/avatar/avatar.component.ts
 import { Component, EventEmitter, Input, Output } from '@angular/core'
@@ -492,7 +492,7 @@ export class AvatarComponent {
 
 ### Add the new widget
 
-And then we can add the widget on top of the **AccountComponent** HTML template:
+And then we can add the widget on top of the `AccountComponent` HTML template:
 
 ```html src/app/account.component.html
 <form [formGroup]="updateProfileForm" (ngSubmit)="updateProfile()" class="form-widget">
@@ -501,7 +501,7 @@ And then we can add the widget on top of the **AccountComponent** HTML template:
 </form>
 ```
 
-And add an `updateAvatar` function along with an `avatarUrl` getter to the **AccountComponent** typescript file:
+And add an `updateAvatar` function along with an `avatarUrl` getter to the `AccountComponent` typescript file:
 
 ```ts src/app/account.component.ts
 @Component({

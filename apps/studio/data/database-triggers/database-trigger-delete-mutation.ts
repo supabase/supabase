@@ -2,8 +2,7 @@ import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { delete_ } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { databaseTriggerKeys } from './keys'
 
@@ -23,12 +22,17 @@ export async function deleteDatabaseTrigger({
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const response = (await delete_(`${API_URL}/pg-meta/${projectRef}/triggers?id=${id}`, undefined, {
-    headers: Object.fromEntries(headers),
-  })) as DeleteDatabaseTriggerResponse
+  const { data, error } = await del('/platform/pg-meta/{ref}/triggers', {
+    params: {
+      header: { 'x-connection-encrypted': connectionString! },
+      path: { ref: projectRef },
+      query: { id },
+    },
+    headers,
+  })
 
-  if (response?.error) throw response.error
-  return response as PostgresTrigger
+  if (error) handleError(error)
+  return data
 }
 
 type DatabaseTriggerDeleteData = Awaited<ReturnType<typeof deleteDatabaseTrigger>>

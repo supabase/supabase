@@ -316,7 +316,7 @@ export function DiskManagementPanelForm() {
               <Link
                 target="_blank"
                 rel="noreferrer"
-                href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}
+                href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=diskManagementPanelDiskSize`}
               >
                 Upgrade plan
               </Link>

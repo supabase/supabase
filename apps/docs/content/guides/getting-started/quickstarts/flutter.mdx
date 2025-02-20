@@ -8,7 +8,7 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    
+
     <QuickstartDbSetup />
 
   </StepHikeCompact.Step>
@@ -101,7 +101,7 @@ hideToc: true
         @override
         Widget build(BuildContext context) {
           return const MaterialApp(
-            title: 'Countries',
+            title: 'Instruments',
             home: HomePage(),
           );
         }
@@ -116,7 +116,7 @@ hideToc: true
 
       class _HomePageState extends State<HomePage> {
         final _future = Supabase.instance.client
-            .from('countries')
+            .from('instruments')
             .select();
 
         @override
@@ -128,13 +128,13 @@ hideToc: true
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                final countries = snapshot.data!;
+                final instruments = snapshot.data!;
                 return ListView.builder(
-                  itemCount: countries.length,
+                  itemCount: instruments.length,
                   itemBuilder: ((context, index) {
-                    final country = countries[index];
+                    final instrument = instruments[index];
                     return ListTile(
-                      title: Text(country['name']),
+                      title: Text(instrument['name']),
                     );
                   }),
                 );
@@ -155,7 +155,7 @@ hideToc: true
     Run your app on a platform of your choosing! By default an app should launch in your web browser.
 
     Note that `supabase_flutter` is compatible with web, iOS, Android, macOS, and Windows apps.
-    Running the app on MacOS requires additional configuration to [set the entitlements](https://docs.flutter.dev/development/platform-integration/macos/building#setting-up-entitlements).
+    Running the app on macOS requires additional configuration to [set the entitlements](https://docs.flutter.dev/development/platform-integration/macos/building#setting-up-entitlements).
 
     </StepHikeCompact.Details>
 

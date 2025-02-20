@@ -3,18 +3,21 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { TelemetryActions } from 'common/telemetry-constants'
 import SignInMfaForm from 'components/interfaces/SignIn/SignInMfaForm'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { Loading } from 'components/ui/Loading'
+import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import type { NextPageWithLayout } from 'types'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
+
   const { mutate: sendEvent } = useSendEventMutation()
+  const { mutate: addLoginEvent } = useAddLoginEvent()
 
   const [loading, setLoading] = useState(true)
 
@@ -44,6 +47,8 @@ const SignInMfaPage: NextPageWithLayout = () => {
 
           if (data.currentLevel === data.nextLevel) {
             sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
+            addLoginEvent({})
+
             await queryClient.resetQueries()
             router.push(getReturnToPath())
             return
@@ -64,7 +69,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col flex-1 bg-alternative h-full items-center justify-center">
+      <div className="flex flex-col flex-1 bg-alternative h-screen items-center justify-center">
         <Loading />
       </div>
     )
