@@ -1,7 +1,8 @@
 import { useParams } from 'common'
 import { AiIconAnimation, Button, Dialog, DialogContent, DialogSection, DialogTrigger } from 'ui'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
+import { ChevronDown, Terminal, Code } from 'lucide-react'
 import { useRouter } from 'next/router'
-
 import {
   EdgeFunctionsListItem,
   FunctionsEmptyState,
@@ -62,7 +63,7 @@ const FunctionsPage: NextPageWithLayout = () => {
             </DialogSection>
           </DialogContent>
         </Dialog>
-        {!edgeFunctionCreate && (
+        {edgeFunctionCreate && (
           <DropdownMenuItem
             onSelect={() => router.push(`/project/${ref}/functions/new`)}
             className="gap-4"
