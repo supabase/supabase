@@ -1,5 +1,69 @@
 import { useState } from 'react'
-import { FilterBar, FilterGroup } from 'ui-patterns'
+import { FilterBar, FilterGroup, CustomOptionProps } from 'ui-patterns'
+import {
+  Button_Shadcn_,
+  Input_Shadcn_,
+  Calendar,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Button,
+} from 'ui'
+import { format } from 'date-fns'
+import { Calendar as CalendarIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+function CustomDatePicker({ onChange, onCancel, search }: CustomOptionProps) {
+  const [date, setDate] = useState<Date | undefined>(search ? new Date(search) : undefined)
+
+  return (
+    <div className="w-full space-y-4">
+      <Calendar mode="single" selected={date} onSelect={setDate} className="w-full" />
+      <div className="flex justify-end gap-2 py-3 px-4 border-t">
+        <Button type="default" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button type="primary" onClick={() => onChange(date ? format(date, 'yyyy-MM-dd') : '')}>
+          Apply
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+function CustomTimePicker({ onChange, onCancel, search }: CustomOptionProps) {
+  const [time, setTime] = useState(search || '')
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium">Select Time</h3>
+      <Input_Shadcn_ type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+      <div className="flex justify-end gap-2">
+        <Button_Shadcn_ variant="outline" onClick={onCancel}>
+          Cancel
+        </Button_Shadcn_>
+        <Button_Shadcn_ onClick={() => onChange(time)}>Apply</Button_Shadcn_>
+      </div>
+    </div>
+  )
+}
+
+function CustomRangePicker({ onChange, onCancel, search }: CustomOptionProps) {
+  const [range, setRange] = useState(search || '')
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium">Select Range</h3>
+      <Input_Shadcn_ type="range" value={range} onChange={(e) => setRange(e.target.value)} />
+      <div className="flex justify-end gap-2">
+        <Button_Shadcn_ variant="outline" onClick={onCancel}>
+          Cancel
+        </Button_Shadcn_>
+        <Button_Shadcn_ onClick={() => onChange(range)}>Apply</Button_Shadcn_>
+      </div>
+    </div>
+  )
+}
 
 const filterProperties = [
   {
@@ -12,7 +76,11 @@ const filterProperties = [
     label: 'Status',
     name: 'status',
     type: 'string' as const,
-    options: ['active', 'inactive', 'pending'],
+    options: [
+      { label: 'Active', value: 'active' },
+      { label: 'Inactive', value: 'inactive' },
+      { label: 'Pending', value: 'pending' },
+    ],
     operators: ['=', '!='],
   },
   {
@@ -27,6 +95,36 @@ const filterProperties = [
         : allOptions
     },
     operators: ['=', '!='],
+  },
+  {
+    label: 'Time period',
+    name: 'created_at',
+    type: 'date' as const,
+    options: [
+      { label: 'Today', value: format(new Date(), 'yyyy-MM-dd') },
+      { label: 'Yesterday', value: format(new Date(Date.now() - 86400000), 'yyyy-MM-dd') },
+      { label: 'Last 7 days', value: format(new Date(Date.now() - 7 * 86400000), 'yyyy-MM-dd') },
+      { label: 'Last 30 days', value: format(new Date(Date.now() - 30 * 86400000), 'yyyy-MM-dd') },
+      {
+        label: 'Pick a date...',
+        component: (props: CustomOptionProps) => <CustomDatePicker {...props} />,
+      },
+    ],
+    operators: ['=', '!=', '>', '<', '>=', '<='],
+  },
+  {
+    label: 'Priority',
+    name: 'priority',
+    type: 'number' as const,
+    options: {
+      component: (props: CustomOptionProps) => (
+        <div className="p-6">
+          <Button onClick={() => props.onChange('1')}>Custom value</Button>
+        </div>
+      ),
+    },
+    triggerOnPropertyClick: true,
+    operators: ['=', '!=', '>', '<', '>=', '<='],
   },
 ]
 

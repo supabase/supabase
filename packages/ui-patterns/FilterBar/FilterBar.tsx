@@ -6,9 +6,21 @@ import {
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  Dialog,
+  DialogContent,
 } from 'ui'
 import { FilterGroup as FilterGroupComponent } from './FilterGroup'
-import { FilterProperty, FilterCondition, FilterGroup } from './types'
+import {
+  FilterProperty,
+  FilterCondition,
+  FilterGroup,
+  CustomOptionProps,
+  FilterOption,
+  CustomOptionObject,
+  FilterOptionObject,
+  AsyncOptionsFunction,
+  SyncOptionsFunction,
+} from './types'
 
 export type ActiveInput =
   | { type: 'value'; path: number[] }
@@ -16,17 +28,45 @@ export type ActiveInput =
   | { type: 'group'; path: number[] }
   | null
 
-type FilterBarProps = {
+type CommandItem = {
+  value: string
+  label: string
+  icon?: React.ReactNode
+  isCustom?: boolean
+  customOption?: (props: CustomOptionProps) => React.ReactElement
+}
+
+function isCustomOptionObject(option: any): option is CustomOptionObject {
+  return typeof option === 'object' && 'component' in option
+}
+
+function isFilterOptionObject(option: any): option is FilterOptionObject {
+  return typeof option === 'object' && 'value' in option && 'label' in option
+}
+
+function isAsyncOptionsFunction(
+  options: FilterProperty['options']
+): options is AsyncOptionsFunction {
+  if (!options || Array.isArray(options) || isCustomOptionObject(options)) return false
+  return typeof options === 'function' && options.constructor.name === 'AsyncFunction'
+}
+
+function isSyncOptionsFunction(options: FilterProperty['options']): options is SyncOptionsFunction {
+  if (!options || Array.isArray(options) || isCustomOptionObject(options)) return false
+  return typeof options === 'function'
+}
+
+function isGroup(condition: FilterCondition | FilterGroup): condition is FilterGroup {
+  return 'logicalOperator' in condition
+}
+
+export type FilterBarProps = {
   filterProperties: FilterProperty[]
   onFilterChange: (filters: FilterGroup) => void
   freeformText: string
   onFreeformTextChange: (freeformText: string) => void
   filters: FilterGroup
   aiApiUrl?: string
-}
-
-const isGroup = (condition: FilterCondition | FilterGroup): condition is FilterGroup => {
-  return 'logicalOperator' in condition
 }
 
 export function FilterBar({
@@ -47,18 +87,59 @@ export function FilterBar({
   const newPathRef = useRef<number[]>([])
   const [loadingOptions, setLoadingOptions] = useState<Record<string, boolean>>({})
   const [propertyOptionsCache, setPropertyOptionsCache] = useState<
-    Record<string, { options: string[]; searchValue: string }>
+    Record<string, { options: (string | FilterOptionObject)[]; searchValue: string }>
   >({})
   const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [dialogContent, setDialogContent] = useState<React.ReactElement | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [pendingPath, setPendingPath] = useState<number[] | null>(null)
+
+  const findGroupByPath = (group: FilterGroup, path: number[]): FilterGroup | null => {
+    if (path.length === 0) return group
+
+    const [current, ...rest] = path
+    const condition = group.conditions[current]
+    if (!condition) return null
+
+    if (rest.length === 0) {
+      return isGroup(condition) ? condition : null
+    }
+
+    if (isGroup(condition)) {
+      return findGroupByPath(condition, rest)
+    }
+
+    return null
+  }
+
+  const findConditionByPath = (group: FilterGroup, path: number[]): FilterCondition | null => {
+    if (path.length === 0) return null
+
+    const [current, ...rest] = path
+    const condition = group.conditions[current]
+    if (!condition) return null
+
+    if (rest.length === 0) {
+      return isGroup(condition) ? null : condition
+    }
+
+    if (isGroup(condition)) {
+      return findConditionByPath(condition, rest)
+    }
+
+    return null
+  }
 
   const handleInputChange = useCallback(
     (path: number[], value: string) => {
+      console.log('handleInputChange called with path:', path, 'value:', value)
       const updateNestedValue = (
         group: FilterGroup,
         currentPath: number[],
         newValue: string
       ): FilterGroup => {
         if (currentPath.length === 1) {
+          console.log('Updating value at path level 1:', currentPath[0], 'newValue:', newValue)
           return {
             ...group,
             conditions: group.conditions.map((condition, i) =>
@@ -68,6 +149,7 @@ export function FilterBar({
         }
 
         const [current, ...rest] = currentPath
+        console.log('Updating nested value at path:', current, 'remaining path:', rest)
         return {
           ...group,
           conditions: group.conditions.map((condition, i) =>
@@ -81,6 +163,7 @@ export function FilterBar({
       }
 
       const updatedFilters = updateNestedValue(activeFilters, path, value)
+      console.log('Updated filters:', updatedFilters)
       onFilterChange(updatedFilters)
       setSelectedCommandIndex(0)
       setIsCommandMenuVisible(true)
@@ -301,6 +384,56 @@ export function FilterBar({
     }
   }, [])
 
+  const handleCustomOptionSelect = useCallback(
+    (property: FilterProperty, path: number[]) => {
+      if (property.options && isCustomOptionObject(property.options)) {
+        const element = property.options.component({
+          onChange: (value: string) => {
+            handleInputChange(path, value)
+            setIsDialogOpen(false)
+            setDialogContent(null)
+            setPendingPath(null)
+          },
+          onCancel: () => {
+            setIsDialogOpen(false)
+            setDialogContent(null)
+            setPendingPath(null)
+          },
+          search: freeformText,
+        })
+        setDialogContent(element)
+        setIsDialogOpen(true)
+        setPendingPath(path)
+      }
+    },
+    [handleInputChange, freeformText]
+  )
+
+  const updateNestedFilter = (
+    group: FilterGroup,
+    path: number[],
+    updateFn: (condition: FilterCondition) => FilterCondition
+  ): FilterGroup => {
+    if (path.length === 1) {
+      return {
+        ...group,
+        conditions: group.conditions.map((condition, index) =>
+          index === path[0] ? updateFn(condition as FilterCondition) : condition
+        ),
+      }
+    }
+
+    const [current, ...rest] = path
+    return {
+      ...group,
+      conditions: group.conditions.map((condition, index) =>
+        index === current && isGroup(condition)
+          ? updateNestedFilter(condition, rest, updateFn)
+          : condition
+      ),
+    }
+  }
+
   const handleCommandSelect = (selectedValue: string) => {
     if (selectedValue === 'ai-filter') {
       handleAIFilter()
@@ -315,9 +448,7 @@ export function FilterBar({
 
         const updatedFilters = addGroupToGroup(activeFilters, currentPath)
         onFilterChange(updatedFilters)
-        // Store the new path for use after the state update
         newPathRef.current = [...currentPath, group.conditions.length]
-        // Focus the new group's freeform input after the state update
         setTimeout(() => {
           setActiveInput({ type: 'group', path: newPathRef.current })
           setIsCommandMenuVisible(true)
@@ -329,32 +460,109 @@ export function FilterBar({
 
     if (activeInput && activeInput.type === 'value') {
       const path = activeInput.path
-      handleInputChange(path, selectedValue)
-      // Focus the parent group's input after setting the value
-      setTimeout(() => {
-        setActiveInput({ type: 'group', path: path.slice(0, -1) })
-        setIsCommandMenuVisible(true)
-      }, 0)
+      const selectedItem = commandItems.find((item) => item.value === selectedValue) as
+        | CommandItem
+        | undefined
+
+      if (selectedItem?.isCustom && selectedItem.customOption) {
+        const element = selectedItem.customOption({
+          onChange: (value: string) => {
+            console.log('onChange:', path, value)
+            handleInputChange(path, value)
+            setIsDialogOpen(false)
+            setDialogContent(null)
+            setPendingPath(null)
+            setTimeout(() => {
+              setActiveInput({ type: 'group', path: path.slice(0, -1) })
+              setIsCommandMenuVisible(true)
+            }, 0)
+          },
+          onCancel: () => {
+            setIsDialogOpen(false)
+            setDialogContent(null)
+            setPendingPath(null)
+            setTimeout(() => {
+              setActiveInput({ type: 'group', path: path.slice(0, -1) })
+              setIsCommandMenuVisible(true)
+            }, 0)
+          },
+          search: freeformText,
+        })
+        setDialogContent(element)
+        setIsDialogOpen(true)
+        setPendingPath(path)
+      } else {
+        handleInputChange(path, selectedValue)
+        setTimeout(() => {
+          setActiveInput({ type: 'group', path: path.slice(0, -1) })
+          setIsCommandMenuVisible(true)
+        }, 0)
+      }
     } else if (activeInput && activeInput.type === 'operator') {
       const path = activeInput.path
       handleOperatorChange(path, selectedValue)
       setActiveInput(null)
     } else if (activeInput && activeInput.type === 'group') {
-      const selectedProperty = filterProperties.find((prop) => prop.name === selectedValue)
+      const selectedProperty = filterProperties.find((p) => p.name === selectedValue)
       if (selectedProperty) {
         const currentPath = activeInput.path
         const group = findGroupByPath(activeFilters, currentPath)
         if (!group) return
 
-        const updatedFilters = addFilterToGroup(activeFilters, currentPath, selectedProperty)
-        onFilterChange(updatedFilters)
-        // Store the new path for use after the state update
-        newPathRef.current = [...currentPath, group.conditions.length]
-        // Focus the new condition's value input after the state update
-        setTimeout(() => {
-          setActiveInput({ type: 'value', path: newPathRef.current })
-          setIsCommandMenuVisible(true)
-        }, 0)
+        // Check if the property itself is a custom option object
+        if (
+          selectedProperty.options &&
+          !Array.isArray(selectedProperty.options) &&
+          isCustomOptionObject(selectedProperty.options)
+        ) {
+          // Add the filter first
+          const updatedFilters = addFilterToGroup(activeFilters, currentPath, selectedProperty)
+          onFilterChange(updatedFilters)
+          const newPath = [...currentPath, group.conditions.length]
+
+          // Show the custom component immediately
+          const element = selectedProperty.options.component({
+            onChange: (value: string) => {
+              console.log('Custom component onChange called with value:', value)
+              console.log('Current active input path:', newPath)
+              // Update the filter with the selected value using the nested update function
+              const filterWithValue = updateNestedFilter(updatedFilters, newPath, (condition) => ({
+                ...condition,
+                propertyName: selectedProperty.name,
+                value: value,
+                operator: '=',
+              }))
+              onFilterChange(filterWithValue)
+              setIsDialogOpen(false)
+              setDialogContent(null)
+              setPendingPath(null)
+              setActiveInput({ type: 'group', path: currentPath })
+            },
+            onCancel: () => {
+              console.log('Custom component onCancel called')
+              removeFilterByPath(newPath)
+              setIsDialogOpen(false)
+              setDialogContent(null)
+              setPendingPath(null)
+              setActiveInput({ type: 'group', path: currentPath })
+            },
+            search: '',
+          })
+          setDialogContent(element)
+          setIsDialogOpen(true)
+          setPendingPath(newPath)
+          setIsCommandMenuVisible(false)
+        } else {
+          // Handle normal array options or async options
+          const updatedFilters = addFilterToGroup(activeFilters, currentPath, selectedProperty)
+          onFilterChange(updatedFilters)
+          const newPath = [...currentPath, group.conditions.length]
+
+          setTimeout(() => {
+            setActiveInput({ type: 'value', path: newPath })
+            setIsCommandMenuVisible(true)
+          }, 0)
+        }
         onFreeformTextChange('')
       } else {
         setError(`Invalid property: ${selectedValue}`)
@@ -362,27 +570,15 @@ export function FilterBar({
     }
   }
 
-  const findConditionByPath = (group: FilterGroup, path: number[]): FilterCondition | null => {
-    if (path.length === 0) return null
-
-    const [current, ...rest] = path
-    const condition = group.conditions[current]
-    if (!condition) return null
-
-    if (rest.length === 0) {
-      return isGroup(condition) ? null : condition
-    }
-
-    if (isGroup(condition)) {
-      return findConditionByPath(condition, rest)
-    }
-
-    return null
-  }
-
   const loadPropertyOptions = useCallback(
     async (property: FilterProperty, search: string = '') => {
-      if (!property.options || Array.isArray(property.options)) return
+      // Skip if no options or if options is an array or not a function
+      if (
+        !property.options ||
+        Array.isArray(property.options) ||
+        !isAsyncOptionsFunction(property.options)
+      )
+        return
 
       // Check if we have cached options for this exact search
       const cached = propertyOptionsCache[property.name]
@@ -399,8 +595,13 @@ export function FilterBar({
 
         try {
           setLoadingOptions((prev) => ({ ...prev, [property.name]: true }))
-          const options =
-            typeof property.options === 'function' ? await property.options(search) : []
+          // We can safely assert this is an AsyncOptionsFunction because we checked above
+          const asyncOptions = property.options as AsyncOptionsFunction
+          const rawOptions = await asyncOptions(search)
+          // Convert string options to FilterOptionObject format
+          const options = rawOptions.map((option: string | FilterOptionObject) =>
+            typeof option === 'string' ? { label: option, value: option } : option
+          )
           setPropertyOptionsCache((prev) => ({
             ...prev,
             [property.name]: { options, searchValue: search },
@@ -443,7 +644,7 @@ export function FilterBar({
           ? findConditionByPath(activeFilters, activeInput.path)?.value?.toString() || ''
           : ''
 
-    const items: { value: string; label: string; icon?: React.ReactNode }[] = []
+    const items: CommandItem[] = []
 
     if (activeInput?.type === 'group') {
       items.push(
@@ -453,6 +654,7 @@ export function FilterBar({
             value: prop.name,
             label: prop.label,
             icon: undefined,
+            isCustom: false,
           }))
       )
 
@@ -474,7 +676,16 @@ export function FilterBar({
       const property = filterProperties.find((p) => p.name === activeCondition?.propertyName)
 
       if (property) {
-        if (loadingOptions[property.name]) {
+        // If the property itself is a custom option object, show just one item
+        if (!Array.isArray(property.options) && isCustomOptionObject(property.options)) {
+          items.push({
+            value: 'custom',
+            label: property.options.label || 'Custom...',
+            icon: undefined,
+            isCustom: true,
+            customOption: property.options.component,
+          })
+        } else if (loadingOptions[property.name]) {
           items.push({
             value: 'loading',
             label: 'Loading options...',
@@ -483,22 +694,62 @@ export function FilterBar({
         } else if (Array.isArray(property.options)) {
           items.push(
             ...property.options
-              .filter((option) => option.toLowerCase().includes(inputValue.toLowerCase()))
-              .map((option) => ({
-                value: option,
-                label: option,
-                icon: undefined,
-              }))
+              .filter((option) => {
+                if (typeof option === 'string') {
+                  return option.toLowerCase().includes(inputValue.toLowerCase())
+                }
+                if (isFilterOptionObject(option)) {
+                  return option.label.toLowerCase().includes(inputValue.toLowerCase())
+                }
+                if (isCustomOptionObject(option)) {
+                  return option.label?.toLowerCase().includes(inputValue.toLowerCase()) ?? true
+                }
+                return true
+              })
+              .map((option) => {
+                if (typeof option === 'string') {
+                  return {
+                    value: option,
+                    label: option,
+                    icon: undefined,
+                  } as CommandItem
+                }
+                if (isFilterOptionObject(option)) {
+                  return {
+                    value: option.value,
+                    label: option.label,
+                    icon: undefined,
+                  } as CommandItem
+                }
+                if (isCustomOptionObject(option)) {
+                  return {
+                    value: 'custom',
+                    label: option.label || 'Custom...',
+                    icon: undefined,
+                    isCustom: true,
+                    customOption: option.component,
+                  } as CommandItem
+                }
+                return null
+              })
+              .filter((item): item is CommandItem => item !== null)
           )
         } else if (propertyOptionsCache[property.name]) {
           items.push(
-            ...propertyOptionsCache[property.name].options
-              .filter((option) => option.toLowerCase().includes(inputValue.toLowerCase()))
-              .map((option) => ({
-                value: option,
-                label: option,
+            ...propertyOptionsCache[property.name].options.map((option) => {
+              if (typeof option === 'string') {
+                return {
+                  value: option,
+                  label: option,
+                  icon: undefined,
+                }
+              }
+              return {
+                value: option.value,
+                label: option.label,
                 icon: undefined,
-              }))
+              }
+            })
           )
         }
 
@@ -523,6 +774,7 @@ export function FilterBar({
     propertyOptionsCache,
     loadingOptions,
     loadPropertyOptions,
+    aiApiUrl,
   ])
 
   const removeFilterByPath = useCallback(
@@ -574,24 +826,6 @@ export function FilterBar({
     },
     [activeFilters]
   )
-
-  const findGroupByPath = (group: FilterGroup, path: number[]): FilterGroup | null => {
-    if (path.length === 0) return group
-
-    const [current, ...rest] = path
-    const condition = group.conditions[current]
-    if (!condition) return null
-
-    if (rest.length === 0) {
-      return isGroup(condition) ? condition : null
-    }
-
-    if (isGroup(condition)) {
-      return findGroupByPath(condition, rest)
-    }
-
-    return null
-  }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowDown') {
@@ -771,7 +1005,7 @@ export function FilterBar({
             onGroupFreeformChange={handleGroupFreeformChange}
             onGroupFreeformFocus={handleGroupFreeformFocus}
             groupFreeformValue={freeformText}
-            isGroupFreeformActive={activeInput?.type === 'group' ?? false}
+            isGroupFreeformActive={Boolean(activeInput?.type === 'group')}
             onLogicalOperatorChange={handleLogicalOperatorChange}
           />
         </div>
@@ -798,6 +1032,11 @@ export function FilterBar({
           </CommandList_Shadcn_>
         </Command_Shadcn_>
       )}
+      <Dialog open={isDialogOpen} onOpenChange={(open: boolean) => setIsDialogOpen(open)}>
+        <DialogContent hideClose className="!w-fit">
+          {dialogContent}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
