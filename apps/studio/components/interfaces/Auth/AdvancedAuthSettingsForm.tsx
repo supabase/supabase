@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { StringNumberOrNull } from 'components/ui/Forms/Form.constants'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
@@ -35,9 +36,8 @@ const FormSchema = z.object({
   API_MAX_REQUEST_DURATION: z.coerce
     .number()
     .min(5, 'Must be 5 or larger')
-    .max(30, 'Must be a value no greater than 30')
-    .or(z.literal('')),
-  DB_MAX_POOL_SIZE: z.coerce.number().or(z.literal('')),
+    .max(30, 'Must be a value no greater than 30'),
+  DB_MAX_POOL_SIZE: StringNumberOrNull,
 })
 
 export const AdvancedAuthSettingsForm = () => {
@@ -62,15 +62,15 @@ export const AdvancedAuthSettingsForm = () => {
 
   const defaultValues = useMemo(
     () => ({
-      API_MAX_REQUEST_DURATION: authConfig?.API_MAX_REQUEST_DURATION ?? ('' as const),
-      DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE ?? ('' as const),
+      API_MAX_REQUEST_DURATION: authConfig?.API_MAX_REQUEST_DURATION ?? undefined,
+      DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE ?? '',
     }),
     [authConfig]
   )
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues,
+    defaultValues: defaultValues as any,
   })
   const { isDirty } = form.formState
 
@@ -79,23 +79,23 @@ export const AdvancedAuthSettingsForm = () => {
   const promptTeamsEnterpriseUpgrade =
     IS_PLATFORM && isSuccessSubscription && !isTeamsEnterprisePlan
 
+  const resetForm = () => {
+    form.reset(defaultValues as any)
+  }
+
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (data) => {
+    if (!projectRef) return console.error('Project ref is required')
+
     const { API_MAX_REQUEST_DURATION, DB_MAX_POOL_SIZE, ...config } = data
     const payload = {
       ...config,
-      ...(isTeamsEnterprisePlan
-        ? {
-            // reset API_MAX_REQUEST_DURATION to 10 if the field is emptied
-            API_MAX_REQUEST_DURATION:
-              API_MAX_REQUEST_DURATION === '' ? 10 : API_MAX_REQUEST_DURATION,
-          }
-        : {}),
-      DB_MAX_POOL_SIZE: DB_MAX_POOL_SIZE === '' ? null : DB_MAX_POOL_SIZE,
+      ...(isTeamsEnterprisePlan ? { API_MAX_REQUEST_DURATION } : {}),
+      DB_MAX_POOL_SIZE,
     }
 
     updateAuthConfig(
       // @ts-expect-error
-      { projectRef: projectRef!, config: payload },
+      { projectRef: projectRef, config: payload },
       {
         onSuccess: () => {
           toast.success('Successfully updated settings')
@@ -107,9 +107,7 @@ export const AdvancedAuthSettingsForm = () => {
 
   useEffect(() => {
     // reset form with the current values
-    if (isSuccess) {
-      form.reset(defaultValues)
-    }
+    if (isSuccess) resetForm()
   }, [defaultValues, isSuccess])
 
   if (isError) {
@@ -144,7 +142,7 @@ export const AdvancedAuthSettingsForm = () => {
                   form={formId}
                   isSubmitting={isUpdatingConfig}
                   hasChanges={isDirty}
-                  handleReset={() => form.reset(defaultValues)}
+                  handleReset={() => resetForm()}
                   disabled={!canUpdateConfig}
                   helper={
                     !canUpdateConfig
@@ -195,6 +193,7 @@ export const AdvancedAuthSettingsForm = () => {
                           disabled={promptTeamsEnterpriseUpgrade}
                           placeholder="10"
                           {...field}
+                          value={field.value || ''}
                         />
                       </FormControl_Shadcn_>
                     </FormItemLayout>

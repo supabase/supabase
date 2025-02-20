@@ -13,3 +13,12 @@ export const StringToPositiveNumber = z.union([
     .transform((v) => null),
   z.null(),
 ])
+
+export const StringNumberOrNull = z
+  .string()
+  .transform((v) => (v === '' ? null : v))
+  .nullable()
+  .refine((value) => value === null || !isNaN(Number(value)), {
+    message: 'Invalid number',
+  })
+  .transform((value) => (value === null ? null : Number(value)))
