@@ -1,6 +1,13 @@
 'use client'
 
-import React, { PropsWithChildren, useState } from 'react'
+import React, {
+  type PropsWithChildren,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react'
 import { InfoIcon, XIcon } from 'lucide-react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useBreakpoint } from 'common'
@@ -34,24 +41,49 @@ const InfoTooltip = ({
   tooltipContent,
   contentContainerClassName,
 }: PopUpProps) => {
-  const [open, setOpen] = useState(false)
+  const id = useId().replaceAll(':', '')
+  const timeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false)
+  const [tooltipOpen, _setTooltipOpen] = useState(false)
   const isMobile = useBreakpoint('md')
+
+  const setTooltipOpen = useCallback(
+    (open: boolean) => {
+      _setTooltipOpen(open)
+      setMobileSheetOpen(true)
+
+      timeout.current = setTimeout(() => {
+        if (isMobile) return
+        const targetElem: HTMLElement | null = document.querySelector(`#tooltip-content-${id}`)
+        targetElem?.focus()
+      })
+    },
+    [_setTooltipOpen, id, isMobile]
+  )
+
+  useEffect(() => () => clearTimeout(timeout.current), [])
 
   return (
     <>
-      <Tooltip>
+      <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
         <TooltipTrigger asChild>
-          <span className={cn(buttonClassName, className)} onClick={() => setOpen(true)}>
+          <span role="button" tabIndex={0} className={cn(buttonClassName, className)}>
             {children}
-            <InfoIcon className="absolute p-[1px] bg-background rounded-full -left-1.5 -top-1.5 w-3 h-3 text-foreground-lighter group-hover/inline-popup:text-foreground-light transition-colors" />
+            <InfoIcon
+              aria-hidden={true}
+              className="absolute p-[1px] bg-background rounded-full -left-1.5 -top-1.5 w-3 h-3 text-foreground-lighter group-hover/inline-popup:text-foreground-light transition-colors"
+            />
           </span>
         </TooltipTrigger>
-        <TooltipContent className={contentContainerClassName}>{tooltipContent}</TooltipContent>
+        <TooltipContent id={`tooltip-content-${id}`} className={contentContainerClassName}>
+          {tooltipContent}
+        </TooltipContent>
       </Tooltip>
       {isMobile && (
-        <Sheet open={open} onOpenChange={setOpen}>
+        <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
           <SheetContent
-            id="mobile-sheet-content"
+            id={`mobile-sheet-content-${id}`}
             showClose={false}
             size="full"
             side="bottom"
@@ -68,7 +100,7 @@ const InfoTooltip = ({
                   <InfoIcon className="p-[1px] min-w-4 min-h-4 text-foreground-lighter" />
                   <p className="italic text-foreground-light truncate">{children}</p>
                 </div>
-                <Button type="text" onClick={() => setOpen(false)} className="px-1">
+                <Button type="text" onClick={() => setMobileSheetOpen(false)} className="px-1">
                   <XIcon className="w-4 h-4 text-foreground-lighter" />
                 </Button>
               </SheetHeader>
