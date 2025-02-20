@@ -13,7 +13,7 @@ import { useParams } from 'common'
 import { useAppStateSnapshot } from 'state/app-state'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
-import { PageLayout } from 'components/layouts/PageLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
 import {
   Command_Shadcn_,
@@ -25,9 +25,6 @@ import {
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  TreeView,
-  TreeViewItem,
-  flattenTree,
 } from 'ui'
 import { useFlag } from 'hooks/ui/useFlag'
 

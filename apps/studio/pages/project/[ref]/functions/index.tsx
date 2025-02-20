@@ -62,7 +62,7 @@ const FunctionsPage: NextPageWithLayout = () => {
             </DialogSection>
           </DialogContent>
         </Dialog>
-        {edgeFunctionCreate && (
+        {!edgeFunctionCreate && (
           <DropdownMenuItem
             onSelect={() => router.push(`/project/${ref}/functions/new`)}
             className="gap-4"
