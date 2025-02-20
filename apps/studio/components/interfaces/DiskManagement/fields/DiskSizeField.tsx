@@ -37,7 +37,6 @@ export function DiskSizeField({
   const org = useSelectedOrganization()
 
   const {
-    data,
     isLoading: isLoadingDiskAttributes,
     error: diskAttributesError,
     isError: isDiskAttributesError,
