@@ -314,7 +314,7 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
             )}
           </>
         }
-        className="col-[1_/_-1] gap-0.75em"
+        className="col-[1_/_-1]"
       />
       <div className="flex flex-col gap-12">
         <div className="flex items-center gap-2">
