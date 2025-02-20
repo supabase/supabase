@@ -1,5 +1,18 @@
 import { literal } from './pg-format'
 
+export const coalesceRowsToArray = (source: string, filter: string) => {
+  return `
+COALESCE(
+  (
+    SELECT
+      array_agg(row_to_json(${source})) FILTER (WHERE ${filter})
+    FROM
+      ${source}
+  ),
+  '{}'
+) AS ${source}`
+}
+
 export function filterByList(include?: string[], exclude?: string[], defaultExclude?: string[]) {
   if (defaultExclude) {
     exclude = defaultExclude.concat(exclude ?? [])
