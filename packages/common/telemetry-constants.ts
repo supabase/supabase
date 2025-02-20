@@ -2,10 +2,6 @@
 // Standardization as per document: https://www.notion.so/supabase/Event-tracking-standardization-1195004b775f80f98ee3fa9e70cf4d05
 
 export enum TelemetryActions {
-  // TODO event name is not consistent
-  CUSTOM_REPORT_ADD_SQL_BLOCK_CLICKED = 'custom-report-add-sql-block-clicked',
-  CUSTOM_REPORT_ASSISTANT_SQL_BLOCK_ADDED = 'custom-report-assistant-sql-block-added',
-
   // TODO can't find where event is emitted
   SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED = 'sql_editor_result_download_csv_clicked',
   SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED = 'sql_editor_result_copy_markdown_clicked',
@@ -633,7 +629,7 @@ export interface AssistantEditInSqlEditorClickedEvent {
  * @page /dashboard/project/{ref}/reports/{id}
  */
 export interface CustomReportAddSQLBlockClicked {
-  action: TelemetryActions.CUSTOM_REPORT_ADD_SQL_BLOCK_CLICKED
+  action: 'custom_report_add_sql_block_clicked'
 }
 
 /**
@@ -644,7 +640,7 @@ export interface CustomReportAddSQLBlockClicked {
  * @page /dashboard/project/{ref}/reports/{id}
  */
 export interface CustomReportAssistantSQLBlockAdded {
-  action: TelemetryActions.CUSTOM_REPORT_ASSISTANT_SQL_BLOCK_ADDED
+  action: 'custom_report_assistant_sql_block_added'
 }
 
 /**
