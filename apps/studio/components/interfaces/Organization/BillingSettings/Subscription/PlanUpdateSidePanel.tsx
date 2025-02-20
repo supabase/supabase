@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { StudioPricingSidePanelOpenedEvent, TelemetryActions } from 'common/telemetry-constants'
+import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -136,7 +136,7 @@ const PlanUpdateSidePanel = () => {
         properties.origin = source
       }
       sendEvent({
-        action: TelemetryActions.STUDIO_PRICING_SIDE_PANEL_OPENED,
+        action: 'studio_pricing_side_panel_opened',
         properties,
         groups: { organization: slug ?? 'Unknown' },
       })
@@ -280,7 +280,7 @@ const PlanUpdateSidePanel = () => {
                         onClick={() => {
                           setSelectedTier(plan.id as any)
                           sendEvent({
-                            action: TelemetryActions.STUDIO_PRICING_PLAN_CTA_CLICKED,
+                            action: 'studio_pricing_plan_cta_clicked',
                             properties: {
                               selectedPlan: plan.name,
                               currentPlan: subscription?.plan?.name,

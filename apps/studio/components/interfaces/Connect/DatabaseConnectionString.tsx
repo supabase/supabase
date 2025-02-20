@@ -103,7 +103,7 @@ export const DatabaseConnectionString = () => {
     const connectionType = connectionInfo?.label ?? 'Unknown'
     const lang = connectionInfo?.lang ?? 'Unknown'
     sendEvent({
-      action: TelemetryActions.CONNECTION_STRING_COPIED,
+      action: 'connection_string_copied',
       properties: { connectionType, lang, connectionMethod },
       groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })

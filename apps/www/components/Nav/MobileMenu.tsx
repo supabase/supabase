@@ -250,7 +250,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                         legacyBehavior
                         onClick={() =>
                           sendTelemetryEvent({
-                            action: TelemetryActions.SIGN_IN_BUTTON_CLICKED,
+                            action: 'sign_in_button_clicked',
                             properties: { buttonLocation: 'Mobile Nav' },
                           })
                         }

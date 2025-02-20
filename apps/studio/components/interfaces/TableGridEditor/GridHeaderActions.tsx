@@ -151,7 +151,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           .map((x: any) => `${x.schema}.${x.name}`)
 
     sendEvent({
-      action: TelemetryActions.REALTIME_TOGGLE_TABLE_CLICKED,
+      action: 'realtime_toggle_table_clicked',
       properties: {
         newState: exists ? 'disabled' : 'enabled',
         origin: 'tableGridHeader',

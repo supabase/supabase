@@ -181,7 +181,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
 
   const onRunQuery = async (queryType: 'select' | 'mutation') => {
     sendEvent({
-      action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED,
+      action: 'assistant_suggestion_run_query_clicked',
       properties: {
         queryType,
         ...(queryType === 'mutation'

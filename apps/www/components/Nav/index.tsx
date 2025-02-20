@@ -141,7 +141,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                         href="https://supabase.com/dashboard"
                         onClick={() =>
                           sendTelemetryEvent({
-                            action: TelemetryActions.SIGN_IN_BUTTON_CLICKED,
+                            action: 'sign_in_button_clicked',
                             properties: { buttonLocation: 'Header Nav' },
                           })
                         }
