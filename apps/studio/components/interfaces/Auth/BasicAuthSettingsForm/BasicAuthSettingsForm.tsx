@@ -1,15 +1,15 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { boolean, object, string } from 'yup'
-import { useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
 
 import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
-import { FormFieldWrapper } from 'components/ui/Forms'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
@@ -22,13 +22,14 @@ import {
   Card,
   CardContent,
   CardFooter,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Form_Shadcn_,
   Switch,
   WarningIcon,
 } from 'ui'
-
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
@@ -113,67 +114,89 @@ const BasicAuthSettingsForm = () => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <Card>
             <CardContent>
-              <FormFieldWrapper
+              <FormField_Shadcn_
                 control={form.control}
                 name="DISABLE_SIGNUP"
-                label="Allow new users to sign up"
-                description="If this is disabled, new users will not be able to sign up to your application."
-                orientation="horizontal"
-              >
-                {(field) => (
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={!canUpdateConfig}
-                  />
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Allow new users to sign up"
+                    description="If this is disabled, new users will not be able to sign up to your application"
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={!canUpdateConfig}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
                 )}
-              </FormFieldWrapper>
+              />
             </CardContent>
             <CardContent>
-              <FormFieldWrapper
+              <FormField_Shadcn_
                 control={form.control}
                 name="SECURITY_MANUAL_LINKING_ENABLED"
-                label="Allow manual linking"
-                description={
-                  <Markdown
-                    extLinks
-                    className="[&>p>a]:text-foreground-light [&>p>a]:transition-all [&>p>a]:hover:text-foreground [&>p>a]:hover:decoration-brand"
-                    content="Enable [manual linking APIs](https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta) for your project."
-                  />
-                }
-                orientation="horizontal"
-              >
-                {(field) => (
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={!canUpdateConfig}
-                  />
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Allow manual linking"
+                    description={
+                      <>
+                        Enable{' '}
+                        <InlineLink
+                          className="text-foreground-light hover:text-foreground"
+                          href="https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta"
+                        >
+                          manual linking APIs
+                        </InlineLink>{' '}
+                        for your project
+                      </>
+                    }
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={!canUpdateConfig}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
                 )}
-              </FormFieldWrapper>
+              />
             </CardContent>
             <CardContent>
-              <FormFieldWrapper
+              <FormField_Shadcn_
                 control={form.control}
                 name="EXTERNAL_ANONYMOUS_USERS_ENABLED"
-                label="Allow anonymous sign-ins"
-                description={
-                  <Markdown
-                    extLinks
-                    className="[&>p>a]:text-foreground-light [&>p>a]:transition-all [&>p>a]:hover:text-foreground [&>p>a]:hover:decoration-brand"
-                    content="Enable [anonymous sign-ins](https://supabase.com/docs/guides/auth/auth-anonymous) for your project."
-                  />
-                }
-                orientation="horizontal"
-              >
-                {(field) => (
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={!canUpdateConfig}
-                  />
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Allow anonymous sign-ins"
+                    description={
+                      <>
+                        Enable{' '}
+                        <InlineLink
+                          className="text-foreground-light hover:text-foreground"
+                          href="https://supabase.com/docs/guides/auth/auth-anonymous"
+                        >
+                          anonymous sign-ins
+                        </InlineLink>{' '}
+                        for your project
+                      </>
+                    }
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={!canUpdateConfig}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
                 )}
-              </FormFieldWrapper>
+              />
 
               {form.watch('EXTERNAL_ANONYMOUS_USERS_ENABLED') && (
                 <Alert_Shadcn_

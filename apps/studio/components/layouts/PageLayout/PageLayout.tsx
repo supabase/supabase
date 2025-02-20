@@ -2,10 +2,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
 
-import { useParams } from 'common'
 import { Button, cn, NavMenu, NavMenuItem } from 'ui'
-import { PageHeader } from '.'
 import { ScaffoldContainer } from '../Scaffold'
+import { PageHeader } from './PageHeader'
 
 export interface NavigationItem {
   id?: string
@@ -40,7 +39,7 @@ interface PageLayoutProps {
  *
  * Pages that would deviate from this are those with dedicated UI, for example: Table Editor, SQL Editor, etc
  *
- * Handles rendering the following UI behaviours:
+ * Handles rendering the following UI behaviors:
  * - Page padding depending on the size property
  * - Top level breadcrumbs (If applicable)
  * - Top level page header (If applicable)
@@ -56,7 +55,7 @@ interface PageLayoutProps {
  * @param size - Controls padding of the page header only, padding for the content to be controlled by PageContainer (Default: 'default')
  * @param isCompact - TBD (Default: false)
  */
-const PageLayout = ({
+export const PageLayout = ({
   children,
   title,
   subtitle,
@@ -135,5 +134,3 @@ const PageLayout = ({
     </div>
   )
 }
-
-export default PageLayout
