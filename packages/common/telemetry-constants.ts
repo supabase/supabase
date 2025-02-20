@@ -39,12 +39,13 @@ export enum TelemetryActions {
   REALTIME_INSPECTOR_COPY_MESSAGE_CLICKED = 'realtime_inspector_copy_message_clicked',
   REALTIME_INSPECTOR_FILTERS_APPLIED = 'realtime_inspector_filters_applied',
   REALTIME_INSPECTOR_DATABASE_ROLE_UPDATED = 'realtime_inspector_database_role_updated',
+  REALTIME_TOGGLE_TABLE_CLICKED = 'realtime_toggle_table_clicked',
 
   SQL_EDITOR_QUICKSTART_CLICKED = 'sql_editor_quickstart_clicked',
   SQL_EDITOR_TEMPLATE_CLICKED = 'sql_editor_template_clicked',
   SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED = 'sql_editor_result_download_csv_clicked',
   SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED = 'sql_editor_result_copy_markdown_clicked',
-  SQL_EDITOR_RESULT_COPY_JSON_CLICKED = 'sql_editor_result_copy_markdown_clicked',
+  SQL_EDITOR_RESULT_COPY_JSON_CLICKED = 'sql_editor_result_copy_json_clicked',
 
   DOCS_FEEDBACK_CLICKED = 'docs_feedback_clicked',
 
@@ -486,6 +487,31 @@ export interface RealtimeInspectorDatabaseRoleUpdatedEvent {
 }
 
 /**
+ * User clicked to toggle realtime on a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface RealtimeToggleTableClickedEvent {
+  action: TelemetryActions.REALTIME_TOGGLE_TABLE_CLICKED
+  properties: {
+    /**
+     * The state of the toggle.
+     */
+    newState: 'enabled' | 'disabled'
+    /**
+     * Where the toggle was clicked from
+     */
+    origin: 'tableSidePanel' | 'tableGridHeader'
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
  * User clicked the quickstart card in the SQL editor.
  *
  * @group Events
@@ -528,7 +554,7 @@ export interface SqlEditorTemplateClickedEvent {
 }
 
 /**
- * User clicked the “Result download CSV” button in the SQL editor.
+ * User clicked the "Result download CSV" button in the SQL editor.
  *
  * @group Events
  * @source studio
@@ -543,7 +569,7 @@ export interface SqlEditorResultDownloadCsvClickedEvent {
 }
 
 /**
- * User clicked the “Result copy Markdown” button in the SQL editor.
+ * User clicked the "Result copy Markdown" button in the SQL editor.
  *
  * @group Events
  * @source studio
@@ -558,7 +584,7 @@ export interface SqlEditorResultCopyMarkdownClickedEvent {
 }
 
 /**
- * User clicked the “Result copy JSON” button in the SQL editor
+ * User clicked the "Result copy JSON" button in the SQL editor
  *
  * @group Events
  * @source studio
@@ -873,7 +899,7 @@ export interface OpenSourceRepoCardClickedEvent {
 }
 
 /**
- * User clicked the green “Start Project” button in various locations described in properties.
+ * User clicked the green "Start Project" button in various locations described in properties.
  *
  * @group Events
  * @source www
@@ -1105,6 +1131,7 @@ export type TelemetryEvent =
   | RealtimeInspectorCopyMessageClickedEvent
   | RealtimeInspectorFiltersAppliedEvent
   | RealtimeInspectorDatabaseRoleUpdatedEvent
+  | RealtimeToggleTableClickedEvent
   | SqlEditorQuickstartClickedEvent
   | SqlEditorTemplateClickedEvent
   | SqlEditorResultDownloadCsvClickedEvent
