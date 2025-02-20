@@ -145,6 +145,8 @@ For a detailed breakdown of how charges are calculated, refer to [Manage Point-i
 
 Supabase provides a convenient way to restore data from an existing project into a completely new one. Whether you're using physical backups or Point-in-Time recovery (PITR), this feature allows you to duplicate project data with ease, perform testing safely, or recover data for analysis. Access to this feature is exclusive to users on paid plans and requires that physical backups are enabled for the source project.
 
+Restoring to a new project does not have any impact (e.g. performance, or load) on the source project. Switching to physical backups (if they weren't already enabled), or changing the disk attributes, can impact the source project.
+
 <Admonition type="note">
 
 PITR is an additional add-on available for organizations on a paid plan with physical backups enabled.
@@ -159,7 +161,7 @@ Once you’ve made your choice, Supabase takes care of the rest. A new project i
 
 <Admonition type="note">
 
-The time required to complete the restoration can vary depending largely on the volume of data involved. If you have a large amount of data you can opt for higher performing disk attributes on the source project _before_ starting a clone operation. These disk attributes will be replicated to the new project. This incurs additional costs which will be displayed before starting.
+The time required to complete the restoration can vary depending largely on the volume of data involved. If you have a large amount of data you can opt for higher performing disk attributes on the source project _before_ starting a clone operation, as these disk attributes will also be used for the new project. This incurs additional costs which will be displayed before starting.
 
 </Admonition>
 
