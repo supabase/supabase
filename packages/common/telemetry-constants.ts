@@ -10,7 +10,6 @@ export enum TelemetryActions {
   SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED = 'sql_editor_result_download_csv_clicked',
   SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED = 'sql_editor_result_copy_markdown_clicked',
   SQL_EDITOR_RESULT_COPY_JSON_CLICKED = 'sql_editor_result_copy_markdown_clicked',
-  HOMEPAGE_HERO_REQUEST_DEMO_CLICKED = 'homepage_hero_request_demo_clicked',
 }
 
 /**
@@ -662,17 +661,6 @@ export interface DocsFeedbackClickedEvent {
      */
     response: 'yes' | 'no'
   }
-}
-
-/**
- * User clicked the "Request a Demo" button in the homepage hero section.
- *
- * @group Events
- * @source www
- * @page /
- */
-export interface HomepageHeroRequestDemoClickedEvent {
-  action: TelemetryActions.HOMEPAGE_HERO_REQUEST_DEMO_CLICKED
 }
 
 /**
