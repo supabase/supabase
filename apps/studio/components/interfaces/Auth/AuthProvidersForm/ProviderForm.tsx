@@ -272,7 +272,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                             type="default"
                             onClick={() => setFieldValue(x, `${apiUrl}/auth/v1`)}
                           >
-                            Use project's API URL
+                            Use project's Auth URL
                           </Button>
                         )
                       }
