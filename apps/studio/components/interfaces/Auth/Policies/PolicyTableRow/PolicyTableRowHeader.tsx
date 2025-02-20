@@ -117,7 +117,7 @@ const PolicyTableRowHeader = ({
               onClick={() => {
                 setAiAssistantPanel({
                   open: true,
-                  initialInput: `Create a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
+                  initialInput: `Create and name a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
                 })
               }}
               tooltip={{

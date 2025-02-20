@@ -5,8 +5,6 @@ import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
 
-import { TelemetryActions } from 'common/telemetry-constants'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams } from 'lib/gotrue'
@@ -23,8 +21,6 @@ const SignInSSOForm = () => {
   const signInSchema = object({
     email: string().email('Must be a valid email').required('Email is required'),
   })
-
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const onSignIn = async ({ email }: { email: string }) => {
     const toastId = toast.loading('Signing in...')
@@ -53,7 +49,6 @@ const SignInSSOForm = () => {
     })
 
     if (!error) {
-      sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
       await queryClient.resetQueries()
       setLastSignInUsed('sso')
       if (data) {

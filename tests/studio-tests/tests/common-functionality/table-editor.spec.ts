@@ -1,23 +1,30 @@
-import { Page, expect, test } from '@playwright/test'
+import { Page, expect } from '@playwright/test'
 import { kebabCase } from 'lodash'
+import { test } from '../../base'
 
 const dismissToast = async (page: Page) => {
-  await page.locator('li.toast').getByRole('button').waitFor({ state: 'visible' })
-  await page.locator('li.toast').getByRole('button').click()
+  await page
+    .locator('li.toast')
+    .getByRole('button', { name: 'Opt out' })
+    .waitFor({ state: 'visible' })
+  await page.locator('li.toast').getByRole('button', { name: 'Opt out' }).click()
 }
 
-test.describe('Table Editor page', () => {
-  test.beforeEach(async ({ page }) => {
+test.describe('Table Editor', () => {
+  test.beforeEach(async ({ page, env, ref, apiUrl }) => {
     const tableResponsePromise = page.waitForResponse(
-      'http://localhost:8082/api/platform/pg-meta/default/query?key=entity-types-public-0',
+      `${apiUrl}/platform/pg-meta/${ref}/query?key=entity-types-public-0`,
       { timeout: 0 }
     )
-    await page.goto('/project/default/editor')
+    await page.goto(`./project/${ref}/editor`)
+    if (env !== 'local') await dismissToast(page)
     await tableResponsePromise
   })
 
   test('should create a new table, view its definition, add new rows, sort and filter', async ({
     page,
+    ref,
+    apiUrl,
   }, testInfo) => {
     const tableName = `${kebabCase(testInfo.title).slice(0, 24)}-${testInfo.retry}-${Math.floor(Math.random() * 10000)}`
 
@@ -44,7 +51,6 @@ test.describe('Table Editor page', () => {
 
     await page.getByRole('button', { name: 'Save' }).waitFor({ state: 'visible' })
     await page.getByRole('button', { name: 'Save' }).click()
-    await dismissToast(page)
 
     // hide React Query DevTools if present
     await page.evaluate(() => {
@@ -67,7 +73,6 @@ test.describe('Table Editor page', () => {
     await page.getByTestId('defaultValueColumn-input').click()
     await page.getByTestId('defaultValueColumn-input').fill('100')
     await page.getByTestId('action-bar-save-row').click()
-    await dismissToast(page)
 
     // add a second row
     await page.getByRole('button', { name: tableName }).click()
@@ -75,11 +80,10 @@ test.describe('Table Editor page', () => {
     await page.getByText('Insert a new row into').click()
     // the default value should be '100' for defaultValueColumn
     await page.getByTestId('action-bar-save-row').click()
-    await dismissToast(page)
 
     // Wait for both rows to be visible in the grid
     await page.waitForResponse((response) =>
-      response.url().includes('/api/platform/pg-meta/default/query')
+      response.url().includes(`${apiUrl}/platform/pg-meta/${ref}/query`)
     )
     await expect(page.getByRole('grid')).toContainText('2')
     await expect(page.getByRole('grid')).toContainText('100')
@@ -94,8 +98,8 @@ test.describe('Table Editor page', () => {
     await page.getByLabel('Pick a column to sort by').getByText('defaultValueColumn').click()
     await page.getByRole('button', { name: 'Apply sorting' }).click()
 
-    // click away to close the sorting dialog
-    await page.locator('#spec-click-target').click()
+    // Close the sorting dialog
+    await page.keyboard.down('Escape')
 
     // expect the row to be sorted by defaultValueColumn. They're inserted in the order 100, 2
     await expect(rows.nth(1)).toContainText('2')
@@ -112,23 +116,26 @@ test.describe('Table Editor page', () => {
     await page.getByPlaceholder('Enter a value').click()
     await page.getByPlaceholder('Enter a value').fill('2')
     await page.getByRole('button', { name: 'Apply filter' }).click()
-    // click away to close the filter dialog
-    await page.locator('#spec-click-target').click()
+
+    // Close the filter dialog
+    await page.keyboard.down('Escape')
+
     await expect(page.getByRole('grid')).toContainText('2')
     await expect(page.getByRole('grid')).not.toContainText('100')
+
+    // Delete the table as clean up
+    await page.getByLabel(`View ${tableName}`).click()
+    await page.getByLabel(`View ${tableName}`).getByRole('button').nth(1).click()
+    await page.getByText('Delete table').click()
+    await page.getByRole('button', { name: 'Delete' }).click()
+    await page.waitForResponse((response) =>
+      response.url().includes(`${apiUrl}/platform/pg-meta/${ref}/tables`)
+    )
   })
 
   test('should check the auth schema', async ({ page }) => {
-    const tableResponsePromise = page.waitForResponse(
-      'http://localhost:8082/api/platform/pg-meta/default/query?key=entity-types-public-0',
-      { timeout: 0 }
-    )
-
     await page.getByTestId('schema-selector').click()
     await page.getByRole('option', { name: 'auth' }).click()
-
-    // wait for the table data to load for the auth schema
-    await tableResponsePromise
 
     // extract the tables names from the sidebar
     const tables = await page
