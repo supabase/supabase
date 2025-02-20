@@ -145,7 +145,11 @@ function create({
     }
     defaultValueClause = `GENERATED ${identity_generation} AS IDENTITY`
   } else if (default_value !== undefined) {
-    defaultValueClause = `DEFAULT ${default_value_format === 'expression' ? default_value : literal(default_value)}`
+    const formattedDefault =
+      // Here we must wrap the litteral value into a String in case it receive a direct number to quote and escape
+      // for the execute(format()) call. Maybe we should change the `default_value` to only accept a string instead ?
+      default_value_format === 'expression' ? default_value : `'${literal(String(default_value))}'`
+    defaultValueClause = `DEFAULT ${formattedDefault}`
   }
 
   const constraints: string[] = []
@@ -211,6 +215,11 @@ function update(
     check?: string | null
   }
 ): { sql: string } {
+  if (is_identity) {
+    if (default_value !== undefined) {
+      throw new Error('Columns cannot both be identity and have a default value')
+    }
+  }
   const sql = `
 DO $$
 DECLARE
@@ -218,13 +227,14 @@ DECLARE
   v_table name;
   v_column name;
   v_attnum int2;
+  r record;
 BEGIN
   WITH RECURSIVE column_info AS (
     ${COLUMNS_SQL}
   )
   SELECT 
     schema, 
-    table,
+    ${ident('table')},
     name,
     ordinal_position::int2
   INTO v_schema, v_table, v_column, v_attnum
@@ -237,7 +247,9 @@ BEGIN
 
   ${is_nullable !== undefined ? `execute(format('ALTER TABLE %I.%I ALTER COLUMN %I ${is_nullable ? 'DROP NOT NULL' : 'SET NOT NULL'}', v_schema, v_table, v_column));` : ''}
 
-  ${type ? `execute(format('ALTER TABLE %I.%I ALTER COLUMN %I TYPE %s USING %I::%s', v_schema, v_table, v_column, ${literal(type)}, v_column, ${literal(type)}));` : ''}
+  ${type ? `execute(format('ALTER TABLE %I.%I ALTER COLUMN %I TYPE %I USING %I::%I', v_schema, v_table, v_column, ${literal(type)}, v_column, ${literal(type)}));` : ''}
+
+  ${drop_default ? `execute(format('ALTER TABLE %I.%I ALTER COLUMN %I DROP DEFAULT', v_schema, v_table, v_column));` : ''}
 
   ${default_value !== undefined ? `execute(format('ALTER TABLE %I.%I ALTER COLUMN %I SET DEFAULT %s', v_schema, v_table, v_column, ${default_value_format === 'expression' ? default_value : literal(default_value)}));` : ''}
   
@@ -247,8 +259,6 @@ BEGIN
 
   ${comment !== undefined ? `execute(format('COMMENT ON COLUMN %I.%I.%I IS %L', v_schema, v_table, v_column, ${literal(comment)}));` : ''}
 
-  ${drop_default ? `execute(format('ALTER TABLE %I.%I ALTER COLUMN %I DROP DEFAULT', v_schema, v_table, v_column));` : ''}
-  
   ${
     check !== undefined
       ? `
@@ -303,9 +313,6 @@ END $$;`
 
   return { sql }
 }
-
-// TODO: make this more robust - use type_id or type_schema + type_name instead
-// of just type.
 
 export default {
   list,
