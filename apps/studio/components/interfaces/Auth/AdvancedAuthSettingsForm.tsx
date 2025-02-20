@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -35,7 +35,8 @@ const FormSchema = z.object({
   API_MAX_REQUEST_DURATION: z
     .number()
     .min(5, 'Must be 5 or larger')
-    .max(30, 'Must be a value no greater than 30'),
+    .max(30, 'Must be a value no greater than 30')
+    .optional(),
   DB_MAX_POOL_SIZE: z.number().optional(),
 })
 
@@ -59,10 +60,14 @@ export const AdvancedAuthSettingsForm = () => {
 
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
-  const defaultValues = {
-    API_MAX_REQUEST_DURATION: authConfig?.API_MAX_REQUEST_DURATION || 10,
-    DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE ?? undefined,
-  }
+  const defaultValues = useMemo(
+    () => ({
+      API_MAX_REQUEST_DURATION: authConfig?.API_MAX_REQUEST_DURATION ?? undefined,
+      DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE ?? undefined,
+    }),
+    [authConfig]
+  )
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues,
@@ -78,7 +83,12 @@ export const AdvancedAuthSettingsForm = () => {
     const { API_MAX_REQUEST_DURATION, DB_MAX_POOL_SIZE, ...config } = data
     const payload = {
       ...config,
-      ...(isTeamsEnterprisePlan ? { API_MAX_REQUEST_DURATION } : {}),
+      ...(isTeamsEnterprisePlan
+        ? {
+            // reset API_MAX_REQUEST_DURATION to 10 if the field is emptied
+            API_MAX_REQUEST_DURATION: API_MAX_REQUEST_DURATION ?? 10,
+          }
+        : {}),
       DB_MAX_POOL_SIZE: DB_MAX_POOL_SIZE === undefined ? null : DB_MAX_POOL_SIZE,
     }
 
@@ -95,8 +105,11 @@ export const AdvancedAuthSettingsForm = () => {
   }
 
   useEffect(() => {
-    form.reset(defaultValues)
-  }, [isSuccess])
+    // reset form with the current values
+    if (isSuccess) {
+      form.reset(defaultValues)
+    }
+  }, [defaultValues, isSuccess])
 
   if (isError) {
     return (
@@ -124,7 +137,6 @@ export const AdvancedAuthSettingsForm = () => {
       <Form_Shadcn_ {...form}>
         <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
           <FormPanel
-            disabled={true}
             footer={
               <div className="flex py-4 px-8">
                 <FormActions
@@ -157,6 +169,7 @@ export const AdvancedAuthSettingsForm = () => {
                           type="number"
                           disabled={promptTeamsEnterpriseUpgrade}
                           {...field}
+                          placeholder="10"
                           onChange={(e) => {
                             field.onChange(
                               e.target.value === '' ? undefined : Number(e.target.value)
@@ -182,6 +195,7 @@ export const AdvancedAuthSettingsForm = () => {
                     >
                       <FormControl_Shadcn_>
                         <Input_Shadcn_
+                          type="number"
                           disabled={promptTeamsEnterpriseUpgrade}
                           {...field}
                           placeholder="10"
