@@ -26,8 +26,11 @@ import {
   Form_Shadcn_,
   FormField_Shadcn_,
   FormControl_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormDescription_Shadcn_,
 } from 'ui'
-import { FormFieldWrapper } from 'components/ui/Forms'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { constructHeaders } from 'data/fetchers'
 import { useParams } from 'common'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
@@ -309,43 +312,57 @@ const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSh
             className="flex-1 overflow-y-auto flex flex-col"
           >
             <div className="space-y-4 p-5">
-              <FormFieldWrapper
+              <FormField_Shadcn_
                 control={form.control}
                 name="method"
-                label="Method"
-                description="Select the HTTP method for your request"
-              >
-                {(field) => (
-                  <Select value={field.value} onValueChange={field.onChange} disabled={isLoading}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {HTTP_METHODS.map((m) => (
-                        <SelectItem key={m} value={m}>
-                          {m}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Method"
+                    description="Select the HTTP method for your request"
+                  >
+                    <FormControl_Shadcn_>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        disabled={isLoading}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select method" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {HTTP_METHODS.map((m) => (
+                            <SelectItem key={m} value={m}>
+                              {m}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
                 )}
-              </FormFieldWrapper>
-              <FormFieldWrapper
+              />
+              <FormField_Shadcn_
                 control={form.control}
                 name="body"
-                label="Body"
-                description="Enter the JSON request body"
-              >
-                {(field) => (
-                  <Textarea
-                    {...field}
-                    placeholder="Request body (JSON)"
-                    rows={3}
-                    disabled={isLoading}
-                    className="font-mono text-xs"
-                  />
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Body"
+                    description="Enter the JSON request body"
+                  >
+                    <FormControl_Shadcn_>
+                      <Textarea
+                        {...field}
+                        placeholder="Request body (JSON)"
+                        rows={3}
+                        disabled={isLoading}
+                        className="font-mono text-xs"
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
                 )}
-              </FormFieldWrapper>
+              />
 
               {renderKeyValuePairs('headers', 'Headers')}
               {renderKeyValuePairs('queryParams', 'Query Parameters')}
