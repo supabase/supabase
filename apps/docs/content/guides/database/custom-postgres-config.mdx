@@ -61,7 +61,7 @@ Some settings can only be modified by a superuser. Supabase pre-enables the [`su
 | `session_replication_role`           | Sets the session's behavior for triggers and rewrite rules.                                                                                                  |
 | `track_io_timing`                    | Collects timing statistics for database I/O activity.                                                                                                        |
 
-For example, to enable `log_nested_statements` for the postgres role, execute:
+For example, to enable `log_nested_statements` for the `postgres` role, execute:
 
 ```sql
 alter role "postgres" set "auto_explain.log_nested_statements" to 'on';

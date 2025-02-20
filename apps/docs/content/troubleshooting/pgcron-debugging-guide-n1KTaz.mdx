@@ -106,7 +106,7 @@ SELECT
 FROM pg_stat_activity where application_name ilike 'pg_cron';
 ```
 
-You can view your peak connection usage throughout the day at the bottom of the [Reports Dashboard](https://supabase.com/dashboard/project/_/reports/database)
+You can view your concurrent peak connection usage throughout the day at the bottom of the [Reports Dashboard](https://supabase.com/dashboard/project/_/reports/database)
 
 <br />
 
@@ -152,7 +152,7 @@ order by timestamp desc
 limit 100;
 ```
 
-If you're interested in modifying the query, there is an advanced [guide](https://github.com/orgs/supabase/discussions/26224) for navigating the postgres logs and a general purpose [one](https://supabase.com/docs/guides/platform/advanced-log-filtering) for applying filters.
+If you're interested in modifying the query, there is an advanced [guide](https://github.com/orgs/supabase/discussions/26224) for navigating the Postgres logs and a general purpose [one](https://supabase.com/docs/guides/platform/advanced-log-filtering) for applying filters.
 
 <br />
 
@@ -190,7 +190,7 @@ You can then search for your custom messages in the [Logs Interface](https://sup
 
 ### Upgrading pg_cron version
 
-The current version of pg*cron on Supabase is 1.6.4. It comes with a [few bug fixes](https://github.com/citusdata/pg_cron/releases/tag/v1.6.4). You should consider upgrading to postgres v15.6.1.122+ in the[ Infrastructure Settings](https://supabase.com/dashboard/project/*/settings/infrastructure) to get the latest extension.
+The current version of pg*cron on Supabase is 1.6.4. It comes with a [few bug fixes](https://github.com/citusdata/pg_cron/releases/tag/v1.6.4). You should consider upgrading to Postgres v15.6.1.122+ in the[ Infrastructure Settings](https://supabase.com/dashboard/project/*/settings/infrastructure) to get the latest extension.
 
 <br />
 

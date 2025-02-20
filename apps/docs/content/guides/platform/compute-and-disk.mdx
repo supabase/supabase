@@ -10,9 +10,9 @@ Every project on the Supabase Platform comes with its own dedicated Postgres ins
 
 The following table describes the base instances, Nano (free plan) and Micro (paid plans), with additional compute instance sizes available if you need extra performance when scaling up.
 
-<Admonition type="note" label="Nano instances in Pro organizations">
+<Admonition type="note" label="Nano instances in paid plan organizations">
 
-In Pro organizations, Nano Compute are billed at the same price as Micro Compute. It is recommended to upgrade your Project from Nano Compute to Micro Compute when it's convenient for you. Compute sizes are not auto-upgraded because of the downtime incurred. See [Supabase Pricing](https://supabase.com/pricing) for more information.
+In paid organizations, Nano Compute are billed at the same price as Micro Compute. It is recommended to upgrade your Project from Nano Compute to Micro Compute when it's convenient for you. Compute sizes are not auto-upgraded because of the downtime incurred. See [Supabase Pricing](https://supabase.com/pricing) for more information. You cannot launch Nano instances on paid plans, only Micro and above - but you might have Nano instances after upgrading from Free Plan.
 
 </Admonition>
 
@@ -36,7 +36,17 @@ In Pro organizations, Nano Compute are billed at the same price as Micro Compute
 
 Compute sizes can be changed by first selecting your project in the dashboard [here](https://supabase.com/dashboard/project/_/settings/compute-and-disk) and the upgrade process will [incur downtime](/docs/guides/platform/compute-and-disk#upgrade-downtime).
 
-We charge hourly for additional compute based on your usage. Read more about [usage-based billing for compute](/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours).
+<Image
+  alt="Compute Size Selection"
+  src={{
+    light: '/docs/img/guides/platform/compute-size-selection--light.png',
+    dark: '/docs/img/guides/platform/compute-size-selection--dark.png',
+  }}
+  zoomable
+  className="max-w-[500px]"
+/>
+
+We charge hourly for additional compute based on your usage. Read more about [usage-based billing for compute](/docs/guides/platform/manage-your-usage/compute).
 
 ### Dedicated vs shared CPU
 
@@ -119,7 +129,7 @@ When selecting your disk, it's essential to focus on the performance needs of yo
 
 For general, day-to-day operations, gp3 should be more than enough. If you need high throughput and IOPS for critical systems, io2 will provide the performance required.
 
-<Admonition type="information">
+<Admonition type="note">
 
 Compute instance size changes will not change your selected disk type or disk size, but your IO limits may change according to what your selected compute instance size supports.
 

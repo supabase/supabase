@@ -13,6 +13,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
@@ -35,8 +36,14 @@ import {
   Listbox,
   Separator,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 
 const formId = 'connection-pooling-form'
 
@@ -58,12 +65,21 @@ const FormSchema = z.object({
   default_pool_size: StringToPositiveNumber,
   pool_mode: z.union([z.literal('transaction'), z.literal('session')]),
   max_client_conn: StringToPositiveNumber,
+  DB_MAX_POOL_SIZE: StringToPositiveNumber,
 })
 
 export const ConnectionPooling = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const snap = useDatabaseSettingsStateSnapshot()
+  const organization = useSelectedOrganization()
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
+    orgSlug: organization?.slug,
+  })
+
+  const isTeamsEnterprisePlan =
+    isSuccessSubscription && subscription.plan.id !== 'free' && subscription.plan.id !== 'pro'
+  const promptTeamsEnterpriseUpgrade = IS_PLATFORM && !isTeamsEnterprisePlan
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
@@ -83,7 +99,9 @@ export const ConnectionPooling = () => {
     isLoading,
     isError,
     isSuccess,
-  } = usePoolingConfigurationQuery({ projectRef: projectRef })
+  } = usePoolingConfigurationQuery({ projectRef })
+
+  const { data: authConfig } = useAuthConfigQuery({ projectRef })
 
   const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,
@@ -103,12 +121,15 @@ export const ConnectionPooling = () => {
     }
   )
 
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       pool_mode: poolingConfiguration?.pool_mode as 'transaction' | 'session',
       default_pool_size: poolingConfiguration?.default_pool_size as number | undefined,
       max_client_conn: poolingConfiguration?.max_client_conn as number | undefined,
+      DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE ?? null,
     },
   })
 
@@ -120,11 +141,14 @@ export const ConnectionPooling = () => {
             pool_mode: data.pool_mode,
             default_pool_size: data.default_pool_size,
             max_client_conn: poolingConfiguration?.max_client_conn,
+            DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE ?? null,
           })
         }
         toast.success('Successfully saved settings')
       },
     })
+
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -135,6 +159,20 @@ export const ConnectionPooling = () => {
       default_pool_size: data.default_pool_size as number | undefined,
       pool_mode: data.pool_mode,
     })
+
+    if (data.DB_MAX_POOL_SIZE !== authConfig?.DB_MAX_POOL_SIZE) {
+      updateAuthConfig(
+        { projectRef, config: { DB_MAX_POOL_SIZE: data.DB_MAX_POOL_SIZE ?? undefined } },
+        {
+          onError: (error: Error) => {
+            toast.error(`Failed to update auth max direct connections: ${error?.message}`)
+          },
+          onSuccess: () => {
+            toast.success('Successfully updated auth max direct connections')
+          },
+        }
+      )
+    }
   }
 
   useEffect(() => {
@@ -143,9 +181,10 @@ export const ConnectionPooling = () => {
         pool_mode: poolingConfiguration?.pool_mode as 'transaction' | 'session',
         default_pool_size: poolingConfiguration?.default_pool_size as number | undefined,
         max_client_conn: poolingConfiguration?.max_client_conn as number | undefined,
+        DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE ?? null,
       })
     }
-  }, [isSuccess])
+  }, [isSuccess, authConfig])
 
   return (
     <section id="connection-pooler">
@@ -259,29 +298,32 @@ export const ConnectionPooling = () => {
                         <>
                           {field.value === 'transaction' ? (
                             <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
-                              <Alert_Shadcn_>
-                                <AlertTitle_Shadcn_ className="text-foreground">
-                                  Pool mode will be set to transaction permanently on port 6543
-                                </AlertTitle_Shadcn_>
-                                <AlertDescription_Shadcn_>
-                                  This will take into effect once saved. You can use session mode by
-                                  pointing the pooler connection to use port 5432.
-                                </AlertDescription_Shadcn_>
-                              </Alert_Shadcn_>
+                              <Admonition
+                                type="warning"
+                                title="Pool mode will be set to transaction permanently on port 6543"
+                                description="This will take into effect once saved. If you are using Session mode with port 6543 in your applications, please update to use port 5432 instead before saving."
+                              />
                             </FormDescription_Shadcn_>
                           ) : (
                             <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
-                              <Alert_Shadcn_>
-                                <AlertTitle_Shadcn_ className="text-foreground">
-                                  Set to transaction mode to use both pooling modes concurrently
-                                </AlertTitle_Shadcn_>
-                                <AlertDescription_Shadcn_>
-                                  Session mode can be used concurrently with transaction mode by
+                              {/* [Joshen] Can probably remove this after Feb 28 */}
+                              <Panel.Notice
+                                layout="vertical"
+                                className="border rounded-lg"
+                                title="Deprecating Session Mode on Port 6543"
+                                description="On February 28, 2025, Supavisor is deprecating Session Mode on port 6543. Please update your application/database clients to use port 5432 for Session Mode."
+                                href="https://github.com/orgs/supabase/discussions/32755"
+                                buttonText="Read the announcement"
+                              />
+                              <Admonition
+                                showIcon={false}
+                                type="default"
+                                title="Set to transaction mode to use both pooling modes concurrently"
+                                description="Session mode can be used concurrently with transaction mode by
                                   using 5432 for session and 6543 for transaction. However, by
                                   configuring the pooler mode to session here, you will not be able
-                                  to use transaction mode at the same time.
-                                </AlertDescription_Shadcn_>
-                              </Alert_Shadcn_>
+                                  to use transaction mode at the same time."
+                              />
                             </FormDescription_Shadcn_>
                           )}
                         </>
@@ -394,6 +436,45 @@ export const ConnectionPooling = () => {
                         to find out more.
                       </FormDescription_Shadcn_>
                       <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                    </FormItem_Shadcn_>
+                  )}
+                />
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="DB_MAX_POOL_SIZE"
+                  render={({ field }) => (
+                    <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                      <FormLabel_Shadcn_ className="col-span-4 text-sm text-foreground-light">
+                        Max Direct Auth Connections
+                      </FormLabel_Shadcn_>
+                      <div className="col-span-8 space-y-2">
+                        {promptTeamsEnterpriseUpgrade && (
+                          <div className="mb-4">
+                            <UpgradeToPro
+                              primaryText="Upgrade to Team or Enterprise"
+                              secondaryText="Max Direct Auth Connections settings are only available on the Team Plan and up."
+                              buttonText="Upgrade to Team"
+                            />
+                          </div>
+                        )}
+                        <FormControl_Shadcn_ className="col-span-8">
+                          <Input_Shadcn_
+                            {...field}
+                            type="number"
+                            className="w-full"
+                            value={field.value || undefined}
+                            placeholder={field.value === null ? '10' : ''}
+                            disabled={!canUpdateConfig || isTeamsEnterprisePlan}
+                          />
+                        </FormControl_Shadcn_>
+                        <FormDescription_Shadcn_>
+                          Auth will take up no more than this number of connections from the total
+                          number of available connections to serve requests. These connections are
+                          not reserved, so when unused they are released. Defaults to 10
+                          connections.
+                        </FormDescription_Shadcn_>
+                        <FormMessage_Shadcn_ />
+                      </div>
                     </FormItem_Shadcn_>
                   )}
                 />

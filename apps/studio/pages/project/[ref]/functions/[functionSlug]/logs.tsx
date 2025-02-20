@@ -1,6 +1,7 @@
 import { useParams } from 'common/hooks'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import FunctionsLayout from 'components/layouts/FunctionsLayout/FunctionsLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import type { NextPageWithLayout } from 'types'
 
@@ -25,6 +26,10 @@ export const LogPage: NextPageWithLayout = () => {
   )
 }
 
-LogPage.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
+LogPage.getLayout = (page) => (
+  <DefaultLayout>
+    <FunctionsLayout>{page}</FunctionsLayout>
+  </DefaultLayout>
+)
 
 export default LogPage

@@ -30,7 +30,7 @@ For this guide we'll use the following example data:
 >
 <TabPanel id="data" label="Data">
 
-{/* <!-- vale off --> */}
+{/* supa-mdx-lint-disable Rule003Spelling */}
 
 | id  | title                               | author                 | description                                                        |
 | --- | ----------------------------------- | ---------------------- | ------------------------------------------------------------------ |
@@ -40,7 +40,7 @@ For this guide we'll use the following example data:
 | 4   | Green Eggs and Ham                  | Dr. Seuss              | Sam has changing food preferences and eats unusually colored food. |
 | 5   | Harry Potter and the Goblet of Fire | J.K. Rowling           | Fourth year of school starts, big drama ensues.                    |
 
-{/* <!-- vale on --> */}
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -301,14 +301,14 @@ data = supabase.from_('books').select().text_search('description', "'big'").exec
 
 <TabPanel id="data" label="Data">
 
-{/* <!-- vale off --> */}
+{/* supa-mdx-lint-disable Rule003Spelling */}
 
 | id  | title                               | author            | description                                     |
 | --- | ----------------------------------- | ----------------- | ----------------------------------------------- |
 | 3   | Tootle                              | Gertrude Crampton | Little toy train has big dreams.                |
 | 5   | Harry Potter and the Goblet of Fire | J.K. Rowling      | Fourth year of school starts, big drama ensues. |
 
-{/* <!-- vale on --> */}
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>
@@ -420,14 +420,14 @@ data = supabase.from_('books').select().text_search('title_description', "little
 </TabPanel>
 <TabPanel id="data" label="Data">
 
-{/* <!-- vale off --> */}
+{/* supa-mdx-lint-disable Rule003Spelling */}
 
 | id  | title                 | author                 | description                                 |
 | --- | --------------------- | ---------------------- | ------------------------------------------- |
 | 1   | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
 | 3   | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
 
-{/* <!-- vale on --> */}
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>
@@ -507,13 +507,13 @@ data = supabase.from_('books').select().text_search('description', "'little' & '
 </TabPanel>
 <TabPanel id="data" label="Data">
 
-{/* <!-- vale off --> */}
+{/* supa-mdx-lint-disable Rule003Spelling */}
 
 | id  | title  | author            | description                      |
 | --- | ------ | ----------------- | -------------------------------- |
 | 3   | Tootle | Gertrude Crampton | Little toy train has big dreams. |
 
-{/* <!-- vale on --> */}
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>
@@ -593,14 +593,14 @@ response = client.from_('books').select().text_search('description', "'little' |
 </TabPanel>
 <TabPanel id="data" label="Data">
 
-{/* <!-- vale off --> */}
+{/* supa-mdx-lint-disable Rule003Spelling */}
 
 | id  | title                 | author                 | description                                 |
 | --- | --------------------- | ---------------------- | ------------------------------------------- |
 | 1   | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
 | 3   | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
 
-{/* <!-- vale on --> */}
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>
@@ -699,7 +699,7 @@ select * from search_books_by_title_prefix('Little+Puppy');
 
 ## Creating indexes
 
-Now that we have Full Text Search working, let's create an `index`. This will allow Postgres to "build" the documents pre-emptively so that they
+Now that we have Full Text Search working, let's create an `index`. This will allow Postgres to "build" the documents preemptively so that they
 don't need to be created at the time we execute the query. This will make our queries much faster.
 
 ### Searchable columns
@@ -734,8 +734,7 @@ from books;
 </TabPanel>
 <TabPanel id="data" label="Data">
 
-{/* <!-- vale off --> */}
-
+```
 | id  | fts                                                                                                             |
 | --- | --------------------------------------------------------------------------------------------------------------- |
 | 1   | 'anim':7 'bigger':6 'littl':10 'poki':9 'puppi':1,11 'slower':3                                                 |
@@ -743,8 +742,7 @@ from books;
 | 3   | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3                                                         |
 | 4   | 'chang':3 'color':9 'eat':7 'egg':12 'food':4,10 'green':11 'ham':14 'prefer':5 'sam':1 'unus':8                |
 | 5   | 'big':6 'drama':7 'ensu':8 'fire':15 'fourth':1 'goblet':13 'harri':9 'potter':10 'school':4 'start':5 'year':2 |
-
-{/* <!-- vale on --> */}
+```
 
 </TabPanel>
 </Tabs>
@@ -820,13 +818,13 @@ data = client.from_('books').select().text_search('fts', "'little' & 'big'").exe
 </TabPanel>
 <TabPanel id="data" label="Data">
 
-{/* <!-- vale off --> */}
+{/* supa-mdx-lint-disable Rule003Spelling */}
 
 | id  | title  | author            | description                      | fts                                                     |
 | --- | ------ | ----------------- | -------------------------------- | ------------------------------------------------------- |
 | 3   | Tootle | Gertrude Crampton | Little toy train has big dreams. | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3 |
 
-{/* <!-- vale on --> */}
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 </Tabs>

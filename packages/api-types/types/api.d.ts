@@ -1310,7 +1310,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets the Stripe customer */
+    /** Gets the Billing customer */
     get: operations['CustomerController_getCustomer']
     /** Updates the billing customer */
     put: operations['updateCustomerV2']
@@ -1660,7 +1660,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets the given organization's roles */
-    get: operations['OrganizationRolesController_getAllRolesV2']
+    get: operations['OrganizationRolesController_getAllRoles']
     put?: never
     post?: never
     delete?: never
@@ -2103,6 +2103,23 @@ export interface paths {
     get: operations['UserAuditLogsController_getAuditLogs']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/profile/audit-login': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Logged into account */
+    post: operations['ProfileController_auditAccountLogin']
     delete?: never
     options?: never
     head?: never
@@ -5183,7 +5200,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets the given organization's roles */
-    get: operations['OrganizationRolesController_getAllRolesV2']
+    get: operations['OrganizationRolesController_getAllRoles']
     put?: never
     post?: never
     delete?: never
@@ -8255,6 +8272,7 @@ export interface components {
       walg_enabled: boolean
     }
     BillingCustomerUpdateBody: {
+      additional_emails?: string[] | undefined
       address?: components['schemas']['CustomerBillingAddress']
     }
     /** @enum {string} */
@@ -8791,6 +8809,7 @@ export interface components {
       state?: string
     }
     CustomerResponse: {
+      additional_emails: string[] | null
       address: components['schemas']['CustomerBillingAddress'] | null
       balance: number
       billing_via_partner: boolean
@@ -15384,7 +15403,7 @@ export interface operations {
           'application/json': components['schemas']['CustomerResponse']
         }
       }
-      /** @description Failed to retrieve the Stripe customer */
+      /** @description Failed to retrieve the Billing customer */
       500: {
         headers: {
           [name: string]: unknown
@@ -16294,7 +16313,7 @@ export interface operations {
       }
     }
   }
-  OrganizationRolesController_getAllRolesV2: {
+  OrganizationRolesController_getAllRoles: {
     parameters: {
       query?: never
       header?: never
@@ -18435,6 +18454,23 @@ export interface operations {
       }
       /** @description Failed to get a user's audit logs */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProfileController_auditAccountLogin: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
         headers: {
           [name: string]: unknown
         }
@@ -20878,6 +20914,7 @@ export interface operations {
           | 'swap_usage'
           | 'physical_replication_lag_physical_replica_lag_seconds'
           | 'pg_stat_database_num_backends'
+          | 'supavisor_connections_active'
         databaseIdentifier?: string
         endDate: string
         interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
@@ -25744,7 +25781,7 @@ export interface operations {
       }
     }
   }
-  OrganizationRolesController_getAllRolesV2: {
+  OrganizationRolesController_getAllRoles: {
     parameters: {
       query?: never
       header?: never
@@ -29560,6 +29597,7 @@ export interface operations {
           | 'swap_usage'
           | 'physical_replication_lag_physical_replica_lag_seconds'
           | 'pg_stat_database_num_backends'
+          | 'supavisor_connections_active'
         databaseIdentifier?: string
         endDate: string
         interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'

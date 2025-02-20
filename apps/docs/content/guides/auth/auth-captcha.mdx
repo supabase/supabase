@@ -41,13 +41,13 @@ In the Settings page, look for the **Sitekey** section and copy the key.
 
 ## Enable CAPTCHA protection for your Supabase project
 
-Navigate to the **[Auth](https://supabase.com/dashboard/project/_/settings/auth)** section of your Project Settings in the Supabase Dashboard and find the **Enable Captcha protection** toggle under Settings > Authentication > Bot and Abuse Protection > Enable Captcha protection.
+Navigate to the **[Auth](https://supabase.com/dashboard/project/_/settings/auth)** section of your Project Settings in the Supabase Dashboard and find the **Enable CAPTCHA protection** toggle under Settings > Authentication > Bot and Abuse Protection > Enable CAPTCHA protection.
 
-Select your CAPTCHA provider from the dropdown, enter your Captcha **Secret key**, and click **Save**.
+Select your CAPTCHA provider from the dropdown, enter your CAPTCHA **Secret key**, and click **Save**.
 
 ## Add the CAPTCHA frontend component
 
-The frontend requires some changes to provide the captcha on-screen for the user. This example uses React and the corresponding Captcha React component, but both Captcha providers can be used with any JavaScript framework.
+The frontend requires some changes to provide the CAPTCHA on-screen for the user. This example uses React and the corresponding CAPTCHA React component, but both CAPTCHA providers can be used with any JavaScript framework.
 
 <Tabs
   scrollable
@@ -77,13 +77,13 @@ Let's create a empty state to store our `captchaToken`
 const [captchaToken, setCaptchaToken] = useState()
 ```
 
-Now lets add the HCaptcha component to the JSX section of our code
+Now lets add the `HCaptcha` component to the JSX section of our code
 
 ```jsx
 <HCaptcha />
 ```
 
-We will pass it the sitekey we copied from the hCaptcha website as a property along with a onVerify property which takes a callback function. This callback function will have a token as one of its properties. Let's set the token in the state using `setCaptchaToken`
+We will pass it the sitekey we copied from the hCaptcha website as a property along with a `onVerify` property which takes a callback function. This callback function will have a token as one of its properties. Let's set the token in the state using `setCaptchaToken`
 
 ```jsx
 <HCaptcha
@@ -94,7 +94,7 @@ We will pass it the sitekey we copied from the hCaptcha website as a property al
 />
 ```
 
-Now lets use the captcha token we receive in our Supabase signUp function.
+Now lets use the CAPTCHA token we receive in our Supabase signUp function.
 
 ```jsx
 await supabase.auth.signUp({
@@ -104,9 +104,9 @@ await supabase.auth.signUp({
 })
 ```
 
-We will also need to reset the captcha challenge after we have made a call to the function above.
+We will also need to reset the CAPTCHA challenge after we have made a call to the function above.
 
-Create a ref to use on our HCaptcha component.
+Create a ref to use on our `HCaptcha` component.
 
 ```jsx
 const captcha = useRef()
@@ -136,7 +136,7 @@ In order to test that this works locally we will need to use something like [ngr
 
 <TabPanel id="turnstile-2" label="Turnstile">
 
-The frontend requires some changes to provide the captcha on-screen for the user. Turnstile can be used with any JavaScript framework but we'll use React and the Turnstile React component for this example.
+The frontend requires some changes to provide the CAPTCHA on-screen for the user. Turnstile can be used with any JavaScript framework but we'll use React and the Turnstile React component for this example.
 
 Install @marsidev/react-turnstile in your project as a dependency.
 
@@ -183,9 +183,9 @@ await supabase.auth.signUp({
 })
 ```
 
-To test locally, you will need to add localhost to the domain whitelist as per the [Cloudflare docs](https://developers.cloudflare.com/turnstile/reference/testing/)
+To test locally, you will need to add localhost to the domain allowlist as per the [Cloudflare docs](https://developers.cloudflare.com/turnstile/reference/testing/)
 
       </TabPanel>
       </Tabs>
 
-Run the application and you should now be provided with a captcha challenge.
+Run the application and you should now be provided with a CAPTCHA challenge.

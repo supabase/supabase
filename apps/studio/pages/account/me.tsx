@@ -1,10 +1,7 @@
-import {
-  AccountInformation,
-  AnalyticsSettings,
-  ThemeSettings,
-} from 'components/interfaces/Account/Preferences'
+import { AccountInformation, AnalyticsSettings } from 'components/interfaces/Account/Preferences'
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
+import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import {
   ScaffoldContainer,

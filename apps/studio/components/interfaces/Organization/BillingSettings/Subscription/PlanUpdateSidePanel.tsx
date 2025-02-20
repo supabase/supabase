@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { TelemetryActions } from 'common/telemetry-constants'
+import { StudioPricingSidePanelOpenedEvent, TelemetryActions } from 'common/telemetry-constants'
 import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -126,6 +126,20 @@ const PlanUpdateSidePanel = () => {
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
+      const source = Array.isArray(router.query.source)
+        ? router.query.source[0]
+        : router.query.source
+      const properties: StudioPricingSidePanelOpenedEvent['properties'] = {
+        currentPlan: subscription?.plan?.name,
+      }
+      if (source) {
+        properties.origin = source
+      }
+      sendEvent({
+        action: TelemetryActions.STUDIO_PRICING_SIDE_PANEL_OPENED,
+        properties,
+        groups: { organization: slug ?? 'Unknown' },
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
@@ -490,11 +504,11 @@ const PlanUpdateSidePanel = () => {
                     <div className="space-x-3 mt-2">
                       <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                         <Link
-                          href="https://supabase.com/docs/guides/platform/org-based-billing"
+                          href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                           target="_blank"
                           rel="noreferrer"
                         >
-                          How billing works
+                          How billing for Compute works
                         </Link>
                       </Button>
                       {subscription?.plan?.id === 'free' && (

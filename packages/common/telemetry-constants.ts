@@ -1,3 +1,4 @@
+// These events are tracked only when users opt in.
 // Standardization as per document: https://www.notion.so/supabase/Event-tracking-standardization-1195004b775f80f98ee3fa9e70cf4d05
 
 export enum TelemetryActions {
@@ -38,6 +39,7 @@ export enum TelemetryActions {
   REALTIME_INSPECTOR_COPY_MESSAGE_CLICKED = 'realtime_inspector_copy_message_clicked',
   REALTIME_INSPECTOR_FILTERS_APPLIED = 'realtime_inspector_filters_applied',
   REALTIME_INSPECTOR_DATABASE_ROLE_UPDATED = 'realtime_inspector_database_role_updated',
+  REALTIME_TOGGLE_TABLE_CLICKED = 'realtime_toggle_table_clicked',
 
   SQL_EDITOR_QUICKSTART_CLICKED = 'sql_editor_quickstart_clicked',
   SQL_EDITOR_TEMPLATE_CLICKED = 'sql_editor_template_clicked',
@@ -70,6 +72,7 @@ export enum TelemetryActions {
   IMPORT_DATA_ADDED = 'import_data_added',
   SQL_EDITOR_QUERY_RUN_BUTTON_CLICKED = 'sql_editor_query_run_button_clicked',
   STUDIO_PRICING_PLAN_CTA_CLICKED = 'studio_pricing_plan_cta_clicked',
+  STUDIO_PRICING_SIDE_PANEL_OPENED = 'studio_pricing_side_panel_opened',
 }
 
 /**
@@ -484,6 +487,31 @@ export interface RealtimeInspectorDatabaseRoleUpdatedEvent {
 }
 
 /**
+ * User clicked to toggle realtime on a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface RealtimeToggleTableClickedEvent {
+  action: TelemetryActions.REALTIME_TOGGLE_TABLE_CLICKED
+  properties: {
+    /**
+     * The state of the toggle.
+     */
+    newState: 'enabled' | 'disabled'
+    /**
+     * Where the toggle was clicked from
+     */
+    origin: 'tableSidePanel' | 'tableGridHeader'
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
  * User clicked the quickstart card in the SQL editor.
  *
  * @group Events
@@ -526,7 +554,7 @@ export interface SqlEditorTemplateClickedEvent {
 }
 
 /**
- * User clicked the “Result download CSV” button in the SQL editor.
+ * User clicked the "Result download CSV" button in the SQL editor.
  *
  * @group Events
  * @source studio
@@ -541,7 +569,7 @@ export interface SqlEditorResultDownloadCsvClickedEvent {
 }
 
 /**
- * User clicked the “Result copy Markdown” button in the SQL editor.
+ * User clicked the "Result copy Markdown" button in the SQL editor.
  *
  * @group Events
  * @source studio
@@ -556,7 +584,7 @@ export interface SqlEditorResultCopyMarkdownClickedEvent {
 }
 
 /**
- * User clicked the “Result copy JSON” button in the SQL editor
+ * User clicked the "Result copy JSON" button in the SQL editor
  *
  * @group Events
  * @source studio
@@ -871,7 +899,7 @@ export interface OpenSourceRepoCardClickedEvent {
 }
 
 /**
- * User clicked the green “Start Project” button in various locations described in properties.
+ * User clicked the green "Start Project" button in various locations described in properties.
  *
  * @group Events
  * @source www
@@ -1059,6 +1087,25 @@ export interface StudioPricingPlanCtaClickedEvent {
   groups: { organization: string }
 }
 
+/**
+ * User opened the pricing side panel in studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /billing?panel=subscriptionPlan
+ */
+export interface StudioPricingSidePanelOpenedEvent {
+  action: TelemetryActions.STUDIO_PRICING_SIDE_PANEL_OPENED
+  properties: {
+    currentPlan?: string
+    /**
+     * Tracks how user landed on the Pricing side panel, e.g. diskManagementPanelDiskSize, backupsRestoreToNewProject
+     */
+    origin?: string
+  }
+  groups: { organization: string }
+}
+
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
@@ -1084,6 +1131,7 @@ export type TelemetryEvent =
   | RealtimeInspectorCopyMessageClickedEvent
   | RealtimeInspectorFiltersAppliedEvent
   | RealtimeInspectorDatabaseRoleUpdatedEvent
+  | RealtimeToggleTableClickedEvent
   | SqlEditorQuickstartClickedEvent
   | SqlEditorTemplateClickedEvent
   | SqlEditorResultDownloadCsvClickedEvent
@@ -1119,3 +1167,4 @@ export type TelemetryEvent =
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
+  | StudioPricingSidePanelOpenedEvent

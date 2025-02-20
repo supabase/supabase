@@ -103,7 +103,7 @@ All available configuration options are available in our [`supabase-community/se
 
 ## Deduplicating spans
 
-If you're already monitoring HTTP errors in Sentry, for example with the Http, Fetch, or Undici integrations, you will get duplicate spans for Supabase calls. You can deduplicate the spans by skipping them in your other integration:
+If you're already monitoring HTTP errors in Sentry, for example with the HTTP, Fetch, or Undici integrations, you will get duplicate spans for Supabase calls. You can deduplicate the spans by skipping them in your other integration:
 
 ```ts
 import * as Sentry from '@sentry/browser'
@@ -274,4 +274,4 @@ export async function register() {
 
 </Tabs>
 
-Afterward build your application (`npm run build`) and start it locally (`npm run start`). You will now see the transactions being logged in the terminal when making supabase-js requests.
+Afterwards, build your application (`npm run build`) and start it locally (`npm run start`). You will now see the transactions being logged in the terminal when making supabase-js requests.

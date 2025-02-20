@@ -103,7 +103,7 @@ Before you activate your domain, prepare your applications and integrations for 
   - You do not need to change the Supabase URL in your applications immediately.
   - You can use it interchangeably with the custom domain.
 - Supabase Auth will use the custom domain immediately once activated.
-  - OAuth flows will advertize the custom domain as a callback URL.
+  - OAuth flows will advertise the custom domain as a callback URL.
   - SAML will use the custom domain instead. This means that the `EntityID` of your project has changed, and this may cause SAML with existing identity providers to stop working.
 
 To prevent issues for your users, follow these steps:
@@ -179,7 +179,7 @@ Before you activate your vanity subdomain, prepare your applications and integra
   - You do not need to change the Supabase URL in your applications immediately or at once.
   - You can use it interchangeably with the custom domain.
 - Supabase Auth will use the subdomain immediately once activated.
-  - OAuth flows will advertize the subdomain as a callback URL.
+  - OAuth flows will advertise the subdomain as a callback URL.
   - SAML will use the subdomain instead. This means that the `EntityID` of your project has changed, and this may cause SAML with existing identity providers to stop working.
 
 To prevent issues for your users, make sure you have gone through these steps:
@@ -223,3 +223,7 @@ Use the [`vanity-subdomains delete`](/docs/reference/cli/supabase-vanity-subdoma
 ```bash
 supabase vanity-subdomains delete --project-ref abcdefghijklmnopqrst --experimental
 ```
+
+## Pricing
+
+For a detailed breakdown of how charges are calculated, refer to [Manage Custom Domain usage](/docs/guides/platform/manage-your-usage/custom-domains).

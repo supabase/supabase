@@ -20,7 +20,7 @@ We generally recommend using the new `@supabase/ssr` package instead of `auth-he
   size="medium"
   className="text-foreground-light border-b mt-8 pb-2"
   >
-  
+
   <AccordionItem
         header="See legacy docs"
         id="legacy-docs"
@@ -155,7 +155,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 <Admonition type="note">
 
-Note that we are specifying filterSerializedResponseHeaders here. We need to tell SvelteKit that supabase needs the `content-range` and `x-supabase-api-version` headers.
+Note that we are specifying `filterSerializedResponseHeaders` here. We need to tell SvelteKit that Supabase needs the `content-range` and `x-supabase-api-version` headers.
 
 </Admonition>
 
@@ -213,7 +213,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
 
 ### Generate types from your database
 
-In order to get the most out of TypeScript and it's intellisense, you should import the generated Database types into the `app.d.ts` type definition file that comes with your SvelteKit project, where `import('./DatabaseDefinitions')` points to the generated types file outlined in [v2 docs here](https://supabase.com/docs/reference/javascript/release-notes#typescript-support) after you have logged in, linked, and generated types through the Supabase CLI.
+In order to get the most out of TypeScript and its IntelliSense, you should import the generated Database types into the `app.d.ts` type definition file that comes with your SvelteKit project, where `import('./DatabaseDefinitions')` points to the generated types file outlined in [v2 docs here](https://supabase.com/docs/reference/javascript/release-notes#typescript-support) after you have logged in, linked, and generated types through the Supabase CLI.
 
 ```ts src/app.d.ts
 // src/app.d.ts
@@ -377,13 +377,13 @@ TypeScript types can be [generated with the Supabase CLI](https://supabase.com/d
 
 Access the client inside pages by `$page.data.supabase` or `data.supabase` when using `export let data`.
 
-The usage of `depends` tells sveltekit that this load function should be executed whenever `invalidate` is called to keep the page store in sync.
+The usage of `depends` tells SvelteKit that this load function should be executed whenever `invalidate` is called to keep the page store in sync.
 
 `createSupabaseLoadClient` caches the client when running in a browser environment and therefore does not create a new client for every time the load function runs.
 
 #### Setting up the event listener on the client side
 
-We need to create an event listener in the root `+layout.svelte` file in order to catch supabase events being triggered.
+We need to create an event listener in the root `+layout.svelte` file in order to catch Supabase events being triggered.
 
 ```svelte src/routes/+layout.svelte
 <!-- src/routes/+layout.svelte -->
@@ -416,7 +416,7 @@ The usage of `invalidate` tells SvelteKit that the root `+layout.ts` load functi
 
 #### Sign in / sign up / sign out
 
-We can access the supabase instance in our `+page.svelte` file through the data object.
+We can access the Supabase instance in our `+page.svelte` file through the data object.
 
 ```svelte src/routes/auth/+page.svelte
 <!-- // src/routes/auth/+page.svelte -->
@@ -634,7 +634,7 @@ If you try to submit a form with the action `?/createPost` without a valid sessi
 
 To avoid writing the same auth logic in every single route you can also use the handle hook to
 protect multiple routes at once. For this to work with your Supabase session, you need to use
-Sveltekit's [sequence helper](https://kit.svelte.dev/docs/modules#sveltejs-kit-hooks) function.
+SvelteKit's [sequence helper](https://kit.svelte.dev/docs/modules#sveltejs-kit-hooks) function.
 Edit your `/src/hooks.server.js` with the below:
 
 <Tabs
@@ -1081,7 +1081,7 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
 Since version 0.9 relies on `hooks.server.ts` to setup our client, we no longer need the `hooks.client.ts` in our project for Supabase related code.
 
-#### Typings [#migration-typings]
+#### Types [#migration-typings]
 
 <Tabs
   scrollable
@@ -1431,7 +1431,7 @@ import '$lib/db'
 </TabPanel>
 </Tabs>
 
-#### Typings [#migration-typings-0-8]
+#### Types [#migration-typings-0-8]
 
 <Tabs
   scrollable
@@ -1784,7 +1784,7 @@ export const handle = sequence(auth(), yourHandler)
 </TabPanel>
 </Tabs>
 
-#### Typings [#migration-typings-0-7]
+#### Types [#migration-typings-0-7]
 
 <Tabs
   scrollable
