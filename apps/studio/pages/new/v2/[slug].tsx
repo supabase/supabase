@@ -14,7 +14,6 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
-import { TelemetryActions } from 'common/telemetry-constants'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,

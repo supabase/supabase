@@ -15,7 +15,6 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'common/telemetry-constants'
 import {
   Entity,
   isTableLike,

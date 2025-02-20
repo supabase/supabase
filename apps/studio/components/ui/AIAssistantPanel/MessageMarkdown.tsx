@@ -2,7 +2,6 @@ import { useRouter } from 'next/router'
 import { DragEvent, memo, ReactNode, useContext, useEffect, useMemo, useRef } from 'react'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'

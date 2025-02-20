@@ -1,7 +1,6 @@
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { Snippet } from 'data/content/sql-folders-query'
