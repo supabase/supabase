@@ -58,13 +58,13 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
   const TypeEnum = z.enum(types)
   const FormSchema = z.object({
     type: TypeEnum,
-    name: z.string(),
-    projectId: z.string(),
-    datasetId: z.string(),
-    serviceAccountKey: z.string(),
-    publicationName: z.string(),
-    maxSize: z.number(),
-    maxFillSecs: z.number(),
+    name: z.string().min(1, 'Name is required'),
+    projectId: z.string().min(1, 'Project id is required'),
+    datasetId: z.string().min(1, 'Dataset id is required'),
+    serviceAccountKey: z.string().min(1, 'Service account key is required'),
+    publicationName: z.string().min(1, 'Publication is required'),
+    maxSize: z.number().min(1, 'Max Size must be greater than 0').int(),
+    maxFillSecs: z.number().min(1, 'Max Fill seconds should be greater than 0').int(),
     enabled: z.boolean(),
   })
   const defaultValues = {
@@ -205,7 +205,6 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                         <FormControl_Shadcn_>
                           <Input_Shadcn_ {...field} placeholder="Dataset id" />
                         </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
                         <FormMessage_Shadcn_ />
                       </FormItem_Shadcn_>
                     )}
