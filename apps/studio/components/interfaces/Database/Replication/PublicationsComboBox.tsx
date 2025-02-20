@@ -53,7 +53,7 @@ const PublicationsComboBox = ({
             : 'Select publication'}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ sameWidthAsTrigger>
+      <PopoverContent_Shadcn_ className="p-0" sameWidthAsTrigger>
         <Command_Shadcn_>
           <CommandInput_Shadcn_
             placeholder="Find publication..."
@@ -90,7 +90,7 @@ const PublicationsComboBox = ({
                   >
                     <span>{pub}</span>
                     {selectedPublication === pub && (
-                      <Check className="text-brand" strokeWidth={2} size={16} />
+                      <Check className="text-brand" strokeWidth={2} size={13} />
                     )}
                   </CommandItem_Shadcn_>
                 ))}
