@@ -1,4 +1,3 @@
-import { BASE_PATH } from 'lib/constants'
 import { NO_REQUIRED_CHARACTERS, urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { ProjectAuthConfigData } from 'data/auth/auth-config-query'
 import { boolean, number, object, string } from 'yup'
@@ -1377,68 +1376,7 @@ const PROVIDER_SAML = {
   },
   validationSchema: object().shape({
     SAML_ENABLED: boolean().required(),
-    SAML_EXTERNAL_URL: string()
-    .test('is_valid_saml_external_url', function (value) { // don't use arrow function here, yup needs its own "this"
-        const { path, createError } = this
-
-      let pathname = window.location.pathname
-
-      if (pathname.startsWith('/dashboard/')) {
-        pathname = pathname.substring('/dashboard'.length)
-      }
-
-        // hack to get the current project ref
-        if (
-          pathname.startsWith('/project/') &&
-          pathname.endsWith('/auth/providers')
-        ) {
-          const currentProjectRef = pathname.split('/')[2]
-
-          if (currentProjectRef) {
-            const expectedValue = `https://${currentProjectRef}.${BASE_PATH}/auth/v1`
-
-            if (value !== expectedValue) {
-              return createError({
-                path,
-                message: `Needs to be this exact value "${expectedValue}"`,
-              })
-            }
-
-            return true
-          }
-        }
-
-        // for some reason we're not on the expected page so we don't know what
-        // the project ref is, do URL parsing instead
-        let url: URL
-        try {
-          url = new URL(value)
-        } catch (e: any) {
-          return createError({ path, message: 'Not a valid URL' })
-        }
-
-        if (url.protocol !== 'https:') {
-          return createError({ path, message: 'Must use HTTPS' })
-        }
-
-        if (url.username || url.password) {
-          return createError({ path, message: 'Must not have username or password in the URL' })
-        }
-
-        if (!url.hostname.endsWith(BASE_PATH)) {
-          return createError({ path, message: `Hostname should with "${BASE_PATH}"` })
-        }
-
-        if (url.pathname !== '/auth/v1') {
-          return createError({
-            path,
-            message: `Must not have the path "${url.pathname}" and should be using "/auth/v1" instead`,
-          })
-        }
-
-        return true
-      })
-      .optional(),
+    SAML_EXTERNAL_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
     SAML_ALLOW_ENCRYPTED_ASSERTIONS: boolean().optional(),
   }),
   misc: {

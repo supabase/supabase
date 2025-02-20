@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { Eye, EyeOff } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 
 import { Markdown } from 'components/interfaces/Markdown'
@@ -15,6 +15,7 @@ interface FormFieldProps {
   formValues: any
   setFieldValue: (field: string, v: any) => any
   disabled?: boolean
+  actions?: ReactNode
 }
 
 function formatDate(date: Date): string {
@@ -27,6 +28,7 @@ const FormField = ({
   formValues,
   disabled = false,
   setFieldValue,
+  actions,
 }: FormFieldProps) => {
   const [hidden, setHidden] = useState(!!properties.isSecret)
   const [dateAsText, setDateAsText] = useState(
@@ -122,21 +124,24 @@ const FormField = ({
             ) : null
           }
           actions={
-            !!properties.isSecret ? (
-              <Button
-                icon={hidden ? <Eye /> : <EyeOff />}
-                type="default"
-                onClick={() => setHidden(!hidden)}
-              />
-            ) : (
-              <span className="mr-3 text-foreground-lighter">
-                {properties.units ? (
-                  <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                    {properties.units}
-                  </ReactMarkdown>
-                ) : null}
-              </span>
-            )
+            <>
+              {actions}
+              {!!properties.isSecret ? (
+                <Button
+                  icon={hidden ? <Eye /> : <EyeOff />}
+                  type="default"
+                  onClick={() => setHidden(!hidden)}
+                />
+              ) : (
+                <span className="mr-3 text-foreground-lighter">
+                  {properties.units ? (
+                    <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                      {properties.units}
+                    </ReactMarkdown>
+                  ) : null}
+                </span>
+              )}
+            </>
           }
         />
       )

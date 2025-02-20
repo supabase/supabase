@@ -266,6 +266,16 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                         // TODO (KM): Remove after 10th October 2024 when we disable the provider
                         shouldDisableField(x) || !canUpdateConfig
                       }
+                      actions={
+                        x === 'SAML_EXTERNAL_URL' && (
+                          <Button
+                            type="default"
+                            onClick={() => setFieldValue(x, `${apiUrl}/auth/v1`)}
+                          >
+                            Use project's API URL
+                          </Button>
+                        )
+                      }
                     />
                   ))}
 
