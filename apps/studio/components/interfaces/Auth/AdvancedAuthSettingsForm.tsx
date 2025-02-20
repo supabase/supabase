@@ -164,12 +164,17 @@ export const AdvancedAuthSettingsForm = () => {
                       description="Number of seconds to wait for an Auth request to complete before canceling it. In certain high-load situations setting a larger or smaller value can be used to control load-shedding. Recommended: 10 seconds."
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          type="number"
-                          disabled={promptTeamsEnterpriseUpgrade}
-                          placeholder="10"
-                          {...field}
-                        />
+                        <div className="relative">
+                          <Input_Shadcn_
+                            type="number"
+                            disabled={promptTeamsEnterpriseUpgrade}
+                            placeholder="10"
+                            {...field}
+                          />
+                          <span className="text-sm text-foreground-lighter absolute top-1.5 right-3">
+                            seconds
+                          </span>
+                        </div>
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
