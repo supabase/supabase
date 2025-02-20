@@ -1,7 +1,5 @@
 import { useParams } from 'common'
 import { AiIconAnimation, Button, Dialog, DialogContent, DialogSection, DialogTrigger } from 'ui'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
-import { ChevronDown, Terminal, Code } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import {
@@ -11,7 +9,7 @@ import {
 } from 'components/interfaces/Functions'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
