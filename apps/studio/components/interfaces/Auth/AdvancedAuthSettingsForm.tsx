@@ -86,9 +86,6 @@ export const AdvancedAuthSettingsForm = () => {
       // @ts-expect-error
       { projectRef: projectRef!, config: payload },
       {
-        onError: (error) => {
-          toast.error(`Failed to update settings: ${error?.message}`)
-        },
         onSuccess: () => {
           toast.success('Successfully updated settings')
           form.reset({ ...defaultValues, ...data })
@@ -116,87 +113,94 @@ export const AdvancedAuthSettingsForm = () => {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
-      <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-        <FormPanel
-          disabled={true}
-          footer={
-            <div className="flex py-4 px-8">
-              <FormActions
-                form={formId}
-                isSubmitting={isUpdatingConfig}
-                hasChanges={isDirty}
-                handleReset={() => form.reset(defaultValues)}
-                disabled={!canUpdateConfig}
-                helper={
-                  !canUpdateConfig
-                    ? 'You need additional permissions to update authentication settings'
-                    : undefined
-                }
-              />
-            </div>
-          }
-        >
-          <FormSection header={<FormSectionLabel>Max Request Duration</FormSectionLabel>}>
-            <FormSectionContent loading={isLoading}>
-              {promptTeamsEnterpriseUpgrade && (
-                <UpgradeToPro
-                  primaryText="Upgrade to Team or Enterprise"
-                  secondaryText="Max Request Duration settings are only available on the Team Plan and up."
-                  buttonText="Upgrade to Team"
+    <>
+      {promptTeamsEnterpriseUpgrade && (
+        <UpgradeToPro
+          primaryText="Upgrade to Team or Enterprise"
+          secondaryText="Advanced Auth server settings are only available on the Team Plan and up."
+          buttonText="Upgrade to Team"
+        />
+      )}
+      <Form_Shadcn_ {...form}>
+        <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+          <FormPanel
+            disabled={true}
+            footer={
+              <div className="flex py-4 px-8">
+                <FormActions
+                  form={formId}
+                  isSubmitting={isUpdatingConfig}
+                  hasChanges={isDirty}
+                  handleReset={() => form.reset(defaultValues)}
+                  disabled={!canUpdateConfig}
+                  helper={
+                    !canUpdateConfig
+                      ? 'You need additional permissions to update authentication settings'
+                      : undefined
+                  }
                 />
-              )}
+              </div>
+            }
+          >
+            <FormSection header={<FormSectionLabel>Max Request Duration</FormSectionLabel>}>
+              <FormSectionContent loading={isLoading}>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="API_MAX_REQUEST_DURATION"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Maximum time allowed for an Auth request to last"
+                      description="Number of seconds to wait for an Auth request to complete before canceling it. In certain high-load situations setting a larger or smaller value can be used to control load-shedding. Recommended: 10 seconds."
+                    >
+                      <FormControl_Shadcn_>
+                        <Input_Shadcn_
+                          type="number"
+                          disabled={promptTeamsEnterpriseUpgrade}
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(
+                              e.target.value === '' ? undefined : Number(e.target.value)
+                            )
+                          }}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </FormSectionContent>
+            </FormSection>
 
-              <FormField_Shadcn_
-                control={form.control}
-                name="API_MAX_REQUEST_DURATION"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Maximum time allowed for an Auth request to last"
-                    description="Number of seconds to wait for an Auth request to complete before canceling it. In certain high-load situations setting a larger or smaller value can be used to control load-shedding. Recommended: 10 seconds."
-                  >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
-                        type="number"
-                        {...field}
-                        onChange={(e) => {
-                          field.onChange(e.target.value === '' ? undefined : Number(e.target.value))
-                        }}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            </FormSectionContent>
-          </FormSection>
-
-          <FormSection header={<FormSectionLabel>Auth Database Connections</FormSectionLabel>}>
-            <FormSectionContent loading={isLoading}>
-              <FormField_Shadcn_
-                control={form.control}
-                name="DB_MAX_POOL_SIZE"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Max Direct Auth Connections"
-                    description="Auth will take up no more than this number of connections from the total number of available connections to serve requests. These connections are not reserved, so when unused they are released. Defaults to 10 connections."
-                  >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
-                        {...field}
-                        placeholder="10"
-                        value={field.value || undefined}
-                        onChange={(e) => {
-                          field.onChange(e.target.value === '' ? undefined : Number(e.target.value))
-                        }}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            </FormSectionContent>
-          </FormSection>
-        </FormPanel>
-      </form>
-    </Form_Shadcn_>
+            <FormSection header={<FormSectionLabel>Auth Database Connections</FormSectionLabel>}>
+              <FormSectionContent loading={isLoading}>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="DB_MAX_POOL_SIZE"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Max Direct Auth Connections"
+                      description="Auth will take up no more than this number of connections from the total number of available connections to serve requests. These connections are not reserved, so when unused they are released. Defaults to 10 connections."
+                    >
+                      <FormControl_Shadcn_>
+                        <Input_Shadcn_
+                          // disabled={promptTeamsEnterpriseUpgrade}
+                          {...field}
+                          placeholder="10"
+                          value={field.value || undefined}
+                          onChange={(e) => {
+                            field.onChange(
+                              e.target.value === '' ? undefined : Number(e.target.value)
+                            )
+                          }}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </FormSectionContent>
+            </FormSection>
+          </FormPanel>
+        </form>
+      </Form_Shadcn_>
+    </>
   )
 }
