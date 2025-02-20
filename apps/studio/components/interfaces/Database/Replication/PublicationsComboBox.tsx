@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
+import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -8,6 +8,7 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -95,6 +96,17 @@ const PublicationsComboBox = ({
                   </CommandItem_Shadcn_>
                 ))}
               </ScrollArea>
+            </CommandGroup_Shadcn_>
+            <CommandSeparator_Shadcn_ />
+            <CommandGroup_Shadcn_>
+              <CommandItem_Shadcn_
+                className="cursor-pointer w-full"
+                onSelect={() => {}}
+                onClick={() => {}}
+              >
+                <Plus size={14} strokeWidth={1.5} />
+                <p>New publication</p>
+              </CommandItem_Shadcn_>
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
