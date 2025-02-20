@@ -486,6 +486,13 @@ const nextConfig = {
             value: 'no-sniff',
           },
           {
+            key: 'Strict-Transport-Security',
+            value:
+              process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
+                ? 'max-age=31536000'
+                : '',
+          },
+          {
             key: 'Content-Security-Policy',
             value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? csp : "frame-ancestors 'none';",
           },
