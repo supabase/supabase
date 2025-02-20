@@ -1,4 +1,4 @@
-name: Local Studio Tests
+name: Studio E2E Tests
 on:
   push:
     branches: [master]
