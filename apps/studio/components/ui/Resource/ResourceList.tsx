@@ -1,9 +1,9 @@
-import { Card } from 'ui'
-import { cn } from 'ui'
-import { forwardRef } from 'react'
+import { forwardRef, HTMLAttributes, ReactNode } from 'react'
 
-export interface ResourceListProps extends React.HTMLAttributes<HTMLDivElement> {
-  children?: React.ReactNode
+import { Card } from 'ui'
+
+export interface ResourceListProps extends HTMLAttributes<HTMLDivElement> {
+  children?: ReactNode
 }
 
 export const ResourceList = forwardRef<HTMLDivElement, ResourceListProps>(
