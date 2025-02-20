@@ -292,10 +292,10 @@ export function DiskManagementForm() {
 
   useEffect(() => {
     // Initialize field values properly when data has been loaded, preserving any user changes
-    if (isSuccess) {
+    if (isDiskAttributesSuccess || isSuccess) {
       form.reset(defaultValues, {})
     }
-  }, [isSuccess])
+  }, [isSuccess, isDiskAttributesSuccess])
 
   // Redirect logic incase disk and compute feature is not live yet
   useEffect(() => {

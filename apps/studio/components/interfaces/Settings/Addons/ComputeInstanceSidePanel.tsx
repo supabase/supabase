@@ -371,7 +371,7 @@ const ComputeInstanceSidePanel = () => {
                 usage-based item and you're billed at the end of your billing cycle based on your
                 compute usage. Read more about{' '}
                 <Link
-                  href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                  href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                   target="_blank"
                   rel="noreferrer"
                   className="underline"

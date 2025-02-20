@@ -504,11 +504,11 @@ const PlanUpdateSidePanel = () => {
                     <div className="space-x-3 mt-2">
                       <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                         <Link
-                          href="https://supabase.com/docs/guides/platform/org-based-billing"
+                          href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                           target="_blank"
                           rel="noreferrer"
                         >
-                          How billing works
+                          How billing for Compute works
                         </Link>
                       </Button>
                       {subscription?.plan?.id === 'free' && (
