@@ -2,6 +2,7 @@ import { UseFormReturn } from 'react-hook-form'
 
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -19,9 +20,6 @@ import { DiskTypeRecommendationSection } from '../ui/DiskTypeRecommendationSecti
 import FormMessage from '../ui/FormMessage'
 import { InputPostTab } from '../ui/InputPostTab'
 import { InputResetButton } from '../ui/InputResetButton'
-import { Admonition } from 'ui-patterns'
-import Markdown from 'markdown-to-jsx'
-import { DocsButton } from 'components/ui/DocsButton'
 
 type DiskSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -45,7 +43,6 @@ export function DiskSizeField({
   } = useDiskAttributesQuery({ projectRef })
   const {
     data: subscription,
-    isLoading: isSubscriptionLoading,
     error: subscriptionError,
     isError: isSubscriptionError,
   } = useOrgSubscriptionQuery({
@@ -53,14 +50,12 @@ export function DiskSizeField({
   })
   const {
     data: diskUtil,
-    isLoading: isDiskUtilizationLoading,
     error: diskUtilError,
     isError: isDiskUtilizationError,
   } = useDiskUtilizationQuery({
     projectRef: projectRef,
   })
 
-  const isLoading = isSubscriptionLoading || isDiskUtilizationLoading || isLoadingDiskAttributes
   const error = subscriptionError || diskUtilError || diskAttributesError
   const isError = isSubscriptionError || isDiskUtilizationError || isDiskAttributesError
 
@@ -94,7 +89,7 @@ export function DiskSizeField({
             <FormItemLayout label="Disk Size" layout="vertical" id={field.name}>
               <div className="relative flex gap-2 items-center">
                 <InputPostTab label="GB">
-                  {isLoading ? (
+                  {isLoadingDiskAttributes ? (
                     <div
                       className={cn(
                         InputVariants({ size: 'small' }),
