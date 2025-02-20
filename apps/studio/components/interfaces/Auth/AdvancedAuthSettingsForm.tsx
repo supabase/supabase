@@ -32,12 +32,12 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 const formId = 'auth-config-advanced-form'
 
 const FormSchema = z.object({
-  API_MAX_REQUEST_DURATION: z
+  API_MAX_REQUEST_DURATION: z.coerce
     .number()
     .min(5, 'Must be 5 or larger')
     .max(30, 'Must be a value no greater than 30')
-    .optional(),
-  DB_MAX_POOL_SIZE: z.number().optional(),
+    .or(z.literal('')),
+  DB_MAX_POOL_SIZE: z.coerce.number().or(z.literal('')),
 })
 
 export const AdvancedAuthSettingsForm = () => {
@@ -62,8 +62,8 @@ export const AdvancedAuthSettingsForm = () => {
 
   const defaultValues = useMemo(
     () => ({
-      API_MAX_REQUEST_DURATION: authConfig?.API_MAX_REQUEST_DURATION ?? undefined,
-      DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE ?? undefined,
+      API_MAX_REQUEST_DURATION: authConfig?.API_MAX_REQUEST_DURATION ?? ('' as const),
+      DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE ?? ('' as const),
     }),
     [authConfig]
   )
@@ -86,10 +86,11 @@ export const AdvancedAuthSettingsForm = () => {
       ...(isTeamsEnterprisePlan
         ? {
             // reset API_MAX_REQUEST_DURATION to 10 if the field is emptied
-            API_MAX_REQUEST_DURATION: API_MAX_REQUEST_DURATION ?? 10,
+            API_MAX_REQUEST_DURATION:
+              API_MAX_REQUEST_DURATION === '' ? 10 : API_MAX_REQUEST_DURATION,
           }
         : {}),
-      DB_MAX_POOL_SIZE: DB_MAX_POOL_SIZE === undefined ? null : DB_MAX_POOL_SIZE,
+      DB_MAX_POOL_SIZE: DB_MAX_POOL_SIZE === '' ? null : DB_MAX_POOL_SIZE,
     }
 
     updateAuthConfig(
@@ -168,13 +169,8 @@ export const AdvancedAuthSettingsForm = () => {
                         <Input_Shadcn_
                           type="number"
                           disabled={promptTeamsEnterpriseUpgrade}
-                          {...field}
                           placeholder="10"
-                          onChange={(e) => {
-                            field.onChange(
-                              e.target.value === '' ? undefined : Number(e.target.value)
-                            )
-                          }}
+                          {...field}
                         />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
@@ -197,14 +193,8 @@ export const AdvancedAuthSettingsForm = () => {
                         <Input_Shadcn_
                           type="number"
                           disabled={promptTeamsEnterpriseUpgrade}
-                          {...field}
                           placeholder="10"
-                          value={field.value || undefined}
-                          onChange={(e) => {
-                            field.onChange(
-                              e.target.value === '' ? undefined : Number(e.target.value)
-                            )
-                          }}
+                          {...field}
                         />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
