@@ -182,7 +182,7 @@ export const AdvancedAuthSettingsForm = () => {
                     >
                       <FormControl_Shadcn_>
                         <Input_Shadcn_
-                          // disabled={promptTeamsEnterpriseUpgrade}
+                          disabled={promptTeamsEnterpriseUpgrade}
                           {...field}
                           placeholder="10"
                           value={field.value || undefined}
