@@ -13,14 +13,14 @@ export const generateUsageData = (attribute: string, days: number): DataPoint[] 
   })
 }
 
-export const getUpgradeUrl = (slug: string, subscription?: OrgSubscription) => {
+export const getUpgradeUrl = (slug: string, subscription?: OrgSubscription, source?: string) => {
   if (!subscription) {
     return `/org/${slug}/billing`
   }
 
   return subscription?.plan?.id === 'pro' && subscription?.usage_billing_enabled === false
     ? `/org/${slug}/billing#cost-control`
-    : `/org/${slug}/billing?panel=subscriptionPlan`
+    : `/org/${slug}/billing?panel=subscriptionPlan&source=usage${source}`
 }
 
 const compactNumberFormatter = new Intl.NumberFormat('en-US', {

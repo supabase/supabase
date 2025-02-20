@@ -105,4 +105,7 @@ VM(s)?
 VSCode
 Vue
 [Ww]eb[Ss]ockets?
+WhatsApp
 Xcode
+pgTAP
+dbdev

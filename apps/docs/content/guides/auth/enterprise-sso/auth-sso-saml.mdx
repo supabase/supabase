@@ -5,7 +5,7 @@ description: 'Use Single Sign-On (SSO) authentication on your project with SAML 
 video: 'https://www.youtube.com/v/em1cpOAXknM'
 ---
 
-<Admonition>
+<Admonition type="tip">
 
 Looking for guides on how to use Single Sign-On with the Supabase dashboard? Head on over to [Enable SSO for Your Organization](/docs/guides/platform/sso).
 
@@ -13,7 +13,7 @@ Looking for guides on how to use Single Sign-On with the Supabase dashboard? Hea
 
 Supabase Auth supports enterprise-level Single Sign-On (SSO) for any identity providers compatible with the SAML 2.0 protocol. This is a non-exclusive list of supported identity providers:
 
-- Google Workspaces (formerly known as GSuite)
+- Google Workspaces (formerly known as G Suite)
 - Okta, Auth0
 - Microsoft Active Directory, Azure Active Directory, Microsoft Entra
 - PingIdentity
@@ -36,14 +36,14 @@ Please note that SAML 2.0 support is offered on plans Pro and above. Check the [
 The number of SAML and SSO acronyms can often be overwhelming. Here's a glossary which you can refer back to at any time:
 
 - **Identity Provider**, **IdP**, or **IDP**
-  An identity provider is a service that manages user accounts at a company or organization. It can verify the identity of a user and exchange that information with your Supabase project and other applications. It acts as a single source of truth for user identities and access rights. Commonly used identity providers are: Microsoft Active Directory (Azure AD, Microsoft Entra), Okta, Google Workspaces (GSuite), PingIdentity, OneLogin, and many others. There are also self-hosted and on-prem versions of identity providers, and sometimes they are accessible only by having access to a company VPN or being in a specific building.
+  An identity provider is a service that manages user accounts at a company or organization. It can verify the identity of a user and exchange that information with your Supabase project and other applications. It acts as a single source of truth for user identities and access rights. Commonly used identity providers are: Microsoft Active Directory (Azure AD, Microsoft Entra), Okta, Google Workspaces (G Suite), PingIdentity, OneLogin, and many others. There are also self-hosted and on-prem versions of identity providers, and sometimes they are accessible only by having access to a company VPN or being in a specific building.
 - **Service Provider**, **SP**
   This is the software that is asking for user information from an identity provider. In Supabase, this is your project's Auth server.
 - **Assertion**
   An assertion is a statement issued by an identity provider that contains information about a user.
-- **EntityID**
+- **`EntityID`**
   A globally unique ID (usually a URL) that identifies an Identity Provider or Service Provider across the world.
-- **NameID**
+- **`NameID`**
   A unique ID (usually an email address) that identifies a user at an Identity Provider.
 - **Metadata**
   An XML document that describes the features and configuration of an Identity Provider or Service Provider. It can be as a standalone document or as a URL. Usually (but not always) the `EntityID` is the URL at which you can access the Metadata.
@@ -53,7 +53,7 @@ The number of SAML and SSO acronyms can often be overwhelming. Here's a glossary
   This is one of the most important SAML URLs. It is the URL where Supabase Auth will accept assertions from an identity provider. Basically, once the identity provider verifies the user's identity it will redirect to this URL and the redirect request will contain the assertion.
 - **Binding (Redirect, POST, or Artifact)**
   This is a description of the way an identity provider communicates with Supabase Auth. When using the Redirect binding, the communication occurs using HTTP 301 redirects. When it's `POST`, it's using `POST` requests sent with `<form>` elements on a page. When using Artifact, it's using a more secure exchange over a Redirect or `POST`.
-- **RelayState**
+- **`RelayState`**
   State used by Supabase Auth to hold information about a request to verify the identity of a user.
 
 ## Important SAML 2.0 information
@@ -62,12 +62,12 @@ Below is information about your project's SAML 2.0 configuration which you can s
 
 | Name                        | Value                                                                   |
 | --------------------------- | ----------------------------------------------------------------------- |
-| EntityID                    | `https://<project>.supabase.co/auth/v1/sso/saml/metadata`               |
+| `EntityID`                  | `https://<project>.supabase.co/auth/v1/sso/saml/metadata`               |
 | Metadata URL                | `https://<project>.supabase.co/auth/v1/sso/saml/metadata`               |
 | Metadata URL<br/>(download) | `https://<project>.supabase.co/auth/v1/sso/saml/metadata?download=true` |
 | ACS URL                     | `https://<project>.supabase.co/auth/v1/sso/saml/acs`                    |
 | SLO URL                     | `https://<project>.supabase.co/auth/v1/sso/slo`                         |
-| NameID                      | Required `emailAddress` or `persistent`                                 |
+| `NameID`                    | Required `emailAddress` or `persistent`                                 |
 
 Note that SLO (Single Logout) is not supported at this time with Supabase Auth as it is a rarely supported feature by identity providers. However, the URL is registered and advertised for when this does become available.
 
@@ -155,7 +155,7 @@ Commonly used SAML 2.0 Identity Providers that support Metadata URLs:
 
 Commonly used SAML 2.0 Identity Providers that only support Metadata XML files:
 
-- Google Workspaces (GSuite)
+- Google Workspaces (G Suite)
 - Any self-hosted or on-prem identity provider behind a VPN
 
 Once you've obtained the SAML 2.0 Metadata XML file or URL you can [establish a connection](/docs/reference/cli/supabase-sso-add) with your project's Supabase Auth server by running:
@@ -323,7 +323,7 @@ Most SAML 2.0 identity providers use Lightweight Directory Access Protocol (LDAP
 
 **Accessing the stored attributes**
 
-The stored attributes, once mapped, show up in the access token (a JWT) of the user. If you need to look these values up in the database, you can find them in the `auth.identities` table under the `identity_data` JSON column. Identities created for SSO providers have `sso:<uuid-of-provider>` in the `provider` column, while `id` contains the unique NameID of the user account.
+The stored attributes, once mapped, show up in the access token (a JWT) of the user. If you need to look these values up in the database, you can find them in the `auth.identities` table under the `identity_data` JSON column. Identities created for SSO providers have `sso:<uuid-of-provider>` in the `provider` column, while `id` contains the unique `NameID` of the user account.
 
 Furthermore, you can find the same identity data under `raw_app_meta_data` inside `auth.users`.
 
@@ -381,6 +381,12 @@ supabase sso show <provider-id> --project-ref <your-project>
 ```
 
 You can use the `-o json` flag to output the information as JSON, should you need to. Other formats may be supported, please use `--help` to see all available options.
+
+## Pricing
+
+<PricingMauSso />
+
+For a detailed breakdown of how charges are calculated, refer to [Manage Monthly Active SSO Users usage](/docs/guides/platform/manage-your-usage/monthly-active-users-sso).
 
 ## Frequently asked questions
 

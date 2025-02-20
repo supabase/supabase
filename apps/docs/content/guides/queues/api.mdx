@@ -11,7 +11,7 @@ Database functions in `pgmq_public` can be exposed via Supabase Data API so cons
 
 Retrieves the next available message and deletes it from the specified Queue.
 
-- `queue_name` (text): Queue name
+- `queue_name` (`text`): Queue name
 
 ---
 
@@ -19,9 +19,9 @@ Retrieves the next available message and deletes it from the specified Queue.
 
 Adds a Message to the specified Queue, optionally delaying its visibility to all consumers by a number of seconds.
 
-- `queue_name` (text): Queue name
-- `message` (jsonb): Message payload to send
-- `sleep_seconds` (integer, optional): Delay message visibility by specified seconds. Defaults to 0
+- `queue_name` (`text`): Queue name
+- `message` (`jsonb`): Message payload to send
+- `sleep_seconds` (`integer`, optional): Delay message visibility by specified seconds. Defaults to 0
 
 ---
 
@@ -29,9 +29,9 @@ Adds a Message to the specified Queue, optionally delaying its visibility to all
 
 Adds a batch of Messages to the specified Queue, optionally delaying their availability to all consumers by a number of seconds.
 
-- `queue_name` (text): Queue name
-- `messages` (jsonb[]): Array of message payloads to send
-- `sleep_seconds` (integer, optional): Delay messages visibility by specified seconds. Defaults to 0
+- `queue_name` (`text`): Queue name
+- `messages` (`jsonb[]`): Array of message payloads to send
+- `sleep_seconds` (`integer`, optional): Delay messages visibility by specified seconds. Defaults to 0
 
 ---
 
@@ -39,8 +39,8 @@ Adds a batch of Messages to the specified Queue, optionally delaying their avail
 
 Archives a Message by moving it from the Queue table to the Queue's archive table.
 
-- `queue_name` (text): Queue name
-- `message_id` (bigint): ID of the Message to archive
+- `queue_name` (`text`): Queue name
+- `message_id` (`bigint`): ID of the Message to archive
 
 ---
 
@@ -48,8 +48,8 @@ Archives a Message by moving it from the Queue table to the Queue's archive tabl
 
 Permanently deletes a Message from the specified Queue.
 
-- `queue_name` (text): Queue name
-- `message_id` (bigint): ID of the Message to delete
+- `queue_name` (`text`): Queue name
+- `message_id` (`bigint`): ID of the Message to delete
 
 ---
 
@@ -57,6 +57,6 @@ Permanently deletes a Message from the specified Queue.
 
 Reads up to "n" Messages from the specified Queue with an optional "sleep_seconds" (visibility timeout).
 
-- `queue_name` (text): Queue name
-- `sleep_seconds` (integer): Visibility timeout in seconds
-- `n` (integer): Maximum number of Messages to read
+- `queue_name` (`text`): Queue name
+- `sleep_seconds` (`integer`): Visibility timeout in seconds
+- `n` (`integer`): Maximum number of Messages to read

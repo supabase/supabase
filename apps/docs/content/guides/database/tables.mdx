@@ -10,12 +10,16 @@ Tables are where you store your data.
 Tables are similar to excel spreadsheets. They contain columns and rows.
 For example, this table has 3 "columns" (`id`, `name`, `description`) and 4 "rows" of data:
 
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
 | `id` | `name`               | `description`                                                                                                                                                 |
 | ---- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1    | The Phantom Menace   | Two Jedi escape a hostile blockade to find allies and come across a young boy who may bring balance to the Force.                                             |
 | 2    | Attack of the Clones | Ten years after the invasion of Naboo, the Galactic Republic is facing a Separatist movement.                                                                 |
 | 3    | Revenge of the Sith  | As Obi-Wan pursues a new threat, Anakin acts as a double agent between the Jedi Council and Palpatine and is lured into a sinister plan to rule the galaxy.   |
 | 4    | Star Wars            | Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a Wookiee and two droids to save the galaxy from the Empire's world-destroying battle station. |
+
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 There are a few important differences from a spreadsheet, but it's a good starting point if you're new to Relational databases.
 
@@ -91,51 +95,51 @@ Every column is a predefined type. PostgreSQL provides many [default types](http
 <details>
 <summary>Show/Hide default data types</summary>
 
-| `Name`                            | `Aliases`   | `Description`                                                    |
-| --------------------------------- | ----------- | ---------------------------------------------------------------- |
-| bigint                            | int8        | signed eight-byte integer                                        |
-| bigserial                         | serial8     | autoincrementing eight-byte integer                              |
-| bit                               |             | fixed-length bit string                                          |
-| bit varying                       | varbit      | variable-length bit string                                       |
-| boolean                           | bool        | logical Boolean (true/false)                                     |
-| box                               |             | rectangular box on a plane                                       |
-| bytea                             |             | binary data (“byte array”)                                       |
-| character                         | char        | fixed-length character string                                    |
-| character varying                 | varchar     | variable-length character string                                 |
-| cidr                              |             | IPv4 or IPv6 network address                                     |
-| circle                            |             | circle on a plane                                                |
-| date                              |             | calendar date (year, month, day)                                 |
-| double precision                  | float8      | double precision floating-point number (8 bytes)                 |
-| inet                              |             | IPv4 or IPv6 host address                                        |
-| integer                           | int, int4   | signed four-byte integer                                         |
-| interval \[ fields \]             |             | time span                                                        |
-| json                              |             | textual JSON data                                                |
-| jsonb                             |             | binary JSON data, decomposed                                     |
-| line                              |             | infinite line on a plane                                         |
-| lseg                              |             | line segment on a plane                                          |
-| macaddr                           |             | MAC (Media Access Control) address                               |
-| macaddr8                          |             | MAC (Media Access Control) address (EUI-64 format)               |
-| money                             |             | currency amount                                                  |
-| numeric                           | decimal     | exact numeric of selectable precision                            |
-| path                              |             | geometric path on a plane                                        |
-| pg_lsn                            |             | PostgreSQL Log Sequence Number                                   |
-| pg_snapshot                       |             | user-level transaction ID snapshot                               |
-| point                             |             | geometric point on a plane                                       |
-| polygon                           |             | closed geometric path on a plane                                 |
-| real                              | float4      | single precision floating-point number (4 bytes)                 |
-| smallint                          | int2        | signed two-byte integer                                          |
-| smallserial                       | serial2     | autoincrementing two-byte integer                                |
-| serial                            | serial4     | autoincrementing four-byte integer                               |
-| text                              |             | variable-length character string                                 |
-| time \[ without time zone \]      |             | time of day (no time zone)                                       |
-| time with time zone               | timetz      | time of day, including time zone                                 |
-| timestamp \[ without time zone \] |             | date and time (no time zone)                                     |
-| timestamp with time zone          | timestamptz | date and time, including time zone                               |
-| tsquery                           |             | text search query                                                |
-| tsvector                          |             | text search document                                             |
-| txid_snapshot                     |             | user-level transaction ID snapshot (deprecated; see pg_snapshot) |
-| uuid                              |             | universally unique identifier                                    |
-| xml                               |             | XML data                                                         |
+| `Name`                            | `Aliases`     | `Description`                                                    |
+| --------------------------------- | ------------- | ---------------------------------------------------------------- |
+| `bigint`                          | `int8`        | signed eight-byte integer                                        |
+| `bigserial`                       | `serial8`     | autoincrementing eight-byte integer                              |
+| `bit`                             |               | fixed-length bit string                                          |
+| `bit varying`                     | `varbit`      | variable-length bit string                                       |
+| `boolean`                         | `bool`        | logical Boolean (true/false)                                     |
+| `box`                             |               | rectangular box on a plane                                       |
+| `bytea`                           |               | binary data (“byte array”)                                       |
+| `character`                       | `char`        | fixed-length character string                                    |
+| `character varying`               | `varchar`     | variable-length character string                                 |
+| `cidr`                            |               | IPv4 or IPv6 network address                                     |
+| `circle`                          |               | circle on a plane                                                |
+| `date`                            |               | calendar date (year, month, day)                                 |
+| `double precision`                | `float8`      | double precision floating-point number (8 bytes)                 |
+| `inet`                            |               | IPv4 or IPv6 host address                                        |
+| `integer`                         | `int`, `int4` | signed four-byte integer                                         |
+| `interval [ fields ]`             |               | time span                                                        |
+| `json`                            |               | textual JSON data                                                |
+| `jsonb`                           |               | binary JSON data, decomposed                                     |
+| `line`                            |               | infinite line on a plane                                         |
+| `lseg`                            |               | line segment on a plane                                          |
+| `macaddr`                         |               | MAC (Media Access Control) address                               |
+| `macaddr8`                        |               | MAC (Media Access Control) address (EUI-64 format)               |
+| `money`                           |               | currency amount                                                  |
+| `numeric`                         | `decimal`     | exact numeric of selectable precision                            |
+| `path`                            |               | geometric path on a plane                                        |
+| `pg_lsn`                          |               | PostgreSQL Log Sequence Number                                   |
+| `pg_snapshot`                     |               | user-level transaction ID snapshot                               |
+| `point`                           |               | geometric point on a plane                                       |
+| `polygon`                         |               | closed geometric path on a plane                                 |
+| `real`                            | `float4`      | single precision floating-point number (4 bytes)                 |
+| `smallint`                        | `int2`        | signed two-byte integer                                          |
+| `smallserial`                     | `serial2`     | autoincrementing two-byte integer                                |
+| `serial`                          | `serial4`     | autoincrementing four-byte integer                               |
+| `text`                            |               | variable-length character string                                 |
+| `time [ without time zone ]`      |               | time of day (no time zone)                                       |
+| `time with time zone`             | `timetz`      | time of day, including time zone                                 |
+| `timestamp [ without time zone ]` |               | date and time (no time zone)                                     |
+| `timestamp with time zone`        | `timestamptz` | date and time, including time zone                               |
+| `tsquery`                         |               | text search query                                                |
+| `tsvector`                        |               | text search document                                             |
+| `txid_snapshot`                   |               | user-level transaction ID snapshot (deprecated; see pg_snapshot) |
+| `uuid`                            |               | universally unique identifier                                    |
+| `xml`                             |               | XML data                                                         |
 
 </details>
 
@@ -300,7 +304,7 @@ supabase
 ### Bulk data loading
 
 When inserting large data sets it's best to use PostgreSQL's [COPY](https://www.postgresql.org/docs/current/sql-copy.html) command.
-This loads data directly from a file into a table. There are several file formats available for copying data: text, csv, binary, JSON, etc.
+This loads data directly from a file into a table. There are several file formats available for copying data: text, CSV, binary, JSON, etc.
 
 For example, if you wanted to load a CSV file into your movies table:
 
@@ -442,11 +446,15 @@ Say we have the following tables from a database of a university:
 
 **`students`**
 
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
 | id  | name             | type          |
 | --- | ---------------- | ------------- |
 | 1   | Princess Leia    | undergraduate |
 | 2   | Yoda             | graduate      |
 | 3   | Anakin Skywalker | graduate      |
+
+{/* supa-mdx-lint-enable Rule003Spelling */}
 
 **`courses`**
 
