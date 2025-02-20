@@ -58,8 +58,6 @@ export const CreateClerkAuthIntegrationDialog = ({
   onClose,
   onDelete,
 }: CreateClerkAuthIntegrationProps) => {
-  const isCreating = true
-
   const { ref: projectRef } = useParams()
   const { mutate: createAuthIntegration, isLoading } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
@@ -100,9 +98,7 @@ export const CreateClerkAuthIntegrationDialog = ({
     <Dialog open={visible} onOpenChange={() => onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="truncate">
-            {isCreating ? `Add new Clerk connection` : `Update existing Clerk connection`}
-          </DialogTitle>
+          <DialogTitle className="truncate">Add new Clerk connection</DialogTitle>
         </DialogHeader>
 
         <Separator />
@@ -134,19 +130,11 @@ export const CreateClerkAuthIntegrationDialog = ({
           </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
-          {!isCreating && (
-            <div className="flex-1">
-              <Button type="danger" onClick={() => onDelete()} icon={<Trash />}>
-                Remove connection
-              </Button>
-            </div>
-          )}
-
           <Button disabled={isLoading} type="default" onClick={() => onClose()}>
             Cancel
           </Button>
           <Button form={FORM_ID} htmlType="submit" disabled={isLoading} loading={isLoading}>
-            {isCreating ? 'Create connection' : 'Update connection'}
+            Create connection
           </Button>
         </DialogFooter>
       </DialogContent>
