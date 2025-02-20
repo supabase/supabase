@@ -35,7 +35,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
   const project = useSelectedProject()
   const { ref: projectRef } = useParams()
 
-  const isIo2Supported = false // IO2_AVAILABLE_REGIONS.includes(project?.region ?? '')
+  const isIo2Supported = IO2_AVAILABLE_REGIONS.includes(project?.region ?? '')
 
   const { isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
 
