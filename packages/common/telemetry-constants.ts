@@ -1069,7 +1069,6 @@ export type TelemetryEvent =
   | AssistantSqlDiffHandlerEvaluatedEvent
   | AssistantEditInSqlEditorClickedEvent
   | DocsFeedbackClickedEvent
-  | HomepageHeroRequestDemoClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
