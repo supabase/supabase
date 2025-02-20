@@ -1,10 +1,11 @@
 'use client'
 
+import { X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useWindowSize } from 'react-use'
-import { CommandEmpty_Shadcn_, Sheet, SheetContent } from 'ui'
+import { CommandEmpty_Shadcn_, Sheet, SheetContent, SheetHeader, SheetTrigger } from 'ui'
 import { cn } from 'ui/src/lib/utils'
 
 const MobileSheetNav: React.FC<{
@@ -31,11 +32,20 @@ const MobileSheetNav: React.FC<{
         size="full"
         side="bottom"
         className={cn(
-          'rounded-t-lg overflow-hidden overflow-y-scroll',
-          'h-[85dvh] md:max-h-[500px] py-2'
+          'rounded-t-lg border overflow-hidden overflow-y-scroll',
+          'h-[85dvh] md:max-h-[500px]'
         )}
       >
-        <ErrorBoundary FallbackComponent={() => <CommandEmpty_Shadcn_ />}>{children}</ErrorBoundary>
+        <ErrorBoundary FallbackComponent={() => <CommandEmpty_Shadcn_ />}>
+          {/* Sticky header for the close button */}
+          <SheetHeader className="sticky flex justify-end z-10 -top-0.5 mb-2 bg-inherit rounded-t-lg">
+            <SheetTrigger>
+              <X size={18} />
+            </SheetTrigger>
+          </SheetHeader>
+          {/* Sheet content */}
+          {children}
+        </ErrorBoundary>
       </SheetContent>
     </Sheet>
   )
