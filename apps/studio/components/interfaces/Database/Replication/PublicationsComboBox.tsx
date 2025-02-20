@@ -104,7 +104,7 @@ const PublicationsComboBox = ({
                 onSelect={() => {}}
                 onClick={() => {}}
               >
-                <Plus size={14} strokeWidth={1.5} />
+                <Plus size={14} strokeWidth={1.5} className="mr-2" />
                 <p>New publication</p>
               </CommandItem_Shadcn_>
             </CommandGroup_Shadcn_>
