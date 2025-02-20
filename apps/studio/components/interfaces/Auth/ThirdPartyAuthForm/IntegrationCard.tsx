@@ -66,8 +66,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
         </>
       )
 
-    case 'clerkDev':
-    case 'clerkProd':
+    case 'clerk':
       return (
         <>
           Allow users to use Supabase with Clerk. Additional setup may be required. You can read
@@ -137,8 +136,7 @@ export const IntegrationTypeContent = ({
       )
     }
 
-    case 'clerkDev':
-    case 'clerkProd':
+    case 'clerk':
       return (
         <div className="text-sm flex flex-row gap-x-4">
           <span className="text-foreground-light w-36">Domain</span>
@@ -157,7 +155,6 @@ export const IntegrationCard = ({
   canUpdateConfig,
   onDelete,
 }: IntegrationCardProps) => {
-  const { ref: projectRef } = useParams()
   let type = getIntegrationType(integration)
 
   if (type === 'custom') {

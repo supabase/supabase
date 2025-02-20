@@ -138,14 +138,7 @@ export const ThirdPartyAuthForm = () => {
       />
 
       <CreateClerkAuthIntegrationDialog
-        prod={true}
-        visible={selectedIntegration === 'clerkProd'}
-        onDelete={() => {}}
-        onClose={() => setSelectedIntegration(undefined)}
-      />
-
-      <CreateClerkAuthIntegrationDialog
-        visible={selectedIntegration === 'clerkDev'}
+        visible={selectedIntegration === 'clerk'}
         onDelete={() => {}}
         onClose={() => setSelectedIntegration(undefined)}
       />

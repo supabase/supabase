@@ -1,14 +1,7 @@
 import { ThirdPartyAuthIntegration } from 'data/third-party-auth/integrations-query'
 import { BASE_PATH } from 'lib/constants'
 
-export const INTEGRATION_TYPES = [
-  'firebase',
-  'auth0',
-  'awsCognito',
-  'clerkDev',
-  'clerkProd',
-  'custom',
-] as const
+export const INTEGRATION_TYPES = ['firebase', 'auth0', 'awsCognito', 'clerk', 'custom'] as const
 export type INTEGRATION_TYPES = (typeof INTEGRATION_TYPES)[number]
 
 export const getIntegrationType = (integration?: ThirdPartyAuthIntegration): INTEGRATION_TYPES => {
@@ -24,12 +17,11 @@ export const getIntegrationType = (integration?: ThirdPartyAuthIntegration): INT
     return 'auth0'
   }
 
-  if (integration?.oidc_issuer_url?.includes('.clerk.accounts.dev')) {
-    return 'clerkDev'
-  }
-
-  if (integration?.oidc_issuer_url?.startsWith('https://clerk.')) {
-    return 'clerkProd'
+  if (
+    integration?.oidc_issuer_url?.includes('.clerk.accounts.dev') ||
+    integration?.oidc_issuer_url?.startsWith('https://clerk.')
+  ) {
+    return 'clerk'
   }
 
   return 'custom'
@@ -43,10 +35,8 @@ export const getIntegrationTypeLabel = (type: INTEGRATION_TYPES) => {
       return 'Auth0'
     case 'awsCognito':
       return 'Amazon Cognito'
-    case 'clerkProd':
+    case 'clerk':
       return 'Clerk'
-    case 'clerkDev':
-      return 'Clerk (Development)'
     case 'custom':
     default:
       return 'Custom'
@@ -61,8 +51,7 @@ export const getIntegrationTypeIcon = (type: INTEGRATION_TYPES) => {
       return `${BASE_PATH}/img/icons/auth0-icon.svg`
     case 'awsCognito':
       return `${BASE_PATH}/img/icons/cognito-icon.svg`
-    case 'clerkDev':
-    case 'clerkProd':
+    case 'clerk':
       return `${BASE_PATH}/img/icons/clerk-icon.svg`
 
     case 'custom':

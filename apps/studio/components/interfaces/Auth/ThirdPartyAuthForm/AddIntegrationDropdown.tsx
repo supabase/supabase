@@ -1,7 +1,6 @@
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
@@ -53,7 +52,6 @@ export const AddIntegrationDropdown = ({
   const selectedProject = useSelectedProject()
 
   const isClerkTPAEnabledFlag = useFlag<string>('isClerkTPAEnabledOnProjects')
-  console.log({ isClerkTPAEnabledFlag })
   const isClerkTPAEnabled =
     selectedProject?.ref &&
     isClerkTPAEnabledFlag &&
@@ -74,15 +72,9 @@ export const AddIntegrationDropdown = ({
         <DropdownMenuSeparator />
 
         <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
-        {isClerkTPAEnabled && (
-          <ProviderDropdownItem type="clerkDev" onSelectIntegrationType={onSelectIntegrationType} />
-        )}
 
         {isClerkTPAEnabled && (
-          <ProviderDropdownItem
-            type="clerkProd"
-            onSelectIntegrationType={onSelectIntegrationType}
-          />
+          <ProviderDropdownItem type="clerk" onSelectIntegrationType={onSelectIntegrationType} />
         )}
         <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="awsCognito" onSelectIntegrationType={onSelectIntegrationType} />
