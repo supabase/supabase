@@ -48,7 +48,7 @@ PGAudit can be configured with different levels of precision.
 **PGAudit logging precision:**
 
 - **[Session](#session-logging):** Logs activity within a connection, such as a [psql](https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-psql) connection.
-- **[User](#user-logging):** Logs activity by a particular database user (for example, anon or postgres).
+- **[User](#user-logging):** Logs activity by a particular database user (for example, `anon` or `postgres`).
 - **[Global](#global-logging):** Logs activity across the entire database.
 - **[Object](#object-logging):** Logs events related to specific database objects (for example, the auth.users table).
 
@@ -58,15 +58,15 @@ Although Session, User, and Global modes differ in their precision, they're all 
 
 These modes can monitor predefined categories of database operations:
 
-| Category | What it Logs                                                          | Description                                                                |
-| -------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| read     | Data retrieval (SELECT, COPY)                                         | Tracks what data is being accessed.                                        |
-| write    | Data modification (INSERT, DELETE, UPDATE, TRUNCATE, COPY)            | Tracks changes made to your database.                                      |
-| function | FUNCTION, PROCEDURE, and DO/END block executions                      | Tracks routine/function executions                                         |
-| role     | User management actions (CREATE, DROP, ALTER on users and privileges) | Tracks changes to user permissions and access.                             |
-| ddl      | Schema changes (CREATE, DROP, ALTER statements)                       | Monitors modifications to your database structure (tables, indexes, etc.). |
-| misc     | Less common commands (FETCH, CHECKPOINT)                              | Captures obscure actions for deeper analysis if needed.                    |
-| all      | Everything above                                                      | Comprehensive logging for complete audit trails.                           |
+| Category   | What it Logs                                                          | Description                                                                |
+| ---------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `read`     | Data retrieval (SELECT, COPY)                                         | Tracks what data is being accessed.                                        |
+| `write`    | Data modification (INSERT, DELETE, UPDATE, TRUNCATE, COPY)            | Tracks changes made to your database.                                      |
+| `function` | FUNCTION, PROCEDURE, and DO/END block executions                      | Tracks routine/function executions                                         |
+| `role`     | User management actions (CREATE, DROP, ALTER on users and privileges) | Tracks changes to user permissions and access.                             |
+| `ddl`      | Schema changes (CREATE, DROP, ALTER statements)                       | Monitors modifications to your database structure (tables, indexes, etc.). |
+| `misc`     | Less common commands (FETCH, CHECKPOINT)                              | Captures obscure actions for deeper analysis if needed.                    |
+| `all`      | Everything above                                                      | Comprehensive logging for complete audit trails.                           |
 
 Below is a limited example of how to assign PGAudit to monitor specific categories.
 
@@ -148,13 +148,13 @@ Use global logging cautiously. It can generate many logs and make it difficult t
 
 </Admonition>
 
-The below SQL configures PGAudit to record all events associated with the "postgres" role. Since it has extensive privileges, this effectively monitors all database activity.
+The below SQL configures PGAudit to record all events associated with the `postgres` role. Since it has extensive privileges, this effectively monitors all database activity.
 
 ```sql
 alter role "postgres" set pgaudit.log to 'all';
 ```
 
-To check if the postgres role is auditing, execute the following command:
+To check if the `postgres` role is auditing, execute the following command:
 
 ```sql
 select
@@ -279,7 +279,7 @@ API requests are already recorded in the [API Edge Network](https://supabase.com
 
 </Admonition>
 
-To monitor all writes initiated by the Postgrest API roles:
+To monitor all writes initiated by the PostgREST API roles:
 
 ```sql
 alter role "authenticator" set pgaudit.log to 'write';
@@ -383,7 +383,7 @@ PGAudit allows settings to be applied to 3 different database scopes:
 | Database | Specific database  | ALTER DATABASE commands    |
 | Role     | Specific user/role | ALTER ROLE commands        |
 
-Supabase limits full privileges for file system and database variables, meaning PGAudit modifications can only occur at the role level. Assigning PGAudit to the 'postgres' role grants it nearly complete visibility into the database, making role-level adjustments a practical alternative to configuring at the database or system level.
+Supabase limits full privileges for file system and database variables, meaning PGAudit modifications can only occur at the role level. Assigning PGAudit to the `postgres` role grants it nearly complete visibility into the database, making role-level adjustments a practical alternative to configuring at the database or system level.
 
 PGAudit's [official documentation](https://www.pgaudit.org) focuses on system and database level configs, but its docs officially supports role level configs, too.
 

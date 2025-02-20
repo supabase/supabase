@@ -1,8 +1,8 @@
 // hooks/useTelemetryCookie.ts
 import { useRouter } from 'next/compat/router'
 import { useEffect } from 'react'
-import { LOCAL_STORAGE_KEYS, IS_PROD } from '../constants'
-import { useTelemetryProps } from './useTelemetryProps'
+import { IS_PROD, LOCAL_STORAGE_KEYS } from '../constants'
+import { getSharedTelemetryData } from '../telemetry'
 
 interface UseTelemetryCookieProps {
   hasAcceptedConsent: boolean
@@ -20,7 +20,6 @@ export function useTelemetryCookie({
   referrer,
 }: UseTelemetryCookieProps) {
   const router = useRouter()
-  const { language, search, viewport_height, viewport_width } = useTelemetryProps()
   const telemetryStorageKey = LOCAL_STORAGE_KEYS.TELEMETRY_DATA
 
   useEffect(() => {
@@ -32,36 +31,13 @@ export function useTelemetryCookie({
     const telemetryCookie = cookies.find((cookie) => cookie.trim().startsWith(telemetryStorageKey))
     if (telemetryCookie) return
 
-    const telemetryData = {
-      page_url: window.location.href,
-      page_title: title,
-      pathname: router.pathname,
-      ph: {
-        referrer,
-        language,
-        search,
-        viewport_height,
-        viewport_width,
-        user_agent: navigator.userAgent,
-      },
-    }
+    const telemetryData = getSharedTelemetryData(router.pathname)
 
     if (!hasAcceptedConsent) {
       const encodedData = encodeURIComponent(JSON.stringify(telemetryData))
       document.cookie = `${telemetryStorageKey}=${encodedData}; ${cookieOptions}`
     }
-  }, [
-    hasAcceptedConsent,
-    router?.isReady,
-    telemetryStorageKey,
-    title,
-    router?.pathname,
-    referrer,
-    language,
-    search,
-    viewport_height,
-    viewport_width,
-  ])
+  }, [hasAcceptedConsent, router?.isReady, telemetryStorageKey, title, router?.pathname, referrer])
 }
 
 export default useTelemetryCookie

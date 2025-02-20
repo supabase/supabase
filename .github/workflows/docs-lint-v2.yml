@@ -38,10 +38,10 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: 6435a4cd1eeea7c2bbd343731de7e8a5127cb2d1
+          key: 0be447eba738c3fd56698eff8ad01fa56c2391d7
       - name: install linter
         if: steps.cache-cargo.outputs.cache-hit != 'true'
-        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 6435a4cd1eeea7c2bbd343731de7e8a5127cb2d1
+        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 0be447eba738c3fd56698eff8ad01fa56c2391d7
       - name: install reviewdog
         uses: reviewdog/action-setup@3f401fe1d58fe77e10d665ab713057375e39b887 # v1.3.0
         with:
@@ -54,7 +54,7 @@ jobs:
         run: |
           set -o pipefail
           git diff --name-only origin/$BASE_REF HEAD \
-            | { grep -E "^apps/docs/content/guides/" || test $? = 1; } \
+            | { grep -E "^apps/docs/content/" || test $? = 1; } \
             | xargs -r supa-mdx-lint --format rdf \
             | reviewdog -f=rdjsonl -reporter=github-pr-review
       - name: run linter on push or workflow dispatch

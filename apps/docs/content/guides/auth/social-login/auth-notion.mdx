@@ -23,7 +23,7 @@ Setting up Notion logins for your application consists of 3 parts:
 
 - Once logged in, go to [notion.so/my-integrations](https://notion.so/my-integrations) and create a new integration.
 - When creating your integration, ensure that you select "Public integration" under "Integration type" and "Read user information including email addresses" under "Capabilities".
-- You will need to add a redirect uri, see [Add the redirect uri](#add-the-redirect-uri)
+- You will need to add a redirect URI, see [Add the redirect URI](#add-the-redirect-uri)
 - Once you've filled in the necessary fields, click "Submit" to finish creating the integration.
 
 ![notion.so](/docs/img/guides/auth-notion/notion-developer.png)
@@ -57,7 +57,7 @@ Setting up Notion logins for your application consists of 3 parts:
 
 <CreateClientSnippet />
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `notion` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `notion` as the `provider`:
 
 ```js
 async function signInWithNotion() {
@@ -70,7 +70,7 @@ async function signInWithNotion() {
 </TabPanel>
 <TabPanel id="flutter" label="Flutter">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `notion` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `notion` as the `provider`:
 
 ```dart
 Future<void> signInWithNotion() async {

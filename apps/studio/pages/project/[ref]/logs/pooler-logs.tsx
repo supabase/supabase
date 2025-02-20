@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import { Loading } from 'components/ui/Loading'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
@@ -23,6 +24,10 @@ export const LogPage: NextPageWithLayout = () => {
   )
 }
 
-LogPage.getLayout = (page) => <LogsLayout title="Pooler Logs">{page}</LogsLayout>
+LogPage.getLayout = (page) => (
+  <DefaultLayout>
+    <LogsLayout title="Pooler Logs">{page}</LogsLayout>
+  </DefaultLayout>
+)
 
 export default LogPage

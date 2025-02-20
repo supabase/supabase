@@ -1,6 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { type ReactNode } from 'react'
+import ReactMarkdown from 'react-markdown'
 
 import { cn } from 'ui'
 
@@ -78,9 +79,13 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
           id="sb-docs-guide-main-article"
           className="prose max-w-none"
         >
-          <h1 className="mb-0">{meta?.title || 'Supabase Docs'}</h1>
+          <h1 className="mb-0 [&>p]:m-0">
+            <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
+          </h1>
           {meta?.subtitle && (
-            <h2 className="mt-3 text-xl text-foreground-light">{meta.subtitle}</h2>
+            <h2 className="mt-3 text-xl text-foreground-light">
+              <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
+            </h2>
           )}
           <hr className="not-prose border-t-0 border-b my-8" />
           <MDXProviderGuides>

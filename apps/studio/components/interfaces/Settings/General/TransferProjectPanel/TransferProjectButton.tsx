@@ -172,8 +172,7 @@ const TransferProjectButton = () => {
             <div className="space-y-2">
               {organizations.length === 0 ? (
                 <div className="flex items-center gap-3 bg-surface-200 p-3 text-sm rounded-md border">
-                  <InfoIcon /> You do not have any organizations with an organization-based
-                  subscription.
+                  <InfoIcon /> You do not have any organizations you can transfer your project to.
                 </div>
               ) : (
                 <Listbox
@@ -240,7 +239,7 @@ const TransferProjectButton = () => {
                         </ul>
                         <p className="text-sm text-foreground-light">
                           These members will need to either delete, pause, or upgrade one or more of
-                          their projects before you can downgrade this project.
+                          their projects before you can transfer this project.
                         </p>
                       </div>
                     )}

@@ -385,6 +385,17 @@ parameters:
       - name: 'PostgreSQL configuration'
         link: 'https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-STATEMENT-TIMEOUT'
 
+  - id: 'db.settings.track_activity_query_size'
+    title: 'db.settings.track_activity_query_size'
+    tags: ['database']
+    required: false
+    description: |
+      Sets the maximum size of the query string that will be tracked in pg_stat_activity.current_query field.
+      Note: Changing this parameter requires a database restart.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-statistics.html#GUC-TRACK-ACTIVITY-QUERY-SIZE'
+
   - id: 'db.settings.track_commit_timestamp'
     title: 'db.settings.track_commit_timestamp'
     tags: ['database']
@@ -1496,6 +1507,21 @@ parameters:
     usage: |
       [functions.my_function]
       entrypoint = "path/to/custom/function.ts"
+
+  - id: 'functions.function_name.static_files'
+    title: 'functions.<function_name>.static_files'
+    tags: ['edge-functions']
+    required: false
+    description: |
+      Specify an array of static files to be bundled with the function. Supports glob patterns.
+
+      NOTE: only file paths within `functions` directory are supported at the moment.
+    links:
+      - name: '`supabase functions` CLI subcommands'
+        link: 'https://supabase.com/docs/reference/cli/supabase-functions'
+    usage: |
+      [functions.my_function]
+      static_files = [ "./functions/MY_FUNCTION_NAME/*.html", "./functions/MY_FUNCTION_NAME/custom.wasm" ]
 
   - id: 'analytics.enabled'
     title: 'analytics.enabled'

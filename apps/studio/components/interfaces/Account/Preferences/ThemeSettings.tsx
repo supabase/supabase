@@ -1,9 +1,10 @@
-import Panel from 'components/ui/Panel'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { BASE_PATH, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
+
+import Panel from 'components/ui/Panel'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { BASE_PATH, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
   Label_Shadcn_,
   RadioGroup_Shadcn_,
@@ -15,7 +16,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-const ThemeSettings = () => {
+export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
 
@@ -24,20 +25,14 @@ const ThemeSettings = () => {
     true
   )
 
-  const [expandNavigationPanel, setExpandNavigationPanel] = useState(allowNavPanelToExpand)
-
   /**
    * Avoid Hydration Mismatch
    * https://github.com/pacocoursey/next-themes?tab=readme-ov-file#avoid-hydration-mismatch
    */
   // useEffect only runs on the client, so now we can safely show the UI
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  useEffect(() => setMounted(true), [])
 
-  if (!mounted) {
-    return null
-  }
+  if (!mounted) return null
 
   function SingleThemeSelection() {
     return (
@@ -48,7 +43,7 @@ const ThemeSettings = () => {
           aria-label="Choose a theme"
           defaultValue={theme}
           value={theme}
-          className="flex flex-wrap gap-5"
+          className="flex flex-wrap gap-2 md:gap-5"
         >
           {singleThemes.map((theme: Theme) => (
             <RadioGroupLargeItem_Shadcn_
@@ -65,16 +60,11 @@ const ThemeSettings = () => {
     )
   }
 
-  function handleExpandNavigationPanel() {
-    setExpandNavigationPanel(!expandNavigationPanel)
-    setAllowNavPanelToExpand(!allowNavPanelToExpand)
-  }
-
   return (
     <Panel title={<h5 key="panel-title">Appearance</h5>}>
-      <Panel.Content className="grid gap-8">
+      <Panel.Content className="grid gap-8 !py-5">
         <div className="grid grid-cols-12">
-          <div className="col-span-4 flex flex-col gap-5">
+          <div className="col-span-full md:col-span-4 flex flex-col gap-5">
             <Label_Shadcn_ htmlFor="theme" className="text-light">
               Theme mode
             </Label_Shadcn_>
@@ -83,30 +73,27 @@ const ThemeSettings = () => {
             </p>
           </div>
 
-          <div className="col-span-8 flex flex-col gap-4">
+          <div className="col-span-full md:col-span-8 flex flex-col gap-4">
             <p className="text-sm text-light">Supabase will use your selected theme</p>
             <SingleThemeSelection />
           </div>
         </div>
-
-        <Separator />
-
+      </Panel.Content>
+      <Separator />
+      <Panel.Content>
         <FormItemLayout
           isReactForm={false}
           label="Expand Navigation menu"
           layout="flex-row-reverse"
           description="Allow the Navigation panel to expand on hover"
-          className="pb-3"
         >
           <Switch
             size="large"
-            checked={expandNavigationPanel}
-            onCheckedChange={() => handleExpandNavigationPanel()}
+            checked={allowNavPanelToExpand}
+            onCheckedChange={setAllowNavPanelToExpand}
           />
         </FormItemLayout>
       </Panel.Content>
     </Panel>
   )
 }
-
-export default ThemeSettings

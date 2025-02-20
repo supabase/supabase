@@ -1,11 +1,9 @@
-import { ExclamationCircleIcon } from '@heroicons/react/16/solid'
 import { Check } from 'lucide-react'
 import Image from 'next/image'
 
 import { useParams } from 'common'
 import { ThirdPartyAuthIntegration } from 'data/third-party-auth/integrations-query'
-import { Badge, Button, Dialog, DialogContent, DialogTrigger } from 'ui'
-import { AddRLSPolicyForFirebaseDialog } from './AddRLSPolicyForFirebaseDialog'
+import { Badge, Button } from 'ui'
 import { AWS_IDP_REGIONS } from './AwsRegionSelector'
 import {
   getIntegrationType,

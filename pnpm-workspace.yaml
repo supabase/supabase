@@ -1,8 +1,11 @@
 packages:
-  - "apps/*"
-  - "packages/*"
-  - "tests/*"
+  - 'apps/*'
+  - 'packages/*'
+  - 'tests/*'
 
 catalog:
   '@types/node': ^20.0.0
+  '@supabase/auth-js': 2.68.0-rc.6
+  '@supabase/supabase-js': ^2.47.14
+  '@supabase/realtime-js': ^2.11.3
   next: 14.2.21

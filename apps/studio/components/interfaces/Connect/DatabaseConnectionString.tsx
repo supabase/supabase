@@ -2,6 +2,7 @@ import { ChevronDown } from 'lucide-react'
 import { HTMLAttributes, ReactNode, useState } from 'react'
 
 import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
@@ -10,7 +11,7 @@ import { usePoolingConfigurationQuery } from 'data/database/pooling-configuratio
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -52,6 +53,7 @@ const StepLabel = ({
 
 export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
@@ -103,6 +105,7 @@ export const DatabaseConnectionString = () => {
     sendEvent({
       action: TelemetryActions.CONNECTION_STRING_COPIED,
       properties: { connectionType, lang, connectionMethod },
+      groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
   }
 
@@ -173,7 +176,12 @@ export const DatabaseConnectionString = () => {
 
   return (
     <div className="flex flex-col">
-      <div className={cn('flex items-center gap-3', DIALOG_PADDING_X)}>
+      <div
+        className={cn(
+          'flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3',
+          DIALOG_PADDING_X
+        )}
+      >
         <div className="flex">
           <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
             Type
@@ -215,7 +223,7 @@ export const DatabaseConnectionString = () => {
         <div className="flex flex-col divide-y divide-border">
           {/* // handle non terminal examples */}
           {hasCodeExamples && (
-            <div className="grid grid-cols-2 gap-x-20 w-full px-7 py-8">
+            <div className="grid grid-cols-2 gap-x-20 w-full px-4 md:px-7 py-8">
               <div>
                 <StepLabel number={++stepNumber} className="mb-4">
                   Install the following
@@ -256,11 +264,11 @@ export const DatabaseConnectionString = () => {
 
           <div>
             {hasCodeExamples && (
-              <div className="px-7 pt-8">
+              <div className="px-4 md:px-7 pt-8">
                 <StepLabel number={++stepNumber}>Choose type of connection</StepLabel>
               </div>
             )}
-            <div className="divide-y divide-border-muted [&>div]:px-7 [&>div]:py-8">
+            <div className="divide-y divide-border-muted [&>div]:px-4 [&>div]:md:px-7 [&>div]:py-8">
               <ConnectionPanel
                 contentType={contentType}
                 lang={lang}
@@ -354,7 +362,7 @@ export const DatabaseConnectionString = () => {
             </div>
           </div>
           {examplePostInstallCommands && (
-            <div className="grid grid-cols-2 gap-20 w-full px-7 py-10">
+            <div className="grid grid-cols-2 gap-20 w-full px-4 md:px-7 py-10">
               <div>
                 <StepLabel number={++stepNumber} className="mb-4">
                   Add the configuration package to read the settings
@@ -401,12 +409,12 @@ export const DatabaseConnectionString = () => {
                 {poolerConnStringSyntax.map((x, idx) => {
                   if (x.tooltip) {
                     return (
-                      <Tooltip_Shadcn_ key={`syntax-${idx}`}>
-                        <TooltipTrigger_Shadcn_ asChild>
+                      <Tooltip key={`syntax-${idx}`}>
+                        <TooltipTrigger asChild>
                           <span className="text-foreground text-xs font-mono">{x.value}</span>
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom">{x.tooltip}</TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">{x.tooltip}</TooltipContent>
+                      </Tooltip>
                     )
                   } else {
                     return (

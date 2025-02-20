@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
+import { useParams } from 'common'
 import {
   formatFilterURLParams,
   formatSortURLParams,
@@ -15,9 +16,10 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { SidePanel } from 'ui'
+import { Button, SidePanel } from 'ui'
 import ActionBar from '../../ActionBar'
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
+import { convertByteaToHex } from '../RowEditor.utils'
 import Pagination from './Pagination'
 import SelectorGrid from './SelectorGrid'
 
@@ -34,10 +36,21 @@ const ForeignRowSelector = ({
   onSelect,
   closePanel,
 }: ForeignRowSelectorProps) => {
+  const { id } = useParams()
   const { project } = useProjectContext()
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id: !!id ? Number(id) : undefined,
+  })
 
   const { tableId: _tableId, schema: schemaName, table: tableName, columns } = foreignKey ?? {}
   const tableId = _tableId ? Number(_tableId) : undefined
+
+  // [Joshen] Only show Set NULL CTA if its a 1:1 foreign key, and source column is nullable
+  // As this wouldn't be straightforward for composite foreign keys
+  const sourceColumn = (selectedTable?.columns ?? []).find((c) => c.name === columns?.[0].source)
+  const isNullable = (columns ?? []).length === 1 && sourceColumn?.is_nullable
 
   const { data: table } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -135,13 +148,27 @@ const ForeignRowSelector = ({
                   </DndProvider>
                 </div>
 
-                <Pagination
-                  page={page}
-                  setPage={setPage}
-                  rowsPerPage={rowsPerPage}
-                  currentPageRowsCount={data?.rows.length ?? 0}
-                  isLoading={isRefetching}
-                />
+                <div className="flex items-center gap-x-3 divide-x">
+                  <Pagination
+                    page={page}
+                    setPage={setPage}
+                    rowsPerPage={rowsPerPage}
+                    currentPageRowsCount={data?.rows.length ?? 0}
+                    isLoading={isRefetching}
+                  />
+                  {isNullable && (
+                    <div className="pl-3">
+                      <Button
+                        type="default"
+                        onClick={() => {
+                          if (columns?.length === 1) onSelect({ [columns[0].source]: null })
+                        }}
+                      >
+                        Set NULL
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {data.rows.length > 0 ? (
@@ -150,7 +177,12 @@ const ForeignRowSelector = ({
                   rows={data.rows}
                   onRowSelect={(row) => {
                     const value = columns?.reduce((a, b) => {
-                      return { ...a, [b.source]: row[b.target] }
+                      const targetColumn = selectedTable?.columns.find((x) => x.name === b.target)
+                      const value =
+                        targetColumn?.format === 'bytea'
+                          ? convertByteaToHex(row[b.target])
+                          : row[b.target]
+                      return { ...a, [b.source]: value }
                     }, {})
                     onSelect(value)
                   }}

@@ -42,7 +42,7 @@ const ExamplesMobile: FC<Props> = ({ examples, className }: any) => {
       >
         {examples.map((example: Example, i: number) => (
           <SwiperSlide key={`${content}-${i}`}>
-            <ExampleCard {...example} showProducts />
+            <ExampleCard {...example} showProducts inHomepage />
           </SwiperSlide>
         ))}
       </Swiper>

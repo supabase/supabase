@@ -4,18 +4,16 @@ import '../styles/index.css'
 
 import {
   AuthProvider,
-  IS_PROD,
+  FeatureFlagProvider,
+  PageTelemetry,
   ThemeProvider,
-  useTelemetryCookie,
-  useTelemetryProps,
   useThemeSandbox,
 } from 'common'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-import { SonnerToaster, themes } from 'ui'
+import { SonnerToaster, themes, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
@@ -24,81 +22,14 @@ import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_THEME_COLOR,
 } from 'common/MetaFavicons/pages-router'
 import { WwwCommandMenu } from '~/components/CommandMenu'
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION, IS_PREVIEW } from '~/lib/constants'
-import { post } from '~/lib/fetchWrapper'
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
-  const telemetryProps = useTelemetryProps()
   const { hasAcceptedConsent } = useConsent()
-  const IS_DEV = !IS_PROD && !IS_PREVIEW
-  const blockEvents = IS_DEV || !hasAcceptedConsent
-
-  const title = typeof document !== 'undefined' ? document?.title : ''
-  const referrer = typeof document !== 'undefined' ? document?.referrer : ''
-
-  const { search, language, viewport_height, viewport_width } = telemetryProps
 
   useThemeSandbox()
-
-  useTelemetryCookie({ hasAcceptedConsent, title, referrer })
-
-  function handlePageTelemetry(url: string) {
-    return post(
-      `${API_URL}/telemetry/page`,
-      {
-        page_url: url,
-        page_title: title,
-        pathname: router.pathname,
-        ph: {
-          referrer,
-          language,
-          search,
-          viewport_height,
-          viewport_width,
-          user_agent: navigator.userAgent,
-        },
-      },
-      { headers: { Version: '2' }, credentials: 'include' }
-    )
-  }
-
-  useEffect(() => {
-    if (blockEvents) return
-
-    function handleRouteChange() {
-      handlePageTelemetry(window.location.href)
-    }
-
-    // Listen for page changes after a navigation or when the query changes
-    router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router.events, blockEvents])
-
-  useEffect(() => {
-    if (!router.isReady) return
-    if (blockEvents) return
-    handlePageTelemetry(window.location.href)
-  }, [router.isReady, blockEvents])
-
-  useEffect(() => {
-    const handleBeforeUnload = async () => {
-      if (!blockEvents) {
-        await post(`${API_URL}/telemetry/page-leave`, {
-          page_url: window.location.href,
-          page_title: title,
-          pathname: router.pathname,
-        })
-      }
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [blockEvents, router.pathname, title])
 
   const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
   const { basePath } = useRouter()
@@ -153,18 +84,23 @@ export default function App({ Component, pageProps }: AppProps) {
       />
 
       <AuthProvider>
-        <ThemeProvider
-          themes={themes.map((theme) => theme.value)}
-          enableSystem
-          disableTransitionOnChange
-          forcedTheme={forceDarkMode ? 'dark' : undefined}
-        >
-          <CommandProvider>
-            <SonnerToaster position="top-right" />
-            <Component {...pageProps} />
-            <WwwCommandMenu />
-          </CommandProvider>
-        </ThemeProvider>
+        <FeatureFlagProvider API_URL={API_URL}>
+          <ThemeProvider
+            themes={themes.map((theme) => theme.value)}
+            enableSystem
+            disableTransitionOnChange
+            forcedTheme={forceDarkMode ? 'dark' : undefined}
+          >
+            <TooltipProvider delayDuration={0}>
+              <CommandProvider>
+                <SonnerToaster position="top-right" />
+                <Component {...pageProps} />
+                <WwwCommandMenu />
+                <PageTelemetry API_URL={API_URL} hasAcceptedConsent={hasAcceptedConsent} />
+              </CommandProvider>
+            </TooltipProvider>
+          </ThemeProvider>
+        </FeatureFlagProvider>
       </AuthProvider>
     </>
   )

@@ -361,8 +361,8 @@ const uiConfig = ui({
         xs: '480px',
       },
       fontFamily: {
-        sans: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
-        mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
+        sans: 'var(--font-custom, Circular, custom-font, Helvetica Neue, Helvetica, Arial, sans-serif)',
+        mono: 'var(--font-source-code-pro, Source Code Pro, Office Code Pro, Menlo, monospace)',
       },
 
       // shadcn defaults START
@@ -480,6 +480,15 @@ function motionSafeTransition({ addUtilities, matchUtilities, theme }) {
       '@media (prefers-reduced-motion)': {
         transitionDuration: '1ms',
       },
+    },
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    '.no-scrollbar::-webkit-scrollbar': {
+      display: 'none',
+    },
+    /* Hide scrollbar for IE, Edge and Firefox */
+    '.no-scrollbar': {
+      '-ms-overflow-style': 'none' /* IE and Edge */,
+      'scrollbar-width': 'none' /* Firefox */,
     },
   })
 

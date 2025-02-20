@@ -24,6 +24,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     anchor: 'dbSize',
     category: 'Database',
     unitName: 'GB',
+    tip: 'Database size refers to the actual amount of space used by all your database objects, as reported by Postgres. Free Plan projects are limited to 0.5 GB Database Size each.',
   },
   {
     key: PricingMetric.EGRESS,
@@ -73,7 +74,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   },
   {
     key: PricingMetric.REALTIME_PEAK_CONNECTIONS,
-    name: 'Realtime Peak Connections',
+    name: 'Realtime Concurrent Peak Connections',
     units: 'absolute',
     anchor: 'realtimePeakConnections',
     category: 'Realtime',
@@ -102,7 +103,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     tip: 'Each project gets provisioned with 8 GB of GP3 disk for free. When you get close to the disk size limit, we autoscale your disk by 1.5x. Each GB of provisioned disk size beyond 8 GB incurs a GB-Hr every hour. Each extra GB is billed at $0.125/month ($0.000171/GB-Hr), prorated down to the hour.',
     docLink: {
       title: 'Read more',
-      url: 'https://supabase.com/docs/guides/platform/org-based-billing#disk-size',
+      url: 'https://supabase.com/docs/guides/platform/manage-your-usage/disk-size',
     },
   },
   {

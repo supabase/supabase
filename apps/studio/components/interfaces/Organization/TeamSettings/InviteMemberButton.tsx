@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { isNil } from 'lodash'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -12,7 +11,6 @@ import { useParams } from 'common'
 import InformationBox from 'components/ui/InformationBox'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import {
@@ -55,9 +53,9 @@ import {
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
   Switch,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -115,8 +113,6 @@ export const InviteMemberButton = () => {
     )
 
   const { mutate: inviteMember, isLoading: isInviting } = useOrganizationCreateInvitationMutation()
-  const { mutate: inviteMemberOld, isLoading: isInvitingOld } =
-    useOrganizationMemberInviteCreateMutation()
 
   const FormSchema = z.object({
     email: z.string().email('Must be a valid email address').min(1, 'Email is required'),
@@ -150,54 +146,27 @@ export const InviteMemberButton = () => {
       }
     }
 
-    if (hasAccessToProjectLevelPermissions) {
-      inviteMember(
-        {
-          slug,
-          email: values.email.toLowerCase(),
-          roleId: Number(values.role),
-          ...(!values.applyToOrg && values.projectRef ? { projects: [values.projectRef] } : {}),
-        },
-        {
-          onSuccess: () => {
-            toast.success('Successfully sent invitation to new member')
-            setIsOpen(!isOpen)
+    inviteMember(
+      {
+        slug,
+        email: values.email.toLowerCase(),
+        roleId: Number(values.role),
+        ...(!values.applyToOrg && values.projectRef ? { projects: [values.projectRef] } : {}),
+      },
+      {
+        onSuccess: () => {
+          toast.success('Successfully sent invitation to new member')
+          setIsOpen(!isOpen)
 
-            form.reset({
-              email: '',
-              role: developerRole?.id.toString() ?? '',
-              applyToOrg: true,
-              projectRef: '',
-            })
-          },
-        }
-      )
-    } else {
-      inviteMemberOld(
-        {
-          slug,
-          invitedEmail: values.email.toLowerCase(),
-          ownerId: profile.id,
-          roleId: Number(values.role),
+          form.reset({
+            email: '',
+            role: developerRole?.id.toString() ?? '',
+            applyToOrg: true,
+            projectRef: '',
+          })
         },
-        {
-          onSuccess: (data) => {
-            if (isNil(data)) {
-              toast.error('Failed to add member')
-            } else {
-              toast.success('Successfully added new member')
-              setIsOpen(!isOpen)
-              form.reset({
-                email: '',
-                role: developerRole?.id.toString() ?? '',
-                applyToOrg: true,
-                projectRef: '',
-              })
-            }
-          },
-        }
-      )
-    }
+      }
+    )
   }
 
   useEffect(() => {
@@ -219,22 +188,22 @@ export const InviteMemberButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <Button
               disabled={!canInviteMembers}
-              className="pointer-events-auto"
+              className="pointer-events-auto flex-grow md:flex-grow-0"
               onClick={() => setIsOpen(true)}
             >
               Invite
             </Button>
-          </TooltipTrigger_Shadcn_>
+          </TooltipTrigger>
           {!canInviteMembers && (
-            <TooltipContent_Shadcn_ side="bottom">
+            <TooltipContent side="bottom">
               You need additional permissions to invite a member to this organization
-            </TooltipContent_Shadcn_>
+            </TooltipContent>
           )}
-        </Tooltip_Shadcn_>
+        </Tooltip>
       </DialogTrigger>
       <DialogContent size="medium">
         <DialogHeader>
@@ -407,7 +376,7 @@ export const InviteMemberButton = () => {
                         autoFocus
                         {...field}
                         autoComplete="off"
-                        disabled={isInviting || isInvitingOld}
+                        disabled={isInviting}
                         placeholder="Enter email address"
                       />
                     </FormControl_Shadcn_>
@@ -439,7 +408,9 @@ export const InviteMemberButton = () => {
                       {isSuccessSubscription &&
                         (currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
                           <Button asChild type="default">
-                            <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                            <Link
+                              href={`/org/${slug}/billing?panel=subscriptionPlan&source=inviteMemberSSO`}
+                            >
                               Upgrade to Team
                             </Link>
                           </Button>
@@ -451,7 +422,7 @@ export const InviteMemberButton = () => {
             </DialogSection>
             <DialogSectionSeparator />
             <DialogSection className="pt-0">
-              <Button block htmlType="submit" loading={isInviting || isInvitingOld}>
+              <Button block htmlType="submit" loading={isInviting}>
                 Send invitation
               </Button>
             </DialogSection>

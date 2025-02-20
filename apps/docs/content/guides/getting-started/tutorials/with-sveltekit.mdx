@@ -47,7 +47,7 @@ Optionally, add `src/styles.css` with the [CSS from the example](https://raw.git
 
 ### Creating a Supabase client for SSR
 
-The ssr package configures Supabase to use Cookies, which is required for server-side languages and frameworks.
+The `ssr` package configures Supabase to use Cookies, which is required for server-side languages and frameworks.
 
 Install the Supabase packages:
 
@@ -55,7 +55,7 @@ Install the Supabase packages:
 npm install @supabase/ssr @supabase/supabase-js
 ```
 
-Creating a Supabase client with the ssr package automatically configures it to use Cookies. This means your user's session is available throughout the entire SvelteKit stack - page, layout, server, hooks.
+Creating a Supabase client with the `ssr` package automatically configures it to use Cookies. This means your user's session is available throughout the entire SvelteKit stack - page, layout, server, hooks.
 
 Add the code below to your `src/hooks.server.ts` to initialize the client on the server:
 
@@ -163,7 +163,7 @@ Start your dev server (`npm run dev`) in order to generate the `./$types` files 
 
 </Admonition>
 
-Create a new `src/routes/+layout.ts` file to handle the session and the supabase object on the client-side.
+Create a new `src/routes/+layout.ts` file to handle the session and the `supabase` object on the client-side.
 
 ```ts src/routes/+layout.ts
 // src/routes/+layout.ts

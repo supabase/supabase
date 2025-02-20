@@ -11,8 +11,14 @@ import FunctionsLayout from 'components/layouts/FunctionsLayout/FunctionsLayout'
 import AreaChart from 'components/ui/Charts/AreaChart'
 import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import NoPermission from 'components/ui/NoPermission'
-import { useFunctionsReqStatsQuery } from 'data/analytics/functions-req-stats-query'
-import { useFunctionsResourceUsageQuery } from 'data/analytics/functions-resource-usage-query'
+import {
+  FunctionsReqStatsVariables,
+  useFunctionsReqStatsQuery,
+} from 'data/analytics/functions-req-stats-query'
+import {
+  FunctionsResourceUsageVariables,
+  useFunctionsResourceUsageQuery,
+} from 'data/analytics/functions-resource-usage-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -24,6 +30,7 @@ import {
   Button,
   WarningIcon,
 } from 'ui'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -77,13 +84,13 @@ const PageLayout: NextPageWithLayout = () => {
   const reqStatsResult = useFunctionsReqStatsQuery({
     projectRef,
     functionId: id,
-    interval: selectedInterval.key,
+    interval: selectedInterval.key as FunctionsReqStatsVariables['interval'],
   })
 
   const resourceUsageResult = useFunctionsResourceUsageQuery({
     projectRef,
     functionId: id,
-    interval: selectedInterval.key,
+    interval: selectedInterval.key as FunctionsResourceUsageVariables['interval'],
   })
 
   const reqStatsData = useMemo(() => {
@@ -324,6 +331,10 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
+PageLayout.getLayout = (page) => (
+  <DefaultLayout>
+    <FunctionsLayout>{page}</FunctionsLayout>
+  </DefaultLayout>
+)
 
 export default PageLayout

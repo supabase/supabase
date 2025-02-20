@@ -2,7 +2,7 @@ import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/Billing/Billi
 import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import type { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { Alert } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 export const COLOR_MAP = {
   white: { bar: 'fill-foreground', marker: 'bg-foreground' },
@@ -109,7 +109,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
             chartPrefix: 'Average',
             unit: 'bytes',
             description:
-              'Database size refers to the monthly average database space usage, as reported by Postgres. Paid Plans use auto-scaling disks.\nBilling is based on the average daily database size used in GB throughout the billing period. Billing is independent of the provisioned disk size.',
+              'Database size refers to the actual amount of space used by all your database objects, as reported by Postgres.',
             links: [
               {
                 name: 'Documentation',
@@ -134,9 +134,8 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
               return (
                 <div>
                   {(isApproachingLimit || isExceededLimit) && isCapped && (
-                    <Alert
-                      withIcon
-                      variant={isExceededLimit ? 'danger' : 'warning'}
+                    <Admonition
+                      type={isExceededLimit ? 'danger' : 'warning'}
                       title={
                         isExceededLimit
                           ? 'Exceeding database size limit'
@@ -152,7 +151,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
                             : "Disable your spend cap to scale seamlessly, and pay for over-usage beyond your Plan's quota."}
                         </div>
                       </div>
-                    </Alert>
+                    </Admonition>
                   )}
                 </div>
               )
@@ -170,7 +169,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
             links: [
               {
                 name: 'Documentation',
-                url: 'https://supabase.com/docs/guides/platform/org-based-billing#disk-size',
+                url: 'https://supabase.com/docs/guides/platform/manage-your-usage/disk-size',
               },
               {
                 name: 'Disk Management',
@@ -300,7 +299,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
         attributes: [
           { key: PricingMetric.REALTIME_PEAK_CONNECTIONS.toLowerCase(), color: 'white' },
         ],
-        name: 'Realtime Peak Connections',
+        name: 'Realtime Concurrent Peak Connections',
         chartPrefix: 'Max',
         unit: 'absolute',
         description:

@@ -5,16 +5,16 @@
   "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "next --port 3000",
+    "dev": "pnpm run content:build && next --port 3000",
     "build": "pnpm run content:build && next build",
     "export": "next export",
     "start": "next start",
     "lint": "next lint",
     "clean": "rimraf node_modules",
     "typecheck": "pnpm run content:build && tsc --noEmit",
-    "content:build": "contentlayer2 build && node scripts/generateLatestBlogPosts.mjs",
+    "content:build": "contentlayer2 build && node scripts/generateStaticContent.mjs",
     "prettier": "prettier --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\"",
-    "postbuild": "node ./internals/generate-sitemap.mjs"
+    "postbuild": "node ./internals/generate-sitemap.mjs && ./../../scripts/upload-static-assets.sh"
   },
   "dependencies": {
     "@code-hike/mdx": "^0.9.0",
@@ -28,8 +28,7 @@
     "@octokit/plugin-paginate-graphql": "^4.0.0",
     "@octokit/rest": "^20.0.2",
     "@radix-ui/react-dialog": "^1.0.5",
-    "@react-three/fiber": "^7.0.29",
-    "@supabase/supabase-js": "^2.44.3",
+    "@supabase/supabase-js": "catalog:",
     "@vercel/og": "^0.6.2",
     "ai-commands": "workspace:*",
     "animejs": "^3.2.2",
@@ -62,7 +61,6 @@
     "react-dom": "^18.2.0",
     "react-markdown": "^8.0.3",
     "react-syntax-highlighter": "^15.5.0",
-    "react-tooltip": "^4.2.17",
     "react-transition-group": "^4.4.1",
     "react-use": "^17.4.0",
     "recharts": "^2.8.0",

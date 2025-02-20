@@ -9,16 +9,20 @@ import {
   DroppableProvided,
 } from 'react-beautiful-dnd'
 
+import { useParams } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import InformationBox from 'components/ui/InformationBox'
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   WarningIcon,
 } from 'ui'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
@@ -54,9 +58,14 @@ const ColumnManagement = ({
   onClearImportContent = noop,
   onUpdateFkRelations,
 }: ColumnManagementProps) => {
+  const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
+
   const [open, setOpen] = useState(false)
   const [selectedColumn, setSelectedColumn] = useState<ColumnField>()
   const [selectedFk, setSelectedFk] = useState<ForeignKey>()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const hasImportContent = !isEmpty(importContent)
   const [primaryKeyColumns, otherColumns] = partition(
@@ -156,8 +165,21 @@ const ColumnManagement = ({
                     </Button>
                   </div>
                 ) : (
-                  <Button type="default" onClick={onSelectImportData}>
-                    Import data via spreadsheet
+                  <Button
+                    type="default"
+                    onClick={() => {
+                      onSelectImportData()
+                      sendEvent({
+                        action: TelemetryActions.IMPORT_DATA_BUTTON_CLICKED,
+                        properties: { tableType: 'New Table' },
+                        groups: {
+                          project: projectRef ?? 'Unknown',
+                          organization: org?.slug ?? 'Unknown',
+                        },
+                      })
+                    }}
+                  >
+                    Import data from CSV
                   </Button>
                 )}
               </>
@@ -199,30 +221,30 @@ const ColumnManagement = ({
             {isNewRecord && <div className="w-[5%]" />}
             <div className="w-[25%] flex items-center space-x-2">
               <h5 className="text-xs text-foreground-lighter">Name</h5>
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_>
+              <Tooltip>
+                <TooltipTrigger>
                   <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="bottom" className="w-[300px]">
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="w-[300px]">
                   Recommended to use lowercase and use an underscore to separate words e.g.
                   column_name
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             </div>
             <div className="w-[25%]">
               <h5 className="text-xs text-foreground-lighter">Type</h5>
             </div>
             <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
               <h5 className="text-xs text-foreground-lighter">Default Value</h5>
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_>
+              <Tooltip>
+                <TooltipTrigger>
                   <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="bottom" className="w-[300px]">
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="w-[300px]">
                   Can either be a literal or an expression. When using an expression wrap your
                   expression in brackets, e.g. (gen_random_uuid())
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             </div>
             <div className="w-[10%]">
               <h5 className="text-xs text-foreground-lighter">Primary</h5>

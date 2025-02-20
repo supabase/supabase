@@ -1,0 +1,56 @@
+---
+title = "Certain operations are too complex to perform directly using the client libraries."
+github_url = "https://github.com/orgs/supabase/discussions/21294"
+date_created = "2024-02-15T12:37:11+00:00"
+topics = [ "database" ]
+keywords = [ "stored", "function", "complex" ]
+database_id = "df9518df-d019-42bb-8d91-918c6d57b452"
+---
+
+**Solution**
+In cases where operations are overly complex or not feasible to implement directly using the client libraries, it might be beneficial to leverage stored functions within your database.
+
+Follow these steps to create and run a stored function:
+
+**Create the Stored Function:**
+
+Go to the [SQL query editor](https://supabase.com/dashboard/project/_/sql/new) on your database dashboard.
+Run the following SQL script to create a stored function tailored to your specific complex query:
+
+```
+DROP FUNCTION IF EXISTS get_my_complex_query;
+CREATE FUNCTION get_my_complex_query(parameter INT)
+RETURNS TABLE (column1 INTEGER, column2 VARCHAR, column3 DATE) AS
+$$
+BEGIN
+    RETURN QUERY
+    SELECT t1.column1, t1.column2, t2.column3
+    FROM "TableName1" AS t1
+    INNER JOIN "TableName2" AS t2 ON t1.column = t2.column
+    INNER JOIN "TableName3" AS t3 ON t2.another_column = t3.another_column
+    LEFT JOIN "TableName4" AS t4 ON t3.some_column = t4.some_column
+    WHERE t2.column = parameter
+    AND t3.column_name = 'some_value';
+END;
+$$
+LANGUAGE plpgsql VOLATILE;
+```
+
+**Call the Stored Function:**
+
+Use the supabase.rpc method to call the stored function from your application code. Replace "get_my_complex_query" with the appropriate function name and provide the necessary parameters:
+
+```
+supabase.rpc("get_my_complex_query", { parameter: 1 })
+  .then(response => {
+    // Handle the response
+  })
+  .catch(error => {
+    // Handle errors
+  });
+```
+
+**Further Resources:**
+
+For more information on PostgreSQL database functions, refer to the following resource:
+[Supabase Stored Procedures](https://supabase.com/docs/guides/database/functions#quick-demo)

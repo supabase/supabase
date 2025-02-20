@@ -5,13 +5,13 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
-  DISK_PRICING,
-  DiskType,
-} from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
-import {
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from 'components/interfaces/DiskManagement/DiskManagement.utils'
+import {
+  DISK_PRICING,
+  DiskType,
+} from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
@@ -71,7 +71,6 @@ const DeployNewReplicaPanel = ({
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
-  const diskManagementV2 = useFlag('diskManagementV2')
   const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
   const { data } = useReadReplicasQuery({ projectRef })
@@ -102,7 +101,7 @@ const DeployNewReplicaPanel = ({
 
   // @ts-ignore
   const { size_gb, type, throughput_mbps, iops } = diskConfiguration?.attributes ?? {}
-  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
+  const showNewDiskManagementUI = project?.cloud_provider === 'AWS'
   const readReplicaDiskSizes = (size_gb ?? 0) * 1.25
   const additionalCostDiskSize =
     readReplicaDiskSizes * (DISK_PRICING[type as DiskType]?.storage ?? 0)
@@ -302,7 +301,7 @@ const DeployNewReplicaPanel = ({
                   <Link
                     href={
                       isFreePlan
-                        ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
+                        ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelSmallCompute`
                         : diskAndComputeFormEnabled
                           ? `/project/${projectRef}/settings/compute-and-disk`
                           : `/project/${projectRef}/settings/addons?panel=computeInstance`
@@ -401,7 +400,7 @@ const DeployNewReplicaPanel = ({
                       <Link
                         href={
                           isFreePlan
-                            ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
+                            ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelMaxReplicas`
                             : diskAndComputeFormEnabled
                               ? `/project/${projectRef}/settings/compute-and-disk`
                               : `/project/${projectRef}/settings/addons?panel=computeInstance`
@@ -529,7 +528,7 @@ const DeployNewReplicaPanel = ({
             <p className="text-foreground-light text-sm">
               Read more about{' '}
               <Link
-                href="https://supabase.com/docs/guides/platform/org-based-billing#read-replicas"
+                href="https://supabase.com/docs/guides/platform/manage-your-usage/read-replicas"
                 target="_blank"
                 rel="noreferrer"
                 className="underline hover:text-foreground transition"

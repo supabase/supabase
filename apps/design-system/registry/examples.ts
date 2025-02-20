@@ -1098,6 +1098,11 @@ export const examples: Registry = [
     files: ['example/multi-select-combobox.tsx'],
   },
   {
+    name: 'multi-select-combobox-creatable',
+    type: 'components:example',
+    files: ['example/multi-select-combobox-creatable.tsx'],
+  },
+  {
     name: 'multi-select-deletable-badge',
     type: 'components:example',
     files: ['example/multi-select-deletable-badge.tsx'],
@@ -1206,5 +1211,10 @@ export const examples: Registry = [
     name: 'expanding-textarea-demo',
     type: 'docs:example',
     files: ['example/expanding-textarea-demo.tsx'],
+  },
+  {
+    name: 'logs-bar-chart',
+    type: 'components:example',
+    files: ['example/logs-bar-chart.tsx'],
   },
 ]
