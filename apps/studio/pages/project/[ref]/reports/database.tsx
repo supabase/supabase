@@ -395,7 +395,7 @@ const GrafanaBannerActions = ({ className }: { className?: string }) => {
           target="_blank"
           onClick={() =>
             sendEvent({
-              action: TelemetryActions.STUDIO_REPORTS_DATABASE_GRAFANA_BANNER_CLICKED,
+              action: TelemetryActions.REPORTS_DATABASE_GRAFANA_BANNER_CLICKED,
               groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
             })
           }
@@ -409,7 +409,7 @@ const GrafanaBannerActions = ({ className }: { className?: string }) => {
           target="_blank"
           onClick={() =>
             sendEvent({
-              action: TelemetryActions.STUDIO_REPORTS_DATABASE_GRAFANA_BANNER_CLICKED,
+              action: TelemetryActions.REPORTS_DATABASE_GRAFANA_BANNER_CLICKED,
               groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
             })
           }
