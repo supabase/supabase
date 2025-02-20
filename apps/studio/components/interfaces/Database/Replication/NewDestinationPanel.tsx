@@ -21,6 +21,7 @@ import {
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
+  Separator,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -143,13 +144,17 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
             </SheetHeader>
             <SheetSection className="flex-grow overflow-auto">
               <Form_Shadcn_ {...form}>
-                <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-                  <p className="mb-2">Where to send</p>
+                <form
+                  id={formId}
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="flex flex-col gap-y-4"
+                >
+                  <p>Where to send</p>
                   <FormField_Shadcn_
                     name="type"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItem_Shadcn_>
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormLabel_Shadcn_>Type</FormLabel_Shadcn_>
                         <FormControl_Shadcn_>
                           <Select_Shadcn_ value={field.value}>
@@ -169,7 +174,7 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                     control={form.control}
                     name="name"
                     render={({ field }) => (
-                      <FormItem_Shadcn_>
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
                         <FormControl_Shadcn_>
                           <Input_Shadcn_ {...field} placeholder="Name" />
@@ -182,7 +187,7 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                     control={form.control}
                     name="projectId"
                     render={({ field }) => (
-                      <FormItem_Shadcn_>
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormLabel_Shadcn_>Project Id</FormLabel_Shadcn_>
                         <FormControl_Shadcn_>
                           <Input_Shadcn_ {...field} placeholder="Project id" />
@@ -195,7 +200,7 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                     control={form.control}
                     name="datasetId"
                     render={({ field }) => (
-                      <FormItem_Shadcn_>
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormLabel_Shadcn_>Dataset Id</FormLabel_Shadcn_>
                         <FormControl_Shadcn_>
                           <Input_Shadcn_ {...field} placeholder="Dataset id" />
@@ -209,7 +214,7 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                     control={form.control}
                     name="serviceAccountKey"
                     render={({ field }) => (
-                      <FormItem_Shadcn_>
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormLabel_Shadcn_>Service Account Key</FormLabel_Shadcn_>
                         <FormControl_Shadcn_>
                           <TextArea_Shadcn_
@@ -223,12 +228,13 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                       </FormItem_Shadcn_>
                     )}
                   />
-                  <p className="mt-6 mb-2">What to send</p>
+                  <Separator className="mt-3" />
+                  <p>What to send</p>
                   <FormField_Shadcn_
                     control={form.control}
                     name="publicationName"
                     render={({ field }) => (
-                      <FormItem_Shadcn_>
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormLabel_Shadcn_>Publication</FormLabel_Shadcn_>
                         <FormControl_Shadcn_>
                           <PublicationsComboBox
@@ -241,12 +247,13 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                       </FormItem_Shadcn_>
                     )}
                   />
-                  <p className="mt-6 mb-2">Advanced Settings</p>
+                  <Separator className="mt-3" />
+                  <p>Advanced Settings</p>
                   <FormField_Shadcn_
                     control={form.control}
                     name="maxSize"
                     render={({ field }) => (
-                      <FormItem_Shadcn_>
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormLabel_Shadcn_>Max Size</FormLabel_Shadcn_>
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
@@ -266,7 +273,7 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                     control={form.control}
                     name="maxFillSecs"
                     render={({ field }) => (
-                      <FormItem_Shadcn_>
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
                         <FormLabel_Shadcn_>Max Fill Seconds</FormLabel_Shadcn_>
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
