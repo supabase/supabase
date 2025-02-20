@@ -1,6 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { subscriptionKeys } from './keys'
 
@@ -34,7 +35,7 @@ export const useProjectAddonsQuery = <TData = ProjectAddonsData>(
     subscriptionKeys.addons(projectRef),
     ({ signal }) => getProjectAddons({ projectRef }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
       ...options,
     }
   )

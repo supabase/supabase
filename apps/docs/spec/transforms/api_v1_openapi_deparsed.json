@@ -8665,9 +8665,6 @@
                       },
                       "import_map_path": {
                         "type": "string"
-                      },
-                      "compute_multiplier": {
-                        "type": "number"
                       }
                     },
                     "required": [
@@ -8701,7 +8698,8 @@
       "post": {
         "operationId": "v1-create-a-function",
         "summary": "Create a function",
-        "description": "Creates a function and adds it to the specified project.",
+        "description": "This endpoint is deprecated - use the deploy endpoint. Creates a function and adds it to the specified project.",
+        "deprecated": true,
         "parameters": [
           {
             "name": "ref",
@@ -8762,16 +8760,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "compute_multiplier",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "maximum": 4,
-              "type": "number"
-            }
           }
         ],
         "requestBody": {
@@ -8793,11 +8781,6 @@
                   },
                   "verify_jwt": {
                     "type": "boolean"
-                  },
-                  "compute_multiplier": {
-                    "type": "number",
-                    "minimum": 1,
-                    "maximum": 4
                   }
                 },
                 "required": ["slug", "name", "body"]
@@ -8819,11 +8802,6 @@
                   },
                   "verify_jwt": {
                     "type": "boolean"
-                  },
-                  "compute_multiplier": {
-                    "type": "number",
-                    "minimum": 1,
-                    "maximum": 4
                   }
                 },
                 "required": ["slug", "name", "body"]
@@ -8874,9 +8852,6 @@
                     },
                     "import_map_path": {
                       "type": "string"
-                    },
-                    "compute_multiplier": {
-                      "type": "number"
                     }
                   },
                   "required": [
@@ -8897,6 +8872,152 @@
           },
           "500": {
             "description": "Failed to create project's function"
+          }
+        },
+        "tags": ["Edge Functions"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "v1-bulk-update-functions",
+        "summary": "Bulk update functions",
+        "description": "Bulk update functions. It will create a new function or replace existing. The operation is idempotent. NOTE: You will need to manually bump the version.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "version": {
+                      "type": "integer"
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                      "type": "string"
+                    },
+                    "verify_jwt": {
+                      "type": "boolean"
+                    },
+                    "import_map": {
+                      "type": "boolean"
+                    },
+                    "entrypoint_path": {
+                      "type": "string"
+                    },
+                    "import_map_path": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["version", "id", "slug", "name", "status"]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "functions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "version": {
+                            "type": "integer"
+                          },
+                          "created_at": {
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          "updated_at": {
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                            "type": "string"
+                          },
+                          "verify_jwt": {
+                            "type": "boolean"
+                          },
+                          "import_map": {
+                            "type": "boolean"
+                          },
+                          "entrypoint_path": {
+                            "type": "string"
+                          },
+                          "import_map_path": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "version",
+                          "created_at",
+                          "updated_at",
+                          "id",
+                          "slug",
+                          "name",
+                          "status"
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["functions"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update functions"
           }
         },
         "tags": ["Edge Functions"],
@@ -8932,6 +9053,14 @@
               "pattern": "/^[A-Za-z0-9_-]+$/",
               "type": "string"
             }
+          },
+          {
+            "name": "bundleOnly",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "requestBody": {
@@ -8944,40 +9073,33 @@
                   "file": {
                     "type": "array",
                     "items": {
-                      "type": "file",
-                      "items": {
-                        "type": "string",
-                        "format": "binary"
-                      }
+                      "type": "string",
+                      "format": "binary"
                     }
                   },
                   "metadata": {
                     "type": "object",
                     "properties": {
                       "entrypoint_path": {
-                        "required": true,
                         "type": "string"
                       },
                       "import_map_path": {
-                        "required": false,
                         "type": "string"
                       },
                       "static_patterns": {
-                        "required": false,
                         "type": "array",
                         "items": {
                           "type": "string"
                         }
                       },
                       "verify_jwt": {
-                        "required": false,
                         "type": "boolean"
                       },
                       "name": {
-                        "required": false,
                         "type": "string"
                       }
-                    }
+                    },
+                    "required": ["entrypoint_path"]
                   }
                 },
                 "required": ["file", "metadata"]
@@ -9028,20 +9150,9 @@
                     },
                     "import_map_path": {
                       "type": "string"
-                    },
-                    "compute_multiplier": {
-                      "type": "number"
                     }
                   },
-                  "required": [
-                    "version",
-                    "created_at",
-                    "updated_at",
-                    "id",
-                    "slug",
-                    "name",
-                    "status"
-                  ]
+                  "required": ["version", "id", "slug", "name", "status"]
                 }
               }
             }
@@ -9132,9 +9243,6 @@
                     },
                     "import_map_path": {
                       "type": "string"
-                    },
-                    "compute_multiplier": {
-                      "type": "number"
                     }
                   },
                   "required": [
@@ -9238,16 +9346,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "compute_multiplier",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "maximum": 4,
-              "type": "number"
-            }
           }
         ],
         "requestBody": {
@@ -9265,11 +9363,6 @@
                   },
                   "verify_jwt": {
                     "type": "boolean"
-                  },
-                  "compute_multiplier": {
-                    "type": "number",
-                    "minimum": 1,
-                    "maximum": 4
                   }
                 }
               }
@@ -9286,11 +9379,6 @@
                   },
                   "verify_jwt": {
                     "type": "boolean"
-                  },
-                  "compute_multiplier": {
-                    "type": "number",
-                    "minimum": 1,
-                    "maximum": 4
                   }
                 }
               }
@@ -9340,9 +9428,6 @@
                     },
                     "import_map_path": {
                       "type": "string"
-                    },
-                    "compute_multiplier": {
-                      "type": "number"
                     }
                   },
                   "required": [
@@ -14689,9 +14774,6 @@
           },
           "import_map_path": {
             "type": "string"
-          },
-          "compute_multiplier": {
-            "type": "number"
           }
         },
         "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
@@ -14711,14 +14793,122 @@
           },
           "verify_jwt": {
             "type": "boolean"
-          },
-          "compute_multiplier": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 4
           }
         },
         "required": ["slug", "name", "body"]
+      },
+      "BulkUpdateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+            "type": "string"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          },
+          "import_map": {
+            "type": "boolean"
+          },
+          "entrypoint_path": {
+            "type": "string"
+          },
+          "import_map_path": {
+            "type": "string"
+          }
+        },
+        "required": ["version", "id", "slug", "name", "status"]
+      },
+      "BulkUpdateFunctionResponse": {
+        "type": "object",
+        "properties": {
+          "functions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "version": {
+                  "type": "integer"
+                },
+                "created_at": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "updated_at": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "status": {
+                  "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                  "type": "string"
+                },
+                "verify_jwt": {
+                  "type": "boolean"
+                },
+                "import_map": {
+                  "type": "boolean"
+                },
+                "entrypoint_path": {
+                  "type": "string"
+                },
+                "import_map_path": {
+                  "type": "string"
+                }
+              },
+              "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
+            }
+          }
+        },
+        "required": ["functions"]
+      },
+      "FunctionDeployMetadata": {
+        "type": "object",
+        "properties": {
+          "entrypoint_path": {
+            "type": "string"
+          },
+          "import_map_path": {
+            "type": "string"
+          },
+          "static_patterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["entrypoint_path"]
       },
       "FunctionDeployBody": {
         "type": "object",
@@ -14726,43 +14916,78 @@
           "file": {
             "type": "array",
             "items": {
-              "type": "file",
-              "items": {
-                "type": "string",
-                "format": "binary"
-              }
+              "type": "string",
+              "format": "binary"
             }
           },
           "metadata": {
             "type": "object",
             "properties": {
               "entrypoint_path": {
-                "required": true,
                 "type": "string"
               },
               "import_map_path": {
-                "required": false,
                 "type": "string"
               },
               "static_patterns": {
-                "required": false,
                 "type": "array",
                 "items": {
                   "type": "string"
                 }
               },
               "verify_jwt": {
-                "required": false,
                 "type": "boolean"
               },
               "name": {
-                "required": false,
                 "type": "string"
               }
-            }
+            },
+            "required": ["entrypoint_path"]
           }
         },
         "required": ["file", "metadata"]
+      },
+      "DeployFunctionResponse": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updated_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+            "type": "string"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          },
+          "import_map": {
+            "type": "boolean"
+          },
+          "entrypoint_path": {
+            "type": "string"
+          },
+          "import_map_path": {
+            "type": "string"
+          }
+        },
+        "required": ["version", "id", "slug", "name", "status"]
       },
       "FunctionSlugResponse": {
         "type": "object",
@@ -14802,9 +15027,6 @@
           },
           "import_map_path": {
             "type": "string"
-          },
-          "compute_multiplier": {
-            "type": "number"
           }
         },
         "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
@@ -14820,11 +15042,6 @@
           },
           "verify_jwt": {
             "type": "boolean"
-          },
-          "compute_multiplier": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 4
           }
         }
       },

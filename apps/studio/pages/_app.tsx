@@ -42,6 +42,7 @@ import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
 import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
 import GroupsTelemetry from 'components/ui/GroupsTelemetry'
 import { useRootQueryClient } from 'data/query-client'
+import { customFont, sourceCodePro } from 'fonts'
 import { AuthProvider } from 'lib/auth'
 import { getFlags as getConfigCatFlags } from 'lib/configcat'
 import { API_URL, BASE_PATH, IS_PLATFORM } from 'lib/constants'
@@ -112,6 +113,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <Head>
                   <title>Supabase</title>
                   <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                  {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
+                  <style
+                    dangerouslySetInnerHTML={{
+                      __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+                    }}
+                  />
                 </Head>
                 <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
                 <TooltipProvider delayDuration={0}>

@@ -21,8 +21,6 @@ Below is a flow chart illustrating how the Enrollment and Verify APIs work in th
   containerClassName="max-w-[700px]"
 />
 
-Phone MFA is part of the Auth Advanced MFA Add-on and costs an additional $75 per month for the first project in the organization and an additional $10 per month for additional projects.
-
 ### Add enrollment flow
 
 An enrollment flow provides a UI for users to set up additional authentication factors. Most applications add the enrollment flow in two places within their app:
@@ -311,3 +309,9 @@ function AuthMFA() {
 Each code is valid for up to 5 minutes, after which a new one can be sent. Successive codes remain valid until expiry. When possible choose the longest code length acceptable to your use case, at a minimum of 6. This can be configured in the [Authentication Settings](/dashboard/project/_/settings/auth).
 
 Please be aware that Phone MFA is vulnerable to SIM swap attacks where an attacker will call a mobile provider and ask to port the target's phone number to a new SIM card and then use the said SIM card to intercept an MFA code. Please evaluate the your application's tolerance for such an attack. You can read more about SIM swapping attacks [here](https://en.wikipedia.org/wiki/SIM_swap_scam)
+
+## Pricing
+
+<PricingMfaPhone />
+
+For a detailed breakdown of how charges are calculated, refer to [Manage Advanced MFA Phone usage](/docs/guides/platform/manage-your-usage/advanced-mfa-phone).
