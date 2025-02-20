@@ -191,7 +191,6 @@ function useLogsPreview({
     }
   )
 
-  console.log('countData', countData)
   const newCount = countData?.result?.[0]?.count ?? 0
 
   // chart data
