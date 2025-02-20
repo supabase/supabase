@@ -2,7 +2,7 @@
 // Standardization as per document: https://www.notion.so/supabase/Event-tracking-standardization-1195004b775f80f98ee3fa9e70cf4d05
 
 export enum TelemetryActions {
-  // TOOD event name is not consistent
+  // TODO event name is not consistent
   CUSTOM_REPORT_ADD_SQL_BLOCK_CLICKED = 'custom-report-add-sql-block-clicked',
   CUSTOM_REPORT_ASSISTANT_SQL_BLOCK_ADDED = 'custom-report-assistant-sql-block-added',
 
@@ -10,21 +10,7 @@ export enum TelemetryActions {
   SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED = 'sql_editor_result_download_csv_clicked',
   SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED = 'sql_editor_result_copy_markdown_clicked',
   SQL_EDITOR_RESULT_COPY_JSON_CLICKED = 'sql_editor_result_copy_markdown_clicked',
-
   HOMEPAGE_HERO_REQUEST_DEMO_CLICKED = 'homepage_hero_request_demo_clicked',
-  HOMEPAGE_FRAMEWORK_QUICKSTART_CLICKED = 'homepage_framework_quickstart_clicked',
-  HOMEPAGE_PRODUCT_CARD_CLICKED = 'homepage_product_card_clicked',
-  WWW_PRICING_PLAN_CTA_CLICKED = 'www_pricing_plan_cta_clicked',
-  EVENT_PAGE_CTA_CLICKED = 'event_page_cta_clicked',
-  HOMEPAGE_GITHUB_BUTTON_CLICKED = 'homepage_github_button_clicked',
-  HOMEPAGE_GITHUB_DISCUSSIONS_BUTTON_CLICKED = 'homepage_github_discussions_button_clicked',
-  HOMEPAGE_DISCORD_BUTTON_CLICKED = 'homepage_discord_button_clicked',
-  HOMEPAGE_CUSTOMER_STORY_CARD_CLICKED = 'homepage_customer_story_card_clicked',
-  HOMEPAGE_PROJECT_TEMPLATE_CARD_CLICKED = 'homepage_project_template_card_clicked',
-  OPEN_SOURCE_REPO_CARD_CLICKED = 'open_source_repo_card_clicked',
-  START_PROJECT_BUTTON_CLICKED = 'start_project_button_clicked',
-  SEE_DOCUMENTATION_BUTTON_CLICKED = 'see_documentation_button_clicked',
-  REQUEST_DEMO_BUTTON_CLICKED = 'request_demo_button_clicked',
 }
 
 /**
@@ -697,7 +683,7 @@ export interface HomepageHeroRequestDemoClickedEvent {
  * @page /
  */
 export interface HomepageFrameworkQuickstartClickedEvent {
-  action: TelemetryActions.HOMEPAGE_FRAMEWORK_QUICKSTART_CLICKED
+  action: 'homepage_framework_quickstart_clicked'
   properties: {
     /**
      * The name of the framework quickstart card clicked.
@@ -714,7 +700,7 @@ export interface HomepageFrameworkQuickstartClickedEvent {
  * @page /
  */
 export interface HomepageProductCardClickedEvent {
-  action: TelemetryActions.HOMEPAGE_PRODUCT_CARD_CLICKED
+  action: 'homepage_product_card_clicked'
   properties: {
     product: string
   }
@@ -728,7 +714,7 @@ export interface HomepageProductCardClickedEvent {
  * @page /pricing
  */
 export interface WwwPricingPlanCtaClickedEvent {
-  action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED
+  action: 'www_pricing_plan_cta_clicked'
   properties: {
     /**
      * The plan type that was clicked.
@@ -756,7 +742,7 @@ export interface WwwPricingPlanCtaClickedEvent {
  * @page /events/*
  */
 export interface EventPageCtaClickedEvent {
-  action: TelemetryActions.EVENT_PAGE_CTA_CLICKED
+  action: 'www_pricing_plan_cta_clicked'
   properties: {
     /**
      * The title of the event clicked.
@@ -773,7 +759,7 @@ export interface EventPageCtaClickedEvent {
  * @page /
  */
 export interface HomepageGitHubButtonClickedEvent {
-  action: TelemetryActions.HOMEPAGE_GITHUB_BUTTON_CLICKED
+  action: 'homepage_github_button_clicked'
 }
 
 /**
@@ -784,7 +770,7 @@ export interface HomepageGitHubButtonClickedEvent {
  * @page /
  */
 export interface HomepageGitHubDiscussionsButtonClickedEvent {
-  action: TelemetryActions.HOMEPAGE_GITHUB_DISCUSSIONS_BUTTON_CLICKED
+  action: 'homepage_github_discussions_button_clicked'
 }
 
 /**
@@ -795,7 +781,7 @@ export interface HomepageGitHubDiscussionsButtonClickedEvent {
  * @page /
  */
 export interface HomepageDiscordButtonClickedEvent {
-  action: TelemetryActions.HOMEPAGE_DISCORD_BUTTON_CLICKED
+  action: 'homepage_discord_button_clicked'
 }
 
 /**
@@ -806,7 +792,7 @@ export interface HomepageDiscordButtonClickedEvent {
  * @page /
  */
 export interface HomepageCustomerStoryCardClickedEvent {
-  action: TelemetryActions.HOMEPAGE_CUSTOMER_STORY_CARD_CLICKED
+  action: 'homepage_customer_story_card_clicked'
   properties: {
     customer?: string
     /**
@@ -824,7 +810,7 @@ export interface HomepageCustomerStoryCardClickedEvent {
  * @page /
  */
 export interface HomepageProjectTemplateCardClickedEvent {
-  action: TelemetryActions.HOMEPAGE_PROJECT_TEMPLATE_CARD_CLICKED
+  action: 'homepage_project_template_card_clicked'
   properties: {
     /**
      * The title of the project template card clicked.
@@ -841,7 +827,7 @@ export interface HomepageProjectTemplateCardClickedEvent {
  * @page /open-source
  */
 export interface OpenSourceRepoCardClickedEvent {
-  action: TelemetryActions.OPEN_SOURCE_REPO_CARD_CLICKED
+  action: 'open_source_repo_card_clicked'
   properties: {
     /**
      * The name of the open source repository clicked.
@@ -857,7 +843,7 @@ export interface OpenSourceRepoCardClickedEvent {
  * @source www
  */
 export interface StartProjectButtonClickedEvent {
-  action: TelemetryActions.START_PROJECT_BUTTON_CLICKED
+  action: 'start_project_button_clicked'
   properties: {
     /**
      * The source of the button click, e.g. homepage hero, product page header.
@@ -873,7 +859,7 @@ export interface StartProjectButtonClickedEvent {
  * @source www
  */
 export interface SeeDocumentationButtonClickedEvent {
-  action: TelemetryActions.SEE_DOCUMENTATION_BUTTON_CLICKED
+  action: 'see_documentation_button_clicked'
   properties: {
     /**
      * The source of the button click, e.g. homepage hero, product page header - product name.
@@ -889,7 +875,7 @@ export interface SeeDocumentationButtonClickedEvent {
  * @source www
  */
 export interface RequestDemoButtonClickedEvent {
-  action: TelemetryActions.REQUEST_DEMO_BUTTON_CLICKED
+  action: 'request_demo_button_clicked'
   properties: {
     /**
      * The source of the button click, e.g. homepage hero, cta banner, product page header.

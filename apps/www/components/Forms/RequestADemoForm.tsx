@@ -267,7 +267,7 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
               loading={isSubmitting}
               onClick={() =>
                 sendTelemetryEvent({
-                  action: TelemetryActions.REQUEST_DEMO_BUTTON_CLICKED,
+                  action: 'request_demo_button_clicked',
                   properties: { buttonLocation: 'Enterprise Request Demo Form' },
                 })
               }
