@@ -1,12 +1,9 @@
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 
-import { IS_PLATFORM } from 'common'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import Link from 'next/link'
 import {
   Button,
   cn,
@@ -53,19 +50,17 @@ const ProviderDropdownItem = ({
 export const AddIntegrationDropdown = ({
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
-  const organization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
 
-  const { data: subscription } = useOrgSubscriptionQuery(
-    { orgSlug: organization?.slug },
-    { enabled: IS_PLATFORM }
-  )
-
   const isClerkTPAEnabledFlag = useFlag<string>('isClerkTPAEnabledOnProjects')
+  console.log({ isClerkTPAEnabledFlag })
   const isClerkTPAEnabled =
     selectedProject?.ref &&
-    typeof isClerkTPAEnabledFlag === 'string' &&
-    isClerkTPAEnabledFlag.split(',').includes(selectedProject.ref)
+    isClerkTPAEnabledFlag &&
+    isClerkTPAEnabledFlag
+      .split(',')
+      .map((it) => it.trim())
+      .includes(selectedProject.ref)
 
   return (
     <DropdownMenu modal={false}>
@@ -83,58 +78,14 @@ export const AddIntegrationDropdown = ({
           <ProviderDropdownItem type="clerkDev" onSelectIntegrationType={onSelectIntegrationType} />
         )}
 
-        {subscription?.plan.id === 'free' ? (
-          <>
-            <DropdownMenuSeparator />
-            <div className="bg-surface-200 -m-1 p-2">
-              <DropdownMenuLabel className="grid gap-1">
-                <p className="text-foreground-light">Unavailable on the Free plan</p>
-                <p className="text-foreground-lighter text-xs">
-                  <Link
-                    target="_href"
-                    rel="noreferrer"
-                    className="underline hover:text-foreground-light transition"
-                    href={`/org/${organization?.slug}/billing`}
-                  >
-                    Upgrade your plan
-                  </Link>{' '}
-                  to add the following providers to your project.
-                </p>
-              </DropdownMenuLabel>
-              {isClerkTPAEnabled && (
-                <ProviderDropdownItem
-                  disabled
-                  type="clerkProd"
-                  onSelectIntegrationType={onSelectIntegrationType}
-                />
-              )}
-              <ProviderDropdownItem
-                disabled
-                type="auth0"
-                onSelectIntegrationType={onSelectIntegrationType}
-              />
-              <ProviderDropdownItem
-                disabled
-                type="awsCognito"
-                onSelectIntegrationType={onSelectIntegrationType}
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            {isClerkTPAEnabled && (
-              <ProviderDropdownItem
-                type="clerkProd"
-                onSelectIntegrationType={onSelectIntegrationType}
-              />
-            )}
-            <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
-            <ProviderDropdownItem
-              type="awsCognito"
-              onSelectIntegrationType={onSelectIntegrationType}
-            />
-          </>
+        {isClerkTPAEnabled && (
+          <ProviderDropdownItem
+            type="clerkProd"
+            onSelectIntegrationType={onSelectIntegrationType}
+          />
         )}
+        <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
+        <ProviderDropdownItem type="awsCognito" onSelectIntegrationType={onSelectIntegrationType} />
       </DropdownMenuContent>
     </DropdownMenu>
   )
