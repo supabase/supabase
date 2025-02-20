@@ -12,7 +12,7 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
-import { PageLayout } from 'components/layouts/PageLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import EdgeFunctionsLayout from '../EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { useFlag } from 'hooks/ui/useFlag'
 

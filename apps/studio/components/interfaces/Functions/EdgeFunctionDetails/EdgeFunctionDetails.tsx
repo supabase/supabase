@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -10,13 +10,13 @@ import { object, string, boolean } from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 
 import { useParams } from 'common'
-import { FormFieldWrapper } from 'components/ui/Forms'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -30,6 +30,9 @@ import {
   CodeBlock,
   CriticalIcon,
   Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormMessage_Shadcn_,
   Input,
   Modal,
   Switch,
@@ -39,6 +42,7 @@ import {
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
+  Input_Shadcn_,
 } from 'ui'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
@@ -208,32 +212,46 @@ const EdgeFunctionDetails = () => {
             <form onSubmit={form.handleSubmit(onUpdateFunction)}>
               <Card>
                 <CardContent>
-                  <FormFieldWrapper
-                    name="name"
+                  <FormField_Shadcn_
                     control={form.control}
-                    label="Name"
-                    description="Your slug and endpoint URL will remain the same"
-                  >
-                    {(field) => (
-                      <Input {...field} className="w-full" disabled={!canUpdateEdgeFunction} />
+                    name="name"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label="Name"
+                        layout="flex-row-reverse"
+                        description="Your slug and endpoint URL will remain the same"
+                      >
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_
+                            {...field}
+                            className="w-full"
+                            disabled={!canUpdateEdgeFunction}
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
                     )}
-                  </FormFieldWrapper>
+                  />
                 </CardContent>
                 <CardContent>
-                  <FormFieldWrapper
-                    name="verify_jwt"
+                  <FormField_Shadcn_
                     control={form.control}
-                    label="Enforce JWT Verification"
-                    description="Require a valid JWT in the authorization header when invoking the function"
-                  >
-                    {(field) => (
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={!canUpdateEdgeFunction}
-                      />
+                    name="verify_jwt"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label="Enforce JWT Verification"
+                        layout="flex-row-reverse"
+                        description="Require a valid JWT in the authorization header when invoking the function"
+                      >
+                        <FormControl_Shadcn_>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={!canUpdateEdgeFunction}
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
                     )}
-                  </FormFieldWrapper>
+                  />
                 </CardContent>
                 <CardFooter className="flex justify-end space-x-2">
                   {form.formState.isDirty && (
