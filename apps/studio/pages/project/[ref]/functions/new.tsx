@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CornerDownLeft, Loader2, Book, Check, ChevronsUpDown, Plus, File } from 'lucide-react'
 import { Button, Input_Shadcn_, Label_Shadcn_, cn } from 'ui'
 import { AiIconAnimation } from 'ui'
@@ -29,6 +29,7 @@ import {
   TreeViewItem,
   flattenTree,
 } from 'ui'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const EDGE_FUNCTION_TEMPLATES = [
   {
@@ -177,6 +178,14 @@ const NewFunctionPage = () => {
   const isOptedInToAI = useOrgOptedIntoAi()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
   const { setAiAssistantPanel } = useAppStateSnapshot()
+  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
+
+  // TODO (Saxon): Remove this once the flag is fully launched
+  useEffect(() => {
+    if (!edgeFunctionCreate) {
+      router.push(`/project/${ref}/functions`)
+    }
+  }, [edgeFunctionCreate, ref, router])
 
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
