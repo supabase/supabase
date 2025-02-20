@@ -1,5 +1,7 @@
 import { useParams } from 'common'
 import { AiIconAnimation, Button, Dialog, DialogContent, DialogSection, DialogTrigger } from 'ui'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
+import { ChevronDown, Terminal, Code } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import {
