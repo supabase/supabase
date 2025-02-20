@@ -1,6 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
+import { useParams } from 'common'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -10,14 +11,14 @@ import {
 } from 'ui'
 
 export const AuthAlert = ({
-  projectRef,
   title,
   isHookSendSMSEnabled,
 }: {
-  projectRef: string
   title: string
   isHookSendSMSEnabled: boolean
 }) => {
+  const { ref } = useParams()
+
   switch (title) {
     // TODO (KM): Remove after 10th October 2024 when we disable the provider
     case 'Slack (Deprecated)':
@@ -51,7 +52,7 @@ export const AuthAlert = ({
             <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
               <p>The SMS hook will be used in place of the SMS provider configured</p>
               <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
-                <Link href={`/project/${projectRef}/auth/hooks`}>View auth hooks</Link>
+                <Link href={`/project/${ref}/auth/hooks`}>View auth hooks</Link>
               </Button>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>

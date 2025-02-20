@@ -1,22 +1,25 @@
 import { ReactNode } from 'react'
+
+import { useParams } from 'common'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import AuthLayout from './AuthLayout'
-import { PageLayout } from 'components/layouts/PageLayout'
 
 interface AuthProvidersLayoutProps {
   children: ReactNode
-  projectRef: string
 }
 
-const AuthProvidersLayout = ({ children, projectRef }: AuthProvidersLayoutProps) => {
+export const AuthProvidersLayout = ({ children }: AuthProvidersLayoutProps) => {
+  const { ref } = useParams()
+
   const navItems = [
     {
       label: 'Supabase Auth',
-      href: `/project/${projectRef}/auth/providers`,
+      href: `/project/${ref}/auth/providers`,
     },
     {
       label: 'Third Party Auth',
-      href: `/project/${projectRef}/auth/third-party`,
+      href: `/project/${ref}/auth/third-party`,
     },
   ]
 
@@ -34,5 +37,3 @@ const AuthProvidersLayout = ({ children, projectRef }: AuthProvidersLayoutProps)
     </DefaultLayout>
   )
 }
-
-export default AuthProvidersLayout
