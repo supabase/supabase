@@ -1,13 +1,6 @@
 // These events are tracked only when users opt in.
 // Standardization as per document: https://www.notion.so/supabase/Event-tracking-standardization-1195004b775f80f98ee3fa9e70cf4d05
 
-export enum TelemetryActions {
-  // TODO can't find where event is emitted
-  SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED = 'sql_editor_result_download_csv_clicked',
-  SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED = 'sql_editor_result_copy_markdown_clicked',
-  SQL_EDITOR_RESULT_COPY_JSON_CLICKED = 'sql_editor_result_copy_markdown_clicked',
-}
-
 /**
  * Triggered when a user signs up. When signing up with Email and Password, this is only triggered once user confirms their email.
  *
@@ -494,7 +487,7 @@ export interface SqlEditorTemplateClickedEvent {
  * @page /dashboard/project/{ref}/sql
  */
 export interface SqlEditorResultDownloadCsvClickedEvent {
-  action: TelemetryActions.SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED
+  action: 'sql_editor_result_download_csv_clicked'
   groups: {
     project: string
     organization: string
@@ -509,7 +502,7 @@ export interface SqlEditorResultDownloadCsvClickedEvent {
  * @page /dashboard/project/{ref}/sql
  */
 export interface SqlEditorResultCopyMarkdownClickedEvent {
-  action: TelemetryActions.SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED
+  action: 'sql_editor_result_copy_markdown_clicked'
   groups: {
     project: string
     organization: string
@@ -524,7 +517,7 @@ export interface SqlEditorResultCopyMarkdownClickedEvent {
  * @page /dashboard/project/{ref}/sql
  */
 export interface SqlEditorResultCopyJsonClickedEvent {
-  action: TelemetryActions.SQL_EDITOR_RESULT_COPY_JSON_CLICKED
+  action: 'sql_editor_result_copy_json_clicked'
   groups: {
     project: string
     organization: string
