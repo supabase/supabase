@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
 import { useEffect, type PropsWithChildren, useState } from 'react'
 
 import { useParams } from 'common'
@@ -8,18 +7,15 @@ import APIDocsButton from 'components/ui/APIDocsButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
-import { Code, Code2, Play, Send, Terminal, TestTubeDiagonal } from 'lucide-react'
+import { Send } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
-import { Button, cn, CodeBlock } from 'ui'
-import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { Button } from 'ui'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import FunctionsNav from '../../interfaces/Functions/FunctionsNav'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
-import { PageLayout } from 'components/layouts/PageLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import EdgeFunctionsLayout from '../EdgeFunctionsLayout/EdgeFunctionsLayout'
 import EdgeFunctionTesterSheet from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -47,7 +43,6 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
 
-  const { data: functions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
   const {
     data: selectedFunction,
     error,
@@ -58,9 +53,6 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
   const canReadFunctions = useCheckPermissions(PermissionAction.FUNCTIONS_READ, '*')
 
   const name = selectedFunction?.name || ''
-  const hasFunctions = (functions ?? []).length > 0
-  const { anonKey } = getAPIKeys(settings)
-  const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint ?? ''
   const functionUrl = `${protocol}://${endpoint}/functions/v1/${functionSlug}`

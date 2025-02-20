@@ -1,12 +1,13 @@
 import { ChevronRight } from 'lucide-react'
-import { CardContent, cn } from 'ui'
-import { forwardRef } from 'react'
+import { forwardRef, HTMLAttributes, ReactNode } from 'react'
 
-export interface ResourceItemProps extends React.HTMLAttributes<HTMLDivElement> {
-  media?: React.ReactNode
-  meta?: React.ReactNode
+import { CardContent, cn } from 'ui'
+
+export interface ResourceItemProps extends HTMLAttributes<HTMLDivElement> {
+  media?: ReactNode
+  meta?: ReactNode
   onClick?: () => void
-  children?: React.ReactNode
+  children?: ReactNode
 }
 
 export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
