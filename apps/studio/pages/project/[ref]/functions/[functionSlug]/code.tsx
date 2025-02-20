@@ -7,6 +7,7 @@ import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { IS_PLATFORM } from 'lib/constants'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
 import { toast } from 'sonner'
 import { useRouter } from 'next/router'
 import { useParams } from 'common'
@@ -28,42 +29,29 @@ const CodePage = () => {
   // TODO (Saxon): Remove this once the flag is fully launched
   useEffect(() => {
     if (!edgeFunctionCreate) {
-      router.push(`/project/${ref}/functions`)
+      //   router.push(`/project/${ref}/functions`)
     }
   }, [edgeFunctionCreate, ref, router])
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
+  const { data: functionFiles } = useEdgeFunctionBodyQuery({ projectRef: ref, slug: functionSlug })
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
   >([])
 
   useEffect(() => {
-    // Set initial code value when function is loaded
-    if (selectedFunction) {
-      setFiles([
-        {
-          id: 1,
-          name: 'index.ts',
-          selected: true,
-          content: `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-
-console.info('server started');
-
-Deno.serve(async (req: Request) => {
-  const data = {
-    message: 'Hello from Supabase Edge Functions!',
-  };
-
-  return new Response(
-    JSON.stringify(data),
-    { headers: { 'Content-Type': 'application/json', 'Connection': 'keep-alive' }}
-  );
-});`,
-        },
-      ])
+    // Set files from API response when available
+    if (functionFiles) {
+      setFiles(
+        functionFiles.map((file, index) => ({
+          id: index + 1,
+          name: file.name,
+          content: file.content,
+          selected: index === 0,
+        }))
+      )
     }
-  }, [selectedFunction])
+  }, [functionFiles])
 
   const { mutateAsync: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
@@ -92,25 +80,6 @@ Deno.serve(async (req: Request) => {
         `Failed to update function: ${error instanceof Error ? error.message : 'Unknown error'}`
       )
     }
-  }
-
-  const handleChat = () => {
-    const selectedFile = files.find((f) => f.selected) ?? files[0]
-    setAiAssistantPanel({
-      open: true,
-      sqlSnippets: [selectedFile.content],
-      initialInput: 'Help me understand and improve this edge function...',
-      suggestions: {
-        title:
-          'I can help you understand and improve your edge function. Here are a few example prompts to get you started:',
-        prompts: [
-          'Explain what this function does...',
-          'Help me optimize this function...',
-          'Show me how to add more features...',
-          'Help me handle errors better...',
-        ],
-      },
-    })
   }
 
   return (
