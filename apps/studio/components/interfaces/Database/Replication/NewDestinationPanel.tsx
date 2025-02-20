@@ -8,6 +8,10 @@ import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutati
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
+  Accordion_Shadcn_,
+  AccordionContent_Shadcn_,
+  AccordionItem_Shadcn_,
+  AccordionTrigger_Shadcn_,
   Button,
   Form_Shadcn_,
   FormControl_Shadcn_,
@@ -247,47 +251,57 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                     )}
                   />
                   <Separator className="mt-3" />
-                  <p>Advanced Settings</p>
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="maxSize"
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                        <FormLabel_Shadcn_>Max Size</FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            {...field}
-                            type="number"
-                            {...form.register('maxSize', {
-                              valueAsNumber: true, // Ensure the value is handled as a number
-                            })}
-                            placeholder="Max size"
+                  <Accordion_Shadcn_ type="single" collapsible>
+                    <AccordionItem_Shadcn_ value="item-1" className="border-none">
+                      <AccordionTrigger_Shadcn_ className="font-normal gap-2 justify-start py-1">
+                        Advanced Settings
+                      </AccordionTrigger_Shadcn_>
+                      <AccordionContent_Shadcn_ asChild className="!pb-0">
+                        <div className="flex flex-col gap-y-4 mt-4">
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="maxSize"
+                            render={({ field }) => (
+                              <FormItem_Shadcn_ className="flex flex-col gap-y-2">
+                                <FormLabel_Shadcn_>Max Size</FormLabel_Shadcn_>
+                                <FormControl_Shadcn_>
+                                  <Input_Shadcn_
+                                    {...field}
+                                    type="number"
+                                    {...form.register('maxSize', {
+                                      valueAsNumber: true, // Ensure the value is handled as a number
+                                    })}
+                                    placeholder="Max size"
+                                  />
+                                </FormControl_Shadcn_>
+                                <FormMessage_Shadcn_ />
+                              </FormItem_Shadcn_>
+                            )}
                           />
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
-                    )}
-                  />
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="maxFillSecs"
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                        <FormLabel_Shadcn_>Max Fill Seconds</FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            {...field}
-                            type="number"
-                            {...form.register('maxFillSecs', {
-                              valueAsNumber: true, // Ensure the value is handled as a number
-                            })}
-                            placeholder="Max fill seconds"
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="maxFillSecs"
+                            render={({ field }) => (
+                              <FormItem_Shadcn_ className="flex flex-col gap-y-2">
+                                <FormLabel_Shadcn_>Max Fill Seconds</FormLabel_Shadcn_>
+                                <FormControl_Shadcn_>
+                                  <Input_Shadcn_
+                                    {...field}
+                                    type="number"
+                                    {...form.register('maxFillSecs', {
+                                      valueAsNumber: true, // Ensure the value is handled as a number
+                                    })}
+                                    placeholder="Max fill seconds"
+                                  />
+                                </FormControl_Shadcn_>
+                                <FormMessage_Shadcn_ />
+                              </FormItem_Shadcn_>
+                            )}
                           />
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
-                    )}
-                  />
+                        </div>
+                      </AccordionContent_Shadcn_>
+                    </AccordionItem_Shadcn_>
+                  </Accordion_Shadcn_>
                   <div className="hidden">
                     <FormField_Shadcn_
                       control={form.control}
