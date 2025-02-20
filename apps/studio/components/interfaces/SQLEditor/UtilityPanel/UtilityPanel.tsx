@@ -127,19 +127,19 @@ const UtilityPanel = ({
               fileName={`Supabase Snippet ${snippet.name}`}
               onDownloadAsCSV={() =>
                 sendEvent({
-                  action: TelemetryActions.SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED,
+                  action: 'sql_editor_result_download_csv_clicked',
                   groups: { project: ref ?? '', organization: org?.slug ?? '' },
                 })
               }
               onCopyAsMarkdown={() => {
                 sendEvent({
-                  action: TelemetryActions.SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED,
+                  action: 'sql_editor_result_copy_markdown_clicked',
                   groups: { project: ref ?? '', organization: org?.slug ?? '' },
                 })
               }}
               onCopyAsJSON={() => {
                 sendEvent({
-                  action: TelemetryActions.SQL_EDITOR_RESULT_COPY_JSON_CLICKED,
+                  action: 'sql_editor_result_copy_json_clicked',
                   groups: { project: ref ?? '', organization: org?.slug ?? '' },
                 })
               }}
