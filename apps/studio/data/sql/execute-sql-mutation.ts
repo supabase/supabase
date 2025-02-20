@@ -43,7 +43,6 @@ export const useExecuteSqlMutation = ({
         // [Joshen] Default to false for now, only used for SQL editor to dynamically invalidate
         if (contextualInvalidation && projectRef) {
           const invalidationKeys = inferInvalidationKeys(projectRef, sql)
-          console.log({ invalidationKeys })
           await Promise.all(invalidationKeys.map((key) => queryClient.invalidateQueries(key)))
         }
         await onSuccess?.(data, variables, context)
