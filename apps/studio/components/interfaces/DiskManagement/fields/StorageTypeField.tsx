@@ -21,6 +21,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { IO2_AVAILABLE_REGIONS } from '../DiskManagement.constants'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { DISK_LIMITS, DISK_TYPE_OPTIONS, DiskType } from '../ui/DiskManagement.constants'
 import FormMessage from '../ui/FormMessage'
