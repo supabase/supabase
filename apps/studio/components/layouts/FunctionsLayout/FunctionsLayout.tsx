@@ -7,15 +7,12 @@ import APIDocsButton from 'components/ui/APIDocsButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
-import { Button } from 'ui'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
-import { PageLayout } from 'components/layouts/PageLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import EdgeFunctionsLayout from '../EdgeFunctionsLayout/EdgeFunctionsLayout'
 
 interface FunctionsLayoutProps {
@@ -27,7 +24,6 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
   const { functionSlug, ref } = useParams()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
-  const { data: functions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
   const {
     data: selectedFunction,
     error,
