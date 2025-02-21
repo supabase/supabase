@@ -4,13 +4,14 @@ import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { replicationKeys } from './keys'
 
-type ReplicationTablesParams = { projectRef?: string; sourceId: number }
+type ReplicationTablesParams = { projectRef?: string; sourceId?: number }
 
 async function fetchReplicationTables(
   { projectRef, sourceId }: ReplicationTablesParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
+  if (!sourceId) throw new Error('sourceId is required')
 
   const { data, error } = await get('/platform/replication/{ref}/sources/{source_id}/tables', {
     params: { path: { ref: projectRef, source_id: sourceId } },
@@ -32,5 +33,8 @@ export const useReplicationTablesQuery = <TData = ReplicationTablesData>(
   useQuery<ReplicationTablesData, ResponseError, TData>(
     replicationKeys.tables(projectRef, sourceId),
     ({ signal }) => fetchReplicationTables({ projectRef, sourceId }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    {
+      enabled: enabled && typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined',
+      ...options,
+    }
   )
