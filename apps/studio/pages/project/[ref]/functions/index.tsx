@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { AiIconAnimation, Button, Dialog, DialogContent, DialogSection, DialogTrigger } from 'ui'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
-import { ChevronDown, Terminal, Code } from 'lucide-react'
+import { ChevronDown, Terminal, Code, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import {
@@ -84,6 +84,15 @@ const FunctionsPage: NextPageWithLayout = () => {
 
   const secondaryActions = [
     <DocsButton key="docs" href="https://supabase.com/docs/guides/functions" />,
+    <Button asChild type="default" icon={<ExternalLink />}>
+      <a
+        target="_blank"
+        rel="noreferrer"
+        href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+      >
+        Examples
+      </a>
+    </Button>,
     <ButtonTooltip
       type="default"
       className="px-1 pointer-events-auto"
@@ -131,7 +140,7 @@ const FunctionsPage: NextPageWithLayout = () => {
 
         {isSuccess && (
           <>
-            {hasFunctions ? (
+            {!hasFunctions ? (
               <div className="py-6 space-y-4">
                 <Table
                   head={
