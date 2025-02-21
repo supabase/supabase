@@ -45,7 +45,7 @@ export enum TelemetryActions {
   SQL_EDITOR_TEMPLATE_CLICKED = 'sql_editor_template_clicked',
   SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED = 'sql_editor_result_download_csv_clicked',
   SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED = 'sql_editor_result_copy_markdown_clicked',
-  SQL_EDITOR_RESULT_COPY_JSON_CLICKED = 'sql_editor_result_copy_markdown_clicked',
+  SQL_EDITOR_RESULT_COPY_JSON_CLICKED = 'sql_editor_result_copy_json_clicked',
 
   DOCS_FEEDBACK_CLICKED = 'docs_feedback_clicked',
 
