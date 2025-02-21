@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { coalesceRowsToArray, filterByList } from './helpers'
+import { coalesceRowsToArray, exceptionIdentifierNotFound, filterByList } from './helpers'
 import { TABLES_SQL } from './sql/tables'
 import { COLUMNS_SQL } from './sql/columns'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
@@ -138,6 +138,29 @@ function retrieve(identifier: TableIdentifier): {
   }
 }
 
+type TableRemoveParams = { cascade: boolean }
+function remove(
+  identifier: TableIdentifier,
+  params: TableRemoveParams = { cascade: false }
+): { sql: string } {
+  const whereClause = getIdentifierWhereClause(identifier)
+  const sql = `
+    do $$
+    declare
+        old record;
+    begin
+        with tables as (${generateEnrichedTablesSql({ includeColumns: false })})
+        select * into old from tables where ${whereClause};
+        if old is null then
+           ${exceptionIdentifierNotFound('table', whereClause)}
+        end if;
+        execute format('drop table %I.%I ${params.cascade ? 'cascade' : 'restrict'}', old.schema, old.name);
+    end
+    $$;
+    `
+  return { sql }
+}
+
 const generateEnrichedTablesSql = ({ includeColumns }: { includeColumns?: boolean }) => `
   with tables as (${TABLES_SQL})
   ${includeColumns ? `, columns as (${COLUMNS_SQL})` : ''}
@@ -146,10 +169,152 @@ const generateEnrichedTablesSql = ({ includeColumns }: { includeColumns?: boolea
     ${includeColumns ? `, ${coalesceRowsToArray('columns', 'columns.table_id = tables.id')}` : ''}
   from tables`
 
-export default {
-  list,
-  retrieve,
-  zod: pgTableZod,
+type TableCreateParams = {
+  name: string
+  schema?: string
+  comment?: string
 }
 
-export { list }
+function create({ name, schema = 'public', comment }: TableCreateParams): { sql: string } {
+  const sql = `
+do $$
+begin
+  execute format('create table %I.%I ()', ${literal(schema)}, ${literal(name)});
+  ${
+    comment === undefined
+      ? ''
+      : `
+  execute format('comment on table %I.%I is %L', ${literal(schema)}, ${literal(name)}, ${literal(comment)});`
+  }
+end
+$$;`
+
+  return { sql }
+}
+
+type TableUpdateParams = {
+  name?: string
+  schema?: string
+  rls_enabled?: boolean
+  rls_forced?: boolean
+  replica_identity?: 'DEFAULT' | 'INDEX' | 'FULL' | 'NOTHING'
+  replica_identity_index?: string
+  primary_keys?: Array<{ name: string }>
+  comment?: string
+}
+
+function update(
+  identifier: TableIdentifier,
+  {
+    name,
+    schema,
+    rls_enabled,
+    rls_forced,
+    replica_identity,
+    replica_identity_index,
+    primary_keys,
+    comment,
+  }: TableUpdateParams
+): { sql: string } {
+  const sql = `
+DO $$
+DECLARE
+  v_table record;
+  r record;
+BEGIN
+  WITH tables AS (
+    ${generateEnrichedTablesSql({ includeColumns: false })}
+  )
+  SELECT *
+  INTO v_table
+  FROM tables
+  WHERE ${getIdentifierWhereClause(identifier)};
+
+  IF v_table IS NULL THEN
+    ${exceptionIdentifierNotFound('table', getIdentifierWhereClause(identifier))}
+  END IF;
+
+  ${
+    rls_enabled !== undefined
+      ? `execute format('ALTER TABLE %I.%I %s ROW LEVEL SECURITY',
+          v_table.schema, v_table.name,
+          CASE WHEN ${literal(rls_enabled)} THEN 'ENABLE' ELSE 'DISABLE' END);`
+      : ''
+  }
+
+  ${
+    rls_forced !== undefined
+      ? `execute format('ALTER TABLE %I.%I %s FORCE ROW LEVEL SECURITY',
+          v_table.schema, v_table.name,
+          CASE WHEN ${literal(rls_forced)} THEN '' ELSE 'NO' END);`
+      : ''
+  }
+
+  ${
+    replica_identity !== undefined
+      ? `execute format('ALTER TABLE %I.%I REPLICA IDENTITY %s%s',
+          v_table.schema, v_table.name,
+          ${literal(replica_identity)},
+          CASE WHEN ${literal(replica_identity)} = 'INDEX' 
+            THEN format(' USING INDEX %I', ${literal(replica_identity_index!)})
+            ELSE '' END);`
+      : ''
+  }
+
+  ${
+    primary_keys !== undefined
+      ? `
+    -- Drop existing primary key if any
+    FOR r IN (
+      SELECT conname
+      FROM pg_constraint
+      WHERE conrelid = format('%I.%I', v_table.schema, v_table.name)::regclass
+      AND contype = 'p'
+    ) LOOP
+      execute format('ALTER TABLE %I.%I DROP CONSTRAINT %I',
+        v_table.schema, v_table.name, r.conname);
+    END LOOP;
+
+    ${
+      primary_keys.length > 0
+        ? `execute format('ALTER TABLE %I.%I ADD PRIMARY KEY (%s)',
+            v_table.schema, v_table.name,
+            ${literal(primary_keys.map((pk) => pk.name).join(', '))});`
+        : ''
+    }`
+      : ''
+  }
+
+  ${
+    comment !== undefined
+      ? `execute format('COMMENT ON TABLE %I.%I IS %L',
+          v_table.schema, v_table.name,
+          ${literal(comment)});`
+      : ''
+  }
+
+  ${
+    schema !== undefined
+      ? `execute format('ALTER TABLE %I.%I SET SCHEMA %I',
+          v_table.schema, v_table.name,
+          ${literal(schema)});`
+      : ''
+  }
+
+  ${
+    name !== undefined
+      ? `
+      if ${literal(name)} != v_table.name then
+        execute format('ALTER TABLE %I.%I RENAME TO %I',
+            ${schema !== undefined ? literal(schema) : 'v_table.schema'},
+            v_table.name,
+            ${literal(name)});
+      end if;`
+      : ''
+  }
+END $$;`
+
+  return { sql }
+}
+
+export default { list, retrieve, remove, create, update }
