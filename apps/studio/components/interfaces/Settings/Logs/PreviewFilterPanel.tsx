@@ -149,14 +149,6 @@ const PreviewFilterPanel = ({
 
     const properties: FilterProperty[] = []
 
-    // Add search query as a special filter
-    properties.push({
-      label: 'Search',
-      name: 'search_query',
-      type: 'string' as const,
-      operators: ['='],
-    })
-
     // Add date range filter
     properties.push({
       label: 'Time Range',
@@ -213,15 +205,6 @@ const PreviewFilterPanel = ({
   const filterBarFilters = useMemo(() => {
     const conditions: FilterCondition[] = []
 
-    // Handle search query as a special case
-    if (filters.search_query) {
-      conditions.push({
-        propertyName: 'search_query',
-        operator: '=',
-        value: String(filters.search_query),
-      })
-    }
-
     // Handle date range - only add from defaultValues if no timerange filter exists
     if ((defaultFromValue || defaultToValue) && !filters.timerange) {
       conditions.push({
@@ -233,7 +216,7 @@ const PreviewFilterPanel = ({
 
     // Convert other filters
     Object.entries(filters).forEach(([key, value]) => {
-      if (key === 'search_query') return // Skip search_query as it's handled above
+      if (key === 'search_query') return // Skip search_query as it's handled in freeform text
 
       if (typeof value === 'object' && value !== null) {
         // If the filter object is empty, add a condition with no value
@@ -281,9 +264,7 @@ const PreviewFilterPanel = ({
       const propertyName = condition.propertyName
       if (!propertyName) return
 
-      if (propertyName === 'search_query') {
-        newFilters.search_query = condition.value ? String(condition.value) : undefined
-      } else if (propertyName === 'timerange') {
+      if (propertyName === 'timerange') {
         hasTimeRange = true
         if (condition.value) {
           const value = String(condition.value)
