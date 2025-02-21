@@ -159,13 +159,13 @@ supabase --experimental \
 postgres-config delete --config shared_buffers,work_mem
 ```
 
-By default, changing the configuration (whether by updating or deleting) causes the database and all associated read replicas to restart. You can use the `--no-restart` flag to prevent this behaviour, and attempt to reload the updated configuration withut a restart. Please refer to the Postgres documentation to determine if a given parameter can be reloaded without a restart.
+By default, changing the configuration, whether by updating or deleting, causes the database and all associated read replicas to restart. You can use the `--no-restart` flag to prevent this behavior, and attempt to reload the updated configuration without a restart. Please refer to the Postgres documentation to determine if a given parameter can be reloaded without a restart.
 
 <Admonition type="note" label="Read Replicas and Custom Config">
 
-Postgres requires several paramters to be synchronized between the Primary cluster and [Read Replicas](./docs/guides/platform/read-replicas).
+Postgres requires several parameters to be synchronized between the Primary cluster and [Read Replicas](./docs/guides/platform/read-replicas).
 
-By default, Supabase ensures that this propagation is executed correctly. However, if the `--no-restart` behavior is used in conjunction with parameters that cannot be reloaded without a restart, the user is responsible for ensuring that both the primaries and the read replicas get restarted in a timely manner to ensure a stable running state. Leaving the configuration updated, but not utilized (via a restart) in such a case can result in read replica failure if the primary (or a read replica) restarts in isolation (eg due to an out-of-memory event, or hardware failure).
+By default, Supabase ensures that this propagation is executed correctly. However, if the `--no-restart` behavior is used in conjunction with parameters that cannot be reloaded without a restart, the user is responsible for ensuring that both the primaries and the read replicas get restarted in a timely manner to ensure a stable running state. Leaving the configuration updated, but not utilized (via a restart) in such a case can result in read replica failure if the primary, or a read replica, restarts in isolation (e.g. due to an out-of-memory event, or hardware failure).
 
 </Admonition>
 
