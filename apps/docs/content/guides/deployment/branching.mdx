@@ -73,7 +73,7 @@ Supabase Branching follows the [Trunk Based Development](https://trunkbaseddevel
   }}
 />
 
-When you merge your Git branch into the production branch, all new migrations will be applied to your Production environment based on the changes made to your [`config.toml`](/docs/guides/local-development/cli/config).
+When you merge your Git branch into the production branch, all new migrations will be applied to your Production environment. If you have declared Storage buckets or Edge Functions in `config.toml`, they will also be deployed automatically. All other configurations, including API, Auth, and seed files, will be ignored by default.
 
 <Admonition type="note" label="Data changes are not merged into production." />
 

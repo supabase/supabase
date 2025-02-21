@@ -1,6 +1,6 @@
-# Local studio tests
+# Studio E2E Tests
 
-In an effort to make the local studio more stable, we've added tests which test features which are commonly used in local
+In an effort to make the local + hosted studio more stable, we've added tests which test features which are commonly used in local
 development. Built with [Playwright](https://playwright.dev/docs/intro).
 
 ## How to run tests
