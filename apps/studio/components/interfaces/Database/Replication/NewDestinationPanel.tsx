@@ -246,7 +246,7 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                           <PublicationsComboBox
                             publications={publications?.map((pub) => pub.name) || []}
                             loading={loadingPublications}
-                            onSelectPublication={field.onChange}
+                            field={field}
                             onNewPublicationClick={() => setPublicationPanelVisible(true)}
                           />
                         </FormControl_Shadcn_>
