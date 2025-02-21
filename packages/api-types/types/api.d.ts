@@ -415,7 +415,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/feedback/feedback/docs': {
+  '/platform/feedback/docs': {
     parameters: {
       query?: never
       header?: never
@@ -432,7 +432,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/feedback/feedback/downgrade': {
+  '/platform/feedback/downgrade': {
     parameters: {
       query?: never
       header?: never
@@ -449,7 +449,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/feedback/feedback/send': {
+  '/platform/feedback/send': {
     parameters: {
       query?: never
       header?: never
@@ -466,7 +466,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/feedback/feedback/upgrade': {
+  '/platform/feedback/upgrade': {
     parameters: {
       query?: never
       header?: never
@@ -737,6 +737,59 @@ export interface paths {
     }
     /** Gets vercel projects with the given organization integration id */
     get: operations['getVercelProjects']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/notifications': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get notifications */
+    get: operations['getNotificationsV2']
+    put?: never
+    post?: never
+    /** Delete notifications */
+    delete: operations['deleteNotifications']
+    options?: never
+    head?: never
+    /** Update notifications */
+    patch: operations['updateNotificationsV2']
+    trace?: never
+  }
+  '/platform/notifications/archive-all': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Archives all notifications */
+    patch: operations['archiveAllNotifications']
+    trace?: never
+  }
+  '/platform/notifications/summary': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get an aggregated data of interest across all notifications for the user */
+    get: operations['getNotificationsSummary']
     put?: never
     post?: never
     delete?: never
@@ -1459,6 +1512,26 @@ export interface paths {
     put?: never
     /** Creates a project */
     post: operations['createProject']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects-resource-warnings': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Gets resource warnings for all projects accessible by the user
+     * @description Only returns the minimal project info
+     */
+    get: operations['getProjectsResourceWarnings']
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -2301,6 +2374,57 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/reset-password': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Reset password for email */
+    post: operations['resetPassword']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/signup': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Sign up with email and password */
+    post: operations['signUp']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get infrastructure status */
+    get: operations['getStatus']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/storage/{ref}/archive': {
     parameters: {
       query?: never
@@ -2731,6 +2855,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/tos/fly': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Redirects to Fly sso flow */
+    get: operations['flyTosAccepted']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/vercel/projects': {
     parameters: {
       query?: never
@@ -2809,6 +2950,41 @@ export interface paths {
     }
     /** Gets the Vercel access token for the given code */
     get: operations['getAccessToken']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/workflow-runs': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get a list of workflow runs */
+    get: operations['listWorkflowRuns']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    /** Count the number of workflow runs for the given branch */
+    head: operations['countWorkflowRuns']
+    patch?: never
+    trace?: never
+  }
+  '/platform/workflow-runs/{workflow_run_id}/logs': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get the logs of a workflow run */
+    get: operations['getWorkflowRunLogs']
     put?: never
     post?: never
     delete?: never
@@ -5157,6 +5333,43 @@ export interface components {
       /** @enum {string} */
       status: 'stored' | 'applied'
     }
+    NotificationAction: {
+      action_type?: string
+      label: string
+      url?: string
+    }
+    NotificationData: {
+      actions?: components['schemas']['NotificationAction'][]
+      message?: string
+      org_slug?: string
+      project_ref?: string
+      title: string
+    }
+    NotificationResponseV1: {
+      data: Record<string, never>
+      id: string
+      inserted_at: string
+      meta: Record<string, never>
+      notification_name: string
+      notification_status: string
+      project_id: number
+    }
+    NotificationResponseV2: {
+      data: components['schemas']['NotificationData']
+      id: string
+      inserted_at: string
+      meta: Record<string, never>
+      name: string
+      /** @enum {string} */
+      priority: 'Critical' | 'Warning' | 'Info'
+      /** @enum {string} */
+      status: 'new' | 'seen' | 'archived'
+    }
+    NotificationsSummary: {
+      has_critical: boolean
+      has_warning: boolean
+      unread_count: number
+    }
     OrganizationProjectsResponse: {
       projects: components['schemas']['ProjectWithDatabases'][]
     }
@@ -5747,6 +5960,26 @@ export interface components {
       name: string
       ref: string
     }
+    ProjectResourceWarningsResponse: {
+      /** @enum {string|null} */
+      auth_email_offender: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      auth_rate_limit_exhaustion: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      auth_restricted_email_sending: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      cpu_exhaustion: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      disk_io_exhaustion: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      disk_space_exhaustion: 'critical' | 'warning' | null
+      is_readonly_mode_enabled: boolean
+      /** @enum {string|null} */
+      memory_and_swap_exhaustion: 'critical' | 'warning' | null
+      /** @enum {string|null} */
+      need_pitr: 'critical' | 'warning' | null
+      project: string
+    }
     ProjectResponse: {
       cloud_provider: string
       db_dns_name: string
@@ -5926,6 +6159,10 @@ export interface components {
         schema: string
       }[]
     }
+    ResetPasswordBody: {
+      email: string
+      redirectTo?: string
+    }
     ResizeBody: {
       volume_size_gb: number
     }
@@ -6100,6 +6337,11 @@ export interface components {
       error: string | null
       path: string | null
       signedUrl: string
+    }
+    SignUpBody: {
+      email: string
+      password: string
+      redirectTo?: string
     }
     SslEnforcementRequest: {
       requestedConfig: components['schemas']['SslEnforcements']
@@ -6769,6 +7011,14 @@ export interface components {
       HOOK_SEND_SMS_SECRETS?: string
       HOOK_SEND_SMS_URI?: string
     }
+    UpdateNotificationBodyV2: {
+      id: string
+      /** @enum {string} */
+      status: 'new' | 'seen' | 'archived'
+    }
+    UpdateNotificationsBodyV1: {
+      ids: string[]
+    }
     UpdateOrganizationBodyDto: {
       additional_billing_emails?: string[]
       /** Format: email */
@@ -7210,6 +7460,23 @@ export interface components {
     }
     VercelRedirectResponse: {
       url: string
+    }
+    WorkflowRunResponse: {
+      branch_id: string
+      check_run_id: number | null
+      created_at: string
+      git_config: Record<string, never> | null
+      id: string
+      /** @enum {string} */
+      status:
+        | 'CREATING_PROJECT'
+        | 'RUNNING_MIGRATIONS'
+        | 'MIGRATIONS_PASSED'
+        | 'MIGRATIONS_FAILED'
+        | 'FUNCTIONS_DEPLOYED'
+        | 'FUNCTIONS_FAILED'
+      updated_at: string
+      workdir: string | null
     }
   }
   responses: never
@@ -8781,6 +9048,142 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  getNotificationsV2: {
+    parameters: {
+      query?: {
+        limit?: string
+        offset?: string
+        org_slug?: string
+        priority?: 'Critical' | 'Warning' | 'Info'
+        project_ref?: string
+        status?: 'new' | 'seen' | 'archived'
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NotificationResponseV2'][]
+        }
+      }
+      /** @description Failed to retrieve notifications */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  deleteNotifications: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateNotificationsBodyV1']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NotificationResponseV1'][]
+        }
+      }
+      /** @description Failed to delete notifications */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  updateNotificationsV2: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateNotificationBodyV2'][]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NotificationResponseV2'][]
+        }
+      }
+      /** @description Failed to update notifications */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  archiveAllNotifications: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to archive all notifications */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  getNotificationsSummary: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NotificationsSummary']
+        }
       }
     }
   }
@@ -11524,6 +11927,25 @@ export interface operations {
       }
     }
   }
+  getProjectsResourceWarnings: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectResourceWarningsResponse'][]
+        }
+      }
+    }
+  }
   getProject: {
     parameters: {
       query?: never
@@ -13590,6 +14012,72 @@ export interface operations {
       }
     }
   }
+  resetPassword: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResetPasswordBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  signUp: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SignUpBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  getStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve infrastructure status */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   getArchive: {
     parameters: {
       query?: never
@@ -14600,6 +15088,26 @@ export interface operations {
       }
     }
   }
+  flyTosAccepted: {
+    parameters: {
+      query: {
+        extension_id: string
+        organization_id: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   getVercelProjects: {
     parameters: {
       query: {
@@ -14777,6 +15285,99 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get Vercel access token */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  listWorkflowRuns: {
+    parameters: {
+      query?: {
+        /** @description Branch ID */
+        branch_id?: string
+        limit?: number
+        offset?: number
+        /** @description Project ref */
+        project_ref?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['WorkflowRunResponse'][]
+        }
+      }
+      /** @description Failed to list workflow runs */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  countWorkflowRuns: {
+    parameters: {
+      query?: {
+        /** @description Branch ID */
+        branch_id?: string
+        /** @description Project ref */
+        project_ref?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          /** @description total count value */
+          'X-Total-Count'?: number
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to count workflow runs */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  getWorkflowRunLogs: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Workflow run ID */
+        workflow_run_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'text/plain': string
+        }
+      }
+      /** @description Failed to get workflow run logs */
       500: {
         headers: {
           [name: string]: unknown
