@@ -26,6 +26,8 @@ RUN apt-get update -qq && \
 RUN npm install -g pnpm@9.15.5
 
 WORKDIR /app
+ARG BUILD_VERSION
+ENV STUDIO_VERSION="$BUILD_VERSION"
 
 # Prune unneeded dependencies with turbo (from apps/ for example)
 FROM base AS turbo
@@ -40,9 +42,6 @@ COPY --from=turbo /app/out/pnpm-lock.yaml ./
 
 # No need to clean cache because production uses standalone build
 RUN pnpm install --frozen-lockfile
-
-ARG BUILD_VERSION
-ENV STUDIO_VERSION="$BUILD_VERSION"
 
 # dev contains dependencies and source code not compiled
 FROM deps AS dev
