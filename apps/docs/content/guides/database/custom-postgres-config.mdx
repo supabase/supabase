@@ -163,7 +163,7 @@ By default, changing the configuration, whether by updating or deleting, causes 
 
 <Admonition type="note" label="Read Replicas and Custom Config">
 
-Postgres requires several parameters to be synchronized between the Primary cluster and [Read Replicas](./docs/guides/platform/read-replicas).
+Postgres requires several parameters to be synchronized between the Primary cluster and [Read Replicas](/docs/guides/platform/read-replicas).
 
 By default, Supabase ensures that this propagation is executed correctly. However, if the `--no-restart` behavior is used in conjunction with parameters that cannot be reloaded without a restart, the user is responsible for ensuring that both the primaries and the read replicas get restarted in a timely manner to ensure a stable running state. Leaving the configuration updated, but not utilized (via a restart) in such a case can result in read replica failure if the primary, or a read replica, restarts in isolation (e.g. due to an out-of-memory event, or hardware failure).
 
