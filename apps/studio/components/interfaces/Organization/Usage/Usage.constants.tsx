@@ -13,7 +13,7 @@ export const COLOR_MAP = {
   'dark-yellow': { bar: 'fill-yellow-1000', marker: 'bg-yellow-1000' },
   orange: { bar: 'fill-orange-800', marker: 'bg-orange-800' },
   'dark-orange': { bar: 'fill-orange-1000', marker: 'bg-orange-1100' },
-  'teal': { bar: 'fill-teal-600', marker: 'bg-teal-700' },
+  teal: { bar: 'fill-teal-600', marker: 'bg-teal-700' },
   red: { bar: 'fill-red-800', marker: 'bg-red-800' },
   'dark-red': { bar: 'fill-red-1000', marker: 'bg-red-1000' },
   purple: { bar: 'fill-purple-900', marker: 'bg-purple-900' },
