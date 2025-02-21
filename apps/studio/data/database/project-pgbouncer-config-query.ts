@@ -1,9 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
-import { configKeys } from './keys'
+import { databaseKeys } from './keys'
 
 export type ProjectPgbouncerConfigVariables = {
   projectRef?: string
@@ -34,7 +33,7 @@ export const useProjectPgbouncerConfigQuery = <TData = ProjectPgbouncerConfigDat
   }: UseQueryOptions<ProjectPgbouncerConfigData, ProjectPgbouncerConfigError, TData> = {}
 ) =>
   useQuery<ProjectPgbouncerConfigData, ProjectPgbouncerConfigError, TData>(
-    configKeys.pgBouncerConfig(projectRef),
+    databaseKeys.pgbouncerConfig(projectRef),
     ({ signal }) => getProjectPgbouncerConfig({ projectRef }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
