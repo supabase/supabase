@@ -23,12 +23,19 @@ export async function deployEdgeFunction({
   files,
 }: EdgeFunctionsDeployVariables) {
   if (!projectRef) throw new Error('projectRef is required')
+  if (!metadata.entrypoint_path) throw new Error('entrypoint_path is required')
 
   const { data, error } = await post(`/v1/projects/{ref}/functions/deploy`, {
     params: { path: { ref: projectRef }, query: { slug: metadata.name } },
     body: {
       file: files as any,
-      metadata: metadata,
+      metadata: {
+        entrypoint_path: metadata.entrypoint_path,
+        import_map_path: metadata.import_map_path,
+        name: metadata.name,
+        static_patterns: metadata.static_patterns,
+        verify_jwt: metadata.verify_jwt,
+      },
     },
     bodySerializer(body) {
       const formData = new FormData()
