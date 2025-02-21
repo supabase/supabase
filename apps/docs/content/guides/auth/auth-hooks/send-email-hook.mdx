@@ -282,7 +282,7 @@ Email sending depends on two settings: Email Provider and Auth Hook status.
         },
         "email_action_type": {
           "type": "string",
-          "enum": ["signup", "login", "reset_password"]
+          "enum": ["signup", "invite", "magiclink", "recovery", "email_change", "email"]
         },
         "site_url": {
           "type": "string",
@@ -472,14 +472,14 @@ If you want to send emails through the Supabase Resend integration, which uses R
 
 Create a `.env` file with the following environment variables:
 
-```bash
-RESEND_API_KEY=your_resend_api_key
-SEND_EMAIL_HOOK_SECRET=<base64_secret>
+```ini
+RESEND_API_KEY="your_resend_api_key"
+SEND_EMAIL_HOOK_SECRET="v1,whsec_<base64_secret>"
 ```
 
 <Admonition type="note">
 
-You can generate the secret in the [Auth Hooks](/dashboard/project/_/auth/hooks) section of the Supabase dashboard. Make sure to remove the `v1,whsec_` prefix!
+You can generate the secret in the [Auth Hooks](/dashboard/project/_/auth/hooks) section of the Supabase dashboard.
 
 </Admonition>
 
@@ -502,7 +502,7 @@ import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0";
 import { Resend } from "npm:resend";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
-const hookSecret = Deno.env.get("SEND_EMAIL_HOOK_SECRET") as string;
+const hookSecret = (Deno.env.get("SEND_EMAIL_HOOK_SECRET") as string).replace("v1,whsec_", "");
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") {
@@ -569,7 +569,7 @@ supabase functions deploy send-email --no-verify-jwt
 
 </TabPanel>
 <TabPanel id="http-internationalization-for-emails" label="Add Internationalization for Email Templates">
-Your company is expanding to France and Spain. As part of expansion efforts, the company would like to deliver internationalized email templates to best support local users in their native language. Ensure that you have configured `POSTMARK_SERVER_TOKEN` and `AUTH_SEND_EMAIL_HOOK_SECRET` in your `.env` file.
+Your company is expanding to France and Spain. As part of expansion efforts, the company would like to deliver internationalized email templates to best support local users in their native language. Ensure that you have configured `POSTMARK_SERVER_TOKEN` and `SEND_EMAIL_HOOK_SECRET` in your `.env` file.
 
 ```javascript
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
@@ -650,7 +650,7 @@ Deno.serve(async (req) => {
   const payload = await req.text()
   const serverToken = Deno.env.get('POSTMARK_SERVER_TOKEN')
   const headers = Object.fromEntries(req.headers)
-  const base64_secret = Deno.env.get('AUTH_SEND_EMAIL_HOOK_SECRET')
+  const base64_secret = Deno.env.get('SEND_EMAIL_HOOK_SECRET').replace('v1,whsec_', '')
   const wh = new Webhook(base64_secret)
   const { user, email_data } = wh.verify(payload, headers)
 
@@ -717,7 +717,7 @@ Deno.serve(async (req) => {
 </TabPanel>
 {/* <TabPanel id="http-backup-email-provider" label="Add Backup Email Provider">
 Your company is rapidly growing and depends heavily on email signups. You'd like to configure a backup email provider in case the email provider runs out of credits during your new product launch. Postmark and Sengrid are used as examples but in practice you can use any email provider.
-Ensure that you have configured `POSTMARK_SERVER_TOKEN`, `SENDGRID_API_KEY` and `AUTH_SEND_EMAIL_HOOK_SECRET` in your `.env` file.
+Ensure that you have configured `POSTMARK_SERVER_TOKEN`, `SENDGRID_API_KEY` and `SEND_EMAIL_HOOK_SECRET` in your `.env` file.
 
 ```javascript
 import {
@@ -829,7 +829,7 @@ Deno.serve(async (req) => {
     const postmarkServerToken = Deno.env.get("POSTMARK_SERVER_TOKEN");
     const sendGridApiKey = Deno.env.get("SENDGRID_API_KEY");
     const headers = Object.fromEntries(req.headers);
-    const base64_secret = Deno.env.get('AUTH_SEND_EMAIL_HOOK_SECRET');
+    const base64_secret = Deno.env.get('SEND_EMAIL_HOOK_SECRET').replace('v1,whsec_', '');
     const wh = new Webhook(base64_secret);
     const {
         user,
