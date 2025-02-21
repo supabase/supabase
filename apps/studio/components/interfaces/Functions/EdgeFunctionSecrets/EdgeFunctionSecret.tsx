@@ -30,6 +30,13 @@ const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps)
         </div>
       </Table.td>
       <Table.td>
+        <div className="flex items-center space-x-2">
+          <p title={secret.updated_at}>
+            {secret.updated_at ? new Date(secret.updated_at).toLocaleString() : '-'}
+          </p>
+        </div>
+      </Table.td>
+      <Table.td>
         <div className="flex items-center justify-end">
           <ButtonTooltip
             type="text"

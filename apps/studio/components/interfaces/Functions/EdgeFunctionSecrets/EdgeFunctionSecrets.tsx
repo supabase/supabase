@@ -93,6 +93,7 @@ const EdgeFunctionSecrets = () => {
                       SHA256
                     </Badge>
                   </Table.th>,
+                  <Table.th key="secret-updated-at">Updated</Table.th>,
                   <Table.th key="actions" />,
                 ]}
                 body={
