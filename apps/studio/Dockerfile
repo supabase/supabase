@@ -41,6 +41,9 @@ COPY --from=turbo /app/out/pnpm-lock.yaml ./
 # No need to clean cache because production uses standalone build
 RUN pnpm install --frozen-lockfile
 
+ARG BUILD_VERSION
+ENV STUDIO_VERSION="$BUILD_VERSION"
+
 # dev contains dependencies and source code not compiled
 FROM deps AS dev
 COPY --from=turbo /app/out/full ./
