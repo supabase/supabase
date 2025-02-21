@@ -14,6 +14,7 @@ const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
   totalSize: z
     .number()
+    .int('Value must be an integer')
     .min(8, { message: 'Allocated disk size must be at least 8 GB.' })
     .describe('Allocated disk size in GB'),
   provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),

@@ -37,6 +37,7 @@ Greg Richardson
 Guilherme Souza
 Haydn Maley
 Hieu Pham
+Illia Basalaiev
 Inian P
 Ivan Vasilov
 Jenny Kibiri
@@ -61,7 +62,8 @@ Long Hoang
 Łukasz Niemier
 Margarita Sandomirskaia
 Mark Burggraf
-Monica El Khoury
+Monica Khoury
+Nyannyacha
 Oli R
 Pamela Chia
 Paul Caselton
