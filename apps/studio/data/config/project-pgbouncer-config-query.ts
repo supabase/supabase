@@ -34,7 +34,7 @@ export const useProjectPgbouncerConfigQuery = <TData = ProjectPgbouncerConfigDat
   }: UseQueryOptions<ProjectPgbouncerConfigData, ProjectPgbouncerConfigError, TData> = {}
 ) =>
   useQuery<ProjectPgbouncerConfigData, ProjectPgbouncerConfigError, TData>(
-    configKeys.pgBouncerStatus(projectRef),
+    configKeys.pgBouncerConfig(projectRef),
     ({ signal }) => getProjectPgbouncerConfig({ projectRef }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
