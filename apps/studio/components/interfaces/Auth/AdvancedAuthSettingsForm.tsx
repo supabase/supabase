@@ -167,7 +167,7 @@ export const AdvancedAuthSettingsForm = () => {
                         <div className="relative">
                           <Input_Shadcn_
                             type="number"
-                            disabled={promptTeamsEnterpriseUpgrade}
+                            disabled={!canUpdateConfig || promptTeamsEnterpriseUpgrade}
                             placeholder="10"
                             {...field}
                           />
@@ -195,7 +195,7 @@ export const AdvancedAuthSettingsForm = () => {
                       <FormControl_Shadcn_>
                         <Input_Shadcn_
                           type="number"
-                          disabled={promptTeamsEnterpriseUpgrade}
+                          disabled={!canUpdateConfig || promptTeamsEnterpriseUpgrade}
                           placeholder="10"
                           {...field}
                           value={field.value || ''}
