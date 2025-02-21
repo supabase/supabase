@@ -4,16 +4,11 @@ import { toast } from 'sonner'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
+import { components } from 'api-types'
 
 export type EdgeFunctionsDeployVariables = {
   projectRef: string
-  metadata: {
-    entrypoint_path?: string
-    import_map_path?: string
-    name?: string
-    static_patterns?: string[]
-    verify_jwt?: boolean
-  }
+  metadata: components['schemas']['FunctionDeployMetadata']
   files: { name: string; content: string }[]
 }
 
@@ -23,19 +18,12 @@ export async function deployEdgeFunction({
   files,
 }: EdgeFunctionsDeployVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!metadata.entrypoint_path) throw new Error('entrypoint_path is required')
 
   const { data, error } = await post(`/v1/projects/{ref}/functions/deploy`, {
     params: { path: { ref: projectRef }, query: { slug: metadata.name } },
     body: {
       file: files as any,
-      metadata: {
-        entrypoint_path: metadata.entrypoint_path,
-        import_map_path: metadata.import_map_path,
-        name: metadata.name,
-        static_patterns: metadata.static_patterns,
-        verify_jwt: metadata.verify_jwt,
-      },
+      metadata,
     },
     bodySerializer(body) {
       const formData = new FormData()
