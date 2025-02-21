@@ -58,10 +58,6 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           {
-            key: 'Strict-Transport-Security',
-            value: '',
-          },
-          {
             key: 'X-Robots-Tag',
             value: 'all',
           },
@@ -83,6 +79,12 @@ const nextConfig = {
       {
         source: '/favicon/:slug*',
         headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
+      },
+      {
+        source: "/(.*)",
+        headers: [{ 
+          key: 'Strict-Transport-Security', 
+          value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1' ? 'max-age=31536000' : '' }],
       },
     ]
   },

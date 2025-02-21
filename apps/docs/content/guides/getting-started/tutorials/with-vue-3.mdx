@@ -279,7 +279,7 @@ Create a new `src/components/Avatar.vue` component that allows users to upload p
 
 ```vue src/components/Avatar.vue
 <script setup>
-import { ref, toRefs, watch } from 'vue'
+import { ref, toRefs, watchEffect } from 'vue'
 import { supabase } from '../supabase'
 
 const prop = defineProps(['path', 'size'])

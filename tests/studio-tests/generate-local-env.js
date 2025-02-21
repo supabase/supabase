@@ -1,5 +1,5 @@
 const fs = require('fs')
-const generatedEnv = require('../keys.json')
+const generatedEnv = require('./keys.json')
 
 /**
  * This script takes the API keys from the local environment, merges them with some predefined variables and saves them
