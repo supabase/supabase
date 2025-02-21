@@ -12,14 +12,14 @@ export interface paths {
       cookie?: never
     }
     /** Gets GoTrue config */
-    get: operations['getGoTrueConfig']
+    get: operations['GoTrueConfigController_getGoTrueConfig']
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
     /** Updates GoTrue config */
-    patch: operations['updateGoTrueConfig']
+    patch: operations['GoTrueConfigController_updateGoTrueConfig']
     trace?: never
   }
   '/platform/auth/{ref}/config/hooks': {
@@ -36,7 +36,7 @@ export interface paths {
     options?: never
     head?: never
     /** Updates GoTrue config hooks */
-    patch: operations['updateGoTrueConfigHooks']
+    patch: operations['GoTrueConfigController_updateGoTrueConfigHooks']
     trace?: never
   }
   '/platform/auth/{ref}/invite': {
@@ -49,7 +49,7 @@ export interface paths {
     get?: never
     put?: never
     /** Sends an invite to the given email */
-    post: operations['sendInvite']
+    post: operations['AuthInviteController_sendInvite']
     delete?: never
     options?: never
     head?: never
@@ -66,7 +66,7 @@ export interface paths {
     get?: never
     put?: never
     /** Sends a magic link to the given email */
-    post: operations['sendMagicLink']
+    post: operations['MagicLinkController_sendMagicLink']
     delete?: never
     options?: never
     head?: never
@@ -83,7 +83,7 @@ export interface paths {
     get?: never
     put?: never
     /** Sends an OTP to the given phone number */
-    post: operations['sendOtp']
+    post: operations['OtpController_sendOtp']
     delete?: never
     options?: never
     head?: never
@@ -100,7 +100,7 @@ export interface paths {
     get?: never
     put?: never
     /** Sends a recovery email to the given email */
-    post: operations['sendRecover']
+    post: operations['RecoverController_sendRecover']
     delete?: never
     options?: never
     head?: never
@@ -115,7 +115,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets GoTrue template */
-    get: operations['getTemplate']
+    get: operations['TemplateController_getTemplate']
     put?: never
     post?: never
     delete?: never
@@ -134,7 +134,7 @@ export interface paths {
     get?: never
     put?: never
     /** Creates user */
-    post: operations['createUser']
+    post: operations['UsersController_createUser']
     delete?: never
     options?: never
     head?: never
@@ -152,11 +152,11 @@ export interface paths {
     put?: never
     post?: never
     /** Delete user with given ID */
-    delete: operations['deleteUserById']
+    delete: operations['UsersController_deleteUserById']
     options?: never
     head?: never
     /** Updates user with given ID */
-    patch: operations['updateUserById']
+    patch: operations['UsersController_updateUserById']
     trace?: never
   }
   '/platform/auth/{ref}/users/{id}/factors': {
@@ -170,7 +170,7 @@ export interface paths {
     put?: never
     post?: never
     /** Delete all factors associated to a user */
-    delete: operations['deleteFactors']
+    delete: operations['FactorsController_deleteFactors']
     options?: never
     head?: never
     patch?: never
@@ -186,7 +186,7 @@ export interface paths {
     get?: never
     put?: never
     /** Validate spam based on the given email content */
-    post: operations['validateSpam']
+    post: operations['ValidateController_validateSpam']
     delete?: never
     options?: never
     head?: never
@@ -203,7 +203,7 @@ export interface paths {
     get?: never
     put?: never
     /** Create CLI login session */
-    post: operations['createCliLoginSession']
+    post: operations['CliLoginController_createCliLoginSession']
     delete?: never
     options?: never
     head?: never
@@ -218,7 +218,7 @@ export interface paths {
       cookie?: never
     }
     /** Retrieve CLI login session */
-    get: operations['getCliLoginSession']
+    get: operations['CliLoginController_getCliLoginSession']
     put?: never
     post?: never
     delete?: never
@@ -235,7 +235,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets project backups */
-    get: operations['getBackups']
+    get: operations['BackupsController_getBackups']
     put?: never
     post?: never
     delete?: never
@@ -254,7 +254,7 @@ export interface paths {
     get?: never
     put?: never
     /** Download project backup */
-    post: operations['downloadBackup']
+    post: operations['BackupsController_downloadBackup']
     delete?: never
     options?: never
     head?: never
@@ -269,7 +269,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets backups that might be downloadable, but potentially not restorable. */
-    get: operations['getDownloadableBackups']
+    get: operations['BackupsController_getDownloadableBackups']
     put?: never
     post?: never
     delete?: never
@@ -288,7 +288,7 @@ export interface paths {
     get?: never
     put?: never
     /** Enable usage of physical backups */
-    post: operations['enablePhysicalBackup']
+    post: operations['BackupsController_enablePhysicalBackup']
     delete?: never
     options?: never
     head?: never
@@ -305,7 +305,7 @@ export interface paths {
     get?: never
     put?: never
     /** Restore project to a previous point in time */
-    post: operations['restorePointInTimeBackup']
+    post: operations['BackupsController_restorePointInTimeBackup']
     delete?: never
     options?: never
     head?: never
@@ -322,7 +322,7 @@ export interface paths {
     get?: never
     put?: never
     /** Restore project backup */
-    post: operations['restoreBackup']
+    post: operations['BackupsController_restoreBackup']
     delete?: never
     options?: never
     head?: never
@@ -339,7 +339,7 @@ export interface paths {
     get?: never
     put?: never
     /** Restore project with a physical backup */
-    post: operations['restorePhysicalBackup']
+    post: operations['BackupsController_restorePhysicalBackup']
     delete?: never
     options?: never
     head?: never
@@ -354,10 +354,10 @@ export interface paths {
       cookie?: never
     }
     /** List valid backups to clone from */
-    get: operations['getValidBackups']
+    get: operations['CloneController_getValidBackups']
     put?: never
     /** Clone the current project from a backup */
-    post: operations['cloneCurrentProject']
+    post: operations['CloneController_cloneCurrentProject']
     delete?: never
     options?: never
     head?: never
@@ -372,7 +372,7 @@ export interface paths {
       cookie?: never
     }
     /** Retrieve the current status of an existing cloning process */
-    get: operations['cloneProjectStatus']
+    get: operations['CloneController_cloneProjectStatus']
     put?: never
     post?: never
     delete?: never
@@ -391,7 +391,7 @@ export interface paths {
     get?: never
     put?: never
     /** Enables Database Webhooks on the project */
-    post: operations['enableHooks']
+    post: operations['HooksController_enableHooks']
     delete?: never
     options?: never
     head?: never
@@ -406,7 +406,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets hook logs with the given ID */
-    get: operations['getHookLogs']
+    get: operations['HooksController_getHookLogs']
     put?: never
     post?: never
     delete?: never
@@ -425,7 +425,7 @@ export interface paths {
     get?: never
     put?: never
     /** Send feedback on docs */
-    post: operations['sendDocsFeedback']
+    post: operations['SendFeedbackController_sendDocsFeedback']
     delete?: never
     options?: never
     head?: never
@@ -442,7 +442,7 @@ export interface paths {
     get?: never
     put?: never
     /** Send exit survey to HubSpot */
-    post: operations['sendExitSurvey']
+    post: operations['SendFeedbackController_sendExitSurvey']
     delete?: never
     options?: never
     head?: never
@@ -459,7 +459,7 @@ export interface paths {
     get?: never
     put?: never
     /** Send feedback */
-    post: operations['sendFeedback']
+    post: operations['SendFeedbackController_sendFeedback']
     delete?: never
     options?: never
     head?: never
@@ -476,7 +476,7 @@ export interface paths {
     get?: never
     put?: never
     /** Send upgrade survey to survey_responses table */
-    post: operations['sendUpgradeSurvey']
+    post: operations['SendFeedbackController_sendUpgradeSurvey']
     delete?: never
     options?: never
     head?: never
@@ -491,7 +491,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets user's integrations */
-    get: operations['getUserInstallations']
+    get: operations['IntegrationsController_getUserInstallations']
     put?: never
     post?: never
     delete?: never
@@ -508,7 +508,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets integration with the given organization slug */
-    get: operations['getUserInstallationForOrg']
+    get: operations['IntegrationsController_getUserInstallationForOrg']
     put?: never
     post?: never
     delete?: never
@@ -525,10 +525,10 @@ export interface paths {
       cookie?: never
     }
     /** Get GitHub authorization */
-    get: operations['getGitHubAuthorization']
+    get: operations['GitHubAuthorizationsController_getGitHubAuthorization']
     put?: never
     /** Create GitHub authorization */
-    post: operations['createGitHubAuthorization']
+    post: operations['GitHubAuthorizationsController_createGitHubAuthorization']
     delete?: never
     options?: never
     head?: never
@@ -543,7 +543,7 @@ export interface paths {
       cookie?: never
     }
     /** List GitHub connection branches */
-    get: operations['listConnectionBranches']
+    get: operations['GitHubBranchesController_listConnectionBranches']
     put?: never
     post?: never
     delete?: never
@@ -560,7 +560,7 @@ export interface paths {
       cookie?: never
     }
     /** Get GitHub connection branch */
-    get: operations['getConnectionBranch']
+    get: operations['GitHubBranchesController_getConnectionBranch']
     put?: never
     post?: never
     delete?: never
@@ -577,10 +577,10 @@ export interface paths {
       cookie?: never
     }
     /** List organization GitHub connections */
-    get: operations['listOrganizationGitHubConnections']
+    get: operations['GitHubConnectionsController_listOrganizationGitHubConnections']
     put?: never
     /** Connects a GitHub project to a supabase project */
-    post: operations['createGitHubConnection']
+    post: operations['GitHubConnectionsController_createGitHubConnection']
     delete?: never
     options?: never
     head?: never
@@ -598,11 +598,11 @@ export interface paths {
     put?: never
     post?: never
     /** Deletes github project connection */
-    delete: operations['deleteGitHubConnection']
+    delete: operations['GitHubConnectionsController_deleteGitHubConnection']
     options?: never
     head?: never
     /** Updates a GitHub connection for a supabase project */
-    patch: operations['updateGitHubConnection']
+    patch: operations['GitHubConnectionsController_updateGitHubConnection']
     trace?: never
   }
   '/platform/integrations/github/repositories': {
@@ -613,7 +613,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets GitHub repositories for user */
-    get: operations['listRepositories']
+    get: operations['GitHubRepositoriesController_listRepositories']
     put?: never
     post?: never
     delete?: never
@@ -635,7 +635,7 @@ export interface paths {
      * Create vercel integration
      * @description Exchanges a vercel code for an access token and saves the access token to the new integration record
      */
-    post: operations['createVercelIntegration']
+    post: operations['VercelIntegrationController_createVercelIntegration']
     delete?: never
     options?: never
     head?: never
@@ -653,7 +653,7 @@ export interface paths {
     put?: never
     post?: never
     /** Removes Vercel organization integration with the given id */
-    delete: operations['removeVercelIntegration']
+    delete: operations['VercelIntegrationController_removeVercelIntegration']
     options?: never
     head?: never
     patch?: never
@@ -669,7 +669,7 @@ export interface paths {
     get?: never
     put?: never
     /** Connects a Vercel project to a supabase project */
-    post: operations['createVercelConnection']
+    post: operations['VercelConnectionsController_createVercelConnection']
     delete?: never
     options?: never
     head?: never
@@ -687,11 +687,11 @@ export interface paths {
     put?: never
     post?: never
     /** Deletes vercel project connection */
-    delete: operations['deleteVercelConnection']
+    delete: operations['VercelConnectionsController_deleteVercelConnection']
     options?: never
     head?: never
     /** Updates a Vercel connection for a supabase project */
-    patch: operations['updateVercelConnection']
+    patch: operations['VercelConnectionsController_updateVercelConnection']
     trace?: never
   }
   '/platform/integrations/vercel/connections/{connection_id}/sync-envs': {
@@ -704,7 +704,7 @@ export interface paths {
     get?: never
     put?: never
     /** Syncs supabase project envs with given connection id */
-    post: operations['syncVercelConnectionEnvironments']
+    post: operations['VercelConnectionsController_syncVercelConnectionEnvironments']
     delete?: never
     options?: never
     head?: never
@@ -719,7 +719,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets installed vercel project connections for the given organization integration */
-    get: operations['getVercelConnections']
+    get: operations['VercelConnectionsController_getVercelConnections']
     put?: never
     post?: never
     delete?: never
@@ -736,7 +736,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets vercel projects with the given organization integration id */
-    get: operations['getVercelProjects']
+    get: operations['VercelProjectController_getVercelProjects']
     put?: never
     post?: never
     delete?: never
@@ -753,15 +753,15 @@ export interface paths {
       cookie?: never
     }
     /** Get notifications */
-    get: operations['getNotificationsV2']
+    get: operations['NotificationsController_getNotificationsV2']
     put?: never
     post?: never
     /** Delete notifications */
-    delete: operations['deleteNotifications']
+    delete: operations['NotificationsController_deleteNotifications']
     options?: never
     head?: never
     /** Update notifications */
-    patch: operations['updateNotificationsV2']
+    patch: operations['NotificationsController_updateNotificationsV2']
     trace?: never
   }
   '/platform/notifications/archive-all': {
@@ -778,7 +778,7 @@ export interface paths {
     options?: never
     head?: never
     /** Archives all notifications */
-    patch: operations['archiveAllNotifications']
+    patch: operations['NotificationsController_archiveAllNotifications']
     trace?: never
   }
   '/platform/notifications/summary': {
@@ -789,7 +789,7 @@ export interface paths {
       cookie?: never
     }
     /** Get an aggregated data of interest across all notifications for the user */
-    get: operations['getNotificationsSummary']
+    get: operations['NotificationsController_getNotificationsSummary']
     put?: never
     post?: never
     delete?: never
@@ -806,7 +806,7 @@ export interface paths {
       cookie?: never
     }
     /** [Beta] Get oauth app authorization request */
-    get: operations['getAuthorizationRequest']
+    get: operations['OAuthAuthorizationsController_getAuthorizationRequest']
     put?: never
     post?: never
     delete?: never
@@ -823,10 +823,10 @@ export interface paths {
       cookie?: never
     }
     /** Gets user's organizations */
-    get: operations['getOrganizations']
+    get: operations['OrganizationsController_getOrganizations']
     put?: never
     /** Creates an organization */
-    post: operations['createOrganizationWithTier']
+    post: operations['OrganizationsController_createOrganizationWithTier']
     delete?: never
     options?: never
     head?: never
@@ -841,15 +841,15 @@ export interface paths {
       cookie?: never
     }
     /** Gets a specific organization that belongs to the authenticated user */
-    get: operations['getOrganization']
+    get: operations['OrganizationSlugController_getOrganization']
     put?: never
     post?: never
     /** Deletes organization */
-    delete: operations['deleteOrganization']
+    delete: operations['OrganizationSlugController_deleteOrganization']
     options?: never
     head?: never
     /** Updates organization */
-    patch: operations['updateOrganization']
+    patch: operations['OrganizationSlugController_updateOrganization']
     trace?: never
   }
   '/platform/organizations/{slug}/available-versions': {
@@ -862,7 +862,7 @@ export interface paths {
     get?: never
     put?: never
     /** Retrieves a list of available Postgres versions available to the organization */
-    post: operations['getAvailableImageVersions']
+    post: operations['OrganizationSlugController_getAvailableImageVersions']
     delete?: never
     options?: never
     head?: never
@@ -877,7 +877,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets the Billing customer */
-    get: operations['getCustomer']
+    get: operations['CustomerController_getCustomer']
     /** Updates the billing customer */
     put: operations['updateCustomerV2']
     post?: never
@@ -895,7 +895,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets daily organization stats */
-    get: operations['getDailyStats']
+    get: operations['OrgDailyStatsController_getDailyStats']
     put?: never
     post?: never
     delete?: never
@@ -912,7 +912,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets daily organization stats for compute */
-    get: operations['getDailyStatsCompute']
+    get: operations['OrgDailyStatsController_getDailyStatsCompute']
     put?: never
     post?: never
     delete?: never
@@ -929,7 +929,7 @@ export interface paths {
       cookie?: never
     }
     /** Get SOC2 Type 2 report URL */
-    get: operations['getSoc2Type2ReportUrl']
+    get: operations['OrgDocumentsController_getSoc2Type2ReportUrl']
     put?: never
     post?: never
     delete?: never
@@ -946,7 +946,7 @@ export interface paths {
       cookie?: never
     }
     /** Get standard security questionnaire URL */
-    get: operations['getStandardSecurityQuestionnaireUrl']
+    get: operations['OrgDocumentsController_getStandardSecurityQuestionnaireUrl']
     put?: never
     post?: never
     delete?: never
@@ -963,7 +963,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets all projects for the given organization */
-    get: operations['getProjects']
+    get: operations['OrganizationProjectsController_getOrganizationProjects']
     put?: never
     post?: never
     delete?: never
@@ -980,7 +980,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets the given organization's roles */
-    get: operations['getAllRoles']
+    get: operations['OrganizationRolesController_getAllRoles']
     put?: never
     post?: never
     delete?: never
@@ -997,12 +997,12 @@ export interface paths {
       cookie?: never
     }
     /** Gets the given organization's tax ID */
-    get: operations['getTaxId']
+    get: operations['TaxIdsController_getTaxId']
     /** Creates or updates a tax ID for the given organization */
-    put: operations['updateTaxId']
+    put: operations['TaxIdsController_updateTaxId']
     post?: never
     /** Delete the tax ID with the given ID */
-    delete: operations['deleteTaxId']
+    delete: operations['TaxIdsController_deleteTaxId']
     options?: never
     head?: never
     patch?: never
@@ -1018,7 +1018,7 @@ export interface paths {
     get?: never
     put?: never
     /** Transfers the organization to the given member */
-    post: operations['transferOrganization']
+    post: operations['TransferController_transferOrganization']
     delete?: never
     options?: never
     head?: never
@@ -1033,7 +1033,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets usage stats */
-    get: operations['getOrgUsage']
+    get: operations['OrgUsageController_getOrgUsage']
     put?: never
     post?: never
     delete?: never
@@ -1050,7 +1050,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets organization linked to fly organization id */
-    get: operations['getOrganizationByFlyOrganizationId']
+    get: operations['OrganizationsController_getOrganizationByFlyOrganizationId']
     put?: never
     post?: never
     delete?: never
@@ -1067,12 +1067,12 @@ export interface paths {
       cookie?: never
     }
     /** Retrieve column privileges */
-    get: operations['getColumnPrivileges']
+    get: operations['ColumnPrivilegesController_getColumnPrivileges']
     put?: never
     /** Grant column privileges */
-    post: operations['grantColumnPrivileges']
+    post: operations['ColumnPrivilegesController_grantColumnPrivileges']
     /** Revoke column privileges */
-    delete: operations['revokeColumnPrivileges']
+    delete: operations['ColumnPrivilegesController_revokeColumnPrivileges']
     options?: never
     head?: never
     patch?: never
@@ -1086,16 +1086,16 @@ export interface paths {
       cookie?: never
     }
     /** Gets project pg.columns */
-    get: operations['getColumns']
+    get: operations['ColumnsController_getColumns']
     put?: never
     /** Creates project pg.column */
-    post: operations['createColumn']
+    post: operations['ColumnsController_createColumn']
     /** Deletes project pg.column with the given ID */
-    delete: operations['deleteColumn']
+    delete: operations['ColumnsController_deleteColumn']
     options?: never
     head?: never
     /** Updates project pg.column with the given ID */
-    patch: operations['updateColumn']
+    patch: operations['ColumnsController_updateColumn']
     trace?: never
   }
   '/platform/pg-meta/{ref}/extensions': {
@@ -1106,12 +1106,12 @@ export interface paths {
       cookie?: never
     }
     /** Gets project pg.extensions */
-    get: operations['getExtensions']
+    get: operations['ExtensionsController_getExtensions']
     put?: never
     /** Creates project pg.extension */
-    post: operations['createExtension']
+    post: operations['ExtensionsController_createExtension']
     /** Deletes project pg.extension with the given ID */
-    delete: operations['deleteExtension']
+    delete: operations['ExtensionsController_deleteExtension']
     options?: never
     head?: never
     patch?: never
@@ -1125,7 +1125,7 @@ export interface paths {
       cookie?: never
     }
     /** Retrieve database foreign tables */
-    get: operations['getForeignTables']
+    get: operations['ForeignTablesController_getForeignTables']
     put?: never
     post?: never
     delete?: never
@@ -1142,16 +1142,16 @@ export interface paths {
       cookie?: never
     }
     /** Gets project pg.functions */
-    get: operations['getFunctions']
+    get: operations['FunctionsController_getFunctions']
     put?: never
     /** Creates project pg.function */
-    post: operations['createFunction']
+    post: operations['FunctionsController_createFunction']
     /** Deletes project pg.function with the given ID */
-    delete: operations['deleteFunction']
+    delete: operations['FunctionsController_deleteFunction']
     options?: never
     head?: never
     /** Updates project pg.function with the given ID */
-    patch: operations['updateFunction']
+    patch: operations['FunctionsController_updateFunction']
     trace?: never
   }
   '/platform/pg-meta/{ref}/materialized-views': {
@@ -1162,7 +1162,7 @@ export interface paths {
       cookie?: never
     }
     /** Retrieve database materialized views */
-    get: operations['getMaterializedViews']
+    get: operations['MaterializedViewsController_getMaterializedViews']
     put?: never
     post?: never
     delete?: never
@@ -1179,16 +1179,16 @@ export interface paths {
       cookie?: never
     }
     /** Gets project pg.policies */
-    get: operations['getPolicies']
+    get: operations['PoliciesController_getPolicies']
     put?: never
     /** Creates project pg.policy */
-    post: operations['createPolicy']
+    post: operations['PoliciesController_createPolicy']
     /** Deletes project pg.policy with the given ID */
-    delete: operations['deletePolicy']
+    delete: operations['PoliciesController_deletePolicy']
     options?: never
     head?: never
     /** Updates project pg.policy with the given ID */
-    patch: operations['updatePolicy']
+    patch: operations['PoliciesController_updatePolicy']
     trace?: never
   }
   '/platform/pg-meta/{ref}/publications': {
@@ -1199,16 +1199,16 @@ export interface paths {
       cookie?: never
     }
     /** Gets project pg.publications */
-    get: operations['getPublications']
+    get: operations['PublicationsController_getPublications']
     put?: never
     /** Gets project pg.publications */
-    post: operations['createPublication']
+    post: operations['PublicationsController_createPublication']
     /** Deletes project pg.publication with the given ID */
-    delete: operations['deletePublication']
+    delete: operations['PublicationsController_deletePublication']
     options?: never
     head?: never
     /** Updates project pg.publication with the given ID */
-    patch: operations['updatePublication']
+    patch: operations['PublicationsController_updatePublication']
     trace?: never
   }
   '/platform/pg-meta/{ref}/query': {
@@ -1221,7 +1221,7 @@ export interface paths {
     get?: never
     put?: never
     /** Run sql query */
-    post: operations['runQuery']
+    post: operations['QueryController_runQuery']
     delete?: never
     options?: never
     head?: never
@@ -1238,7 +1238,7 @@ export interface paths {
     get?: never
     put?: never
     /** Format sql query */
-    post: operations['formatQuery']
+    post: operations['QueryController_formatQuery']
     delete?: never
     options?: never
     head?: never
@@ -1255,7 +1255,7 @@ export interface paths {
     get?: never
     put?: never
     /** Validate sql query */
-    post: operations['validateQuery']
+    post: operations['QueryController_validateQuery']
     delete?: never
     options?: never
     head?: never
@@ -1270,16 +1270,16 @@ export interface paths {
       cookie?: never
     }
     /** Gets project pg.schemas */
-    get: operations['getSchemas']
+    get: operations['SchemasController_getSchemas']
     put?: never
     /** Creates project pg.schema */
-    post: operations['createSchema']
+    post: operations['SchemasController_createSchema']
     /** Deletes project pg.schema with the given ID */
-    delete: operations['deleteSchema']
+    delete: operations['SchemasController_deleteSchema']
     options?: never
     head?: never
     /** Updates project pg.schema with the given ID */
-    patch: operations['updateSchema']
+    patch: operations['SchemasController_updateSchema']
     trace?: never
   }
   '/platform/pg-meta/{ref}/tables': {
@@ -1290,16 +1290,16 @@ export interface paths {
       cookie?: never
     }
     /** Gets project pg.tables or pg.table with the given ID */
-    get: operations['getTables']
+    get: operations['TablesController_getTables']
     put?: never
     /** Creates project pg.table */
-    post: operations['createTable']
+    post: operations['TablesController_createTable']
     /** Deletes project pg.table with the given ID */
-    delete: operations['deleteTable']
+    delete: operations['TablesController_deleteTable']
     options?: never
     head?: never
     /** Updates project pg.table with the given ID */
-    patch: operations['updateTable']
+    patch: operations['TablesController_updateTable']
     trace?: never
   }
   '/platform/pg-meta/{ref}/triggers': {
@@ -1310,16 +1310,16 @@ export interface paths {
       cookie?: never
     }
     /** Gets project pg.triggers */
-    get: operations['getTriggers']
+    get: operations['TriggersController_getTriggers']
     put?: never
     /** Creates project pg.trigger */
-    post: operations['createTrigger']
+    post: operations['TriggersController_createTrigger']
     /** Deletes project pg.trigger with the given ID */
-    delete: operations['deleteTrigger']
+    delete: operations['TriggersController_deleteTrigger']
     options?: never
     head?: never
     /** Updates project pg.trigger with the given ID */
-    patch: operations['updateTrigger']
+    patch: operations['TriggersController_updateTrigger']
     trace?: never
   }
   '/platform/pg-meta/{ref}/types': {
@@ -1330,7 +1330,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets project pg.types */
-    get: operations['getTypes']
+    get: operations['TypesController_getTypes']
     put?: never
     post?: never
     delete?: never
@@ -1347,7 +1347,7 @@ export interface paths {
       cookie?: never
     }
     /** Retrieve database views */
-    get: operations['getViews']
+    get: operations['ViewsController_getViews']
     put?: never
     post?: never
     delete?: never
@@ -1364,16 +1364,16 @@ export interface paths {
       cookie?: never
     }
     /** Gets the user's profile */
-    get: operations['getProfile']
+    get: operations['ProfileController_getProfile']
     put?: never
     /** Creates user's profile */
-    post: operations['createProfile']
+    post: operations['ProfileController_createProfile']
     /** Deletes user's profile */
-    delete: operations['deleteProfile']
+    delete: operations['ProfileController_deleteProfile']
     options?: never
     head?: never
     /** Updates user's profile */
-    patch: operations['updateProfile']
+    patch: operations['ProfileController_updateProfile']
     trace?: never
   }
   '/platform/profile/access-tokens': {
@@ -1384,10 +1384,10 @@ export interface paths {
       cookie?: never
     }
     /** Gets the user's access tokens */
-    get: operations['getAccessTokens']
+    get: operations['AccessTokensController_getAccessTokens']
     put?: never
     /** Creates a new access token */
-    post: operations['createAccessToken']
+    post: operations['AccessTokensController_createAccessToken']
     delete?: never
     options?: never
     head?: never
@@ -1402,11 +1402,11 @@ export interface paths {
       cookie?: never
     }
     /** Gets the access token with the given ID */
-    get: operations['getAccessToken']
+    get: operations['AccessTokensController_getAccessToken']
     put?: never
     post?: never
     /** Deletes the access token with the given ID */
-    delete: operations['deleteAccessToken']
+    delete: operations['AccessTokensController_deleteAccessToken']
     options?: never
     head?: never
     patch?: never
@@ -1420,7 +1420,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets a user's audit logs */
-    get: operations['getAuditLogs']
+    get: operations['UserAuditLogsController_getAuditLogs']
     put?: never
     post?: never
     delete?: never
@@ -1439,7 +1439,7 @@ export interface paths {
     get?: never
     put?: never
     /** Logged into account */
-    post: operations['auditAccountLogin']
+    post: operations['ProfileController_auditAccountLogin']
     delete?: never
     options?: never
     head?: never
@@ -1456,7 +1456,7 @@ export interface paths {
     get?: never
     put?: never
     /** Check password strength */
-    post: operations['checkPassword']
+    post: operations['PasswordCheckController_checkPassword']
     delete?: never
     options?: never
     head?: never
@@ -1471,7 +1471,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets all the user's permissions */
-    get: operations['getPermissions']
+    get: operations['PermissionsController_getPermissions']
     put?: never
     post?: never
     delete?: never
@@ -1490,7 +1490,7 @@ export interface paths {
     get?: never
     put?: never
     /** Search profiles by username, email with the given keywords */
-    post: operations['searchProfile']
+    post: operations['SearchProfileController_searchProfile']
     delete?: never
     options?: never
     head?: never
@@ -1508,10 +1508,10 @@ export interface paths {
      * Gets all projects that belong to the authenticated user
      * @description Only returns the minimal project info
      */
-    get: operations['getProjects']
+    get: operations['ProjectsController_getProjects']
     put?: never
     /** Creates a project */
-    post: operations['createProject']
+    post: operations['ProjectsController_createProject']
     delete?: never
     options?: never
     head?: never
@@ -1529,7 +1529,7 @@ export interface paths {
      * Gets resource warnings for all projects accessible by the user
      * @description Only returns the minimal project info
      */
-    get: operations['getProjectsResourceWarnings']
+    get: operations['ProjectsResourceWarningsController_getProjectsResourceWarnings']
     put?: never
     post?: never
     delete?: never
@@ -1546,15 +1546,15 @@ export interface paths {
       cookie?: never
     }
     /** Gets a specific project that belongs to the authenticated user */
-    get: operations['getProject']
+    get: operations['ProjectsRefController_getProject']
     put?: never
     post?: never
     /** Deletes the given project */
-    delete: operations['deleteProject']
+    delete: operations['ProjectsRefController_deleteProject']
     options?: never
     head?: never
     /** Updates the given project */
-    patch: operations['updateProject']
+    patch: operations['ProjectsRefController_updateProject']
     trace?: never
   }
   '/platform/projects/{ref}/api/graphql': {
@@ -1567,7 +1567,7 @@ export interface paths {
     get?: never
     put?: never
     /** Queries project Graphql */
-    post: operations['projectGraphql']
+    post: operations['ProjectsApiController_projectGraphql']
     delete?: never
     options?: never
     head?: never
@@ -1582,7 +1582,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets project OpenApi */
-    get: operations['projectOpenApi']
+    get: operations['ProjectsApiController_projectOpenApi']
     put?: never
     post?: never
     delete?: never
@@ -1599,13 +1599,13 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's content */
-    get: operations['getContent']
+    get: operations['ContentController_getContent']
     /** Updates project's content */
-    put: operations['updateWholeContent']
+    put: operations['ContentController_updateWholeContent']
     /** Creates project's content */
-    post: operations['createContent']
+    post: operations['ContentController_createContent']
     /** Deletes project's contents */
-    delete: operations['deleteContents']
+    delete: operations['ContentController_deleteContents']
     options?: never
     head?: never
     patch?: never
@@ -1619,7 +1619,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets the user's content counts */
-    get: operations['getContentCountV2']
+    get: operations['ContentController_getContentCountV2']
     put?: never
     post?: never
     delete?: never
@@ -1636,12 +1636,12 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's content root folder */
-    get: operations['getRootFolder']
+    get: operations['ContentFoldersController_getRootFolder']
     put?: never
     /** Creates project's content folder */
-    post: operations['createFolder']
+    post: operations['ContentFoldersController_createFolder']
     /** Deletes project's content folders */
-    delete: operations['DeleteFolder']
+    delete: operations['ContentFoldersController_DeleteFolder']
     options?: never
     head?: never
     patch?: never
@@ -1655,14 +1655,14 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's content folder */
-    get: operations['getFolder']
+    get: operations['ContentFoldersController_getFolder']
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
     /** Updates project's content folder */
-    patch: operations['updateFolder']
+    patch: operations['ContentFoldersController_updateFolder']
     trace?: never
   }
   '/platform/projects/{ref}/content/item/{id}': {
@@ -1673,7 +1673,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's content by the given id */
-    get: operations['getContentById']
+    get: operations['ContentController_getContentById']
     put?: never
     post?: never
     delete?: never
@@ -1690,7 +1690,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets daily project stats */
-    get: operations['getDailyStats']
+    get: operations['DailyStatsController_getDailyStats']
     put?: never
     post?: never
     delete?: never
@@ -1707,7 +1707,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets non-removed databases of a specified project */
-    get: operations['getDatabases']
+    get: operations['DatabasesController_getDatabases']
     put?: never
     post?: never
     delete?: never
@@ -1724,7 +1724,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets statuses of databases within a project */
-    get: operations['getStatus']
+    get: operations['DatabasesStatusesController_getStatus']
     put?: never
     post?: never
     delete?: never
@@ -1747,7 +1747,7 @@ export interface paths {
     options?: never
     head?: never
     /** Updates the database password */
-    patch: operations['updatePassword']
+    patch: operations['DbPasswordController_updatePassword']
     trace?: never
   }
   '/platform/projects/{ref}/disk': {
@@ -1758,10 +1758,10 @@ export interface paths {
       cookie?: never
     }
     /** Get database disk attributes */
-    get: operations['getDisk']
+    get: operations['DiskController_getDisk']
     put?: never
     /** Modify database disk */
-    post: operations['modifyDisk']
+    post: operations['DiskController_modifyDisk']
     delete?: never
     options?: never
     head?: never
@@ -1776,10 +1776,10 @@ export interface paths {
       cookie?: never
     }
     /** Gets disk autoscale config */
-    get: operations['getDiskAutoscaleConfig']
+    get: operations['DiskController_getDiskAutoscaleConfig']
     put?: never
     /** Updates disk autoscale config */
-    post: operations['updateDiskAutoscaleConfig']
+    post: operations['DiskController_updateDiskAutoscaleConfig']
     delete?: never
     options?: never
     head?: never
@@ -1794,7 +1794,7 @@ export interface paths {
       cookie?: never
     }
     /** Get disk utilization */
-    get: operations['getDiskUtilization']
+    get: operations['DiskController_getDiskUtilization']
     put?: never
     post?: never
     delete?: never
@@ -1811,7 +1811,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's usage metrics */
-    get: operations['getUsageMetrics']
+    get: operations['InfraMonitoringController_getUsageMetrics']
     put?: never
     post?: never
     delete?: never
@@ -1828,7 +1828,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets project health check */
-    get: operations['projectHealthCheck']
+    get: operations['HealthCheckController_projectHealthCheck']
     put?: never
     post?: never
     delete?: never
@@ -1845,7 +1845,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets non-removed databases of a specified project */
-    get: operations['getLoadBalancers']
+    get: operations['LoadBalancersController_getLoadBalancers']
     put?: never
     post?: never
     delete?: never
@@ -1864,7 +1864,7 @@ export interface paths {
     get?: never
     put?: never
     /** Pauses the project */
-    post: operations['pauseProject']
+    post: operations['PauseController_pauseProject']
     delete?: never
     options?: never
     head?: never
@@ -1879,7 +1879,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets the latest pause event for a project if a project is paused */
-    get: operations['getProject']
+    get: operations['PauseController_getProject']
     put?: never
     post?: never
     delete?: never
@@ -1898,7 +1898,7 @@ export interface paths {
     get?: never
     put?: never
     /** Resize database disk */
-    post: operations['resizeDatabase']
+    post: operations['ResizeController_resizeDatabase']
     delete?: never
     options?: never
     head?: never
@@ -1915,7 +1915,7 @@ export interface paths {
     get?: never
     put?: never
     /** Restarts project */
-    post: operations['restartProject']
+    post: operations['RestartController_restartProject']
     delete?: never
     options?: never
     head?: never
@@ -1932,7 +1932,7 @@ export interface paths {
     get?: never
     put?: never
     /** Restarts given services */
-    post: operations['restartServices']
+    post: operations['RestartServicesController_restartServices']
     delete?: never
     options?: never
     head?: never
@@ -1949,7 +1949,7 @@ export interface paths {
     get?: never
     put?: never
     /** Unpauses project */
-    post: operations['unpauseProject']
+    post: operations['UnpauseController_unpauseProject']
     delete?: never
     options?: never
     head?: never
@@ -1966,7 +1966,7 @@ export interface paths {
     get?: never
     put?: never
     /** Cancels a failed restoration */
-    post: operations['cancelProjectRestoration']
+    post: operations['UnpauseController_cancelProjectRestoration']
     delete?: never
     options?: never
     head?: never
@@ -1981,7 +1981,7 @@ export interface paths {
       cookie?: never
     }
     /** Retrieves versions to which a project can be restored */
-    get: operations['getAvailableImageVersions']
+    get: operations['UnpauseController_getAvailableImageVersions']
     put?: never
     post?: never
     delete?: never
@@ -1998,7 +1998,7 @@ export interface paths {
       cookie?: never
     }
     /** Run project lints */
-    get: operations['runProjectLints']
+    get: operations['ProjectRunLintsController_runProjectLints']
     put?: never
     post?: never
     delete?: never
@@ -2015,7 +2015,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets service versions for a specific project */
-    get: operations['getServiceVersions']
+    get: operations['ProjectServiceVersionsController_getServiceVersions']
     put?: never
     post?: never
     delete?: never
@@ -2032,7 +2032,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's settings */
-    get: operations['getProjectApi']
+    get: operations['SettingsController_getProjectSettings']
     put?: never
     post?: never
     delete?: never
@@ -2055,7 +2055,7 @@ export interface paths {
     options?: never
     head?: never
     /** Updates the given project sensitivity */
-    patch: operations['updateProjectSensitivity']
+    patch: operations['SensitivityController_updateProjectSensitivity']
     trace?: never
   }
   '/platform/projects/{ref}/status': {
@@ -2066,7 +2066,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's status */
-    get: operations['getStatus']
+    get: operations['ProjectStatusController_getStatus']
     put?: never
     post?: never
     delete?: never
@@ -2085,7 +2085,7 @@ export interface paths {
     get?: never
     put?: never
     /** Transfers a project to a different organization. */
-    post: operations['transferProject']
+    post: operations['ProjectTransferController_transferProject']
     delete?: never
     options?: never
     head?: never
@@ -2102,7 +2102,7 @@ export interface paths {
     get?: never
     put?: never
     /** Previews transfering a project to a different organizations, shows eligibility and impact. */
-    post: operations['previewTransfer']
+    post: operations['ProjectTransferController_previewTransfer']
     delete?: never
     options?: never
     head?: never
@@ -2117,7 +2117,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets project linked to fly extension id */
-    get: operations['getProjectByFlyExtensionId']
+    get: operations['ProjectsController_getProjectByFlyExtensionId']
     put?: never
     post?: never
     delete?: never
@@ -2137,7 +2137,7 @@ export interface paths {
      * Gets project's api info
      * @deprecated
      */
-    get: operations['getProjectApi']
+    get: operations['ApiController_getProjectApi']
     put?: never
     post?: never
     delete?: never
@@ -2154,7 +2154,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets the last JWT secret update status */
-    get: operations['getJwtSecretUpdateStatus']
+    get: operations['JwtSecretUpdateStatusController_getJwtSecretUpdateStatus']
     put?: never
     post?: never
     delete?: never
@@ -2174,7 +2174,7 @@ export interface paths {
      * Gets project's settings
      * @deprecated
      */
-    get: operations['getProjectApi']
+    get: operations['PropsSettingsController_getProjectSettingsDeprecated']
     put?: never
     post?: never
     delete?: never
@@ -2191,10 +2191,10 @@ export interface paths {
       cookie?: never
     }
     /** Gets replication pipelines */
-    get: operations['getPipelines']
+    get: operations['ReplicationPipelinesController_getPipelines']
     put?: never
     /** Creates a pipeline */
-    post: operations['createPipeline']
+    post: operations['ReplicationPipelinesController_createPipeline']
     delete?: never
     options?: never
     head?: never
@@ -2212,7 +2212,7 @@ export interface paths {
     put?: never
     post?: never
     /** Deletes a pipeline */
-    delete: operations['deletePipeline']
+    delete: operations['ReplicationPipelinesController_deletePipeline']
     options?: never
     head?: never
     patch?: never
@@ -2228,7 +2228,7 @@ export interface paths {
     get?: never
     put?: never
     /** Starts a pipeline */
-    post: operations['startPipeline']
+    post: operations['ReplicationPipelinesController_startPipeline']
     delete?: never
     options?: never
     head?: never
@@ -2243,7 +2243,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets status of a pipeline */
-    get: operations['getPipelineStatus']
+    get: operations['ReplicationPipelinesController_getPipelineStatus']
     put?: never
     post?: never
     delete?: never
@@ -2262,7 +2262,7 @@ export interface paths {
     get?: never
     put?: never
     /** Stops a pipeline */
-    post: operations['stopPipeline']
+    post: operations['ReplicationPipelinesController_stopPipeline']
     delete?: never
     options?: never
     head?: never
@@ -2277,10 +2277,10 @@ export interface paths {
       cookie?: never
     }
     /** Gets replication sinks */
-    get: operations['getSinks']
+    get: operations['ReplicationSinksController_getSinks']
     put?: never
     /** Creates a sink */
-    post: operations['createSink']
+    post: operations['ReplicationSinksController_createSink']
     delete?: never
     options?: never
     head?: never
@@ -2298,7 +2298,7 @@ export interface paths {
     put?: never
     post?: never
     /** Deletes a sink */
-    delete: operations['deleteSink']
+    delete: operations['ReplicationSinksController_deleteSink']
     options?: never
     head?: never
     patch?: never
@@ -2312,10 +2312,10 @@ export interface paths {
       cookie?: never
     }
     /** Returns replication sources. */
-    get: operations['getSources']
+    get: operations['ReplicationSourcesController_getSources']
     put?: never
     /** Creates a replication source. */
-    post: operations['createSource']
+    post: operations['ReplicationSourcesController_createSource']
     delete?: never
     options?: never
     head?: never
@@ -2330,10 +2330,10 @@ export interface paths {
       cookie?: never
     }
     /** Returns source publications. */
-    get: operations['getPublications']
+    get: operations['ReplicationSourcesController_getPublications']
     put?: never
     /** Creates a publication. */
-    post: operations['createPublication']
+    post: operations['ReplicationSourcesController_createPublication']
     delete?: never
     options?: never
     head?: never
@@ -2351,7 +2351,7 @@ export interface paths {
     put?: never
     post?: never
     /** Deletes a publication. */
-    delete: operations['deletePublication']
+    delete: operations['ReplicationSourcesController_deletePublication']
     options?: never
     head?: never
     patch?: never
@@ -2365,7 +2365,7 @@ export interface paths {
       cookie?: never
     }
     /** Returns source tables. */
-    get: operations['getTables']
+    get: operations['ReplicationSourcesController_getTables']
     put?: never
     post?: never
     delete?: never
@@ -2384,7 +2384,7 @@ export interface paths {
     get?: never
     put?: never
     /** Reset password for email */
-    post: operations['resetPassword']
+    post: operations['ResetPasswordController_resetPassword']
     delete?: never
     options?: never
     head?: never
@@ -2401,7 +2401,7 @@ export interface paths {
     get?: never
     put?: never
     /** Sign up with email and password */
-    post: operations['signUp']
+    post: operations['SignUpController_signUp']
     delete?: never
     options?: never
     head?: never
@@ -2416,7 +2416,7 @@ export interface paths {
       cookie?: never
     }
     /** Get infrastructure status */
-    get: operations['getStatus']
+    get: operations['StatusController_getStatus']
     put?: never
     post?: never
     delete?: never
@@ -2433,10 +2433,10 @@ export interface paths {
       cookie?: never
     }
     /** Gets project storage archive */
-    get: operations['getArchive']
+    get: operations['StorageArchiveController_getArchive']
     put?: never
     /** Creates project storage archive */
-    post: operations['createArchive']
+    post: operations['StorageArchiveController_createArchive']
     delete?: never
     options?: never
     head?: never
@@ -2451,10 +2451,10 @@ export interface paths {
       cookie?: never
     }
     /** Gets list of buckets */
-    get: operations['getBuckets']
+    get: operations['StorageBucketsController_getBuckets']
     put?: never
     /** Create bucket */
-    post: operations['createBucket']
+    post: operations['StorageBucketsController_createBucket']
     delete?: never
     options?: never
     head?: never
@@ -2469,15 +2469,15 @@ export interface paths {
       cookie?: never
     }
     /** Gets bucket */
-    get: operations['getBucket']
+    get: operations['StorageBucketIdController_getBucket']
     put?: never
     post?: never
     /** Deletes bucket */
-    delete: operations['deleteBucket']
+    delete: operations['StorageBucketIdController_deleteBucket']
     options?: never
     head?: never
     /** Updates bucket */
-    patch: operations['updateBucket']
+    patch: operations['StorageBucketIdController_updateBucket']
     trace?: never
   }
   '/platform/storage/{ref}/buckets/{id}/empty': {
@@ -2490,7 +2490,7 @@ export interface paths {
     get?: never
     put?: never
     /** Removes all objects inside a single bucket. */
-    post: operations['emptyBucket']
+    post: operations['StorageBucketIdController_emptyBucket']
     delete?: never
     options?: never
     head?: never
@@ -2508,7 +2508,7 @@ export interface paths {
     put?: never
     post?: never
     /** Deletes objects */
-    delete: operations['deleteObjects']
+    delete: operations['StorageObjectsController_deleteObjects']
     options?: never
     head?: never
     patch?: never
@@ -2524,7 +2524,7 @@ export interface paths {
     get?: never
     put?: never
     /** Copys object */
-    post: operations['copyObject']
+    post: operations['StorageObjectsController_copyObject']
     delete?: never
     options?: never
     head?: never
@@ -2541,7 +2541,7 @@ export interface paths {
     get?: never
     put?: never
     /** Downloads a file from a private bucket */
-    post: operations['download']
+    post: operations['StorageObjectsController_download']
     delete?: never
     options?: never
     head?: never
@@ -2558,7 +2558,7 @@ export interface paths {
     get?: never
     put?: never
     /** Gets list of objects with the given bucket */
-    post: operations['getObjects']
+    post: operations['StorageObjectsController_getObjects']
     delete?: never
     options?: never
     head?: never
@@ -2575,7 +2575,7 @@ export interface paths {
     get?: never
     put?: never
     /** Move object */
-    post: operations['moveObject']
+    post: operations['StorageObjectsController_moveObject']
     delete?: never
     options?: never
     head?: never
@@ -2592,7 +2592,7 @@ export interface paths {
     get?: never
     put?: never
     /** Creates URL for an asset in a public bucket */
-    post: operations['createPublicUrl']
+    post: operations['StorageObjectsController_createPublicUrl']
     delete?: never
     options?: never
     head?: never
@@ -2609,7 +2609,7 @@ export interface paths {
     get?: never
     put?: never
     /** Creates a signed URL */
-    post: operations['createSignedUrl']
+    post: operations['StorageObjectsController_createSignedUrl']
     delete?: never
     options?: never
     head?: never
@@ -2626,7 +2626,7 @@ export interface paths {
     get?: never
     put?: never
     /** Gets multiple signed URLs */
-    post: operations['createSignedUrls']
+    post: operations['StorageObjectsController_createSignedUrls']
     delete?: never
     options?: never
     head?: never
@@ -2641,10 +2641,10 @@ export interface paths {
       cookie?: never
     }
     /** Gets project storage credentials */
-    get: operations['getAllCredentials']
+    get: operations['StorageS3CredentialsController_getAllCredentials']
     put?: never
     /** Creates project storage credential */
-    post: operations['createCredential']
+    post: operations['StorageS3CredentialsController_createCredential']
     delete?: never
     options?: never
     head?: never
@@ -2662,7 +2662,7 @@ export interface paths {
     put?: never
     post?: never
     /** Deletes project storage credential */
-    delete: operations['deleteCredential']
+    delete: operations['StorageS3CredentialsController_deleteCredential']
     options?: never
     head?: never
     patch?: never
@@ -2676,7 +2676,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets information about overdue invoices that relate to the authenticated user */
-    get: operations['getOverdueInvoices']
+    get: operations['InvoicesController_getOverdueInvoices']
     put?: never
     post?: never
     delete?: never
@@ -2695,7 +2695,7 @@ export interface paths {
     get?: never
     put?: never
     /** Initiated payment method setup */
-    post: operations['setUpPaymentMethod']
+    post: operations['SetupIntentController_setUpPaymentMethod']
     delete?: never
     options?: never
     head?: never
@@ -2712,7 +2712,7 @@ export interface paths {
     get?: never
     put?: never
     /** Sends analytics server event */
-    post: operations['sendServerEventV2']
+    post: operations['TelemetryEventController_sendServerEventV2']
     delete?: never
     options?: never
     head?: never
@@ -2727,7 +2727,7 @@ export interface paths {
       cookie?: never
     }
     /** Call feature flags */
-    get: operations['callFeatureFlag']
+    get: operations['TelemetryFeatureFlagsController_callFeatureFlag']
     put?: never
     post?: never
     delete?: never
@@ -2746,7 +2746,7 @@ export interface paths {
     get?: never
     put?: never
     /** Track feature flag called */
-    post: operations['trackFeatureFlag']
+    post: operations['TelemetryFeatureFlagsController_trackFeatureFlag']
     delete?: never
     options?: never
     head?: never
@@ -2763,7 +2763,7 @@ export interface paths {
     get?: never
     put?: never
     /** Send analytics group identify event */
-    post: operations['groupIdentify']
+    post: operations['TelemetryGroupsController_groupIdentify']
     delete?: never
     options?: never
     head?: never
@@ -2780,7 +2780,7 @@ export interface paths {
     get?: never
     put?: never
     /** Send analytics group reset event */
-    post: operations['groupReset']
+    post: operations['TelemetryGroupsController_groupReset']
     delete?: never
     options?: never
     head?: never
@@ -2797,7 +2797,7 @@ export interface paths {
     get?: never
     put?: never
     /** Send analytics identify event */
-    post: operations['identifyV2']
+    post: operations['TelemetryIdentifyController_identifyV2']
     delete?: never
     options?: never
     head?: never
@@ -2814,7 +2814,7 @@ export interface paths {
     get?: never
     put?: never
     /** Send server page event */
-    post: operations['sendServerPageV2']
+    post: operations['TelemetryPageController_sendServerPageV2']
     delete?: never
     options?: never
     head?: never
@@ -2831,7 +2831,7 @@ export interface paths {
     get?: never
     put?: never
     /** Send analytics page leave event */
-    post: operations['trackPageLeave']
+    post: operations['TelemetryPageLeaveController_trackPageLeave']
     delete?: never
     options?: never
     head?: never
@@ -2848,7 +2848,7 @@ export interface paths {
     get?: never
     put?: never
     /** Reset analytics */
-    post: operations['reset']
+    post: operations['TelemetryResetController_reset']
     delete?: never
     options?: never
     head?: never
@@ -2863,7 +2863,7 @@ export interface paths {
       cookie?: never
     }
     /** Redirects to Fly sso flow */
-    get: operations['flyTosAccepted']
+    get: operations['TermsOfServiceController_flyTosAccepted']
     put?: never
     post?: never
     delete?: never
@@ -2880,7 +2880,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets the list of Vercel projects */
-    get: operations['getVercelProjects']
+    get: operations['VercelProjectsController_getVercelProjects']
     put?: never
     post?: never
     delete?: never
@@ -2897,7 +2897,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets the Vercel project with the given ID */
-    get: operations['getVercelProject']
+    get: operations['VercelProjectsController_getVercelProject']
     put?: never
     post?: never
     delete?: never
@@ -2914,10 +2914,10 @@ export interface paths {
       cookie?: never
     }
     /** Gets the environment variables for the given project ID on behalf of the given team ID */
-    get: operations['getEnvironmentVariables']
+    get: operations['VercelEnvironmentVariablesController_getEnvironmentVariables']
     put?: never
     /** Creates the environment variable for the given project ID on behalf of the given team ID */
-    post: operations['createEnvironmentVariable']
+    post: operations['VercelEnvironmentVariablesController_createEnvironmentVariable']
     delete?: never
     options?: never
     head?: never
@@ -2932,7 +2932,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets the Vercel redirect url */
-    get: operations['getRedirectUrl']
+    get: operations['VercelRedirectController_getRedirectUrl']
     put?: never
     post?: never
     delete?: never
@@ -2949,7 +2949,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets the Vercel access token for the given code */
-    get: operations['getAccessToken']
+    get: operations['VercelAccessTokenController_getAccessToken']
     put?: never
     post?: never
     delete?: never
@@ -2966,13 +2966,13 @@ export interface paths {
       cookie?: never
     }
     /** Get a list of workflow runs */
-    get: operations['listWorkflowRuns']
+    get: operations['WorkflowRunController_listWorkflowRuns']
     put?: never
     post?: never
     delete?: never
     options?: never
     /** Count the number of workflow runs for the given branch */
-    head: operations['countWorkflowRuns']
+    head: operations['WorkflowRunController_countWorkflowRuns']
     patch?: never
     trace?: never
   }
@@ -2984,7 +2984,7 @@ export interface paths {
       cookie?: never
     }
     /** Get the logs of a workflow run */
-    get: operations['getWorkflowRunLogs']
+    get: operations['WorkflowRunController_getWorkflowRunLogs']
     put?: never
     post?: never
     delete?: never
@@ -3019,7 +3019,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's logs */
-    get: operations['getLogs']
+    get: operations['V1ProjectLogsController_getLogs']
     put?: never
     post?: never
     delete?: never
@@ -3039,7 +3039,7 @@ export interface paths {
     get: operations['v1-get-project-api-keys']
     put?: never
     /** [Alpha] Creates a new API key for the project */
-    post: operations['createApiKey']
+    post: operations['ApiKeysController_createApiKey']
     delete?: never
     options?: never
     head?: never
@@ -3054,15 +3054,15 @@ export interface paths {
       cookie?: never
     }
     /** [Alpha] Get API key */
-    get: operations['getApiKey']
+    get: operations['ApiKeysController_getApiKey']
     put?: never
     post?: never
     /** [Alpha] Deletes an API key for the project */
-    delete: operations['deleteApiKey']
+    delete: operations['ApiKeysController_deleteApiKey']
     options?: never
     head?: never
     /** [Alpha] Updates an API key for the project */
-    patch: operations['updateApiKey']
+    patch: operations['ApiKeysController_updateApiKey']
     trace?: never
   }
   '/v1/projects/{ref}/branches': {
@@ -3119,10 +3119,10 @@ export interface paths {
       cookie?: never
     }
     /** [Alpha] Lists all third-party auth integrations */
-    get: operations['listTPAForProject']
+    get: operations['ThirdPartyAuthController_listTPAForProject']
     put?: never
     /** Creates a new third-party auth integration */
-    post: operations['createTPAForProject']
+    post: operations['ThirdPartyAuthController_createTPAForProject']
     delete?: never
     options?: never
     head?: never
@@ -3137,11 +3137,11 @@ export interface paths {
       cookie?: never
     }
     /** [Alpha] Get a third-party integration */
-    get: operations['getTPAForProject']
+    get: operations['ThirdPartyAuthController_getTPAForProject']
     put?: never
     post?: never
     /** [Alpha] Removes a third-party auth integration */
-    delete: operations['deleteTPAForProject']
+    delete: operations['ThirdPartyAuthController_deleteTPAForProject']
     options?: never
     head?: never
     patch?: never
@@ -3299,7 +3299,7 @@ export interface paths {
      * @deprecated
      * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
      */
-    get: operations['getDatabaseMetadata']
+    get: operations['V1DatabaseContextController_getDatabaseMetadata']
     put?: never
     post?: never
     delete?: never
@@ -7487,7 +7487,7 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
-  getGoTrueConfig: {
+  GoTrueConfigController_getGoTrueConfig: {
     parameters: {
       query?: never
       header?: never
@@ -7516,7 +7516,7 @@ export interface operations {
       }
     }
   }
-  updateGoTrueConfig: {
+  GoTrueConfigController_updateGoTrueConfig: {
     parameters: {
       query?: never
       header?: never
@@ -7549,7 +7549,7 @@ export interface operations {
       }
     }
   }
-  updateGoTrueConfigHooks: {
+  GoTrueConfigController_updateGoTrueConfigHooks: {
     parameters: {
       query?: never
       header?: never
@@ -7588,7 +7588,7 @@ export interface operations {
       }
     }
   }
-  sendInvite: {
+  AuthInviteController_sendInvite: {
     parameters: {
       query?: never
       header?: never
@@ -7627,7 +7627,7 @@ export interface operations {
       }
     }
   }
-  sendMagicLink: {
+  MagicLinkController_sendMagicLink: {
     parameters: {
       query?: never
       header?: never
@@ -7666,7 +7666,7 @@ export interface operations {
       }
     }
   }
-  sendOtp: {
+  OtpController_sendOtp: {
     parameters: {
       query?: never
       header?: never
@@ -7705,7 +7705,7 @@ export interface operations {
       }
     }
   }
-  sendRecover: {
+  RecoverController_sendRecover: {
     parameters: {
       query?: never
       header?: never
@@ -7744,7 +7744,7 @@ export interface operations {
       }
     }
   }
-  getTemplate: {
+  TemplateController_getTemplate: {
     parameters: {
       query?: never
       header?: never
@@ -7779,7 +7779,7 @@ export interface operations {
       }
     }
   }
-  createUser: {
+  UsersController_createUser: {
     parameters: {
       query?: never
       header?: never
@@ -7818,7 +7818,7 @@ export interface operations {
       }
     }
   }
-  deleteUserById: {
+  UsersController_deleteUserById: {
     parameters: {
       query?: never
       header?: never
@@ -7852,7 +7852,7 @@ export interface operations {
       }
     }
   }
-  updateUserById: {
+  UsersController_updateUserById: {
     parameters: {
       query?: never
       header?: never
@@ -7892,7 +7892,7 @@ export interface operations {
       }
     }
   }
-  deleteFactors: {
+  FactorsController_deleteFactors: {
     parameters: {
       query?: never
       header?: never
@@ -7928,7 +7928,7 @@ export interface operations {
       }
     }
   }
-  validateSpam: {
+  ValidateController_validateSpam: {
     parameters: {
       query?: never
       header?: never
@@ -7964,7 +7964,7 @@ export interface operations {
       }
     }
   }
-  createCliLoginSession: {
+  CliLoginController_createCliLoginSession: {
     parameters: {
       query?: never
       header?: never
@@ -7992,7 +7992,7 @@ export interface operations {
       }
     }
   }
-  getCliLoginSession: {
+  CliLoginController_getCliLoginSession: {
     parameters: {
       query?: {
         device_code?: string
@@ -8020,7 +8020,7 @@ export interface operations {
       }
     }
   }
-  getBackups: {
+  BackupsController_getBackups: {
     parameters: {
       query?: never
       header?: never
@@ -8049,7 +8049,7 @@ export interface operations {
       }
     }
   }
-  downloadBackup: {
+  BackupsController_downloadBackup: {
     parameters: {
       query?: never
       header?: never
@@ -8082,7 +8082,7 @@ export interface operations {
       }
     }
   }
-  getDownloadableBackups: {
+  BackupsController_getDownloadableBackups: {
     parameters: {
       query?: never
       header?: never
@@ -8111,7 +8111,7 @@ export interface operations {
       }
     }
   }
-  enablePhysicalBackup: {
+  BackupsController_enablePhysicalBackup: {
     parameters: {
       query?: never
       header?: never
@@ -8138,7 +8138,7 @@ export interface operations {
       }
     }
   }
-  restorePointInTimeBackup: {
+  BackupsController_restorePointInTimeBackup: {
     parameters: {
       query?: never
       header?: never
@@ -8169,7 +8169,7 @@ export interface operations {
       }
     }
   }
-  restoreBackup: {
+  BackupsController_restoreBackup: {
     parameters: {
       query?: never
       header?: never
@@ -8200,7 +8200,7 @@ export interface operations {
       }
     }
   }
-  restorePhysicalBackup: {
+  BackupsController_restorePhysicalBackup: {
     parameters: {
       query?: never
       header?: never
@@ -8231,7 +8231,7 @@ export interface operations {
       }
     }
   }
-  getValidBackups: {
+  CloneController_getValidBackups: {
     parameters: {
       query?: never
       header?: never
@@ -8260,7 +8260,7 @@ export interface operations {
       }
     }
   }
-  cloneCurrentProject: {
+  CloneController_cloneCurrentProject: {
     parameters: {
       query?: never
       header?: never
@@ -8293,7 +8293,7 @@ export interface operations {
       }
     }
   }
-  cloneProjectStatus: {
+  CloneController_cloneProjectStatus: {
     parameters: {
       query?: never
       header?: never
@@ -8322,7 +8322,7 @@ export interface operations {
       }
     }
   }
-  enableHooks: {
+  HooksController_enableHooks: {
     parameters: {
       query?: never
       header?: never
@@ -8355,7 +8355,7 @@ export interface operations {
       }
     }
   }
-  getHookLogs: {
+  HooksController_getHookLogs: {
     parameters: {
       query: {
         id: number
@@ -8396,7 +8396,7 @@ export interface operations {
       }
     }
   }
-  sendDocsFeedback: {
+  SendFeedbackController_sendDocsFeedback: {
     parameters: {
       query?: never
       header?: never
@@ -8426,7 +8426,7 @@ export interface operations {
       }
     }
   }
-  sendExitSurvey: {
+  SendFeedbackController_sendExitSurvey: {
     parameters: {
       query?: never
       header?: never
@@ -8456,7 +8456,7 @@ export interface operations {
       }
     }
   }
-  sendFeedback: {
+  SendFeedbackController_sendFeedback: {
     parameters: {
       query?: never
       header?: never
@@ -8486,7 +8486,7 @@ export interface operations {
       }
     }
   }
-  sendUpgradeSurvey: {
+  SendFeedbackController_sendUpgradeSurvey: {
     parameters: {
       query?: never
       header?: never
@@ -8516,7 +8516,7 @@ export interface operations {
       }
     }
   }
-  getUserInstallations: {
+  IntegrationsController_getUserInstallations: {
     parameters: {
       query: {
         /** @description Filter results by integration name. Optional */
@@ -8545,7 +8545,7 @@ export interface operations {
       }
     }
   }
-  getUserInstallationForOrg: {
+  IntegrationsController_getUserInstallationForOrg: {
     parameters: {
       query?: never
       header?: never
@@ -8573,7 +8573,7 @@ export interface operations {
       }
     }
   }
-  getGitHubAuthorization: {
+  GitHubAuthorizationsController_getGitHubAuthorization: {
     parameters: {
       query?: never
       header?: never
@@ -8599,7 +8599,7 @@ export interface operations {
       }
     }
   }
-  createGitHubAuthorization: {
+  GitHubAuthorizationsController_createGitHubAuthorization: {
     parameters: {
       query?: never
       header?: never
@@ -8627,7 +8627,7 @@ export interface operations {
       }
     }
   }
-  listConnectionBranches: {
+  GitHubBranchesController_listConnectionBranches: {
     parameters: {
       query?: {
         page?: number
@@ -8658,7 +8658,7 @@ export interface operations {
       }
     }
   }
-  getConnectionBranch: {
+  GitHubBranchesController_getConnectionBranch: {
     parameters: {
       query?: never
       header?: never
@@ -8687,7 +8687,7 @@ export interface operations {
       }
     }
   }
-  listOrganizationGitHubConnections: {
+  GitHubConnectionsController_listOrganizationGitHubConnections: {
     parameters: {
       query: {
         organization_id: number
@@ -8715,7 +8715,7 @@ export interface operations {
       }
     }
   }
-  createGitHubConnection: {
+  GitHubConnectionsController_createGitHubConnection: {
     parameters: {
       query?: never
       header?: never
@@ -8743,7 +8743,7 @@ export interface operations {
       }
     }
   }
-  deleteGitHubConnection: {
+  GitHubConnectionsController_deleteGitHubConnection: {
     parameters: {
       query?: never
       header?: never
@@ -8769,7 +8769,7 @@ export interface operations {
       }
     }
   }
-  updateGitHubConnection: {
+  GitHubConnectionsController_updateGitHubConnection: {
     parameters: {
       query?: never
       header?: never
@@ -8799,7 +8799,7 @@ export interface operations {
       }
     }
   }
-  listRepositories: {
+  GitHubRepositoriesController_listRepositories: {
     parameters: {
       query?: never
       header?: never
@@ -8823,7 +8823,7 @@ export interface operations {
       }
     }
   }
-  createVercelIntegration: {
+  VercelIntegrationController_createVercelIntegration: {
     parameters: {
       query?: never
       header?: never
@@ -8851,7 +8851,7 @@ export interface operations {
       }
     }
   }
-  removeVercelIntegration: {
+  VercelIntegrationController_removeVercelIntegration: {
     parameters: {
       query?: never
       header?: never
@@ -8877,7 +8877,7 @@ export interface operations {
       }
     }
   }
-  createVercelConnection: {
+  VercelConnectionsController_createVercelConnection: {
     parameters: {
       query?: never
       header?: never
@@ -8907,7 +8907,7 @@ export interface operations {
       }
     }
   }
-  deleteVercelConnection: {
+  VercelConnectionsController_deleteVercelConnection: {
     parameters: {
       query?: never
       header?: never
@@ -8935,7 +8935,7 @@ export interface operations {
       }
     }
   }
-  updateVercelConnection: {
+  VercelConnectionsController_updateVercelConnection: {
     parameters: {
       query?: never
       header?: never
@@ -8965,7 +8965,7 @@ export interface operations {
       }
     }
   }
-  syncVercelConnectionEnvironments: {
+  VercelConnectionsController_syncVercelConnectionEnvironments: {
     parameters: {
       query?: never
       header?: never
@@ -8991,7 +8991,7 @@ export interface operations {
       }
     }
   }
-  getVercelConnections: {
+  VercelConnectionsController_getVercelConnections: {
     parameters: {
       query?: never
       header?: never
@@ -9019,7 +9019,7 @@ export interface operations {
       }
     }
   }
-  getVercelProjects: {
+  VercelProjectController_getVercelProjects: {
     parameters: {
       query: {
         from?: string
@@ -9051,7 +9051,7 @@ export interface operations {
       }
     }
   }
-  getNotificationsV2: {
+  NotificationsController_getNotificationsV2: {
     parameters: {
       query?: {
         limit?: string
@@ -9084,7 +9084,7 @@ export interface operations {
       }
     }
   }
-  deleteNotifications: {
+  NotificationsController_deleteNotifications: {
     parameters: {
       query?: never
       header?: never
@@ -9114,7 +9114,7 @@ export interface operations {
       }
     }
   }
-  updateNotificationsV2: {
+  NotificationsController_updateNotificationsV2: {
     parameters: {
       query?: never
       header?: never
@@ -9144,7 +9144,7 @@ export interface operations {
       }
     }
   }
-  archiveAllNotifications: {
+  NotificationsController_archiveAllNotifications: {
     parameters: {
       query?: never
       header?: never
@@ -9168,7 +9168,7 @@ export interface operations {
       }
     }
   }
-  getNotificationsSummary: {
+  NotificationsController_getNotificationsSummary: {
     parameters: {
       query?: never
       header?: never
@@ -9187,7 +9187,7 @@ export interface operations {
       }
     }
   }
-  getAuthorizationRequest: {
+  OAuthAuthorizationsController_getAuthorizationRequest: {
     parameters: {
       query?: never
       header?: never
@@ -9209,7 +9209,7 @@ export interface operations {
       }
     }
   }
-  getOrganizations: {
+  OrganizationsController_getOrganizations: {
     parameters: {
       query?: never
       header?: never
@@ -9235,7 +9235,7 @@ export interface operations {
       }
     }
   }
-  createOrganizationWithTier: {
+  OrganizationsController_createOrganizationWithTier: {
     parameters: {
       query?: never
       header?: never
@@ -9265,7 +9265,7 @@ export interface operations {
       }
     }
   }
-  getOrganization: {
+  OrganizationSlugController_getOrganization: {
     parameters: {
       query?: never
       header?: never
@@ -9286,7 +9286,7 @@ export interface operations {
       }
     }
   }
-  deleteOrganization: {
+  OrganizationSlugController_deleteOrganization: {
     parameters: {
       query?: never
       header?: never
@@ -9318,7 +9318,7 @@ export interface operations {
       }
     }
   }
-  updateOrganization: {
+  OrganizationSlugController_updateOrganization: {
     parameters: {
       query?: never
       header?: never
@@ -9350,7 +9350,7 @@ export interface operations {
       }
     }
   }
-  getAvailableImageVersions: {
+  OrganizationSlugController_getAvailableImageVersions: {
     parameters: {
       query?: never
       header?: never
@@ -9388,7 +9388,7 @@ export interface operations {
       }
     }
   }
-  getCustomer: {
+  CustomerController_getCustomer: {
     parameters: {
       query?: never
       header?: never
@@ -9454,7 +9454,7 @@ export interface operations {
       }
     }
   }
-  getDailyStats: {
+  OrgDailyStatsController_getDailyStats: {
     parameters: {
       query: {
         endDate: string
@@ -9524,7 +9524,7 @@ export interface operations {
       }
     }
   }
-  getDailyStatsCompute: {
+  OrgDailyStatsController_getDailyStatsCompute: {
     parameters: {
       query: {
         endDate: string
@@ -9555,7 +9555,7 @@ export interface operations {
       }
     }
   }
-  getSoc2Type2ReportUrl: {
+  OrgDocumentsController_getSoc2Type2ReportUrl: {
     parameters: {
       query?: never
       header?: never
@@ -9577,7 +9577,7 @@ export interface operations {
       }
     }
   }
-  getStandardSecurityQuestionnaireUrl: {
+  OrgDocumentsController_getStandardSecurityQuestionnaireUrl: {
     parameters: {
       query?: never
       header?: never
@@ -9599,7 +9599,7 @@ export interface operations {
       }
     }
   }
-  getProjects: {
+  OrganizationProjectsController_getOrganizationProjects: {
     parameters: {
       query?: never
       header?: never
@@ -9634,7 +9634,7 @@ export interface operations {
       }
     }
   }
-  getAllRoles: {
+  OrganizationRolesController_getAllRoles: {
     parameters: {
       query?: never
       header?: never
@@ -9663,7 +9663,7 @@ export interface operations {
       }
     }
   }
-  getTaxId: {
+  TaxIdsController_getTaxId: {
     parameters: {
       query?: never
       header?: never
@@ -9698,7 +9698,7 @@ export interface operations {
       }
     }
   }
-  updateTaxId: {
+  TaxIdsController_updateTaxId: {
     parameters: {
       query?: never
       header?: never
@@ -9737,7 +9737,7 @@ export interface operations {
       }
     }
   }
-  deleteTaxId: {
+  TaxIdsController_deleteTaxId: {
     parameters: {
       query?: never
       header?: never
@@ -9770,7 +9770,7 @@ export interface operations {
       }
     }
   }
-  transferOrganization: {
+  TransferController_transferOrganization: {
     parameters: {
       query?: never
       header?: never
@@ -9798,7 +9798,7 @@ export interface operations {
       }
     }
   }
-  getOrgUsage: {
+  OrgUsageController_getOrgUsage: {
     parameters: {
       query?: {
         end?: string
@@ -9831,7 +9831,7 @@ export interface operations {
       }
     }
   }
-  getOrganizationByFlyOrganizationId: {
+  OrganizationsController_getOrganizationByFlyOrganizationId: {
     parameters: {
       query?: never
       header?: never
@@ -9852,7 +9852,7 @@ export interface operations {
       }
     }
   }
-  getColumnPrivileges: {
+  ColumnPrivilegesController_getColumnPrivileges: {
     parameters: {
       query?: never
       header: {
@@ -9889,7 +9889,7 @@ export interface operations {
       }
     }
   }
-  grantColumnPrivileges: {
+  ColumnPrivilegesController_grantColumnPrivileges: {
     parameters: {
       query?: never
       header: {
@@ -9930,7 +9930,7 @@ export interface operations {
       }
     }
   }
-  revokeColumnPrivileges: {
+  ColumnPrivilegesController_revokeColumnPrivileges: {
     parameters: {
       query?: never
       header: {
@@ -9971,7 +9971,7 @@ export interface operations {
       }
     }
   }
-  getColumns: {
+  ColumnsController_getColumns: {
     parameters: {
       query: {
         excluded_schemas: string
@@ -10011,7 +10011,7 @@ export interface operations {
       }
     }
   }
-  createColumn: {
+  ColumnsController_createColumn: {
     parameters: {
       query?: never
       header: {
@@ -10052,7 +10052,7 @@ export interface operations {
       }
     }
   }
-  deleteColumn: {
+  ColumnsController_deleteColumn: {
     parameters: {
       query: {
         cascade?: string
@@ -10093,7 +10093,7 @@ export interface operations {
       }
     }
   }
-  updateColumn: {
+  ColumnsController_updateColumn: {
     parameters: {
       query: {
         /** @description Column ID */
@@ -10137,7 +10137,7 @@ export interface operations {
       }
     }
   }
-  getExtensions: {
+  ExtensionsController_getExtensions: {
     parameters: {
       query?: never
       header: {
@@ -10174,7 +10174,7 @@ export interface operations {
       }
     }
   }
-  createExtension: {
+  ExtensionsController_createExtension: {
     parameters: {
       query?: never
       header: {
@@ -10215,7 +10215,7 @@ export interface operations {
       }
     }
   }
-  deleteExtension: {
+  ExtensionsController_deleteExtension: {
     parameters: {
       query: {
         /** @description Extension ID */
@@ -10255,7 +10255,7 @@ export interface operations {
       }
     }
   }
-  getForeignTables: {
+  ForeignTablesController_getForeignTables: {
     parameters: {
       query: {
         id: string
@@ -10297,7 +10297,7 @@ export interface operations {
       }
     }
   }
-  getFunctions: {
+  FunctionsController_getFunctions: {
     parameters: {
       query: {
         excluded_schemas: string
@@ -10337,7 +10337,7 @@ export interface operations {
       }
     }
   }
-  createFunction: {
+  FunctionsController_createFunction: {
     parameters: {
       query?: never
       header: {
@@ -10378,7 +10378,7 @@ export interface operations {
       }
     }
   }
-  deleteFunction: {
+  FunctionsController_deleteFunction: {
     parameters: {
       query: {
         /** @description Function ID */
@@ -10418,7 +10418,7 @@ export interface operations {
       }
     }
   }
-  updateFunction: {
+  FunctionsController_updateFunction: {
     parameters: {
       query: {
         /** @description Function ID */
@@ -10462,7 +10462,7 @@ export interface operations {
       }
     }
   }
-  getMaterializedViews: {
+  MaterializedViewsController_getMaterializedViews: {
     parameters: {
       query: {
         excluded_schemas: string
@@ -10506,7 +10506,7 @@ export interface operations {
       }
     }
   }
-  getPolicies: {
+  PoliciesController_getPolicies: {
     parameters: {
       query: {
         excluded_schemas: string
@@ -10546,7 +10546,7 @@ export interface operations {
       }
     }
   }
-  createPolicy: {
+  PoliciesController_createPolicy: {
     parameters: {
       query?: never
       header: {
@@ -10587,7 +10587,7 @@ export interface operations {
       }
     }
   }
-  deletePolicy: {
+  PoliciesController_deletePolicy: {
     parameters: {
       query: {
         /** @description Policy ID */
@@ -10627,7 +10627,7 @@ export interface operations {
       }
     }
   }
-  updatePolicy: {
+  PoliciesController_updatePolicy: {
     parameters: {
       query: {
         /** @description Policy ID */
@@ -10671,7 +10671,7 @@ export interface operations {
       }
     }
   }
-  getPublications: {
+  PublicationsController_getPublications: {
     parameters: {
       query?: never
       header: {
@@ -10708,7 +10708,7 @@ export interface operations {
       }
     }
   }
-  createPublication: {
+  PublicationsController_createPublication: {
     parameters: {
       query?: never
       header: {
@@ -10749,7 +10749,7 @@ export interface operations {
       }
     }
   }
-  deletePublication: {
+  PublicationsController_deletePublication: {
     parameters: {
       query: {
         /** @description Publication ID */
@@ -10789,7 +10789,7 @@ export interface operations {
       }
     }
   }
-  updatePublication: {
+  PublicationsController_updatePublication: {
     parameters: {
       query: {
         /** @description Publication ID */
@@ -10833,7 +10833,7 @@ export interface operations {
       }
     }
   }
-  runQuery: {
+  QueryController_runQuery: {
     parameters: {
       query?: never
       header: {
@@ -10874,7 +10874,7 @@ export interface operations {
       }
     }
   }
-  formatQuery: {
+  QueryController_formatQuery: {
     parameters: {
       query?: never
       header?: never
@@ -10907,7 +10907,7 @@ export interface operations {
       }
     }
   }
-  validateQuery: {
+  QueryController_validateQuery: {
     parameters: {
       query?: never
       header?: never
@@ -10940,7 +10940,7 @@ export interface operations {
       }
     }
   }
-  getSchemas: {
+  SchemasController_getSchemas: {
     parameters: {
       query?: never
       header: {
@@ -10977,7 +10977,7 @@ export interface operations {
       }
     }
   }
-  createSchema: {
+  SchemasController_createSchema: {
     parameters: {
       query?: never
       header: {
@@ -11018,7 +11018,7 @@ export interface operations {
       }
     }
   }
-  deleteSchema: {
+  SchemasController_deleteSchema: {
     parameters: {
       query: {
         /** @description Schema ID */
@@ -11058,7 +11058,7 @@ export interface operations {
       }
     }
   }
-  updateSchema: {
+  SchemasController_updateSchema: {
     parameters: {
       query: {
         /** @description Schema ID */
@@ -11102,7 +11102,7 @@ export interface operations {
       }
     }
   }
-  getTables: {
+  TablesController_getTables: {
     parameters: {
       query: {
         excluded_schemas: string
@@ -11148,7 +11148,7 @@ export interface operations {
       }
     }
   }
-  createTable: {
+  TablesController_createTable: {
     parameters: {
       query?: never
       header: {
@@ -11189,7 +11189,7 @@ export interface operations {
       }
     }
   }
-  deleteTable: {
+  TablesController_deleteTable: {
     parameters: {
       query: {
         cascade: boolean
@@ -11230,7 +11230,7 @@ export interface operations {
       }
     }
   }
-  updateTable: {
+  TablesController_updateTable: {
     parameters: {
       query: {
         /** @description Table ID */
@@ -11274,7 +11274,7 @@ export interface operations {
       }
     }
   }
-  getTriggers: {
+  TriggersController_getTriggers: {
     parameters: {
       query: {
         excluded_schemas: string
@@ -11314,7 +11314,7 @@ export interface operations {
       }
     }
   }
-  createTrigger: {
+  TriggersController_createTrigger: {
     parameters: {
       query?: never
       header: {
@@ -11355,7 +11355,7 @@ export interface operations {
       }
     }
   }
-  deleteTrigger: {
+  TriggersController_deleteTrigger: {
     parameters: {
       query: {
         /** @description Trigger ID */
@@ -11395,7 +11395,7 @@ export interface operations {
       }
     }
   }
-  updateTrigger: {
+  TriggersController_updateTrigger: {
     parameters: {
       query: {
         /** @description Trigger ID */
@@ -11439,7 +11439,7 @@ export interface operations {
       }
     }
   }
-  getTypes: {
+  TypesController_getTypes: {
     parameters: {
       query: {
         excluded_schemas: string
@@ -11479,7 +11479,7 @@ export interface operations {
       }
     }
   }
-  getViews: {
+  ViewsController_getViews: {
     parameters: {
       query: {
         excluded_schemas: string
@@ -11524,7 +11524,7 @@ export interface operations {
       }
     }
   }
-  getProfile: {
+  ProfileController_getProfile: {
     parameters: {
       query?: never
       header?: never
@@ -11550,7 +11550,7 @@ export interface operations {
       }
     }
   }
-  createProfile: {
+  ProfileController_createProfile: {
     parameters: {
       query?: never
       header?: never
@@ -11576,7 +11576,7 @@ export interface operations {
       }
     }
   }
-  deleteProfile: {
+  ProfileController_deleteProfile: {
     parameters: {
       query?: never
       header?: never
@@ -11607,7 +11607,7 @@ export interface operations {
       }
     }
   }
-  updateProfile: {
+  ProfileController_updateProfile: {
     parameters: {
       query?: never
       header?: never
@@ -11637,7 +11637,7 @@ export interface operations {
       }
     }
   }
-  getAccessTokens: {
+  AccessTokensController_getAccessTokens: {
     parameters: {
       query?: never
       header?: never
@@ -11663,7 +11663,7 @@ export interface operations {
       }
     }
   }
-  createAccessToken: {
+  AccessTokensController_createAccessToken: {
     parameters: {
       query?: never
       header?: never
@@ -11693,7 +11693,7 @@ export interface operations {
       }
     }
   }
-  getAccessToken: {
+  AccessTokensController_getAccessToken: {
     parameters: {
       query?: never
       header?: never
@@ -11722,7 +11722,7 @@ export interface operations {
       }
     }
   }
-  deleteAccessToken: {
+  AccessTokensController_deleteAccessToken: {
     parameters: {
       query?: never
       header?: never
@@ -11751,7 +11751,7 @@ export interface operations {
       }
     }
   }
-  getAuditLogs: {
+  UserAuditLogsController_getAuditLogs: {
     parameters: {
       query?: {
         /** @description End timestamp */
@@ -11782,7 +11782,7 @@ export interface operations {
       }
     }
   }
-  auditAccountLogin: {
+  ProfileController_auditAccountLogin: {
     parameters: {
       query?: never
       header?: never
@@ -11799,7 +11799,7 @@ export interface operations {
       }
     }
   }
-  checkPassword: {
+  PasswordCheckController_checkPassword: {
     parameters: {
       query?: never
       header?: never
@@ -11829,7 +11829,7 @@ export interface operations {
       }
     }
   }
-  getPermissions: {
+  PermissionsController_getPermissions: {
     parameters: {
       query?: never
       header?: never
@@ -11855,7 +11855,7 @@ export interface operations {
       }
     }
   }
-  searchProfile: {
+  SearchProfileController_searchProfile: {
     parameters: {
       query?: never
       header?: never
@@ -11885,7 +11885,7 @@ export interface operations {
       }
     }
   }
-  getProjects: {
+  ProjectsController_getProjects: {
     parameters: {
       query?: never
       header?: never
@@ -11904,7 +11904,7 @@ export interface operations {
       }
     }
   }
-  createProject: {
+  ProjectsController_createProject: {
     parameters: {
       query?: never
       header?: never
@@ -11927,7 +11927,7 @@ export interface operations {
       }
     }
   }
-  getProjectsResourceWarnings: {
+  ProjectsResourceWarningsController_getProjectsResourceWarnings: {
     parameters: {
       query?: never
       header?: never
@@ -11946,7 +11946,7 @@ export interface operations {
       }
     }
   }
-  getProject: {
+  ProjectsRefController_getProject: {
     parameters: {
       query?: never
       header?: never
@@ -11968,7 +11968,7 @@ export interface operations {
       }
     }
   }
-  deleteProject: {
+  ProjectsRefController_deleteProject: {
     parameters: {
       query?: never
       header?: never
@@ -11996,7 +11996,7 @@ export interface operations {
       }
     }
   }
-  updateProject: {
+  ProjectsRefController_updateProject: {
     parameters: {
       query?: never
       header?: never
@@ -12035,7 +12035,7 @@ export interface operations {
       }
     }
   }
-  projectGraphql: {
+  ProjectsApiController_projectGraphql: {
     parameters: {
       query?: never
       header: {
@@ -12076,7 +12076,7 @@ export interface operations {
       }
     }
   }
-  projectOpenApi: {
+  ProjectsApiController_projectOpenApi: {
     parameters: {
       query?: never
       header?: never
@@ -12111,7 +12111,7 @@ export interface operations {
       }
     }
   }
-  getContent: {
+  ContentController_getContent: {
     parameters: {
       query?: {
         cursor?: string
@@ -12148,7 +12148,7 @@ export interface operations {
       }
     }
   }
-  updateWholeContent: {
+  ContentController_updateWholeContent: {
     parameters: {
       query?: never
       header?: never
@@ -12178,7 +12178,7 @@ export interface operations {
       }
     }
   }
-  createContent: {
+  ContentController_createContent: {
     parameters: {
       query?: never
       header?: never
@@ -12210,7 +12210,7 @@ export interface operations {
       }
     }
   }
-  deleteContents: {
+  ContentController_deleteContents: {
     parameters: {
       query: {
         ids: string[]
@@ -12240,7 +12240,7 @@ export interface operations {
       }
     }
   }
-  getContentCountV2: {
+  ContentController_getContentCountV2: {
     parameters: {
       query?: {
         name?: string
@@ -12271,7 +12271,7 @@ export interface operations {
       }
     }
   }
-  getRootFolder: {
+  ContentFoldersController_getRootFolder: {
     parameters: {
       query?: {
         cursor?: string
@@ -12307,7 +12307,7 @@ export interface operations {
       }
     }
   }
-  createFolder: {
+  ContentFoldersController_createFolder: {
     parameters: {
       query?: never
       header?: never
@@ -12339,7 +12339,7 @@ export interface operations {
       }
     }
   }
-  DeleteFolder: {
+  ContentFoldersController_DeleteFolder: {
     parameters: {
       query: {
         ids: string[]
@@ -12367,7 +12367,7 @@ export interface operations {
       }
     }
   }
-  getFolder: {
+  ContentFoldersController_getFolder: {
     parameters: {
       query?: {
         cursor?: string
@@ -12403,7 +12403,7 @@ export interface operations {
       }
     }
   }
-  updateFolder: {
+  ContentFoldersController_updateFolder: {
     parameters: {
       query?: never
       header?: never
@@ -12435,7 +12435,7 @@ export interface operations {
       }
     }
   }
-  getContentById: {
+  ContentController_getContentById: {
     parameters: {
       query?: never
       header?: never
@@ -12464,7 +12464,7 @@ export interface operations {
       }
     }
   }
-  getDailyStats: {
+  DailyStatsController_getDailyStats: {
     parameters: {
       query: {
         attribute:
@@ -12537,7 +12537,7 @@ export interface operations {
       }
     }
   }
-  getDatabases: {
+  DatabasesController_getDatabases: {
     parameters: {
       query?: never
       header?: never
@@ -12559,7 +12559,7 @@ export interface operations {
       }
     }
   }
-  getStatus: {
+  DatabasesStatusesController_getStatus: {
     parameters: {
       query?: never
       header?: never
@@ -12588,7 +12588,7 @@ export interface operations {
       }
     }
   }
-  updatePassword: {
+  DbPasswordController_updatePassword: {
     parameters: {
       query?: never
       header?: never
@@ -12625,7 +12625,7 @@ export interface operations {
       }
     }
   }
-  getDisk: {
+  DiskController_getDisk: {
     parameters: {
       query?: never
       header?: never
@@ -12660,7 +12660,7 @@ export interface operations {
       }
     }
   }
-  modifyDisk: {
+  DiskController_modifyDisk: {
     parameters: {
       query?: never
       header?: never
@@ -12697,7 +12697,7 @@ export interface operations {
       }
     }
   }
-  getDiskAutoscaleConfig: {
+  DiskController_getDiskAutoscaleConfig: {
     parameters: {
       query?: never
       header?: never
@@ -12732,7 +12732,7 @@ export interface operations {
       }
     }
   }
-  updateDiskAutoscaleConfig: {
+  DiskController_updateDiskAutoscaleConfig: {
     parameters: {
       query?: never
       header?: never
@@ -12771,7 +12771,7 @@ export interface operations {
       }
     }
   }
-  getDiskUtilization: {
+  DiskController_getDiskUtilization: {
     parameters: {
       query?: never
       header?: never
@@ -12806,7 +12806,7 @@ export interface operations {
       }
     }
   }
-  getUsageMetrics: {
+  InfraMonitoringController_getUsageMetrics: {
     parameters: {
       query: {
         attribute:
@@ -12851,7 +12851,7 @@ export interface operations {
       }
     }
   }
-  projectHealthCheck: {
+  HealthCheckController_projectHealthCheck: {
     parameters: {
       query?: never
       header?: never
@@ -12884,7 +12884,7 @@ export interface operations {
       }
     }
   }
-  getLoadBalancers: {
+  LoadBalancersController_getLoadBalancers: {
     parameters: {
       query?: never
       header?: never
@@ -12906,7 +12906,7 @@ export interface operations {
       }
     }
   }
-  pauseProject: {
+  PauseController_pauseProject: {
     parameters: {
       query?: never
       header?: never
@@ -12939,7 +12939,7 @@ export interface operations {
       }
     }
   }
-  getProject: {
+  PauseController_getProject: {
     parameters: {
       query?: never
       header?: never
@@ -12961,7 +12961,7 @@ export interface operations {
       }
     }
   }
-  resizeDatabase: {
+  ResizeController_resizeDatabase: {
     parameters: {
       query?: never
       header?: never
@@ -12992,7 +12992,7 @@ export interface operations {
       }
     }
   }
-  restartProject: {
+  RestartController_restartProject: {
     parameters: {
       query?: never
       header?: never
@@ -13026,7 +13026,7 @@ export interface operations {
       }
     }
   }
-  restartServices: {
+  RestartServicesController_restartServices: {
     parameters: {
       query?: never
       header?: never
@@ -13057,7 +13057,7 @@ export interface operations {
       }
     }
   }
-  unpauseProject: {
+  UnpauseController_unpauseProject: {
     parameters: {
       query?: never
       header?: never
@@ -13095,7 +13095,7 @@ export interface operations {
       }
     }
   }
-  cancelProjectRestoration: {
+  UnpauseController_cancelProjectRestoration: {
     parameters: {
       query?: never
       header?: never
@@ -13129,7 +13129,7 @@ export interface operations {
       }
     }
   }
-  getAvailableImageVersions: {
+  UnpauseController_getAvailableImageVersions: {
     parameters: {
       query?: never
       header?: never
@@ -13163,7 +13163,7 @@ export interface operations {
       }
     }
   }
-  runProjectLints: {
+  ProjectRunLintsController_runProjectLints: {
     parameters: {
       query?: never
       header?: never
@@ -13191,7 +13191,7 @@ export interface operations {
       }
     }
   }
-  getServiceVersions: {
+  ProjectServiceVersionsController_getServiceVersions: {
     parameters: {
       query?: never
       header?: never
@@ -13213,7 +13213,7 @@ export interface operations {
       }
     }
   }
-  getProjectApi: {
+  SettingsController_getProjectSettings: {
     parameters: {
       query?: never
       header?: never
@@ -13242,7 +13242,7 @@ export interface operations {
       }
     }
   }
-  updateProjectSensitivity: {
+  SensitivityController_updateProjectSensitivity: {
     parameters: {
       query?: never
       header?: never
@@ -13281,7 +13281,7 @@ export interface operations {
       }
     }
   }
-  getStatus: {
+  ProjectStatusController_getStatus: {
     parameters: {
       query?: never
       header?: never
@@ -13308,7 +13308,7 @@ export interface operations {
       }
     }
   }
-  transferProject: {
+  ProjectTransferController_transferProject: {
     parameters: {
       query?: never
       header?: never
@@ -13338,7 +13338,7 @@ export interface operations {
       }
     }
   }
-  previewTransfer: {
+  ProjectTransferController_previewTransfer: {
     parameters: {
       query?: never
       header?: never
@@ -13370,7 +13370,7 @@ export interface operations {
       }
     }
   }
-  getProjectByFlyExtensionId: {
+  ProjectsController_getProjectByFlyExtensionId: {
     parameters: {
       query?: never
       header?: never
@@ -13391,7 +13391,7 @@ export interface operations {
       }
     }
   }
-  getProjectApi: {
+  ApiController_getProjectApi: {
     parameters: {
       query?: never
       header?: never
@@ -13420,7 +13420,7 @@ export interface operations {
       }
     }
   }
-  getJwtSecretUpdateStatus: {
+  JwtSecretUpdateStatusController_getJwtSecretUpdateStatus: {
     parameters: {
       query?: never
       header?: never
@@ -13449,7 +13449,7 @@ export interface operations {
       }
     }
   }
-  getProjectApi: {
+  PropsSettingsController_getProjectSettingsDeprecated: {
     parameters: {
       query?: never
       header?: never
@@ -13478,7 +13478,7 @@ export interface operations {
       }
     }
   }
-  getPipelines: {
+  ReplicationPipelinesController_getPipelines: {
     parameters: {
       query?: never
       header?: never
@@ -13512,7 +13512,7 @@ export interface operations {
       }
     }
   }
-  createPipeline: {
+  ReplicationPipelinesController_createPipeline: {
     parameters: {
       query?: never
       header?: never
@@ -13551,7 +13551,7 @@ export interface operations {
       }
     }
   }
-  deletePipeline: {
+  ReplicationPipelinesController_deletePipeline: {
     parameters: {
       query?: never
       header?: never
@@ -13584,7 +13584,7 @@ export interface operations {
       }
     }
   }
-  startPipeline: {
+  ReplicationPipelinesController_startPipeline: {
     parameters: {
       query?: never
       header?: never
@@ -13617,7 +13617,7 @@ export interface operations {
       }
     }
   }
-  getPipelineStatus: {
+  ReplicationPipelinesController_getPipelineStatus: {
     parameters: {
       query?: never
       header?: never
@@ -13652,7 +13652,7 @@ export interface operations {
       }
     }
   }
-  stopPipeline: {
+  ReplicationPipelinesController_stopPipeline: {
     parameters: {
       query?: never
       header?: never
@@ -13685,7 +13685,7 @@ export interface operations {
       }
     }
   }
-  getSinks: {
+  ReplicationSinksController_getSinks: {
     parameters: {
       query?: never
       header?: never
@@ -13719,7 +13719,7 @@ export interface operations {
       }
     }
   }
-  createSink: {
+  ReplicationSinksController_createSink: {
     parameters: {
       query?: never
       header?: never
@@ -13758,7 +13758,7 @@ export interface operations {
       }
     }
   }
-  deleteSink: {
+  ReplicationSinksController_deleteSink: {
     parameters: {
       query?: never
       header?: never
@@ -13791,7 +13791,7 @@ export interface operations {
       }
     }
   }
-  getSources: {
+  ReplicationSourcesController_getSources: {
     parameters: {
       query?: never
       header?: never
@@ -13826,7 +13826,7 @@ export interface operations {
       }
     }
   }
-  createSource: {
+  ReplicationSourcesController_createSource: {
     parameters: {
       query?: never
       header?: never
@@ -13861,7 +13861,7 @@ export interface operations {
       }
     }
   }
-  getPublications: {
+  ReplicationSourcesController_getPublications: {
     parameters: {
       query?: never
       header?: never
@@ -13897,7 +13897,7 @@ export interface operations {
       }
     }
   }
-  createPublication: {
+  ReplicationSourcesController_createPublication: {
     parameters: {
       query?: never
       header?: never
@@ -13941,7 +13941,7 @@ export interface operations {
       }
     }
   }
-  deletePublication: {
+  ReplicationSourcesController_deletePublication: {
     parameters: {
       query?: never
       header?: never
@@ -13976,7 +13976,7 @@ export interface operations {
       }
     }
   }
-  getTables: {
+  ReplicationSourcesController_getTables: {
     parameters: {
       query?: never
       header?: never
@@ -14012,7 +14012,7 @@ export interface operations {
       }
     }
   }
-  resetPassword: {
+  ResetPasswordController_resetPassword: {
     parameters: {
       query?: never
       header?: never
@@ -14033,7 +14033,7 @@ export interface operations {
       }
     }
   }
-  signUp: {
+  SignUpController_signUp: {
     parameters: {
       query?: never
       header?: never
@@ -14054,7 +14054,7 @@ export interface operations {
       }
     }
   }
-  getStatus: {
+  StatusController_getStatus: {
     parameters: {
       query?: never
       header?: never
@@ -14078,7 +14078,7 @@ export interface operations {
       }
     }
   }
-  getArchive: {
+  StorageArchiveController_getArchive: {
     parameters: {
       query?: never
       header?: never
@@ -14107,7 +14107,7 @@ export interface operations {
       }
     }
   }
-  createArchive: {
+  StorageArchiveController_createArchive: {
     parameters: {
       query?: never
       header?: never
@@ -14134,7 +14134,7 @@ export interface operations {
       }
     }
   }
-  getBuckets: {
+  StorageBucketsController_getBuckets: {
     parameters: {
       query?: never
       header?: never
@@ -14169,7 +14169,7 @@ export interface operations {
       }
     }
   }
-  createBucket: {
+  StorageBucketsController_createBucket: {
     parameters: {
       query?: never
       header?: never
@@ -14208,7 +14208,7 @@ export interface operations {
       }
     }
   }
-  getBucket: {
+  StorageBucketIdController_getBucket: {
     parameters: {
       query?: never
       header?: never
@@ -14245,7 +14245,7 @@ export interface operations {
       }
     }
   }
-  deleteBucket: {
+  StorageBucketIdController_deleteBucket: {
     parameters: {
       query?: never
       header?: never
@@ -14280,7 +14280,7 @@ export interface operations {
       }
     }
   }
-  updateBucket: {
+  StorageBucketIdController_updateBucket: {
     parameters: {
       query?: never
       header?: never
@@ -14319,7 +14319,7 @@ export interface operations {
       }
     }
   }
-  emptyBucket: {
+  StorageBucketIdController_emptyBucket: {
     parameters: {
       query?: never
       header?: never
@@ -14354,7 +14354,7 @@ export interface operations {
       }
     }
   }
-  deleteObjects: {
+  StorageObjectsController_deleteObjects: {
     parameters: {
       query?: never
       header?: never
@@ -14393,7 +14393,7 @@ export interface operations {
       }
     }
   }
-  copyObject: {
+  StorageObjectsController_copyObject: {
     parameters: {
       query?: never
       header?: never
@@ -14434,7 +14434,7 @@ export interface operations {
       }
     }
   }
-  download: {
+  StorageObjectsController_download: {
     parameters: {
       query?: never
       header?: never
@@ -14473,7 +14473,7 @@ export interface operations {
       }
     }
   }
-  getObjects: {
+  StorageObjectsController_getObjects: {
     parameters: {
       query?: never
       header?: never
@@ -14514,7 +14514,7 @@ export interface operations {
       }
     }
   }
-  moveObject: {
+  StorageObjectsController_moveObject: {
     parameters: {
       query?: never
       header?: never
@@ -14553,7 +14553,7 @@ export interface operations {
       }
     }
   }
-  createPublicUrl: {
+  StorageObjectsController_createPublicUrl: {
     parameters: {
       query?: never
       header?: never
@@ -14594,7 +14594,7 @@ export interface operations {
       }
     }
   }
-  createSignedUrl: {
+  StorageObjectsController_createSignedUrl: {
     parameters: {
       query?: never
       header?: never
@@ -14635,7 +14635,7 @@ export interface operations {
       }
     }
   }
-  createSignedUrls: {
+  StorageObjectsController_createSignedUrls: {
     parameters: {
       query?: never
       header?: never
@@ -14676,7 +14676,7 @@ export interface operations {
       }
     }
   }
-  getAllCredentials: {
+  StorageS3CredentialsController_getAllCredentials: {
     parameters: {
       query?: never
       header?: never
@@ -14711,7 +14711,7 @@ export interface operations {
       }
     }
   }
-  createCredential: {
+  StorageS3CredentialsController_createCredential: {
     parameters: {
       query?: never
       header?: never
@@ -14750,7 +14750,7 @@ export interface operations {
       }
     }
   }
-  deleteCredential: {
+  StorageS3CredentialsController_deleteCredential: {
     parameters: {
       query?: never
       header?: never
@@ -14785,7 +14785,7 @@ export interface operations {
       }
     }
   }
-  getOverdueInvoices: {
+  InvoicesController_getOverdueInvoices: {
     parameters: {
       query?: never
       header?: never
@@ -14804,7 +14804,7 @@ export interface operations {
       }
     }
   }
-  setUpPaymentMethod: {
+  SetupIntentController_setUpPaymentMethod: {
     parameters: {
       query?: never
       header?: never
@@ -14834,7 +14834,7 @@ export interface operations {
       }
     }
   }
-  sendServerEventV2: {
+  TelemetryEventController_sendServerEventV2: {
     parameters: {
       query?: never
       header?: never
@@ -14862,7 +14862,7 @@ export interface operations {
       }
     }
   }
-  callFeatureFlag: {
+  TelemetryFeatureFlagsController_callFeatureFlag: {
     parameters: {
       query?: never
       header?: never
@@ -14889,7 +14889,7 @@ export interface operations {
       }
     }
   }
-  trackFeatureFlag: {
+  TelemetryFeatureFlagsController_trackFeatureFlag: {
     parameters: {
       query?: never
       header?: never
@@ -14917,7 +14917,7 @@ export interface operations {
       }
     }
   }
-  groupIdentify: {
+  TelemetryGroupsController_groupIdentify: {
     parameters: {
       query?: never
       header?: never
@@ -14945,7 +14945,7 @@ export interface operations {
       }
     }
   }
-  groupReset: {
+  TelemetryGroupsController_groupReset: {
     parameters: {
       query?: never
       header?: never
@@ -14973,7 +14973,7 @@ export interface operations {
       }
     }
   }
-  identifyV2: {
+  TelemetryIdentifyController_identifyV2: {
     parameters: {
       query?: never
       header?: never
@@ -15001,7 +15001,7 @@ export interface operations {
       }
     }
   }
-  sendServerPageV2: {
+  TelemetryPageController_sendServerPageV2: {
     parameters: {
       query?: never
       header?: never
@@ -15029,7 +15029,7 @@ export interface operations {
       }
     }
   }
-  trackPageLeave: {
+  TelemetryPageLeaveController_trackPageLeave: {
     parameters: {
       query?: never
       header?: never
@@ -15064,7 +15064,7 @@ export interface operations {
       }
     }
   }
-  reset: {
+  TelemetryResetController_reset: {
     parameters: {
       query?: never
       header?: never
@@ -15088,7 +15088,7 @@ export interface operations {
       }
     }
   }
-  flyTosAccepted: {
+  TermsOfServiceController_flyTosAccepted: {
     parameters: {
       query: {
         extension_id: string
@@ -15108,7 +15108,7 @@ export interface operations {
       }
     }
   }
-  getVercelProjects: {
+  VercelProjectsController_getVercelProjects: {
     parameters: {
       query: {
         id: string
@@ -15139,7 +15139,7 @@ export interface operations {
       }
     }
   }
-  getVercelProject: {
+  VercelProjectsController_getVercelProject: {
     parameters: {
       query: {
         id: string
@@ -15173,7 +15173,7 @@ export interface operations {
       }
     }
   }
-  getEnvironmentVariables: {
+  VercelEnvironmentVariablesController_getEnvironmentVariables: {
     parameters: {
       query: {
         projectId: string
@@ -15204,7 +15204,7 @@ export interface operations {
       }
     }
   }
-  createEnvironmentVariable: {
+  VercelEnvironmentVariablesController_createEnvironmentVariable: {
     parameters: {
       query: {
         projectId: string
@@ -15239,7 +15239,7 @@ export interface operations {
       }
     }
   }
-  getRedirectUrl: {
+  VercelRedirectController_getRedirectUrl: {
     parameters: {
       query?: never
       header?: never
@@ -15267,7 +15267,7 @@ export interface operations {
       }
     }
   }
-  getAccessToken: {
+  VercelAccessTokenController_getAccessToken: {
     parameters: {
       query: {
         code: string
@@ -15293,7 +15293,7 @@ export interface operations {
       }
     }
   }
-  listWorkflowRuns: {
+  WorkflowRunController_listWorkflowRuns: {
     parameters: {
       query?: {
         /** @description Branch ID */
@@ -15326,7 +15326,7 @@ export interface operations {
       }
     }
   }
-  countWorkflowRuns: {
+  WorkflowRunController_countWorkflowRuns: {
     parameters: {
       query?: {
         /** @description Branch ID */
@@ -15357,7 +15357,7 @@ export interface operations {
       }
     }
   }
-  getWorkflowRunLogs: {
+  WorkflowRunController_getWorkflowRunLogs: {
     parameters: {
       query?: never
       header?: never
@@ -15443,7 +15443,7 @@ export interface operations {
       }
     }
   }
-  getLogs: {
+  V1ProjectLogsController_getLogs: {
     parameters: {
       query?: {
         iso_timestamp_end?: string
@@ -15498,7 +15498,7 @@ export interface operations {
       }
     }
   }
-  createApiKey: {
+  ApiKeysController_createApiKey: {
     parameters: {
       query: {
         reveal: boolean
@@ -15526,7 +15526,7 @@ export interface operations {
       }
     }
   }
-  getApiKey: {
+  ApiKeysController_getApiKey: {
     parameters: {
       query: {
         reveal: boolean
@@ -15551,7 +15551,7 @@ export interface operations {
       }
     }
   }
-  deleteApiKey: {
+  ApiKeysController_deleteApiKey: {
     parameters: {
       query: {
         reveal: boolean
@@ -15582,7 +15582,7 @@ export interface operations {
       }
     }
   }
-  updateApiKey: {
+  ApiKeysController_updateApiKey: {
     parameters: {
       query: {
         reveal: boolean
@@ -15774,7 +15774,7 @@ export interface operations {
       }
     }
   }
-  listTPAForProject: {
+  ThirdPartyAuthController_listTPAForProject: {
     parameters: {
       query?: never
       header?: never
@@ -15802,7 +15802,7 @@ export interface operations {
       }
     }
   }
-  createTPAForProject: {
+  ThirdPartyAuthController_createTPAForProject: {
     parameters: {
       query?: never
       header?: never
@@ -15834,7 +15834,7 @@ export interface operations {
       }
     }
   }
-  getTPAForProject: {
+  ThirdPartyAuthController_getTPAForProject: {
     parameters: {
       query?: never
       header?: never
@@ -15863,7 +15863,7 @@ export interface operations {
       }
     }
   }
-  deleteTPAForProject: {
+  ThirdPartyAuthController_deleteTPAForProject: {
     parameters: {
       query?: never
       header?: never
@@ -16306,7 +16306,7 @@ export interface operations {
       }
     }
   }
-  getDatabaseMetadata: {
+  V1DatabaseContextController_getDatabaseMetadata: {
     parameters: {
       query?: never
       header?: never
