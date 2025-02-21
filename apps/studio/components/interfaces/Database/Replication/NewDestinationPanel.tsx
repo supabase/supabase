@@ -341,6 +341,7 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
       </Sheet>
       <NewPublicationPanel
         visible={publicationPanelVisible}
+        sourceId={sourceId}
         onClose={() => setPublicationPanelVisible(false)}
       />
     </>
