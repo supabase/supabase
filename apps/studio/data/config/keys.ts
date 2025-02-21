@@ -1,8 +1,4 @@
 export const configKeys = {
-  pgBouncerConfig: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'pgbouncer'] as const,
-  pgBouncerStatus: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'pgbouncer', 'status'] as const,
   settings: (projectRef: string | undefined) => ['projects', projectRef, 'settings'] as const,
   settingsV2: (projectRef: string | undefined) => ['projects', projectRef, 'settings-v2'] as const,
   api: (projectRef: string | undefined) => ['projects', projectRef, 'settings', 'api'] as const,
