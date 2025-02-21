@@ -247,7 +247,7 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                             publications={publications?.map((pub) => pub.name) || []}
                             loading={loadingPublications}
                             onSelectPublication={field.onChange}
-                            onNewPublicationClick={() => setPublicationPanelVisible(false)}
+                            onNewPublicationClick={() => setPublicationPanelVisible(true)}
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
@@ -339,7 +339,10 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
           </div>
         </SheetContent>
       </Sheet>
-      <NewPublicationPanel visible={publicationPanelVisible}></NewPublicationPanel>
+      <NewPublicationPanel
+        visible={publicationPanelVisible}
+        onClose={() => setPublicationPanelVisible(false)}
+      />
     </>
   )
 }
