@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useCreatePublicationMutation } from 'data/replication/create-publication-mutation'
+import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import { X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -22,6 +23,7 @@ import {
   Input_Shadcn_,
   FormMessage_Shadcn_,
 } from 'ui'
+import { MultiSelector } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
 interface NewPublicationPanelProps {
@@ -34,12 +36,18 @@ const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanel
   const { ref: projectRef } = useParams()
   const { mutateAsync: createPublication, isLoading: creatingPublication } =
     useCreatePublicationMutation()
+  const { data: tables } = useReplicationTablesQuery({
+    projectRef,
+    sourceId,
+  })
   const formId = 'publication-editor'
   const FormSchema = z.object({
     name: z.string().min(1, 'Name is required'),
+    tables: z.array(z.string()).min(1, 'At least one table is required'),
   })
   const defaultValues = {
     name: '',
+    tables: [],
   }
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -56,7 +64,10 @@ const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanel
         projectRef,
         sourceId,
         name: data.name,
-        tables: [],
+        tables: data.tables.map((table) => {
+          const [schema, name] = table.split('.')
+          return { schema, name }
+        }),
       })
       toast.success('Successfully created publication')
       onClose()
@@ -101,6 +112,39 @@ const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanel
                         <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
                         <FormControl_Shadcn_>
                           <Input_Shadcn_ {...field} placeholder="Name" />
+                        </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="tables"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
+                        <FormLabel_Shadcn_>Tables</FormLabel_Shadcn_>
+                        <FormControl_Shadcn_>
+                          <MultiSelector
+                            values={field.value}
+                            onValuesChange={field.onChange}
+                            disabled={creatingPublication}
+                          >
+                            <MultiSelector.Trigger>
+                              <MultiSelector.Input placeholder="Select tables" />
+                            </MultiSelector.Trigger>
+                            <MultiSelector.Content>
+                              <MultiSelector.List>
+                                {tables?.tables.map((table) => (
+                                  <MultiSelector.Item
+                                    key={`${table.schema}.${table.name}`}
+                                    value={`${table.schema}.${table.name}`}
+                                  >
+                                    {`${table.schema}.${table.name}`}
+                                  </MultiSelector.Item>
+                                ))}
+                              </MultiSelector.List>
+                            </MultiSelector.Content>
+                          </MultiSelector>
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
                       </FormItem_Shadcn_>
