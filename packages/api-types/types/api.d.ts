@@ -415,6 +415,74 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/feedback/feedback/docs': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Send feedback on docs */
+    post: operations['sendDocsFeedback']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/feedback/feedback/downgrade': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Send exit survey to HubSpot */
+    post: operations['sendExitSurvey']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/feedback/feedback/send': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Send feedback */
+    post: operations['sendFeedback']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/feedback/feedback/upgrade': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Send upgrade survey to survey_responses table */
+    post: operations['sendUpgradeSurvey']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/integrations': {
     parameters: {
       query?: never
@@ -5914,6 +5982,48 @@ export interface components {
       updated_at?: string
       value: string
     }
+    SendDocsFeedbackBody: {
+      feedback?: string
+      isHelpful: boolean
+      page: string
+      team?: string
+      title: string
+    }
+    SendExitSurveyBody: {
+      additionalFeedback?: string
+      exitAction?: string
+      orgSlug?: string
+      projectRef?: string
+      reasons: string
+    }
+    SendFeedbackBody: {
+      additionalRedirectUrls?: string
+      affectedServices?: string
+      allowSupportAccess?: boolean
+      browserInformation?: string
+      category: string
+      library?: string
+      message: string
+      organizationSlug?: string
+      pathname?: string
+      projectRef?: string
+      severity?: string
+      siteUrl?: string
+      subject?: string
+      tags: string[]
+      urlToAirTable?: string
+      verified?: boolean
+    }
+    SendFeedbackResponse: {
+      result: string
+    }
+    SendUpgradeSurveyBody: {
+      additionalFeedback?: string
+      currentPlan?: string
+      orgSlug?: string
+      prevPlan?: string
+      reasons: string[]
+    }
     ServiceApiKey: {
       api_key_encrypted?: string
       name: string
@@ -8011,6 +8121,126 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get hook logs with the given ID */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  sendDocsFeedback: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SendDocsFeedbackBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SendFeedbackResponse']
+        }
+      }
+      /** @description Failed to send feedback for docs */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  sendExitSurvey: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SendExitSurveyBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SendFeedbackResponse']
+        }
+      }
+      /** @description Failed to send exit survey */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  sendFeedback: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SendFeedbackBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SendFeedbackResponse']
+        }
+      }
+      /** @description Failed to send feedback */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  sendUpgradeSurvey: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SendUpgradeSurveyBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SendFeedbackResponse']
+        }
+      }
+      /** @description Failed to send upgrade survey */
       500: {
         headers: {
           [name: string]: unknown
