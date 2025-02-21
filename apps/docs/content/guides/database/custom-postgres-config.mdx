@@ -159,7 +159,7 @@ supabase --experimental \
 postgres-config delete --config shared_buffers,work_mem
 ```
 
-By default, changing the configuration, whether by updating or deleting, causes the database and all associated read replicas to restart. You can use the `--no-restart` flag to prevent this behavior, and attempt to reload the updated configuration without a restart. Please refer to the Postgres documentation to determine if a given parameter can be reloaded without a restart.
+By default, changing the configuration, whether by updating or deleting, causes the database and all associated read replicas to restart. You can use the `--no-restart` flag to prevent this behavior, and attempt to reload the updated configuration without a restart. Refer to the Postgres documentation to determine if a given parameter can be reloaded without a restart.
 
 <Admonition type="note" label="Read Replicas and Custom Config">
 
