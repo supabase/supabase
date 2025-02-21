@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { components } from 'api-types'
+import { apiComponents } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
@@ -10,7 +10,7 @@ export type EdgeFunctionVariables = {
   slug?: string
 }
 
-export type EdgeFunction = components['schemas']['FunctionSlugResponse']
+export type EdgeFunction = apiComponents['schemas']['FunctionSlugResponse']
 
 export async function getEdgeFunction(
   { projectRef, slug }: EdgeFunctionVariables,

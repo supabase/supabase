@@ -4,11 +4,11 @@ import { toast } from 'sonner'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
-import { components } from 'api-types'
+import { apiComponents } from 'api-types'
 
 export type EdgeFunctionsDeployVariables = {
   projectRef: string
-  metadata: components['schemas']['FunctionDeployMetadata']
+  metadata: apiComponents['schemas']['FunctionDeployMetadata']
   files: { name: string; content: string }[]
 }
 
