@@ -90,8 +90,7 @@ All of the services should have a status `running (healthy)`. If you see a statu
 <Admonition type="danger">
 
 Your app is now running with default credentials.
-Please [secure your services](#securing-your-services) as soon as possible using the instructions below.
-
+[Secure your services](#securing-your-services) as soon as possible using the instructions below.
 </Admonition>
 
 ### Accessing Supabase Studio
@@ -126,7 +125,7 @@ By default, the Supabase stack runs the [Supavisor](https://supabase.github.io/s
 
 You can connect to the Postgres database using the following methods:
 
-1. For session-based connections (equivalent to direct PostgreSQL connections):
+1. For session-based connections (equivalent to direct Postgres connections):
 
 ```bash
 psql 'postgres://postgres.your-tenant-id:your-super-secret-and-long-postgres-password@localhost:5432/postgres'
@@ -158,7 +157,7 @@ You'll want to update the Studio(Dashboard) frequently to get the latest feature
 
 ## Securing your services
 
-While we provided you with some example secrets for getting started, you should NEVER deploy your Supabase setup using the defaults we have provided. Please follow all of the steps in this section to ensure you have a secure setup, and then [restart all services](#restarting-all-services) to pick up the changes.
+While we provided you with some example secrets for getting started, you should NEVER deploy your Supabase setup using the defaults we have provided. Follow all of the steps in this section to ensure you have a secure setup, and then [restart all services](#restarting-all-services) to pick up the changes.
 
 ### Generate API keys
 
@@ -225,8 +224,9 @@ docker compose down
 docker compose up -d
 ```
 
-Be aware that this will result in downtime. Simply restarting the services does not apply configuration changes.
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 
+Be aware that this will result in downtime. Simply restarting the services does not apply configuration changes.
 ## Stopping all services
 
 You can stop Supabase by running `docker compose stop` in same directory as your `docker-compose.yml` file.
@@ -279,11 +279,11 @@ If the tool doesn't exist, we build and open source it ourselves.
 
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
 - [GoTrue](https://github.com/supabase/gotrue) is an JWT based API for managing users and issuing JWT tokens.
-- [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
-- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using WebSockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over WebSockets to authorized clients.
+- [PostgREST](http://postgrest.org/) is a web server that turns your Postgres database directly into a RESTful API
+- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to Postgres inserts, updates, and deletes using WebSockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over WebSockets to authorized clients.
 - [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
 - [`postgres-meta`](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
-- [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
+- [Postgres](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
 - [Supavisor](https://github.com/supabase/supavisor) is a scalable connection pooler for Postgres, allowing for efficient management of database connections.
 
 For the system to work cohesively, some services require additional configuration within the Postgres database. For example, the APIs and Auth system require several [default roles](/docs/guides/database/postgres/roles) and the `pgjwt` Postgres extension.
@@ -398,7 +398,7 @@ db:
     - ${POSTGRES_PORT}:${POSTGRES_PORT}
 ```
 
-This is less-secure, so please make sure you are running a firewall in front of your server.
+This is less-secure, so make sure you are running a firewall in front of your server.
 
 #### File storage backend on macOS
 
