@@ -53,6 +53,10 @@ module.exports = [
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
   },
   {
+    source: '/llms.txt',
+    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/llms.txt`,
+  },
+  {
     source: '/feed.xml',
     destination: `/rss.xml`,
   },

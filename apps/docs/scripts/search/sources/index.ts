@@ -117,6 +117,9 @@ export async function fetchSources() {
 
   const sources: SearchSource[] = (
     await Promise.all([
+      ...guideSources,
+      ...partnerIntegrationSources,
+      ...githubDiscussionSources,
       openApiReferenceSource,
       jsLibReferenceSource,
       dartLibReferenceSource,
@@ -125,9 +128,6 @@ export async function fetchSources() {
       swiftLibReferenceSource,
       ktLibReferenceSource,
       cliReferenceSource,
-      ...githubDiscussionSources,
-      ...partnerIntegrationSources,
-      ...guideSources,
     ])
   ).flat()
 
