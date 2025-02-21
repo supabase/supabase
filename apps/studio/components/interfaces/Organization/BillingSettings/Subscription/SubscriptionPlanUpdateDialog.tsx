@@ -2,9 +2,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { ChevronRight, ExternalLink, Info, CreditCard, InfoIcon, Check } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { pickFeatures } from 'shared-data/plans'
+import tweets from 'shared-data/tweets'
 
 import AlertError from 'components/ui/AlertError'
 import InformationBox from 'components/ui/InformationBox'
@@ -30,6 +31,20 @@ import { SubscriptionTier } from 'data/subscriptions/types'
 import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, cn } from 'ui'
+
+const getRandomTweet = () => {
+  const randomIndex = Math.floor(Math.random() * tweets.length)
+  return tweets[randomIndex]
+}
+
+const PLAN_HEADINGS = {
+  tier_pro:
+    'Upgrade to Pro and create unlimited projects, daily backups and premium support when you need it',
+  tier_team: 'Upgrade to Team for SOC2, SSO, priority support and greater data and log retention',
+  default: 'Upgrade your plan',
+} as const
+
+type PlanHeadingKey = keyof typeof PLAN_HEADINGS
 
 interface Props {
   selectedTier: 'tier_free' | 'tier_pro' | 'tier_team' | undefined
@@ -64,7 +79,13 @@ const SubscriptionPlanUpdateDialog = ({
 }: Props) => {
   const queryClient = useQueryClient()
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
-  const [usageFeesExpanded, setUsageFeesExpanded] = useState<string[]>([])
+  const [testimonialTweet, setTestimonialTweet] = useState(getRandomTweet())
+
+  useEffect(() => {
+    if (selectedTier !== undefined && selectedTier !== 'tier_free') {
+      setTestimonialTweet(getRandomTweet())
+    }
+  }, [selectedTier])
 
   const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
@@ -80,14 +101,6 @@ const SubscriptionPlanUpdateDialog = ({
   )
 
   console.log('meta:', subscriptionPlanMeta, subscription)
-
-  const expandUsageFee = (fee: string) => {
-    setUsageFeesExpanded([...usageFeesExpanded, fee])
-  }
-
-  const collapseUsageFee = (fee: string) => {
-    setUsageFeesExpanded(usageFeesExpanded.filter((item) => item !== fee))
-  }
 
   const onUpdateSubscription = async () => {
     if (!slug) return console.error('org slug is required')
@@ -120,7 +133,7 @@ const SubscriptionPlanUpdateDialog = ({
   }
 
   const features = subscriptionPlanMeta?.features?.[0]?.features || []
-  const topFeatures = features.slice(0, 3)
+  const topFeatures = features
 
   return (
     <Dialog
@@ -135,10 +148,16 @@ const SubscriptionPlanUpdateDialog = ({
           <div className="p-8 pb-0 flex flex-col">
             <div className="flex-1">
               <h3 className="text-lg font-medium mb-4">
-                Experience {subscriptionPlanMeta?.name} with enhanced features starting at{' '}
-                <span>{formatCurrency(subscriptionPlanMeta?.priceMonthly ?? 0)} a month</span>
+                {PLAN_HEADINGS[(selectedTier as PlanHeadingKey) || 'default']}
               </h3>
 
+              {subscriptionPreviewIsLoading && (
+                <div className="space-y-2 mb-4 mt-2">
+                  <ShimmeringLoader />
+                  <ShimmeringLoader className="w-3/4" />
+                  <ShimmeringLoader className="w-1/2" />
+                </div>
+              )}
               {subscriptionPreviewInitialized && (
                 <Table className="mt-2 mb-4 text-foreground-light">
                   <TableBody>
@@ -218,6 +237,163 @@ const SubscriptionPlanUpdateDialog = ({
                   </TableBody>
                 </Table>
               )}
+              <HoverCard>
+                <HoverCardTrigger asChild>
+                  <Card className="cursor-help text-sm">
+                    <CardContent className="flex items-center gap-2 py-2 px-3">
+                      <InfoIcon strokeWidth={1.5} size={16} className="text-foreground-light" />
+                      Next invoice estimate is{' '}
+                      {formatCurrency(
+                        Math.round(
+                          subscriptionPreview?.breakdown.reduce(
+                            (prev: number, cur: any) => prev + cur.total_price,
+                            0
+                          )
+                        ) ?? 0
+                      )}
+                    </CardContent>
+                  </Card>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-[520px] p-6">
+                  <h3 className="text-md font-medium mb-2">Estimating your invoice</h3>
+                  <p className="text-sm text-foreground-light mb-4">
+                    At the end of your billing cycle, compute costs will be calculated and added to
+                    your plan costs. Each active project will use at least $10 of compute a month
+                    (billed hourly).
+                  </p>
+                  {subscriptionPreviewError && (
+                    <AlertError
+                      error={subscriptionPreviewError}
+                      subject="Failed to preview subscription."
+                    />
+                  )}
+
+                  {subscriptionPreviewIsLoading && (
+                    <div className="space-y-2 p-6">
+                      <span className="text-sm">Estimating monthly costs...</span>
+                      <ShimmeringLoader />
+                      <ShimmeringLoader className="w-3/4" />
+                      <ShimmeringLoader className="w-1/2" />
+                    </div>
+                  )}
+
+                  {subscriptionPreviewInitialized && (
+                    <>
+                      <Table className="[&_tr:last-child]:border-t font-mono text-xs">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="px-0 text-foreground-lighter py-2 h-auto">
+                              Item
+                            </TableHead>
+                            <TableHead className="text-right px-0 text-foreground-lighter py-2 h-auto">
+                              Cost
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {/* Non-compute items and Projects list */}
+                          {(() => {
+                            // Combine all compute-related projects
+                            const computeItems = subscriptionPreview.breakdown.filter(
+                              (item: any) =>
+                                item.description?.toLowerCase().includes('compute') &&
+                                item.breakdown?.length > 0
+                            )
+
+                            const allProjects = computeItems.flatMap((item: any) =>
+                              item.breakdown.map((project: any) => ({
+                                ...project,
+                                computeType: item.description.split(' ')[0], // Get first word of description
+                              }))
+                            )
+
+                            const nonComputeItems = subscriptionPreview.breakdown.filter(
+                              (item: any) =>
+                                !item.description?.toLowerCase().includes('compute') ||
+                                !(item.breakdown?.length > 0)
+                            )
+
+                            const content = (
+                              <>
+                                {/* Non-compute items */}
+                                {nonComputeItems.map((item: any) => (
+                                  <TableRow
+                                    key={item.description}
+                                    className="text-foreground-light"
+                                  >
+                                    <TableCell className="text-xs py-2 px-0">
+                                      <div className="flex items-center gap-1">
+                                        {item.description ?? 'Unknown'}
+                                      </div>
+                                    </TableCell>
+                                    <TableCell className="text-right text-xs py-2 px-0">
+                                      {formatCurrency(item.total_price)}
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+
+                                {/* Combined projects section */}
+                                {allProjects.length > 0 && (
+                                  <>
+                                    <TableRow className="text-foreground-light">
+                                      <TableCell className="!py-2 px-0">Projects</TableCell>
+                                      <TableCell className="text-right py-2 px-0">
+                                        {formatCurrency(
+                                          computeItems.reduce(
+                                            (sum: number, item: any) => sum + item.total_price,
+                                            0
+                                          )
+                                        )}
+                                      </TableCell>
+                                    </TableRow>
+                                    {/* Show first 3 projects */}
+                                    {allProjects.slice(0, 3).map((project: any) => (
+                                      <TableRow
+                                        key={project.project_ref}
+                                        className="text-foreground-light"
+                                      >
+                                        <TableCell className="!py-2 px-0 pl-6">
+                                          {project.project_name} ({project.computeType} for{' '}
+                                          {project.usage} hours)
+                                        </TableCell>
+                                      </TableRow>
+                                    ))}
+                                    {/* Show "+X more" row if more than 3 projects */}
+                                    {allProjects.length > 3 && (
+                                      <TableRow className="text-foreground-light">
+                                        <TableCell className="py-2 px-0 pl-6">
+                                          +{allProjects.length - 3} more projects
+                                        </TableCell>
+                                      </TableRow>
+                                    )}
+                                  </>
+                                )}
+                              </>
+                            )
+                            return content
+                          })()}
+
+                          <TableRow>
+                            <TableCell className="font-medium py-2 px-0">
+                              Total (per month)
+                            </TableCell>
+                            <TableCell className="text-right font-medium py-2 px-0">
+                              {formatCurrency(
+                                Math.round(
+                                  subscriptionPreview.breakdown.reduce(
+                                    (prev: number, cur: any) => prev + cur.total_price,
+                                    0
+                                  )
+                                ) ?? 0
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </>
+                  )}
+                </HoverCardContent>
+              </HoverCard>
             </div>
 
             <div className="mt-4 py-4">
@@ -269,7 +445,7 @@ const SubscriptionPlanUpdateDialog = ({
           <div className="bg-surface-100 p-8 flex flex-col border-l">
             {topFeatures.length > 0 && (
               <div className="mb-4">
-                <h3 className="text-md font-medium mb-2">Upgrade features</h3>
+                <h3 className="text-sm mb-2">Upgrade features</h3>
 
                 <div className="space-y-2 mb-4 text-foreground-light">
                   {topFeatures.map((feature) => (
@@ -288,130 +464,12 @@ const SubscriptionPlanUpdateDialog = ({
                 </div>
               </div>
             )}
-            <h3 className="text-md font-medium mb-2">Estimating your invoice</h3>
-            <p className="text-sm text-foreground-light mb-4">
-              At the end of your billing cycle, compute costs will be calculated and added to your
-              plan costs. Each active project will use at least $10 of compute a month (billed
-              hourly).
-            </p>
-            <HoverCard>
-              <HoverCardTrigger asChild>
-                <Card className="cursor-help text-sm">
-                  <CardContent className="flex items-center gap-2 py-2 px-3 bg-surface-200">
-                    <InfoIcon strokeWidth={1.5} size={16} className="text-foreground-light" />
-                    Next invoice estimate is{' '}
-                    {formatCurrency(
-                      Math.round(
-                        subscriptionPreview?.breakdown.reduce(
-                          (prev: number, cur: any) => prev + cur.total_price,
-                          0
-                        )
-                      ) ?? 0
-                    )}
-                  </CardContent>
-                </Card>
-              </HoverCardTrigger>
-              <HoverCardContent className="w-[520px] p-6">
-                {subscriptionPreviewError && (
-                  <AlertError
-                    error={subscriptionPreviewError}
-                    subject="Failed to preview subscription."
-                  />
-                )}
-
-                {subscriptionPreviewIsLoading && (
-                  <div className="space-y-2 p-6">
-                    <span className="text-sm">Estimating monthly costs...</span>
-                    <ShimmeringLoader />
-                    <ShimmeringLoader className="w-3/4" />
-                    <ShimmeringLoader className="w-1/2" />
-                  </div>
-                )}
-
-                {subscriptionPreviewInitialized && (
-                  <>
-                    <h3 className="sm mb-4 text-sm">Invoice estimate breakdown</h3>
-                    <Table className="[&_tr:last-child]:border-t font-mono text-xs">
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="px-0 text-foreground-lighter py-2 h-auto">
-                            Item
-                          </TableHead>
-                          <TableHead className="text-right px-0 text-foreground-lighter py-2 h-auto">
-                            Cost
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {subscriptionPreview.breakdown.map((item: any) => (
-                          <>
-                            <TableRow key={item.description} className="text-foreground-light">
-                              <TableCell className="text-xs py-2 px-0">
-                                <div className="flex items-center gap-1">
-                                  {item.breakdown && item.breakdown.length > 0 && (
-                                    <Button
-                                      type="text"
-                                      className="!pl-0 !pr-1"
-                                      icon={
-                                        <ChevronRight
-                                          className={cn(
-                                            'transition',
-                                            usageFeesExpanded.includes(item.description) &&
-                                              'rotate-90'
-                                          )}
-                                        />
-                                      }
-                                      onClick={() =>
-                                        usageFeesExpanded.includes(item.description)
-                                          ? collapseUsageFee(item.description)
-                                          : expandUsageFee(item.description)
-                                      }
-                                    />
-                                  )}
-                                  {item.description ?? 'Unknown'}{' '}
-                                  {item.description.endsWith('Compute') && ` (Hours)`}
-                                </div>
-                              </TableCell>
-                              <TableCell className="text-right text-xs py-2 px-0">
-                                {formatCurrency(item.total_price)}
-                              </TableCell>
-                            </TableRow>
-
-                            {usageFeesExpanded.includes(item.description) &&
-                              item.breakdown &&
-                              item.breakdown.length > 0 &&
-                              item.breakdown.map((project: any) => (
-                                <TableRow key={project.project_ref}>
-                                  <TableCell className="!pl-12 py-2 px-6">
-                                    {project.project_name}
-                                  </TableCell>
-                                  <TableCell className="text-right py-2 px-6">
-                                    {project.usage}
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                          </>
-                        ))}
-
-                        <TableRow>
-                          <TableCell className="font-medium py-2 px-0">Total (per month)</TableCell>
-                          <TableCell className="text-right font-medium py-2 px-0">
-                            {formatCurrency(
-                              Math.round(
-                                subscriptionPreview.breakdown.reduce(
-                                  (prev: number, cur: any) => prev + cur.total_price,
-                                  0
-                                )
-                              ) ?? 0
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </>
-                )}
-              </HoverCardContent>
-            </HoverCard>
+            <div className="border-t pt-6">
+              <blockquote className="text-sm text-foreground-light italic">
+                {testimonialTweet.text}
+                <div className="mt-2 text-foreground">— @{testimonialTweet.handle}</div>
+              </blockquote>
+            </div>
           </div>
         </div>
       </DialogContent>
