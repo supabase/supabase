@@ -986,9 +986,9 @@ export function FilterBar({
 
   return (
     <div className="w-full space-y-2 relative">
-      <div className="relative flex items-center w-full rounded-md border border-control bg-foreground/[.026]">
+      <div className="relative flex items-center w-full">
         <Search className="absolute left-1 top-1/2 transform -translate-y-1/2 text-foreground-muted w-4 h-4" />
-        <div className="flex-1 flex flex-wrap items-center pl-6 pr-1 py-1 gap-1 h-full">
+        <div className="flex-1 flex flex-wrap items-center pl-6 pr-1 py-0 gap-1 h-full">
           <FilterGroupComponent
             group={activeFilters}
             filterProperties={filterProperties}
@@ -1033,7 +1033,7 @@ export function FilterBar({
         </Command_Shadcn_>
       )}
       <Dialog open={isDialogOpen} onOpenChange={(open: boolean) => setIsDialogOpen(open)}>
-        <DialogContent hideClose className="!w-fit">
+        <DialogContent hideClose className="!w-fit max-w-screen">
           {dialogContent}
         </DialogContent>
       </Dialog>

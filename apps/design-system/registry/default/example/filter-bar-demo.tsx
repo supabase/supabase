@@ -14,16 +14,41 @@ import { Calendar as CalendarIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 function CustomDatePicker({ onChange, onCancel, search }: CustomOptionProps) {
-  const [date, setDate] = useState<Date | undefined>(search ? new Date(search) : undefined)
+  const [date, setDate] = useState<any | undefined>(
+    search
+      ? {
+          from: new Date(search),
+          to: undefined,
+        }
+      : undefined
+  )
 
   return (
     <div className="w-full space-y-4">
-      <Calendar mode="single" selected={date} onSelect={setDate} className="w-full" />
+      <Calendar
+        initialFocus
+        mode="range"
+        defaultMonth={date?.from}
+        selected={date}
+        onSelect={setDate}
+        className="w-full"
+      />
       <div className="flex justify-end gap-2 py-3 px-4 border-t">
         <Button type="default" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="primary" onClick={() => onChange(date ? format(date, 'yyyy-MM-dd') : '')}>
+        <Button
+          type="primary"
+          onClick={() =>
+            onChange(
+              date?.from
+                ? date.to
+                  ? `${format(date.from, 'yyyy-MM-dd')} - ${format(date.to, 'yyyy-MM-dd')}`
+                  : format(date.from, 'yyyy-MM-dd')
+                : ''
+            )
+          }
+        >
           Apply
         </Button>
       </div>
