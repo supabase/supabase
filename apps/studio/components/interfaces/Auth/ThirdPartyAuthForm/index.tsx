@@ -18,12 +18,14 @@ import { AddIntegrationDropdown } from './AddIntegrationDropdown'
 import { CreateAuth0IntegrationDialog } from './CreateAuth0Dialog'
 import { CreateAwsCognitoAuthIntegrationDialog } from './CreateAwsCognitoAuthDialog'
 import { CreateFirebaseAuthIntegrationDialog } from './CreateFirebaseAuthDialog'
+import { CreateClerkAuthIntegrationDialog } from './CreateClerkAuthDialog'
 import { IntegrationCard } from './IntegrationCard'
 import {
   getIntegrationType,
   getIntegrationTypeLabel,
   INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
+import Link from 'next/link'
 
 export const ThirdPartyAuthForm = () => {
   const { ref: projectRef } = useParams()
@@ -65,13 +67,16 @@ export const ThirdPartyAuthForm = () => {
         }
         docsUrl="https://supabase.com/docs/guides/auth/third-party/overview"
       />
-      <div className="prose text-sm mb-6 max-w-full">
-        <span>
-          Billing is based on the number of monthly active users (MAUs) requesting your API
-          throughout the billing period (50 included then you'll be charged{' '}
-        </span>
-        <span className="text-brand">$0.00325</span>
-        <span> per MAU).</span>
+      <div className="prose text-sm mb-6 max-w-full prose">
+        Billing is based on the number of distinct monthly active users (MAUs) requesting your API
+        throughout the billing period, see{' '}
+        <Link
+          href="/docs/guides/platform/manage-your-usage/monthly-active-users-third-party"
+          target="_blank"
+        >
+          billing docs
+        </Link>
+        .
       </div>
       {isLoading && (
         <div
@@ -128,6 +133,12 @@ export const ThirdPartyAuthForm = () => {
 
       <CreateAuth0IntegrationDialog
         visible={selectedIntegration === 'auth0'}
+        onDelete={() => {}}
+        onClose={() => setSelectedIntegration(undefined)}
+      />
+
+      <CreateClerkAuthIntegrationDialog
+        visible={selectedIntegration === 'clerk'}
         onDelete={() => {}}
         onClose={() => setSelectedIntegration(undefined)}
       />
