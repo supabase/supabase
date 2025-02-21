@@ -19,7 +19,7 @@ export const LogPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     router.replace(`/project/${ref}/logs/${lastVisitedLogsPage}`)
-  }, [router, lastVisitedLogsPage, ref])
+  }, [])
 
   return null
 }

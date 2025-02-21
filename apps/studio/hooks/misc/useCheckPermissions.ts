@@ -3,11 +3,11 @@ import jsonLogic from 'json-logic-js'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
 import type { Permission } from 'types'
 import { useSelectedOrganization } from './useSelectedOrganization'
 import { useSelectedProject } from './useSelectedProject'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
@@ -109,7 +109,10 @@ export function useGetProjectPermissions(
     permissions,
     organizationSlug,
     projectRef,
+    error: permissionsResult.error,
+    isError: permissionsResult.isError,
     isLoading: permissionsResult.isLoading,
+    isSuccess: permissionsResult.isSuccess,
   }
 }
 
@@ -192,7 +195,10 @@ export function useAsyncCheckProjectPermissions(
     permissions: allPermissions,
     organizationSlug: _organizationSlug,
     projectRef: _projectRef,
+    error: permissionsError,
+    isError: isPermissionsError,
     isLoading: isPermissionsLoading,
+    isSuccess: isPermissionsSuccess,
   } = useGetProjectPermissions(permissions, organizationSlug, projectRef, isLoggedIn)
 
   if (!isLoggedIn)
@@ -207,7 +213,10 @@ export function useAsyncCheckProjectPermissions(
     }
 
   return {
+    error: permissionsError,
+    isError: isPermissionsError,
     isLoading: isPermissionsLoading,
+    isSuccess: isPermissionsSuccess,
     can: doPermissionsCheck(allPermissions, action, resource, data, _organizationSlug, _projectRef),
   }
 }

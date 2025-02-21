@@ -13,9 +13,6 @@ setup('Authenticate', async ({ page }) => {
   await page.getByLabel('Email').fill(process.env.EMAIL ?? '')
   await page.getByLabel('Password').fill(process.env.PASSWORD ?? '')
   await page.getByRole('button', { name: 'Sign In' }).click()
-
-  await page.pause()
-
   await page.waitForURL('./projects')
   await page.context().storageState({ path: authFile })
 })

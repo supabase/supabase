@@ -10,13 +10,19 @@ const LOGS_PAGES = [
 test.describe('Logs', async () => {
   for (const logPage of LOGS_PAGES) {
     test.describe(`${logPage.label} logs page`, () => {
-      test('can navigate to logs page', async ({ page, ref }) => {
-        await page.goto(`./project/${ref}`)
-        await page.locator('a', { hasText: 'Logs' }).click({ timeout: 10000 })
-        await expect(page.getByRole('heading', { name: 'Logs & Analytics' })).toBeVisible()
+      test('can navigate to logs page', async ({ page, ref, apiUrl }) => {
+        await page.goto(`./project/${ref}`, { waitUntil: 'load' })
+
+        // [Joshen] To investigate - without waiting for permissions, the test seems to get redirected to /logs/logs
+        await page.waitForResponse((response) =>
+          response.url().includes(`${apiUrl}/platform/profile/permissions`)
+        )
+
+        await page.locator('a', { hasText: 'Logs' }).click({ timeout: 20000 })
 
         // Click anywhere on the screen to close the sidebar
         await page.click('body')
+        await expect(page.getByRole('heading', { name: 'Logs & Analytics' })).toBeVisible()
 
         await page
           .getByRole('link', { name: logPage.label, exact: true })

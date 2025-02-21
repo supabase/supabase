@@ -15,36 +15,35 @@ interface LogsLayoutProps {
 }
 
 const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => {
-  const { isLoading, can: canUseLogsExplorer } = useAsyncCheckProjectPermissions(
-    PermissionAction.ANALYTICS_READ,
-    'logflare'
-  )
+  const {
+    isLoading,
+    isSuccess,
+    can: canUseLogsExplorer,
+  } = useAsyncCheckProjectPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
 
   const router = useRouter()
   const [_, setLastLogsPage] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
-    router.pathname.split('/').pop()
+    'explorer'
   )
 
   useEffect(() => {
     if (router.pathname.includes('/logs/')) {
-      const path = router.pathname.split('/').pop()
-      setLastLogsPage(path)
+      const path = router.pathname.split('/logs/').pop()
+      if (path) setLastLogsPage(path)
     }
-  }, [router, setLastLogsPage])
+  }, [router.pathname])
 
-  if (!canUseLogsExplorer) {
-    if (isLoading) {
-      return <ProjectLayout isLoading></ProjectLayout>
-    }
+  if (isLoading) {
+    return <ProjectLayout isLoading />
+  }
 
-    if (!isLoading && !canUseLogsExplorer) {
-      return (
-        <ProjectLayout>
-          <NoPermission isFullPage resourceText="access your project's logs" />
-        </ProjectLayout>
-      )
-    }
+  if (isSuccess && !canUseLogsExplorer) {
+    return (
+      <ProjectLayout>
+        <NoPermission isFullPage resourceText="access your project's logs" />
+      </ProjectLayout>
+    )
   }
 
   return (
