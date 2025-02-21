@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
-import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
+import { SITE_ORIGIN, LW_URL } from '~/lib/constants'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
@@ -16,7 +16,6 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
-import AnimatedParticles from '~/components/LaunchWeek/8/AnimatedParticles/ParticlesCanvas'
 
 const LW8Releases = dynamic(() => import('~/components/LaunchWeek/8/Releases'))
 const LW8Meetups = dynamic(() => import('~/components/LaunchWeek/8/LW8Meetups'))
@@ -106,7 +105,7 @@ export default function TicketHome({ users, meetups }: Props) {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: SITE_URL,
+          url: LW_URL,
           images: [
             {
               url: OG_IMAGE,
@@ -134,12 +133,11 @@ export default function TicketHome({ users, meetups }: Props) {
           <div className="-mt-[65px]">
             <div className="relative">
               <div className="relative z-10">
-                <SectionContainer className="relative flex flex-col justify-around items-center min-h-[500px] !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !px-0 !mx-auto">
+                <SectionContainer className="relative flex flex-col justify-around items-center min-h-[200px] !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !px-0 !mx-auto">
                   <div className="absolute bottom-0 z-10 w-full flex flex-col items-center justify-end gap-4 px-6">
                     <LaunchWeekLogoHeader />
                   </div>
                   <div className="absolute inset-0 z-0 flex items-center justify-center">
-                    <AnimatedParticles />
                     <Image
                       src="/images/launchweek/8/stars.svg"
                       alt="starts background"

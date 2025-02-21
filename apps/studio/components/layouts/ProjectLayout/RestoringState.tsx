@@ -126,7 +126,12 @@ const RestoringState = () => {
                 icon={<Download />}
                 loading={isDownloading}
                 disabled={backups.length === 0}
-                tooltip={{ content: { side: 'bottom', text: 'No available backups to download' } }}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: backups.length === 0 ? 'No available backups to download' : undefined,
+                  },
+                }}
                 onClick={onClickDownloadBackup}
               >
                 Download backup

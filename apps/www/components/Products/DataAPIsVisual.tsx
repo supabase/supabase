@@ -1,9 +1,14 @@
 import React from 'react'
 import Image from 'next/image'
 import { range } from 'lodash'
+import { cn } from 'ui'
 
-const DataAPIsVisual = () => (
-  <figure className="absolute inset-0 overflow-hidden">
+interface Props {
+  className?: string
+}
+
+const DataAPIsVisual: React.FC<Props> = ({ className }) => (
+  <figure className={cn('absolute inset-0 overflow-hidden', className)}>
     <div className="absolute z-0 inset-0 flex flex-nowrap">
       {range(0, 3).map((_, idx1: number) => (
         <div

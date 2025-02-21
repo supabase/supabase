@@ -8,9 +8,11 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const IndexesPage: NextPageWithLayout = () => {
   return (
@@ -23,17 +25,11 @@ const IndexesPage: NextPageWithLayout = () => {
             description="Improve query performance against your database"
           />
         </ScaffoldSectionContent>
-        <ScaffoldSectionDetail className="flex items-center justify-end gap-2 flex-wrap">
-          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              className="no-underline"
-              href="https://supabase.com/docs/guides/database/query-optimization"
-            >
-              Documentation
-            </a>
-          </Button>
+        <ScaffoldSectionDetail className="flex items-center lg:justify-end gap-2 flex-wrap">
+          <DocsButton
+            className="no-underline"
+            href="https://supabase.com/docs/guides/database/query-optimization"
+          />
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <a
               target="_blank"
@@ -41,7 +37,7 @@ const IndexesPage: NextPageWithLayout = () => {
               className="no-underline"
               href="https://supabase.com/docs/guides/database/extensions/index_advisor"
             >
-              Optimization with index_advisor
+              Index Advisor
             </a>
           </Button>
         </ScaffoldSectionDetail>
@@ -53,6 +49,10 @@ const IndexesPage: NextPageWithLayout = () => {
   )
 }
 
-IndexesPage.getLayout = (page) => <DatabaseLayout title="Indexes">{page}</DatabaseLayout>
+IndexesPage.getLayout = (page) => (
+  <DefaultLayout>
+    <DatabaseLayout title="Indexes">{page}</DatabaseLayout>
+  </DefaultLayout>
+)
 
 export default IndexesPage

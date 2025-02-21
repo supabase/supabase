@@ -10,10 +10,10 @@ Andrew Valleteau
 Angelico de los Reyes
 Ant Wilson
 Ariuna K
+Artur Zakirov
 Beng Eu
 Bo Lu
 Bobbie Soedirgo
-Bruno Andrade
 Carel de Waal
 Chandana Anumula
 Charis Lam
@@ -32,18 +32,21 @@ Egor Romanov
 Etienne Stalmans
 Fabrizio Fenoglio
 Francesco Sansalvadore
+Greg P
 Greg Richardson
 Guilherme Souza
 Haydn Maley
 Hieu Pham
+Illia Basalaiev
 Inian P
+Ivan Vasilov
 Jenny Kibiri
 Jess Shears
-Joel Lee
 John Pena
 Jon M
 Jonny Summers-Muir
 Jordi Enric
+José Luis Ledesma
 Joshen Lim
 Julien Goux
 Kamil Ogórek
@@ -54,11 +57,13 @@ Kevin Brolly
 Kevin Grüneberg
 Lakshan Perera
 Laura C
+Laurence Isla
 Long Hoang
 Łukasz Niemier
 Margarita Sandomirskaia
 Mark Burggraf
-Monica El Khoury
+Monica Khoury
+Nyannyacha
 Oli R
 Pamela Chia
 Paul Caselton
@@ -73,6 +78,7 @@ Rory Wilding
 Sam Rose
 Sreyas Udayavarman
 Stanislav M
+Stephen Morgan
 Steve Chavez
 Stojan Dimitrovski
 Supun Sudaraka Kalidasa
@@ -80,6 +86,7 @@ Terry Sutton
 Thomas E
 Thor Schaeff
 Tom Ashley
+Tom G
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
@@ -99,7 +106,7 @@ TECHNOLOGIES
 
 Supabase would not be possible without the work of some other amazing open source contributors.
 
-- Postgres - https://www.postgresql.org/docs/devel/git.html
+- Postgres - https://www.postgresql.org/
 - PostgREST - https://github.com/PostgREST
 - Kong - https://github.com/kong/
 - Next.js - https://nextjs.org/

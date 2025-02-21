@@ -2,7 +2,6 @@ import Editor from '@monaco-editor/react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo, useRef } from 'react'
-import { format } from 'sql-formatter'
 
 import { useParams } from 'common'
 import Footer from 'components/grid/components/footer/Footer'
@@ -10,73 +9,60 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableDefinitionQuery } from 'data/database/table-definition-query'
 import { useViewDefinitionQuery } from 'data/database/view-definition-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import useEntityType from 'hooks/misc/useEntityType'
+import {
+  Entity,
+  isMaterializedView,
+  isTableLike,
+  isView,
+  isViewLike,
+} from 'data/table-editor/table-editor-types'
+import { formatSql } from 'lib/formatSql'
 import { timeout } from 'lib/helpers'
 import { Button } from 'ui'
 
 export interface TableDefinitionProps {
-  id?: number
+  entity?: Entity
 }
 
-const TableDefinition = ({ id }: TableDefinitionProps) => {
+const TableDefinition = ({ entity }: TableDefinitionProps) => {
   const { ref } = useParams()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
   const { resolvedTheme } = useTheme()
-  const entityType = useEntityType(id)
   const { project } = useProjectContext()
 
   const viewResult = useViewDefinitionQuery(
     {
-      schema: entityType?.schema,
-      name: entityType?.name,
+      id: entity?.id,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
     {
-      enabled:
-        entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW,
+      enabled: isViewLike(entity),
     }
   )
 
   const tableResult = useTableDefinitionQuery(
     {
-      schema: entityType?.schema,
-      name: entityType?.name,
+      id: entity?.id,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
     {
-      enabled: entityType?.type === ENTITY_TYPE.TABLE,
+      enabled: isTableLike(entity),
     }
   )
 
-  const { data: definition, isLoading } =
-    entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
-      ? viewResult
-      : tableResult
+  const { data: definition, isLoading } = isViewLike(entity) ? viewResult : tableResult
 
-  const prepend =
-    entityType?.type === ENTITY_TYPE.VIEW
-      ? `create view ${entityType.schema}.${entityType.name} as\n`
-      : entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
-        ? `create materialized view ${entityType.schema}.${entityType.name} as\n`
-        : ''
-
-  const formatDefinition = (value: string) => {
-    try {
-      return format(value, {
-        language: 'postgresql',
-        keywordCase: 'lower',
-      })
-    } catch (err) {
-      return value
-    }
-  }
+  const prepend = isView(entity)
+    ? `create view ${entity.schema}.${entity.name} as\n`
+    : isMaterializedView(entity)
+      ? `create materialized view ${entity.schema}.${entity.name} as\n`
+      : ''
 
   const formattedDefinition = useMemo(
-    () => (definition ? formatDefinition(prepend + definition) : undefined),
+    () => (definition ? formatSql(prepend + definition) : undefined),
     [definition]
   )
 

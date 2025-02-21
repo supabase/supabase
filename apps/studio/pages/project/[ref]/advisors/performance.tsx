@@ -13,10 +13,11 @@ import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import { LoadingLine } from 'ui'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
-  const { preset, id } = useParams()
+  const { ref, preset, id } = useParams()
 
   // need to maintain a list of filters for each tab
   const [filters, setFilters] = useState<{ level: LINTER_LEVELS; filters: string[] }[]>([
@@ -24,7 +25,6 @@ const ProjectLints: NextPageWithLayout = () => {
     { level: LINTER_LEVELS.WARN, filters: [] },
     { level: LINTER_LEVELS.INFO, filters: [] },
   ])
-
   const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
     (preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR
   )
@@ -34,25 +34,15 @@ const ProjectLints: NextPageWithLayout = () => {
     projectRef: project?.ref,
   })
 
-  let clientLints: Lint[] = []
-
   const activeLints = useMemo(() => {
-    return [...(data ?? []), ...clientLints]?.filter((x) => x.categories.includes('PERFORMANCE'))
+    return [...(data ?? [])]?.filter((x) => x.categories.includes('PERFORMANCE'))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
-
-  useEffect(() => {
-    // check the URL for an ID and set the selected lint
-    if (id) setSelectedLint(activeLints.find((lint) => lint.cache_key === id) ?? null)
-  }, [id, activeLints])
-
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
-
   const filteredLints = activeLints
     .filter((x) => x.level === currentTab)
     .filter((x) => (currentTabFilters.length > 0 ? currentTabFilters.includes(x.name) : x))
-
   const filterOptions = lintInfoMap
     // only show filters for lint types which are present in the results and not ignored
     .filter((item) =>
@@ -62,6 +52,11 @@ const ProjectLints: NextPageWithLayout = () => {
       name: type.title,
       value: type.name,
     }))
+
+  useEffect(() => {
+    // check the URL for an ID and set the selected lint
+    if (id) setSelectedLint(activeLints.find((lint) => lint.cache_key === id) ?? null)
+  }, [id, activeLints])
 
   return (
     <div className="h-full flex flex-col">
@@ -80,9 +75,12 @@ const ProjectLints: NextPageWithLayout = () => {
       <LinterFilters
         filterOptions={filterOptions}
         activeLints={activeLints}
+        filteredLints={filteredLints}
         currentTab={currentTab}
         filters={filters}
+        isLoading={isLoading || isRefetching}
         setFilters={setFilters}
+        onClickRefresh={refetch}
       />
       <LoadingLine loading={isRefetching} />
       <LinterDataGrid
@@ -97,6 +95,10 @@ const ProjectLints: NextPageWithLayout = () => {
   )
 }
 
-ProjectLints.getLayout = (page) => <AdvisorsLayout title="Linter">{page}</AdvisorsLayout>
+ProjectLints.getLayout = (page) => (
+  <DefaultLayout>
+    <AdvisorsLayout title="Linter">{page}</AdvisorsLayout>
+  </DefaultLayout>
+)
 
 export default ProjectLints

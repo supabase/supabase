@@ -1,17 +1,164 @@
+import type { Message as MessageType } from 'ai/react'
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { proxy, snapshot, useSnapshot } from 'valtio'
+import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
+import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
+import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 
-const EMPTY_DASHBOARD_HISTORY: {
+export type CommonDatabaseEntity = {
+  id: number
+  name: string
+  schema: string
+  [key: string]: any
+}
+
+export type SuggestionsType = {
+  title: string
+  prompts?: string[]
+}
+
+export type Template = {
+  name: string
+  description: string
+  content: string
+}
+
+type AiAssistantPanelType = {
+  open: boolean
+  messages: MessageType[]
+  initialInput: string
+  sqlSnippets?: string[]
+  suggestions?: SuggestionsType
+  editor?: SupportedAssistantEntities | null
+  // Raw string content for the monaco editor, currently used to retain where the user left off when toggling off the panel
+  content?: string
+  // Mainly used for editing a database entity (e.g editing a function, RLS policy etc)
+  entity?: CommonDatabaseEntity
+  tables: { schema: string; name: string }[]
+}
+
+type EditorPanelType = {
+  open: boolean
+  initialValue?: string
+  label?: string
+  saveLabel?: string
+  onSave?: (value: string) => void
+  functionName?: string
+  templates?: Template[]
+  initialPrompt?: string
+}
+
+type DashboardHistoryType = {
   sql?: string
   editor?: string
-} = {
+}
+
+const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
+  open: false,
+  messages: [],
+  sqlSnippets: undefined,
+  initialInput: '',
+  suggestions: undefined,
+  editor: null,
+  content: '',
+  entity: undefined,
+  tables: [],
+}
+
+const INITIAL_EDITOR_PANEL: EditorPanelType = {
+  open: false,
+  initialValue: '',
+  label: '',
+  saveLabel: '',
+  initialPrompt: '',
+  templates: SQL_TEMPLATES.filter((template) => template.type === 'template').map((template) => ({
+    name: template.title,
+    description: template.description,
+    content: template.sql,
+  })),
+}
+
+const EMPTY_DASHBOARD_HISTORY: DashboardHistoryType = {
   sql: undefined,
   editor: undefined,
 }
 
+const getInitialState = () => {
+  if (typeof window === 'undefined') {
+    return {
+      aiAssistantPanel: INITIAL_AI_ASSISTANT,
+      editorPanel: INITIAL_EDITOR_PANEL,
+      dashboardHistory: EMPTY_DASHBOARD_HISTORY,
+      activeDocsSection: ['introduction'],
+      docsLanguage: 'js',
+      showProjectApiDocs: false,
+      isOptedInTelemetry: false,
+      showEnableBranchingModal: false,
+      showFeaturePreviewModal: false,
+      selectedFeaturePreview: '',
+      showAiSettingsModal: false,
+      showGenerateSqlModal: false,
+      navigationPanelOpen: false,
+      navigationPanelJustClosed: false,
+      ongoingQueriesPanelOpen: false,
+      mobileMenuOpen: false,
+    }
+  }
+
+  const stored = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE)
+  const storedEditor = localStorage.getItem(LOCAL_STORAGE_KEYS.EDITOR_PANEL_STATE)
+
+  const urlParams = new URLSearchParams(window.location.search)
+  const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
+
+  let parsedAiAssistant = INITIAL_AI_ASSISTANT
+  let parsedEditorPanel = INITIAL_EDITOR_PANEL
+
+  try {
+    if (stored) {
+      parsedAiAssistant = JSON.parse(stored, (key, value) => {
+        if (key === 'createdAt' && value) {
+          return new Date(value)
+        }
+        return value
+      })
+    }
+    if (storedEditor) {
+      parsedEditorPanel = JSON.parse(storedEditor)
+    }
+  } catch {
+    // Ignore parsing errors
+  }
+
+  return {
+    aiAssistantPanel: {
+      ...parsedAiAssistant,
+      open:
+        aiAssistantPanelOpenParam !== null
+          ? aiAssistantPanelOpenParam === 'true'
+          : parsedAiAssistant.open,
+    },
+    editorPanel: parsedEditorPanel,
+    dashboardHistory: EMPTY_DASHBOARD_HISTORY,
+    activeDocsSection: ['introduction'],
+    docsLanguage: 'js',
+    showProjectApiDocs: false,
+    isOptedInTelemetry: false,
+    showEnableBranchingModal: false,
+    showFeaturePreviewModal: false,
+    selectedFeaturePreview: '',
+    showAiSettingsModal: false,
+    showGenerateSqlModal: false,
+    navigationPanelOpen: false,
+    navigationPanelJustClosed: false,
+    ongoingQueriesPanelOpen: false,
+    mobileMenuOpen: false,
+  }
+}
+
 export const appState = proxy({
-  // [Joshen] Last visited "entity" for any page that we wanna track
-  dashboardHistory: EMPTY_DASHBOARD_HISTORY,
+  ...getInitialState(),
+
   setDashboardHistory: (ref: string, key: 'sql' | 'editor', id: string) => {
     if (appState.dashboardHistory[key] !== id) {
       appState.dashboardHistory[key] = id
@@ -36,28 +183,33 @@ export const appState = proxy({
   },
 
   isOptedInTelemetry: false,
-  setIsOptedInTelemetry: (value: boolean) => {
-    appState.isOptedInTelemetry = value
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
+  setIsOptedInTelemetry: (value: boolean | null) => {
+    appState.isOptedInTelemetry = value === null ? false : value
+    if (typeof window !== 'undefined' && value !== null) {
+      localStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
     }
   },
+
   showEnableBranchingModal: false,
   setShowEnableBranchingModal: (value: boolean) => {
     appState.showEnableBranchingModal = value
   },
+
   showFeaturePreviewModal: false,
   setShowFeaturePreviewModal: (value: boolean) => {
     appState.showFeaturePreviewModal = value
   },
+
   selectedFeaturePreview: '',
   setSelectedFeaturePreview: (value: string) => {
     appState.selectedFeaturePreview = value
   },
+
   showAiSettingsModal: false,
   setShowAiSettingsModal: (value: boolean) => {
     appState.showAiSettingsModal = value
   },
+
   showGenerateSqlModal: false,
   setShowGenerateSqlModal: (value: boolean) => {
     appState.showGenerateSqlModal = value
@@ -67,18 +219,14 @@ export const appState = proxy({
   navigationPanelJustClosed: false,
   setNavigationPanelOpen: (value: boolean, trackJustClosed: boolean = false) => {
     if (value === false) {
-      // If closing navigation panel by clicking on icon/button, nav bar should not open again until mouse leaves nav bar
       if (trackJustClosed) {
         appState.navigationPanelOpen = false
         appState.navigationPanelJustClosed = true
       } else {
-        // If closing navigation panel by leaving nav bar, nav bar can open again when mouse re-enter
         appState.navigationPanelOpen = false
         appState.navigationPanelJustClosed = false
       }
     } else {
-      // If opening nav panel, check if it was just closed by a nav icon/button click
-      // If yes, do not open nav panel, otherwise open as per normal
       if (appState.navigationPanelJustClosed === false) {
         appState.navigationPanelOpen = true
       }
@@ -87,7 +235,85 @@ export const appState = proxy({
   setNavigationPanelJustClosed: (value: boolean) => {
     appState.navigationPanelJustClosed = value
   },
+
+  resetAiAssistantPanel: () => {
+    appState.aiAssistantPanel = {
+      ...INITIAL_AI_ASSISTANT,
+      open: appState.aiAssistantPanel.open,
+    }
+  },
+
+  setAiAssistantPanel: (value: Partial<AiAssistantPanelType>) => {
+    // Close Editor panel if AI Assistant panel is being opened
+    if (value.open && appState.editorPanel.open) {
+      appState.editorPanel.open = false
+    }
+
+    const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
+    appState.aiAssistantPanel = {
+      ...appState.aiAssistantPanel,
+      content: hasEntityChanged ? '' : appState.aiAssistantPanel.content,
+      ...value,
+    }
+  },
+
+  saveLatestMessage: (message: any) => {
+    appState.aiAssistantPanel = {
+      ...appState.aiAssistantPanel,
+      messages: [...appState.aiAssistantPanel.messages, message],
+    }
+  },
+
+  showOngoingQueriesPanelOpen: false,
+  setOnGoingQueriesPanelOpen: (value: boolean) => {
+    appState.ongoingQueriesPanelOpen = value
+  },
+
+  setEditorPanel: (value: Partial<EditorPanelType>) => {
+    // Close AI Assistant panel if editor panel is being opened
+    if (value.open && appState.aiAssistantPanel.open) {
+      appState.aiAssistantPanel.open = false
+    }
+
+    // Reset templates to initial if initialValue is empty
+    if (value.initialValue === '') {
+      value.templates = INITIAL_EDITOR_PANEL.templates
+    }
+
+    if (!value.open) {
+      value.initialPrompt = INITIAL_EDITOR_PANEL.initialPrompt
+    }
+
+    appState.editorPanel = {
+      ...appState.editorPanel,
+      ...value,
+    }
+  },
+
+  mobileMenuOpen: false,
+  setMobileMenuOpen: (value: boolean) => {
+    appState.mobileMenuOpen = value
+  },
 })
+
+// Set up localStorage subscriptions
+if (typeof window !== 'undefined') {
+  subscribe(appState, () => {
+    // Save AI assistant state with limited message history
+    const aiAssistantState = {
+      ...appState.aiAssistantPanel,
+      // limit to 20 messages so as to not overflow the context window
+      messages: appState.aiAssistantPanel.messages?.slice(-20),
+    }
+    localStorage.setItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE, JSON.stringify(aiAssistantState))
+
+    // Save editor panel state
+    localStorage.setItem(
+      LOCAL_STORAGE_KEYS.EDITOR_PANEL_STATE,
+      JSON.stringify(appState.editorPanel)
+    )
+  })
+}
 
 export const getAppStateSnapshot = () => snapshot(appState)
 

@@ -8,7 +8,7 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    
+
     <QuickstartDbSetup />
 
   </StepHikeCompact.Step>
@@ -58,7 +58,7 @@ hideToc: true
     <ProjectConfigVariables variable="url" />
     <ProjectConfigVariables variable="anonKey" />
 
-    Add a `getCountries` function to fetch the data and display the query result to the page.
+    Add a `getInstruments` function to fetch the data and display the query result to the page.
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
@@ -70,17 +70,17 @@ hideToc: true
 
         const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>');
 
-        async function getCountries() {
-          const { data } = await supabase.from("countries").select();
+        async function getInstruments() {
+          const { data } = await supabase.from("instruments").select();
           return data;
         }
 
         function App() {
-          const [countries] = createResource(getCountries);
+          const [instruments] = createResource(getInstruments);
 
           return (
             <ul>
-              <For each={countries()}>{(country) => <li>{country.name}</li>}</For>
+              <For each={instruments()}>{(instrument) => <li>{instrument.name}</li>}</For>
             </ul>
           );
         }
@@ -95,7 +95,7 @@ hideToc: true
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Start the app">
 
-    Start the app and go to http://localhost:3000 in a browser and you should see the list of countries.
+    Start the app and go to http://localhost:3000 in a browser and you should see the list of instruments.
 
     </StepHikeCompact.Details>
 

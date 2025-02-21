@@ -2,22 +2,21 @@ import DevelopersDropdown from '~/components/Nav/DevelopersDropdown'
 import ProductDropdown from '~/components/Nav/ProductDropdown'
 
 import { data as DevelopersData } from 'data/Developers'
-import SolutionsData from 'data/Solutions'
-import { BlogPost } from 'contentlayer/generated'
+import MainProductsData from '~/data/MainProducts'
 
-export const getMenu = (latestBlogPosts: BlogPost[]) => ({
+export const getMenu = () => ({
   primaryNav: [
     {
       title: 'Product',
       hasDropdown: true,
       dropdown: <ProductDropdown />,
       dropdownContainerClassName: 'rounded-xl',
-      subMenu: SolutionsData,
+      subMenu: MainProductsData,
     },
     {
       title: 'Developers',
       hasDropdown: true,
-      dropdown: <DevelopersDropdown blogPosts={latestBlogPosts} />,
+      dropdown: <DevelopersDropdown />,
       dropdownContainerClassName: 'rounded-xl',
       subMenu: DevelopersData,
     },

@@ -188,6 +188,38 @@ export const lintInfoMap: LintInfo[] = [
     docsLink:
       'https://supabase.com/docs/guides/database/database-advisors?lint=0018_unsupported_reg_types&queryGroups=lint',
   },
+  {
+    name: 'ssl_not_enforced',
+    title: 'SSL not enforced',
+    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/database`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/platform/ssl-enforcement',
+  },
+  {
+    name: 'network_restrictions_not_set',
+    title: 'No network restrictions',
+    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/database`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/platform/network-restrictions',
+  },
+  {
+    name: 'pitr_not_enabled',
+    title: 'PITR not enabled',
+    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/database/backups/pitr`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/platform/backups#point-in-time-recovery',
+  },
+  {
+    name: 'password_requirements_min_length',
+    title: 'Minimum password length not set or inadequate',
+    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/auth`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
+  },
 ]
 
 export const LintCTA = ({

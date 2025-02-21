@@ -1,8 +1,12 @@
 import React, { useRef, useState } from 'react'
 import Image from 'next/image'
 import { isBrowser, useReducedMotion } from 'common'
+import { cn } from 'ui'
+interface Props {
+  className?: string
+}
 
-const RealtimeVisual = () => {
+const RealtimeVisual: React.FC<Props> = ({ className }) => {
   const cardRef = useRef<HTMLDivElement | null>(null)
   const [svgTransformSelf, setSvgTransformSelf] = useState<string>('translate(0px, 0px)')
   const [svgTransform, setSvgTransform] = useState<string>('translate(0px, 0px)')
@@ -39,7 +43,10 @@ const RealtimeVisual = () => {
   return (
     <figure
       ref={cardRef}
-      className="absolute inset-0 xl:-bottom-2 2xl:bottom-0 z-0 w-full overflow-hidden pointer-events-auto"
+      className={cn(
+        'absolute inset-0 xl:-bottom-2 2xl:bottom-0 z-0 w-full overflow-hidden pointer-events-auto',
+        className
+      )}
       role="img"
       aria-label="Supabase Realtime multiplayer app demo"
       onMouseMove={reduceMotion ? undefined : handleMouseMove}

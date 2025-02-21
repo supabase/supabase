@@ -2,14 +2,13 @@ import dayjs from 'dayjs'
 import { ComponentProps, useState } from 'react'
 import {
   Bar,
+  CartesianGrid,
   Cell,
   Legend,
   BarChart as RechartBarChart,
   Tooltip,
   XAxis,
-  Label,
   YAxis,
-  CartesianGrid,
 } from 'recharts'
 
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
@@ -96,7 +95,7 @@ const BarChart = ({
     return (
       <NoDataPlaceholder
         message={emptyStateMessage}
-        description="It may take up to 24 hours for data to show"
+        description="It may take up to 24 hours for data to refresh"
         size={size}
         className={className}
         attribute={title}
@@ -155,7 +154,7 @@ const BarChart = ({
             dataKey={yAxisKey}
             fill={CHART_COLORS.GREEN_1}
             animationDuration={300}
-            // max bar size required to prevent bars from expanding to max width.
+            // Max bar size required to prevent bars from expanding to max width.
             maxBarSize={48}
           >
             {data?.map((_entry: Datum, index: any) => (

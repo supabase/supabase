@@ -1,9 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { post } from 'lib/common/fetch'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { serviceStatusKeys } from './keys'
-import { API_URL } from 'lib/constants'
 
 export type PostgresServiceStatusVariables = {
   projectRef?: string
@@ -20,14 +19,20 @@ export async function getPostgresServiceStatus(
   let headers = new Headers()
   headers.set('x-connection-encrypted', connectionString)
 
-  const response = await post(
-    `${API_URL}/pg-meta/${projectRef}/query?key=service_status`,
-    { query: 'select 1' },
-    { headers: Object.fromEntries(headers), signal }
-  )
+  const { error } = await post('/platform/pg-meta/{ref}/query', {
+    params: {
+      header: { 'x-connection-encrypted': connectionString! },
+      path: { ref: projectRef },
+      // @ts-expect-error Intentional key for easier reference of query in the network tab
+      query: { key: 'service_status' },
+    },
+    body: { query: 'select 1' },
+    headers,
+    signal,
+  })
 
-  if (response.error) throw response.error
-  return response.error === undefined
+  if (error) handleError(error)
+  return error === undefined
 }
 
 export type PostgresServiceStatusData = Awaited<ReturnType<typeof getPostgresServiceStatus>>

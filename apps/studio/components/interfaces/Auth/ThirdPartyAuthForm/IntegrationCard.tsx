@@ -1,11 +1,9 @@
-import { ExclamationCircleIcon } from '@heroicons/react/16/solid'
 import { Check } from 'lucide-react'
 import Image from 'next/image'
 
 import { useParams } from 'common'
 import { ThirdPartyAuthIntegration } from 'data/third-party-auth/integrations-query'
-import { Badge, Button, Dialog, DialogContent, DialogTrigger } from 'ui'
-import { AddRLSPolicyForFirebaseDialog } from './AddRLSPolicyForFirebaseDialog'
+import { Badge, Button } from 'ui'
 import { AWS_IDP_REGIONS } from './AwsRegionSelector'
 import {
   getIntegrationType,
@@ -177,38 +175,6 @@ export const IntegrationCard = ({
           )}
         </div>
       </div>
-      {type === 'firebase' ? (
-        <div className="bg-alternative border overflow-hidden shadow pl-11 pr-4 py-5 flex flex-row space-x-4">
-          <div className="bg-warning h-5 w-5 text-black flex items-center justify-center rounded-md">
-            <ExclamationCircleIcon className="h-4 w-4 text-black" />
-          </div>
-          <div className="text-sm space-y-4">
-            <div className="space-y-1">
-              <p className="text-foreground">Firebase provider uses a custom RLS policy</p>
-              <p className="text-foreground-light">
-                Be aware that this provider requires an RLS policy to correctly work.
-              </p>
-            </div>
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button type="warning" size="tiny">
-                  Insert policy
-                </Button>
-              </DialogTrigger>
-              <DialogContent size="xlarge">
-                <AddRLSPolicyForFirebaseDialog
-                  projectRef={projectRef!}
-                  firebaseProjectId={
-                    integration.oidc_issuer_url?.replace('https://securetoken.google.com/', '') ||
-                    ''
-                  }
-                />
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-      ) : null}
     </>
   )
 }

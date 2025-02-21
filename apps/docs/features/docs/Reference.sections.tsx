@@ -44,9 +44,11 @@ type RefSectionsProps = {
 }
 
 async function RefSections({ libraryId, version }: RefSectionsProps) {
+  console.log('[Enter] RefSections')
   let flattenedSections = await getFlattenedSections(libraryId, version)
   flattenedSections = trimIntro(flattenedSections)
 
+  console.log('[PreReturn] RefSections')
   return (
     <MDXProviderReference>
       <div className="flex flex-col my-16 gap-16">
@@ -298,7 +300,7 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
       <StickyHeader title={endpointDetails.summary} className="col-[1_/_-1]" />
       <div className="flex flex-col gap-12">
         <div className="flex items-center gap-2">
-          <span className="font-mono uppercase text-sm whitespace-nowrap bg-foreground text-background rounded-full font-mono font-medium px-2 py-0.5">
+          <span className="uppercase text-sm whitespace-nowrap bg-foreground text-background rounded-full font-mono font-medium px-2 py-0.5">
             {endpointDetails.method}
           </span>
           <code className="text-foreground-lighter break-all">{endpointDetails.path}</code>

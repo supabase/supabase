@@ -1,9 +1,10 @@
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
+import { Edit, Upload } from 'lucide-react'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import {
   OAuthAppCreateResponse,
   useOAuthAppCreateMutation,
@@ -23,12 +24,10 @@ import {
   Input,
   Modal,
   SidePanel,
-  Upload,
   cn,
 } from 'ui'
 import AuthorizeRequesterDetails from '../AuthorizeRequesterDetails'
 import { ScopesPanel } from './Scopes'
-import { Edit, ExternalLink } from 'lucide-react'
 
 export interface PublishAppSidePanelProps {
   visible: boolean
@@ -86,11 +85,11 @@ const PublishAppSidePanel = ({
 
       if (selectedApp !== undefined) {
         setUrls(
-          selectedApp.redirect_uris.map((url) => {
+          selectedApp.redirect_uris?.map((url) => {
             return { id: uuidv4(), value: url }
-          })
+          }) ?? []
         )
-        setScopes(selectedApp.scopes)
+        setScopes((selectedApp?.scopes ?? []) as OAuthScope[])
         setIconUrl(selectedApp.icon === null ? undefined : selectedApp.icon)
       } else {
         setUrls([{ id: uuidv4(), value: '' }])
@@ -337,15 +336,7 @@ const PublishAppSidePanel = ({
                             of its projects.
                           </span>
                         </div>
-                        <Button asChild type="default" icon={<ExternalLink />}>
-                          <Link
-                            href="https://supabase.com/docs/guides/platform/oauth-apps/oauth-scopes"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Documentation
-                          </Link>
-                        </Button>
+                        <DocsButton href="https://supabase.com/docs/guides/platform/oauth-apps/oauth-scopes" />
                       </div>
 
                       <ScopesPanel scopes={scopes} setScopes={setScopes} />

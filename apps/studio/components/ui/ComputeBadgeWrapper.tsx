@@ -11,6 +11,7 @@ import { INSTANCE_MICRO_SPECS } from 'lib/constants'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import ShimmeringLoader from './ShimmeringLoader'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {
   return (
@@ -36,6 +37,8 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
   // once open it will fetch the addons
   const [open, setOpenState] = useState(false)
 
+  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
+
   // returns hardcoded values for infra
   const cpuArchitecture = getCloudProviderArchitecture(project.cloud_provider)
 
@@ -49,12 +52,13 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
   const selectedAddons = addons?.selected_addons ?? []
 
   const { computeInstance } = getAddons(selectedAddons)
+  const computeInstanceMeta = computeInstance?.variant?.meta
 
-  let meta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
-  // some older instances on micro compute are missing metadata
-  if (meta === undefined && project.infra_compute_size === 'micro') {
-    meta = INSTANCE_MICRO_SPECS
-  }
+  const meta = (
+    computeInstanceMeta === undefined && project.infra_compute_size === 'micro'
+      ? INSTANCE_MICRO_SPECS
+      : computeInstanceMeta
+  ) as ProjectAddonVariantMeta
 
   const availableCompute = addons?.available_addons.find(
     (addon) => addon.name === 'Compute Instance'
@@ -66,7 +70,11 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
     e.preventDefault()
     e.stopPropagation()
 
-    router.push(`/project/${project?.ref}/settings/addons?panel=computeInstance`)
+    if (diskAndComputeFormEnabled) {
+      router.push(`/project/${project?.ref}/settings/compute-and-disk`)
+    } else {
+      router.push(`/project/${project?.ref}/settings/addons?panel=computeInstance`)
+    }
   }
 
   const highestComputeAvailable = availableCompute?.[availableCompute.length - 1].identifier

@@ -5,13 +5,16 @@ import {
   handlePageTelemetry,
   isBrowser,
   useBreakpoint,
-  useTelemetryProps,
+  useFeatureFlags,
 } from 'common'
 import { noop } from 'lodash'
-import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn } from 'ui'
+import { proxy, useSnapshot } from 'valtio'
+import { PrivacySettings } from '../PrivacySettings'
+import { useRouter } from 'next/compat/router'
+import { usePathname } from 'next/navigation'
 
 interface ConsentToastProps {
   onAccept: () => void
@@ -22,20 +25,35 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
   const isMobile = useBreakpoint(639)
 
   return (
-    <div className="space-y-3 py-1 flex flex-col w-full">
+    <div className="py-1 flex flex-col gap-y-3 w-full">
       <div>
-        <p className="text-foreground">
-          We only collect analytics essential to ensuring smooth operation of our services.{' '}
-          <Link
-            className="inline sm:hidden underline text-light"
+        <p className="text-sm text-foreground">
+          We use first-party cookies to improve our services.{' '}
+          <a
             target="_blank"
-            rel="noreferrer"
-            href="https://supabase.com/privacy"
+            rel="noreferrer noopener"
+            href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services"
+            className="hidden sm:inline underline underline-offset-2 decoration-foreground-lighter hover:decoration-foreground-light transition-all"
           >
             Learn more
-          </Link>
+          </a>{' '}
         </p>
+        <div className="flex items-center justify-start gap-x-2 sm:hidden">
+          <a
+            target="_blank"
+            rel="noreferrer noopener"
+            href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services"
+            className="underline underline-offset-2 text-foreground-light hover:decoration-foreground-light transition-all"
+          >
+            Learn more
+          </a>
+          <span className="text-foreground-lighter text-xs">•</span>
+          <PrivacySettings className="underline underline-offset-2 inline text-light">
+            Privacy settings
+          </PrivacySettings>
+        </div>
       </div>
+
       <div className="flex items-center space-x-2">
         <Button
           type="default"
@@ -54,31 +72,69 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
           Opt out
         </Button>
         <Button asChild type="text" className="hidden sm:block text-light hover:text-foreground">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/privacy">
-            Learn more
-          </Link>
+          <PrivacySettings>Privacy settings</PrivacySettings>
         </Button>
       </div>
     </div>
   )
 }
 
-export const useConsent = () => {
-  const { TELEMETRY_CONSENT } = LOCAL_STORAGE_KEYS
-  const consentToastId = useRef<string | number>()
-  const telemetryProps = useTelemetryProps()
+// [Alaister]: Using global state here so multiple components can access the consent value
+const consentState = proxy({
+  consentValue: (isBrowser ? localStorage?.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT) : null) as
+    | string
+    | null,
+  setConsentValue: (value: string | null) => {
+    consentState.consentValue = value
+  },
+})
 
-  const initialValue = isBrowser ? localStorage?.getItem(TELEMETRY_CONSENT) : null
-  const [consentValue, setConsentValue] = useState<string | null>(initialValue)
+export const useConsent = () => {
+  const { TELEMETRY_CONSENT, TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
+  const consentToastId = useRef<string | number>()
+  const router = useRouter()
+  const appRouterPathname = usePathname()
+  const featureFlags = useFeatureFlags()
+
+  const { consentValue } = useSnapshot(consentState)
+  const pathname =
+    router?.pathname ?? appRouterPathname ?? (isBrowser ? window.location.pathname : '')
 
   const handleConsent = (value: 'true' | 'false') => {
     if (!isBrowser) return
-    setConsentValue(value)
+
+    if (value === 'true') {
+      const cookies = document.cookie.split(';')
+      const telemetryCookie = cookies.find((cookie) => cookie.trim().startsWith(TELEMETRY_DATA))
+      if (telemetryCookie) {
+        try {
+          const encodedData = telemetryCookie.split('=')[1]
+          const telemetryData = JSON.parse(decodeURIComponent(encodedData))
+          handlePageTelemetry(
+            process.env.NEXT_PUBLIC_API_URL!,
+            pathname,
+            featureFlags.posthog,
+            telemetryData
+          )
+          // remove the telemetry cookie
+          document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+        } catch (error) {
+          console.error('Invalid telemetry data:', error)
+        }
+      } else {
+        handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, pathname, featureFlags.posthog)
+      }
+    } else {
+      // remove the telemetry cookie
+      document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+    }
+
+    consentState.setConsentValue(value)
     localStorage.setItem(TELEMETRY_CONSENT, value)
 
-    if (consentToastId.current) toast.dismiss(consentToastId.current)
-    if (value === 'true')
-      handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname, telemetryProps)
+    if (consentToastId.current) {
+      toast.dismiss(consentToastId.current)
+    }
   }
 
   const triggerConsentToast = useCallback(() => {
@@ -122,14 +178,12 @@ export const useConsent = () => {
 
   return {
     consentValue,
-    setConsentValue,
     hasAcceptedConsent: consentValue === 'true',
     triggerConsentToast,
   }
 }
 
 export const useConsentValue = (KEY_NAME: string) => {
-  const telemetryProps = useTelemetryProps()
   const initialValue = isBrowser ? localStorage?.getItem(KEY_NAME) : null
   const [consentValue, setConsentValue] = useState<string | null>(initialValue)
 
@@ -138,8 +192,9 @@ export const useConsentValue = (KEY_NAME: string) => {
     setConsentValue(value)
     localStorage.setItem(KEY_NAME, value)
     window.dispatchEvent(new Event('storage'))
-    if (value === 'true')
-      handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname, telemetryProps)
+    if (value === 'true') {
+      handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname)
+    }
   }
 
   return {

@@ -1,18 +1,12 @@
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
-import { BookOpen } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+
 import { Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import gaEvents from '~/lib/gaEvents'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import { TelemetryActions } from 'common/telemetry-constants'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 const Hero = () => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <div className="relative -mt-[65px]">
@@ -38,7 +32,12 @@ const Hero = () => {
                     <Link
                       href="https://supabase.com/dashboard"
                       as="https://supabase.com/dashboard"
-                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}
+                      onClick={() =>
+                        sendTelemetryEvent({
+                          action: TelemetryActions.START_PROJECT_BUTTON_CLICKED,
+                          properties: { buttonLocation: 'Homepage Hero' },
+                        })
+                      }
                     >
                       Start your project
                     </Link>
@@ -47,7 +46,12 @@ const Hero = () => {
                     <Link
                       href="/contact/sales"
                       as="/contact/sales"
-                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_requestDemo'])}
+                      onClick={() =>
+                        sendTelemetryEvent({
+                          action: TelemetryActions.REQUEST_DEMO_BUTTON_CLICKED,
+                          properties: { buttonLocation: 'Homepage Hero' },
+                        })
+                      }
                     >
                       Request a demo
                     </Link>

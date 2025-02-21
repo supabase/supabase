@@ -53,7 +53,7 @@ const presenceTrackStatus = await roomOne.track({
 })
 ```
 
-Each client maintains their own state, and this is then combined into a "shared state" for that Channel topic. It's commonly used for sharing statuses (eg: "online" or "inactive"). The neat thing about Presence is that if a client is suddenly disconnected (for example, they go offline), their state is automatically removed from the shared state. If you've ever tried to build an “I'm online” feature which handles unexpected disconnects, you'll appreciate how useful this is.
+Each client maintains their own state, and this is then combined into a "shared state" for that Channel topic. It's commonly used for sharing statuses (e.g. "online" or "inactive"). The neat thing about Presence is that if a client is suddenly disconnected (for example, they go offline), their state is automatically removed from the shared state. If you've ever tried to build an “I'm online” feature which handles unexpected disconnects, you'll appreciate how useful this is.
 
 When a new client subscribes to a channel, it will immediately receive the channel's latest state in a single message because the state is held by the Realtime server.
 

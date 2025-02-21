@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 
-import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
+import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
 import {
@@ -25,14 +25,14 @@ import {
   GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL,
 } from 'lib/github'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
+import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
     <img
-      className="border rounded-lg shadow w-48 mt-6 border-body"
+      className="border rounded-lg shadow w-full sm:w-48 mt-6 border-body"
       src={`${BASE_PATH}/img/integrations/covers/${title}-cover.png`}
       alt={`${title} cover`}
     />

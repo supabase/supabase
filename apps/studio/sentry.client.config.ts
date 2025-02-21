@@ -1,3 +1,7 @@
+// This file configures the initialization of Sentry on the client.
+// The config you add here will be used whenever a users loads a page in their browser.
+// https://docs.sentry.io/platforms/javascript/guides/nextjs/
+
 import * as Sentry from '@sentry/nextjs'
 import { IS_PLATFORM } from 'common/constants/environment'
 import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
@@ -5,7 +9,7 @@ import { match } from 'path-to-regexp'
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  tracesSampleRate: 0.01,
+  // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
   beforeSend(event, hint) {
     const consent =
@@ -25,20 +29,6 @@ Sentry.init({
     }
     return null
   },
-  integrations: [
-    new Sentry.BrowserTracing({
-      // TODO: update gotrue + api to support Access-Control-Request-Headers: authorization,baggage,sentry-trace,x-client-info
-      // then remove these options
-      traceFetch: false,
-      traceXHR: false,
-      beforeNavigate: (context) => {
-        return {
-          ...context,
-          name: standardiseRouterUrl(location.pathname),
-        }
-      },
-    }),
-  ],
   ignoreErrors: [
     // Used exclusively in Monaco Editor.
     'ResizeObserver',

@@ -24,6 +24,7 @@ export type UserData = {
     hasSharedSecret?: boolean
     hideAvatar?: boolean
     hideMetadata?: boolean
+    theme?: string
   }
   shared_on_twitter?: string
   shared_on_linkedin?: string

@@ -7,7 +7,6 @@ import { cn } from '../../../lib/utils/cn'
 import styles from './popover.module.css'
 
 const Popover = PopoverPrimitive.Root
-
 const PopoverTrigger = PopoverPrimitive.Trigger
 const PopoverAnchor = PopoverPrimitive.Anchor
 

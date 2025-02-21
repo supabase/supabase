@@ -16,6 +16,7 @@ interface Props {
   footerPosition?: 'bottom' | 'left'
   ctas?: CTA[]
   className?: string
+  sectionContainerClassName?: string
 }
 
 const ProductHeader = (props: Props) => (
@@ -25,7 +26,7 @@ const ProductHeader = (props: Props) => (
       props.className
     )}
   >
-    <SectionContainer className="!py-0 grid grid-cols-12">
+    <SectionContainer className={cn('!py-0 grid grid-cols-12', props.sectionContainerClassName)}>
       <div className="relative z-10 col-span-12 gap-8 lg:col-span-5">
         <div>
           {(props.icon || props.title) && (
@@ -63,7 +64,7 @@ const ProductHeader = (props: Props) => (
           ))}
         </div>
         {props.footer && props.footerPosition === 'left' && (
-          <div className="relative z-10 mt-4 md:mt-8 lg:mt-20 xl:mt-32 col-span-12">
+          <div className="ph-footer relative z-10 mt-4 md:mt-8 lg:mt-20 xl:mt-32 col-span-12">
             {props.footer}
           </div>
         )}

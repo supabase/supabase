@@ -1,7 +1,7 @@
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Image } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition, type AdmonitionProps } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
@@ -28,6 +28,18 @@ import {
   QuickstartIntro,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
+  PostgresInstallation,
+  PricingMfaPhone,
+  PricingBranching,
+  PricingEdgeFunctions,
+  PricingMau,
+  PricingMauSso,
+  PricingMauThirdParty,
+  PricingPitr,
+  PricingRealtimeMessages,
+  PricingRealtimeConnections,
+  PricingStorageImageTransformations,
+  PricingStorageSize,
 } from '~/components/MDX/partials'
 import { NavData } from '~/components/NavData'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
@@ -35,15 +47,17 @@ import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
 import { RegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
-import { CodeSampleWrapper } from '~/features/directives/CodeSample.client'
+import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import * as CH from '~/features/ui/CodeHike'
+import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 
 const components = {
   Accordion,
   AccordionItem,
   Admonition,
+  // Admonition: (props: AdmonitionProps) => <Admonition className="[&_a]:underline" {...props} />,
   AuthErrorCodesTable,
   AuthRateLimits,
   AuthSmsProviderConfig,
@@ -52,6 +66,7 @@ const components = {
   Button,
   ButtonCard,
   CH,
+  CodeSampleDummy,
   CodeSampleWrapper,
   CostWarning,
   CreateClientSnippet,
@@ -78,12 +93,25 @@ const components = {
   RealtimeLimitsEstimator,
   RegionsList,
   SharedData,
+  ShowUntil,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
+  PostgresInstallation,
   SqlToRest,
   StepHikeCompact,
   Tabs,
   TabPanel,
+  PricingMfaPhone,
+  PricingBranching,
+  PricingEdgeFunctions,
+  PricingMau,
+  PricingMauSso,
+  PricingMauThirdParty,
+  PricingPitr,
+  PricingRealtimeMessages,
+  PricingRealtimeConnections,
+  PricingStorageImageTransformations,
+  PricingStorageSize,
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
       {props.children}

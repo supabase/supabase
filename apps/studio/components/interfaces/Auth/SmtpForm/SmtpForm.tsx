@@ -29,6 +29,7 @@ import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 import { AlertTriangle, Eye, EyeOff } from 'lucide-react'
+import Link from 'next/link'
 
 const SmtpForm = () => {
   const { ref: projectRef } = useParams()
@@ -76,7 +77,7 @@ const SmtpForm = () => {
       },
       then: (schema) =>
         schema
-          .matches(urlRegex, 'Must be a valid URL or IP address')
+          .matches(urlRegex({ excludeSimpleDomains: false }), 'Must be a valid URL or IP address')
           .required('Host URL is required.'),
       otherwise: (schema) => schema,
     }),
@@ -184,10 +185,6 @@ const SmtpForm = () => {
 
         return (
           <>
-            <FormHeader
-              title="SMTP Settings"
-              description="You can use your own SMTP server instead of the built-in email service."
-            />
             <FormPanel
               footer={
                 <div className="flex py-4 px-8">
@@ -218,28 +215,29 @@ const SmtpForm = () => {
                     // @ts-ignore
                     onChange={(value: boolean) => setEnableSmtp(value)}
                     descriptionText={
-                      <Markdown
-                        className="max-w-full [&>p]:text-foreground-lighter"
-                        content={`Emails will be sent using your custom SMTP provider. Email rate limits can be adjusted [here](/dashboard/project/${projectRef}/auth/rate-limits).`}
-                      />
+                      <p className="max-w-full prose text-sm text-foreground-lighter">
+                        Emails will be sent using your custom SMTP provider. Email rate limits can
+                        be adjusted{' '}
+                        <Link
+                          className="underline"
+                          href={`/project/${projectRef}/auth/rate-limits`}
+                        >
+                          here
+                        </Link>
+                        .
+                      </p>
                     }
                   />
-                  {enableSmtp ? (
-                    !isValidSmtpConfig && (
-                      <div className="">
-                        <Alert_Shadcn_ variant="warning">
-                          <AlertTriangle strokeWidth={2} />
-                          <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
-                            The following fields must be filled before custom SMTP can be properly
-                            enabled
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
-                      </div>
-                    )
-                  ) : (
+                  {enableSmtp && !isValidSmtpConfig && !isValidSmtpConfig && (
                     <div className="">
-                      <EmailRateLimitsAlert />
+                      <Alert_Shadcn_ variant="warning">
+                        <AlertTriangle strokeWidth={2} />
+                        <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          The following fields must be filled before custom SMTP can be properly
+                          enabled
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
                     </div>
                   )}
                 </FormSectionContent>

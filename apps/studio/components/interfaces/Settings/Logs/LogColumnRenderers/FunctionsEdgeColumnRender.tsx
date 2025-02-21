@@ -14,10 +14,10 @@ const columns: Column<LogData>[] = [
       }
       return (
         <RowLayout>
-          <TimestampInfo value={props.row.timestamp!} />
-          <ResponseCodeFormatter row={props} value={props.row.status_code} />
-          <TextFormatter value={props.row.method as string} />
-          <TextFormatter value={props.row.id} />
+          <TimestampInfo utcTimestamp={props.row.timestamp!} />
+          <ResponseCodeFormatter value={String(props.row.status_code)} />
+          <TextFormatter value={String(props.row.method)} />
+          <TextFormatter value={String(props.row.id)} />
         </RowLayout>
       )
     },

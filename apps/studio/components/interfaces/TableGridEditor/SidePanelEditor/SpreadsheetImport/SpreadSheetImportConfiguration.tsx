@@ -1,8 +1,8 @@
-import clsx from 'clsx'
-import { useState } from 'react'
-import { Button, Collapsible, SidePanel } from 'ui'
-import type { SpreadsheetData } from './SpreadsheetImport.types'
 import { ChevronDown } from 'lucide-react'
+import { useState } from 'react'
+
+import { Button, cn, Collapsible, SidePanel } from 'ui'
+import type { SpreadsheetData } from './SpreadsheetImport.types'
 
 interface SpreadSheetImportConfigurationProps {
   spreadsheetData: SpreadsheetData
@@ -29,7 +29,7 @@ const SpreadsheetImportConfiguration = ({
                 <ChevronDown
                   size={18}
                   strokeWidth={2}
-                  className={clsx('text-foreground-light', expandConfiguration && 'rotate-180')}
+                  className={cn('text-foreground-light', expandConfiguration && 'rotate-180')}
                 />
               }
               className="px-1"
@@ -54,7 +54,7 @@ const SpreadsheetImportConfiguration = ({
                   <Button
                     key={header}
                     type={isSelected ? 'primary' : 'default'}
-                    className={clsx('transition', isSelected ? 'opacity-100' : 'opacity-75')}
+                    className={cn('transition', isSelected ? 'opacity-100' : 'opacity-75')}
                     onClick={() => onToggleHeader(header)}
                   >
                     {header}

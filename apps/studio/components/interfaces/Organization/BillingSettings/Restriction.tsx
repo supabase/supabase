@@ -7,6 +7,7 @@ import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { CriticalIcon, WarningIcon } from 'ui'
+import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 
 export const Restriction = () => {
   const org = useSelectedOrganization()
@@ -18,7 +19,10 @@ export const Restriction = () => {
   const hasExceededAnyLimits = Boolean(
     usage?.usages.find(
       (metric) =>
-        !metric.unlimited && metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
+        metric.metric !== PricingMetric.DISK_SIZE_GB_HOURS_GP3 &&
+        !metric.unlimited &&
+        metric.capped &&
+        metric.usage > (metric?.pricing_free_units ?? 0)
     )
   )
 
@@ -70,7 +74,9 @@ export const Restriction = () => {
                 </Link>
               </Button>
               <Button asChild type="default" icon={<ExternalLink />}>
-                <a href="https://supabase.com/docs/guides/platform/spend-cap">About spend cap</a>
+                <a href="https://supabase.com/docs/guides/platform/cost-control#spend-cap">
+                  About spend cap
+                </a>
               </Button>
             </div>
           </AlertDescription_Shadcn_>
@@ -93,7 +99,11 @@ export const Restriction = () => {
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button asChild key="upgrade-button" type="default">
-                <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
+                <Link
+                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=fairUseGracePeriodStarted`}
+                >
+                  Upgrade plan
+                </Link>
               </Button>
               <Button asChild type="default" icon={<ExternalLink />}>
                 <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
@@ -120,7 +130,11 @@ export const Restriction = () => {
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild type="default">
-                <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
+                <Link
+                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=fairUseGracePeriodOver`}
+                >
+                  Upgrade plan
+                </Link>
               </Button>
               <Button asChild type="default" icon={<ExternalLink />}>
                 <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
@@ -147,7 +161,11 @@ export const Restriction = () => {
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild type="default">
-                <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
+                <Link
+                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=fairUseRestricted`}
+                >
+                  Upgrade plan
+                </Link>
               </Button>
               <Button asChild type="default" icon={<ExternalLink />}>
                 <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">

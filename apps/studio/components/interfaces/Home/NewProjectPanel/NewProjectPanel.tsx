@@ -1,8 +1,9 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
+import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
+import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Auth, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { Button } from 'ui'
@@ -10,8 +11,7 @@ import APIKeys from './APIKeys'
 import GetStartedHero from './GetStartedHero'
 
 const NewProjectPanel = () => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
 
   const {
     projectAuthAll: authEnabled,
@@ -22,7 +22,7 @@ const NewProjectPanel = () => {
   return (
     <div className="grid grid-cols-12 gap-4 lg:gap-20">
       <div className="col-span-12">
-        <div className="flex flex-col space-y-20">
+        <div className="flex flex-col space-y-12 md:space-y-20">
           <div className="flex h-full flex-col justify-between">
             <div className="space-y-2">
               <h3 className="text-xl text-foreground">Welcome to your new project</h3>
@@ -47,10 +47,10 @@ const NewProjectPanel = () => {
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Button asChild type="default" icon={<TableEditor strokeWidth={1.5} />}>
-                  <Link href={`/project/${ref}/editor`}>Table Editor</Link>
+                  <EditorIndexPageLink projectRef={ref}>Table Editor</EditorIndexPageLink>
                 </Button>
                 <Button asChild type="default" icon={<SqlEditor strokeWidth={1.5} />}>
-                  <Link href={`/project/${ref}/sql/new`}>SQL editor</Link>
+                  <Link href={`/project/${ref}/sql/new`}>SQL Editor</Link>
                 </Button>
                 <Button asChild type="default" icon={<ExternalLink />}>
                   <Link

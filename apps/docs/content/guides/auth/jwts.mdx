@@ -41,7 +41,7 @@ The JSON object starts out looking something like this:
 
 Just note that the more data you store in your token, the longer the encoded string will be.
 
-When we want to send the JWT to the user, we first encode the data using an algorithm such as `HS256`. There are many libraries (and several different algorithms) that can be used to do this encoding/decoding, such as [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken). The signing is as simple as:
+When we want to send the JWT to the user, we first encode the data using an algorithm such as `HS256`. There are many libraries (and several different algorithms) that can be used to do this encoding/decoding, such as [`jsonwebtoken`](https://www.npmjs.com/package/jsonwebtoken). The signing is as simple as:
 
 ```js
 // from https://replit.com/@awalias/jsonwebtokens#index.js
@@ -133,7 +133,7 @@ The `user access token` is the JWT issued when you call for example:
 
 ```js
 supabase.auth.signIn({
-  email: 'lao.gimmie@gov.sg',
+  email: 'valid.email@supabase.io',
   password: 'They_Live_1988!',
 })
 ```
@@ -153,7 +153,7 @@ You'll notice that this token is quite a bit longer, since it contains informati
   "aud": "authenticated",
   "exp": 1615824388,
   "sub": "0334744a-f2a2-4aba-8c8a-6e748f62a172",
-  "email": "d.l.solove@gmail.com",
+  "email": "valid.email@supabase.io",
   "app_metadata": {
     "provider": "email"
   },

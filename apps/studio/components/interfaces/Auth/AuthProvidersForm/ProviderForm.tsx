@@ -1,20 +1,21 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { Check, ChevronUp, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import type { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
-import Link from 'next/link'
 import {
-  Alert,
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -24,6 +25,8 @@ import {
   Input,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
@@ -109,8 +112,10 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
     }
   }
 
-  const { data: settings } = useProjectApiQuery({ projectRef })
-  const apiUrl = `${settings?.autoApiService.protocol}://${settings?.autoApiService.endpoint}`
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint
+  const apiUrl = `${protocol}://${endpoint}`
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
@@ -171,6 +176,11 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
       if (payload[x] === '') payload[x] = null
     })
 
+    // The backend uses empty string to represent no required characters in the password
+    if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
+      payload.PASSWORD_REQUIRED_CHARACTERS = ''
+    }
+
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
@@ -201,7 +211,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
         <button
           ref={ref}
           type="button"
-          className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
+          className="group flex w-full items-center justify-between rounded py-3 px-4 text-foreground"
         >
           <div className="flex items-center gap-3">
             <ChevronUp
@@ -238,17 +248,18 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
         validationSchema={provider.validationSchema}
         onSubmit={onSubmit}
       >
-        {({ handleReset, initialValues, values }: any) => {
+        {({ handleReset, initialValues, values, setFieldValue }: any) => {
           const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
           return (
             <Collapsible.Content>
-              <div className="group border-t border-strong bg-surface-100 py-6 px-6 text-foreground">
-                <div className="mx-auto my-6 max-w-lg space-y-6">
+              <div className="group border-t border-strong bg-surface-100 py-6 px-4 md:px-6 text-foreground">
+                <div className="mx-auto my-2 md:my-6 max-w-lg space-y-6">
                   {showAlert(provider.title)}
                   {Object.keys(provider.properties).map((x: string) => (
                     <FormField
                       key={x}
                       name={x}
+                      setFieldValue={setFieldValue}
                       properties={provider.properties[x]}
                       formValues={values}
                       disabled={
@@ -259,9 +270,15 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                   ))}
 
                   {provider?.misc?.alert && (
-                    <Alert title={provider.misc.alert.title} variant="warning" withIcon>
-                      <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
-                    </Alert>
+                    <Admonition
+                      type="warning"
+                      title={provider.misc.alert.title}
+                      description={
+                        <>
+                          <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
+                        </>
+                      }
+                    />
                   )}
 
                   {provider.misc.requiresRedirect && (
@@ -277,19 +294,16 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                             : `${apiUrl}/auth/v1/callback`
                         }
                         descriptionText={
-                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                            {provider.misc.helper}
-                          </ReactMarkdown>
+                          <Markdown
+                            content={provider.misc.helper}
+                            className="text-foreground-lighter"
+                          />
                         }
                       />
                     </>
                   )}
                   <div className="flex items-center justify-between">
-                    <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                      <Link href={provider.link} target="_blank" rel="noreferrer">
-                        Documentation
-                      </Link>
-                    </Button>
+                    <DocsButton href={provider.link} />
                     <div className="flex items-center gap-x-3">
                       <Button
                         type="default"

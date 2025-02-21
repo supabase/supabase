@@ -1,18 +1,28 @@
-import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Panel from 'components/ui/Panel'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { Info } from 'lucide-react'
-import { cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import PolicyRow from './PolicyRow'
 import PolicyTableRowHeader from './PolicyTableRowHeader'
 
-interface PolicyTableRowProps {
-  table: PostgresTable
+export interface PolicyTableRowProps {
+  table: {
+    id: number
+    schema: string
+    name: string
+    rls_enabled: boolean
+  }
   isLocked: boolean
-  onSelectToggleRLS: (table: PostgresTable) => void
+  onSelectToggleRLS: (table: {
+    id: number
+    schema: string
+    name: string
+    rls_enabled: boolean
+  }) => void
   onSelectCreatePolicy: () => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
   onSelectDeletePolicy: (policy: PostgresPolicy) => void
@@ -59,15 +69,15 @@ const PolicyTableRow = ({
           <span className="text-foreground-light">
             Row Level Security is disabled. Your table is publicly readable and writable.
           </span>
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
+          <Tooltip>
+            <TooltipTrigger asChild>
               <Info className="w-3 h-3" />
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ className="w-[400px]">
+            </TooltipTrigger>
+            <TooltipContent className="w-[400px]">
               Anyone with the project's anonymous key can modify or delete your data. Enable RLS and
               create access policies to keep your data secure.
-            </TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
+            </TooltipContent>
+          </Tooltip>
         </div>
       )}
       {policies.length === 0 && (
@@ -78,6 +88,7 @@ const PolicyTableRow = ({
       {policies?.map((policy) => (
         <PolicyRow
           key={policy.id}
+          isLocked={isLocked}
           policy={policy}
           onSelectEditPolicy={onSelectEditPolicy}
           onSelectDeletePolicy={onSelectDeletePolicy}

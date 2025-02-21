@@ -137,7 +137,7 @@ export const CustomerQuote = ({
 )
 
 export const CustomerLogo = ({ title, logo }: { title: string; logo: string }) => (
-  <div className="relative h-8 max-h-6 w-28">
+  <div className="relative h-8 max-h-5 xl:max-h-6 w-20 max-w-20 md:w-28 xl:max-w-28">
     <Image
       fill
       src={logo}

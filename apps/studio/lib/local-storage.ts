@@ -1,4 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
 
 const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   'graphiql:theme',
@@ -6,7 +7,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   'supabaseDarkMode',
   'supabase.dashboard.auth.debug',
   'supabase.dashboard.auth.navigatorLock.disabled',
-  LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT,
+  COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,

@@ -30,7 +30,7 @@ const ProductCard = ({
   <Link
     href={url}
     className={cn(
-      'group relative w-full h-[400px] flex flex-col gap-5 lg:flex-row focus:outline-none focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-xl',
+      'group relative w-full sm:h-[400px] flex flex-col gap-5 lg:flex-row focus:outline-none focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-xl',
       className
     )}
     onClick={onClick}
@@ -41,17 +41,22 @@ const ProductCard = ({
       hasMotion={title.includes('Edge Functions')}
       outerClassName="relative w-full h-full"
       innerClassName={cn(
-        'relative overflow-hidden flex-1 flex flex-col items-center gap-5 lg:items-start justify-between',
-        'bg-surface-75 w-full h-full text-foreground-lighter [&_strong]:!font-normal [&_strong]:!text-foreground'
+        'relative overflow-hidden flex-1 flex flex-row sm:flex-col gap-4 items-start sm:items-center lg:items-start justify-between',
+        'bg-surface-75 w-full h-full text-foreground-lighter [&_strong]:!font-normal [&_strong]:!text-foreground',
+        'p-4 sm:py-6'
       )}
     >
       <div
         className={cn(
-          'relative z-10 flex flex-col lg:h-full gap-4 mx-auto items-center text-center h-full px-4 py-6',
-          alignLeft && !isDatabase && 'lg:mx-0 lg:pl-6 lg:items-start lg:text-left',
+          'relative z-10',
+          'h-full w-full',
+          'mx-auto gap-2 sm:gap-4',
+          'flex flex-col items-start sm:items-center',
+          'text-left sm:text-center',
+          alignLeft && !isDatabase && 'lg:mx-0 lg:pl-2 lg:items-start lg:text-left',
           alignLeft &&
             isDatabase &&
-            'md:ml-4 md:mt-2 md:justify-start md:max-w-[260px] md:text-left md:items-start'
+            'md:ml-2 md:mt-2 lg:pl-0 md:justify-start md:max-w-[250px] md:text-left md:items-start'
         )}
       >
         <div className="flex items-center gap-2 text-foreground">

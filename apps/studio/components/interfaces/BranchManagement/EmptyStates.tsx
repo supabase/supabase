@@ -29,7 +29,9 @@ export const BranchingEmptyState = () => {
           tooltip={{
             content: {
               side: 'bottom',
-              text: 'You need additional permissions to enable branching',
+              text: !canEnableBranching
+                ? 'You need additional permissions to enable branching'
+                : undefined,
             },
           }}
         >

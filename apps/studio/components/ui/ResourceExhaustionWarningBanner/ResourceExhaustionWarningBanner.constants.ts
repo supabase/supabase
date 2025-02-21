@@ -1,5 +1,3 @@
-const AFTER_26_09_2024 = Date.now() >= new Date('2024-09-26T00:00:00Z').getTime()
-
 interface ResourceWarningMessage {
   // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/auth')
   restrictToRoutes?: string[]
@@ -44,7 +42,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode',
-    buttonText: 'View database settings',
+    buttonText: 'View Compute and Disk',
     metric: 'read_only',
   },
   disk_io_exhaustion: {
@@ -71,7 +69,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: 'It may become unresponsive',
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-disk-io',
+    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/exhaust-disk-io',
     buttonText: 'Check usage',
     metric: 'disk_io',
   },
@@ -126,7 +124,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: `Performance is affected`,
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-cpu',
+    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/high-cpu-usage',
     buttonText: 'Check usage',
     metric: 'cpu',
   },
@@ -154,7 +152,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: `Performance is affected`,
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-ram',
+    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/exhaust-ram',
     buttonText: 'Check usage',
     metric: 'ram',
   },
@@ -213,47 +211,5 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
     docsUrl: undefined,
     buttonText: 'Check usage',
     metric: null,
-  },
-  auth_restricted_email_sending: {
-    restrictToRoutes: ['/project/[ref]', '/project/[ref]/auth', '/project/[ref]/settings/auth'], // project home, auth, settings
-    bannerContent: {
-      warning: {
-        title: AFTER_26_09_2024
-          ? "Auth emails are restricted to your organization's members"
-          : "On 26th September: Auth email sending will be restricted to your organization's members",
-        description: AFTER_26_09_2024
-          ? "To fight abuse, emails sent by Auth are restricted to the members of this project's organization. Set up a custom SMTP provider to send messages to any user."
-          : "To fight abuse, emails sent by Auth will be restricted to the members of this project's organization. Set up a custom SMTP provider before then to send messages to any user and avoid disruptions.",
-      },
-      critical: {
-        title: AFTER_26_09_2024
-          ? "Auth emails are restricted to your organization's members"
-          : "On 26th September: Auth email sending will be restricted to your organization's members",
-        description: AFTER_26_09_2024
-          ? "To fight abuse, emails sent by Auth are restricted to the members of this project's organization. Set up a custom SMTP provider to send messages to any user."
-          : "To fight abuse, emails sent by Auth will be restricted to the members of this project's organization. Set up a custom SMTP provider before then to send messages to any user and avoid disruptions.",
-      },
-    },
-    cardContent: {
-      warning: {
-        title: AFTER_26_09_2024
-          ? 'Auth emails are restricted'
-          : 'Action required: Auth emails to be restricted',
-        description: AFTER_26_09_2024
-          ? "Your project can only send Auth emails to your organization's members. Set up a custom SMTP provider to send Auth emails to any user."
-          : "On 26th September your project will only be able to send Auth emails to your organization's members. Set up a custom SMTP provider before then to avoid disruptions!",
-      },
-      critical: {
-        title: AFTER_26_09_2024
-          ? 'Auth emails are restricted'
-          : 'Action required: Auth emails to be restricted',
-        description: AFTER_26_09_2024
-          ? "Your project can only send Auth emails to your organization's members. Set up a custom SMTP provider to send Auth emails to any user."
-          : "On 26th September your project will only be able to send Auth emails to your organization's members. Set up a custom SMTP provider before then to avoid disruptions!",
-      },
-    },
-    docsUrl: 'https://github.com/orgs/supabase/discussions/29370',
-    buttonText: 'Set up custom SMTP now',
-    metric: 'auth_restricted_email_sending',
   },
 }

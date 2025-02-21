@@ -90,7 +90,7 @@ export function LogDrains({
 
   if (!isLoading && logDrains?.length === 0) {
     return (
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid lg:grid-cols-2 gap-3">
         {LOG_DRAIN_TYPES.map((src) => (
           <CardButton
             key={src.value}
@@ -127,8 +127,15 @@ export function LogDrains({
           <TableBody>
             {logDrains?.map((drain) => (
               <TableRow key={drain.id}>
-                <TableCell className="font-medium">{drain.name}</TableCell>
-                <TableCell>{drain.description}</TableCell>
+                <TableCell className="font-medium truncate max-w-72" title={drain.name}>
+                  {drain.name}
+                </TableCell>
+                <TableCell
+                  className="text-foreground-light truncate max-w-72"
+                  title={drain.description}
+                >
+                  {drain.description}
+                </TableCell>
                 <TableCell className="text-right font-mono">{drain.type}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -176,7 +183,7 @@ export function LogDrains({
             }}
             onCancel={() => setIsDeleteModalOpen(false)}
           >
-            <div className="text-foreground-light">
+            <div className="text-foreground-light text-sm">
               <p>
                 Are you sure you want to delete{' '}
                 <span className="text-foreground">{selectedLogDrain?.name}</span>?

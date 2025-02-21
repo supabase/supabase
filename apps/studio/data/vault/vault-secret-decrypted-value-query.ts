@@ -42,7 +42,7 @@ export type VaultSecretsDecryptedValueError = unknown
 export const useVaultSecretDecryptedValueQuery = <TData = VaultSecretsDecryptedValueData>(
   { projectRef, connectionString, id }: VaultSecretsDecryptedValueVariables,
   {
-    enabled,
+    enabled = true,
     ...options
   }: UseQueryOptions<VaultSecretsDecryptedValueData, VaultSecretsDecryptedValueError, TData> = {}
 ) =>

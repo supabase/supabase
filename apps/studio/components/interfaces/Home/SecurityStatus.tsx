@@ -1,19 +1,18 @@
 import { CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
-import { useState } from 'react'
+import Link from 'next/link'
+import { Fragment, useState } from 'react'
+
+import { useParams } from 'common'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
 import {
   Button,
   PopoverContent_Shadcn_,
+  PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  PopoverSeparator_Shadcn_,
   cn,
 } from 'ui'
-import { useProjectLintsQuery } from 'data/lint/lint-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import Link from 'next/link'
-
 import { LINTER_LEVELS, LINT_TABS } from '../Linter/Linter.constants'
-import { useParams } from 'common'
 
 export const SecurityStatus = () => {
   const { ref } = useParams()
@@ -82,12 +81,9 @@ export const SecurityStatus = () => {
                 const { label, descriptionShort } = LINT_TABS.find((tab) => tab.id === level) ?? {}
                 return (
                   lints.length > 0 && (
-                    <>
+                    <Fragment key={level}>
                       <Link href={`/project/${ref}/database/security-advisor?preset=${level}`}>
-                        <div
-                          key={level}
-                          className="group flex items-center justify-between w-full px-3 py-3 transition hover:bg-surface-300"
-                        >
+                        <div className="group flex items-center justify-between w-full px-3 py-3 transition hover:bg-surface-300">
                           <div className="flex gap-x-3">
                             <div>
                               <StatusDot level={level} />
@@ -110,7 +106,7 @@ export const SecurityStatus = () => {
                         </div>
                       </Link>
                       <PopoverSeparator_Shadcn_ />
-                    </>
+                    </Fragment>
                   )
                 )
               })}

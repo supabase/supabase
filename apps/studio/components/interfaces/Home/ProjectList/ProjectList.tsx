@@ -50,7 +50,7 @@ const ProjectList = ({
     error: permissionsError,
   } = usePermissionsQuery()
   const { data: resourceWarnings } = useResourceWarningsQuery()
-  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
+  const { data: allOverdueInvoices } = useOverdueInvoicesQuery()
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
@@ -86,7 +86,7 @@ const ProjectList = ({
     return (
       <div
         className={cn(
-          'bg-surface-100 border border-default px-6 py-4 rounded flex items-center justify-between'
+          'bg-surface-100 border border-default px-4 md:px-6 py-4 rounded flex items-center justify-between'
         )}
       >
         <div className="space-y-1">
@@ -263,7 +263,7 @@ const OrganizationProjects = ({
           <ShimmeringCard />
         </ul>
       ) : (
-        <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        <ul className="mx-auto grid grid-cols-1 gap-2 md:gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {isErrorPermissions ? (
             <div className="col-span-3">
               <AlertError
