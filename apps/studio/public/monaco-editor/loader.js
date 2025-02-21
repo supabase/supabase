@@ -57,8 +57,8 @@ var AMDLoader
         navigator.userAgent.indexOf('Windows') >= 0
         ? !0
         : typeof process < 'u'
-        ? process.platform === 'win32'
-        : !1
+          ? process.platform === 'win32'
+          : !1
     }
   }
   u.Environment = y
@@ -224,10 +224,10 @@ var AMDLoader
           t === 'ignoreDuplicateModules' && typeof a.ignoreDuplicateModules < 'u'
             ? (a.ignoreDuplicateModules = a.ignoreDuplicateModules.concat(e))
             : t === 'paths' && typeof a.paths < 'u'
-            ? u.Utilities.forEachProperty(e, (i, s) => (a.paths[i] = s))
-            : t === 'config' && typeof a.config < 'u'
-            ? u.Utilities.forEachProperty(e, (i, s) => (a.config[i] = s))
-            : (a[t] = u.Utilities.recursiveClone(e))
+              ? u.Utilities.forEachProperty(e, (i, s) => (a.paths[i] = s))
+              : t === 'config' && typeof a.config < 'u'
+                ? u.Utilities.forEachProperty(e, (i, s) => (a.config[i] = s))
+                : (a[t] = u.Utilities.recursiveClone(e))
         }),
         m.validateConfigurationOptions(a)
       )
@@ -654,20 +654,23 @@ var AMDLoader
         o = 0,
         _
       const f = () => {
-        setTimeout(() => {
-          _ || (_ = this._crypto.createHash('md5').update(i, 'utf8').digest())
-          const g = e.createCachedData()
-          if (!(g.length === 0 || g.length === d || o >= 5)) {
-            if (g.length < d) {
-              f()
-              return
+        setTimeout(
+          () => {
+            _ || (_ = this._crypto.createHash('md5').update(i, 'utf8').digest())
+            const g = e.createCachedData()
+            if (!(g.length === 0 || g.length === d || o >= 5)) {
+              if (g.length < d) {
+                f()
+                return
+              }
+              ;(d = g.length),
+                this._fs.writeFile(s, Buffer.concat([_, g]), (v) => {
+                  v && n.getConfig().onError(v), n.getRecorder().record(63, s), f()
+                })
             }
-            ;(d = g.length),
-              this._fs.writeFile(s, Buffer.concat([_, g]), (v) => {
-                v && n.getConfig().onError(v), n.getRecorder().record(63, s), f()
-              })
-          }
-        }, l * Math.pow(4, o++))
+          },
+          l * Math.pow(4, o++)
+        )
       }
       f()
     }
@@ -695,20 +698,23 @@ var AMDLoader
     _verifyCachedData(e, i, s, n, l) {
       !n ||
         e.cachedDataRejected ||
-        setTimeout(() => {
-          const d = this._crypto.createHash('md5').update(i, 'utf8').digest()
-          n.equals(d) ||
-            (l
-              .getConfig()
-              .onError(
-                new Error(
-                  `FAILED TO VERIFY CACHED DATA, deleting stale '${s}' now, but a RESTART IS REQUIRED`
-                )
-              ),
-            this._fs.unlink(s, (o) => {
-              o && l.getConfig().onError(o)
-            }))
-        }, Math.ceil(5e3 * (1 + Math.random())))
+        setTimeout(
+          () => {
+            const d = this._crypto.createHash('md5').update(i, 'utf8').digest()
+            n.equals(d) ||
+              (l
+                .getConfig()
+                .onError(
+                  new Error(
+                    `FAILED TO VERIFY CACHED DATA, deleting stale '${s}' now, but a RESTART IS REQUIRED`
+                  )
+                ),
+              this._fs.unlink(s, (o) => {
+                o && l.getConfig().onError(o)
+              }))
+          },
+          Math.ceil(5e3 * (1 + Math.random()))
+        )
     }
   }
   ;(r._BOM = 65279),

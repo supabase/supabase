@@ -17,8 +17,8 @@ define('vs/basic-languages/html/html', ['require', 'require'], (require) => {
       typeof require != 'undefined'
         ? require
         : typeof Proxy != 'undefined'
-        ? new Proxy(e, { get: (t, n) => (typeof require != 'undefined' ? require : t)[n] })
-        : e)(function (e) {
+          ? new Proxy(e, { get: (t, n) => (typeof require != 'undefined' ? require : t)[n] })
+          : e)(function (e) {
       if (typeof require != 'undefined') return require.apply(this, arguments)
       throw new Error('Dynamic require of "' + e + '" is not supported')
     })

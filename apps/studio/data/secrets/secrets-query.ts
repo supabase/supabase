@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import type { apiComponents } from 'data/api'
+import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { secretsKeys } from './keys'
@@ -9,7 +9,7 @@ export type SecretsVariables = {
   projectRef?: string
 }
 
-export type ProjectSecret = apiComponents['schemas']['SecretResponse']
+export type ProjectSecret = components['schemas']['SecretResponse']
 
 export async function getSecrets({ projectRef }: SecretsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('Project ref is required')

@@ -17,8 +17,8 @@ define('vs/language/html/htmlMode', ['require', 'require'], (require) => {
       typeof require != 'undefined'
         ? require
         : typeof Proxy != 'undefined'
-        ? new Proxy(n, { get: (t, i) => (typeof require != 'undefined' ? require : t)[i] })
-        : n)(function (n) {
+          ? new Proxy(n, { get: (t, i) => (typeof require != 'undefined' ? require : t)[i] })
+          : n)(function (n) {
       if (typeof require != 'undefined') return require.apply(this, arguments)
       throw new Error('Dynamic require of "' + n + '" is not supported')
     })
@@ -530,10 +530,10 @@ define('vs/language/html/htmlMode', ['require', 'require'], (require) => {
               (r === void 0
                 ? (e = _.insert(t, i))
                 : T.is(r)
-                ? ((o = r), (e = I.insert(t, i, r)))
-                : (this.assertChangeAnnotations(this.changeAnnotations),
-                  (o = this.changeAnnotations.manage(r)),
-                  (e = I.insert(t, i, o))),
+                  ? ((o = r), (e = I.insert(t, i, r)))
+                  : (this.assertChangeAnnotations(this.changeAnnotations),
+                    (o = this.changeAnnotations.manage(r)),
+                    (e = I.insert(t, i, o))),
               this.edits.push(e),
               o !== void 0)
             )
@@ -545,10 +545,10 @@ define('vs/language/html/htmlMode', ['require', 'require'], (require) => {
               (r === void 0
                 ? (e = _.replace(t, i))
                 : T.is(r)
-                ? ((o = r), (e = I.replace(t, i, r)))
-                : (this.assertChangeAnnotations(this.changeAnnotations),
-                  (o = this.changeAnnotations.manage(r)),
-                  (e = I.replace(t, i, o))),
+                  ? ((o = r), (e = I.replace(t, i, r)))
+                  : (this.assertChangeAnnotations(this.changeAnnotations),
+                    (o = this.changeAnnotations.manage(r)),
+                    (e = I.replace(t, i, o))),
               this.edits.push(e),
               o !== void 0)
             )
@@ -560,10 +560,10 @@ define('vs/language/html/htmlMode', ['require', 'require'], (require) => {
               (i === void 0
                 ? (r = _.del(t))
                 : T.is(i)
-                ? ((e = i), (r = I.del(t, i)))
-                : (this.assertChangeAnnotations(this.changeAnnotations),
-                  (e = this.changeAnnotations.manage(i)),
-                  (r = I.del(t, e))),
+                  ? ((e = i), (r = I.del(t, i)))
+                  : (this.assertChangeAnnotations(this.changeAnnotations),
+                    (e = this.changeAnnotations.manage(i)),
+                    (r = I.del(t, e))),
               this.edits.push(r),
               e !== void 0)
             )
@@ -1040,8 +1040,8 @@ define('vs/language/html/htmlMode', ['require', 'require'], (require) => {
           typeof e == 'string'
             ? ((u = !1), (s.kind = e))
             : O.is(e)
-            ? (s.command = e)
-            : (s.edit = e),
+              ? (s.command = e)
+              : (s.edit = e),
           u && o !== void 0 && (s.kind = o),
           s
         )
@@ -1530,18 +1530,18 @@ define('vs/language/html/htmlMode', ['require', 'require'], (require) => {
       return typeof n == 'string'
         ? { value: n }
         : xn(n)
-        ? n.kind === 'plaintext'
-          ? { value: n.value.replace(/[\\`*_{}[\]()#+\-.!]/g, '\\$&') }
-          : { value: n.value }
-        : {
-            value:
-              '```' +
-              n.language +
-              `
+          ? n.kind === 'plaintext'
+            ? { value: n.value.replace(/[\\`*_{}[\]()#+\-.!]/g, '\\$&') }
+            : { value: n.value }
+          : {
+              value:
+                '```' +
+                n.language +
+                `
 ` +
-              n.value +
-              '\n```\n',
-          }
+                n.value +
+                '\n```\n',
+            }
     }
     function kn(n) {
       if (!!n) return Array.isArray(n) ? n.map(Ge) : [Ge(n)]

@@ -17,8 +17,8 @@ define('vs/language/json/jsonMode', ['require', 'require'], (require) => {
       typeof require != 'undefined'
         ? require
         : typeof Proxy != 'undefined'
-        ? new Proxy(e, { get: (t, i) => (typeof require != 'undefined' ? require : t)[i] })
-        : e)(function (e) {
+          ? new Proxy(e, { get: (t, i) => (typeof require != 'undefined' ? require : t)[i] })
+          : e)(function (e) {
       if (typeof require != 'undefined') return require.apply(this, arguments)
       throw new Error('Dynamic require of "' + e + '" is not supported')
     })
@@ -530,10 +530,10 @@ define('vs/language/json/jsonMode', ['require', 'require'], (require) => {
               (r === void 0
                 ? (n = A.insert(t, i))
                 : T.is(r)
-                ? ((a = r), (n = S.insert(t, i, r)))
-                : (this.assertChangeAnnotations(this.changeAnnotations),
-                  (a = this.changeAnnotations.manage(r)),
-                  (n = S.insert(t, i, a))),
+                  ? ((a = r), (n = S.insert(t, i, r)))
+                  : (this.assertChangeAnnotations(this.changeAnnotations),
+                    (a = this.changeAnnotations.manage(r)),
+                    (n = S.insert(t, i, a))),
               this.edits.push(n),
               a !== void 0)
             )
@@ -545,10 +545,10 @@ define('vs/language/json/jsonMode', ['require', 'require'], (require) => {
               (r === void 0
                 ? (n = A.replace(t, i))
                 : T.is(r)
-                ? ((a = r), (n = S.replace(t, i, r)))
-                : (this.assertChangeAnnotations(this.changeAnnotations),
-                  (a = this.changeAnnotations.manage(r)),
-                  (n = S.replace(t, i, a))),
+                  ? ((a = r), (n = S.replace(t, i, r)))
+                  : (this.assertChangeAnnotations(this.changeAnnotations),
+                    (a = this.changeAnnotations.manage(r)),
+                    (n = S.replace(t, i, a))),
               this.edits.push(n),
               a !== void 0)
             )
@@ -560,10 +560,10 @@ define('vs/language/json/jsonMode', ['require', 'require'], (require) => {
               (i === void 0
                 ? (r = A.del(t))
                 : T.is(i)
-                ? ((n = i), (r = S.del(t, i)))
-                : (this.assertChangeAnnotations(this.changeAnnotations),
-                  (n = this.changeAnnotations.manage(i)),
-                  (r = S.del(t, n))),
+                  ? ((n = i), (r = S.del(t, i)))
+                  : (this.assertChangeAnnotations(this.changeAnnotations),
+                    (n = this.changeAnnotations.manage(i)),
+                    (r = S.del(t, n))),
               this.edits.push(r),
               n !== void 0)
             )
@@ -1040,8 +1040,8 @@ define('vs/language/json/jsonMode', ['require', 'require'], (require) => {
           typeof n == 'string'
             ? ((u = !1), (o.kind = n))
             : K.is(n)
-            ? (o.command = n)
-            : (o.edit = n),
+              ? (o.command = n)
+              : (o.edit = n),
           u && a !== void 0 && (o.kind = a),
           o
         )
@@ -1530,18 +1530,18 @@ define('vs/language/json/jsonMode', ['require', 'require'], (require) => {
       return typeof e == 'string'
         ? { value: e }
         : Fn(e)
-        ? e.kind === 'plaintext'
-          ? { value: e.value.replace(/[\\`*_{}[\]()#+\-.!]/g, '\\$&') }
-          : { value: e.value }
-        : {
-            value:
-              '```' +
-              e.language +
-              `
+          ? e.kind === 'plaintext'
+            ? { value: e.value.replace(/[\\`*_{}[\]()#+\-.!]/g, '\\$&') }
+            : { value: e.value }
+          : {
+              value:
+                '```' +
+                e.language +
+                `
 ` +
-              e.value +
-              '\n```\n',
-          }
+                e.value +
+                '\n```\n',
+            }
     }
     function jn(e) {
       if (!!e) return Array.isArray(e) ? e.map(un) : [un(e)]
@@ -2125,10 +2125,10 @@ define('vs/language/json/jsonMode', ['require', 'require'], (require) => {
           return t === this
             ? !0
             : !t || !(t instanceof W)
-            ? !1
-            : this.scanError === t.scanError &&
-              this.lastWasColon === t.lastWasColon &&
-              P.equals(this.parents, t.parents)
+              ? !1
+              : this.scanError === t.scanError &&
+                this.lastWasColon === t.lastWasColon &&
+                P.equals(this.parents, t.parents)
         }
         getStateData() {
           return this._state

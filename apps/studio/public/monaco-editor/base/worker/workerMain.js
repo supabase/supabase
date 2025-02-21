@@ -123,8 +123,8 @@
           navigator.userAgent.indexOf('Windows') >= 0
           ? !0
           : typeof process < 'u'
-          ? process.platform === 'win32'
-          : !1
+            ? process.platform === 'win32'
+            : !1
       }
     }
     x.Environment = n
@@ -290,10 +290,10 @@
             h === 'ignoreDuplicateModules' && typeof L.ignoreDuplicateModules < 'u'
               ? (L.ignoreDuplicateModules = L.ignoreDuplicateModules.concat(a))
               : h === 'paths' && typeof L.paths < 'u'
-              ? x.Utilities.forEachProperty(a, (w, e) => (L.paths[w] = e))
-              : h === 'config' && typeof L.config < 'u'
-              ? x.Utilities.forEachProperty(a, (w, e) => (L.config[w] = e))
-              : (L[h] = x.Utilities.recursiveClone(a))
+                ? x.Utilities.forEachProperty(a, (w, e) => (L.paths[w] = e))
+                : h === 'config' && typeof L.config < 'u'
+                  ? x.Utilities.forEachProperty(a, (w, e) => (L.config[w] = e))
+                  : (L[h] = x.Utilities.recursiveClone(a))
           }),
           R.validateConfigurationOptions(L)
         )
@@ -724,20 +724,23 @@
           g = 0,
           S
         const E = () => {
-          setTimeout(() => {
-            S || (S = this._crypto.createHash('md5').update(w, 'utf8').digest())
-            const y = a.createCachedData()
-            if (!(y.length === 0 || y.length === v || g >= 5)) {
-              if (y.length < v) {
-                E()
-                return
+          setTimeout(
+            () => {
+              S || (S = this._crypto.createHash('md5').update(w, 'utf8').digest())
+              const y = a.createCachedData()
+              if (!(y.length === 0 || y.length === v || g >= 5)) {
+                if (y.length < v) {
+                  E()
+                  return
+                }
+                ;(v = y.length),
+                  this._fs.writeFile(e, Buffer.concat([S, y]), (_) => {
+                    _ && b.getConfig().onError(_), b.getRecorder().record(63, e), E()
+                  })
               }
-              ;(v = y.length),
-                this._fs.writeFile(e, Buffer.concat([S, y]), (_) => {
-                  _ && b.getConfig().onError(_), b.getRecorder().record(63, e), E()
-                })
-            }
-          }, f * Math.pow(4, g++))
+            },
+            f * Math.pow(4, g++)
+          )
         }
         E()
       }
@@ -765,20 +768,23 @@
       _verifyCachedData(a, w, e, b, f) {
         !b ||
           a.cachedDataRejected ||
-          setTimeout(() => {
-            const v = this._crypto.createHash('md5').update(w, 'utf8').digest()
-            b.equals(v) ||
-              (f
-                .getConfig()
-                .onError(
-                  new Error(
-                    `FAILED TO VERIFY CACHED DATA, deleting stale '${e}' now, but a RESTART IS REQUIRED`
-                  )
-                ),
-              this._fs.unlink(e, (g) => {
-                g && f.getConfig().onError(g)
-              }))
-          }, Math.ceil(5e3 * (1 + Math.random())))
+          setTimeout(
+            () => {
+              const v = this._crypto.createHash('md5').update(w, 'utf8').digest()
+              b.equals(v) ||
+                (f
+                  .getConfig()
+                  .onError(
+                    new Error(
+                      `FAILED TO VERIFY CACHED DATA, deleting stale '${e}' now, but a RESTART IS REQUIRED`
+                    )
+                  ),
+                this._fs.unlink(e, (g) => {
+                  g && f.getConfig().onError(g)
+                }))
+            },
+            Math.ceil(5e3 * (1 + Math.random()))
+          )
       }
     }
     ;(s._BOM = 65279),
@@ -1571,38 +1577,38 @@
             o ? g([v + '.nls'], u) : u(c)
           })
         : _.translationServiceUrl && !C
-        ? be(this, void 0, void 0, function* () {
-            var o
-            try {
-              const c = yield L(_.translationServiceUrl, d, v)
-              return u(c)
-            } catch (c) {
-              if (!d.includes('-')) return console.error(c), g([v + '.nls'], u)
+          ? be(this, void 0, void 0, function* () {
+              var o
               try {
-                const l = d.split('-')[0],
-                  m = yield L(_.translationServiceUrl, l, v)
-                return (
-                  ((o = _.availableLanguages) !== null && o !== void 0) ||
-                    (_.availableLanguages = {}),
-                  (_.availableLanguages['*'] = l),
-                  u(m)
-                )
-              } catch (l) {
-                return console.error(l), g([v + '.nls'], u)
+                const c = yield L(_.translationServiceUrl, d, v)
+                return u(c)
+              } catch (c) {
+                if (!d.includes('-')) return console.error(c), g([v + '.nls'], u)
+                try {
+                  const l = d.split('-')[0],
+                    m = yield L(_.translationServiceUrl, l, v)
+                  return (
+                    ((o = _.availableLanguages) !== null && o !== void 0) ||
+                      (_.availableLanguages = {}),
+                    (_.availableLanguages['*'] = l),
+                    u(m)
+                  )
+                } catch (l) {
+                  return console.error(l), g([v + '.nls'], u)
+                }
               }
-            }
-          })
-        : g([v + r], u, (o) => {
-            if (r === '.nls') {
-              console.error('Failed trying to load default language strings', o)
-              return
-            }
-            console.error(
-              `Failed to load message bundle for language ${d}. Falling back to the default language:`,
-              o
-            ),
-              g([v + '.nls'], u)
-          })
+            })
+          : g([v + r], u, (o) => {
+              if (r === '.nls') {
+                console.error('Failed trying to load default language strings', o)
+                return
+              }
+              console.error(
+                `Failed to load message bundle for language ${d}. Falling back to the default language:`,
+                o
+              ),
+                g([v + '.nls'], u)
+            })
     }
     n.load = f
   }),
@@ -1799,8 +1805,8 @@
         return F < t.length
           ? a(F, t, T)
           : F < t.length + ie.length
-          ? ie[0]
-          : a(F - (t.length + ie.length), te, T)
+            ? ie[0]
+            : a(F - (t.length + ie.length), te, T)
       }
       n.quickSelect = a
       function w(F, U) {
@@ -3060,7 +3066,13 @@
           if (s.prev !== R.Undefined && s.next !== R.Undefined) {
             const p = s.prev
             ;(p.next = s.next), (s.next.prev = p)
-          } else s.prev === R.Undefined && s.next === R.Undefined ? ((this._first = R.Undefined), (this._last = R.Undefined)) : s.next === R.Undefined ? ((this._last = this._last.prev), (this._last.next = R.Undefined)) : s.prev === R.Undefined && ((this._first = this._first.next), (this._first.prev = R.Undefined))
+          } else
+            s.prev === R.Undefined && s.next === R.Undefined
+              ? ((this._first = R.Undefined), (this._last = R.Undefined))
+              : s.next === R.Undefined
+                ? ((this._last = this._last.prev), (this._last.next = R.Undefined))
+                : s.prev === R.Undefined &&
+                  ((this._first = this._first.next), (this._first.prev = R.Undefined))
           this._size -= 1
         }
         *[Symbol.iterator]() {
@@ -3495,20 +3507,20 @@
         return P === 0
           ? O !== 5 && O !== 7
           : P === 2 && O === 3
-          ? !1
-          : P === 4 || P === 2 || P === 3 || O === 4 || O === 2 || O === 3
-          ? !0
-          : !(
-              (P === 8 && (O === 8 || O === 9 || O === 11 || O === 12)) ||
-              ((P === 11 || P === 9) && (O === 9 || O === 10)) ||
-              ((P === 12 || P === 10) && O === 10) ||
-              O === 5 ||
-              O === 13 ||
-              O === 7 ||
-              P === 1 ||
-              (P === 13 && O === 14) ||
-              (P === 6 && O === 6)
-            )
+            ? !1
+            : P === 4 || P === 2 || P === 3 || O === 4 || O === 2 || O === 3
+              ? !0
+              : !(
+                  (P === 8 && (O === 8 || O === 9 || O === 11 || O === 12)) ||
+                  ((P === 11 || P === 9) && (O === 9 || O === 10)) ||
+                  ((P === 12 || P === 10) && O === 10) ||
+                  O === 5 ||
+                  O === 13 ||
+                  O === 7 ||
+                  P === 1 ||
+                  (P === 13 && O === 14) ||
+                  (P === 6 && O === 6)
+                )
       }
       class ee {
         static getInstance() {
@@ -3748,15 +3760,15 @@
             y < 128
               ? (S[E++] = y)
               : y < 2048
-              ? ((S[E++] = 192 | ((y & 1984) >>> 6)), (S[E++] = 128 | ((y & 63) >>> 0)))
-              : y < 65536
-              ? ((S[E++] = 224 | ((y & 61440) >>> 12)),
-                (S[E++] = 128 | ((y & 4032) >>> 6)),
-                (S[E++] = 128 | ((y & 63) >>> 0)))
-              : ((S[E++] = 240 | ((y & 1835008) >>> 18)),
-                (S[E++] = 128 | ((y & 258048) >>> 12)),
-                (S[E++] = 128 | ((y & 4032) >>> 6)),
-                (S[E++] = 128 | ((y & 63) >>> 0))),
+                ? ((S[E++] = 192 | ((y & 1984) >>> 6)), (S[E++] = 128 | ((y & 63) >>> 0)))
+                : y < 65536
+                  ? ((S[E++] = 224 | ((y & 61440) >>> 12)),
+                    (S[E++] = 128 | ((y & 4032) >>> 6)),
+                    (S[E++] = 128 | ((y & 63) >>> 0)))
+                  : ((S[E++] = 240 | ((y & 1835008) >>> 18)),
+                    (S[E++] = 128 | ((y & 258048) >>> 12)),
+                    (S[E++] = 128 | ((y & 4032) >>> 6)),
+                    (S[E++] = 128 | ((y & 63) >>> 0))),
             E >= 64 &&
               (this._step(),
               (E -= 64),
@@ -3816,10 +3828,10 @@
             l < 20
               ? ((u = (_ & d) | (~_ & C)), (o = 1518500249))
               : l < 40
-              ? ((u = _ ^ d ^ C), (o = 1859775393))
-              : l < 60
-              ? ((u = (_ & d) | (_ & C) | (d & C)), (o = 2400959708))
-              : ((u = _ ^ d ^ C), (o = 3395469782)),
+                ? ((u = _ ^ d ^ C), (o = 1859775393))
+                : l < 60
+                  ? ((u = (_ & d) | (_ & C) | (d & C)), (o = 2400959708))
+                  : ((u = _ ^ d ^ C), (o = 3395469782)),
               (c = (w(y, 5) + u + r + o + S.getUint32(l * 4, !1)) & 4294967295),
               (r = C),
               (C = d),
@@ -3946,8 +3958,8 @@
           return this._originalElementsOrHash[e] !== this._modifiedElementsOrHash[b]
             ? !1
             : this._hasStrings
-            ? this._originalStringElements[e] === this._modifiedStringElements[b]
-            : !0
+              ? this._originalStringElements[e] === this._modifiedStringElements[b]
+              : !0
         }
         ElementsAreStrictEqual(e, b) {
           if (!this.ElementsAreEqual(e, b)) return !1
@@ -3962,15 +3974,15 @@
           return this._originalElementsOrHash[e] !== this._originalElementsOrHash[b]
             ? !1
             : this._hasStrings
-            ? this._originalStringElements[e] === this._originalStringElements[b]
-            : !0
+              ? this._originalStringElements[e] === this._originalStringElements[b]
+              : !0
         }
         ModifiedElementsAreEqual(e, b) {
           return this._modifiedElementsOrHash[e] !== this._modifiedElementsOrHash[b]
             ? !1
             : this._hasStrings
-            ? this._modifiedStringElements[e] === this._modifiedStringElements[b]
-            : !0
+              ? this._modifiedStringElements[e] === this._modifiedStringElements[b]
+              : !0
         }
         ComputeDiff(e) {
           return this._ComputeDiff(
@@ -3996,11 +4008,17 @@
                 ? (p.Assert(e === b + 1, 'originalStart should only be one more than originalEnd'),
                   (C = [new R.DiffChange(e, 0, f, v - f + 1)]))
                 : e <= b
-                ? (p.Assert(f === v + 1, 'modifiedStart should only be one more than modifiedEnd'),
-                  (C = [new R.DiffChange(e, b - e + 1, f, 0)]))
-                : (p.Assert(e === b + 1, 'originalStart should only be one more than originalEnd'),
-                  p.Assert(f === v + 1, 'modifiedStart should only be one more than modifiedEnd'),
-                  (C = [])),
+                  ? (p.Assert(
+                      f === v + 1,
+                      'modifiedStart should only be one more than modifiedEnd'
+                    ),
+                    (C = [new R.DiffChange(e, b - e + 1, f, 0)]))
+                  : (p.Assert(
+                      e === b + 1,
+                      'originalStart should only be one more than originalEnd'
+                    ),
+                    p.Assert(f === v + 1, 'modifiedStart should only be one more than modifiedEnd'),
+                    (C = [])),
               C
             )
           }
@@ -5256,11 +5274,11 @@
             w === null
               ? (w = e)
               : w.endLineNumberExclusive >= e.startLineNumber
-              ? (w = new D(
-                  w.startLineNumber,
-                  Math.max(w.endLineNumberExclusive, e.endLineNumberExclusive)
-                ))
-              : (L.push(w), (w = e))
+                ? (w = new D(
+                    w.startLineNumber,
+                    Math.max(w.endLineNumberExclusive, e.endLineNumberExclusive)
+                  ))
+                : (L.push(w), (w = e))
           }
           return w !== null && L.push(w), L
         }
@@ -5392,8 +5410,8 @@
           return i.lineNumber < s.lineNumber
             ? !0
             : s.lineNumber < i.lineNumber
-            ? !1
-            : i.column < s.column
+              ? !1
+              : i.column < s.column
         }
         isBeforeOrEqual(i) {
           return R.isBeforeOrEqual(this, i)
@@ -5402,8 +5420,8 @@
           return i.lineNumber < s.lineNumber
             ? !0
             : s.lineNumber < i.lineNumber
-            ? !1
-            : i.column <= s.column
+              ? !1
+              : i.column <= s.column
         }
         static compare(i, s) {
           const p = i.lineNumber | 0,
@@ -5505,13 +5523,13 @@
             p.startLineNumber < s.startLineNumber
               ? ((L = p.startLineNumber), (h = p.startColumn))
               : p.startLineNumber === s.startLineNumber
-              ? ((L = p.startLineNumber), (h = Math.min(p.startColumn, s.startColumn)))
-              : ((L = s.startLineNumber), (h = s.startColumn)),
+                ? ((L = p.startLineNumber), (h = Math.min(p.startColumn, s.startColumn)))
+                : ((L = s.startLineNumber), (h = s.startColumn)),
             p.endLineNumber > s.endLineNumber
               ? ((a = p.endLineNumber), (w = p.endColumn))
               : p.endLineNumber === s.endLineNumber
-              ? ((a = p.endLineNumber), (w = Math.max(p.endColumn, s.endColumn)))
-              : ((a = s.endLineNumber), (w = s.endColumn)),
+                ? ((a = p.endLineNumber), (w = Math.max(p.endColumn, s.endColumn)))
+                : ((a = s.endLineNumber), (w = s.endColumn)),
             new D(L, h, a, w)
           )
         }
@@ -6580,18 +6598,18 @@
           return A.originalEndLineNumber === 0 || A.modifiedEndLineNumber === 0
             ? !1
             : A.originalEndLineNumber === r && A.modifiedEndLineNumber === c
-            ? (this.shouldComputeCharChanges &&
-                A.charChanges &&
-                A.charChanges.push(new f(r, u, r, o, c, l, c, m)),
-              !0)
-            : A.originalEndLineNumber + 1 === r && A.modifiedEndLineNumber + 1 === c
-            ? ((A.originalEndLineNumber = r),
-              (A.modifiedEndLineNumber = c),
-              this.shouldComputeCharChanges &&
-                A.charChanges &&
-                A.charChanges.push(new f(r, u, r, o, c, l, c, m)),
-              !0)
-            : !1
+              ? (this.shouldComputeCharChanges &&
+                  A.charChanges &&
+                  A.charChanges.push(new f(r, u, r, o, c, l, c, m)),
+                !0)
+              : A.originalEndLineNumber + 1 === r && A.modifiedEndLineNumber + 1 === c
+                ? ((A.originalEndLineNumber = r),
+                  (A.modifiedEndLineNumber = c),
+                  this.shouldComputeCharChanges &&
+                    A.charChanges &&
+                    A.charChanges.push(new f(r, u, r, o, c, l, c, m)),
+                  !0)
+                : !1
         }
       }
       n.DiffComputer = S
@@ -6935,18 +6953,18 @@
           return l === 10
             ? 7
             : l === 13
-            ? 6
-            : c(l)
-            ? 5
-            : l >= 97 && l <= 122
-            ? 0
-            : l >= 65 && l <= 90
-            ? 1
-            : l >= 48 && l <= 57
-            ? 2
-            : l === -1
-            ? 3
-            : 4
+              ? 6
+              : c(l)
+                ? 5
+                : l >= 97 && l <= 122
+                  ? 0
+                  : l >= 65 && l <= 90
+                    ? 1
+                    : l >= 48 && l <= 57
+                      ? 2
+                      : l === -1
+                        ? 3
+                        : 4
         }
         function c(l) {
           return l === 32 || l === 9
@@ -7761,8 +7779,8 @@
           return m
             ? w(this._getMultilineMatchRange(y, u, c, l, m.index, m[0]), m, C)
             : _.lineNumber !== 1 || _.column !== 1
-            ? this._doFindNextMatchMultiline(y, new i.Position(1, 1), d, C)
-            : null
+              ? this._doFindNextMatchMultiline(y, new i.Position(1, 1), d, C)
+              : null
         }
         static _doFindNextMatchLineByLine(y, _, d, C) {
           const r = y.getLineCount(),
@@ -8021,12 +8039,12 @@
           return !g && S
             ? 0
             : this.options.invisibleCharacters &&
-              !w(b) &&
-              i.InvisibleCharacters.isInvisibleCharacter(v)
-            ? 2
-            : this.options.ambiguousCharacters && this.ambiguousCharacters.isAmbiguous(v)
-            ? 3
-            : 0
+                !w(b) &&
+                i.InvisibleCharacters.isInvisibleCharacter(v)
+              ? 2
+              : this.options.ambiguousCharacters && this.ambiguousCharacters.isAmbiguous(v)
+                ? 3
+                : 0
         }
       }
       function w(e) {
@@ -10159,9 +10177,9 @@
           return a === L.None || a === L.Cancelled || a instanceof s
             ? !0
             : !a || typeof a != 'object'
-            ? !1
-            : typeof a.isCancellationRequested == 'boolean' &&
-              typeof a.onCancellationRequested == 'function'
+              ? !1
+              : typeof a.isCancellationRequested == 'boolean' &&
+                typeof a.onCancellationRequested == 'function'
         }
         ;(L.isCancellationToken = h),
           (L.None = Object.freeze({
@@ -10260,15 +10278,15 @@
           return c instanceof f
             ? !0
             : c
-            ? typeof c.authority == 'string' &&
-              typeof c.fragment == 'string' &&
-              typeof c.path == 'string' &&
-              typeof c.query == 'string' &&
-              typeof c.scheme == 'string' &&
-              typeof c.fsPath == 'string' &&
-              typeof c.with == 'function' &&
-              typeof c.toString == 'function'
-            : !1
+              ? typeof c.authority == 'string' &&
+                typeof c.fragment == 'string' &&
+                typeof c.path == 'string' &&
+                typeof c.query == 'string' &&
+                typeof c.scheme == 'string' &&
+                typeof c.fsPath == 'string' &&
+                typeof c.with == 'function' &&
+                typeof c.toString == 'function'
+              : !1
         }
         constructor(c, l, m, N, A, M = !1) {
           typeof c == 'object'
@@ -10446,13 +10464,13 @@
           o.authority && o.path.length > 1 && o.scheme === 'file'
             ? (l = `//${o.authority}${o.path}`)
             : o.path.charCodeAt(0) === 47 &&
-              ((o.path.charCodeAt(1) >= 65 && o.path.charCodeAt(1) <= 90) ||
-                (o.path.charCodeAt(1) >= 97 && o.path.charCodeAt(1) <= 122)) &&
-              o.path.charCodeAt(2) === 58
-            ? c
-              ? (l = o.path.substr(1))
-              : (l = o.path[1].toLowerCase() + o.path.substr(2))
-            : (l = o.path),
+                ((o.path.charCodeAt(1) >= 65 && o.path.charCodeAt(1) <= 90) ||
+                  (o.path.charCodeAt(1) >= 97 && o.path.charCodeAt(1) <= 122)) &&
+                o.path.charCodeAt(2) === 58
+              ? c
+                ? (l = o.path.substr(1))
+                : (l = o.path[1].toLowerCase() + o.path.substr(2))
+              : (l = o.path),
           D.isWindows && (l = l.replace(/\//g, '\\')),
           l
         )

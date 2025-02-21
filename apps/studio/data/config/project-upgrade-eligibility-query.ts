@@ -6,12 +6,12 @@ import { useProjectByRef } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants/infrastructure'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
-import { apiComponents } from 'api-types'
+import { components } from 'api-types'
 
-export type ProjectUpgradeTargetVersion = apiComponents['schemas']['ProjectVersion']
+export type ProjectUpgradeTargetVersion = components['schemas']['ProjectVersion']
 export type ProjectUpgradeEligibilityVariables = { projectRef?: string }
 export type ProjectUpgradeEligibilityResponse =
-apiComponents['schemas']['ProjectUpgradeEligibilityResponse']
+  components['schemas']['ProjectUpgradeEligibilityResponse']
 
 export async function getProjectUpgradeEligibility(
   { projectRef }: ProjectUpgradeEligibilityVariables,

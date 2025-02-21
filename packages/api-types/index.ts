@@ -11,9 +11,12 @@ import type {
 } from './types/platform'
 
 export interface paths extends apiPaths, platformPaths {}
-
-//  For backwards compat, this is exported as components instead of platformComponents to avoid a ton of file changes right now
-export type { platformComponents as components }
-export type { apiComponents }
-
 export interface operations extends apiOperations, platformOperations {}
+export interface components {
+  schemas: apiComponents['schemas'] & platformComponents['schemas']
+  responses: apiComponents['responses'] & platformComponents['responses']
+  parameters: apiComponents['parameters'] & platformComponents['parameters']
+  requestBodies: apiComponents['requestBodies'] & platformComponents['requestBodies']
+  headers: apiComponents['headers'] & platformComponents['headers']
+  pathItems: apiComponents['pathItems'] & platformComponents['pathItems']
+}

@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import type { apiComponents } from 'data/api'
+import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
@@ -8,7 +8,7 @@ export type BranchesVariables = {
   projectRef?: string
 }
 
-export type Branch = apiComponents['schemas']['BranchResponse']
+export type Branch = components['schemas']['BranchResponse']
 
 export async function getBranches({ projectRef }: BranchesVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('Project ref is required')
