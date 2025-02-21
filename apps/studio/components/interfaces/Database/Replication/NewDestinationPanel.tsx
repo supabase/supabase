@@ -5,7 +5,7 @@ import { useCreateSinkMutation } from 'data/replication/create-sink-mutation'
 import { useCreateSourceMutation } from 'data/replication/create-source-mutation'
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Accordion_Shadcn_,
@@ -37,6 +37,8 @@ import {
 } from 'ui'
 import * as z from 'zod'
 import PublicationsComboBox from './PublicationsComboBox'
+import NewPublicationPanel from './NewPublicationPanel'
+import { useState } from 'react'
 
 interface NewDestinationPanelProps {
   visible: boolean
@@ -46,6 +48,7 @@ interface NewDestinationPanelProps {
 
 const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanelProps) => {
   const { ref: projectRef } = useParams()
+  const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
   const { mutateAsync: createSource, isLoading: creatingSource } = useCreateSourceMutation()
   const { mutateAsync: createSink, isLoading: creatingSink } = useCreateSinkMutation()
   const { mutateAsync: createPipeline, isLoading: creatingPipeline } = useCreatePipelineMutation()
@@ -244,6 +247,7 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
                             publications={publications?.map((pub) => pub.name) || []}
                             loading={loadingPublications}
                             onSelectPublication={field.onChange}
+                            onNewPublicationClick={() => setPublicationPanelVisible(false)}
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
@@ -335,6 +339,7 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
           </div>
         </SheetContent>
       </Sheet>
+      <NewPublicationPanel visible={publicationPanelVisible}></NewPublicationPanel>
     </>
   )
 }

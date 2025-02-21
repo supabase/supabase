@@ -19,12 +19,14 @@ interface PublicationsComboBoxProps {
   publications: string[]
   loading: boolean
   onSelectPublication: (publication: string) => void
+  onNewPublicationClick: () => void
 }
 
 const PublicationsComboBox = ({
   publications,
   loading,
   onSelectPublication,
+  onNewPublicationClick,
 }: PublicationsComboBoxProps) => {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [selectedPublication, setSelectedPublication] = useState<string>('')
@@ -101,8 +103,8 @@ const PublicationsComboBox = ({
             <CommandGroup_Shadcn_>
               <CommandItem_Shadcn_
                 className="cursor-pointer w-full"
-                onSelect={() => {}}
-                onClick={() => {}}
+                onSelect={onNewPublicationClick}
+                onClick={onNewPublicationClick}
               >
                 <Plus size={14} strokeWidth={1.5} className="mr-2" />
                 <p>New publication</p>
