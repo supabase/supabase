@@ -219,11 +219,11 @@ const SubscriptionPlanUpdateDialog = ({
                           {subscription?.plan?.id !== 'free' && (
                             <TableRow>
                               <TableCell className="py-2 pl-0">
-                                <span>+ compute already used</span>
+                                <span>+ current cycle usage</span>
                               </TableCell>
                               <TableCell className="py-2 pr-0 text-right">
                                 <Link
-                                  href={`/org/${slug}/usage`}
+                                  href={`/org/${slug}/billing#breakdown`}
                                   className="text-sm text-brand hover:text-brand-600 transition"
                                 >
                                   View spend
@@ -257,9 +257,9 @@ const SubscriptionPlanUpdateDialog = ({
                 <HoverCardContent className="w-[520px] p-6">
                   <h3 className="text-md font-medium mb-2">Estimating your invoice</h3>
                   <p className="text-sm text-foreground-light mb-4">
-                    At the end of your billing cycle, compute costs will be calculated and added to
-                    your plan costs. Each active project will use at least $10 of compute a month
-                    (billed hourly).
+                    At the end of your billing cycle, compute and add-on costs will be calculated on
+                    an hourly basis and added to your plan. Each active project will use at least
+                    $10 of compute a month if it's active 24/7.
                   </p>
                   {subscriptionPreviewError && (
                     <AlertError
