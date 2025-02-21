@@ -38,10 +38,10 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: f4ba6aec3bbe2bb3fb451a5d4404dc3a331d8e80
+          key: 1b63d22ef9b987f802cba06f01ec0da4b8eb4847
       - name: install linter
         if: steps.cache-cargo.outputs.cache-hit != 'true'
-        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev f4ba6aec3bbe2bb3fb451a5d4404dc3a331d8e80
+        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 1b63d22ef9b987f802cba06f01ec0da4b8eb4847
       - name: install reviewdog
         uses: reviewdog/action-setup@3f401fe1d58fe77e10d665ab713057375e39b887 # v1.3.0
         with:
