@@ -14,30 +14,46 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
+import { ControllerRenderProps } from 'react-hook-form'
 
 interface PublicationsComboBoxProps {
   publications: string[]
   loading: boolean
-  onSelectPublication: (publication: string) => void
   onNewPublicationClick: () => void
+  field: ControllerRenderProps<any, 'publicationName'>
 }
 
 const PublicationsComboBox = ({
   publications,
   loading,
-  onSelectPublication,
   onNewPublicationClick,
+  field,
 }: PublicationsComboBoxProps) => {
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [selectedPublication, setSelectedPublication] = useState<string>('')
+  const [selectedPublication, setSelectedPublication] = useState<string>(field?.value || '')
   const [searchTerm, setSearchTerm] = useState('')
 
   function handleSearchChange(value: string) {
     setSearchTerm(value)
   }
 
+  function handlePublicationSelect(pub: string) {
+    setSelectedPublication(pub)
+    setDropdownOpen(false)
+    field.onChange(pub)
+  }
+
   return (
-    <Popover_Shadcn_ modal={false} open={dropdownOpen} onOpenChange={setDropdownOpen}>
+    <Popover_Shadcn_
+      modal={false}
+      open={dropdownOpen}
+      onOpenChange={(open) => {
+        setDropdownOpen(open)
+        if (!open && field?.onBlur) {
+          field.onBlur()
+        }
+      }}
+    >
       <PopoverTrigger_Shadcn_ asChild>
         <Button
           type="default"
@@ -50,10 +66,10 @@ const PublicationsComboBox = ({
               size={14}
             ></ChevronsUpDown>
           }
+          name={field.name}
+          onBlur={field.onBlur}
         >
-          {selectedPublication !== undefined && selectedPublication !== ''
-            ? selectedPublication
-            : 'Select publication'}
+          {selectedPublication || 'Select publication'}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0" sameWidthAsTrigger>
@@ -81,14 +97,10 @@ const PublicationsComboBox = ({
                     key={pub}
                     className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                     onSelect={() => {
-                      setSelectedPublication(pub)
-                      setDropdownOpen(false)
-                      onSelectPublication(pub)
+                      handlePublicationSelect(pub)
                     }}
                     onClick={() => {
-                      setSelectedPublication(pub)
-                      setDropdownOpen(false)
-                      onSelectPublication(pub)
+                      handlePublicationSelect(pub)
                     }}
                   >
                     <span>{pub}</span>
