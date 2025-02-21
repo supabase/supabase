@@ -66,9 +66,14 @@ const InfoTooltip = ({
 
   return (
     <>
-      <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
+      <Tooltip open={tooltipOpen} onOpenChange={(open) => !isMobile && setTooltipOpen(open)}>
         <TooltipTrigger asChild>
-          <span role="button" tabIndex={0} className={cn(buttonClassName, className)}>
+          <span
+            role="button"
+            tabIndex={0}
+            onClick={() => setMobileSheetOpen(true)}
+            className={cn(buttonClassName, className)}
+          >
             {children}
             <InfoIcon
               aria-hidden={true}
