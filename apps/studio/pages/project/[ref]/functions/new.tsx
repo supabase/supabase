@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { CornerDownLeft, Loader2, Book, Check, ChevronsUpDown, Plus, File } from 'lucide-react'
+import { CornerDownLeft, Loader2, Book, Check } from 'lucide-react'
 import { Button, Input_Shadcn_, Label_Shadcn_, cn } from 'ui'
 import { AiIconAnimation } from 'ui'
 import { BASE_PATH } from 'lib/constants'
@@ -126,47 +126,6 @@ app.get(/(.*)/, (req, res) => {
 app.listen(8000);`,
   },
 ]
-
-interface TreeNode {
-  id: string
-  name: string
-  metadata?: {
-    isEditing?: boolean
-    originalId: number
-  }
-  children?: TreeNode[]
-}
-
-interface TreeNodeRendererProps {
-  element: TreeNode
-  isBranch: boolean
-  isExpanded: boolean
-  isSelected: boolean
-  level: number
-  getNodeProps: () => React.HTMLAttributes<HTMLDivElement>
-}
-
-const getLanguageFromFileName = (fileName: string): string => {
-  const extension = fileName.split('.').pop()?.toLowerCase()
-  switch (extension) {
-    case 'ts':
-    case 'tsx':
-      return 'typescript'
-    case 'js':
-    case 'jsx':
-      return 'javascript'
-    case 'json':
-      return 'json'
-    case 'html':
-      return 'html'
-    case 'css':
-      return 'css'
-    case 'md':
-      return 'markdown'
-    default:
-      return 'typescript' // Default to typescript
-  }
-}
 
 const NewFunctionPage = () => {
   const router = useRouter()
