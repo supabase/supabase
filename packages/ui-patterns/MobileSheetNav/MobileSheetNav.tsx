@@ -32,7 +32,7 @@ const MobileSheetNav: React.FC<{
         side="bottom"
         className={cn(
           'rounded-t-lg overflow-hidden overflow-y-scroll',
-          'h-[85dvh] md:max-h-[500px] py-2'
+          'h-[85dvh] md:max-h-[500px] py-2 border border-b-0'
         )}
       >
         <ErrorBoundary FallbackComponent={() => <CommandEmpty_Shadcn_ />}>{children}</ErrorBoundary>
