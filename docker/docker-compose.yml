@@ -11,7 +11,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20250113-83c9420
+    image: supabase/studio:20250219-7101314
     restart: unless-stopped
     healthcheck:
       test:
