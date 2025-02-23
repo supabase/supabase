@@ -16,7 +16,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
   const urlParams = new URLSearchParams(router.asPath.split('?')[1])
-  const signInMethod = urlParams.get('method')
+  const signInMethod = urlParams.get('method') ?? 'Unknown' // current methods for mfa are github and sso
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: addLoginEvent } = useAddLoginEvent()
@@ -48,15 +48,13 @@ const SignInMfaPage: NextPageWithLayout = () => {
           }
 
           if (data.currentLevel === data.nextLevel) {
-            if (signInMethod === 'github' || signInMethod === 'sso') {
-              sendEvent({
-                action: TelemetryActions.SIGN_IN,
-                properties: {
-                  category: 'account',
-                  method: signInMethod,
-                },
-              })
-            }
+            sendEvent({
+              action: TelemetryActions.SIGN_IN,
+              properties: {
+                category: 'account',
+                method: signInMethod,
+              },
+            })
             addLoginEvent({})
 
             await queryClient.resetQueries()

@@ -106,7 +106,7 @@ export interface SignInEvent {
     /**
      * The method used to sign in, e.g. email, github, sso
      */
-    method: 'email' | 'github' | 'sso'
+    method: string
   }
 }
 
