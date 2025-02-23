@@ -33,7 +33,7 @@ const schema = object({
     .max(30, 'must be a value no greater than 30'),
   MFA_PHONE_TEMPLATE: string().required('SMS template is required.'),
   MFA_MAX_ENROLLED_FACTORS: number()
-    .min(0, 'Must be be a value more than 0')
+    .min(0, 'Must be a value 0 or larger')
     .max(30, 'Must be a value no greater than 30'),
   MFA_TOTP: string().required(),
   MFA_PHONE: string().required(),
@@ -97,7 +97,7 @@ const MfaAuthSettingsForm = () => {
   const INITIAL_VALUES = {
     MFA_PHONE_OTP_LENGTH: authConfig?.MFA_PHONE_OTP_LENGTH || 6,
     MFA_PHONE_TEMPLATE: authConfig?.MFA_PHONE_TEMPLATE || 'Your code is {{ .Code }}',
-    MFA_MAX_ENROLLED_FACTORS: authConfig?.MFA_MAX_ENROLLED_FACTORS || 10,
+    MFA_MAX_ENROLLED_FACTORS: authConfig?.MFA_MAX_ENROLLED_FACTORS ?? 10,
     MFA_TOTP:
       determineMFAStatus(
         authConfig?.MFA_TOTP_VERIFY_ENABLED ?? true,

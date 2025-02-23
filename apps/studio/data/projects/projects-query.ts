@@ -13,7 +13,7 @@ export type ProjectsVariables = {
 }
 
 export type ProjectInfo = components['schemas']['ProjectInfo'] & {
-  status: components['schemas']['ResourceWithServicesStatusResponse']['status']
+  status: components['schemas']['project_status']
 }
 
 export async function getProjects(signal?: AbortSignal) {
