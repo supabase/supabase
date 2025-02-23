@@ -202,7 +202,7 @@ We will create [database functions](https://supabase.com/docs/guides/database/fu
 
 ### Order by distance
 
-Sorting datasets from closest to farthest, sometimes called nearest-neighbor sort, is a very common use case in Geo-queries. PostGIS can handle it very easily with the use of the [`<->`](https://postgis.net/docs/geometry_distance_knn.html) operator. `<->` operator returns the two-dimensional distance between two geometries and will utilize the spatial index when used within `order by` clause. You can create the following database function to sort the restaurants from closest to farthest by passing the current locations as parameters.
+Sorting datasets from closest to farthest, sometimes called nearest-neighbor sort, is a very common use case in Geo-queries. PostGIS can handle it with the use of the [`<->`](https://postgis.net/docs/geometry_distance_knn.html) operator. `<->` operator returns the two-dimensional distance between two geometries and will utilize the spatial index when used within `order by` clause. You can create the following database function to sort the restaurants from closest to farthest by passing the current locations as parameters.
 
 ```sql
 create or replace function nearby_restaurants(lat float, long float)
