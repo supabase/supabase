@@ -218,6 +218,20 @@ const AIEditor = ({
   }, [value, defaultValue])
 
   useEffect(() => {
+    if (initialPrompt) {
+      setPromptInput(initialPrompt)
+      setPromptState({
+        isOpen: Boolean(initialPrompt),
+        selection: '',
+        beforeSelection: '',
+        afterSelection: '',
+        startLineNumber: 0,
+        endLineNumber: 0,
+      })
+    }
+  }, [initialPrompt])
+
+  useEffect(() => {
     if (!isDiffMode) {
       setIsDiffEditorMounted(false)
     }
