@@ -4025,7 +4025,7 @@ functions:
             DeleteAction.self,
             schema: "public",
             table: "users",
-            filter: "id=eq.1"
+            filter: .eq(id, value: 1)
           )
 
           await channel.subscribe()
@@ -4044,7 +4044,7 @@ functions:
             DeleteAction.self,
             schema: "public",
             table: "users",
-            filter: "id=eq.1"
+            filter: .eq(id, value: 1)
           ) { deletion in
             print("Deleted: \(deletion.oldRecord)")
           }
