@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { capitalize } from 'lodash'
-import { Fragment, useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
 
@@ -61,12 +61,34 @@ const PoolingConfigurationFormSchema = z.object({
   max_client_conn: StringToPositiveNumber,
 })
 
+/**
+ * [Joshen] Some outstanding questions that need clarification for support both type of poolers
+ * I've left comments in the code itself below, but just leaving a summary here for easier reference
+ * - How to check for when Supavisor is ready to receive connections? We have pgbouncer/status for PgBouncer
+ * - Are we currently ensuring the 2 hour window on the BE? I noticed pgbouncer/status flips active to false in a second after setting pgbouncer_enabled to false
+ * - Existing projects currently have pgbouncer_enabled and supavisor_enabled as true, are we going to backfill?
+ *   - We're using pgbouncer_enabled to determine the pooler type, which means that all projects are going to show on the UI that pgbouncer is being used
+ *
+ * Apart from the above, some pointers to note:
+ * - max_client_conn should be editable for pgbouncer
+ * - (Nice to have) Show a countdown of 2 hours when the pooler is swapped as a UI indication for users
+ * - [TODO] Connect UI needs to be updated to show the correct pooler connection string depending on which type is being used
+ * - [TODO] Project addons IPv4 needs an update on the CTA "You do not need...", needs to now be dependent on the Pooler type
+ *
+ * Added a feature flag just in case
+ * - Toggles visibility of Pooler Type input field
+ * - Whether to use pgbouncer_enabled to determine pooler type
+ */
+
 export const ConnectionPooling = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const snap = useDatabaseSettingsStateSnapshot()
   const allowPgBouncerSelection = useFlag('dualPoolerSupport')
+
+  const toastIdRef = useRef<string | number>()
   const [showConfirmation, setShowConfirmation] = useState(false)
+  const [refetchPgBouncerStatus, setRefetchPgBouncerStatus] = useState<boolean>(false)
 
   const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
     PermissionAction.UPDATE,
@@ -81,6 +103,7 @@ export const ConnectionPooling = () => {
     isError: isErrorSupavisorConfig,
     isSuccess: isSuccessSupavisorConfig,
   } = useSupavisorConfigurationQuery({ projectRef })
+
   const {
     data: pgbouncerConfig,
     error: pgbouncerConfigError,
@@ -90,19 +113,51 @@ export const ConnectionPooling = () => {
   } = usePgbouncerConfigQuery({
     projectRef,
   })
-  const { data: pgbouncerStatus, isSuccess: isSuccessPgbouncerStatus } = usePgbouncerStatusQuery({
-    projectRef,
-  })
+
   const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
   const { data: addons } = useProjectAddonsQuery({ projectRef })
+
+  usePgbouncerStatusQuery(
+    { projectRef },
+    {
+      refetchInterval: (data) => {
+        // [Joshen] Need to clarify the following:
+        // - How to check for when Supavisor is ready to receive connections when swapping over to Supavisor
+        // - I notice status goes to false when i swap over to Supavisor in 2 seconds, does this mean that PgBouncer is already offline?
+        // - Cause we need to consider the 2 hour window that we're providing for users to swap over the pooler connection strings
+        if (refetchPgBouncerStatus) {
+          if (
+            (!!pgbouncerConfig?.pgbouncer_enabled && !data?.active) ||
+            (!pgbouncerConfig?.pgbouncer_enabled && !!data?.active)
+          ) {
+            return 2000
+          } else {
+            toast.success(
+              `${data?.active ? 'PgBouncer' : 'Supavisor'} is now ready to receive connections!`,
+              { id: toastIdRef.current }
+            )
+            toastIdRef.current = undefined
+            setRefetchPgBouncerStatus(false)
+            return false
+          }
+        } else {
+          return false
+        }
+      },
+    }
+  )
 
   const { mutate: updateSupavisorConfig, isLoading: isUpdatingSupavisor } =
     useSupavisorConfigurationUpdateMutation()
-  const { mutate: updatePgbouncerConfig, isLoading: isUpdatingPgBouncer } =
-    usePgbouncerConfigurationUpdateMutation()
+  const {
+    mutate: updatePgbouncerConfig,
+    mutateAsync: updatePgBouncerConfigAsync,
+    isLoading: isUpdatingPgBouncer,
+  } = usePgbouncerConfigurationUpdateMutation()
 
   const form = useForm<z.infer<typeof PoolingConfigurationFormSchema>>({
     resolver: zodResolver(PoolingConfigurationFormSchema),
@@ -132,10 +187,11 @@ export const ConnectionPooling = () => {
   )
   const isSaving = isUpdatingSupavisor || isUpdatingPgBouncer
 
-  // [Joshen] Pending confirmation with Kamil what's the best check here
-  // const isPgbouncerActive = pgbouncerStatus?.active
-  // [Joshen] Pending confirmation with Kamil what's the best check here
-  const currentPooler = pgbouncerConfig?.pgbouncer_enabled ? 'PgBouncer' : 'Supavisor'
+  const currentPooler = allowPgBouncerSelection
+    ? pgbouncerConfig?.pgbouncer_enabled
+      ? 'PgBouncer'
+      : 'Supavisor'
+    : 'Supavisor'
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
   const computeSize =
     computeInstance?.variant.name ?? capitalize(project?.infra_compute_size) ?? 'Micro'
@@ -175,7 +231,14 @@ export const ConnectionPooling = () => {
         },
         {
           onSuccess: (data) => {
-            toast.success(`Successfully updated PgBouncer configuration`)
+            if (isChangingPoolerType) {
+              const toastId = toast.loading('Swapping pooler to PgBouncer')
+              toastIdRef.current = toastId
+              setRefetchPgBouncerStatus(true)
+            } else {
+              toast.success(`Successfully updated PgBouncer configuration`)
+            }
+
             setShowConfirmation(false)
             form.reset({ type: 'PgBouncer', ...data })
           },
@@ -183,7 +246,7 @@ export const ConnectionPooling = () => {
       )
     } else if (type === 'Supavisor') {
       if (isChangingPoolerType && pgbouncerConfig) {
-        updatePgbouncerConfig({
+        await updatePgBouncerConfigAsync({
           ref: projectRef,
           pgbouncer_enabled: false,
           ignore_startup_parameters: pgbouncerConfig.ignore_startup_parameters ?? '',
@@ -198,7 +261,13 @@ export const ConnectionPooling = () => {
         },
         {
           onSuccess: (data) => {
-            toast.success(`Successfully updated Supavisor configuration`)
+            if (isChangingPoolerType) {
+              const toastId = toast.loading('Swapping pooler to Supavisor')
+              toastIdRef.current = toastId
+              setRefetchPgBouncerStatus(true)
+            } else {
+              toast.success(`Successfully updated Supavisor configuration`)
+            }
             setShowConfirmation(false)
             form.reset({ type: 'Supavisor', ...data })
           },
@@ -231,11 +300,10 @@ export const ConnectionPooling = () => {
 
   useEffect(() => {
     // [Joshen] We're using pgbouncer_enabled from pgbouncer's config to determine the current type
-    if (isSuccessPgbouncerStatus && isSuccessPgbouncerConfig && isSuccessSupavisorConfig) {
+    if (isSuccessPgbouncerConfig && isSuccessSupavisorConfig) {
       resetForm()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessPgbouncerStatus, isSuccessPgbouncerConfig, isSuccessSupavisorConfig])
+  }, [isSuccessPgbouncerConfig, isSuccessSupavisorConfig])
 
   // [Joshen] Temp: This is really dumb but somehow RHF is setting max_client_conn to undefined
   // It should never be undefined, either a number of null, and I can't figure out why
@@ -352,6 +420,7 @@ export const ConnectionPooling = () => {
                         >
                           <Select_Shadcn_
                             {...field}
+                            disabled={refetchPgBouncerStatus}
                             onValueChange={(e) => {
                               field.onChange(e)
                               if (e === 'Supavisor' && supavisorConfig) {
