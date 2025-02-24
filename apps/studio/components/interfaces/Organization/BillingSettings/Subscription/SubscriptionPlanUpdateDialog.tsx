@@ -450,7 +450,7 @@ const SubscriptionPlanUpdateDialog = ({
                 <h3 className="text-sm mb-2">Upgrade features</h3>
 
                 <div className="space-y-2 mb-4 text-foreground-light">
-                  {topFeatures.map((feature) => (
+                  {topFeatures.map((feature: string | [string, ...any[]]) => (
                     <div
                       key={typeof feature === 'string' ? feature : feature[0]}
                       className="flex items-center gap-2"
