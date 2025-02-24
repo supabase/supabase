@@ -7,7 +7,7 @@ development. Built with [Playwright](https://playwright.dev/docs/intro).
 
 Before running the tests, make sure you've done the following:
 
-- Run `npm install` in the root folder of this repo
+- Run `npm install` in the root folder of this repo aaaa
 - `docker` or `orbstack` is currently running
 - `supabase` CLI is already [installed](https://github.com/supabase/cli?tab=readme-ov-file#install-the-cli)
 - no other supabase local environment is running (infrastructure environment is ok)
