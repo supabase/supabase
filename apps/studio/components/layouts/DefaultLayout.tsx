@@ -8,6 +8,7 @@ import { SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
+import WithSidebar from './AccountLayout/WithSidebar'
 
 export interface DefaultLayoutProps {
   showProductMenu?: boolean
@@ -31,6 +32,7 @@ const DefaultLayout = ({
   headerTitle,
 }: PropsWithChildren<DefaultLayoutProps>) => {
   const { ref } = useParams()
+
   return (
     <SidebarProvider defaultOpen={false}>
       <ProjectContextProvider projectRef={ref}>
@@ -45,19 +47,10 @@ const DefaultLayout = ({
             {/* Main Content Area */}
             <div className="flex flex-1 w-full overflow-y-hidden">
               {/* Sidebar */}
-
               <Sidebar />
               {/* Main Content */}
               <div className="flex-grow h-full overflow-y-auto">{children}</div>
             </div>
-          </div>
-          {/* Main Content Area */}
-          <div className="flex flex-1 w-full overflow-y-hidden">
-            {/* Sidebar */}
-
-            <Sidebar />
-            {/* Main Content */}
-            <div className="flex-grow h-full overflow-y-auto">{children}</div>
           </div>
         </AppBannerContextProvider>
       </ProjectContextProvider>
