@@ -42,7 +42,7 @@ export const PROVIDERS = {
 } as const
 
 export const PROJECT_STATUS: {
-  [key: string]: components['schemas']['ResourceWithServicesStatusResponse']['status']
+  [key: string]: components['schemas']['project_status']
 } = {
   INACTIVE: 'INACTIVE',
   ACTIVE_HEALTHY: 'ACTIVE_HEALTHY',
