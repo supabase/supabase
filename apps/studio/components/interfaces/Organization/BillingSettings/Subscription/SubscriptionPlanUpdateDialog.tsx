@@ -271,10 +271,10 @@ const SubscriptionPlanUpdateDialog = ({
                           {formatCurrency(
                             Math.round(
                               subscriptionPreview?.breakdown.reduce(
-                                (prev: number, cur: any) => prev + cur.total_price,
+                                (prev: number, cur) => prev + cur.total_price,
                                 0
-                              )
-                            ) ?? 0
+                              ) ?? 0
+                            )
                           )}
                         </CardContent>
                       </Card>
@@ -331,7 +331,7 @@ const SubscriptionPlanUpdateDialog = ({
                                 )
 
                                 const otherItems = subscriptionPreview.breakdown.filter(
-                                  (item: any) =>
+                                  (item) =>
                                     !item.description?.toLowerCase().includes('compute') &&
                                     !item.description?.toLowerCase().includes('plan')
                                 )
@@ -414,14 +414,14 @@ const SubscriptionPlanUpdateDialog = ({
                                           <TableCell className="text-right py-2 px-0">
                                             {formatCurrency(
                                               computeItems.reduce(
-                                                (sum: number, item: any) => sum + item.total_price,
+                                                (sum: number, item) => sum + item.total_price,
                                                 0
                                               ) + (computeCreditsItem?.total_price ?? 0)
                                             )}
                                           </TableCell>
                                         </TableRow>
                                         {/* Show first 3 projects */}
-                                        {allProjects.map((project: any) => (
+                                        {allProjects.map((project) => (
                                           <TableRow
                                             key={project.project_ref}
                                             className="text-foreground-light"
@@ -486,7 +486,7 @@ const SubscriptionPlanUpdateDialog = ({
                                   {formatCurrency(
                                     Math.round(
                                       subscriptionPreview.breakdown.reduce(
-                                        (prev: number, cur: any) => prev + cur.total_price,
+                                        (prev: number, cur) => prev + cur.total_price,
                                         0
                                       )
                                     ) ?? 0
