@@ -199,6 +199,7 @@ export const ConnectionPooling = () => {
       ? 'PgBouncer'
       : 'Supavisor'
     : 'Supavisor'
+  const hasIpv4Addon = !!addons?.selected_addons.find((addon) => addon.type === 'ipv4')
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
   const computeSize =
     computeInstance?.variant.name ?? capitalize(project?.infra_compute_size) ?? 'Nano'
@@ -402,9 +403,9 @@ export const ConnectionPooling = () => {
                                   type="warning"
                                   className="mt-2"
                                   title={`${type === 'PgBouncer' ? 'Supavisor' : 'PgBouncer'} will be active for 2 hours before fully deactivated`}
-                                  description={`Migrate your applications from ${currentPooler} to ${type} during this time by switching to the right connection strings in your client applications`}
+                                  description={`Migrate your applications from ${currentPooler} to ${type} during this time by switching to the ${type} connection strings in your client applications.`}
                                 />
-                                {type === 'PgBouncer' && (
+                                {type === 'PgBouncer' && !hasIpv4Addon && (
                                   <Admonition
                                     type="default"
                                     className="mt-2"
@@ -732,7 +733,7 @@ export const ConnectionPooling = () => {
         alert={{
           base: { variant: 'warning' },
           title: `Current pooler ${currentPooler} will be active for 2 hours before fully deactivated`,
-          description: `Migrate your applications from ${currentPooler} to ${type} during this time by switching to the right connection strings in your client applications`,
+          description: `Migrate your applications from ${currentPooler} to ${type} during this time by switching to the ${type} connection strings in your client applications`,
         }}
       >
         <p className="text-sm text-foreground-light">
