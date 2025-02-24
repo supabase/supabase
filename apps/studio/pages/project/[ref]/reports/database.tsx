@@ -52,6 +52,7 @@ const REPORT_ATTRIBUTES = [
   { id: 'max_cpu_usage', label: 'Max CPU usage' },
   { id: 'disk_io_consumption', label: 'Disk IO consumed' },
   { id: 'pg_stat_database_num_backends', label: 'Number of database connections' },
+  { id: 'supavisor_connections_active', label: 'Number of supavisor connections' },
 ]
 
 const DatabaseUsage = () => {

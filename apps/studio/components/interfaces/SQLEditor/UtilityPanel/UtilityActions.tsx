@@ -1,21 +1,10 @@
-import {
-  AlignLeft,
-  Check,
-  Command,
-  CornerDownLeft,
-  Heart,
-  Keyboard,
-  Loader2,
-  MoreVertical,
-} from 'lucide-react'
+import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -31,6 +20,7 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
+import { SqlRunButton } from './RunButton'
 import SavingIndicator from './SavingIndicator'
 
 export type UtilityActionsProps = {
@@ -53,9 +43,6 @@ const UtilityActions = ({
   const os = detectOS()
   const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const org = useSelectedOrganization()
-
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
@@ -195,29 +182,12 @@ const UtilityActions = ({
             onSelectId={onSelectDatabase}
           />
           <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
-          <Button
-            onClick={executeQuery}
-            disabled={isDisabled || isExecuting}
-            type="primary"
-            size="tiny"
-            iconRight={
-              isExecuting ? (
-                <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-              ) : (
-                <div className="flex items-center space-x-1">
-                  {os === 'macos' ? (
-                    <Command size={10} strokeWidth={1.5} />
-                  ) : (
-                    <p className="text-xs text-foreground-light">CTRL</p>
-                  )}
-                  <CornerDownLeft size={10} strokeWidth={1.5} />
-                </div>
-              )
-            }
+          <SqlRunButton
+            isDisabled={isDisabled || isExecuting}
+            isExecuting={isExecuting}
             className="rounded-l-none min-w-[82px]"
-          >
-            {hasSelection ? 'Run selected' : 'Run'}
-          </Button>
+            onClick={executeQuery}
+          />
         </div>
       </div>
     </div>
