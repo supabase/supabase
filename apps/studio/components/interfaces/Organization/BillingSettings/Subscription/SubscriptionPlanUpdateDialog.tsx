@@ -512,7 +512,7 @@ const SubscriptionPlanUpdateDialog = ({
                   />
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="mb-4">
                   <p className="text-sm">
                     This organization is billed through our partner{' '}
                     {billingPartnerLabel(billingPartner)}.{' '}
