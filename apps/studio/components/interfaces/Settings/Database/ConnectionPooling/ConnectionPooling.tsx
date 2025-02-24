@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { capitalize } from 'lodash'
-import { Fragment, useEffect } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
-import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -26,6 +26,7 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Badge,
+  Button,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
@@ -35,11 +36,16 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
   Listbox,
+  NavMenu,
+  NavMenuItem,
   Separator,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
+import { PgBouncerConfiguration } from './PgBouncerConfiguration'
+import { SupavisorConfiguration } from './SupavisorConfiguration'
 
 const formId = 'connection-pooling-form'
 
@@ -53,6 +59,8 @@ export const ConnectionPooling = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const snap = useDatabaseSettingsStateSnapshot()
+
+  const [selectedTab, setSelectedTab] = useState<'supavisor' | 'pgbouncer'>('supavisor')
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
@@ -141,7 +149,7 @@ export const ConnectionPooling = () => {
   return (
     <section id="connection-pooler">
       <Panel
-        className="!mb-0"
+        className="!mb-0 [&>div]:border-b-0"
         title={
           <div className="w-full flex items-center justify-between">
             <div className="flex items-center gap-x-2">
@@ -169,6 +177,34 @@ export const ConnectionPooling = () => {
           />
         }
       >
+        <NavMenu className={cn('px-4')}>
+          <NavMenuItem active={selectedTab === 'supavisor'}>
+            <Button
+              type="text"
+              className="!pb-4 text-sm hover:bg-transparent"
+              onClick={() => setSelectedTab('supavisor')}
+            >
+              Supavisor
+            </Button>
+          </NavMenuItem>
+          <NavMenuItem active={selectedTab === 'pgbouncer'}>
+            <Button
+              type="text"
+              className="!pb-4 text-sm hover:bg-transparent"
+              onClick={() => setSelectedTab('pgbouncer')}
+            >
+              PgBouncer
+            </Button>
+          </NavMenuItem>
+        </NavMenu>
+
+        {selectedTab === 'supavisor' ? (
+          <SupavisorConfiguration />
+        ) : selectedTab === 'pgbouncer' ? (
+          <PgBouncerConfiguration />
+        ) : null}
+
+        {/* IGNORE */}
         {isLoading && (
           <Panel.Content className="space-y-8">
             {Array.from({ length: 4 }).map((_, i) => (
