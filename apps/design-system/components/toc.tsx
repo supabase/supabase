@@ -6,6 +6,7 @@ import * as React from 'react'
 import { TableOfContents } from '@/lib/toc'
 import { cn } from '@/lib/utils'
 import { useMounted } from '@/hooks/use-mounted'
+import { TableOfContents as TableOfContentsComponent } from 'ui-patterns/table-of-contents'
 
 interface TocProps {
   toc: TableOfContents
@@ -33,7 +34,7 @@ export function DashboardTableOfContents({ toc }: TocProps) {
   return (
     <div className="space-y-2">
       <p className="font-medium text-foreground-light">On This Page</p>
-      <Tree tree={toc} activeItem={activeHeading} />
+      <TableOfContentsComponent tree={toc} activeItem={activeHeading} />
     </div>
   )
 }
