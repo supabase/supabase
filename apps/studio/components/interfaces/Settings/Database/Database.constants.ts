@@ -3,3 +3,6 @@ export const TRANSACTION_MODE_DESCRIPTION =
 
 export const SESSION_MODE_DESCRIPTION =
   'When a new client connects, a connection is assigned to the client until it disconnects. All Postgres features can be used with this option.'
+
+export const STATEMENT_MODE_DESCRIPTION =
+  'Connections are returned to the pool after every statement. Transactions with multiple statements are not allowed. Best used when AUTOCOMMIT is in use.'

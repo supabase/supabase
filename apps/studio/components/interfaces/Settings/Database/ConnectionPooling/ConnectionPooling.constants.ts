@@ -1,5 +1,7 @@
 // https://supabase.com/docs/guides/platform/performance#optimizing-the-number-of-connections
 // https://github.com/supabase/infrastructure/blob/develop/worker/src/lib/constants.ts#L544-L596
+// https://github.com/supabase/supabase-admin-api/blob/master/optimizations/pgbouncer.go
+// [Joshen] This matches for both Supavisor and PgBouncer
 
 export const POOLING_OPTIMIZATIONS = {
   ci_nano: {
@@ -47,3 +49,13 @@ export const POOLING_OPTIMIZATIONS = {
     poolSize: 128,
   },
 }
+
+export const POOLER = {
+  PGBOUNCER: 'PgBouncer',
+  SUPAVISOR: 'Supavisor',
+}
+
+export const POOLER_OPTIONS = [
+  { value: 'Supavisor', label: 'Supavisor', description: 'Some description' },
+  { value: 'PgBouncer', label: 'PgBouncer', description: 'Dedicated Pooler' },
+]

@@ -57,7 +57,42 @@ export const usePoolingConfigurationUpdateMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to update pooling configuration: ${data.message}`)
+        toast.error(`Failed to update PgBouncer configuration: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}
+
+export const useSupavisorConfigurationUpdateMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseMutationOptions<
+    PoolingConfigurationUpdateData,
+    ResponseError,
+    PoolingConfigurationUpdateVariables
+  >,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    PoolingConfigurationUpdateData,
+    ResponseError,
+    PoolingConfigurationUpdateVariables
+  >((vars) => updatePoolingConfiguration(vars), {
+    async onSuccess(data, variables, context) {
+      const { ref } = variables
+      await queryClient.invalidateQueries(databaseKeys.poolingConfiguration(ref))
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update Supavisor configuration: ${data.message}`)
       } else {
         onError(data, variables, context)
       }
