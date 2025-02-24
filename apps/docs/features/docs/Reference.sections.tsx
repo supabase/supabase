@@ -44,11 +44,9 @@ type RefSectionsProps = {
 }
 
 async function RefSections({ libraryId, version }: RefSectionsProps) {
-  console.log('[Enter] RefSections')
   let flattenedSections = await getFlattenedSections(libraryId, version)
   flattenedSections = trimIntro(flattenedSections)
 
-  console.log('[PreReturn] RefSections')
   return (
     <MDXProviderReference>
       <div className="flex flex-col my-16 gap-16">
@@ -297,13 +295,43 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader title={endpointDetails.summary} className="col-[1_/_-1]" />
+      <StickyHeader
+        title={
+          <>
+            {endpointDetails.summary}
+            {endpointDetails.deprecated && (
+              <span
+                className="
+                  uppercase
+                  whitespace-nowrap align-middle inline-block -translate-y-0.5
+                  border border-amber-700 bg-amber-300 text-amber-900
+                  rounded-full font-mono font-medium text-xs px-2 py-0.5 ml-2"
+              >
+                deprecated
+              </span>
+            )}
+          </>
+        }
+        className="col-[1_/_-1]"
+      />
       <div className="flex flex-col gap-12">
         <div className="flex items-center gap-2">
-          <span className="uppercase text-sm whitespace-nowrap bg-foreground text-background rounded-full font-mono font-medium px-2 py-0.5">
+          <span
+            className={cn(
+              'uppercase text-sm whitespace-nowrap bg-foreground text-background rounded-full font-mono font-medium px-2 py-0.5',
+              endpointDetails.deprecated && 'line-through'
+            )}
+          >
             {endpointDetails.method}
           </span>
-          <code className="text-foreground-lighter break-all">{endpointDetails.path}</code>
+          <code
+            className={cn(
+              'text-foreground-lighter break-all',
+              endpointDetails.deprecated && 'line-through'
+            )}
+          >
+            {endpointDetails.path}
+          </code>
         </div>
         {endpointDetails.description && (
           <ReactMarkdown className="prose break-words mb-8">
