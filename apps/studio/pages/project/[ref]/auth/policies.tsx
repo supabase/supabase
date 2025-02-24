@@ -4,9 +4,13 @@ import { partition } from 'lodash'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 
-import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Policies from 'components/interfaces/Auth/Policies/Policies'
+import { getGeneralPolicyTemplates } from 'components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
+import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
+import { generatePolicyCreateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -19,9 +23,9 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 /**
  * Filter tables by table name and policy name
@@ -65,6 +69,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   }>()
   const { schema = 'public', search: searchString = '' } = params
   const { project } = useProjectContext()
+  const { setEditorPanel } = useAppStateSnapshot()
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
@@ -147,12 +153,45 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           hasTables={tables.length > 0}
           isLocked={isLocked}
           onSelectCreatePolicy={(table: string) => {
-            setSelectedTable(table)
-            setShowPolicyAiEditor(true)
+            if (isInlineEditorEnabled) {
+              setEditorPanel({
+                open: true,
+                initialValue: `create policy "replace_with_policy_name"
+  on ${schema}.${table}
+  for select
+  to authenticated
+  using (
+    true  -- Write your policy condition here
+);`,
+                label: `Create new RLS policy on "${table}"`,
+                saveLabel: 'Create policy',
+                initialPrompt: `Create and name a entirely new RLS policy for the "${table}" table in the ${schema} schema. The policy should...`,
+              })
+            } else {
+              setSelectedTable(table)
+              setShowPolicyAiEditor(true)
+            }
           }}
           onSelectEditPolicy={(policy) => {
-            setSelectedPolicyToEdit(policy)
-            setShowPolicyAiEditor(true)
+            if (isInlineEditorEnabled) {
+              const sql = generatePolicyCreateSQL(policy)
+              const templates = getGeneralPolicyTemplates(policy.schema, policy.table)
+              setEditorPanel({
+                open: true,
+                initialValue: sql,
+                label: `Edit policy "${policy.name}"`,
+                saveLabel: 'Update policy',
+                templates: templates.map((template) => ({
+                  name: template.templateName,
+                  description: template.description,
+                  content: template.statement,
+                })),
+                initialPrompt: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
+              })
+            } else {
+              setSelectedPolicyToEdit(policy)
+              setShowPolicyAiEditor(true)
+            }
           }}
         />
       )}
@@ -176,7 +215,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
 AuthPoliciesPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout title="Auth">
+    <AuthLayout>
       <div className="h-full p-4">{page}</div>
     </AuthLayout>
   </DefaultLayout>

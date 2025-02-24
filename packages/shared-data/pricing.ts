@@ -313,9 +313,9 @@ export const pricing: Pricing = {
         key: 'auth.thirdPartyMAUs',
         title: 'Third-Party MAUs',
         plans: {
-          free: '50 included',
-          pro: ['50 included', 'then $0.00325 per MAU'],
-          team: ['50 included', 'then $0.00325 per MAU'],
+          free: '50,000 included',
+          pro: ['100,000 included', 'then $0.00325 per MAU'],
+          team: ['100,000 included', 'then $0.00325 per MAU'],
           enterprise: 'Custom',
         },
         usage_based: true,
