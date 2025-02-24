@@ -3,20 +3,25 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { TelemetryActions } from 'common/telemetry-constants'
 import SignInMfaForm from 'components/interfaces/SignIn/SignInMfaForm'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { Loading } from 'components/ui/Loading'
 import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import useLatest from 'hooks/misc/useLatest'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import type { NextPageWithLayout } from 'types'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const urlParams = new URLSearchParams(router.asPath.split('?')[1])
-  const signInMethod = urlParams.get('method') ?? 'Unknown' // current methods for mfa are github and sso
+  const {
+    // current methods for mfa are github and sso
+    method: signInMethod = 'unknown',
+  } = useParams()
+  const signInMethodRef = useLatest(signInMethod)
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: addLoginEvent } = useAddLoginEvent()
@@ -52,7 +57,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
               action: TelemetryActions.SIGN_IN,
               properties: {
                 category: 'account',
-                method: signInMethod,
+                method: signInMethodRef.current,
               },
             })
             addLoginEvent({})
