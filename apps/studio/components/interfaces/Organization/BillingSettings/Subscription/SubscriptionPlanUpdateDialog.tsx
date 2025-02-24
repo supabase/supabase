@@ -231,7 +231,7 @@ const SubscriptionPlanUpdateDialog = ({
                               </TableRow>
                             )}
                             <TableRow className="text-foreground">
-                              <TableCell className="py-2 pl-0 border-t">Charges today</TableCell>
+                              <TableCell className="py-2 pl-0 border-t">Charge today</TableCell>
                               <TableCell className="py-2 pr-0 text-right border-t">
                                 {formatCurrency(totalCharge)}
                               </TableCell>
@@ -316,6 +316,10 @@ const SubscriptionPlanUpdateDialog = ({
                                     item.description.startsWith('Compute Credits')
                                   ) ?? null
 
+                                const planItem = subscriptionPreview.breakdown.find((item) =>
+                                  item.description?.toLowerCase().includes('plan')
+                                )
+
                                 const allProjects = computeItems.flatMap((item) =>
                                   item.breakdown.map((project) => ({
                                     ...project,
@@ -326,33 +330,26 @@ const SubscriptionPlanUpdateDialog = ({
                                   }))
                                 )
 
-                                const nonComputeItems = subscriptionPreview.breakdown.filter(
+                                const otherItems = subscriptionPreview.breakdown.filter(
                                   (item: any) =>
-                                    !item.description?.toLowerCase().includes('compute')
+                                    !item.description?.toLowerCase().includes('compute') &&
+                                    !item.description?.toLowerCase().includes('plan')
                                 )
 
                                 const content = (
                                   <>
-                                    {/* Non-compute items */}
-                                    {nonComputeItems.map((item: any) => (
-                                      <TableRow
-                                        key={item.description}
-                                        className="text-foreground-light"
-                                      >
-                                        <TableCell className="text-xs py-2 px-0">
-                                          <div className="flex items-center gap-1">
-                                            {item.description ?? 'Unknown'}
-                                          </div>
-                                        </TableCell>
-                                        <TableCell className="text-right text-xs py-2 px-0">
-                                          {formatCurrency(item.total_price)}
-                                        </TableCell>
-                                      </TableRow>
-                                    ))}
-
                                     {/* Combined projects section */}
                                     {allProjects.length > 0 && (
                                       <>
+                                        <TableRow className="text-foreground-light">
+                                          <TableCell className="!py-2 px-0">
+                                            {planItem?.description}
+                                          </TableCell>
+                                          <TableCell className="text-right py-2 px-0">
+                                            {formatCurrency(planItem?.total_price)}
+                                          </TableCell>
+                                        </TableRow>
+
                                         <TableRow className="text-foreground-light">
                                           <TableCell className="!py-2 px-0 flex items-center gap-1">
                                             <span>Compute</span>
@@ -445,6 +442,23 @@ const SubscriptionPlanUpdateDialog = ({
                                         )}
                                       </>
                                     )}
+
+                                    {/* Non-compute items */}
+                                    {otherItems.map((item: any) => (
+                                      <TableRow
+                                        key={item.description}
+                                        className="text-foreground-light"
+                                      >
+                                        <TableCell className="text-xs py-2 px-0">
+                                          <div className="flex items-center gap-1">
+                                            {item.description ?? 'Unknown'}
+                                          </div>
+                                        </TableCell>
+                                        <TableCell className="text-right text-xs py-2 px-0">
+                                          {formatCurrency(item.total_price)}
+                                        </TableCell>
+                                      </TableRow>
+                                    ))}
                                   </>
                                 )
                                 return content
