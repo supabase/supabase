@@ -9,7 +9,6 @@ import {
   EdgeFunctions,
   Realtime,
   Reports,
-  RESTApi,
   SqlEditor,
   Storage,
   TableEditor,
@@ -42,12 +41,7 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
 export const generateProductRoutes = (
   ref?: string,
   project?: Project,
-  features?: {
-    auth?: boolean
-    edgeFunctions?: boolean
-    storage?: boolean
-    realtime?: boolean
-  }
+  features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean; realtime?: boolean }
 ): Route[] => {
   const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
