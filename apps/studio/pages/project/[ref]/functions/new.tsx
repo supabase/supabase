@@ -41,7 +41,7 @@ const NewFunctionPage = () => {
   // TODO (Saxon): Remove this once the flag is fully launched
   useEffect(() => {
     if (!edgeFunctionCreate) {
-      // router.push(`/project/${ref}/functions`)
+      router.push(`/project/${ref}/functions`)
     }
   }, [edgeFunctionCreate, ref, router])
 
