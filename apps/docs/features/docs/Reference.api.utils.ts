@@ -4,6 +4,7 @@ export interface IApiEndPoint {
   method: 'get' | 'post' | 'put' | 'delete' | 'patch'
   summary?: string
   description?: string
+  deprecated?: boolean
   parameters: Array<{
     name: string
     required: boolean

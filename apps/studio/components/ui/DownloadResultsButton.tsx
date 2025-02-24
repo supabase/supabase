@@ -18,6 +18,7 @@ interface DownloadResultsButtonProps {
   align?: 'start' | 'center' | 'end'
   results: any[]
   fileName: string
+  onDownloadAsCSV?: () => void
   onCopyAsMarkdown?: () => void
   onCopyAsJSON?: () => void
 }
@@ -27,6 +28,7 @@ export const DownloadResultsButton = ({
   align = 'start',
   results,
   fileName,
+  onDownloadAsCSV,
   onCopyAsMarkdown,
   onCopyAsJSON,
 }: DownloadResultsButtonProps) => {
@@ -93,6 +95,7 @@ export const DownloadResultsButton = ({
             onClick={() => {
               csvRef.current?.link.click()
               toast.success('Downloading results as CSV')
+              onDownloadAsCSV?.()
             }}
           >
             <Download size={14} />

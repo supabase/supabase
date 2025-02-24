@@ -103,6 +103,7 @@ By default, Supabase Auth uses the _common_ Microsoft tenant (`https://login.mic
 
 If your app is registered as _Personal Microsoft accounts only_ for the _Supported account types_ set Microsoft tenant to _consumers_ (`https://login.microsoftonline.com/consumers`).
 
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 If your app is registered as _My organization only_ for the _Supported account types_ you may want to configure Supabase Auth with the organization's tenant URL. This will use the tenant's authorization flows instead, and will limit access at the Supabase Auth level to Microsoft accounts arising from only the specified tenant.
 
 Configure this by storing a value under _Azure Tenant URL_ in the Supabase Auth provider configuration page for Azure that has the following format `https://login.microsoftonline.com/<tenant-id>`.
