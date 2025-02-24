@@ -30,6 +30,7 @@ import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/
 import PaymentMethodSelection from './PaymentMethodSelection'
 import { Button, Dialog, DialogContent } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
 
 const getRandomTweet = () => {
   const randomIndex = Math.floor(Math.random() * tweets.length)
@@ -53,7 +54,7 @@ interface Props {
   subscriptionPreviewError: any
   subscriptionPreviewIsLoading: boolean
   subscriptionPreviewInitialized: boolean
-  subscriptionPreview: any
+  subscriptionPreview: OrganizationBillingSubscriptionPreviewResponse
   billingViaPartner: boolean
   billingPartner?: string
   selectedOrganization: any
@@ -218,7 +219,12 @@ const SubscriptionPlanUpdateDialog = ({
                             {/* Ignore rare case with negative balance (debt) */}
                             {customerBalance > 0 && (
                               <TableRow>
-                                <TableCell className="py-2 pl-0">Account balance</TableCell>
+                                <TableCell className="py-2 pl-0 flex items-center gap-1">
+                                  <span>Credits</span>
+                                  <InfoTooltip>
+                                    Credits will be used first before charging your card.
+                                  </InfoTooltip>
+                                </TableCell>
                                 <TableCell className="py-2 pr-0 text-right">
                                   {formatCurrency(customerBalance)}
                                 </TableCell>
@@ -275,56 +281,7 @@ const SubscriptionPlanUpdateDialog = ({
                     </HoverCardTrigger>
                     <HoverCardContent className="w-[520px] p-6">
                       <h3 className="text-md font-medium mb-2">Your new monthly invoice</h3>
-                      <p className="text-sm text-foreground-light mb-4 prose">
-                        Each project on a paid plan is a dedicated server running 24/7 with no
-                        pausing. The first project is covered by Compute Credits. Additional
-                        projects will incur compute costs starting at $10/month, independent of
-                        activity. See{' '}
-                        <Link
-                          href={'/docs/guides/platform/manage-your-usage/compute'}
-                          target="_blank"
-                        >
-                          docs
-                        </Link>
-                        .
-                      </p>
-                      {subscription?.plan?.id === 'free' && (
-                        <>
-                          <p className="text-sm text-foreground-light mb-4">
-                            Mixing paid and non-paid projects in a single organization is not
-                            possible. If you want projects to be on the Free Plan, use self-serve
-                            project transfers.
-                          </p>
-                          <div className="space-x-3 mt-2">
-                            <Button
-                              asChild
-                              type="default"
-                              icon={<ExternalLink strokeWidth={1.5} />}
-                            >
-                              <Link
-                                href="/docs/guides/platform/manage-your-usage/compute"
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                How billing for Compute works
-                              </Link>
-                            </Button>
-                            <Button
-                              asChild
-                              type="default"
-                              icon={<ExternalLink strokeWidth={1.5} />}
-                            >
-                              <Link
-                                href="/docs/guides/platform/project-transfer"
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                Project transfers
-                              </Link>
-                            </Button>
-                          </div>
-                        </>
-                      )}
+
                       {subscriptionPreviewError && (
                         <AlertError
                           error={subscriptionPreviewError}
@@ -344,37 +301,34 @@ const SubscriptionPlanUpdateDialog = ({
                       {subscriptionPreviewInitialized && (
                         <>
                           <Table className="[&_tr:last-child]:border-t font-mono text-xs">
-                            <TableHeader>
-                              <TableRow>
-                                <TableHead className="px-0 text-foreground-lighter py-2 h-auto">
-                                  Item
-                                </TableHead>
-                                <TableHead className="text-right px-0 text-foreground-lighter py-2 h-auto">
-                                  Cost
-                                </TableHead>
-                              </TableRow>
-                            </TableHeader>
                             <TableBody>
                               {/* Non-compute items and Projects list */}
                               {(() => {
                                 // Combine all compute-related projects
                                 const computeItems = subscriptionPreview.breakdown.filter(
-                                  (item: any) =>
+                                  (item) =>
                                     item.description?.toLowerCase().includes('compute') &&
                                     item.breakdown?.length > 0
                                 )
 
-                                const allProjects = computeItems.flatMap((item: any) =>
-                                  item.breakdown.map((project: any) => ({
+                                const computeCreditsItem =
+                                  subscriptionPreview.breakdown.find((item) =>
+                                    item.description.startsWith('Compute Credits')
+                                  ) ?? null
+
+                                const allProjects = computeItems.flatMap((item) =>
+                                  item.breakdown.map((project) => ({
                                     ...project,
-                                    computeType: item.description.split(' ')[0], // Get first word of description
+                                    computeType: item.description,
+                                    computeCosts: Math.round(
+                                      item.total_price / item.breakdown.length
+                                    ),
                                   }))
                                 )
 
                                 const nonComputeItems = subscriptionPreview.breakdown.filter(
                                   (item: any) =>
-                                    !item.description?.toLowerCase().includes('compute') ||
-                                    !(item.breakdown?.length > 0)
+                                    !item.description?.toLowerCase().includes('compute')
                                 )
 
                                 const content = (
@@ -400,33 +354,92 @@ const SubscriptionPlanUpdateDialog = ({
                                     {allProjects.length > 0 && (
                                       <>
                                         <TableRow className="text-foreground-light">
-                                          <TableCell className="!py-2 px-0">Projects</TableCell>
+                                          <TableCell className="!py-2 px-0 flex items-center gap-1">
+                                            <span>Compute</span>
+                                            <InfoTooltip className="max-w-sm">
+                                              {' '}
+                                              <p className="text-sm text-foreground-light mb-4 prose">
+                                                Each project on a paid plan is a dedicated server
+                                                running 24/7 with no pausing. The first project is
+                                                covered by Compute Credits. Additional projects will
+                                                incur compute costs starting at $10/month,
+                                                independent of activity. See{' '}
+                                                <Link
+                                                  href={
+                                                    '/docs/guides/platform/manage-your-usage/compute'
+                                                  }
+                                                  target="_blank"
+                                                >
+                                                  docs
+                                                </Link>
+                                                .
+                                              </p>
+                                              {subscription?.plan?.id === 'free' && (
+                                                <>
+                                                  <p className="text-sm text-foreground-light mb-4">
+                                                    Mixing paid and non-paid projects in a single
+                                                    organization is not possible. If you want
+                                                    projects to be on the Free Plan, use self-serve
+                                                    project transfers.
+                                                  </p>
+                                                  <div className="space-x-3 mt-2">
+                                                    <Button
+                                                      asChild
+                                                      type="default"
+                                                      icon={<ExternalLink strokeWidth={1.5} />}
+                                                    >
+                                                      <Link
+                                                        href="/docs/guides/platform/manage-your-usage/compute"
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                      >
+                                                        How billing for Compute works
+                                                      </Link>
+                                                    </Button>
+                                                    <Button
+                                                      asChild
+                                                      type="default"
+                                                      icon={<ExternalLink strokeWidth={1.5} />}
+                                                    >
+                                                      <Link
+                                                        href="/docs/guides/platform/project-transfer"
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                      >
+                                                        Project transfers
+                                                      </Link>
+                                                    </Button>
+                                                  </div>
+                                                </>
+                                              )}
+                                            </InfoTooltip>
+                                          </TableCell>
                                           <TableCell className="text-right py-2 px-0">
                                             {formatCurrency(
                                               computeItems.reduce(
                                                 (sum: number, item: any) => sum + item.total_price,
                                                 0
-                                              )
+                                              ) + (computeCreditsItem?.total_price ?? 0)
                                             )}
                                           </TableCell>
                                         </TableRow>
                                         {/* Show first 3 projects */}
-                                        {allProjects.slice(0, 3).map((project: any) => (
+                                        {allProjects.map((project: any) => (
                                           <TableRow
                                             key={project.project_ref}
                                             className="text-foreground-light"
                                           >
                                             <TableCell className="!py-2 px-0 pl-6">
-                                              {project.project_name} ({project.computeType} for{' '}
-                                              {project.usage} hours)
+                                              {project.project_name} ({project.computeType}) |{' '}
+                                              {formatCurrency(project.computeCosts)}
                                             </TableCell>
                                           </TableRow>
                                         ))}
-                                        {/* Show "+X more" row if more than 3 projects */}
-                                        {allProjects.length > 3 && (
+                                        {computeCreditsItem && (
                                           <TableRow className="text-foreground-light">
-                                            <TableCell className="py-2 px-0 pl-6">
-                                              +{allProjects.length - 3} more projects
+                                            <TableCell className="!py-2 px-0 pl-6">
+                                              Compute Credits |{' '}
+                                              {formatCurrency(computeCreditsItem.total_price)}
                                             </TableCell>
                                           </TableRow>
                                         )}
@@ -439,7 +452,7 @@ const SubscriptionPlanUpdateDialog = ({
 
                               <TableRow>
                                 <TableCell className="font-medium py-2 px-0">
-                                  Total (per month)
+                                  Total per month (excluding other usage)
                                 </TableCell>
                                 <TableCell className="text-right font-medium py-2 px-0">
                                   {formatCurrency(
