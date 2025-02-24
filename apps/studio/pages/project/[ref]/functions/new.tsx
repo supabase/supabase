@@ -167,6 +167,30 @@ Deno.serve(async (req: Request) => {
 });`,
     },
   ])
+
+  useEffect(() => {
+    // Load example code from localStorage if it exists
+    const exampleData = localStorage.getItem('edgefunction_example')
+    if (exampleData) {
+      try {
+        const { code, slug } = JSON.parse(exampleData)
+        setFiles([
+          {
+            id: 1,
+            name: 'index.ts',
+            selected: true,
+            content: code,
+          },
+        ])
+        setFunctionName(slug)
+        // Clear the example code from localStorage
+        localStorage.removeItem('edgefunction_example')
+      } catch (error) {
+        console.error('Failed to parse example data:', error)
+      }
+    }
+  }, [])
+
   const [functionName, setFunctionName] = useState('')
   const [open, setOpen] = useState(false)
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)

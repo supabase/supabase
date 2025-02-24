@@ -20,7 +20,11 @@ import type { NextPageWithLayout } from 'types'
 import { DocsButton } from 'components/ui/DocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAppStateSnapshot } from 'state/app-state'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import {
+  ScaffoldContainer,
+  ScaffoldSection,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 import { useFlag } from 'hooks/ui/useFlag'
 
 const FunctionsPage: NextPageWithLayout = () => {
@@ -130,18 +134,14 @@ const FunctionsPage: NextPageWithLayout = () => {
       secondaryActions={secondaryActions}
     >
       <ScaffoldContainer size="large">
-        {isLoading && (
-          <div className="pt-8">
-            <GenericSkeletonLoader />
-          </div>
-        )}
+        <ScaffoldSection isFullWidth>
+          {isLoading && <GenericSkeletonLoader />}
 
-        {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
+          {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
 
-        {isSuccess && (
-          <>
-            {!hasFunctions ? (
-              <div className="py-6 space-y-4">
+          {isSuccess && (
+            <>
+              {!hasFunctions ? (
                 <Table
                   head={
                     <>
@@ -161,12 +161,12 @@ const FunctionsPage: NextPageWithLayout = () => {
                     </>
                   }
                 />
-              </div>
-            ) : (
-              <FunctionsEmptyState />
-            )}
-          </>
-        )}
+              ) : (
+                <FunctionsEmptyState />
+              )}
+            </>
+          )}
+        </ScaffoldSection>
       </ScaffoldContainer>
     </PageLayout>
   )
