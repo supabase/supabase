@@ -6580,7 +6580,7 @@ functions:
             .overrideTypes<Array<MyType>, { merge: false }>()
           ```
         response: |
-          ```
+          ```ts
           let x: typeof data // MyType[]
           ```
         hideCodeBlock: true
@@ -6596,7 +6596,7 @@ functions:
             .overrideTypes<MyType, { merge: false }>()
           ```
         response: |
-          ```
+          ```ts
           let x: typeof data // MyType | null
           ```
         hideCodeBlock: true
@@ -6611,7 +6611,7 @@ functions:
             .overrideTypes<Array<{ status: "A" | "B" }>>()
           ```
         response: |
-          ```
+          ```ts
           let x: typeof data // Array<CountryRowProperties & { status: "A" | "B" }>
           ```
         hideCodeBlock: true
@@ -6627,7 +6627,7 @@ functions:
             .overrideTypes<{ status: "A" | "B" }>()
           ```
         response: |
-          ```
+          ```ts
           let x: typeof data // CountryRowProperties & { status: "A" | "B" } | null
           ```
         hideCodeBlock: true
