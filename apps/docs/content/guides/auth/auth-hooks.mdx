@@ -96,16 +96,16 @@ HTTP Hooks in Supabase follow the [Standard Webhooks Specification](https://www.
 
 When the request is made to the HTTP hook, you should use the [Standard Webhooks libraries](https://github.com/standard-webhooks/standard-webhooks/tree/main/libraries) to verify these headers.
 
-When a HTTP hook is created, the secret generated should be of the following format: `v1,whsec_<standard-base64-secret>`:
+When a HTTP hook is created, the secret generated should be of the `v1,whsec_<base64-secret>` format:
 
 - `v1` denotes the version of the hook
 - `whsec_` signifies that the secret is symmetric
-- `<standard-base64-secret>` implies a Standard Base64 encoded secret which can contain the characters `+`, `/` and `=`
+- `<base64-secret>` implies a Standard Base64 encoded secret which can contain the characters `+`, `/` and `=`
 
-The secret is used to verify the payload received in your hook. Create an entry in your `.env.local` file to store the secret for each hook that you have. For example:
+The secret is used to verify the payload received in your hook. Create an entry in your `.env.local` file to store the `<standard-base64-secret>` portion of the secret for each hook that you have. For example:
 
-```bash
-HOOK_SECRETS=<standard-base64-secret>
+```ini
+SEND_SMS_HOOK_SECRETS=v1,whsec_<base64-secret>
 ```
 
 There field is expressed in plural rather than singular as there are plans to allow for asymmetric signing and multiple hook secrets for ease of secret rotation. For instance: `<standard-base-64-secret>|<another-standard-base-64-secret>`.
@@ -117,7 +117,7 @@ import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
 Deno.serve(async (req) => {
   const payload = await req.text()
-  const hookSecret = Deno.env.get('HOOK_SECRETS')
+  const hookSecret = Deno.env.get('SEND_SMS_HOOK_SECRETS').replace('v1,whsec_', '')
   // Extract headers and security specific fields
   const headers = Object.fromEntries(req.headers)
   const wh = new Webhook(hookSecret)
@@ -229,19 +229,25 @@ You can visit `SQL Editor > Templates` for hook templates.
 </TabPanel>
 <TabPanel id="http" label="HTTP">
 Modify the `auth.hook.<hook_name>` field and set `uri` to a valid HTTP URI. For example, the `send_sms` hook would take the following fields:
-```
+
+```toml
 [auth.hook.send_sms]
 enabled = true
 uri = "http://host.docker.internal:54321/functions/v1/send_sms"
-secrets = "env(SEND_SMS_HOOK_SECRET)"
+# Comma separated list of secrets
+secrets = "env(SEND_SMS_HOOK_SECRETS)"
 ```
 
-`host.docker.internal` is a special DNS name used in Docker to allow a container to access the host machine's network. This allows the Auth container to reach the Functions container
+<Admonition type="note">
+
+`host.docker.internal` is a special DNS name used in Docker to allow a container to access the host machine's network. This allows the Auth container to reach your HTTP function, no matter if it's a Supabase Edge Function or a custom endpoint.
+
+</Admonition>
 
 Fill in the Hook Secret in `supabase/functions/.env`
 
-```bash
-SEND_SMS_HOOK_SECRET='v1,whsec_<base64_standard_secret>'
+```ini
+SEND_SMS_HOOK_SECRETS='v1,whsec_<base64-secret>'
 ```
 
 Start the function locally:

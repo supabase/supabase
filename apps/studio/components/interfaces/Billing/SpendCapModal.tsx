@@ -15,7 +15,7 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
       header={
         <div className="flex justify-between items-center">
           <span>Spend Cap</span>
-          <DocsButton href="https://supabase.com/docs/guides/platform/spend-cap" />
+          <DocsButton href="https://supabase.com/docs/guides/platform/cost-control#spend-cap" />
         </div>
       }
       showCloseButton={false}
@@ -65,7 +65,7 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
 
               <TableRow>
                 <TableCell>Auth Third-Party MAUs</TableCell>
-                <TableCell>50</TableCell>
+                <TableCell>100,000</TableCell>
                 <TableCell>$0.00325 per user</TableCell>
               </TableRow>
 

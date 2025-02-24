@@ -597,13 +597,19 @@ response = supabase.storage.from_('bucket').download(
 | BMP    | `bmp`     | ☑️     | ☑️     |
 | TIFF   | `tiff`    | ☑️     | ☑️     |
 
+## Pricing
+
+<PricingStorageImageTransformations />
+
+For a detailed breakdown of how charges are calculated, refer to [Manage Storage Image Transformations usage](/docs/guides/platform/manage-your-usage/storage-image-transformations).
+
 ## Self hosting
 
 Our solution to image resizing and optimization can be self-hosted as with any other Supabase product. Under the hood we use [imgproxy](https://imgproxy.net/)
 
 #### imgproxy configuration:
 
-Simply deploy an imgproxy container with the following configuration:
+Deploy an imgproxy container with the following configuration:
 
 ```yaml
 imgproxy:

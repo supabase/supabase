@@ -10,7 +10,8 @@ module.exports = config({
     './layouts/**/*.tsx',
     './pages/**/*.{tsx,mdx}',
     './../../packages/ui/src/**/*.{tsx,ts,js}',
-    './../../packages/ui-patterns/!(node_modules)/**/*.{tsx,ts,js}',
+    './../../packages/ui-patterns/**/*.{tsx,ts,js}',
+    '!./../../packages/ui-patterns/node_modules/**/*', // ignore node_modules rule
   ],
   plugins: [
     function ({ addUtilities, addVariant }) {

@@ -89,6 +89,7 @@ const PITR = () => {
           {!isEnabled ? (
             <UpgradeToPro
               addon="pitr"
+              source="pitr"
               primaryText="Point in Time Recovery is a Pro Plan add-on."
               secondaryText={
                 plan === 'free'

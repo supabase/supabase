@@ -27,3 +27,9 @@ There are some limitations you should be aware of when using third-party authent
 1. The third-party provider must use asymmetrically signed JWTs (exposed as an OIDC Issuer Discovery URL by the third-party authentication provider). Using symmetrically signed JWTs is not possible at this time.
 2. The JWT signing keys from the third-party provider are stored in the configuration of your project, and are checked for changes periodically. If you are rotating your keys (when supported) allow up to 30 minutes for the change to be picked up.
 3. It is not possible to disable Supabase Auth at this time.
+
+## Pricing
+
+<PricingMauThirdParty />
+
+For a detailed breakdown of how charges are calculated, refer to [Manage Monthly Active Third-Party Users usage](/docs/guides/platform/manage-your-usage/monthly-active-users-third-party).

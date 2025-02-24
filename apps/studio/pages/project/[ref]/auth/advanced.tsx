@@ -1,19 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { AdvancedAuthSettingsForm, SmtpForm, ThirdPartyAuthForm } from 'components/interfaces/Auth'
+import { AdvancedAuthSettingsForm } from 'components/interfaces/Auth/AdvancedAuthSettingsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
-const AdvancedAuthSettings: NextPageWithLayout = () => {
+const PageLayout: NextPageWithLayout = () => {
   const isPermissionsLoaded = usePermissionsLoaded()
   // TODO: check if these permissions cover third party auth as well
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
@@ -31,16 +27,18 @@ const AdvancedAuthSettings: NextPageWithLayout = () => {
         ) : !canReadAuthSettings ? (
           <NoPermission isFullPage resourceText="access your project's authentication settings" />
         ) : (
-          <>
-            <AdvancedAuthSettingsForm />
-          </>
+          <AdvancedAuthSettingsForm />
         )}
       </ScaffoldContainer>
     </>
   )
 }
 
-AdvancedAuthSettings.getLayout = (page) => {
-  return <AuthLayout>{page}</AuthLayout>
+PageLayout.getLayout = (page) => {
+  return (
+    <DefaultLayout>
+      <AuthLayout>{page}</AuthLayout>
+    </DefaultLayout>
+  )
 }
-export default AdvancedAuthSettings
+export default PageLayout

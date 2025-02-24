@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   LogsTableName,
@@ -22,7 +22,7 @@ import {
   genDefaultQuery,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'data/fetchers'
-import { parseAsString, useQueryStates } from 'nuqs'
+import { useLogsUrlState } from './useLogsUrlState'
 import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
 
@@ -39,9 +39,8 @@ interface LogsPreviewHook {
   eventChartData: EventChartData[]
   loadOlder: () => void
   refresh: () => void
-  setFilters: (filters: Filters | ((previous: Filters) => Filters)) => void
-  setParams: Dispatch<SetStateAction<LogsEndpointParams>>
 }
+
 function useLogsPreview({
   projectRef,
   table,
@@ -54,20 +53,37 @@ function useLogsPreview({
   limit?: number
 }): LogsPreviewHook {
   const defaultHelper = getDefaultHelper(PREVIEWER_DATEPICKER_HELPERS)
-  const [latestRefresh, setLatestRefresh] = useState<string>(new Date().toISOString())
-
-  const [filters, setFilters] = useState<Filters>({ ...filterOverride })
+  const [latestRefresh, setLatestRefresh] = useState(new Date().toISOString())
   const isFirstRender = useRef<boolean>(true)
 
-  const [queryParams, setQueryParams] = useQueryStates({
-    project: parseAsString.withDefault(projectRef),
-    iso_timestamp_start: parseAsString.withDefault(defaultHelper.calcFrom()),
-    iso_timestamp_end: parseAsString.withDefault(defaultHelper.calcTo()),
-  })
+  const {
+    timestampStart: urlTimestampStart = defaultHelper.calcFrom(),
+    timestampEnd: urlTimestampEnd = defaultHelper.calcTo(),
+    filters: urlFilters,
+    search,
+  } = useLogsUrlState()
 
-  const [sql, setSQL] = useState(genDefaultQuery(table, filters, limit))
+  // Ensure we never pass null to the API
+  const timestampStart = urlTimestampStart || defaultHelper.calcFrom()
+  const timestampEnd = urlTimestampEnd || defaultHelper.calcTo()
 
-  const params: LogsEndpointParams = { ...queryParams, sql }
+  const mergedFilters = useMemo(
+    () => ({
+      ...urlFilters,
+      ...filterOverride,
+      ...(search ? { search_query: search } : {}),
+    }),
+    [urlFilters, filterOverride, search]
+  )
+
+  const [sql, setSQL] = useState(genDefaultQuery(table, mergedFilters, limit))
+
+  const params: LogsEndpointParams = {
+    project: projectRef,
+    iso_timestamp_start: timestampStart,
+    iso_timestamp_end: timestampEnd,
+    sql,
+  }
 
   const {
     data,
@@ -117,10 +133,10 @@ function useLogsPreview({
       isFirstRender.current = false
       return
     }
-    const newSql = genDefaultQuery(table, filters, limit)
+    const newSql = genDefaultQuery(table, mergedFilters, limit)
     setSQL(newSql)
     refresh(newSql)
-  }, [JSON.stringify(filters)])
+  }, [JSON.stringify(mergedFilters)])
 
   // memoize all this calculations stuff
   const { logData, error, oldestTimestamp } = useMemo(() => {
@@ -146,7 +162,7 @@ function useLogsPreview({
       'projects',
       projectRef,
       'logs-count',
-      { ...params, sql: genCountQuery(table, filters), iso_timestamp_start: latestRefresh },
+      { ...params, sql: genCountQuery(table, mergedFilters), timestampStart, latestRefresh },
     ],
     async ({ signal }) => {
       const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
@@ -154,7 +170,7 @@ function useLogsPreview({
           path: { ref: projectRef },
           query: {
             ...params,
-            sql: genCountQuery(table, filters),
+            sql: genCountQuery(table, mergedFilters),
             iso_timestamp_start: latestRefresh,
           },
         },
@@ -179,8 +195,8 @@ function useLogsPreview({
 
   // chart data
   const chartQuery = useMemo(
-    () => genChartQuery(table, params, filters),
-    [table, params.iso_timestamp_end, params.project, filters]
+    () => genChartQuery(table, params, mergedFilters),
+    [table, params.iso_timestamp_end, params.project, mergedFilters]
   )
   const { data: eventChartResponse, refetch: refreshEventChart } = useQuery(
     [
@@ -212,24 +228,18 @@ function useLogsPreview({
   )
 
   const refresh = async (newSql?: string) => {
-    const generatedSql = newSql || genDefaultQuery(table, filters, limit)
+    const generatedSql = newSql || genDefaultQuery(table, mergedFilters, limit)
     setSQL(generatedSql)
-    setQueryParams((prev) => ({ ...prev, sql: generatedSql }))
-    setLatestRefresh(new Date().toISOString())
     refreshEventChart()
+    setLatestRefresh(new Date().toISOString())
     refetch()
   }
 
-  const handleSetFilters: LogsPreviewHook['setFilters'] = (newFilters) => {
-    if (typeof newFilters === 'function') {
-      setFilters((prev) => {
-        const resolved = newFilters(prev)
-        return { ...resolved, ...filterOverride }
-      })
-    } else {
-      setFilters({ ...newFilters, ...filterOverride })
-    }
-  }
+  // Update query params when timestamps change
+  useEffect(() => {
+    params.iso_timestamp_start = timestampStart
+    params.iso_timestamp_end = timestampEnd
+  }, [timestampStart, timestampEnd])
 
   const normalizedEventChartData = useTimeseriesUnixToIso(
     eventChartResponse?.result ?? [],
@@ -253,14 +263,12 @@ function useLogsPreview({
     isLoading: isLoading || isRefetching,
     isLoadingOlder: isFetchingNextPage,
     error: error || eventChartError,
-    filters,
+    filters: mergedFilters,
     params,
     oldestTimestamp: oldestTimestamp ? String(oldestTimestamp) : undefined,
     eventChartData,
-    setFilters: handleSetFilters,
     refresh,
     loadOlder: () => fetchNextPage(),
-    setParams: setQueryParams,
   }
 }
 export default useLogsPreview
