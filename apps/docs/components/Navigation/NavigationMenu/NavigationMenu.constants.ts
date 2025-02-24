@@ -1092,6 +1092,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/bigquery',
         },
         {
+          name: 'Connecting to Clerk',
+          url: '/guides/database/extensions/wrappers/clerk',
+        },
+        {
           name: 'Connecting to ClickHouse',
           url: '/guides/database/extensions/wrappers/clickhouse',
         },
