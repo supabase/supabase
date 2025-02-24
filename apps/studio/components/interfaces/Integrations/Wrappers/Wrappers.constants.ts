@@ -2594,7 +2594,7 @@ export const WRAPPERS: WrapperMeta[] = [
           required: true,
           encrypted: true,
           secureEntry: true,
-        }
+        },
       ],
     },
     tables: [
@@ -2609,7 +2609,7 @@ export const WRAPPERS: WrapperMeta[] = [
           { name: 'instance_id', type: 'text' },
           { name: 'created_at', type: 'timestamp' },
           { name: 'updated_at', type: 'timestamp' },
-          { name: 'attrs', type: 'jsonb' }
+          { name: 'attrs', type: 'jsonb' },
         ],
         options: [
           {
@@ -2618,8 +2618,8 @@ export const WRAPPERS: WrapperMeta[] = [
             editable: false,
             required: true,
             type: 'text',
-          }
-        ]
+          },
+        ],
       },
       {
         label: 'Block List',
@@ -2631,7 +2631,7 @@ export const WRAPPERS: WrapperMeta[] = [
           { name: 'instance_id', type: 'text' },
           { name: 'created_at', type: 'timestamp' },
           { name: 'updated_at', type: 'timestamp' },
-          { name: 'attrs', type: 'jsonb' }
+          { name: 'attrs', type: 'jsonb' },
         ],
         options: [
           {
@@ -2640,8 +2640,8 @@ export const WRAPPERS: WrapperMeta[] = [
             editable: false,
             required: true,
             type: 'text',
-          }
-        ]
+          },
+        ],
       },
       {
         label: 'Domains',
@@ -2652,7 +2652,7 @@ export const WRAPPERS: WrapperMeta[] = [
           { name: 'is_satellite', type: 'boolean' },
           { name: 'frontend_api_url', type: 'text' },
           { name: 'accounts_portal_url', type: 'text' },
-          { name: 'attrs', type: 'jsonb' }
+          { name: 'attrs', type: 'jsonb' },
         ],
         options: [
           {
@@ -2661,8 +2661,8 @@ export const WRAPPERS: WrapperMeta[] = [
             editable: false,
             required: true,
             type: 'text',
-          }
-        ]
+          },
+        ],
       },
       {
         label: 'Invitations',
@@ -2676,7 +2676,7 @@ export const WRAPPERS: WrapperMeta[] = [
           { name: 'expires_at', type: 'timestamp' },
           { name: 'created_at', type: 'timestamp' },
           { name: 'updated_at', type: 'timestamp' },
-          { name: 'attrs', type: 'jsonb' }
+          { name: 'attrs', type: 'jsonb' },
         ],
         options: [
           {
@@ -2685,8 +2685,8 @@ export const WRAPPERS: WrapperMeta[] = [
             editable: false,
             required: true,
             type: 'text',
-          }
-        ]
+          },
+        ],
       },
       {
         label: 'JWT Templates',
@@ -2700,7 +2700,7 @@ export const WRAPPERS: WrapperMeta[] = [
           { name: 'signing_algorithm', type: 'text' },
           { name: 'created_at', type: 'timestamp' },
           { name: 'updated_at', type: 'timestamp' },
-          { name: 'attrs', type: 'jsonb' }
+          { name: 'attrs', type: 'jsonb' },
         ],
         options: [
           {
@@ -2709,8 +2709,8 @@ export const WRAPPERS: WrapperMeta[] = [
             editable: false,
             required: true,
             type: 'text',
-          }
-        ]
+          },
+        ],
       },
       {
         label: 'OAuth Applications',
@@ -2724,7 +2724,7 @@ export const WRAPPERS: WrapperMeta[] = [
           { name: 'scopes', type: 'text' },
           { name: 'created_at', type: 'timestamp' },
           { name: 'updated_at', type: 'timestamp' },
-          { name: 'attrs', type: 'jsonb' }
+          { name: 'attrs', type: 'jsonb' },
         ],
         options: [
           {
@@ -2733,8 +2733,8 @@ export const WRAPPERS: WrapperMeta[] = [
             editable: false,
             required: true,
             type: 'text',
-          }
-        ]
+          },
+        ],
       },
       {
         label: 'Organizations',
@@ -2745,7 +2745,7 @@ export const WRAPPERS: WrapperMeta[] = [
           { name: 'slug', type: 'text' },
           { name: 'created_at', type: 'timestamp' },
           { name: 'updated_at', type: 'timestamp' },
-          { name: 'attrs', type: 'jsonb' }
+          { name: 'attrs', type: 'jsonb' },
         ],
         options: [
           {
@@ -2754,8 +2754,8 @@ export const WRAPPERS: WrapperMeta[] = [
             editable: false,
             required: true,
             type: 'text',
-          }
-        ]
+          },
+        ],
       },
       {
         label: 'Organization Invitations',
@@ -2769,7 +2769,7 @@ export const WRAPPERS: WrapperMeta[] = [
           { name: 'status', type: 'text' },
           { name: 'created_at', type: 'timestamp' },
           { name: 'updated_at', type: 'timestamp' },
-          { name: 'attrs', type: 'jsonb' }
+          { name: 'attrs', type: 'jsonb' },
         ],
         options: [
           {
@@ -2778,8 +2778,8 @@ export const WRAPPERS: WrapperMeta[] = [
             editable: false,
             required: true,
             type: 'text',
-          }
-        ]
+          },
+        ],
       },
       {
         label: 'Organization Memberships',
@@ -2790,7 +2790,7 @@ export const WRAPPERS: WrapperMeta[] = [
           { name: 'role_name', type: 'text' },
           { name: 'created_at', type: 'timestamp' },
           { name: 'updated_at', type: 'timestamp' },
-          { name: 'attrs', type: 'jsonb' }
+          { name: 'attrs', type: 'jsonb' },
         ],
         options: [
           {
@@ -2799,8 +2799,8 @@ export const WRAPPERS: WrapperMeta[] = [
             editable: false,
             required: true,
             type: 'text',
-          }
-        ]
+          },
+        ],
       },
       {
         label: 'Redirect URLs',
@@ -2810,7 +2810,7 @@ export const WRAPPERS: WrapperMeta[] = [
           { name: 'url', type: 'text' },
           { name: 'created_at', type: 'timestamp' },
           { name: 'updated_at', type: 'timestamp' },
-          { name: 'attrs', type: 'jsonb' }
+          { name: 'attrs', type: 'jsonb' },
         ],
         options: [
           {
@@ -2819,8 +2819,8 @@ export const WRAPPERS: WrapperMeta[] = [
             editable: false,
             required: true,
             type: 'text',
-          }
-        ]
+          },
+        ],
       },
       {
         label: 'SAML Connections',
@@ -2834,7 +2834,7 @@ export const WRAPPERS: WrapperMeta[] = [
           { name: 'user_count', type: 'bigint' },
           { name: 'created_at', type: 'timestamp' },
           { name: 'updated_at', type: 'timestamp' },
-          { name: 'attrs', type: 'jsonb' }
+          { name: 'attrs', type: 'jsonb' },
         ],
         options: [
           {
@@ -2843,8 +2843,8 @@ export const WRAPPERS: WrapperMeta[] = [
             editable: false,
             required: true,
             type: 'text',
-          }
-        ]
+          },
+        ],
       },
       {
         label: 'Users',
@@ -2857,7 +2857,7 @@ export const WRAPPERS: WrapperMeta[] = [
           { name: 'last_name', type: 'text' },
           { name: 'created_at', type: 'timestamp' },
           { name: 'updated_at', type: 'timestamp' },
-          { name: 'attrs', type: 'jsonb' }
+          { name: 'attrs', type: 'jsonb' },
         ],
         options: [
           {
@@ -2866,9 +2866,9 @@ export const WRAPPERS: WrapperMeta[] = [
             editable: false,
             required: true,
             type: 'text',
-          }
-        ]
-      }
+          },
+        ],
+      },
     ],
   },
 ]
