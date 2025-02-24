@@ -141,7 +141,7 @@ const FunctionsPage: NextPageWithLayout = () => {
 
           {isSuccess && (
             <>
-              {!hasFunctions ? (
+              {hasFunctions ? (
                 <Table
                   head={
                     <>

@@ -102,7 +102,9 @@ const FunctionsEmptyState = () => {
           </div>
         </CardContent>
       </Card>
-      <ScaffoldSectionTitle className="text-xl mb-4 mt-12">Examples</ScaffoldSectionTitle>
+      <ScaffoldSectionTitle className="text-xl mb-4 mt-12">
+        Start with a template
+      </ScaffoldSectionTitle>
       <ResourceList>
         {EDGE_FUNCTION_TEMPLATES.map((template) => (
           <ResourceItem
