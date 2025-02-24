@@ -34,7 +34,7 @@ export function ContributingToc({ className }: { className?: string }) {
       items={tocItems}
       className={cn(
         '[--local-top-spacing:2rem]',
-        'fixed top-[calc(var(--header-height)+var(--local-top-spacing))] right-8'
+        'sticky top-[calc(var(--header-height)+var(--local-top-spacing))] right-8'
       )}
     />
   ) : (
@@ -42,8 +42,9 @@ export function ContributingToc({ className }: { className?: string }) {
       items={tocItems}
       className={cn(
         '[--local-top-spacing:5rem]',
-        'fixed top-[calc(var(--header-height)+var(--local-top-spacing))] right-8 w-36',
-        'xl:border-l border-foreground-muted'
+        'border-l thin-scrollbar overflow-y-auto px-2 hidden md:block',
+        'col-span-3 self-start sticky',
+        'top-[calc(var(--header-height)+1px+2rem)] max-h-[calc(100vh-var(--header-height)-3rem)]'
       )}
     />
   )
@@ -69,8 +70,8 @@ function MobileToc({ items, className }: { items: Array<TocItem>; className?: st
 
 function TocBase({ items, className }: { items: Array<TocItem>; className?: string }) {
   return (
-    <nav aria-label="Table of contents" className={cn('px-4 text-foreground-light', className)}>
-      <ul className="flex flex-col gap-1">
+    <nav aria-label="Table of contents" className={cn('text-foreground-lighter', className)}>
+      <ul className="toc-menu list-none pl-5 text-[0.8rem] grid gap-2">
         {items.map((item) => (
           <li key={item.anchor} className="overflow-hidden truncate">
             <a href={`#${item.anchor}`}>{item.label}</a>
