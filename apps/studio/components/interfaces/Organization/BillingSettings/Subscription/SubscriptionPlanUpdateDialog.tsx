@@ -190,7 +190,7 @@ const SubscriptionPlanUpdateDialog = ({
                                 Current plan credit ({subscription?.plan?.name})
                               </TableCell>
                               <TableCell className="py-2 pr-0 text-right">
-                                -{formatCurrency(proratedCredit)}
+                                {formatCurrency(proratedCredit)}
                               </TableCell>
                             </TableRow>
                             <TableRow>
@@ -203,10 +203,9 @@ const SubscriptionPlanUpdateDialog = ({
                             </TableRow>
                             {customerBalance !== 0 && (
                               <TableRow>
-                                <TableCell className="py-2 pl-0">Account credit balance</TableCell>
+                                <TableCell className="py-2 pl-0">Account balance</TableCell>
                                 <TableCell className="py-2 pr-0 text-right">
-                                  {customerBalance > 0 ? '-' : '+'}
-                                  {formatCurrency(Math.abs(customerBalance))}
+                                  {formatCurrency(customerBalance)}
                                 </TableCell>
                               </TableRow>
                             )}
