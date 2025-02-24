@@ -1,9 +1,11 @@
 import { useParams } from 'common'
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Connect from 'components/interfaces/Connect/Connect'
 import { UserDropdown } from 'components/interfaces/user-dropdown'
 import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
 import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
+import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
 import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
@@ -63,10 +65,10 @@ const LayoutHeader = ({
   const router = useRouter()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-  const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
   const isOrgPage = router.pathname.startsWith('/org/') // Add this check
-  const { aiAssistantPanel, setMobileInnerMenuOpen } = useAppStateSnapshot()
+  const { aiAssistantPanel, setMobileMenuOpen } = useAppStateSnapshot()
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganization?.slug,
@@ -100,7 +102,7 @@ const LayoutHeader = ({
                 className={cn(
                   'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
                 )}
-                onClick={() => setMobileInnerMenuOpen(true)}
+                onClick={() => setMobileMenuOpen(true)}
               >
                 <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
                 <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />

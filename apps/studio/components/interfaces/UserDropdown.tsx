@@ -1,11 +1,12 @@
+import { Command, FlaskConical, Palette, Settings } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { Command, FlaskConical, Settings } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   DropdownMenu,
@@ -23,8 +24,9 @@ import {
   singleThemes,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import { ICON_SIZE, ICON_STROKE_WIDTH, SideBarNavLink } from './Sidebar'
 
-export function UserDropdown() {
+export const UserDropdown = () => {
   const { profile } = useProfile()
   const appStateSnapshot = useAppStateSnapshot()
   const { theme, setTheme } = useTheme()
@@ -32,7 +34,6 @@ export function UserDropdown() {
   const router = useRouter()
 
   const setCommandMenuOpen = useSetCommandMenuOpen()
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -62,7 +63,6 @@ export function UserDropdown() {
           </button>
         </SidebarMenuButton>
       </DropdownMenuTrigger>
-
       <DropdownMenuContent side="top" align="start">
         {IS_PLATFORM && (
           <>
@@ -140,6 +140,42 @@ export function UserDropdown() {
             </DropdownMenuGroup>
           </>
         )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+export const ThemeDropdown = () => {
+  const { theme, setTheme } = useTheme()
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <SideBarNavLink
+          key="palette"
+          route={{
+            key: 'palette',
+            label: 'Theme',
+            icon: <Palette size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+          }}
+        />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="top" align="start">
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Theme</DropdownMenuLabel>
+          <DropdownMenuRadioGroup
+            value={theme}
+            onValueChange={(value) => {
+              setTheme(value)
+            }}
+          >
+            {singleThemes.map((theme: Theme) => (
+              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                {theme.name}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )
