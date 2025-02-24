@@ -355,7 +355,7 @@ const SubscriptionPlanUpdateDialog = ({
                                             <span>Compute</span>
                                             <InfoTooltip className="max-w-sm">
                                               {' '}
-                                              <p className="text-sm text-foreground-light mb-4 prose">
+                                              <p className="prose text-xs">
                                                 Each project on a paid plan is a dedicated server
                                                 running 24/7 with no pausing. The first project is
                                                 covered by Compute Credits. Additional projects will
@@ -444,14 +444,28 @@ const SubscriptionPlanUpdateDialog = ({
                                     )}
 
                                     {/* Non-compute items */}
-                                    {otherItems.map((item: any) => (
+                                    {otherItems.map((item) => (
                                       <TableRow
                                         key={item.description}
                                         className="text-foreground-light"
                                       >
                                         <TableCell className="text-xs py-2 px-0">
-                                          <div className="flex items-center gap-1">
-                                            {item.description ?? 'Unknown'}
+                                          <div className="flex items-center gap-1 flex items-center gap-1">
+                                            <span>{item.description ?? 'Unknown'}</span>
+                                            {item.breakdown.length > 0 && (
+                                              <InfoTooltip className="max-w-sm">
+                                                <p>Projects using {item.description}:</p>
+                                                <ul className="ml-6 list-disc">
+                                                  {item.breakdown.map((breakdown) => (
+                                                    <li
+                                                      key={`${item.description}-breakdown-${breakdown.project_ref}`}
+                                                    >
+                                                      {breakdown.project_name}
+                                                    </li>
+                                                  ))}
+                                                </ul>
+                                              </InfoTooltip>
+                                            )}
                                           </div>
                                         </TableCell>
                                         <TableCell className="text-right text-xs py-2 px-0">
