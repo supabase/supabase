@@ -1108,6 +1108,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/mssql',
         },
         {
+          name: 'Connecting to Notion',
+          url: '/guides/database/extensions/wrappers/notion',
+        },
+        {
           name: 'Connecting to Paddle',
           url: '/guides/database/extensions/wrappers/paddle',
         },

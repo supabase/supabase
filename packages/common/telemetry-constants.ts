@@ -103,6 +103,10 @@ export interface SignInEvent {
   action: TelemetryActions.SIGN_IN
   properties: {
     category: 'account'
+    /**
+     * The method used to sign in, e.g. email, github, sso
+     */
+    method: string
   }
 }
 
