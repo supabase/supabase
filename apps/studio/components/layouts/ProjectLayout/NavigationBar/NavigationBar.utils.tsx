@@ -56,7 +56,6 @@ export const generateProductRoutes = (
     edgeFunctions?: boolean
     storage?: boolean
     realtime?: boolean
-    replication?: boolean
   }
 ): Route[] => {
   const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -67,7 +66,6 @@ export const generateProductRoutes = (
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
-  const replicationEnabled = features?.replication ?? true
 
   const databaseMenu = generateDatabaseMenu(project)
   const authMenu = generateAuthMenu(ref as string)
@@ -124,17 +122,6 @@ export const generateProductRoutes = (
             label: 'Realtime',
             icon: <Realtime size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/inspector`),
-          },
-        ]
-      : []),
-    ...(replicationEnabled
-      ? [
-          {
-            key: 'replication',
-            label: 'Replication',
-            //TODO: Use a proper icon
-            icon: <RESTApi size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/replication`),
           },
         ]
       : []),
