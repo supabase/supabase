@@ -177,7 +177,7 @@ const SubscriptionPlanUpdateDialog = ({
                         // Calculate new plan cost
                         const newPlanCost = subscriptionPlanMeta?.priceMonthly ?? 0
 
-                        const customerBalance = subscription?.customer_balance ?? 0
+                        const customerBalance = ((subscription?.customer_balance ?? 0) / 100) * -1
 
                         // Calculate total charge (new plan - prorated credit)
                         const totalCharge = Math.max(
@@ -188,8 +188,8 @@ const SubscriptionPlanUpdateDialog = ({
                         return (
                           <>
                             <TableRow>
-                              <TableCell className="py-2 pl-0">
-                                {subscriptionPlanMeta?.name} Plan{' '}
+                              <TableCell className="py-2 pl-0 flex items-center gap-1">
+                                <span>{subscriptionPlanMeta?.name} Plan</span>
                                 <Badge variant={'brand'} size={'small'}>
                                   New
                                 </Badge>
@@ -198,17 +198,25 @@ const SubscriptionPlanUpdateDialog = ({
                                 {formatCurrency(newPlanCost)}
                               </TableCell>
                             </TableRow>
-                            <TableRow>
-                              <TableCell className="py-2 pl-0 flex items-center gap-1">
-                                <span>Unused Time on {subscription?.plan?.name} Plan</span>
-                                <InfoTooltip>Bla</InfoTooltip>
-                              </TableCell>
-                              <TableCell className="py-2 pr-0 text-right">
-                                -{formatCurrency(proratedCredit)}
-                              </TableCell>
-                            </TableRow>
+                            {subscription?.plan?.id !== 'free' && (
+                              <TableRow>
+                                <TableCell className="py-2 pl-0 flex items-center gap-1">
+                                  <span>Unused Time on {subscription?.plan?.name} Plan</span>
+                                  <InfoTooltip className="max-w-sm">
+                                    Your previous plan was charged upfront, so a plan change will
+                                    prorate any unused time in credits. If the prorated credits
+                                    exceed the new plan charge, the excessive credits are added to
+                                    your organization for future use.
+                                  </InfoTooltip>
+                                </TableCell>
+                                <TableCell className="py-2 pr-0 text-right">
+                                  -{formatCurrency(proratedCredit)}
+                                </TableCell>
+                              </TableRow>
+                            )}
 
-                            {customerBalance !== 0 && (
+                            {/* Ignore rare case with negative balance (debt) */}
+                            {customerBalance > 0 && (
                               <TableRow>
                                 <TableCell className="py-2 pl-0">Account balance</TableCell>
                                 <TableCell className="py-2 pr-0 text-right">
@@ -217,17 +225,20 @@ const SubscriptionPlanUpdateDialog = ({
                               </TableRow>
                             )}
                             <TableRow className="text-foreground">
-                              <TableCell className="py-2 pl-0 border-t">
-                                Total charged today
-                              </TableCell>
+                              <TableCell className="py-2 pl-0 border-t">Charges today</TableCell>
                               <TableCell className="py-2 pr-0 text-right border-t">
                                 {formatCurrency(totalCharge)}
                               </TableCell>
                             </TableRow>
                             {subscription?.plan?.id !== 'free' && (
                               <TableRow>
-                                <TableCell className="py-2 pl-0">
+                                <TableCell className="py-2 pl-0 flex items-center gap-1">
                                   <span>+ current cycle usage</span>
+                                  <InfoTooltip className="max-w-sm">
+                                    Changing your plan resets your billing cycle. If your previous
+                                    billing cycle still has any outstanding usage charges, they will
+                                    be added to your total charge today.
+                                  </InfoTooltip>
                                 </TableCell>
                                 <TableCell className="py-2 pr-0 text-right">
                                   <Link
