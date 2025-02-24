@@ -41,7 +41,7 @@ const NewFunctionPage = () => {
   // TODO (Saxon): Remove this once the flag is fully launched
   useEffect(() => {
     if (!edgeFunctionCreate) {
-      router.push(`/project/${ref}/functions`)
+      // router.push(`/project/${ref}/functions`)
     }
   }, [edgeFunctionCreate, ref, router])
 
@@ -146,23 +146,23 @@ Deno.serve(async (req: Request) => {
     })
   }
 
-  const onSelectTemplate = (templateValue: string) => {
-    const template = EDGE_FUNCTION_TEMPLATES.find((t) => t.value === templateValue)
+  const onSelectTemplate = (templateSlug: string) => {
+    const template = EDGE_FUNCTION_TEMPLATES.find((t) => t.slug === templateSlug)
     if (template) {
       setFiles((prev) =>
-        prev.map((file) => (file.selected ? { ...file, content: template.content } : file))
+        prev.map((file) => (file.selected ? { ...file, content: template.code } : file))
       )
       setOpen(false)
     }
   }
 
-  const handleTemplateMouseEnter = (content: string) => {
+  const handleTemplateMouseEnter = (code: string) => {
     if (!isPreviewingTemplate) {
       const selectedFile = files.find((f) => f.selected) ?? files[0]
       setSavedCode(selectedFile.content)
     }
     setIsPreviewingTemplate(true)
-    setFiles((prev) => prev.map((file) => (file.selected ? { ...file, content } : file)))
+    setFiles((prev) => prev.map((file) => (file.selected ? { ...file, content: code } : file)))
   }
 
   const handleTemplateMouseLeave = () => {
@@ -216,7 +216,7 @@ Deno.serve(async (req: Request) => {
                 Templates
               </Button>
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="w-[300px] p-0">
+            <PopoverContent_Shadcn_ className="w-[340px] p-0">
               <Command_Shadcn_>
                 <CommandInput_Shadcn_ placeholder="Search templates..." />
                 <CommandList_Shadcn_>
@@ -224,28 +224,23 @@ Deno.serve(async (req: Request) => {
                   <CommandGroup_Shadcn_>
                     {EDGE_FUNCTION_TEMPLATES.map((template) => (
                       <CommandItem_Shadcn_
-                        key={template.value}
-                        value={template.value}
-                        onSelect={onSelectTemplate}
-                        onMouseEnter={() => handleTemplateMouseEnter(template.content)}
+                        key={template.slug}
+                        value={template.slug}
+                        onSelect={(value) => onSelectTemplate(value)}
+                        onMouseEnter={() => handleTemplateMouseEnter(template.code)}
                         onMouseLeave={handleTemplateMouseLeave}
                         className="cursor-pointer"
                       >
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center">
-                            <Check
-                              className={cn(
-                                'mr-2 h-4 w-4',
-                                files.some((f) => f.selected && f.content === template.content)
-                                  ? 'opacity-100'
-                                  : 'opacity-0'
-                              )}
-                            />
-                            <span className="text-foreground">{template.name}</span>
-                          </div>
-                          <span className="text-xs text-foreground-light pl-6">
-                            {template.description}
-                          </span>
+                        <div className="flex items-center overflow-hidden">
+                          <Check
+                            className={cn(
+                              'mr-2 h-4 w-4',
+                              files.some((f) => f.selected && f.content === template.code)
+                                ? 'opacity-100'
+                                : 'opacity-0'
+                            )}
+                          />
+                          <span className="flex-1 text-foreground truncate">{template.title}</span>
                         </div>
                       </CommandItem_Shadcn_>
                     ))}
