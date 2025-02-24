@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { InfoIcon, Check } from 'lucide-react'
+import { InfoIcon, Check, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
@@ -19,6 +19,7 @@ import {
   HoverCardTrigger,
   Card,
   CardContent,
+  Badge,
 } from 'ui'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { organizationKeys } from 'data/organizations/keys'
@@ -28,6 +29,7 @@ import { SubscriptionTier } from 'data/subscriptions/types'
 import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import { Button, Dialog, DialogContent } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 const getRandomTweet = () => {
   const randomIndex = Math.floor(Math.random() * tweets.length)
@@ -142,7 +144,7 @@ const SubscriptionPlanUpdateDialog = ({
       <DialogContent size="xlarge" className="p-0">
         <div className="grid grid-cols-1 md:grid-cols-2 h-full items-stretch">
           {/* Left Column */}
-          <div className="p-8 pb-0 flex flex-col">
+          <div className="p-8 pb-8 flex flex-col">
             <div className="flex-1">
               <h3 className="text-lg font-medium mb-4">
                 Upgrade {selectedOrganization.name} to{' '}
@@ -187,20 +189,25 @@ const SubscriptionPlanUpdateDialog = ({
                           <>
                             <TableRow>
                               <TableCell className="py-2 pl-0">
-                                Current plan credit ({subscription?.plan?.name})
-                              </TableCell>
-                              <TableCell className="py-2 pr-0 text-right">
-                                {formatCurrency(proratedCredit)}
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell className="py-2 pl-0">
-                                New plan ({subscriptionPlanMeta?.name})
+                                {subscriptionPlanMeta?.name} Plan{' '}
+                                <Badge variant={'brand'} size={'small'}>
+                                  New
+                                </Badge>
                               </TableCell>
                               <TableCell className="py-2 pr-0 text-right">
                                 {formatCurrency(newPlanCost)}
                               </TableCell>
                             </TableRow>
+                            <TableRow>
+                              <TableCell className="py-2 pl-0 flex items-center gap-1">
+                                <span>Unused Time on {subscription?.plan?.name} Plan</span>
+                                <InfoTooltip>Bla</InfoTooltip>
+                              </TableCell>
+                              <TableCell className="py-2 pr-0 text-right">
+                                -{formatCurrency(proratedCredit)}
+                              </TableCell>
+                            </TableRow>
+
                             {customerBalance !== 0 && (
                               <TableRow>
                                 <TableCell className="py-2 pl-0">Account balance</TableCell>
@@ -226,6 +233,7 @@ const SubscriptionPlanUpdateDialog = ({
                                   <Link
                                     href={`/org/${slug}/billing#breakdown`}
                                     className="text-sm text-brand hover:text-brand-600 transition"
+                                    target="_blank"
                                   >
                                     View spend
                                   </Link>
@@ -242,7 +250,7 @@ const SubscriptionPlanUpdateDialog = ({
                       <Card className="cursor-help text-sm">
                         <CardContent className="flex items-center gap-2 py-2 px-3">
                           <InfoIcon strokeWidth={1.5} size={16} className="text-foreground-light" />
-                          Next invoice estimate is{' '}
+                          Monthly invoice estimate is{' '}
                           {formatCurrency(
                             Math.round(
                               subscriptionPreview?.breakdown.reduce(
@@ -255,12 +263,57 @@ const SubscriptionPlanUpdateDialog = ({
                       </Card>
                     </HoverCardTrigger>
                     <HoverCardContent className="w-[520px] p-6">
-                      <h3 className="text-md font-medium mb-2">Estimating your invoice</h3>
-                      <p className="text-sm text-foreground-light mb-4">
-                        At the end of your billing cycle, compute and add-on costs will be
-                        calculated on an hourly basis and added to your plan. Each active project
-                        will use at least $10 of compute a month if it's active 24/7.
+                      <h3 className="text-md font-medium mb-2">Your new monthly invoice</h3>
+                      <p className="text-sm text-foreground-light mb-4 prose">
+                        Each project on a paid plan is a dedicated server running 24/7 with no
+                        pausing. The first project is covered by Compute Credits. Additional
+                        projects will incur compute costs starting at $10/month, independent of
+                        activity. See{' '}
+                        <Link
+                          href={'/docs/guides/platform/manage-your-usage/compute'}
+                          target="_blank"
+                        >
+                          docs
+                        </Link>
+                        .
                       </p>
+                      {subscription?.plan?.id === 'free' && (
+                        <>
+                          <p className="text-sm text-foreground-light mb-4">
+                            Mixing paid and non-paid projects in a single organization is not
+                            possible. If you want projects to be on the Free Plan, use self-serve
+                            project transfers.
+                          </p>
+                          <div className="space-x-3 mt-2">
+                            <Button
+                              asChild
+                              type="default"
+                              icon={<ExternalLink strokeWidth={1.5} />}
+                            >
+                              <Link
+                                href="/docs/guides/platform/manage-your-usage/compute"
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                How billing for Compute works
+                              </Link>
+                            </Button>
+                            <Button
+                              asChild
+                              type="default"
+                              icon={<ExternalLink strokeWidth={1.5} />}
+                            >
+                              <Link
+                                href="/docs/guides/platform/project-transfer"
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Project transfers
+                              </Link>
+                            </Button>
+                          </div>
+                        </>
+                      )}
                       {subscriptionPreviewError && (
                         <AlertError
                           error={subscriptionPreviewError}
@@ -398,7 +451,7 @@ const SubscriptionPlanUpdateDialog = ({
               )}
             </div>
 
-            <div className="mt-4 py-4">
+            <div className="mt-4 pt-4">
               {!billingViaPartner ? (
                 <div className="space-y-4">
                   <PaymentMethodSelection
