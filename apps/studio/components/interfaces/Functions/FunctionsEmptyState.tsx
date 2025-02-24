@@ -19,11 +19,13 @@ import { AiIconAnimation } from 'ui'
 import { ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { ResourceItem } from 'components/ui/Resource/ResourceItem'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const FunctionsEmptyState = () => {
   const { ref } = useParams()
   const router = useRouter()
   const { setAiAssistantPanel } = useAppStateSnapshot()
+  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
 
   return (
     <>
@@ -31,7 +33,7 @@ const FunctionsEmptyState = () => {
         <CardHeader>
           <CardTitle>Create your first edge function</CardTitle>
         </CardHeader>
-        <CardContent className="p-0 grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
+        <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
           {/* CLI Option */}
           <div className="p-8">
             <div className="flex items-center gap-2">
@@ -62,8 +64,7 @@ const FunctionsEmptyState = () => {
               <h4 className="text-base text-foreground">AI Assistant</h4>
             </div>
             <p className="text-sm text-foreground-light mb-4 mt-1">
-              Let our AI assistant help you create functions. Perfect for quick prototypes and
-              learning.
+              Let our AI assistant help you create functions. Perfect for kickstarting a function.
             </p>
             <Button
               type="default"
@@ -88,43 +89,49 @@ const FunctionsEmptyState = () => {
           </div>
 
           {/* Editor Option */}
-          <div className="p-8">
-            <div className="flex items-center gap-2">
-              <Code strokeWidth={1.5} size={20} />
-              <h4 className="text-base text-foreground">Via Editor</h4>
+          {edgeFunctionCreate && (
+            <div className="p-8">
+              <div className="flex items-center gap-2">
+                <Code strokeWidth={1.5} size={20} />
+                <h4 className="text-base text-foreground">Via Editor</h4>
+              </div>
+              <p className="text-sm text-foreground-light mb-4 mt-1">
+                Create and edit functions directly in the browser. Download to local at any time.
+              </p>
+              <Button type="default" onClick={() => router.push(`/project/${ref}/functions/new`)}>
+                Open Editor
+              </Button>
             </div>
-            <p className="text-sm text-foreground-light mb-4 mt-1">
-              Create and edit functions directly in the browser. Great for quick edits and testing.
-            </p>
-            <Button type="default" onClick={() => router.push(`/project/${ref}/functions/new`)}>
-              Open Editor
-            </Button>
-          </div>
+          )}
         </CardContent>
       </Card>
-      <ScaffoldSectionTitle className="text-xl mb-4 mt-12">
-        Start with a template
-      </ScaffoldSectionTitle>
-      <ResourceList>
-        {EDGE_FUNCTION_TEMPLATES.map((template) => (
-          <ResourceItem
-            key={template.title}
-            media={<Code strokeWidth={1.5} size={16} />}
-            onClick={() => {
-              localStorage.setItem(
-                'edgefunction_example',
-                JSON.stringify({
-                  code: template.code,
-                  slug: template.slug,
-                })
-              )
-              router.push(`/project/${ref}/functions/new`)
-            }}
-          >
-            {template.title}
-          </ResourceItem>
-        ))}
-      </ResourceList>
+      {edgeFunctionCreate && (
+        <>
+          <ScaffoldSectionTitle className="text-xl mb-4 mt-12">
+            Start with a template
+          </ScaffoldSectionTitle>
+          <ResourceList>
+            {EDGE_FUNCTION_TEMPLATES.map((template) => (
+              <ResourceItem
+                key={template.title}
+                media={<Code strokeWidth={1.5} size={16} />}
+                onClick={() => {
+                  localStorage.setItem(
+                    'edgefunction_example',
+                    JSON.stringify({
+                      code: template.code,
+                      slug: template.slug,
+                    })
+                  )
+                  router.push(`/project/${ref}/functions/new`)
+                }}
+              >
+                {template.title}
+              </ResourceItem>
+            ))}
+          </ResourceList>
+        </>
+      )}
     </>
   )
 }
