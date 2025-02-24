@@ -1,0 +1,67 @@
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+
+interface TopUpRequest {
+  phoneNumber: string
+  amount: string
+  operator: string
+  paymentMethod: string
+  txHash?: string
+}
+
+// 这里替换为实际的运营商 API 配置
+const OPERATOR_API_CONFIG = {
+  'china-mobile': {
+    url: 'https://api.example.com/china-mobile/topup',
+    key: Deno.env.get('CHINA_MOBILE_API_KEY'),
+  },
+  'china-unicom': {
+    url: 'https://api.example.com/china-unicom/topup',
+    key: Deno.env.get('CHINA_UNICOM_API_KEY'),
+  },
+  'china-telecom': {
+    url: 'https://api.example.com/china-telecom/topup',
+    key: Deno.env.get('CHINA_TELECOM_API_KEY'),
+  },
+}
+
+serve(async (req) => {
+  try {
+    const input: TopUpRequest = await req.json()
+    
+    // 获取运营商配置
+    const operatorConfig = OPERATOR_API_CONFIG[input.operator as keyof typeof OPERATOR_API_CONFIG]
+    if (!operatorConfig) {
+      throw new Error('不支持的运营商')
+    }
+
+    // TODO: 实现实际的运营商 API 调用
+    // 这里暂时返回模拟数据
+    const response = {
+      success: true,
+      orderId: `${input.operator}-${Date.now()}`,
+      message: '充值成功',
+      details: {
+        operator: input.operator,
+        phoneNumber: input.phoneNumber,
+        amount: input.amount,
+        timestamp: new Date().toISOString(),
+      },
+    }
+
+    return new Response(
+      JSON.stringify(response),
+      { headers: { 'Content-Type': 'application/json' } },
+    )
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: error.message,
+      }),
+      { 
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+  }
+})
