@@ -28,6 +28,7 @@ yarn-error.log*
 public/sitemap.xml
 # llms.txt (generated)
 public/llms.txt
+public/llms/
 
 # Copied examples folder
 /examples/
