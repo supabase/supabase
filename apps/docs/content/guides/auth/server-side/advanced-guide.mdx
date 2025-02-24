@@ -28,6 +28,8 @@ For an implementation example, see the [@supabase/ssr](https://github.com/supaba
 
 ## Frequently asked questions
 
+{/* supa-mdx-lint-disable Rule004ExcludeWords */}
+
 ### No session on the server side with Next.js route prefetching?
 
 When you use route prefetching in Next.js using `<Link href="/...">` components or the `Router.push()` APIs can send server-side requests before the browser processes the access and refresh tokens. This means that those requests may not have any cookies set and your server code will render unauthenticated content.

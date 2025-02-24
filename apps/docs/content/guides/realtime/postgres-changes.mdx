@@ -832,7 +832,7 @@ let changes = await myChannel.postgresChange(
   InsertAction.self,
   schema: "public",
   table: "todos",
-  filter: "id=eq.1"
+  filter: .eq("id", value: 1)
 )
 
 await myChannel.subscribe()
@@ -941,7 +941,7 @@ let changes = await myChannel.postgresChange(
   UpdateAction.self,
   schema: "public",
   table: "messages",
-  filter: "body=eq.hey"
+  filter: .eq("body", value: "hey")
 )
 
 await myChannel.subscribe()
@@ -1048,7 +1048,7 @@ let changes = await myChannel.postgresChange(
   UpdateAction.self,
   schema: "public",
   table: "messages",
-  filter: "body=neq.hey"
+  filter: .neq("body", value: "hey")
 )
 
 await myChannel.subscribe()
@@ -1156,7 +1156,7 @@ let changes = await myChannel.postgresChange(
   InsertAction.self,
   schema: "public",
   table: "profiles",
-  filter: "age=lt.65"
+  filter: .lt("age", value: 65)
 )
 
 await myChannel.subscribe()
@@ -1263,7 +1263,7 @@ let changes = await myChannel.postgresChange(
   InsertAction.self,
   schema: "public",
   table: "profiles",
-  filter: "age=lte.65"
+  filter: .lte("age", value: 65)
 )
 
 await myChannel.subscribe()
@@ -1370,7 +1370,7 @@ let changes = await myChannel.postgresChange(
   InsertAction.self,
   schema: "public",
   table: "products",
-  filter: "quantity=gt.10"
+  filter: .gt("quantity", value: 10)
 )
 
 await myChannel.subscribe()
@@ -1477,7 +1477,7 @@ let changes = await myChannel.postgresChange(
   InsertAction.self,
   schema: "public",
   table: "products",
-  filter: "quantity=gte.10"
+  filter: .gte("quantity", value: 10)
 )
 
 await myChannel.subscribe()
@@ -1584,7 +1584,7 @@ let changes = await myChannel.postgresChange(
   InsertAction.self,
   schema: "public",
   table: "products",
-  filter: "name=in.(red, blue, yellow)"
+  filter: .in("name", values: ["red", "blue", "yellow"])
 )
 
 await myChannel.subscribe()
@@ -1876,4 +1876,4 @@ Enter your database settings to estimate the maximum throughput for your instanc
 
 Don't forget to run your own benchmarks to make sure that the performance is acceptable for your use case.
 
-We are making many improvements to Realtime's Postgres Changes. If you are uncertain about the performance of your use case, please reach out using [Support Form](https://supabase.com/dashboard/support/new) and we will be happy to help you. We have a team of engineers that can advise you on the best solution for your use-case.
+We are making many improvements to Realtime's Postgres Changes. If you are uncertain about the performance of your use case, reach out using [Support Form](https://supabase.com/dashboard/support/new) and we will be happy to help you. We have a team of engineers that can advise you on the best solution for your use-case.
