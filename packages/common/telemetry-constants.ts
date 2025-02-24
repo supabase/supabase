@@ -29,6 +29,10 @@ export interface SignInEvent {
   action: 'sign_in'
   properties: {
     category: 'account'
+    /**
+     * The method used to sign in, e.g. email, github, sso
+     */
+    method: string
   }
 }
 

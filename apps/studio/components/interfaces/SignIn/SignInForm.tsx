@@ -61,7 +61,10 @@ const SignInForm = () => {
         }
 
         toast.success(`Signed in successfully!`, { id: toastId })
-        sendEvent({ action: 'sign_in', properties: { category: 'account' } })
+        sendEvent({
+          action: 'sign_in',
+          properties: { category: 'account', method: 'email' },
+        })
         addLoginEvent({})
 
         await queryClient.resetQueries()
