@@ -1,5 +1,13 @@
-// These events are tracked only when users opt in.
-// Standardization as per document: https://www.notion.so/supabase/Event-tracking-standardization-1195004b775f80f98ee3fa9e70cf4d05
+/**
+ * Consolidated event definitions coming from the frontend, including studio, www, and docs.
+ *
+ * Note that events are not emitted for users that have opted out of telemetry.
+ *
+ * Original definitions located at:
+ * https://github.com/supabase/supabase/blob/master/packages/common/telemetry-constants.ts
+ *
+ * @module telemetry-frontend
+ */
 
 /**
  * Triggered when a user signs up. When signing up with Email and Password, this is only triggered once user confirms their email.
@@ -1025,6 +1033,9 @@ export interface StudioPricingSidePanelOpenedEvent {
   groups: { organization: string }
 }
 
+/**
+ * @hidden
+ */
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
