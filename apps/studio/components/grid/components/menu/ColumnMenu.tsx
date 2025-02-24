@@ -95,6 +95,9 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             className="opacity-50 flex"
             type="text"
             style={{ padding: '3px' }}
+            onClick={(e) => {
+              e.stopPropagation()
+            }}
             icon={<ChevronDown />}
           />
         </DropdownMenuTrigger>

@@ -274,7 +274,6 @@ function addCanonicalUrl(entry) {
 function escapeGraphQlString(str) {
   return str
     .replace(/\\/g, '\\\\')
-    .replace(/`/g, '\\`')
     .replace(/"/g, '\\"')
     .replace(/\n/g, '\\n')
     .replace(/\r/g, '\\r')
@@ -389,7 +388,7 @@ async function updateGithubDiscussion(entry) {
     mutation {
       updateDiscussion(input: {
         discussionId: "${data.github_id}",
-        body: "${content}",
+        body: "${content}"
       }) {
         discussion {
           id
@@ -397,9 +396,13 @@ async function updateGithubDiscussion(entry) {
       }
     }
     `
-
-  await octokit().graphql(mutation)
-  console.log(`[INFO] Updated discussion content for ${entry.data.title}`)
+  try {
+    await octokit().graphql(mutation)
+    console.log(`[INFO] Updated discussion content for ${entry.data.title}`)
+  } catch (err) {
+    console.error('[DEBUG] Failed GraphQL mutation:\n', mutation)
+    throw err
+  }
 }
 
 /** @param {string} id */
