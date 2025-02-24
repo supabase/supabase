@@ -19,8 +19,10 @@ import { usePgbouncerConfigurationUpdateMutation } from 'data/database/pgbouncer
 import { usePgbouncerStatusQuery } from 'data/database/pgbouncer-status-query'
 import { useSupavisorConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useSupavisorConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { toast } from 'sonner'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
@@ -40,6 +42,10 @@ import {
   SelectValue_Shadcn_,
   Select_Shadcn_,
   Separator,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -50,7 +56,7 @@ import {
   STATEMENT_MODE_DESCRIPTION,
   TRANSACTION_MODE_DESCRIPTION,
 } from '../Database.constants'
-import { POOLER_OPTIONS, POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
+import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 
 const formId = 'pooling-configuration-form'
 
@@ -83,6 +89,7 @@ const PoolingConfigurationFormSchema = z.object({
 export const ConnectionPooling = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
   const snap = useDatabaseSettingsStateSnapshot()
   const allowPgBouncerSelection = useFlag('dualPoolerSupport')
 
@@ -118,8 +125,8 @@ export const ConnectionPooling = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
   const { data: addons } = useProjectAddonsQuery({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
 
   usePgbouncerStatusQuery(
     { projectRef },
@@ -194,7 +201,7 @@ export const ConnectionPooling = () => {
     : 'Supavisor'
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
   const computeSize =
-    computeInstance?.variant.name ?? capitalize(project?.infra_compute_size) ?? 'Micro'
+    computeInstance?.variant.name ?? capitalize(project?.infra_compute_size) ?? 'Nano'
   const poolingOptimizations =
     POOLING_OPTIMIZATIONS[
       (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
@@ -203,11 +210,13 @@ export const ConnectionPooling = () => {
   const defaultPoolSize = poolingOptimizations.poolSize ?? 15
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
 
+  const isFreePlan = subscription?.plan.id === 'free'
   const supavisorConfig = supavisorPoolingInfo?.find((x) => x.database_type === 'PRIMARY')
   const connectionPoolingUnavailable =
     type === 'PgBouncer' ? pgbouncerConfig?.pool_mode === null : supavisorConfig?.pool_mode === null
   const disablePoolModeSelection =
     type === 'Supavisor' && supavisorConfig?.pool_mode === 'transaction'
+  const disablePgBouncerSelection = computeSize === 'Nano'
   const showPoolModeWarning = type === 'Supavisor' && supavisorConfig?.pool_mode === 'session'
   const isChangingPoolerType =
     (currentPooler === 'PgBouncer' && type === 'Supavisor') ||
@@ -451,13 +460,51 @@ export const ConnectionPooling = () => {
                               </SelectTrigger_Shadcn_>
                             </FormControl_Shadcn_>
                             <SelectContent_Shadcn_>
-                              {POOLER_OPTIONS.map((x) => (
-                                <SelectItem_Shadcn_ key={x.value} value={x.value}>
-                                  <div className="flex flex-col gap-y-1 items-start">
-                                    <p className="text-sm text-foreground">{x.label}</p>
-                                  </div>
-                                </SelectItem_Shadcn_>
-                              ))}
+                              <SelectItem_Shadcn_ value="Supavisor">
+                                <div className="flex flex-col gap-y-1 items-start">
+                                  <p className="text-sm text-foreground">Supavisor</p>
+                                </div>
+                              </SelectItem_Shadcn_>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <SelectItem_Shadcn_
+                                    disabled={disablePgBouncerSelection}
+                                    value="PgBouncer"
+                                    className={cn(
+                                      disablePgBouncerSelection && '!pointer-events-auto'
+                                    )}
+                                  >
+                                    <div className="flex flex-col gap-y-1 items-start">
+                                      <p className="text-sm text-foreground">PgBouncer</p>
+                                    </div>
+                                  </SelectItem_Shadcn_>
+                                </TooltipTrigger>
+                                {disablePgBouncerSelection && (
+                                  <TooltipContent side="right" className="w-72">
+                                    PgBouncer can only be used while on a Micro Compute and above.{' '}
+                                    {isFreePlan ? (
+                                      <>
+                                        <InlineLink
+                                          href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}
+                                        >
+                                          Upgrade your plan
+                                        </InlineLink>{' '}
+                                        to adjust your project's compute size.
+                                      </>
+                                    ) : (
+                                      <>
+                                        Upgrade your compute size through your{' '}
+                                        <InlineLink
+                                          href={`/project/${projectRef}/settings/compute-and-disk`}
+                                        >
+                                          project's settings
+                                        </InlineLink>
+                                        .
+                                      </>
+                                    )}
+                                  </TooltipContent>
+                                )}
+                              </Tooltip>
                             </SelectContent_Shadcn_>
                           </Select_Shadcn_>
                         </FormItemLayout>

@@ -54,8 +54,3 @@ export const POOLER = {
   PGBOUNCER: 'PgBouncer',
   SUPAVISOR: 'Supavisor',
 }
-
-export const POOLER_OPTIONS = [
-  { value: 'Supavisor', label: 'Supavisor', description: 'Some description' },
-  { value: 'PgBouncer', label: 'PgBouncer', description: 'Dedicated Pooler' },
-]
