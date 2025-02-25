@@ -6,6 +6,7 @@ import Panel from 'components/ui/Panel'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
+  Badge,
   Button,
   cn,
   CodeBlock,
@@ -21,6 +22,7 @@ import { DirectConnectionIcon, TransactionIcon } from './PoolerIcons'
 
 interface ConnectionPanelProps {
   type?: 'direct' | 'transaction' | 'session'
+  badge?: string
   title: string
   description: string
   connectionString: string
@@ -100,6 +102,7 @@ export const CodeBlockFileHeader = ({ title }: { title: string }) => {
 
 export const ConnectionPanel = ({
   type = 'direct',
+  badge,
   title,
   description,
   connectionString,
@@ -120,7 +123,10 @@ export const ConnectionPanel = ({
   return (
     <div className="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:gap-20 w-full">
       <div className="flex flex-col">
-        <h1 className="text-sm mb-2">{title}</h1>
+        <div className="flex items-center gap-x-2 mb-2">
+          <h1 className="text-sm">{title}</h1>
+          {!!badge && <Badge>{badge}</Badge>}
+        </div>
         <p className="text-sm text-foreground-light mb-4">{description}</p>
         <div className="flex flex-col -space-y-px">
           {fileTitle && <CodeBlockFileHeader title={fileTitle} />}

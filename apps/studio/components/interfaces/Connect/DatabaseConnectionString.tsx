@@ -7,7 +7,8 @@ import { getAddons } from 'components/interfaces/Billing/Subscription/Subscripti
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
+import { useSupavisorConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -59,15 +60,23 @@ export const DatabaseConnectionString = () => {
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
 
   const {
-    data: poolingInfo,
-    error: poolingInfoError,
-    isLoading: isLoadingPoolingInfo,
-    isError: isErrorPoolingInfo,
-    isSuccess: isSuccessPoolingInfo,
-  } = usePoolingConfigurationQuery({
-    projectRef,
-  })
-  const poolingConfiguration = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+    data: pgbouncerConfig,
+    error: pgbouncerError,
+    isLoading: isLoadingPgbouncerConfig,
+    isError: isErrorPgbouncerConfig,
+    isSuccess: isSuccessPgBouncerConfig,
+  } = usePgbouncerConfigQuery({ projectRef })
+  const {
+    data: supavisorConfig,
+    error: supavisorConfigError,
+    isLoading: isLoadingSupavisorConfig,
+    isError: isErrorSupavisorConfig,
+    isSuccess: isSuccessSupavisorConfig,
+  } = useSupavisorConfigurationQuery({ projectRef }, { enabled: !pgbouncerConfig })
+  const isPgBouncerEnabled = !!pgbouncerConfig?.pgbouncer_enabled
+  const poolingConfiguration = isPgBouncerEnabled
+    ? pgbouncerConfig
+    : supavisorConfig?.find((x) => x.identifier === state.selectedDatabaseId)
 
   const {
     data: databases,
@@ -77,10 +86,19 @@ export const DatabaseConnectionString = () => {
     isSuccess: isSuccessReadReplicas,
   } = useReadReplicasQuery({ projectRef })
 
-  const error = poolingInfoError || readReplicasError
-  const isLoading = isLoadingPoolingInfo || isLoadingReadReplicas
-  const isError = isErrorPoolingInfo || isErrorReadReplicas
-  const isSuccess = isSuccessPoolingInfo && isSuccessReadReplicas
+  const poolerError = isPgBouncerEnabled ? pgbouncerError : supavisorConfigError
+  const isLoadingPoolerConfig = isPgBouncerEnabled
+    ? isLoadingPgbouncerConfig
+    : isLoadingSupavisorConfig
+  const isErrorPoolerConfig = isPgBouncerEnabled ? isErrorPgbouncerConfig : isErrorSupavisorConfig
+  const isSuccessPoolerConfig = isPgBouncerEnabled
+    ? isSuccessPgBouncerConfig
+    : isSuccessSupavisorConfig
+
+  const error = poolerError || readReplicasError
+  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas
+  const isError = isErrorPoolerConfig || isErrorReadReplicas
+  const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas
 
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
@@ -110,9 +128,17 @@ export const DatabaseConnectionString = () => {
   }
 
   const connectionStrings =
-    isSuccessPoolingInfo && poolingConfiguration !== undefined
-      ? getConnectionStrings(connectionInfo, poolingConfiguration, {
-          projectRef,
+    isSuccessSupavisorConfig && poolingConfiguration !== undefined
+      ? getConnectionStrings({
+          connectionInfo,
+          poolingInfo: {
+            connectionString: poolingConfiguration.connectionString,
+            db_host: poolingConfiguration.db_host,
+            db_name: poolingConfiguration.db_name,
+            db_port: poolingConfiguration.db_port,
+            db_user: poolingConfiguration.db_user,
+          },
+          metadata: { projectRef },
         })
       : {
           direct: {
@@ -304,6 +330,7 @@ export const DatabaseConnectionString = () => {
                 lang={lang}
                 type="transaction"
                 title="Transaction pooler"
+                badge={isPgBouncerEnabled ? 'PgBouncer' : 'Supavisor'}
                 fileTitle={fileTitle}
                 description="Ideal for stateless applications like serverless functions where each interaction with Postgres is brief and isolated."
                 connectionString={connectionStrings['pooler'][selectedTab]}
@@ -342,6 +369,7 @@ export const DatabaseConnectionString = () => {
                 lang={lang}
                 type="session"
                 title="Session pooler"
+                badge={isPgBouncerEnabled ? 'PgBouncer' : 'Supavisor'}
                 fileTitle={fileTitle}
                 description="Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network."
                 connectionString={connectionStrings['pooler'][selectedTab].replace('6543', '5432')}

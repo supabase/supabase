@@ -62,7 +62,7 @@ const IPv4SidePanel = () => {
   const isFreePlan = subscription?.plan?.id === 'free'
   const hasChanges = selectedOption !== (subscriptionIpV4Option?.variant.identifier ?? 'ipv4_none')
   const selectedIPv4 = availableOptions.find((option) => option.identifier === selectedOption)
-  const isPgBouncerEnabled = pgbouncerConfig?.pgbouncer_enabled
+  const isPgBouncerEnabled = !!pgbouncerConfig?.pgbouncer_enabled
 
   useEffect(() => {
     if (visible) {

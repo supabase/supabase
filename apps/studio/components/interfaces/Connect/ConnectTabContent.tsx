@@ -4,7 +4,8 @@ import { forwardRef, HTMLAttributes, useMemo } from 'react'
 import { useParams } from 'common'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
+import { useSupavisorConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { pluckObjectFields } from 'lib/helpers'
 import { cn } from 'ui'
 import type { projectKeys } from './Connect.types'
@@ -25,16 +26,30 @@ const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
     const { ref: projectRef } = useParams()
 
     const { data: settings } = useProjectSettingsV2Query({ projectRef })
-    const { data: poolingInfo } = usePoolingConfigurationQuery({ projectRef })
+    const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
+    const { data: supavisorConfig } = useSupavisorConfigurationQuery({ projectRef })
 
+    const isPgBouncerEnabled = !!pgbouncerConfig?.pgbouncer_enabled
     const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
     const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
     const connectionInfo = pluckObjectFields(settings || emptyState, DB_FIELDS)
-    const poolingConfiguration = poolingInfo?.find((x) => x.database_type === 'PRIMARY')
+    const poolingConfiguration = isPgBouncerEnabled
+      ? pgbouncerConfig
+      : supavisorConfig?.find((x) => x.database_type === 'PRIMARY')
 
     const connectionStrings =
       poolingConfiguration !== undefined
-        ? getConnectionStringsV2(connectionInfo, poolingConfiguration, { projectRef })
+        ? getConnectionStringsV2({
+            connectionInfo,
+            poolingInfo: {
+              connectionString: poolingConfiguration.connectionString,
+              db_host: poolingConfiguration.db_host,
+              db_name: poolingConfiguration.db_name,
+              db_port: poolingConfiguration.db_port,
+              db_user: poolingConfiguration.db_user,
+            },
+            metadata: { projectRef },
+          })
         : { direct: { uri: '' }, pooler: { uri: '' } }
     const connectionStringsPooler = connectionStrings.pooler
     const connectionStringsDirect = connectionStrings.direct
