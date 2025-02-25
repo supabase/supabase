@@ -171,10 +171,10 @@ const DestinationPanel = ({
         }
         const { id: sinkId } = await createSink({
           projectRef,
-          sink_name: data.name,
-          project_id: data.projectId,
-          dataset_id: data.datasetId,
-          service_account_key: data.serviceAccountKey,
+          sinkName: data.name,
+          projectId: data.projectId,
+          datasetId: data.datasetId,
+          serviceAccountKey: data.serviceAccountKey,
         })
         const { id: pipelineId } = await createPipeline({
           projectRef,
