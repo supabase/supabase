@@ -27,7 +27,10 @@ export type ReplicationSinkByIdData = Awaited<ReturnType<typeof fetchReplication
 
 export const useReplicationSinkByIdQuery = <TData = ReplicationSinkByIdData>(
   { projectRef, sinkId }: ReplicationSinkByIdParams,
-  { enabled = true, ...options }: UseQueryOptions<ReplicationSinkByIdData, ResponseError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<ReplicationSinkByIdData, ResponseError, TData> = {}
 ) =>
   useQuery<ReplicationSinkByIdData, ResponseError, TData>(
     replicationKeys.sinkById(projectRef, sinkId),
