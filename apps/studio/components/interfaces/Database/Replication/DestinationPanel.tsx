@@ -40,7 +40,7 @@ import {
 import * as z from 'zod'
 import PublicationsComboBox from './PublicationsComboBox'
 import NewPublicationPanel from './NewPublicationPanel'
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useReplicationSinkByIdQuery } from 'data/replication/sink-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 
@@ -102,17 +102,20 @@ const DestinationPanel = ({
     maxFillSecs: z.number().min(1, 'Max Fill seconds should be greater than 0').int(),
     enabled: z.boolean(),
   })
-  const defaultValues = {
-    type: TypeEnum.enum.BigQuery,
-    name: sinkData?.name ?? '',
-    projectId: sinkData?.config.big_query.project_id ?? '',
-    datasetId: sinkData?.config.big_query.dataset_id ?? '',
-    serviceAccountKey: sinkData?.config.big_query.service_account_key ?? '',
-    publicationName: pipelineData?.publication_name ?? '',
-    maxSize: pipelineData?.config.config.max_size ?? 1000,
-    maxFillSecs: pipelineData?.config.config.max_fill_secs ?? 10,
-    enabled: existingDestination?.enabled ?? true,
-  }
+  const defaultValues = useMemo(
+    () => ({
+      type: TypeEnum.enum.BigQuery,
+      name: sinkData?.name ?? '',
+      projectId: sinkData?.config?.big_query?.project_id ?? '',
+      datasetId: sinkData?.config?.big_query?.dataset_id ?? '',
+      serviceAccountKey: sinkData?.config?.big_query?.service_account_key ?? '',
+      publicationName: pipelineData?.publication_name ?? '',
+      maxSize: pipelineData?.config?.config?.max_size ?? 1000,
+      maxFillSecs: pipelineData?.config?.config?.max_fill_secs ?? 10,
+      enabled: existingDestination?.enabled ?? true,
+    }),
+    [sinkData, pipelineData, existingDestination, TypeEnum]
+  )
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
@@ -182,6 +185,12 @@ const DestinationPanel = ({
   }
 
   const { enabled } = form.watch()
+
+  useEffect(() => {
+    if (isEditing && sinkData && pipelineData) {
+      form.reset(defaultValues)
+    }
+  }, [sinkData, pipelineData, isEditing, defaultValues, form])
 
   return (
     <>
