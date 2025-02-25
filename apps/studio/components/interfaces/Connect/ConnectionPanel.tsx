@@ -30,7 +30,7 @@ interface ConnectionPanelProps {
     type: 'error' | 'success'
     title: string
     description?: string
-    link?: { text: string; url: string }
+    links?: { text: string; url: string }[]
   }
   notice?: string[]
   parameters?: Array<{
@@ -119,6 +119,8 @@ export const ConnectionPanel = ({
   const { data: poolingInfo } = useSupavisorConfigurationQuery({ projectRef })
   const poolingConfiguration = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
   const isSessionMode = poolingConfiguration?.pool_mode === 'session'
+
+  const links = ipv4Status.links ?? []
 
   return (
     <div className="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:gap-20 w-full">
@@ -222,16 +224,15 @@ export const ConnectionPanel = ({
               {ipv4Status.description && (
                 <span className="text-xs text-foreground-lighter">{ipv4Status.description}</span>
               )}
-              {ipv4Status.link && (
-                <div className="mt-2">
-                  <Button asChild type="default" size="tiny">
-                    <Link
-                      href={ipv4Status.link.url}
-                      className="text-xs text-light hover:text-foreground"
-                    >
-                      {ipv4Status.link.text}
-                    </Link>
-                  </Button>
+              {links.length > 0 && (
+                <div className="flex items-center gap-x-2 mt-2">
+                  {links.map((link) => (
+                    <Button key={link.text} asChild type="default" size="tiny">
+                      <Link href={link.url} className="text-xs text-light hover:text-foreground">
+                        {link.text}
+                      </Link>
+                    </Button>
+                  ))}
                 </div>
               )}
             </div>
@@ -286,7 +287,7 @@ export const ConnectionPanel = ({
                   <p className="text-xs text-foreground-lighter max-w-xs">
                     If you wish to use a Direct Connection with these, please purchase{' '}
                     <Link
-                      href={ipv4Status.link?.url ?? '/'}
+                      href={`/project/${projectRef}/settings/addons?panel=ipv4`}
                       className="text-xs text-light hover:text-foreground"
                     >
                       IPv4 support

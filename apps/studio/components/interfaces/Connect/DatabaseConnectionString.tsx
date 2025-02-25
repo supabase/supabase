@@ -35,6 +35,8 @@ import {
   CONNECTION_PARAMETERS,
   DATABASE_CONNECTION_TYPES,
   DatabaseConnectionType,
+  IPV4_ADDON_TEXT,
+  PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT,
 } from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings } from './DatabaseSettings.utils'
@@ -202,6 +204,22 @@ export const DatabaseConnectionString = () => {
   // [Refactor] See if we can do this in an immutable way, technically not a good practice to do this
   let stepNumber = 0
 
+  const ipv4AddOnUrl = {
+    text: 'IPv4 add-on',
+    url: `/project/${projectRef}/settings/addons?panel=ipv4`,
+  }
+  const ipv4SettingsUrl = {
+    text: 'IPv4 settings',
+    url: `/project/${projectRef}/settings/addons?panel=ipv4`,
+  }
+  const poolerSettingsUrl = {
+    text: 'Pooler settings',
+    url: `/project/${projectRef}/settings/database#connection-pooling`,
+  }
+  const buttonLinks = !ipv4Addon
+    ? [ipv4AddOnUrl, ...(isPgBouncerEnabled ? [poolerSettingsUrl] : [])]
+    : [ipv4SettingsUrl, ...(isPgBouncerEnabled ? [poolerSettingsUrl] : [])]
+
   return (
     <div className="flex flex-col">
       <div
@@ -310,19 +328,11 @@ export const DatabaseConnectionString = () => {
                   title: !ipv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
                   description:
                     isPgBouncerEnabled && !ipv4Addon
-                      ? 'Purchase IPv4 add-on if on a IPv4 network'
+                      ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
                       : !isPgBouncerEnabled
                         ? 'Use Session Pooler if on a IPv4 network or purchase IPv4 add-on'
-                        : 'Connections are IPv4 proxied with IPv4 add-on',
-                  link: !ipv4Addon
-                    ? {
-                        text: 'IPv4 add-on',
-                        url: `/project/${projectRef}/settings/addons?panel=ipv4`,
-                      }
-                    : {
-                        text: 'IPv4 settings',
-                        url: `/project/${projectRef}/settings/addons?panel=ipv4`,
-                      },
+                        : IPV4_ADDON_TEXT,
+                  links: buttonLinks,
                 }}
                 parameters={[
                   { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
@@ -346,21 +356,11 @@ export const DatabaseConnectionString = () => {
                   title: isPgBouncerEnabled && !ipv4Addon ? 'IPv4 incompatible' : 'IPv4 compatible',
                   description:
                     isPgBouncerEnabled && !ipv4Addon
-                      ? 'Purchase IPv4 add-on if on a IPv4 network'
+                      ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
                       : !isPgBouncerEnabled
                         ? 'Transaction pooler connections are IPv4 proxied for free.'
-                        : 'Connections are IPv4 proxied with IPv4 add-on',
-                  link: isPgBouncerEnabled
-                    ? !ipv4Addon
-                      ? {
-                          text: 'IPv4 add-on',
-                          url: `/project/${projectRef}/settings/addons?panel=ipv4`,
-                        }
-                      : {
-                          text: 'IPv4 settings',
-                          url: `/project/${projectRef}/settings/addons?panel=ipv4`,
-                        }
-                    : undefined,
+                        : IPV4_ADDON_TEXT,
+                  links: isPgBouncerEnabled ? buttonLinks : undefined,
                 }}
                 notice={['Does not support PREPARE statements']}
                 parameters={[
@@ -401,21 +401,11 @@ export const DatabaseConnectionString = () => {
                   title: isPgBouncerEnabled && !ipv4Addon ? 'IPv4 incompatible' : 'IPv4 compatible',
                   description:
                     isPgBouncerEnabled && !ipv4Addon
-                      ? 'Purchase IPv4 add-on to use on a IPv4 network'
+                      ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
                       : !isPgBouncerEnabled
                         ? 'Session pooler connections are IPv4 proxied for free'
-                        : 'Connections are IPv4 proxied with IPv4 add-on',
-                  link: isPgBouncerEnabled
-                    ? !ipv4Addon
-                      ? {
-                          text: 'IPv4 add-on',
-                          url: `/project/${projectRef}/settings/addons?panel=ipv4`,
-                        }
-                      : {
-                          text: 'IPv4 settings',
-                          url: `/project/${projectRef}/settings/addons?panel=ipv4`,
-                        }
-                    : undefined,
+                        : IPV4_ADDON_TEXT,
+                  links: isPgBouncerEnabled ? buttonLinks : undefined,
                 }}
                 parameters={[
                   { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
