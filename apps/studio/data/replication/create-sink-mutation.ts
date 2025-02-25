@@ -7,14 +7,14 @@ import { handleError, post } from 'data/fetchers'
 
 export type CreateSinkParams = {
   projectRef: string
-  sink_name: string
-  project_id: string
-  dataset_id: string
-  service_account_key: string
+  sinkName: string
+  projectId: string
+  datasetId: string
+  serviceAccountKey: string
 }
 
 async function createSink(
-  { projectRef, sink_name, project_id, dataset_id, service_account_key }: CreateSinkParams,
+  { projectRef, sinkName, projectId, datasetId, serviceAccountKey }: CreateSinkParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -22,10 +22,10 @@ async function createSink(
   const { data, error } = await post('/platform/replication/{ref}/sinks', {
     params: { path: { ref: projectRef } },
     body: {
-      project_id,
-      dataset_id,
-      service_account_key,
-      sink_name,
+      project_id: projectId,
+      dataset_id: datasetId,
+      service_account_key: serviceAccountKey,
+      sink_name: sinkName,
     },
     signal,
   })
