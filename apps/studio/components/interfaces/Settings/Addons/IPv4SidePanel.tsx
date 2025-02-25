@@ -13,6 +13,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { formatCurrency } from 'lib/helpers'
 import { ExternalLink } from 'lucide-react'
 import { useAddonsPagePanel } from 'state/addons-page'
@@ -22,6 +23,7 @@ import { Admonition } from 'ui-patterns'
 const IPv4SidePanel = () => {
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
+  const allowPgBouncerSelection = useFlag('dualPoolerSupport')
 
   const [selectedOption, setSelectedOption] = useState<string>('ipv4_none')
 
@@ -31,7 +33,10 @@ const IPv4SidePanel = () => {
   const visible = panel === 'ipv4'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
+  const { data: pgbouncerConfig } = usePgbouncerConfigQuery(
+    { projectRef },
+    { enabled: allowPgBouncerSelection }
+  )
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
@@ -62,7 +67,7 @@ const IPv4SidePanel = () => {
   const isFreePlan = subscription?.plan?.id === 'free'
   const hasChanges = selectedOption !== (subscriptionIpV4Option?.variant.identifier ?? 'ipv4_none')
   const selectedIPv4 = availableOptions.find((option) => option.identifier === selectedOption)
-  const isPgBouncerEnabled = !!pgbouncerConfig?.pgbouncer_enabled
+  const isPgBouncerEnabled = allowPgBouncerSelection && !!pgbouncerConfig?.pgbouncer_enabled
 
   useEffect(() => {
     if (visible) {

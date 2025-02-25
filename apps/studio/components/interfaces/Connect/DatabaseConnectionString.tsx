@@ -13,6 +13,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -56,6 +57,7 @@ export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
   const org = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
+  const allowPgBouncerSelection = useFlag('dualPoolerSupport')
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
 
@@ -65,15 +67,15 @@ export const DatabaseConnectionString = () => {
     isLoading: isLoadingPgbouncerConfig,
     isError: isErrorPgbouncerConfig,
     isSuccess: isSuccessPgBouncerConfig,
-  } = usePgbouncerConfigQuery({ projectRef })
+  } = usePgbouncerConfigQuery({ projectRef }, { enabled: allowPgBouncerSelection })
   const {
     data: supavisorConfig,
     error: supavisorConfigError,
     isLoading: isLoadingSupavisorConfig,
     isError: isErrorSupavisorConfig,
     isSuccess: isSuccessSupavisorConfig,
-  } = useSupavisorConfigurationQuery({ projectRef }, { enabled: !pgbouncerConfig })
-  const isPgBouncerEnabled = !!pgbouncerConfig?.pgbouncer_enabled
+  } = useSupavisorConfigurationQuery({ projectRef })
+  const isPgBouncerEnabled = allowPgBouncerSelection && !!pgbouncerConfig?.pgbouncer_enabled
   const poolingConfiguration = isPgBouncerEnabled
     ? pgbouncerConfig
     : supavisorConfig?.find((x) => x.identifier === state.selectedDatabaseId)
@@ -335,7 +337,7 @@ export const DatabaseConnectionString = () => {
                 lang={lang}
                 type="transaction"
                 title="Transaction pooler"
-                badge={isPgBouncerEnabled ? 'PgBouncer' : 'Supavisor'}
+                badge={isPgBouncerEnabled ? 'Dedicated Pooler' : 'Supavisor'}
                 fileTitle={fileTitle}
                 description="Ideal for stateless applications like serverless functions where each interaction with Postgres is brief and isolated."
                 connectionString={connectionStrings['pooler'][selectedTab]}
@@ -390,7 +392,7 @@ export const DatabaseConnectionString = () => {
                 lang={lang}
                 type="session"
                 title="Session pooler"
-                badge={isPgBouncerEnabled ? 'PgBouncer' : 'Supavisor'}
+                badge={isPgBouncerEnabled ? 'Dedicated Pooler' : 'Supavisor'}
                 fileTitle={fileTitle}
                 description="Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network."
                 connectionString={connectionStrings['pooler'][selectedTab].replace('6543', '5432')}

@@ -113,9 +113,7 @@ export const ConnectionPooling = () => {
     isLoading: isLoadingPgbouncerConfig,
     isError: isErrorPgbouncerConfig,
     isSuccess: isSuccessPgbouncerConfig,
-  } = usePgbouncerConfigQuery({
-    projectRef,
-  })
+  } = usePgbouncerConfigQuery({ projectRef }, { enabled: allowPgBouncerSelection })
 
   const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,
