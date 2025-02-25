@@ -26,7 +26,7 @@ export const ThemeSettings = () => {
   const { theme, setTheme } = useTheme()
 
   const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
     DEFAULT_SIDEBAR_BEHAVIOR
   )
   /**

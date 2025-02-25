@@ -29,7 +29,7 @@ import {
 export const ThemeDropdown = () => {
   const { theme, setTheme } = useTheme()
   const [sidebarBehaviour] = useLocalStorageQuery<SidebarBehaviourType>(
-    LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
     DEFAULT_SIDEBAR_BEHAVIOR
   )
 

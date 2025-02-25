@@ -60,7 +60,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
   const hideSideBar = useHideSidebar()
 
   const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
     DEFAULT_SIDEBAR_BEHAVIOR
   )
 
@@ -203,7 +203,7 @@ export function SideBarNavLink({
   onClick?: () => void
 } & ComponentPropsWithoutRef<typeof SidebarMenuButton>) {
   const [sidebarBehaviour] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
     DEFAULT_SIDEBAR_BEHAVIOR
   )
 
