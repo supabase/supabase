@@ -14,10 +14,12 @@ import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation
 import { useDeleteSinkMutation } from 'data/replication/delete-sink-mutation'
 import { useDeletePipelineMutation } from 'data/replication/delete-pipeline-mutation'
 import DeleteDestination from './DeleteDestination'
+import DestinationPanel from './DestinationPanel'
 
 export type Pipeline = ReplicationPipelinesData['pipelines'][0]
 
 interface DestinationRowProps {
+  sourceId: number | undefined
   sinkId: number
   sinkName: string
   type: string
@@ -29,6 +31,7 @@ interface DestinationRowProps {
 }
 
 const DestinationRow = ({
+  sourceId,
   sinkId,
   sinkName,
   type,
@@ -41,6 +44,8 @@ const DestinationRow = ({
   const { ref: projectRef } = useParams()
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
+  const [showEditDestinationPanel, setShowEditDestinationPanel] = useState(false)
+
   const {
     data: pipelineStatusData,
     error: pipelineStatusError,
@@ -171,6 +176,7 @@ const DestinationRow = ({
               onEnableClick={onEnableClick}
               onDisableClick={onDisableClick}
               onDeleteClick={() => setShowDeleteDestinationForm(true)}
+              onEditClick={() => setShowEditDestinationPanel(true)}
             ></RowMenu>
           </Table.td>
         </Table.tr>
@@ -181,6 +187,17 @@ const DestinationRow = ({
         onDelete={onDeleteClick}
         isLoading={isPipelineStatusLoading}
         name={sinkName}
+      />
+      <DestinationPanel
+        visible={showEditDestinationPanel}
+        onClose={() => setShowEditDestinationPanel(false)}
+        sourceId={sourceId}
+        existingDestination={{
+          sourceId,
+          sinkId,
+          pipelineId: pipeline?.id,
+          enabled: false,
+        }}
       />
     </>
   )

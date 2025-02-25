@@ -17,6 +17,7 @@ interface RowMenuProps {
   isError: boolean
   onEnableClick: () => void
   onDisableClick: () => void
+  onEditClick: () => void
   onDeleteClick: () => void
 }
 
@@ -27,6 +28,7 @@ const RowMenu = ({
   isError,
   onEnableClick,
   onDisableClick,
+  onEditClick,
   onDeleteClick,
 }: RowMenuProps) => {
   const pipelineEnabled = pipelineStatus === 'Stopped' ? false : true
@@ -51,7 +53,7 @@ const RowMenu = ({
               <p>Enable</p>
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem className="space-x-2">
+          <DropdownMenuItem className="space-x-2" onClick={onEditClick}>
             <Edit size={14} />
             <p>Edit destination</p>
           </DropdownMenuItem>

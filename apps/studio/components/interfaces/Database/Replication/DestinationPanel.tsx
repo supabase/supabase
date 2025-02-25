@@ -5,6 +5,8 @@ import { useCreateSinkMutation } from 'data/replication/create-sink-mutation'
 import { useCreateSourceMutation } from 'data/replication/create-source-mutation'
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
+import { useUpdateSinkMutation } from 'data/replication/update-sink-mutation'
+import { useUpdatePipelineMutation } from 'data/replication/update-pipeline-mutation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -39,26 +41,52 @@ import * as z from 'zod'
 import PublicationsComboBox from './PublicationsComboBox'
 import NewPublicationPanel from './NewPublicationPanel'
 import { useState } from 'react'
+import { useReplicationSinkByIdQuery } from 'data/replication/sink-by-id-query'
+import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 
-interface NewDestinationPanelProps {
+interface DestinationPanelProps {
   visible: boolean
   sourceId: number | undefined
   onClose: () => void
+  existingDestination?: {
+    sourceId?: number
+    sinkId: number
+    pipelineId?: number
+    enabled: boolean
+  }
 }
 
-const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanelProps) => {
+const DestinationPanel = ({
+  visible,
+  sourceId,
+  onClose,
+  existingDestination,
+}: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
   const { mutateAsync: createSource, isLoading: creatingSource } = useCreateSourceMutation()
   const { mutateAsync: createSink, isLoading: creatingSink } = useCreateSinkMutation()
   const { mutateAsync: createPipeline, isLoading: creatingPipeline } = useCreatePipelineMutation()
   const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
+  const { mutateAsync: updateSink } = useUpdateSinkMutation()
+  const { mutateAsync: updatePipeline } = useUpdatePipelineMutation()
   const { data: publications, isLoading: loadingPublications } = useReplicationPublicationsQuery({
     projectRef,
     sourceId,
   })
 
-  const isLoading = creatingSource || creatingSink || creatingPipeline || startingPipeline
+  const { data: sinkData } = useReplicationSinkByIdQuery({
+    projectRef,
+    sinkId: existingDestination?.sinkId,
+  })
+
+  const { data: pipelineData } = useReplicationPipelineByIdQuery({
+    projectRef,
+    pipelineId: existingDestination?.pipelineId,
+  })
+
+  const isCreating = creatingSource || creatingSink || creatingPipeline || startingPipeline
+  const isEditing = !!existingDestination
 
   const formId = 'destination-editor'
   const types = ['BigQuery'] as const
@@ -76,14 +104,14 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
   })
   const defaultValues = {
     type: TypeEnum.enum.BigQuery,
-    name: '',
-    projectId: '',
-    datasetId: '',
-    serviceAccountKey: '',
-    publicationName: '',
-    maxSize: 1000,
-    maxFillSecs: 10,
-    enabled: true,
+    name: sinkData?.name ?? '',
+    projectId: sinkData?.config.big_query.project_id ?? '',
+    datasetId: sinkData?.config.big_query.dataset_id ?? '',
+    serviceAccountKey: sinkData?.config.big_query.service_account_key ?? '',
+    publicationName: pipelineData?.publication_name ?? '',
+    maxSize: pipelineData?.config.config.max_size ?? 1000,
+    maxFillSecs: pipelineData?.config.config.max_fill_secs ?? 10,
+    enabled: existingDestination?.enabled ?? true,
   }
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -94,31 +122,61 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     try {
-      if (!sourceId) {
-        const { id } = await createSource({ projectRef })
-        sourceId = id
+      if (isEditing && existingDestination) {
+        if (!sourceId) {
+          console.error('Source id is required')
+          return
+        }
+        // Update existing destination
+        await updateSink({
+          projectRef,
+          sinkId: existingDestination.sinkId,
+          sinkName: data.name,
+          projectId: data.projectId,
+          datasetId: data.datasetId,
+          serviceAccountKey: data.serviceAccountKey,
+        })
+
+        if (existingDestination.pipelineId) {
+          await updatePipeline({
+            projectRef,
+            pipelineId: existingDestination.pipelineId,
+            sourceId,
+            sinkId: existingDestination.sinkId,
+            publicationName: data.publicationName,
+            config: { config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs } },
+          })
+        }
+
+        toast.success('Successfully updated destination')
+      } else {
+        // Create new destination
+        if (!sourceId) {
+          const { id } = await createSource({ projectRef })
+          sourceId = id
+        }
+        const { id: sinkId } = await createSink({
+          projectRef,
+          sink_name: data.name,
+          project_id: data.projectId,
+          dataset_id: data.datasetId,
+          service_account_key: data.serviceAccountKey,
+        })
+        const { id: pipelineId } = await createPipeline({
+          projectRef,
+          sourceId,
+          sinkId,
+          publicationName: data.publicationName,
+          config: { config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs } },
+        })
+        if (data.enabled) {
+          await startPipeline({ projectRef, pipelineId })
+        }
+        toast.success('Successfully created destination')
       }
-      const { id: sinkId } = await createSink({
-        projectRef,
-        sink_name: data.name,
-        project_id: data.projectId,
-        dataset_id: data.datasetId,
-        service_account_key: data.serviceAccountKey,
-      })
-      const { id: pipelineId } = await createPipeline({
-        projectRef,
-        sourceId,
-        sinkId,
-        publicationName: data.publicationName,
-        config: { config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs } },
-      })
-      if (data.enabled) {
-        await startPipeline({ projectRef, pipelineId })
-      }
-      toast.success('Successfully created destination')
       onClose()
     } catch (error) {
-      toast.error('Failed to create destination')
+      toast.error(`Failed to ${isEditing ? 'update' : 'create'} destination`)
     }
     form.reset(defaultValues)
   }
@@ -134,8 +192,10 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
               <SheetTitle>
                 <div className="flex items-center justify-between">
                   <div>
-                    <div>New Destination</div>
-                    <div className="text-xs">Send data to a new destination</div>
+                    <div>{isEditing ? 'Edit Destination' : 'New Destination'}</div>
+                    <div className="text-xs">
+                      {isEditing ? 'Modify existing destination' : 'Send data to a new destination'}
+                    </div>
                   </div>
                   <div className="flex">
                     <Switch
@@ -329,11 +389,11 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
               </Form_Shadcn_>
             </SheetSection>
             <SheetFooter>
-              <Button disabled={isLoading} type="default" onClick={onClose}>
+              <Button disabled={isCreating} type="default" onClick={onClose}>
                 Cancel
               </Button>
-              <Button disabled={isLoading} loading={isLoading} form={formId} htmlType="submit">
-                Create
+              <Button disabled={isCreating} loading={isCreating} form={formId} htmlType="submit">
+                {isEditing ? 'Update' : 'Create'}
               </Button>
             </SheetFooter>
           </div>
@@ -348,4 +408,4 @@ const NewDestinationPanel = ({ visible, sourceId, onClose }: NewDestinationPanel
   )
 }
 
-export default NewDestinationPanel
+export default DestinationPanel
