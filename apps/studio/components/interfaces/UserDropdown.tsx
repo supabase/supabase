@@ -144,39 +144,3 @@ export const UserDropdown = () => {
     </DropdownMenu>
   )
 }
-
-export const ThemeDropdown = () => {
-  const { theme, setTheme } = useTheme()
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger>
-        <SideBarNavLink
-          key="palette"
-          route={{
-            key: 'palette',
-            label: 'Theme',
-            icon: <Palette size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-          }}
-        />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="top" align="start">
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>Theme</DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={theme}
-            onValueChange={(value) => {
-              setTheme(value)
-            }}
-          >
-            {singleThemes.map((theme: Theme) => (
-              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                {theme.name}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}

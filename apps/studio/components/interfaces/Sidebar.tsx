@@ -39,7 +39,8 @@ import {
   useSidebar,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
-import { ThemeDropdown, UserDropdown } from './UserDropdown'
+import { ThemeDropdown } from './ThemeDropdown'
+import { UserDropdown } from './UserDropdown'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
