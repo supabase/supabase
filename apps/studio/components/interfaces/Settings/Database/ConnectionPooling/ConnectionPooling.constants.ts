@@ -49,8 +49,3 @@ export const POOLING_OPTIMIZATIONS = {
     poolSize: 128,
   },
 }
-
-export const POOLER = {
-  PGBOUNCER: 'PgBouncer',
-  SUPAVISOR: 'Supavisor',
-}

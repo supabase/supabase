@@ -140,7 +140,7 @@ export const ConnectionPooling = () => {
             return 2000
           } else {
             toast.success(
-              `${data?.active ? 'PgBouncer' : 'Supavisor'} is now ready to receive connections!`,
+              `${data?.active ? 'Dedicated Pooler' : 'Supavisor'} is now ready to receive connections!`,
               { id: toastIdRef.current }
             )
             toastIdRef.current = undefined
@@ -195,6 +195,11 @@ export const ConnectionPooling = () => {
       ? 'PgBouncer'
       : 'Supavisor'
     : 'Supavisor'
+  // [Joshen] These are labels just for user-facing texts
+  const formattedCurrentPooler =
+    currentPooler === 'PgBouncer' ? 'the Dedicated Pooler' : currentPooler
+  const formattedTargetPooler = type === 'PgBouncer' ? 'the Dedicated Pooler' : currentPooler
+
   const hasIpv4Addon = !!addons?.selected_addons.find((addon) => addon.type === 'ipv4')
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
   const computeSize =
@@ -219,6 +224,10 @@ export const ConnectionPooling = () => {
     (currentPooler === 'PgBouncer' && type === 'Supavisor') ||
     (currentPooler === 'Supavisor' && type === 'PgBouncer')
 
+  const poolerSwitchWarningTitle =
+    'Your current pooler will be active for 2 hours before fully deactivated'
+  const poolerSwitchWarningDescription = `Migrate your applications from ${formattedCurrentPooler} to ${formattedTargetPooler} during this time by switching to ${formattedTargetPooler} connection strings in your applications.`
+
   const onSubmit: SubmitHandler<z.infer<typeof PoolingConfigurationFormSchema>> = async (data) => {
     const { type, pool_mode, default_pool_size, max_client_conn } = data
 
@@ -239,11 +248,11 @@ export const ConnectionPooling = () => {
         {
           onSuccess: (data) => {
             if (isChangingPoolerType) {
-              const toastId = toast.loading('Swapping pooler to PgBouncer')
+              const toastId = toast.loading('Swapping pooler to the Dedicated Pooler')
               toastIdRef.current = toastId
               setRefetchPgBouncerStatus(true)
             } else {
-              toast.success(`Successfully updated PgBouncer configuration`)
+              toast.success(`Successfully updated Dedicated Pooler configuration`)
             }
 
             setShowConfirmation(false)
@@ -390,14 +399,14 @@ export const ConnectionPooling = () => {
                                 <Admonition
                                   type="warning"
                                   className="mt-2"
-                                  title={`${type === 'PgBouncer' ? 'Supavisor' : 'PgBouncer'} will be active for 2 hours before fully deactivated`}
-                                  description={`Migrate your applications from ${currentPooler} to ${type} during this time by switching to the ${type} connection strings in your client applications.`}
+                                  title={poolerSwitchWarningTitle}
+                                  description={poolerSwitchWarningDescription}
                                 />
                                 {type === 'PgBouncer' && !hasIpv4Addon && (
                                   <Admonition
                                     type="default"
                                     className="mt-2"
-                                    title="PgBouncer does not support IPv4"
+                                    title="The Dedicated Pooler does not support IPv4"
                                     description={
                                       <>
                                         If you were using Supavisor for IPv6, we recommend
@@ -407,7 +416,7 @@ export const ConnectionPooling = () => {
                                         >
                                           add-ons page
                                         </InlineLink>{' '}
-                                        before changing your pooler to PgBouncer
+                                        before changing your pooler type.
                                       </>
                                     }
                                   />
@@ -465,14 +474,15 @@ export const ConnectionPooling = () => {
                                     )}
                                   >
                                     <div className="flex gap-x-2 items-center">
-                                      <p className="text-sm text-foreground">PgBouncer</p>
+                                      <p className="text-sm text-foreground">Dedicated Pooler</p>
                                       <Badge>IPv6</Badge>
                                     </div>
                                   </SelectItem_Shadcn_>
                                 </TooltipTrigger>
                                 {disablePgBouncerSelection && (
                                   <TooltipContent side="right" className="w-72">
-                                    PgBouncer can only be used while on a Micro Compute and above.{' '}
+                                    Dedicated Pooler can only be used while on a Micro Compute and
+                                    above.{' '}
                                     {isFreePlan ? (
                                       <>
                                         <InlineLink
@@ -705,22 +715,22 @@ export const ConnectionPooling = () => {
         </Panel.Content>
       </Panel>
       <ConfirmationModal
-        size="large"
+        size="medium"
         visible={showConfirmation}
         loading={isSaving}
-        title={`Confirm switching pooler type to ${type}`}
+        title={`Confirm switching pooler type to ${formattedTargetPooler}`}
         confirmLabel="Confirm"
         onCancel={() => setShowConfirmation(false)}
         onConfirm={() => onSubmit(form.getValues())}
         alert={{
           base: { variant: 'warning' },
-          title: `Current pooler ${currentPooler} will be active for 2 hours before fully deactivated`,
-          description: `Migrate your applications from ${currentPooler} to ${type} during this time by switching to the ${type} connection strings in your client applications`,
+          title: poolerSwitchWarningTitle,
+          description: poolerSwitchWarningDescription,
         }}
       >
         <p className="text-sm text-foreground-light">
-          Are you sure you wish to switch your pooler type to {type} and apply the provided
-          configurations?
+          Are you sure you wish to switch your pooler type to {formattedTargetPooler} and apply the
+          provided configurations?
         </p>
       </ConfirmationModal>
     </section>
