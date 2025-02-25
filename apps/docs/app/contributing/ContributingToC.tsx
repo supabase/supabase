@@ -116,7 +116,7 @@ function TocBase({ items, className }: { items: Array<TocItem>; className?: stri
           </li>
         ))}
       </ul>
-      <Separator className="w-[calc(100%-2rem)] ml-5 my-4" />
+      <Separator className="lg:w-[calc(100%-2rem)] lg:ml-5 my-4 lg:my-8" />
       <Feedback className="pl-0 lg:pl-5" />
     </nav>
   )
