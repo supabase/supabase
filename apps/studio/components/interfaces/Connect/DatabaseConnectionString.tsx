@@ -394,7 +394,11 @@ export const DatabaseConnectionString = () => {
                 title="Session pooler"
                 badge={isPgBouncerEnabled ? 'Dedicated Pooler' : 'Supavisor'}
                 fileTitle={fileTitle}
-                description="Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network."
+                description={
+                  isPgBouncerEnabled
+                    ? 'Recommended if you need to use prepared statements, or other features that are only available in Session mode.'
+                    : 'Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network.'
+                }
                 connectionString={connectionStrings['pooler'][selectedTab].replace('6543', '5432')}
                 ipv4Status={{
                   type: isPgBouncerEnabled && !ipv4Addon ? 'error' : 'success',
