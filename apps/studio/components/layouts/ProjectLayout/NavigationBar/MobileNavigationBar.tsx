@@ -4,25 +4,19 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { SidebarContent } from 'components/interfaces/Sidebar'
 import { IS_PLATFORM } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
 import { buttonVariants, cn } from 'ui'
 import { CommandMenuTrigger } from 'ui-patterns'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import { NavContent } from './NavigationBar'
+
+export const ICON_SIZE = 20
+export const ICON_STROKE_WIDTH = 1.5
 
 const MobileNavigationBar = () => {
   const router = useRouter()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const { ref: projectRef } = useParams()
-  const snap = useAppStateSnapshot()
-
-  const onCloseNavigationIconLink = (event: any) => {
-    snap.setNavigationPanelOpen(
-      false,
-      event.target.id === 'icon-link' || ['svg', 'path'].includes(event.target.localName)
-    )
-  }
 
   return (
     <div className="h-14 w-full flex flex-row md:hidden">
@@ -37,7 +31,6 @@ const MobileNavigationBar = () => {
         <Link
           href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
           className="flex items-center h-[26px] w-[26px] min-w-[26px]"
-          onClick={onCloseNavigationIconLink}
         >
           <img
             alt="Supabase"
@@ -70,14 +63,13 @@ const MobileNavigationBar = () => {
               buttonVariants({ type: 'default' }),
               'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30'
             )}
-            onClick={() => setIsSheetOpen(true)}
           >
             <Menu size={18} strokeWidth={1} />
           </button>
         </div>
       </nav>
-      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <NavContent />
+      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen} data-state="expanded">
+        <SidebarContent />
       </MobileSheetNav>
     </div>
   )

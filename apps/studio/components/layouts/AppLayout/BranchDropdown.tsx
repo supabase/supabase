@@ -21,6 +21,7 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
+  cn,
 } from 'ui'
 import { sanitizeRoute } from './ProjectDropdown'
 
@@ -101,86 +102,93 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
       )}
 
       {isSuccess && branches.length > 0 && (
-        <div className="flex items-center px-2">
-          <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-            <PopoverTrigger_Shadcn_ asChild>
-              <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
-                <div className="flex items-center space-x-2">
-                  <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedBranch?.name}</p>
-                  {selectedBranch?.is_default ? (
-                    <Badge variant="warning">Production</Badge>
-                  ) : (
-                    <Badge variant="brand">Preview Branch</Badge>
-                  )}
-                </div>
-              </Button>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
-              <Command_Shadcn_>
-                <CommandInput_Shadcn_ placeholder="Find branch..." />
-                <CommandList_Shadcn_>
-                  <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
-                  <CommandGroup_Shadcn_>
-                    <ScrollArea className="max-h-[210px] overflow-y-auto">
-                      {sortedBranches?.map((branch) => (
-                        <BranchLink
-                          key={branch.id}
-                          branch={branch}
-                          isSelected={branch.id === selectedBranch?.id}
-                          setOpen={setOpen}
-                        />
-                      ))}
-                    </ScrollArea>
-                  </CommandGroup_Shadcn_>
-                  <CommandSeparator_Shadcn_ />
-                  <CommandGroup_Shadcn_>
-                    <CommandItem_Shadcn_
-                      className="cursor-pointer w-full"
-                      onSelect={(e) => {
-                        setOpen(false)
-                        router.push(`/project/${ref}/branches`)
-                      }}
-                      onClick={() => setOpen(false)}
-                    >
-                      <Link
-                        href={`/project/${ref}/branches`}
-                        className="w-full flex items-center gap-2"
-                      >
-                        <ListTree size={14} strokeWidth={1.5} />
-                        <p>Manage branches</p>
-                      </Link>
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
-                  <CommandSeparator_Shadcn_ />
-                  <CommandGroup_Shadcn_>
-                    <CommandItem_Shadcn_
-                      className="cursor-pointer w-full"
-                      onSelect={() => {
-                        setOpen(false)
-                        window?.open(BRANCHING_GITHUB_DISCUSSION_LINK, '_blank')?.focus()
-                      }}
-                      onClick={() => setOpen(false)}
-                    >
-                      <Link
-                        href={BRANCHING_GITHUB_DISCUSSION_LINK}
-                        target="_blank"
-                        onClick={() => {
+        <div>
+          <Link href={`/project/${ref}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
+            <span className="text-foreground max-w-32 lg:max-w-none truncate">
+              {selectedBranch?.name}
+            </span>
+            {selectedBranch?.is_default ? (
+              <Badge variant="warning">Production</Badge>
+            ) : (
+              <Badge variant="brand">Preview Branch</Badge>
+            )}
+          </Link>
+          <div className="flex items-center px-2">
+            <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button
+                  type="text"
+                  className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
+                  iconRight={<ChevronsUpDown strokeWidth={1.5} />}
+                ></Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+                <Command_Shadcn_>
+                  <CommandInput_Shadcn_ placeholder="Find branch..." />
+                  <CommandList_Shadcn_>
+                    <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      <ScrollArea className="max-h-[210px] overflow-y-auto">
+                        {sortedBranches?.map((branch) => (
+                          <BranchLink
+                            key={branch.id}
+                            branch={branch}
+                            isSelected={branch.id === selectedBranch?.id}
+                            setOpen={setOpen}
+                          />
+                        ))}
+                      </ScrollArea>
+                    </CommandGroup_Shadcn_>
+                    <CommandSeparator_Shadcn_ />
+                    <CommandGroup_Shadcn_>
+                      <CommandItem_Shadcn_
+                        className="cursor-pointer w-full"
+                        onSelect={(e) => {
                           setOpen(false)
+                          router.push(`/project/${ref}/branches`)
                         }}
-                        className="w-full flex gap-2"
+                        onClick={() => setOpen(false)}
                       >
-                        <MessageCircle size={14} strokeWidth={1} className="text-muted mt-0.5" />
-                        <div>
-                          <p>Branching feedback</p>
-                          <p className="text-lighter">Join Github Discussion</p>
-                        </div>
-                      </Link>
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+                        <Link
+                          href={`/project/${ref}/branches`}
+                          className="w-full flex items-center gap-2"
+                        >
+                          <ListTree size={14} strokeWidth={1.5} />
+                          <p>Manage branches</p>
+                        </Link>
+                      </CommandItem_Shadcn_>
+                    </CommandGroup_Shadcn_>
+                    <CommandSeparator_Shadcn_ />
+                    <CommandGroup_Shadcn_>
+                      <CommandItem_Shadcn_
+                        className="cursor-pointer w-full"
+                        onSelect={() => {
+                          setOpen(false)
+                          window?.open(BRANCHING_GITHUB_DISCUSSION_LINK, '_blank')?.focus()
+                        }}
+                        onClick={() => setOpen(false)}
+                      >
+                        <Link
+                          href={BRANCHING_GITHUB_DISCUSSION_LINK}
+                          target="_blank"
+                          onClick={() => {
+                            setOpen(false)
+                          }}
+                          className="w-full flex gap-2"
+                        >
+                          <MessageCircle size={14} strokeWidth={1} className="text-muted mt-0.5" />
+                          <div>
+                            <p>Branching feedback</p>
+                            <p className="text-lighter">Join Github Discussion</p>
+                          </div>
+                        </Link>
+                      </CommandItem_Shadcn_>
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
+          </div>
         </div>
       )}
     </>

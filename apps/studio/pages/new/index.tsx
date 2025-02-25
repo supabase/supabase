@@ -10,6 +10,8 @@ import { SetupIntentResponse, useSetupIntent } from 'data/stripe/setup-intent-mu
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -104,9 +106,13 @@ const Wizard: NextPageWithLayout = () => {
 }
 
 Wizard.getLayout = (page) => (
-  <WizardLayout organization={null} project={null}>
-    {page}
-  </WizardLayout>
+  <AppLayout>
+    <DefaultLayout product="New Organization" hasProductMenu={false} headerTitle="New organization">
+      <WizardLayout organization={null} project={null}>
+        {page}
+      </WizardLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 export default Wizard

@@ -98,8 +98,7 @@ const getInitialState = () => {
       selectedFeaturePreview: '',
       showAiSettingsModal: false,
       showGenerateSqlModal: false,
-      navigationPanelOpen: false,
-      navigationPanelJustClosed: false,
+      showConnectDialog: false,
       ongoingQueriesPanelOpen: false,
       mobileMenuOpen: false,
     }
@@ -149,8 +148,7 @@ const getInitialState = () => {
     selectedFeaturePreview: '',
     showAiSettingsModal: false,
     showGenerateSqlModal: false,
-    navigationPanelOpen: false,
-    navigationPanelJustClosed: false,
+    showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
   }
@@ -215,27 +213,6 @@ export const appState = proxy({
     appState.showGenerateSqlModal = value
   },
 
-  navigationPanelOpen: false,
-  navigationPanelJustClosed: false,
-  setNavigationPanelOpen: (value: boolean, trackJustClosed: boolean = false) => {
-    if (value === false) {
-      if (trackJustClosed) {
-        appState.navigationPanelOpen = false
-        appState.navigationPanelJustClosed = true
-      } else {
-        appState.navigationPanelOpen = false
-        appState.navigationPanelJustClosed = false
-      }
-    } else {
-      if (appState.navigationPanelJustClosed === false) {
-        appState.navigationPanelOpen = true
-      }
-    }
-  },
-  setNavigationPanelJustClosed: (value: boolean) => {
-    appState.navigationPanelJustClosed = value
-  },
-
   resetAiAssistantPanel: () => {
     appState.aiAssistantPanel = {
       ...INITIAL_AI_ASSISTANT,
@@ -257,11 +234,8 @@ export const appState = proxy({
     }
   },
 
-  saveLatestMessage: (message: any) => {
-    appState.aiAssistantPanel = {
-      ...appState.aiAssistantPanel,
-      messages: [...appState.aiAssistantPanel.messages, message],
-    }
+  setShowConnectDialog: (value: boolean) => {
+    appState.showConnectDialog = value
   },
 
   showOngoingQueriesPanelOpen: false,

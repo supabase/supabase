@@ -151,7 +151,7 @@ const nextConfig = {
             },
             {
               source: '/',
-              destination: '/projects',
+              destination: '/organizations',
               permanent: false,
             },
             {
@@ -378,11 +378,6 @@ const nextConfig = {
       {
         source: '/project/:ref/settings/billing/update/enterprise',
         destination: '/org/_/billing',
-        permanent: true,
-      },
-      {
-        source: '/project/:ref/sql',
-        destination: '/project/:ref/sql/new',
         permanent: true,
       },
       {

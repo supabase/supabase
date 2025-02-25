@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Boxes, Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -22,16 +22,15 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
+  cn,
 } from 'ui'
 import PartnerIcon from 'components/ui/PartnerIcon'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
-interface OrganizationDropdownProps {
-  isNewNav?: boolean
-}
-
-const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) => {
+const OrganizationDropdown = () => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
+  const project = useSelectedProject()
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
@@ -47,15 +46,19 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
   }
 
   return (
-    <div className="flex items-center">
+    <>
+      <Link href={`/org/${slug}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
+        <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+        <span className="text-foreground max-w-32 lg:max-w-none truncate">{orgName}</span>
+        {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
+      </Link>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
-          <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
-            <div className="flex items-center space-x-2">
-              <p className={isNewNav ? 'text-sm' : 'text-xs'}>{orgName}</p>
-              {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
-            </div>
-          </Button>
+          <Button
+            type="text"
+            className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
+            iconRight={<ChevronsUpDown strokeWidth={1.5} />}
+          ></Button>
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
           <Command_Shadcn_>
@@ -65,11 +68,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
               <CommandGroup_Shadcn_>
                 <ScrollArea className={(organizations || []).length > 7 ? 'h-[210px]' : ''}>
                   {organizations?.map((org) => {
-                    const href = router.pathname.includes('[slug]')
-                      ? router.pathname.replace('[slug]', org.slug)
-                      : isNewNav
-                        ? `/org/${org.slug}`
-                        : `/org/${org.slug}/general`
+                    const href = `/org/${org.slug}`
                     return (
                       <CommandItem_Shadcn_
                         key={org.slug}
@@ -93,6 +92,23 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                   })}
                 </ScrollArea>
               </CommandGroup_Shadcn_>
+              <>
+                <CommandSeparator_Shadcn_ />
+                <CommandGroup_Shadcn_>
+                  <CommandItem_Shadcn_
+                    className="cursor-pointer w-full"
+                    onSelect={(e) => {
+                      setOpen(false)
+                      router.push(`/organizations`)
+                    }}
+                    onClick={() => setOpen(false)}
+                  >
+                    <Link href="/organizations" className="flex items-center gap-2 w-full">
+                      <p>All Organizations</p>
+                    </Link>
+                  </CommandItem_Shadcn_>
+                </CommandGroup_Shadcn_>
+              </>
               {organizationCreationEnabled && (
                 <>
                   <CommandSeparator_Shadcn_ />
@@ -117,7 +133,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
           </Command_Shadcn_>
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>
-    </div>
+    </>
   )
 }
 

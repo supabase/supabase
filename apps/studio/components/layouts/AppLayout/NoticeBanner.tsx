@@ -29,10 +29,7 @@ export const NoticeBanner = () => {
   }
 
   return (
-    <div
-      style={{ height: '44px' }}
-      className="flex items-center justify-center gap-x-4 bg-surface-100 py-3 transition text-foreground box-border border-b border-default"
-    >
+    <div className="flex items-center justify-center gap-x-4 bg py-0.5 border transition text-foreground border-default">
       <p className="text-sm">
         Supabase is deprecating Fly's Postgres offering managed by Supabase on March 14, 2025
       </p>
