@@ -196,7 +196,7 @@ const DestinationRow = ({
           sourceId,
           sinkId,
           pipelineId: pipeline?.id,
-          enabled: false,
+          enabled: pipelineStatusData?.status === 'Started',
         }}
       />
     </>
