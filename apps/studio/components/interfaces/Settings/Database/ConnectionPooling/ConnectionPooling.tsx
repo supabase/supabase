@@ -234,6 +234,7 @@ export const ConnectionPooling = () => {
           ignore_startup_parameters: pgbouncerConfig.ignore_startup_parameters ?? '',
           pool_mode: pgbouncerConfig.pool_mode as 'transaction' | 'session' | 'statement',
           max_client_conn,
+          default_pool_size: default_pool_size as number | undefined,
         },
         {
           onSuccess: (data) => {
@@ -428,7 +429,7 @@ export const ConnectionPooling = () => {
                                   supavisorConfig.default_pool_size
                                 )
                                 form.setValue('max_client_conn', supavisorConfig.max_client_conn)
-                              } else if (e === 'pgBouncer' && pgbouncerConfig) {
+                              } else if (e === 'PgBouncer' && pgbouncerConfig) {
                                 form.setValue('type', 'PgBouncer')
                                 form.setValue('pool_mode', pgbouncerConfig.pool_mode as any)
                                 form.setValue(

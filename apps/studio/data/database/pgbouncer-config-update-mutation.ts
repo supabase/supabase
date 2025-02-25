@@ -15,6 +15,8 @@ export async function updatePgbouncerConfiguration({
   pool_mode,
   default_pool_size,
   pgbouncer_enabled,
+  ignore_startup_parameters,
+  max_client_conn,
 }: PgbouncerConfigurationUpdateVariables) {
   if (!ref) return console.error('Project ref is required')
 
@@ -24,7 +26,8 @@ export async function updatePgbouncerConfiguration({
       default_pool_size,
       pool_mode,
       pgbouncer_enabled,
-      ignore_startup_parameters: '',
+      ignore_startup_parameters,
+      max_client_conn,
     },
   })
 
