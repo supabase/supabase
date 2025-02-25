@@ -390,7 +390,7 @@ const GrafanaBannerActions = ({ className }: { className?: string }) => {
 
   return (
     <div className={cn('flex gap-2', className)}>
-      <Button type="outline" size="tiny" icon={<BookOpen />} asChild>
+      <Button type="outline" className="bg-alternative" size="tiny" icon={<BookOpen />} asChild>
         <Link
           href="https://supabase.com/docs/guides/telemetry/metrics"
           target="_blank"
