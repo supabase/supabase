@@ -82,7 +82,10 @@ const AddNewSecretForm = () => {
     }
 
     if (pairs.length) {
-      form.setValue('secrets', pairs)
+      const currentSecrets = form.getValues('secrets')
+      // Filter out any empty pairs before combining
+      const nonEmptySecrets = currentSecrets.filter((secret) => secret.name || secret.value)
+      form.setValue('secrets', [...nonEmptySecrets, ...pairs])
     }
   }
 
