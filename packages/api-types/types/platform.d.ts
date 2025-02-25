@@ -4658,7 +4658,7 @@ export interface components {
     database_type: 'PRIMARY' | 'READ_REPLICA'
     DatabaseDetailResponse: {
       /** @enum {string} */
-      cloud_provider: 'AWS' | 'FLY'
+      cloud_provider: 'AWS' | 'AWS_K8S' | 'FLY'
       connectionString: string
       db_host: string
       db_name: string

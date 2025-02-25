@@ -10,7 +10,7 @@ import DestinationRow from './DestinationRow'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useState } from 'react'
-import NewDestinationPanel from './NewDestinationPanel'
+import NewDestinationPanel from './DestinationPanel'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 
 const Destinations = () => {
@@ -97,6 +97,7 @@ const Destinations = () => {
               return (
                 <DestinationRow
                   key={sink.id}
+                  sourceId={sourceId}
                   sinkId={sink.id}
                   sinkName={sink.name}
                   type={sink.config.big_query ? 'BigQuery' : 'Other'}
