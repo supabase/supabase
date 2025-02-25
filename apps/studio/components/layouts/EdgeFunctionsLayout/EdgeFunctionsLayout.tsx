@@ -1,8 +1,8 @@
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useRouter } from 'next/router'
+import { PropsWithChildren } from 'react'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 
 export interface EdgeFunctionsLayoutProps {
@@ -22,13 +22,13 @@ const EdgeFunctionsProductMenu = () => {
       items: [
         {
           name: 'Functions',
-          key: 'functions-index',
+          key: 'main',
           url: `/project/${projectRef}/functions`,
           items: [],
         },
         {
           name: 'Secrets',
-          key: 'functions-secrets',
+          key: 'secrets',
           url: `/project/${projectRef}/functions/secrets`,
           items: [],
         },
