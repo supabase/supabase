@@ -5,10 +5,6 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 
-export interface EdgeFunctionsLayoutProps {
-  title?: string
-}
-
 const EdgeFunctionsProductMenu = () => {
   const { ref: projectRef = 'default' } = useParams()
   const router = useRouter()
@@ -39,10 +35,10 @@ const EdgeFunctionsProductMenu = () => {
   return <ProductMenu page={page} menu={menuItems} />
 }
 
-const EdgeFunctionsLayout = ({ title, children }: PropsWithChildren<EdgeFunctionsLayoutProps>) => {
+const EdgeFunctionsLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
     <ProjectLayout
-      title={title || 'Edge Functions'}
+      title="Edge Functions"
       product="Edge Functions"
       productMenu={<EdgeFunctionsProductMenu />}
       isBlocking={false}
