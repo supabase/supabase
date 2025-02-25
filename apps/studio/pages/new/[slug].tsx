@@ -12,7 +12,6 @@ import { z } from 'zod'
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
@@ -201,7 +200,7 @@ const Wizard: NextPageWithLayout = () => {
   } = useProjectCreateMutation({
     onSuccess: (res) => {
       sendEvent({
-        action: TelemetryActions.PROJECT_CREATION_SIMPLE_VERSION_SUBMITTED,
+        action: 'project_creation_simple_version_submitted',
       })
       router.push(`/project/${res.ref}/building`)
     },

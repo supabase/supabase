@@ -1,29 +1,29 @@
 import { useParams } from 'common'
 import { AiIconAnimation, Button, Dialog, DialogContent, DialogSection, DialogTrigger } from 'ui'
-import { useRouter } from 'next/router'
 
 import {
   EdgeFunctionsListItem,
   FunctionsEmptyState,
   TerminalInstructions,
 } from 'components/interfaces/Functions'
-import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import type { NextPageWithLayout } from 'types'
-import { DocsButton } from 'components/ui/DocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAppStateSnapshot } from 'state/app-state'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import { ExternalLink } from 'lucide-react'
+import type { NextPageWithLayout } from 'types'
 
 const FunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { setAiAssistantPanel } = useAppStateSnapshot()
-  const router = useRouter()
+
   const {
     data: functions,
     error,
@@ -77,11 +77,25 @@ const FunctionsPage: NextPageWithLayout = () => {
     />,
   ]
 
+  if (!hasFunctions) {
+    secondaryActions.unshift(
+      <Button asChild type="default" icon={<ExternalLink />}>
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+        >
+          Examples
+        </a>
+      </Button>
+    )
+  }
+
   return (
     <PageLayout
       size="large"
       title="Edge Functions"
-      subtitle="Deploy edge functions to handle complex business logic"
+      subtitle="Server-side TypeScript functions distributed globally at the edge"
       primaryActions={deployButton}
       secondaryActions={secondaryActions}
     >
