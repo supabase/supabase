@@ -234,6 +234,7 @@ export const ConnectionPooling = () => {
           ignore_startup_parameters: pgbouncerConfig.ignore_startup_parameters ?? '',
           pool_mode: pgbouncerConfig.pool_mode as 'transaction' | 'session' | 'statement',
           max_client_conn,
+          default_pool_size: default_pool_size as number | undefined,
         },
         {
           onSuccess: (data) => {
@@ -310,15 +311,6 @@ export const ConnectionPooling = () => {
       resetForm()
     }
   }, [isSuccessPgbouncerConfig, isSuccessSupavisorConfig])
-
-  // [Joshen] Temp: This is really dumb but somehow RHF is setting max_client_conn to undefined
-  // It should never be undefined, either a number of null, and I can't figure out why
-  // I'm stuck figuring out why the form starts with being dirty if its on Supavisor too
-  useEffect(() => {
-    if (max_client_conn === undefined) {
-      form.setValue('max_client_conn', null)
-    }
-  }, [max_client_conn])
 
   return (
     <section id="connection-pooler">
@@ -437,7 +429,7 @@ export const ConnectionPooling = () => {
                                   supavisorConfig.default_pool_size
                                 )
                                 form.setValue('max_client_conn', supavisorConfig.max_client_conn)
-                              } else if (e === 'pgBouncer' && pgbouncerConfig) {
+                              } else if (e === 'PgBouncer' && pgbouncerConfig) {
                                 form.setValue('type', 'PgBouncer')
                                 form.setValue('pool_mode', pgbouncerConfig.pool_mode as any)
                                 form.setValue(
@@ -659,7 +651,6 @@ export const ConnectionPooling = () => {
                   />
 
                   <FormField_Shadcn_
-                    disabled={type === 'Supavisor'}
                     control={form.control}
                     name="max_client_conn"
                     render={({ field }) => (
@@ -700,6 +691,7 @@ export const ConnectionPooling = () => {
                             type="number"
                             className="w-full"
                             value={field.value || ''}
+                            disabled={type === 'Supavisor'}
                             placeholder={!field.value ? `${defaultMaxClientConn}` : ''}
                           />
                         </FormControl_Shadcn_>
