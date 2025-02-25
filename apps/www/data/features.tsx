@@ -1860,6 +1860,38 @@ This feature is particularly valuable for teams looking to implement robust secu
     },
   },
   {
+    title: 'User Impersonation',
+    subtitle: 'Experience your application as any user.',
+    description: `
+User Impersonation in Supabase allows developers to simulate the experience of any user within their application. This feature is particularly useful for testing and debugging, as it enables you to view and interact with your application exactly as a specific user would.
+
+## Key benefits
+1. Realistic Testing: Validate user-specific features and permissions by impersonating users directly in Supabase Studio.
+2. RLS Policy Verification: Test Row Level Security (RLS) policies with real data to ensure they function as intended.
+3. Enhanced Debugging: Quickly identify and resolve user-specific issues by experiencing the application from their perspective.
+4. Seamless Integration: Use the Table Editor, SQL Editor, and GraphiQL to impersonate users and test queries and mutations.
+5. Efficient Development: Accelerate the process of writing and testing RLS policies, reducing development time and effort.
+
+## User Impersonation is particularly valuable for:
+- Developers testing user-specific features and permissions
+- Teams implementing complex RLS policies
+- Applications requiring detailed user experience validation
+- Debugging user-reported issues with precision
+
+By leveraging User Impersonation, you can ensure that your application delivers the intended experience for every user, enhancing both functionality and security. This feature empowers developers to create more robust and user-friendly applications by providing a comprehensive toolset for testing and validation.
+`,
+    icon: Users,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION, ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '/images/blog/launch-week-x/day-1/3.png',
+    heroImageLight: '/images/blog/launch-week-x/day-1/3.png',
+    docsUrl: '/blog/studio-introducing-assistant#user-impersonation',
+    slug: 'user-impersonation',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
     title: 'Foreign Key Selector',
     subtitle: 'Easily manage foreign key relationships between tables.',
     description: `
