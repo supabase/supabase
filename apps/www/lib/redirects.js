@@ -2836,11 +2836,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/monitoring-troubleshooting/:path*',
-    destination: '/docs/guides/telemetry/:path*',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/troubleshooting',
     destination: '/docs/guides/troubleshooting/http-api-issues',
   },
@@ -2868,6 +2863,11 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/http-status-codes',
     destination: '/docs/guides/troubleshooting/http-status-codes',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/:path*',
+    destination: '/docs/guides/telemetry/:path*',
   },
   {
     permanent: true,
