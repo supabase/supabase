@@ -54,8 +54,6 @@ const AddNewSecretForm = () => {
     control: form.control,
     name: 'secrets',
   })
-  console.log(form.getValues())
-  console.log(fields)
 
   function handlePaste(e: ClipboardEvent) {
     e.preventDefault()
