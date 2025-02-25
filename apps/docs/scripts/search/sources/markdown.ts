@@ -44,6 +44,8 @@ export class MarkdownSource extends BaseSource {
 
   extractIndexedContent(): string {
     const sections = this.sections ?? []
-    return sections.map(({ content }) => content).join('\n\n')
+    const sectionText = sections.map(({ content }) => content).join('\n\n')
+
+    return `# ${this.meta.title ?? ''}\n\n${this.meta.subtitle ?? ''}\n\n${sectionText}`
   }
 }

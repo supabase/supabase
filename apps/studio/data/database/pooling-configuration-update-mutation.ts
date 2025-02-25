@@ -10,6 +10,9 @@ export type PoolingConfigurationUpdateVariables = {
   ref: string
 } & components['schemas']['UpdateSupavisorConfigBody']
 
+/**
+ * Should rename this to Supavisor eventually since we're supporting both types of poolers
+ */
 export async function updatePoolingConfiguration({
   ref,
   pool_mode,
