@@ -13,6 +13,7 @@ import {
 } from 'react'
 
 import { type Database, useConstant, useIsLoggedIn } from 'common'
+import { TelemetryActions } from 'common/telemetry-constants'
 import { Button, cn } from 'ui'
 
 import { IS_PLATFORM } from '~/lib/constants'
@@ -108,7 +109,7 @@ function Feedback({ className }: { className?: string }) {
 
   function handleVote(response: Response) {
     sendTelemetryEvent({
-      action: 'docs_feedback_clicked',
+      action: TelemetryActions.DOCS_FEEDBACK_CLICKED,
       properties: { response },
     })
     sendFeedbackVote(response)
@@ -141,37 +142,21 @@ function Feedback({ className }: { className?: string }) {
   }
 
   return (
-    <section className={cn('@container px-5 mb-6', className)} aria-labelledby="feedback-title">
-      <h3 id="feedback-title" className="block font-mono text-xs uppercase text-foreground mb-4">
+    <section className={cn('@container', className)} aria-labelledby="feedback-title">
+      <span id="feedback-title" className="block font-mono text-xs text-foreground-light mb-2">
         Is this helpful?
-      </h3>
-      <div className="relative flex flex-col gap-y-4 mb-2 @[12rem]:flex-row @[12rem]:items-center">
+      </span>
+      <div className="relative flex flex-col gap-y-4 @[12rem]:flex-row @[12rem]:items-center">
         <div
           style={{ '--container-flex-gap': '0.5rem' } as CSSProperties}
-          className={`relative flex gap-[var(--container-flex-gap)] items-center`}
+          className="relative flex gap-[var(--container-flex-gap)] items-center"
         >
           <Button
             type="outline"
             rounded
             className={cn(
-              'px-1',
-              !isYes && 'hover:text-brand-600 hover:border-brand-500',
-              isYes && 'bg-brand text-brand-200 !border-brand disabled:opacity-100',
-              !showYes && 'opacity-0 invisible',
-              '[transition-property:opacity,transform,color] [transition-duration:150ms,300ms,300ms]',
-              'motion-reduce:[transition-duration:150ms,1ms,300ms]'
-            )}
-            onClick={() => handleVote('yes')}
-            disabled={state.type === StateType.Followup}
-          >
-            <Check size={14} strokeWidth={3} />
-            <span className="sr-only">Yes</span>
-          </Button>
-          <Button
-            type="outline"
-            rounded
-            className={cn(
-              'px-1',
+              'px-1 w-7 h-7',
+              'text-foreground-light',
               !isNo && 'hover:text-warning-600 hover:border-warning-500',
               isNo &&
                 `bg-warning text-warning-200 !border-warning -translate-x-[calc(100%+var(--container-flex-gap,0.5rem))] disabled:opacity-100`,
@@ -182,15 +167,33 @@ function Feedback({ className }: { className?: string }) {
             onClick={() => handleVote('no')}
             disabled={state.type === StateType.Followup}
           >
-            <X size={14} strokeWidth={3} />
+            <X size={14} strokeWidth={2} className="text-current" />
             <span className="sr-only">No</span>
+          </Button>
+          <Button
+            type="outline"
+            rounded
+            className={cn(
+              'px-1 w-7 h-7',
+              'text-foreground-light',
+              !isYes && 'hover:text-brand-600 hover:border-brand-500',
+              isYes && 'bg-brand text-brand-200 !border-brand disabled:opacity-100',
+              !showYes && 'opacity-0 invisible',
+              '[transition-property:opacity,transform,color] [transition-duration:150ms,300ms,300ms]',
+              'motion-reduce:[transition-duration:150ms,1ms,300ms]'
+            )}
+            onClick={() => handleVote('yes')}
+            disabled={state.type === StateType.Followup}
+          >
+            <Check size={14} strokeWidth={2} />
+            <span className="sr-only">Yes</span>
           </Button>
         </div>
         <div
           className={cn(
             'flex flex-col gap-1',
             'text-xs',
-            'opacity-0 invisible',
+            'opacity-0 invisible hidden',
             'text-left',
             '-translate-x-[0.25rem] @[12rem]:-translate-x-[1.25rem]',
             '[transition-property:opacity,transform] [transition-duration:150ms,300ms]',

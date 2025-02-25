@@ -137,7 +137,9 @@ const GuidesTableOfContents = ({
           <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} />
         </div>
       )}
-      <Feedback key={pathname} />
+      <div className="pl-5 mb-6">
+        <Feedback key={pathname} />
+      </div>
       {displayedList.length > 0 && (
         <>
           <span className="block font-mono text-xs uppercase text-foreground px-5 mb-6">
