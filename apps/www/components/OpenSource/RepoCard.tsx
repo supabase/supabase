@@ -4,7 +4,6 @@ import Link from 'next/link'
 
 import Panel from '~/components/Panel'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; index: number }) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -22,7 +21,7 @@ const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; in
         className="h-full"
         onClick={() =>
           sendTelemetryEvent({
-            action: TelemetryActions.OPEN_SOURCE_REPO_CARD_CLICKED,
+            action: 'open_source_repo_card_clicked',
             properties: { repoName: repo.name },
           })
         }
