@@ -114,7 +114,7 @@ const DestinationPanel = ({
       maxFillSecs: pipelineData?.config?.config?.max_fill_secs ?? 10,
       enabled: existingDestination?.enabled ?? true,
     }),
-    [sinkData, pipelineData, existingDestination, TypeEnum]
+    [sinkData, pipelineData, existingDestination]
   )
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -181,7 +181,6 @@ const DestinationPanel = ({
     } catch (error) {
       toast.error(`Failed to ${isEditing ? 'update' : 'create'} destination`)
     }
-    form.reset(defaultValues)
   }
 
   const { enabled } = form.watch()
@@ -190,7 +189,7 @@ const DestinationPanel = ({
     if (isEditing && sinkData && pipelineData) {
       form.reset(defaultValues)
     }
-  }, [sinkData, pipelineData, isEditing, defaultValues, form])
+  }, [sinkData, pipelineData, isEditing])
 
   return (
     <>
