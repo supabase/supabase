@@ -3569,7 +3569,11 @@
       },
       "SecretResponse": {
         "type": "object",
-        "properties": { "name": { "type": "string" }, "value": { "type": "string" } },
+        "properties": {
+          "name": { "type": "string" },
+          "value": { "type": "string" },
+          "updated_at": { "type": "string" }
+        },
         "required": ["name", "value"]
       },
       "CreateSecretBody": {

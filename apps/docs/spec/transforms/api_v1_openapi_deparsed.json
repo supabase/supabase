@@ -3592,6 +3592,9 @@
                       },
                       "value": {
                         "type": "string"
+                      },
+                      "updated_at": {
+                        "type": "string"
                       }
                     },
                     "required": ["name", "value"]
@@ -12283,6 +12286,9 @@
             "type": "string"
           },
           "value": {
+            "type": "string"
+          },
+          "updated_at": {
             "type": "string"
           }
         },
