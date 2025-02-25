@@ -14,19 +14,19 @@ toc_depth: 3
 
 [pgRouting](https://github.com/pgRouting/pgrouting) is a Postgres extension. It's often used for finding the “shortest path” between two locations, however it's a hidden gem in Postgres and can be used for basic graph functionality.
 
-![pgrouting on HN](/images/blog/pgrouting-graph/pgrouting-og.png)
+![pgrouting on HN](/images/blog/pgrouting-graph/pgrouting-hn.png)
 
 pgRouting is typically combined with PostGIS for working with geospatial data, but it can also be [useful beyond that](https://news.ycombinator.com/item?id=26350454) as a lightweight alternative to Graph extensions like [Apache AGE](https://age.apache.org/), or specialized graph databases like [Neo4j](https://neo4j.com/).
 
 Let's explore some useful applications of pgRouting and graphs.
 
-## **What is pgRouting?**
+## What is pgRouting?
 
 pgRouting is an extension of PostGIS that provides geospatial routing functionality. You can use it to calculate the shortest path, perform network analysis, and solve complex routing problems on a graph-based structure. Most commonly, this is used in Geographic Information Systems (GIS) for tasks like determining the fastest route between two locations.
 
-![pgrouting map](/images/blog/pgrouting-graph/pgrouting-hn.png)
+![pgrouting map](/images/blog/pgrouting-graph/pgrouting-map.png)
 
-## **Working with Graphs**
+## Working with Graphs
 
 The power of pgRouting lies in its ability to work with any data structured as a graph. A graph is essentially a network of interconnected points, where:
 
@@ -43,7 +43,7 @@ In maps / [GIS](https://en.wikipedia.org/wiki/Geographic_information_system), no
   }}
 />
 
-## **Non-GIS Use Cases for pgRouting**
+## Non-GIS Use Cases for pgRouting
 
 Let's explore how pgRouting can be applied to a few non-[GIS](https://en.wikipedia.org/wiki/Geographic_information_system) problems.
 
