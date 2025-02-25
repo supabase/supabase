@@ -607,7 +607,7 @@ const SubscriptionPlanUpdateDialog = ({
                 )
               : topFeatures.length > 0 && (
                   <div className="mb-4">
-                    <h3 className="text-sm mb-2">Upgrade features</h3>
+                    <h3 className="text-sm mb-4">Upgrade features</h3>
 
                     <div className="space-y-2 mb-4 text-foreground-light">
                       {topFeatures.map((feature: string | [string, ...any[]]) => (
