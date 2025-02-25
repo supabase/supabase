@@ -20,14 +20,15 @@ interface PageLayoutProps {
   subtitle?: string
   icon?: ReactNode
   breadcrumbs?: Array<{
-    label: string
+    label?: string
     href?: string
+    element?: ReactNode
   }>
   primaryActions?: ReactNode
   secondaryActions?: ReactNode
   navigationItems?: NavigationItem[]
   className?: string
-  size?: 'default' | 'full'
+  size?: 'default' | 'full' | 'large' | 'small'
   isCompact?: boolean
 }
 
@@ -70,8 +71,9 @@ export const PageLayout = ({
   const router = useRouter()
 
   return (
-    <div className="w-full">
+    <div className="w-full h-full flex flex-col items-stretch">
       <ScaffoldContainer
+        size={size}
         className={cn(
           'w-full mx-auto',
           size === 'full' &&
