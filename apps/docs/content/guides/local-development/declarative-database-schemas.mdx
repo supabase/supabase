@@ -183,7 +183,7 @@ supabase start && supabase migration up
 
 As your database schema evolves, you will probably start using more advanced entities like views and functions. These entities are notoriously verbose to manage using plain migrations because the entire body must be recreated whenever there is a change. Using declarative schema, you can now edit them in-place so it’s much easier to review.
 
-```sql
+```sql supabase/schemas/employees.sql
 create table "employees" (
   "id" integer not null,
   "name" text,
@@ -202,9 +202,9 @@ AS $$
 $$;
 ```
 
-Your schema files are run in lexicographic order. If you need to declare foreign keys between multiple tables, remember to create the parent table first. For example, your `supabase` directory may end up with the following structure.
+Your schema files are run in lexicographic order by default. The order is important for declaring foreign keys between multiple tables as the parent table must be created first. For example, your `supabase` directory may end up with the following structure.
 
-```sql
+```bash
 .
 └── supabase/
     ├── schemas/
@@ -214,6 +214,16 @@ Your schema files are run in lexicographic order. If you need to declare foreign
         ├── 20241004112233_employees_table.sql
         ├── 20241005112233_add_employee_age.sql
         └── 20241006112233_add_managers_table.sql
+```
+
+If you need to specify a custom order to apply the schemas, you can arrange them in `config.toml`. Any glob patterns will evaluated, deduplicated, and sorted in lexicographic order. For example, the following pattern ensures `employees.sql` is always executed first.
+
+```toml supabase/config.toml
+[db.migrations]
+schema_paths = [
+  "./schemas/employees.sql",
+  "./schemas/*.sql",
+]
 ```
 
 ## Known caveats
