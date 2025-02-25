@@ -19,6 +19,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAppStateSnapshot } from 'state/app-state'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import { ExternalLink } from 'lucide-react'
 
 const FunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -77,11 +78,25 @@ const FunctionsPage: NextPageWithLayout = () => {
     />,
   ]
 
+  if (!hasFunctions) {
+    secondaryActions.unshift(
+      <Button asChild type="default" icon={<ExternalLink />}>
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+        >
+          Examples
+        </a>
+      </Button>
+    )
+  }
+
   return (
     <PageLayout
       size="large"
       title="Edge Functions"
-      subtitle="Deploy edge functions to handle complex business logic"
+      subtitle="Server-side TypeScript functions distributed globally at the edge"
       primaryActions={deployButton}
       secondaryActions={secondaryActions}
     >
