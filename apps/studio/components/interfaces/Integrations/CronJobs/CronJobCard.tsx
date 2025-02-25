@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useCronJobRunQuery } from 'data/database-cron-jobs/database-cron-jobs-run-query'
@@ -94,7 +93,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 icon={<History />}
                 onClick={() => {
                   sendEvent({
-                    action: TelemetryActions.CRON_JOB_HISTORY_CLICKED,
+                    action: 'cron_job_history_clicked',
                     groups: {
                       project: selectedProject?.ref ?? 'Unknown',
                       organization: org?.slug ?? 'Unknown',
@@ -116,7 +115,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                   <DropdownMenuItem
                     onClick={() => {
                       sendEvent({
-                        action: TelemetryActions.CRON_JOB_UPDATE_CLICKED,
+                        action: 'cron_job_update_clicked',
                         groups: {
                           project: selectedProject?.ref ?? 'Unknown',
                           organization: org?.slug ?? 'Unknown',
@@ -131,7 +130,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                   <DropdownMenuItem
                     onClick={() => {
                       sendEvent({
-                        action: TelemetryActions.CRON_JOB_DELETE_CLICKED,
+                        action: 'cron_job_delete_clicked',
                         groups: {
                           project: selectedProject?.ref ?? 'Unknown',
                           organization: org?.slug ?? 'Unknown',
