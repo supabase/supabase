@@ -70,8 +70,8 @@ const DestinationPanel = ({
   const { mutateAsync: createPipeline, isLoading: creatingPipeline } = useCreatePipelineMutation()
   const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline, isLoading: stoppingPipeline } = useStopPipelineMutation()
-  const { mutateAsync: updateSink } = useUpdateSinkMutation()
-  const { mutateAsync: updatePipeline } = useUpdatePipelineMutation()
+  const { mutateAsync: updateSink, isLoading: updatingSink } = useUpdateSinkMutation()
+  const { mutateAsync: updatePipeline, isLoading: updatingPipeline } = useUpdatePipelineMutation()
   const { data: publications, isLoading: loadingPublications } = useReplicationPublicationsQuery({
     projectRef,
     sourceId,
@@ -88,7 +88,9 @@ const DestinationPanel = ({
   })
 
   const isCreating = creatingSource || creatingSink || creatingPipeline || startingPipeline
-  const isEditing = !!existingDestination
+  const isUpdating = updatingSink || updatingPipeline || stoppingPipeline || startingPipeline
+  const isSubmitting = isCreating || isUpdating
+  const editMode = !!existingDestination
 
   const formId = 'destination-editor'
   const types = ['BigQuery'] as const
@@ -127,7 +129,7 @@ const DestinationPanel = ({
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     try {
-      if (isEditing && existingDestination) {
+      if (editMode && existingDestination) {
         if (!sourceId) {
           console.error('Source id is required')
           return
@@ -190,17 +192,17 @@ const DestinationPanel = ({
       }
       onClose()
     } catch (error) {
-      toast.error(`Failed to ${isEditing ? 'update' : 'create'} destination`)
+      toast.error(`Failed to ${editMode ? 'update' : 'create'} destination`)
     }
   }
 
   const { enabled } = form.watch()
 
   useEffect(() => {
-    if (isEditing && sinkData && pipelineData) {
+    if (editMode && sinkData && pipelineData) {
       form.reset(defaultValues)
     }
-  }, [sinkData, pipelineData, isEditing])
+  }, [sinkData, pipelineData, editMode])
 
   return (
     <>
@@ -211,9 +213,9 @@ const DestinationPanel = ({
               <SheetTitle>
                 <div className="flex items-center justify-between">
                   <div>
-                    <div>{isEditing ? 'Edit Destination' : 'New Destination'}</div>
+                    <div>{editMode ? 'Edit Destination' : 'New Destination'}</div>
                     <div className="text-xs">
-                      {isEditing ? 'Modify existing destination' : 'Send data to a new destination'}
+                      {editMode ? 'Modify existing destination' : 'Send data to a new destination'}
                     </div>
                   </div>
                   <div className="flex">
@@ -408,11 +410,16 @@ const DestinationPanel = ({
               </Form_Shadcn_>
             </SheetSection>
             <SheetFooter>
-              <Button disabled={isCreating} type="default" onClick={onClose}>
+              <Button disabled={isSubmitting} type="default" onClick={onClose}>
                 Cancel
               </Button>
-              <Button disabled={isCreating} loading={isCreating} form={formId} htmlType="submit">
-                {isEditing ? 'Update' : 'Create'}
+              <Button
+                disabled={isSubmitting}
+                loading={isSubmitting}
+                form={formId}
+                htmlType="submit"
+              >
+                {editMode ? 'Update' : 'Create'}
               </Button>
             </SheetFooter>
           </div>
