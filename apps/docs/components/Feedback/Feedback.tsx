@@ -36,7 +36,7 @@ const FeedbackButton = forwardRef<
         'flex items-center gap-2',
         'text-xs text-foreground-lighter',
         'hover:text-foreground',
-        !visible && 'opacity-0 invisible',
+        !visible && 'opacity-0 invisible hidden',
         '[transition-property:opacity,color]',
         '[transition-delay:700ms,0ms]'
       )}
@@ -145,7 +145,7 @@ function Feedback({ className }: { className?: string }) {
       <span id="feedback-title" className="block font-mono text-xs text-foreground-light mb-2">
         Is this helpful?
       </span>
-      <div className="relative flex flex-col gap-y-4 @[12rem]:flex-row @[12rem]:items-center">
+      <div className="relative flex flex-col gap-4 @[12rem]:flex-row @[12rem]:items-center">
         <div
           style={{ '--container-flex-gap': '0.5rem' } as CSSProperties}
           className="relative flex gap-[var(--container-flex-gap)] items-center"
@@ -154,12 +154,12 @@ function Feedback({ className }: { className?: string }) {
             type="outline"
             rounded
             className={cn(
-              'px-1 w-7 h-7',
+              'px-1 w-7 h-7 inline-flex',
               'text-foreground-light',
               !isNo && 'hover:text-warning-600 hover:border-warning-500',
               isNo &&
-                `bg-warning text-warning-200 !border-warning -translate-x-[calc(100%+var(--container-flex-gap,0.5rem))] disabled:opacity-100`,
-              !showNo && 'opacity-0 invisible',
+                `bg-warning text-warning-200 !border-warning -translate-x-[calc(100%+var(--container-inline-flex-gap,0.5rem))] disabled:opacity-100`,
+              !showNo && 'opacity-0 invisible hidden',
               '[transition-property:opacity,transform,color] [transition-duration:150ms,300ms,300ms]',
               'motion-reduce:[transition-duration:150ms,1ms,300ms]'
             )}
@@ -173,11 +173,11 @@ function Feedback({ className }: { className?: string }) {
             type="outline"
             rounded
             className={cn(
-              'px-1 w-7 h-7',
+              'px-1 w-7 h-7 inline-flex',
               'text-foreground-light',
               !isYes && 'hover:text-brand-600 hover:border-brand-500',
               isYes && 'bg-brand text-brand-200 !border-brand disabled:opacity-100',
-              !showYes && 'opacity-0 invisible',
+              !showYes && 'opacity-0 invisible hidden',
               '[transition-property:opacity,transform,color] [transition-duration:150ms,300ms,300ms]',
               'motion-reduce:[transition-duration:150ms,1ms,300ms]'
             )}
@@ -194,12 +194,11 @@ function Feedback({ className }: { className?: string }) {
             'text-xs',
             'opacity-0 invisible hidden',
             'text-left',
-            '-translate-x-[0.25rem] @[12rem]:-translate-x-[1.25rem]',
+            '-translate-x-[0.25rem]',
             '[transition-property:opacity,transform] [transition-duration:150ms,300ms]',
             'motion-reduce:[transition-duration:150ms,1ms]',
             'delay-300',
-            state.type === StateType.Followup &&
-              'opacity-100 visible -translate-x-0 @[12rem]:-translate-x-[1rem]'
+            state.type === StateType.Followup && 'flex opacity-100 visible -translate-x-0'
           )}
         >
           <span className="text-foreground-light">Thanks for your feedback!</span>
