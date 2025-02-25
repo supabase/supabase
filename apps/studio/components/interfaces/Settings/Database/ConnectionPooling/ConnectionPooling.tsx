@@ -51,11 +51,7 @@ import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import {
-  SESSION_MODE_DESCRIPTION,
-  STATEMENT_MODE_DESCRIPTION,
-  TRANSACTION_MODE_DESCRIPTION,
-} from '../Database.constants'
+import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 
 const formId = 'pooling-configuration-form'
@@ -604,14 +600,6 @@ export const ConnectionPooling = () => {
                                 {SESSION_MODE_DESCRIPTION}
                               </p>
                             </Listbox.Option>
-                            {type === 'PgBouncer' && (
-                              <Listbox.Option key="statement" label="Session" value="statement">
-                                <p>Statement mode</p>
-                                <p className="text-xs text-foreground-lighter">
-                                  {STATEMENT_MODE_DESCRIPTION}
-                                </p>
-                              </Listbox.Option>
-                            )}
                           </Listbox>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
