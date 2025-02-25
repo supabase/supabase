@@ -138,7 +138,7 @@ const GuidesTableOfContents = ({
         </div>
       )}
       <div className="pl-5">
-        <Feedback key={pathname} className="border-b pb-4 mb-4" />
+        <Feedback key={pathname} className="mb-6 lg:mb-8" />
       </div>
       {displayedList.length > 0 && (
         <>
