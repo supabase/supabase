@@ -82,20 +82,15 @@ const AddNewSecretForm = () => {
     }
 
     if (pairs.length) {
-      // Replace all fields with new pairs
-      form.reset({ secrets: pairs })
+      form.setValue('secrets', pairs)
     }
   }
 
   const { mutate: createSecret, isLoading: isCreating } = useSecretsCreateMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully created new secret "${variables.secrets[0].name}"`)
-      // useFieldArray maintains internal state independently of useForm
-      // so it retains field state even after calling form.reset().
-      // setTimeout avoids a React state update conflict between useFieldArray and form.setValue
-      setTimeout(() => {
-        form.setValue('secrets', [{ name: '', value: '' }])
-      }, 0)
+      // RHF recommends using setTimeout/useEffect to reset the form
+      setTimeout(() => form.reset(), 0)
     },
   })
 
