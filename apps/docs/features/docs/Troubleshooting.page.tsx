@@ -94,7 +94,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
-              <Feedback className="px-0 mb-6" />
+              <Feedback className="px-0 border-b pb-4 mb-4" />
             </aside>
           </div>
         </article>

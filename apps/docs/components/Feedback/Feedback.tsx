@@ -142,7 +142,7 @@ function Feedback({ className }: { className?: string }) {
 
   return (
     <section className={cn('@container', className)} aria-labelledby="feedback-title">
-      <span id="feedback-title" className="block font-mono text-xs text-foreground-light mb-4">
+      <span id="feedback-title" className="block font-mono text-xs text-foreground-light mb-3">
         Is this helpful?
       </span>
       <div className="relative flex flex-col gap-2 @[12rem]:gap-4 @[12rem]:flex-row @[12rem]:items-center">
