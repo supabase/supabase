@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
@@ -116,7 +116,7 @@ export const ConnectionPanel = ({
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
-  const { data: poolingInfo } = usePoolingConfigurationQuery({ projectRef })
+  const { data: poolingInfo } = useSupavisorConfigurationQuery({ projectRef })
   const poolingConfiguration = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
   const isSessionMode = poolingConfiguration?.pool_mode === 'session'
 
