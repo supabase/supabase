@@ -311,15 +311,6 @@ export const ConnectionPooling = () => {
     }
   }, [isSuccessPgbouncerConfig, isSuccessSupavisorConfig])
 
-  // [Joshen] Temp: This is really dumb but somehow RHF is setting max_client_conn to undefined
-  // It should never be undefined, either a number of null, and I can't figure out why
-  // I'm stuck figuring out why the form starts with being dirty if its on Supavisor too
-  useEffect(() => {
-    if (max_client_conn === undefined) {
-      form.setValue('max_client_conn', null)
-    }
-  }, [max_client_conn])
-
   return (
     <section id="connection-pooler">
       <Panel
@@ -659,7 +650,6 @@ export const ConnectionPooling = () => {
                   />
 
                   <FormField_Shadcn_
-                    disabled={type === 'Supavisor'}
                     control={form.control}
                     name="max_client_conn"
                     render={({ field }) => (
@@ -700,6 +690,7 @@ export const ConnectionPooling = () => {
                             type="number"
                             className="w-full"
                             value={field.value || ''}
+                            disabled={type === 'Supavisor'}
                             placeholder={!field.value ? `${defaultMaxClientConn}` : ''}
                           />
                         </FormControl_Shadcn_>
