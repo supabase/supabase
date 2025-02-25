@@ -19,7 +19,7 @@ export const MAX_WIDTH_CLASSES_COLUMN = 'min-w-[420px]'
  */
 export const ScaffoldContainer = forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & {
+  HTMLAttributes<HTMLDivElement> & {
     bottomPadding?: boolean
     size?: 'small' | 'default' | 'large' | 'full'
   }
