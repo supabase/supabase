@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
@@ -19,37 +19,31 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
-interface AddNewSecretFormProps {
-  onComplete?: () => void
-}
-
 type SecretPair = {
   name: string
   value: string
 }
 
-const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
+const FormSchema = z.object({
+  secrets: z.array(
+    z.object({
+      name: z
+        .string()
+        .min(1, 'Please provide a name for your secret')
+        .refine((value) => !value.match(/^(SUPABASE_).*/), {
+          message: 'Name must not start with the SUPABASE_ prefix',
+        }),
+      value: z.string().min(1, 'Please provide a value for your secret'),
+    })
+  ),
+})
+
+const defaultValues = {
+  secrets: [{ name: '', value: '' }],
+}
+const AddNewSecretForm = () => {
   const { ref: projectRef } = useParams()
-  const submitRef = useRef<HTMLButtonElement>(null)
   const [showSecretValue, setShowSecretValue] = useState(false)
-
-  const FormSchema = z.object({
-    secrets: z.array(
-      z.object({
-        name: z
-          .string()
-          .min(1, 'Please provide a name for your secret')
-          .refine((value) => !value.match(/^(SUPABASE_).*/), {
-            message: 'Name must not start with the SUPABASE_ prefix',
-          }),
-        value: z.string().min(1, 'Please provider a value for your secret'),
-      })
-    ),
-  })
-
-  const defaultValues = {
-    secrets: [{ name: '', value: '' }],
-  }
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -60,6 +54,8 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
     control: form.control,
     name: 'secrets',
   })
+  console.log(form.getValues())
+  console.log(fields)
 
   function handlePaste(e: ClipboardEvent) {
     e.preventDefault()
@@ -96,14 +92,8 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
   const { mutate: createSecret, isLoading: isCreating } = useSecretsCreateMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully created new secret "${variables.secrets[0].name}"`)
-      // useFieldArray maintains internal state independently of useForm
-      // so it retains field state even after calling form.reset().
-      // setTimeout avoids a React state update conflict between useFieldArray and form.setValue
-      setTimeout(() => {
-        form.setValue('secrets', [{ name: '', value: '' }])
-      }, 0)
-
-      onComplete?.()
+      // RHF recommends using setTimeout/useEffect to reset the form
+      setTimeout(() => form.reset(), 0)
     },
   })
 
@@ -116,9 +106,9 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
       <Panel.Content className="grid gap-4">
         <h2 className="text-sm">Add new secrets</h2>
         <Form_Shadcn_ {...form}>
-          <form id="create-secret-form" className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
-            {fields.map((field, index) => (
-              <div key={field.id} className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4">
+          <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
+            {fields.map((fieldItem, index) => (
+              <div key={fieldItem.id} className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4">
                 <FormField_Shadcn_
                   control={form.control}
                   name={`secrets.${index}.name`}
@@ -132,6 +122,7 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
                           onPaste={(e) => handlePaste(e.nativeEvent)}
                         />
                       </FormControl_Shadcn_>
+                      <FormMessage_Shadcn_ />
                     </FormItem_Shadcn_>
                   )}
                 />
@@ -157,9 +148,7 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
                           }
                         />
                       </FormControl_Shadcn_>
-                      <div className="absolute -bottom-8">
-                        <FormMessage_Shadcn_ />
-                      </div>
+                      <FormMessage_Shadcn_ />
                     </FormItem_Shadcn_>
                   )}
                 />
@@ -190,13 +179,7 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
             </Button>
 
             <div className="flex items-center gap-2 col-span-2 -mx-6 px-6 border-t pt-4 mt-4">
-              <Button
-                type="primary"
-                htmlType="submit"
-                form="create-secret-form"
-                disabled={isCreating}
-                loading={isCreating}
-              >
+              <Button type="primary" htmlType="submit" disabled={isCreating} loading={isCreating}>
                 {isCreating ? 'Saving...' : 'Save'}
               </Button>
             </div>

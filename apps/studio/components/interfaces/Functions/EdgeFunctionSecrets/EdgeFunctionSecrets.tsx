@@ -6,8 +6,6 @@ import { toast } from 'sonner'
 
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
@@ -16,13 +14,12 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Badge, Separator } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import EdgeFunctionSecret from './EdgeFunctionSecret'
 import AddNewSecretForm from './AddNewSecretForm'
+import EdgeFunctionSecret from './EdgeFunctionSecret'
 
 const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
   const [searchString, setSearchString] = useState('')
-  const [showCreateSecret, setShowCreateSecret] = useState(false)
   const [selectedSecret, setSelectedSecret] = useState<ProjectSecret>()
 
   const canReadSecrets = useCheckPermissions(PermissionAction.SECRETS_READ, '*')
@@ -53,7 +50,7 @@ const EdgeFunctionSecrets = () => {
       {isSuccess && canUpdateSecrets && (
         <>
           <div className="grid gap-5">
-            <AddNewSecretForm onComplete={() => setShowCreateSecret(false)} />
+            <AddNewSecretForm />
             <Separator />
           </div>
           <div className="space-y-4 mt-4">
