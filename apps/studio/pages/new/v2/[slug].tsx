@@ -14,7 +14,6 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
-import { TelemetryActions } from 'common/telemetry-constants'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
@@ -309,7 +308,7 @@ const WizardForm = () => {
     // too important to cause disruption here, make sure to catch and skip any errors
     try {
       sendEvent({
-        action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_SUBMITTED,
+        action: 'project_creation_second_step_submitted',
       })
     } catch (error) {}
 
@@ -538,7 +537,7 @@ const WizardForm = () => {
                       'We have generated a starting schema for you based on your description'
                     )
                     sendEvent({
-                      action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
+                      action: 'project_creation_initial_step_submitted',
                       properties: { onboardingPath: 'use_prompt' },
                     })
                     setStep(2)
@@ -547,7 +546,7 @@ const WizardForm = () => {
                     setFormTitle('Start from Scratch')
                     setFormDescription('Configure your new blank project')
                     sendEvent({
-                      action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
+                      action: 'project_creation_initial_step_submitted',
                       properties: { onboardingPath: 'start_blank' },
                     })
                     setStep(2)
@@ -558,7 +557,7 @@ const WizardForm = () => {
                       'First we need to create a new project to migrate your database to'
                     )
                     sendEvent({
-                      action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
+                      action: 'project_creation_initial_step_submitted',
                       properties: { onboardingPath: 'migrate' },
                     })
                     setStep(2)

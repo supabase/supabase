@@ -6,7 +6,6 @@ import { Button, cn } from 'ui'
 import { Organization } from '~/data/organizations'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import UpgradePlan from './UpgradePlan'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 interface PricingPlansProps {
   organizations?: Organization[]
@@ -29,7 +28,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
 
             const sendPricingEvent = () => {
               sendTelemetryEvent({
-                action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED,
+                action: 'www_pricing_plan_cta_clicked',
                 properties: {
                   plan: plan.name,
                   showUpgradeText: isUpgradablePlan && hasExistingOrganizations ? true : false,

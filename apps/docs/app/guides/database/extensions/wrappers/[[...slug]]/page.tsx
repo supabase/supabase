@@ -86,6 +86,13 @@ const pageMap = [
     remoteFile: 'mssql.md',
   },
   {
+    slug: 'notion',
+    meta: {
+      title: 'Notion',
+    },
+    remoteFile: 'notion.md',
+  },
+  {
     slug: 'paddle',
     meta: {
       title: 'Paddle',
