@@ -30,7 +30,6 @@ import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
@@ -396,7 +395,7 @@ const GrafanaBannerActions = ({ className }: { className?: string }) => {
           target="_blank"
           onClick={() =>
             sendEvent({
-              action: TelemetryActions.REPORTS_DATABASE_GRAFANA_BANNER_CLICKED,
+              action: 'reports_database_grafana_banner_clicked',
               groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
             })
           }
@@ -410,7 +409,7 @@ const GrafanaBannerActions = ({ className }: { className?: string }) => {
           target="_blank"
           onClick={() =>
             sendEvent({
-              action: TelemetryActions.REPORTS_DATABASE_GRAFANA_BANNER_CLICKED,
+              action: 'reports_database_grafana_banner_clicked',
               groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
             })
           }
