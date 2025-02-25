@@ -736,6 +736,50 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.rate_limit_anonymous_users'
+    title: 'auth.rate_limit_anonymous_users'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Rate limit for unauthenticated requests per minute. Controls how many requests an anonymous user can make per minute.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit_token_refresh'
+    title: 'auth.rate_limit_token_refresh'
+    tags: ['auth']
+    required: false
+    default: '150'
+    description: |
+      Rate limit for token refresh requests per minute. Controls how many token refreshes are allowed per user per minute.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit_otp'
+    title: 'auth.rate_limit_otp'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Rate limit for OTP generation requests per minute. Controls how many one-time password requests a user can make per minute.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit_verify'
+    title: 'auth.rate_limit_verify'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Rate limit for verification requests per minute. Controls how many verification attempts a user can make per minute.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
   - id: 'auth.enable_signup'
     title: 'auth.enable_signup'
     tags: ['auth']
@@ -886,6 +930,17 @@ parameters:
     description: |
       Display name used as the sender for emails sent from the application.
 
+  - id: 'auth.email.smtp.rate_limit_email_sent'
+    title: 'auth.email.smtp.rate_limit_email_sent'
+    tags: ['auth']
+    required: false
+    default: '2'
+    description: |
+      Rate limit for email sending requests per hour. Controls how many emails can be sent to a single address within an hour.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
   - id: 'auth.email.template.type.subject'
     title: 'auth.email.template.<type>.subject'
     tags: ['auth']
@@ -952,6 +1007,17 @@ parameters:
     usage: |
       [auth.sms.test_otp]
       4152127777 = "123456"
+
+  - id: 'auth.sms.rate_limit_sms_sent'
+    title: 'auth.sms.rate_limit_sms_sent'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Rate limit for SMS sending requests per hour. Controls how many SMS messages can be sent to a single phone number within an hour.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
 
   - id: 'auth.sms.provider.enabled'
     title: 'auth.sms.<provider>.enabled'
