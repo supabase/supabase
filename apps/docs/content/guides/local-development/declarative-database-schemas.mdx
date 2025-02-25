@@ -202,7 +202,7 @@ AS $$
 $$;
 ```
 
-Your schema files are run in lexicographic order by default. The order is important for declaring foreign keys between multiple tables as the parent table must be created first. For example, your `supabase` directory may end up with the following structure.
+Your schema files are run in lexicographic order by default. The order is important when you have foreign keys between multiple tables as the parent table must be created first. For example, your `supabase` directory may end up with the following structure.
 
 ```bash
 .
@@ -216,7 +216,7 @@ Your schema files are run in lexicographic order by default. The order is import
         └── 20241006112233_add_managers_table.sql
 ```
 
-If you need to specify a custom order to apply the schemas, you can arrange them in `config.toml`. Any glob patterns will evaluated, deduplicated, and sorted in lexicographic order. For example, the following pattern ensures `employees.sql` is always executed first.
+To specify a custom order for applying the schemas, you can declare them explicitly in `config.toml`. Any glob patterns will evaluated, deduplicated, and sorted in lexicographic order. For example, the following pattern ensures `employees.sql` is always executed first.
 
 ```toml supabase/config.toml
 [db.migrations]
