@@ -462,8 +462,9 @@ export const ConnectionPooling = () => {
                             </FormControl_Shadcn_>
                             <SelectContent_Shadcn_>
                               <SelectItem_Shadcn_ value="Supavisor">
-                                <div className="flex flex-col gap-y-1 items-start">
+                                <div className="flex gap-x-2 items-center">
                                   <p className="text-sm text-foreground">Supavisor</p>
+                                  <Badge>IPv4</Badge>
                                 </div>
                               </SelectItem_Shadcn_>
                               <Tooltip>
@@ -475,8 +476,9 @@ export const ConnectionPooling = () => {
                                       disablePgBouncerSelection && '!pointer-events-auto'
                                     )}
                                   >
-                                    <div className="flex flex-col gap-y-1 items-start">
+                                    <div className="flex gap-x-2 items-center">
                                       <p className="text-sm text-foreground">PgBouncer</p>
+                                      <Badge>IPv6</Badge>
                                     </div>
                                   </SelectItem_Shadcn_>
                                 </TooltipTrigger>
