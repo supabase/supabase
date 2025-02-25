@@ -5,7 +5,8 @@ import type { HTMLAttributes } from 'react'
 import { useEffect, useState } from 'react'
 
 import { useBreakpoint } from 'common'
-import { cn, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { cn, Separator, Sheet, SheetContent, SheetHeader, SheetTrigger } from 'ui'
+import { Feedback } from '../../components/Feedback'
 
 interface TocItem extends HTMLAttributes<HTMLElement> {
   label: string
@@ -18,7 +19,7 @@ export function ContributingToc({ className }: { className?: string }) {
 
   useEffect(() => {
     const headings = [
-      ...document.querySelectorAll('article.prose > h2,h3'),
+      ...document.querySelectorAll('article.prose>h2,h3'),
     ] as Array<HTMLHeadingElement>
     const tocItems = headings
       .filter((heading) => !!heading.id)
@@ -30,19 +31,13 @@ export function ContributingToc({ className }: { className?: string }) {
   }, [])
 
   return mobileToc ? (
-    <MobileToc
-      items={tocItems}
-      className={cn(
-        '[--local-top-spacing:2rem]',
-        'sticky top-[calc(var(--header-height)+var(--local-top-spacing))] right-8'
-      )}
-    />
+    <MobileToc items={tocItems} className={cn('')} />
   ) : (
     <TocBase
       items={tocItems}
       className={cn(
         '[--local-top-spacing:5rem]',
-        'border-l thin-scrollbar overflow-y-auto px-2 hidden md:block',
+        'border-l thin-scrollbar overflow-y-auto px-2 hidden lg:block',
         'col-span-3 self-start sticky',
         'top-[calc(var(--header-height)+1px+2rem)] max-h-[calc(100vh-var(--header-height)-3rem)]'
       )}
@@ -53,31 +48,76 @@ export function ContributingToc({ className }: { className?: string }) {
 function MobileToc({ items, className }: { items: Array<TocItem>; className?: string }) {
   const [open, setOpen] = useState(false)
 
+  useEffect(() => {
+    const onHashChanged = (url) => {
+      setOpen(false)
+    }
+
+    window.addEventListener('hashchange', onHashChanged)
+
+    return () => {
+      window.removeEventListener('hashchange', onHashChanged)
+    }
+  }, [])
+
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ className={cn('border rounded p-2', className)}>
-        <Menu />
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger
+        className={cn(
+          'fixed z-0 inset-0 top-auto w-full rounded-t-lg border border-b-0 p-4 bg-studio flex items-center gap-2 text-foreground-light text-sm',
+          className
+        )}
+      >
+        <Menu size={16} strokeWidth={1.5} className="text-foreground-light" />
         <span className="sr-only">
           {open ? 'Close table of contents' : 'Open table of contents'}
         </span>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ align="end" className="w-48">
-        <TocBase items={items} />
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+        <span>On this page</span>
+      </SheetTrigger>
+      <SheetContent
+        side="bottom"
+        className={cn(
+          'w-full p-0 rounded-t-lg overflow-hidden',
+          !open && 'top-[calc(100vh-100px)]'
+        )}
+      >
+        <SheetHeader className="py-0 px-4">
+          <SheetTrigger
+            className={cn(
+              'w-full py-4 flex items-center gap-2 text-foreground-light text-sm',
+              className
+            )}
+          >
+            <Menu size={16} strokeWidth={1.5} className="text-foreground-light" />
+            <span className="sr-only">
+              {open ? 'Close table of contents' : 'Open table of contents'}
+            </span>
+            <span>On this page</span>
+          </SheetTrigger>
+        </SheetHeader>
+        <div className="w-full h-full p-4 pb-12 overflow-y-auto thin-scrollbar">
+          <TocBase items={items} />
+        </div>
+      </SheetContent>
+    </Sheet>
   )
 }
 
 function TocBase({ items, className }: { items: Array<TocItem>; className?: string }) {
   return (
     <nav aria-label="Table of contents" className={cn('text-foreground-lighter', className)}>
-      <ul className="toc-menu list-none pl-5 text-[0.8rem] grid gap-2">
+      <span className="hidden lg:block font-mono text-xs uppercase text-foreground px-5 mb-6">
+        On this page
+      </span>
+      <ul className="toc-menu list-none lg:pl-5 text-[0.8rem] grid gap-2">
         {items.map((item) => (
           <li key={item.anchor} className="overflow-hidden truncate">
             <a href={`#${item.anchor}`}>{item.label}</a>
           </li>
         ))}
       </ul>
+      <Separator className="w-[calc(100%-2rem)] ml-5 my-4" />
+      <Feedback className="pl-0 lg:pl-5" />
     </nav>
   )
 }

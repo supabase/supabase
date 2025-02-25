@@ -15,7 +15,7 @@ export default async function ContributingPage() {
   return (
     <SidebarSkeleton>
       <LayoutMainContent className="pb-0 grid grid-cols-12 relative gap-4">
-        <article className="prose max-w-none relative transition-all ease-out duration-100 col-span-12 md:col-span-9">
+        <article className="prose max-w-none relative transition-all ease-out duration-100 col-span-12 lg:col-span-9">
           <MDXProviderGuides>
             <MDXRemoteBase source={content} />
           </MDXProviderGuides>
