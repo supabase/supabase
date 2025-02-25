@@ -372,7 +372,12 @@ const PlanUpdateSidePanel = () => {
           billingPartner={billingPartner}
           subscription={subscription}
           slug={slug}
-          currentPlanMeta={availablePlans.find((p) => p.id === subscription?.plan?.id)}
+          currentPlanMeta={{
+            ...availablePlans.find((p) => p.id === subscription?.plan?.id),
+            features:
+              subscriptionsPlans.find((plan) => plan.id === `tier_${subscription?.plan?.id}`)
+                ?.features || [],
+          }}
         />
       ) : (
         <Modal

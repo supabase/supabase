@@ -46,6 +46,15 @@ const PLAN_HEADINGS = {
 
 type PlanHeadingKey = keyof typeof PLAN_HEADINGS
 
+// Add downgrade headings
+const DOWNGRADE_PLAN_HEADINGS = {
+  tier_free: 'the Free plan with limited resources and active projects',
+  tier_pro: 'the Pro plan',
+  default: 'to a lower plan',
+} as const
+
+type DowngradePlanHeadingKey = keyof typeof DOWNGRADE_PLAN_HEADINGS
+
 interface Props {
   selectedTier: 'tier_free' | 'tier_pro' | 'tier_team' | undefined
   onClose: () => void
@@ -54,7 +63,7 @@ interface Props {
   subscriptionPreviewError: any
   subscriptionPreviewIsLoading: boolean
   subscriptionPreviewInitialized: boolean
-  subscriptionPreview: OrganizationBillingSubscriptionPreviewResponse
+  subscriptionPreview: OrganizationBillingSubscriptionPreviewResponse | undefined
   billingViaPartner: boolean
   billingPartner?: string
   selectedOrganization: any
@@ -92,7 +101,9 @@ const SubscriptionPlanUpdateDialog = ({
   const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onSuccess: () => {
-        toast.success(`Successfully updated subscription to ${subscriptionPlanMeta?.name}!`)
+        toast.success(
+          `Successfully ${planMeta?.change_type === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
+        )
         onClose()
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
       },
@@ -135,6 +146,22 @@ const SubscriptionPlanUpdateDialog = ({
   const features = subscriptionPlanMeta?.features?.[0]?.features || []
   const topFeatures = features
 
+  // Get current plan features for downgrade comparison
+  const currentPlanFeatures = currentPlanMeta?.features?.[0]?.features || []
+
+  // Features that will be lost when downgrading
+  const featuresToLose =
+    planMeta?.change_type === 'downgrade'
+      ? currentPlanFeatures.filter((feature: string | [string, ...any[]]) => {
+          const featureStr = typeof feature === 'string' ? feature : feature[0]
+          // Check if this feature exists in the new plan
+          return !topFeatures.some((newFeature: string | [string, ...any[]]) => {
+            const newFeatureStr = typeof newFeature === 'string' ? newFeature : newFeature[0]
+            return newFeatureStr === featureStr
+          })
+        })
+      : []
+
   return (
     <Dialog
       open={selectedTier !== undefined && selectedTier !== 'tier_free'}
@@ -148,8 +175,11 @@ const SubscriptionPlanUpdateDialog = ({
           <div className="p-8 pb-8 flex flex-col">
             <div className="flex-1">
               <h3 className="text-lg font-medium mb-4">
-                Upgrade {selectedOrganization.name} to{' '}
-                {PLAN_HEADINGS[(selectedTier as PlanHeadingKey) || 'default']}
+                {planMeta?.change_type === 'downgrade' ? 'Downgrade' : 'Upgrade'}{' '}
+                {selectedOrganization.name} to{' '}
+                {planMeta?.change_type === 'downgrade'
+                  ? DOWNGRADE_PLAN_HEADINGS[(selectedTier as DowngradePlanHeadingKey) || 'default']
+                  : PLAN_HEADINGS[(selectedTier as PlanHeadingKey) || 'default']}
               </h3>
 
               {subscriptionPreviewIsLoading && (
@@ -191,7 +221,7 @@ const SubscriptionPlanUpdateDialog = ({
                             <TableRow>
                               <TableCell className="py-2 pl-0 flex items-center gap-1">
                                 <span>{subscriptionPlanMeta?.name} Plan</span>
-                                <Badge variant={'brand'} size={'small'}>
+                                <Badge variant={'brand'} size={'small'} className="ml-1">
                                   New
                                 </Badge>
                               </TableCell>
@@ -265,7 +295,7 @@ const SubscriptionPlanUpdateDialog = ({
                   <HoverCard>
                     <HoverCardTrigger asChild>
                       <Card className="cursor-help text-sm">
-                        <CardContent className="flex items-center gap-2 py-2 px-3">
+                        <CardContent className="flex items-center gap-2 py-2 px-3 text-foreground-light hover:text-foreground">
                           <InfoIcon strokeWidth={1.5} size={16} className="text-foreground-light" />
                           Monthly invoice estimate is{' '}
                           {formatCurrency(
@@ -305,18 +335,19 @@ const SubscriptionPlanUpdateDialog = ({
                               {/* Non-compute items and Projects list */}
                               {(() => {
                                 // Combine all compute-related projects
-                                const computeItems = subscriptionPreview.breakdown.filter(
-                                  (item) =>
-                                    item.description?.toLowerCase().includes('compute') &&
-                                    item.breakdown?.length > 0
-                                )
+                                const computeItems =
+                                  subscriptionPreview?.breakdown?.filter(
+                                    (item) =>
+                                      item.description?.toLowerCase().includes('compute') &&
+                                      item.breakdown?.length > 0
+                                  ) || []
 
                                 const computeCreditsItem =
-                                  subscriptionPreview.breakdown.find((item) =>
+                                  subscriptionPreview?.breakdown?.find((item) =>
                                     item.description.startsWith('Compute Credits')
                                   ) ?? null
 
-                                const planItem = subscriptionPreview.breakdown.find((item) =>
+                                const planItem = subscriptionPreview?.breakdown?.find((item) =>
                                   item.description?.toLowerCase().includes('plan')
                                 )
 
@@ -330,11 +361,12 @@ const SubscriptionPlanUpdateDialog = ({
                                   }))
                                 )
 
-                                const otherItems = subscriptionPreview.breakdown.filter(
-                                  (item) =>
-                                    !item.description?.toLowerCase().includes('compute') &&
-                                    !item.description?.toLowerCase().includes('plan')
-                                )
+                                const otherItems =
+                                  subscriptionPreview?.breakdown?.filter(
+                                    (item) =>
+                                      !item.description?.toLowerCase().includes('compute') &&
+                                      !item.description?.toLowerCase().includes('plan')
+                                  ) || []
 
                                 const content = (
                                   <>
@@ -353,9 +385,8 @@ const SubscriptionPlanUpdateDialog = ({
                                         <TableRow className="text-foreground-light">
                                           <TableCell className="!py-2 px-0 flex items-center gap-1">
                                             <span>Compute</span>
-                                            <InfoTooltip className="max-w-sm">
-                                              {' '}
-                                              <p className="prose text-xs">
+                                            <InfoTooltip className="max-w-sm p-3">
+                                              <p className="prose text-xs mb-2">
                                                 Each project on a paid plan is a dedicated server
                                                 running 24/7 with no pausing. The first project is
                                                 covered by Compute Credits. Additional projects will
@@ -373,13 +404,13 @@ const SubscriptionPlanUpdateDialog = ({
                                               </p>
                                               {subscription?.plan?.id === 'free' && (
                                                 <>
-                                                  <p className="text-sm text-foreground-light mb-4">
+                                                  <p className="text-xs text-foreground-light mb-3">
                                                     Mixing paid and non-paid projects in a single
                                                     organization is not possible. If you want
                                                     projects to be on the Free Plan, use self-serve
                                                     project transfers.
                                                   </p>
-                                                  <div className="space-x-3 mt-2">
+                                                  <div className="space-x-3">
                                                     <Button
                                                       asChild
                                                       type="default"
@@ -485,10 +516,10 @@ const SubscriptionPlanUpdateDialog = ({
                                 <TableCell className="text-right font-medium py-2 px-0">
                                   {formatCurrency(
                                     Math.round(
-                                      subscriptionPreview.breakdown.reduce(
-                                        (prev: number, cur) => prev + cur.total_price,
+                                      subscriptionPreview?.breakdown?.reduce(
+                                        (prev, cur) => prev + cur.total_price,
                                         0
-                                      )
+                                      ) ?? 0
                                     ) ?? 0
                                   )}
                                 </TableCell>
@@ -550,33 +581,59 @@ const SubscriptionPlanUpdateDialog = ({
 
           {/* Right Column */}
           <div className="bg-surface-100 p-8 flex flex-col border-l">
-            {topFeatures.length > 0 && (
-              <div className="mb-4">
-                <h3 className="text-sm mb-2">Upgrade features</h3>
-
-                <div className="space-y-2 mb-4 text-foreground-light">
-                  {topFeatures.map((feature: string | [string, ...any[]]) => (
-                    <div
-                      key={typeof feature === 'string' ? feature : feature[0]}
-                      className="flex items-center gap-2"
-                    >
-                      <div className="w-4">
-                        <Check className="h-3 w-3 text-brand" strokeWidth={3} />
-                      </div>
-                      <p className="text-sm">
-                        {typeof feature === 'string' ? feature : feature[0]}
-                      </p>
+            {planMeta?.change_type === 'downgrade'
+              ? featuresToLose.length > 0 && (
+                  <div className="mb-4">
+                    <h3 className="text-sm mb-1">Features you'll lose</h3>
+                    <p className="text-xs text-foreground-light mb-4">
+                      Please review this carefully before downgrading.
+                    </p>
+                    <div className="space-y-2 mb-4 text-foreground-light">
+                      {featuresToLose.map((feature: string | [string, ...any[]]) => (
+                        <div
+                          key={typeof feature === 'string' ? feature : feature[0]}
+                          className="flex items-center gap-2"
+                        >
+                          <div className="w-4">
+                            <InfoIcon className="h-3 w-3 text-amber-900" strokeWidth={3} />
+                          </div>
+                          <p className="text-sm">
+                            {typeof feature === 'string' ? feature : feature[0]}
+                          </p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )
+              : topFeatures.length > 0 && (
+                  <div className="mb-4">
+                    <h3 className="text-sm mb-2">Upgrade features</h3>
+
+                    <div className="space-y-2 mb-4 text-foreground-light">
+                      {topFeatures.map((feature: string | [string, ...any[]]) => (
+                        <div
+                          key={typeof feature === 'string' ? feature : feature[0]}
+                          className="flex items-center gap-2"
+                        >
+                          <div className="w-4">
+                            <Check className="h-3 w-3 text-brand" strokeWidth={3} />
+                          </div>
+                          <p className="text-sm">
+                            {typeof feature === 'string' ? feature : feature[0]}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+            {planMeta?.change_type !== 'downgrade' && (
+              <div className="border-t pt-6">
+                <blockquote className="text-sm text-foreground-light italic">
+                  {testimonialTweet.text}
+                  <div className="mt-2 text-foreground">— @{testimonialTweet.handle}</div>
+                </blockquote>
               </div>
             )}
-            <div className="border-t pt-6">
-              <blockquote className="text-sm text-foreground-light italic">
-                {testimonialTweet.text}
-                <div className="mt-2 text-foreground">— @{testimonialTweet.handle}</div>
-              </blockquote>
-            </div>
           </div>
         </div>
       </DialogContent>
