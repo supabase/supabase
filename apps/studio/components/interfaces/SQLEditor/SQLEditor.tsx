@@ -9,7 +9,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
@@ -317,7 +316,7 @@ export const SQLEditor = () => {
         })
 
         sendEvent({
-          action: TelemetryActions.SQL_EDITOR_QUERY_RUN_BUTTON_CLICKED,
+          action: 'sql_editor_query_run_button_clicked',
           groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
         })
       }
@@ -418,7 +417,7 @@ export const SQLEditor = () => {
       }
 
       sendEvent({
-        action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
+        action: 'assistant_sql_diff_handler_evaluated',
         properties: { handlerAccepted: true },
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
@@ -443,7 +442,7 @@ export const SQLEditor = () => {
 
   const discardAiHandler = useCallback(() => {
     sendEvent({
-      action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
+      action: 'assistant_sql_diff_handler_evaluated',
       properties: { handlerAccepted: false },
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
