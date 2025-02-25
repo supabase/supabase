@@ -222,11 +222,6 @@ export const ConnectionPanel = ({
               {ipv4Status.description && (
                 <span className="text-xs text-foreground-lighter">{ipv4Status.description}</span>
               )}
-              {ipv4Status.type === 'error' && (
-                <span className="text-xs text-foreground-lighter">
-                  Use Session Pooler if on a IPv4 network or purchase IPv4 addon
-                </span>
-              )}
               {ipv4Status.link && (
                 <div className="mt-2">
                   <Button asChild type="default" size="tiny">
