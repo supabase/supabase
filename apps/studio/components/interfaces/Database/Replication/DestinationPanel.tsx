@@ -43,6 +43,7 @@ import NewPublicationPanel from './NewPublicationPanel'
 import { useState, useMemo, useEffect } from 'react'
 import { useReplicationSinkByIdQuery } from 'data/replication/sink-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
+import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 
 interface DestinationPanelProps {
   visible: boolean
@@ -68,6 +69,7 @@ const DestinationPanel = ({
   const { mutateAsync: createSink, isLoading: creatingSink } = useCreateSinkMutation()
   const { mutateAsync: createPipeline, isLoading: creatingPipeline } = useCreatePipelineMutation()
   const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
+  const { mutateAsync: stopPipeline, isLoading: stoppingPipeline } = useStopPipelineMutation()
   const { mutateAsync: updateSink } = useUpdateSinkMutation()
   const { mutateAsync: updatePipeline } = useUpdatePipelineMutation()
   const { data: publications, isLoading: loadingPublications } = useReplicationPublicationsQuery({
@@ -130,6 +132,10 @@ const DestinationPanel = ({
           console.error('Source id is required')
           return
         }
+        if (!existingDestination.pipelineId) {
+          console.error('Pipeline id is required')
+          return
+        }
         // Update existing destination
         await updateSink({
           projectRef,
@@ -149,6 +155,11 @@ const DestinationPanel = ({
             publicationName: data.publicationName,
             config: { config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs } },
           })
+        }
+        if (data.enabled) {
+          await startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
+        } else {
+          await stopPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         }
 
         toast.success('Successfully updated destination')
