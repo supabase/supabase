@@ -129,8 +129,8 @@ const IPv4SidePanel = () => {
           {isPgBouncerEnabled ? (
             <Admonition
               type="default"
-              title="PgBouncer does not support IPv4 addresses"
-              description="If you are connecting to your database via the PgBouncer connection pooler, you may need this add-on if your network does not support communicating via IPv6. Alternatively, you may consider switching to Supavisor which support IPv4 addresses."
+              title="The Dedicated Pooler does not support IPv4 addresses"
+              description="If you are connecting to your database via the Dedicated Pooler, you may need this add-on if your network does not support communicating via IPv6. Alternatively, you may consider switching to Supavisor which support IPv4 addresses."
             >
               <Button asChild type="default" className="mt-2">
                 <Link
