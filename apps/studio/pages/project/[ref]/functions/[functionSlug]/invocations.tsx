@@ -19,13 +19,14 @@ export const LogPage: NextPageWithLayout = () => {
   if (selectedFunction === undefined || isLoading) return null
 
   return (
-    <LogsPreviewer
-      condensedLayout
-      projectRef={ref as string}
-      queryType={'fn_edge'}
-      filterOverride={{ function_id: selectedFunction.id }}
-      filterPanelClassName="px-0"
-    />
+    <div className="flex-1">
+      <LogsPreviewer
+        condensedLayout
+        projectRef={ref as string}
+        queryType={'fn_edge'}
+        filterOverride={{ function_id: selectedFunction.id }}
+      />
+    </div>
   )
 }
 
