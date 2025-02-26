@@ -1,20 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateFunction, DeleteFunction } from 'components/interfaces/Database'
 import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useAppStateSnapshot } from 'state/app-state'
+import type { NextPageWithLayout } from 'types'
 
-const FunctionsPage: NextPageWithLayout = () => {
+const DatabaseFunctionsPage: NextPageWithLayout = () => {
   const [selectedFunction, setSelectedFunction] = useState<DatabaseFunction | undefined>()
   const [showCreateFunctionForm, setShowCreateFunctionForm] = useState(false)
   const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState(false)
@@ -101,10 +101,10 @@ $$;`,
   )
 }
 
-FunctionsPage.getLayout = (page) => (
+DatabaseFunctionsPage.getLayout = (page) => (
   <DefaultLayout>
     <DatabaseLayout title="Database">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 
-export default FunctionsPage
+export default DatabaseFunctionsPage
