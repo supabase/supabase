@@ -29,7 +29,9 @@ Deno.serve(async (req: Request) => {
 })
 ```
 
-Importantly, this is done _inside_ the `Deno.serve()` callback argument, so that the Authorization header is set for each request.
+Important notes to consider:
+* This is done _inside_ the `Deno.serve()` callback argument, so that the Authorization header is set for each request.
+* Use `Deno.env.get('SUPABASE_URL')` to get the URL associated with your project. Using a value such as `http://localhost:54321` for local development will fail due to Docker containerization.
 
 ## Fetching the user
 
