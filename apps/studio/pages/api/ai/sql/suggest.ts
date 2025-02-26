@@ -1,8 +1,8 @@
 import { StreamingTextResponse } from 'ai'
 import { chatRlsPolicy } from 'ai-commands/edge'
+import { DatabasePoliciesData } from 'data/database-policies/database-policies-query'
 import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
-import { DatabasePoliciesData } from 'data/database-policies/database-policies-query'
 
 export const config = {
   runtime: 'edge',
