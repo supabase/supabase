@@ -82,6 +82,10 @@ const levelsData = {
     icon: 'platform',
     name: 'Platform',
   },
+  contributing: {
+    icon: 'contributing',
+    name: 'Contributing',
+  },
   resources: {
     icon: 'resources',
     name: 'Resources',
@@ -376,6 +380,8 @@ function SidebarSkeleton({
   const menuId = _menuId ?? getMenuId(pathname)
 
   const mobileMenuOpen = useMenuMobileOpen()
+
+  console.log('menuName', menuName, menuId)
 
   return (
     <div className={cn('flex flex-row h-full relative', className)}>
