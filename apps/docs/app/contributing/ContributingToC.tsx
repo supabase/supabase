@@ -49,7 +49,7 @@ function MobileToc({ items, className }: { items: Array<TocItem>; className?: st
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    const onHashChanged = (url) => {
+    const onHashChanged = (_) => {
       setOpen(false)
     }
 
