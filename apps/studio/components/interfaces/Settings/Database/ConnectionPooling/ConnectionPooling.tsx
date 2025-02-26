@@ -198,7 +198,7 @@ export const ConnectionPooling = () => {
   // [Joshen] These are labels just for user-facing texts
   const formattedCurrentPooler =
     currentPooler === 'PgBouncer' ? 'the Dedicated Pooler' : currentPooler
-  const formattedTargetPooler = type === 'PgBouncer' ? 'the Dedicated Pooler' : currentPooler
+  const formattedTargetPooler = type === 'PgBouncer' ? 'the Dedicated Pooler' : type
 
   const hasIpv4Addon = !!addons?.selected_addons.find((addon) => addon.type === 'ipv4')
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
