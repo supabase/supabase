@@ -16,11 +16,15 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLints } from 'hooks/misc/useLints'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useFlag } from 'hooks/ui/useFlag'
 import { Home } from 'icons'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
@@ -39,6 +43,7 @@ import {
   useSidebar,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
+import { useIsAPIDocsSidePanelEnabled } from './App/FeaturePreview/FeaturePreviewContext'
 import { ThemeDropdown } from './ThemeDropdown'
 import { UserDropdown } from './UserDropdown'
 
@@ -237,10 +242,29 @@ export function SideBarNavLink({
   )
 }
 
+const ActiveDot = (errorArray: any[], warningArray: any[]) => {
+  return (
+    <div
+      className={cn(
+        'absolute flex h-2 w-2 left-[21px] group-data-[state=expanded]:left-[22.25px] top-2 z-10 rounded-full',
+        errorArray.length > 0
+          ? 'bg-destructive-600'
+          : warningArray.length > 0
+            ? 'bg-warning-600'
+            : 'bg-transparent'
+      )}
+    />
+  )
+}
+
 function ProjectLinks() {
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
+  const snap = useAppStateSnapshot()
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const { securityLints, errorLints } = useLints()
+  const showWarehouse = useFlag('warehouse')
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -302,13 +326,53 @@ function ProjectLinks() {
       </SidebarGroup>
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
-        {otherRoutes.map((route, i) => (
-          <SideBarNavLink
-            key={`other-routes-${i}`}
-            route={route}
-            active={activeRoute === route.key}
-          />
-        ))}
+        {otherRoutes.map((route, i) => {
+          if (route.key === 'api' && isNewAPIDocsEnabled) {
+            return (
+              <SideBarNavLink
+                key={`other-routes-${i}`}
+                route={{
+                  label: route.label,
+                  icon: route.icon,
+                  key: route.key,
+                }}
+                onClick={() => {
+                  snap.setShowProjectApiDocs(true)
+                }}
+              />
+            )
+          } else if (route.key === 'advisors') {
+            return (
+              <div className="relative" key={route.key}>
+                {ActiveDot(errorLints, securityLints)}
+                <SideBarNavLink
+                  key={`other-routes-${i}`}
+                  route={route}
+                  active={activeRoute === route.key}
+                />
+              </div>
+            )
+          } else if (route.key === 'logs') {
+            // TODO: Undo this when warehouse flag is removed
+            const label = showWarehouse ? 'Logs & Analytics' : route.label
+            const newRoute = { ...route, label }
+            return (
+              <SideBarNavLink
+                key={`other-routes-${i}`}
+                route={newRoute}
+                active={activeRoute === newRoute.key}
+              />
+            )
+          } else {
+            return (
+              <SideBarNavLink
+                key={`other-routes-${i}`}
+                route={route}
+                active={activeRoute === route.key}
+              />
+            )
+          }
+        })}
       </SidebarGroup>
       {/* Settings routes to be added in with project/org nav */}
       {/* <SidebarGroup className="gap-0.5">
