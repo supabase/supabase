@@ -82,8 +82,10 @@ const AddNewSecretForm = () => {
     }
 
     if (pairs.length) {
-      // Replace all fields with new pairs
-      form.reset({ secrets: pairs })
+      const currentSecrets = form.getValues('secrets')
+      // Filter out any empty pairs before combining
+      const nonEmptySecrets = currentSecrets.filter((secret) => secret.name || secret.value)
+      form.setValue('secrets', [...nonEmptySecrets, ...pairs])
     }
   }
 
@@ -153,7 +155,7 @@ const AddNewSecretForm = () => {
 
                 <Button
                   type="default"
-                  className="self-end h-9 flex"
+                  className="h-[34px] mt-6"
                   icon={<MinusCircle />}
                   onClick={() => (fields.length > 1 ? remove(index) : form.reset(defaultValues))}
                 />

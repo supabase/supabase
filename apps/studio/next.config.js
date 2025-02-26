@@ -460,6 +460,11 @@ const nextConfig = {
         source: '/project/:ref/settings/warehouse',
         destination: '/project/:ref/settings/general',
       },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/functions',
+        destination: '/project/:ref/functions/secrets',
+      },
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
             {
