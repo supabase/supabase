@@ -365,6 +365,7 @@ export enum LogsTableName {
   STORAGE = 'storage_logs',
   POSTGREST = 'postgrest_logs',
   SUPAVISOR = 'supavisor_logs',
+  PGBOUNCER = 'pgbouncer_logs',
   WAREHOUSE = 'warehouse_logs',
   PG_CRON = 'pg_cron_logs',
 }
