@@ -1,4 +1,6 @@
+import { ChevronLeft } from 'lucide-react'
 import { Fragment, ReactNode } from 'react'
+
 import { useParams } from 'common'
 import { cn } from 'ui'
 import {
@@ -10,7 +12,6 @@ import {
   BreadcrumbSeparator,
 } from 'ui/src/components/shadcn/ui/breadcrumb'
 import { ScaffoldDescription, ScaffoldTitle } from '../Scaffold'
-import { ChevronLeft } from 'lucide-react'
 
 interface PageHeaderProps {
   title?: string
