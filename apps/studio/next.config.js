@@ -223,11 +223,6 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/project/:ref/database/replication',
-        destination: '/project/:ref/database/publications',
-        permanent: true,
-      },
-      {
         source: '/project/:ref/database/graphiql',
         destination: '/project/:ref/api/graphiql',
         permanent: true,

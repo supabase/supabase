@@ -3100,9 +3100,11 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    /** Gets a pipeline by id */
+    get: operations['ReplicationPipelinesController_getPipeline']
     put?: never
-    post?: never
+    /** Updates a pipeline */
+    post: operations['ReplicationPipelinesController_updatePipeline']
     /** Deletes a pipeline */
     delete: operations['ReplicationPipelinesController_deletePipeline']
     options?: never
@@ -3186,9 +3188,11 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    /** Gets a sink by id */
+    get: operations['ReplicationSinksController_getSink']
     put?: never
-    post?: never
+    /** Updates a sink */
+    post: operations['ReplicationSinksController_updateSink']
     /** Deletes a sink */
     delete: operations['ReplicationSinksController_deleteSink']
     options?: never
@@ -4479,7 +4483,7 @@ export interface components {
     database_type: 'PRIMARY' | 'READ_REPLICA'
     DatabaseDetailResponse: {
       /** @enum {string} */
-      cloud_provider: 'AWS' | 'FLY'
+      cloud_provider: 'AWS' | 'AWS_K8S' | 'FLY'
       connectionString: string
       db_host: string
       db_name: string
@@ -6076,6 +6080,22 @@ export interface components {
      * @enum {string}
      */
     ReleaseChannel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+    ReplicationPipelineResponse: {
+      config: {
+        config: {
+          max_fill_secs: number
+          max_size: number
+        }
+      }
+      id: number
+      publication_name: string
+      replicator_id: number
+      sink_id: number
+      sink_name: string
+      source_id: number
+      source_name: string
+      tenant_id: string
+    }
     ReplicationPipelinesResponse: {
       pipelines: {
         config: {
@@ -6106,6 +6126,18 @@ export interface components {
           schema: string
         }[]
       }[]
+    }
+    ReplicationSinkResponse: {
+      config: {
+        big_query: {
+          dataset_id: string
+          project_id: string
+          service_account_key: string
+        }
+      }
+      id: number
+      name: string
+      tenant_id: string
     }
     ReplicationSinksResponse: {
       sinks: {
@@ -6888,6 +6920,31 @@ export interface components {
       max_joins_per_second?: number
       /** @description Whether to only allow private channels */
       private_only?: boolean
+    }
+    UpdateReplicationPipelineBody: {
+      /** @description Pipeline config */
+      config?: {
+        config: {
+          max_fill_secs: number
+          max_size: number
+        }
+      }
+      /** @description Publication name */
+      publication_name?: string
+      /** @description Sink id */
+      sink_id?: number
+      /** @description Source id */
+      source_id?: number
+    }
+    UpdateReplicationSinkBody: {
+      /** @description BigQuery dataset id */
+      dataset_id: string
+      /** @description BigQuery project id */
+      project_id: string
+      /** @description BigQuery service account key */
+      service_account_key: string
+      /** @description Sink name */
+      sink_name: string
     }
     UpdateSchemaBody: {
       name?: string
@@ -15783,6 +15840,79 @@ export interface operations {
       }
     }
   }
+  ReplicationPipelinesController_getPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        pipeline_id: number
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returns the pipeline. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationPipelineResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get pipeline */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_updatePipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        pipeline_id: number
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateReplicationPipelineBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update pipeline */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ReplicationPipelinesController_deletePipeline: {
     parameters: {
       query?: never
@@ -15982,6 +16112,79 @@ export interface operations {
         content?: never
       }
       /** @description Failed to create sink */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSinksController_getSink: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+        sink_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returns the sink. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationSinkResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get sink */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSinksController_updateSink: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+        sink_id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateReplicationSinkBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update sink */
       500: {
         headers: {
           [name: string]: unknown
