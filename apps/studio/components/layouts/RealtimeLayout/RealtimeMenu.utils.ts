@@ -25,6 +25,12 @@ export const generateRealtimeMenu = (project: Project): ProductMenuGroup[] => {
           url: `/project/${ref}/realtime/policies`,
           items: [],
         },
+        {
+          name: 'Settings',
+          key: 'settings',
+          url: `/project/${ref}/realtime/settings`,
+          items: [],
+        },
       ],
     },
   ]

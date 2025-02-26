@@ -28,6 +28,13 @@ overrides:
 importers:
 
   .:
+    dependencies:
+      '@supabase/shared-types':
+        specifier: 0.1.80
+        version: 0.1.80
+      studio:
+        specifier: ^0.13.5
+        version: 0.13.5(supports-color@8.1.1)
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -587,8 +594,8 @@ importers:
         specifier: 'catalog:'
         version: 2.11.3
       '@supabase/shared-types':
-        specifier: 0.1.74
-        version: 0.1.74
+        specifier: 0.1.80
+        version: 0.1.80
       '@supabase/sql-to-rest':
         specifier: ^0.1.6
         version: 0.1.6(encoding@0.1.13)(supports-color@8.1.1)
@@ -5299,8 +5306,8 @@ packages:
   '@supabase/realtime-js@2.11.3':
     resolution: {integrity: sha512-rMMGtZy2MaSBlNXP5hJZx+ij5JtQGPuBQ7/izE1oKlR1A6SzbN0VWeFTdmDHVa1gcJ72zpQAjbSmByIG6uz/eA==}
 
-  '@supabase/shared-types@0.1.74':
-    resolution: {integrity: sha512-vYbNA6JtV4PNTSuyRQsRBn6v99WMKCBN5wgS2Ezl3n4EGgCoJCvHyQFbNEwbf1vvZVum/j1bAAK3n3io1jxiqA==}
+  '@supabase/shared-types@0.1.80':
+    resolution: {integrity: sha512-U2ACit34Up5OzB53dthb50YVGcAUzkuWn0Wq9fXWDdfl4Wlp+euWKSSVUMUIQo+bf2phu3V/PmVHEWR6dpls1g==}
 
   '@supabase/sql-to-rest@0.1.6':
     resolution: {integrity: sha512-06KgjeINtc6405XQvfnchBE1azEsU8G2NElfadmvVHKmHa5l2bFzjbtFbpaYgpgTzccHlcDmBaCgedVf2Gyl8Q==}
@@ -6549,6 +6556,9 @@ packages:
   bintrees@1.0.2:
     resolution: {integrity: sha512-VOMgTMwjAaUG580SXn3LacVgjurrbMme7ZZNYGSSV7mmtY6QQRh0Eg3pwIcntQ77DErK1L0NxkbetjcoXzVwKw==}
 
+  bluebird@3.7.2:
+    resolution: {integrity: sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==}
+
   boolbase@1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
 
@@ -7179,6 +7189,14 @@ packages:
 
   debounce@1.2.1:
     resolution: {integrity: sha512-XRRe6Glud4rd/ZGQfiV1ruXSfbvfJedlV9Y6zOlP+2K04vBYiJEte6stfFkCP03aMnY5tsipamumUjL14fofug==}
+
+  debug@2.6.9:
+    resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
 
   debug@3.2.7:
     resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
@@ -8298,6 +8316,9 @@ packages:
     resolution: {integrity: sha512-vafaFqs8MZkRrSX7sFVUdo3ap/eNiLnb4IakshzvP56X5Nr1iGKAIqdX6tMlm6HcNRIkr6AxO5jFEoJzzpT8aQ==}
     engines: {node: '>=0.4.7'}
     hasBin: true
+
+  harmony-proxy@1.0.1:
+    resolution: {integrity: sha512-Fb9dzGn1Fx7BAYqSGg0SPscTB+CBL2YJJfTzdGM0x2zXFP6CaUnEiyjoAw8i+Qsmw9N0TknUJ+stII2pFpXL0g==}
 
   has-bigints@1.0.2:
     resolution: {integrity: sha512-tSvCKtBr9lkF0Ex0aQiP9N+OpV4zi2r/Nee5VkRDbaqv35RLYMzbwQfFSZZH0kR+Rd6302UJZ2p/bJCEoR3VoQ==}
@@ -10021,6 +10042,9 @@ packages:
   mrmime@2.0.0:
     resolution: {integrity: sha512-eu38+hdgojoyq63s+yTpN4XMBdt5l8HhMhc4VKLO9KM5caLIBvUm4thi7fFaxyTmCKeNnXZ5pAlBwCUnhA09uw==}
     engines: {node: '>=10'}
+
+  ms@2.0.0:
+    resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -12059,6 +12083,9 @@ packages:
 
   strnum@1.0.5:
     resolution: {integrity: sha512-J8bbNyKKXl5qYcR36TIO8W3mVGVHrmmxsd5PAItGkmyzwJvybiw2IVq5nqd0i4LSNSkB/sx9VHllbfFdr9k1JA==}
+
+  studio@0.13.5:
+    resolution: {integrity: sha512-00XlL97dUYaWk7FU+RQ7Pqvd83mWsuTc7cJVY4UYP8znIDTz2cBZ7dIeavWN7bBgMBUevKi9qc85dZlg8gmhFQ==}
 
   style-dictionary@3.8.0:
     resolution: {integrity: sha512-wHlB/f5eO3mDcYv6WtOz6gvQC477jBKrwuIXe+PtHskTCBsJdAOvL8hCquczJxDui2TnwpeNE+2msK91JJomZg==}
@@ -17584,7 +17611,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@supabase/shared-types@0.1.74': {}
+  '@supabase/shared-types@0.1.80': {}
 
   '@supabase/sql-to-rest@0.1.6(encoding@0.1.13)(supports-color@8.1.1)':
     dependencies:
@@ -19073,6 +19100,8 @@ snapshots:
 
   bintrees@1.0.2: {}
 
+  bluebird@3.7.2: {}
+
   boolbase@1.0.0: {}
 
   bowser@2.11.0: {}
@@ -19794,6 +19823,12 @@ snapshots:
   debounce-promise@3.1.2: {}
 
   debounce@1.2.1: {}
+
+  debug@2.6.9(supports-color@8.1.1):
+    dependencies:
+      ms: 2.0.0
+    optionalDependencies:
+      supports-color: 8.1.1
 
   debug@3.2.7(supports-color@8.1.1):
     dependencies:
@@ -21188,6 +21223,8 @@ snapshots:
       wordwrap: 1.0.0
     optionalDependencies:
       uglify-js: 3.17.4
+
+  harmony-proxy@1.0.1: {}
 
   has-bigints@1.0.2: {}
 
@@ -23847,6 +23884,8 @@ snapshots:
 
   mrmime@2.0.0: {}
 
+  ms@2.0.0: {}
+
   ms@2.1.3: {}
 
   msw@2.4.11(typescript@5.5.2):
@@ -26321,6 +26360,14 @@ snapshots:
   strip-json-comments@3.1.1: {}
 
   strnum@1.0.5: {}
+
+  studio@0.13.5(supports-color@8.1.1):
+    dependencies:
+      bluebird: 3.7.2
+      debug: 2.6.9(supports-color@8.1.1)
+      harmony-proxy: 1.0.1
+    transitivePeerDependencies:
+      - supports-color
 
   style-dictionary@3.8.0:
     dependencies:
