@@ -7,8 +7,8 @@ import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import FunctionsLayout from 'components/layouts/FunctionsLayout/FunctionsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import AreaChart from 'components/ui/Charts/AreaChart'
 import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import NoPermission from 'components/ui/NoPermission'
@@ -343,7 +343,7 @@ const PageLayout: NextPageWithLayout = () => {
 
 PageLayout.getLayout = (page) => (
   <DefaultLayout>
-    <FunctionsLayout>{page}</FunctionsLayout>
+    <EdgeFunctionDetailsLayout>{page}</EdgeFunctionDetailsLayout>
   </DefaultLayout>
 )
 
