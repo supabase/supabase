@@ -19,7 +19,7 @@ export function ContributingToc({ className }: { className?: string }) {
 
   useEffect(() => {
     const headings = [
-      ...document.querySelectorAll('article.prose>h2,h3'),
+      ...document.querySelectorAll('article.prose > h2,h3:not(#feedback-title)'),
     ] as Array<HTMLHeadingElement>
     const tocItems = headings
       .filter((heading) => !!heading.id)
@@ -39,7 +39,8 @@ export function ContributingToc({ className }: { className?: string }) {
         '[--local-top-spacing:5rem]',
         'border-l thin-scrollbar overflow-y-auto px-2 hidden lg:block',
         'col-span-3 self-start sticky',
-        'top-[calc(var(--header-height)+1px+2rem)] max-h-[calc(100vh-var(--header-height)-3rem)]'
+        'top-[calc(var(--header-height)+1px+2rem)] max-h-[calc(100vh-var(--header-height)-3rem)]',
+        className
       )}
     />
   )
