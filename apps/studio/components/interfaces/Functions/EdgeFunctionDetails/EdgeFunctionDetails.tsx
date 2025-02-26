@@ -35,13 +35,13 @@ import {
   FormField_Shadcn_,
   Input,
   Input_Shadcn_,
-  Modal,
   Switch,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import CommandRender from '../CommandRender'
 import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
@@ -271,25 +271,22 @@ const EdgeFunctionDetails = () => {
           </Alert_Shadcn_>
         </ScaffoldSection>
 
-        <Modal
-          size="small"
-          alignFooter="right"
-          header={<h3>Confirm to delete {selectedFunction?.name}</h3>}
+        <ConfirmationModal
           visible={showDeleteModal}
           loading={isDeleting}
+          variant="destructive"
+          confirmLabel="Delete"
+          confirmLabelLoading="Deleting"
+          title={`Confirm to delete ${selectedFunction?.name}`}
           onCancel={() => setShowDeleteModal(false)}
           onConfirm={onConfirmDelete}
-        >
-          <Modal.Content>
-            <Alert_Shadcn_ variant="warning">
-              <CriticalIcon />
-              <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                Ensure that you have made a backup if you want to restore your edge function
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          </Modal.Content>
-        </Modal>
+          alert={{
+            base: { variant: 'destructive' },
+            title: 'This action cannot be undone',
+            description:
+              'Ensure that you have made a backup if you want to restore your edge function',
+          }}
+        />
       </div>
 
       <div className="w-full xl:max-w-[600px] shrink-0">
