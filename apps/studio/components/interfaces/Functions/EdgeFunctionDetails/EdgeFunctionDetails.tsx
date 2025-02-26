@@ -1,3 +1,4 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
@@ -6,131 +7,61 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { object, string, boolean } from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
+import { boolean, object, string } from 'yup'
 
 import { useParams } from 'common'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
+  cn,
   CodeBlock,
   CriticalIcon,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormMessage_Shadcn_,
   Input,
+  Input_Shadcn_,
   Modal,
   Switch,
-  Toggle,
-  cn,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
-  Input_Shadcn_,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import CommandRender from '../CommandRender'
+import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 
 const schema = object({
   name: string().required('Name is required'),
   verify_jwt: boolean().required(),
 })
 
-interface InvocationTab {
-  id: string
-  label: string
-  language: 'bash' | 'js' | 'ts' | 'dart' | 'python'
-  hideLineNumbers?: boolean
-  code: (functionUrl: string, functionName: string, apiKey: string) => string
-}
-
-const INVOCATION_TABS: InvocationTab[] = [
-  {
-    id: 'curl',
-    label: 'cURL',
-    language: 'bash',
-    code: (functionUrl, _, apiKey) => `curl -L -X POST '${functionUrl}' \\
-  -H 'Authorization: Bearer ${apiKey}' \\
-  -H 'Content-Type: application/json' \\
-  --data '{"name":"Functions"}'`,
-  },
-  {
-    id: 'supabase-js',
-    label: 'JavaScript',
-    language: 'js',
-    hideLineNumbers: true,
-    code: (_, functionName) => `import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
-const { data, error } = await supabase.functions.invoke('${functionName}', {
-  body: { name: 'Functions' },
-})`,
-  },
-  {
-    id: 'swift',
-    label: 'Swift',
-    language: 'ts',
-    hideLineNumbers: true,
-    code: (_, functionName) => `struct Response: Decodable {
-  // Expected response definition
-}
-
-let response: Response = try await supabase.functions
-  .invoke(
-    "${functionName}",
-    options: FunctionInvokeOptions(
-      body: ["name": "Functions"]
-    )
-  )`,
-  },
-  {
-    id: 'flutter',
-    label: 'Flutter',
-    language: 'dart',
-    hideLineNumbers: true,
-    code: (
-      _,
-      functionName
-    ) => `final res = await supabase.functions.invoke('${functionName}', body: {'name': 'Functions'});
-final data = res.data;`,
-  },
-  {
-    id: 'python',
-    label: 'Python',
-    language: 'python',
-    hideLineNumbers: true,
-    code: (_, functionName) => `response = supabase.functions.invoke(
-    "${functionName}",
-    invoke_options={"body": {"name": "Functions"}}
-)`,
-  },
-]
-
 const EdgeFunctionDetails = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [showInstructions, setShowInstructions] = useState(false)
+  const canUpdateEdgeFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
+
   const { mutate: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
   const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
     onSuccess: () => {
@@ -139,7 +70,10 @@ const EdgeFunctionDetails = () => {
     },
   })
 
-  const canUpdateEdgeFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
+  const form = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: { name: '', verify_jwt: false },
+  })
 
   const { anonKey } = getAPIKeys(settings)
   const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
@@ -150,29 +84,15 @@ const EdgeFunctionDetails = () => {
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}/functions/v1/${selectedFunction?.slug}`
       : `${protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
-
-  const { managementCommands, secretCommands, invokeCommands } = generateCLICommands({
+  const hasImportMap = useMemo(
+    () => selectedFunction?.import_map || selectedFunction?.import_map_path,
+    [selectedFunction]
+  )
+  const { managementCommands } = generateCLICommands({
     selectedFunction,
     functionUrl,
     anonKey: apiKey,
   })
-
-  const form = useForm({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      name: '',
-      verify_jwt: false,
-    },
-  })
-
-  useEffect(() => {
-    if (selectedFunction) {
-      form.reset({
-        name: selectedFunction.name,
-        verify_jwt: selectedFunction.verify_jwt,
-      })
-    }
-  }, [selectedFunction])
 
   const onUpdateFunction = async (values: any) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -198,10 +118,14 @@ const EdgeFunctionDetails = () => {
     deleteEdgeFunction({ projectRef, slug: selectedFunction.slug })
   }
 
-  const hasImportMap = useMemo(
-    () => selectedFunction?.import_map || selectedFunction?.import_map_path,
-    [selectedFunction]
-  )
+  useEffect(() => {
+    if (selectedFunction) {
+      form.reset({
+        name: selectedFunction.name,
+        verify_jwt: selectedFunction.verify_jwt,
+      })
+    }
+  }, [selectedFunction])
 
   return (
     <div className="mx-auto flex flex-col xl:flex-row gap-8 pb-8">
