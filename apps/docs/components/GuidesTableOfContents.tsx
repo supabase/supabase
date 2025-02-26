@@ -131,16 +131,25 @@ const GuidesTableOfContents = ({
   const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
 
   return (
-    <div className={cn('border-l', 'thin-scrollbar overflow-y-auto', 'px-2', className)}>
+    <div
+      className={cn(
+        'border-l flex flex-col gap-6 lg:gap-8',
+        'thin-scrollbar overflow-y-auto',
+        'px-2',
+        className
+      )}
+    >
       {video && (
-        <div className="relative mb-6 pl-5">
+        <div className="relative pl-5">
           <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} />
         </div>
       )}
-      <Feedback key={pathname} />
+      <div className="pl-5">
+        <Feedback key={pathname} />
+      </div>
       {displayedList.length > 0 && (
-        <>
-          <span className="block font-mono text-xs uppercase text-foreground px-5 mb-6">
+        <div>
+          <span className="block font-mono text-xs uppercase text-foreground px-5 mb-3">
             On this page
           </span>
           <ul className="toc-menu list-none pl-5 text-[0.8rem] grid gap-2">
@@ -163,7 +172,7 @@ const GuidesTableOfContents = ({
               </li>
             ))}
           </ul>
-        </>
+        </div>
       )}
     </div>
   )
