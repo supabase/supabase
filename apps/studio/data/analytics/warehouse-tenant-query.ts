@@ -1,7 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { analyticsKeys } from './keys'
 import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
+import { analyticsKeys } from './keys'
 
 export type WarehouseTenantVariables = {
   projectRef: string
@@ -41,7 +42,7 @@ export const useWarehouseTenantQuery = <TData = WarehouseTenantData>(
     analyticsKeys.warehouseTenant(projectRef),
     ({ signal }) => getWarehouseTenant({ projectRef }, signal),
     {
-      enabled: enabled && !!projectRef,
+      enabled: enabled && !!projectRef && IS_PLATFORM,
       staleTime: Infinity,
       // 2H mins cache time
       cacheTime: 120 * 60 * 1000,

@@ -29,6 +29,17 @@ import {
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
   PostgresInstallation,
+  PricingMfaPhone,
+  PricingBranching,
+  PricingEdgeFunctions,
+  PricingMau,
+  PricingMauSso,
+  PricingMauThirdParty,
+  PricingPitr,
+  PricingRealtimeMessages,
+  PricingRealtimeConnections,
+  PricingStorageImageTransformations,
+  PricingStorageSize,
 } from '~/components/MDX/partials'
 import { NavData } from '~/components/NavData'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
@@ -41,6 +52,7 @@ import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import * as CH from '~/features/ui/CodeHike'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import InfoTooltip from '~/features/ui/InfoTooltip'
 
 const components = {
   Accordion,
@@ -90,6 +102,18 @@ const components = {
   StepHikeCompact,
   Tabs,
   TabPanel,
+  InfoTooltip,
+  PricingMfaPhone,
+  PricingBranching,
+  PricingEdgeFunctions,
+  PricingMau,
+  PricingMauSso,
+  PricingMauThirdParty,
+  PricingPitr,
+  PricingRealtimeMessages,
+  PricingRealtimeConnections,
+  PricingStorageImageTransformations,
+  PricingStorageSize,
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
       {props.children}

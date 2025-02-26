@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.12.0
+  version: 2.15.8
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -2739,6 +2739,10 @@ commands:
         name: --import-map <string>
         description: Path to import map file.
         default_value: ''
+      - id: jobs
+        name: -j, --jobs <uint>
+        description: Maximum number of parallel jobs.
+        default_value: '1'
       - id: no-verify-jwt
         name: --no-verify-jwt
         description: Disable JWT verification for the Function.
@@ -2747,6 +2751,14 @@ commands:
         name: --project-ref <string>
         description: Project ref of the Supabase project.
         default_value: ''
+      - id: use-api
+        name: --use-api
+        description: Use Management API to bundle functions.
+        default_value: 'false'
+      - id: use-docker
+        name: --use-docker
+        description: Use Docker to bundle functions.
+        default_value: 'true'
   - id: supabase-functions-delete
     title: supabase functions delete
     summary: Delete a Function from Supabase
@@ -3006,7 +3018,7 @@ commands:
           Linked project is up to date.
       - id: self-hosted
         name: Self hosted
-        code: supabase db push --db-url "postgres://user.tenant:pass@127.0.0.1:5432"
+        code: supabase db push --db-url "postgres://user:pass@127.0.0.1:5432/postgres"
         response: |
           Pushing migration 20230410135622_create_employees_table.sql...
           Finished supabase db push.

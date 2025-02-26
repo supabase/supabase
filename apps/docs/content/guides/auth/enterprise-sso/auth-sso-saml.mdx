@@ -19,17 +19,16 @@ Supabase Auth supports enterprise-level Single Sign-On (SSO) for any identity pr
 - PingIdentity
 - OneLogin
 
-If you're having issues with identity provider software not on this list, please [open a support ticket](https://supabase.com/dashboard/support/new).
+If you're having issues with identity provider software not on this list, [open a support ticket](https://supabase.com/dashboard/support/new).
 
 ## Prerequisites
 
-This guide requires the use of the [Supabase CLI](/docs/guides/cli). Please make sure you're using version v1.46.4 or higher. You can use `supabase -v` to see the currently installed version.
-
+This guide requires the use of the [Supabase CLI](/docs/guides/cli). Make sure you're using version v1.46.4 or higher. You can use `supabase -v` to see the currently installed version.
 You can use the `supabase sso` [subcommands](/docs/reference/cli/supabase-sso) to manage your project's configuration.
 
 SAML 2.0 support is disabled by default on Supabase projects. You can configure this on the [Auth Providers](https://supabase.com/dashboard/project/_/auth/providers) page on your project.
 
-Please note that SAML 2.0 support is offered on plans Pro and above. Check the [Pricing](https://supabase.com/pricing) page for more information.
+Note that SAML 2.0 support is offered on plans Pro and above. Check the [Pricing](https://supabase.com/pricing) page for more information.
 
 ## Terminology
 
@@ -82,7 +81,7 @@ User accounts and identities created via SSO differ from regular (email, phone, 
 - **No automatic linking.**
   Each user account verified using a SSO identity provider will not be automatically linked to existing user accounts in the system. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO login with your project, there will be two `valid.email@supabase.io` user accounts in the system.
 - **Emails are not necessarily unique.**
-  Given the behavior with no automatic linking, email addresses are no longer a unique identifier for a user account. Please always use the user's UUID to correctly reference user accounts.
+  Given the behavior with no automatic linking, email addresses are no longer a unique identifier for a user account. Always use the user's UUID to correctly reference user accounts.
 - **Sessions may have a maximum duration.**
   Depending on the configuration of the identity provider, a login session established with SSO may forcibly log out a user after a certain period of time.
 
@@ -176,7 +175,7 @@ supabase sso add --type saml --project-ref <your-project> \
 
 This command will register a new identity provider with your project's Auth server. When successful, you will see the details of the provider such as it's SAML information and registered domains.
 
-Please note that only persons with write access to the project can register, update or remove identity providers.
+Note that only persons with write access to the project can register, update or remove identity providers.
 
 Once you've added an identity provider, users who have access to it can sign in to your application. With SAML 2.0 there are two ways that users can sign in to your project:
 
@@ -319,7 +318,7 @@ Supabase Auth does not require specifying attribute mappings if you only need ac
 
 At this time it is not possible to have users without an email address, so SAML assertions without one will be rejected.
 
-Most SAML 2.0 identity providers use Lightweight Directory Access Protocol (LDAP) attribute names. However, due to their variability and complexity operators of identity providers are able to customize both the `Name` and attribute value that is sent to Supabase Auth in an assertion. Please refer to the identity provider's documentation and contact the operator for details on what attributes are mapped for your project.
+Most SAML 2.0 identity providers use Lightweight Directory Access Protocol (LDAP) attribute names. However, due to their variability and complexity operators of identity providers are able to customize both the `Name` and attribute value that is sent to Supabase Auth in an assertion. Refer to the identity provider's documentation and contact the operator for details on what attributes are mapped for your project.
 
 **Accessing the stored attributes**
 
@@ -337,8 +336,7 @@ supabase sso remove <provider-id> --project-ref <your-project>
 
 If successful, the details of the removed identity provider will be shown. All user accounts from that identity provider will be immediately logged out. User information will remain in the system, but it will no longer be possible for any of those accounts to be accessed in the future, even if you add the connection again.
 
-If you need to reassign those user accounts to another identity provider, please [open a support ticket](https://supabase.com/dashboard/support/new).
-
+If you need to reassign those user accounts to another identity provider, [open a support ticket](https://supabase.com/dashboard/support/new).
 A [list of all](/docs/reference/cli/supabase-sso-list) registered identity providers can be displayed by running:
 
 ```bash
@@ -362,7 +360,7 @@ You can use this command to [update](/docs/reference/cli/supabase-sso-update) th
 supabase sso update <provider-id> --project-ref <your-project>
 ```
 
-Please use `--help` to see all available flags.
+Use `--help` to see all available flags.
 
 It is not possible to change the unique SAML identifier of the identity provider, known as `EntityID`. Everything else can be updated. If the SAML `EntityID` of your identity provider has changed, it is regarded as a new identity provider and you will have to register it like a new connection.
 
@@ -380,15 +378,21 @@ This list will only include basic information about each provider. To see [all o
 supabase sso show <provider-id> --project-ref <your-project>
 ```
 
-You can use the `-o json` flag to output the information as JSON, should you need to. Other formats may be supported, please use `--help` to see all available options.
+You can use the `-o json` flag to output the information as JSON, should you need to. Other formats may be supported, use `--help` to see all available options.
+
+## Pricing
+
+<PricingMauSso />
+
+For a detailed breakdown of how charges are calculated, refer to [Manage Monthly Active SSO Users usage](/docs/guides/platform/manage-your-usage/monthly-active-users-sso).
 
 ## Frequently asked questions
 
-### How do I publish my application to an identity provider's marketplace?
+### Publishing your application to an identity provider's marketplace
 
 Many cloud-based identity providers offer a marketplace where you can register your application for easy on-boarding with customers. When you use Supabase Auth's SAML 2.0 support you can register your project in any one of these marketplaces.
 
-Please refer to the relevant documentation for each cloud-based identity provider on how you can do this. Some common marketplaces are:
+Refer to the relevant documentation for each cloud-based identity provider on how you can do this. Some common marketplaces are:
 
 - [Okta Integration Network](https://developer.okta.com/docs/guides/build-sso-integration/saml2/main/)
 - [Azure Active Directory App Gallery](https://learn.microsoft.com/en-us/azure/active-directory-b2c/publish-app-to-azure-ad-app-gallery)
@@ -408,13 +412,13 @@ The following list of commonly used SAML attribute names is inspected, in order 
 
 Finally if there is no such attribute, it will use the SAML `NameID` value but only if the format is advertised as `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`.
 
-Should you run into this problem, it is most likely a misconfiguration issue **on the identity provider side.** Please instruct your contact at the company to map the user's email address to one of the above listed attribute names, typically `email`.
+Should you run into this problem, it is most likely a misconfiguration issue **on the identity provider side.** Instruct your contact at the company to map the user's email address to one of the above listed attribute names, typically `email`.
 
-### How do I access the private key used for SAML in my project?
+### Accessing the private key used for SAML in your project
 
-At this time it is not possible to extract the RSA private key used by your project's Supabase Auth server. This is done to keep the private key as secure as possible, given that SAML does not offer an easy way to rotate keys without disrupting service. (Please use a SAML 2.0 Metadata URL whenever possible for this reason!)
+At this time it is not possible to extract the RSA private key used by your project's Supabase Auth server. This is done to keep the private key as secure as possible, given that SAML does not offer an easy way to rotate keys without disrupting service. (Use a SAML 2.0 Metadata URL whenever possible for this reason!)
 
-If you really need access to the key, please [open a support ticket](https://supabase.com/dashboard/support/new) and we'll try to support you as best as possible.
+If you really need access to the key, [open a support ticket](https://supabase.com/dashboard/support/new) and we'll try to support you as best as possible.
 
 ### Is multi-tenant SSO with SAML supported?
 

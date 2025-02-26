@@ -5,8 +5,18 @@ export * from './infrastructure'
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 export const DEFAULT_HOME = IS_PLATFORM ? '/projects' : '/project/default'
 
-// TODO: Replace PG_META_URL with STUDIO_PG_META_URL and remove all references to PLATFORM_PG_META_URL
-export const API_URL = IS_PLATFORM ? process.env.NEXT_PUBLIC_API_URL! : '/api'
+export const API_URL = (() => {
+  //  If running in platform, use API_URL from the env var
+  if (IS_PLATFORM) return process.env.NEXT_PUBLIC_API_URL!
+  // If running in browser, let it add the host
+  if (typeof window !== 'undefined') return '/api'
+  // If running self-hosted Vercel preview, use VERCEL_URL
+  if (!!process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}/api`
+  // If running on self-hosted, use NEXT_PUBLIC_SITE_URL
+  if (!!process.env.NEXT_PUBLIC_SITE_URL) return `${process.env.NEXT_PUBLIC_SITE_URL}/api`
+  return '/api'
+})()
+
 export const PG_META_URL = IS_PLATFORM
   ? process.env.PLATFORM_PG_META_URL
   : process.env.STUDIO_PG_META_URL
@@ -30,13 +40,14 @@ export const STRIPE_PUBLIC_KEY =
 export const USAGE_APPROACHING_THRESHOLD = 0.75
 
 export const LOCAL_STORAGE_KEYS = {
-  RECENTLY_VISITED_ORGANIZATION: 'supabase-organization',
-
   AI_ASSISTANT_STATE: 'supabase-ai-assistant-state',
+  SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
+  EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
 
   UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
+  UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
 
   SQL_SCRATCH_PAD_BANNER_ACKNOWLEDGED: 'supabase-sql-scratch-pad-banner-acknowledged',
@@ -77,12 +88,15 @@ export const LOCAL_STORAGE_KEYS = {
   EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
-  AUTH_SMTP_CHANGES_WARNING: 'auth-smtp-changes-warning-dismissed',
+  FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
 
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
 
   // api keys view switcher for new and legacy api keys
   API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
+
+  // last visited logs page
+  LAST_VISITED_LOGS_PAGE: 'supabase-last-visited-logs-page',
 }
 
 export const OPT_IN_TAGS = {

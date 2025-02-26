@@ -1,6 +1,5 @@
 import { toast } from 'sonner'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseCronJobDeleteMutation } from 'data/database-cron-jobs/database-cron-jobs-delete-mutation'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
@@ -22,7 +21,7 @@ export const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps)
   const { mutate: deleteDatabaseCronJob, isLoading } = useDatabaseCronJobDeleteMutation({
     onSuccess: () => {
       sendEvent({
-        action: TelemetryActions.CRON_JOB_DELETED,
+        action: 'cron_job_deleted',
         groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
       toast.success(`Successfully removed cron job ${cronJob.jobname}`)

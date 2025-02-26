@@ -5,7 +5,6 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -56,7 +55,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
   const onSubmit = () => {
     setOpen(false)
     sendEvent({
-      action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED,
+      action: 'realtime_inspector_listen_channel_clicked',
       groups: {
         project: ref ?? 'Unknown',
         organization: org?.slug ?? 'Unknown',
