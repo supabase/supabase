@@ -1,13 +1,13 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { boolean, object, string } from 'yup'
+import z from 'zod'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
@@ -47,9 +47,9 @@ import CommandRender from '../CommandRender'
 import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
 
-const schema = object({
-  name: string().required('Name is required'),
-  verify_jwt: boolean().required(),
+const FormSchema = z.object({
+  name: z.string().min(0, 'Name is required'),
+  verify_jwt: z.boolean(),
 })
 
 const EdgeFunctionDetails = () => {
@@ -71,7 +71,7 @@ const EdgeFunctionDetails = () => {
   })
 
   const form = useForm({
-    resolver: yupResolver(schema),
+    resolver: zodResolver(FormSchema),
     defaultValues: { name: '', verify_jwt: false },
   })
 
@@ -94,7 +94,7 @@ const EdgeFunctionDetails = () => {
     anonKey: apiKey,
   })
 
-  const onUpdateFunction = async (values: any) => {
+  const onUpdateFunction: SubmitHandler<z.infer<typeof FormSchema>> = async (values: any) => {
     if (!projectRef) return console.error('Project ref is required')
     if (selectedFunction === undefined) return console.error('No edge function selected')
 
