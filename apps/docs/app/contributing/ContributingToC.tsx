@@ -75,7 +75,7 @@ function MobileToc({ items, className }: { items: Array<TocItem>; className?: st
       <SheetContent
         side="bottom"
         className={cn(
-          'w-full p-0 rounded-t-lg overflow-hidden',
+          'w-full flex flex-col gap-0 p-0 h-fit max-h-[50vh] rounded-t-lg overflow-hidden',
           !open && 'top-[calc(100vh-100px)]'
         )}
       >
@@ -93,7 +93,7 @@ function MobileToc({ items, className }: { items: Array<TocItem>; className?: st
             <span>On this page</span>
           </SheetTrigger>
         </SheetHeader>
-        <div className="w-full h-full p-4 pb-12 overflow-y-auto thin-scrollbar">
+        <div className="w-full flex-1 p-4 pb-8 overflow-y-auto thin-scrollbar">
           <TocBase items={items} />
         </div>
       </SheetContent>
