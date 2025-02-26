@@ -1,4 +1,4 @@
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
@@ -20,7 +20,7 @@ export const LogPage: NextPageWithLayout = () => {
       <LogsPreviewer
         condensedLayout
         projectRef={ref as string}
-        queryType={'functions'}
+        queryType="functions"
         filterOverride={{ 'metadata.function_id': selectedFunction.id }}
       />
     </div>

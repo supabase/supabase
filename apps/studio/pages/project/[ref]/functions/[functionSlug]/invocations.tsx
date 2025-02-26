@@ -1,14 +1,10 @@
 import { useParams } from 'common'
-
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import type { NextPageWithLayout } from 'types'
 
-/**
- * Placeholder page for logs previewers until we figure out where to slot them
- */
 export const LogPage: NextPageWithLayout = () => {
   const { ref, functionSlug } = useParams()
   const { data: selectedFunction, isLoading } = useEdgeFunctionQuery({
@@ -23,7 +19,7 @@ export const LogPage: NextPageWithLayout = () => {
       <LogsPreviewer
         condensedLayout
         projectRef={ref as string}
-        queryType={'fn_edge'}
+        queryType="fn_edge"
         filterOverride={{ function_id: selectedFunction.id }}
       />
     </div>
