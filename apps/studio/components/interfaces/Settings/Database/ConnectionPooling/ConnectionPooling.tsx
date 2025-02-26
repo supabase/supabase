@@ -241,7 +241,7 @@ export const ConnectionPooling = () => {
           ref: projectRef,
           pgbouncer_enabled: true,
           ignore_startup_parameters: pgbouncerConfig.ignore_startup_parameters ?? '',
-          pool_mode: pgbouncerConfig.pool_mode as 'transaction' | 'session' | 'statement',
+          pool_mode: pool_mode as 'transaction' | 'session' | 'statement',
           max_client_conn,
           default_pool_size: default_pool_size as number | undefined,
         },
