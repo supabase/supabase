@@ -190,8 +190,8 @@ export async function handler(req: Request) {
       }
     )
 
-    const normalizedCountry = normalizeString(meetup.country)
-    const normalizedCity = normalizeString(meetup.city)
+    const normalizedCountry = normalizeString(meetup.country, true)
+    const normalizedCity = normalizeString(meetup.city, true)
 
     const relativeFilePath = encodeUrl(
       `og/meetups/${normalizedCountry}-${normalizedCity}-${meetup.id}.png`
