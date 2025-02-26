@@ -7,6 +7,7 @@ import { MDXProviderGuides } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
+import Breadcrumbs from '~/components/Breadcrumbs'
 
 export default async function ContributingPage() {
   const contentFile = join(dirname(fileURLToPath(import.meta.url)), 'content.mdx')
@@ -15,14 +16,17 @@ export default async function ContributingPage() {
   return (
     <SidebarSkeleton>
       <LayoutMainContent className="pb-0 grid grid-cols-12 relative gap-4">
-        <article
-          id="contributing"
-          className="prose max-w-none relative transition-all ease-out duration-100 col-span-12 lg:col-span-9"
-        >
-          <MDXProviderGuides>
-            <MDXRemoteBase source={content} />
-          </MDXProviderGuides>
-        </article>
+        <div className="col-span-12 lg:col-span-9">
+          <Breadcrumbs className="mb-2 col-span-full" />
+          <article
+            id="contributing"
+            className="prose max-w-none relative transition-all ease-out duration-100"
+          >
+            <MDXProviderGuides>
+              <MDXRemoteBase source={content} />
+            </MDXProviderGuides>
+          </article>
+        </div>
         <ContributingToc />
       </LayoutMainContent>
     </SidebarSkeleton>
