@@ -4,12 +4,12 @@ import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { databaseKeys } from './keys'
 
-export type ProjectPgbouncerConfigVariables = {
+export type PgbouncerConfigVariables = {
   projectRef?: string
 }
 
-export async function getProjectPgbouncerConfig(
-  { projectRef }: ProjectPgbouncerConfigVariables,
+export async function getPgbouncerConfig(
+  { projectRef }: PgbouncerConfigVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -22,19 +22,19 @@ export async function getProjectPgbouncerConfig(
   return data
 }
 
-export type ProjectPgbouncerConfigData = Awaited<ReturnType<typeof getProjectPgbouncerConfig>>
-export type ProjectPgbouncerConfigError = ResponseError
+export type PgbouncerConfigData = Awaited<ReturnType<typeof getPgbouncerConfig>>
+export type PgbouncerConfigError = ResponseError
 
-export const useProjectPgbouncerConfigQuery = <TData = ProjectPgbouncerConfigData>(
-  { projectRef }: ProjectPgbouncerConfigVariables,
+export const usePgbouncerConfigQuery = <TData = PgbouncerConfigData>(
+  { projectRef }: PgbouncerConfigVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectPgbouncerConfigData, ProjectPgbouncerConfigError, TData> = {}
+  }: UseQueryOptions<PgbouncerConfigData, PgbouncerConfigError, TData> = {}
 ) =>
-  useQuery<ProjectPgbouncerConfigData, ProjectPgbouncerConfigError, TData>(
+  useQuery<PgbouncerConfigData, PgbouncerConfigError, TData>(
     databaseKeys.pgbouncerConfig(projectRef),
-    ({ signal }) => getProjectPgbouncerConfig({ projectRef }, signal),
+    ({ signal }) => getPgbouncerConfig({ projectRef }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
