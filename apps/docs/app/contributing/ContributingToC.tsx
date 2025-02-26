@@ -74,8 +74,9 @@ function MobileToc({ items, className }: { items: Array<TocItem>; className?: st
       </SheetTrigger>
       <SheetContent
         side="bottom"
+        size="lg"
         className={cn(
-          'w-full flex flex-col gap-0 p-0 h-fit max-h-[50vh] rounded-t-lg overflow-hidden',
+          'w-full flex flex-col gap-0 p-0 rounded-t-lg overflow-hidden',
           !open && 'top-[calc(100vh-100px)]'
         )}
       >
