@@ -8,6 +8,16 @@ export type RealtimeConfigurationVariables = {
   projectRef?: string
 }
 
+export const REALTIME_DEFAULT_CONFIG = {
+  private_only: false,
+  connection_pool: 2,
+  max_concurrent_users: 200,
+  max_events_per_second: 100,
+  max_bytes_per_second: 100000,
+  max_channels_per_client: 100,
+  max_joins_per_second: 100,
+}
+
 export async function getRealtimeConfiguration(
   { projectRef }: RealtimeConfigurationVariables,
   signal?: AbortSignal
@@ -15,11 +25,17 @@ export async function getRealtimeConfiguration(
   if (!projectRef) throw new Error('Project ref is required')
 
   const { data, error } = await get(`/platform/projects/{ref}/config/realtime`, {
-    // @ts-expect-error [Joshen] I think API typing might be wrong here
     params: { path: { ref: projectRef } },
     signal,
   })
-  if (error) handleError(error)
+  if (error) {
+    if ((error as ResponseError).message === 'Custom realtime config for a project not found') {
+      // return REALTIME_DEFAULT_CONFIG
+      handleError(error)
+    } else {
+      handleError(error)
+    }
+  }
   return data
 }
 

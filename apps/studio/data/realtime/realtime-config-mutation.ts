@@ -23,7 +23,6 @@ export async function updateRealtimeConfiguration({
   if (!ref) return console.error('Project ref is required')
 
   const { data, error } = await patch('/platform/projects/{ref}/config/realtime', {
-    // @ts-expect-error [Joshen] API typing issue
     params: { path: { ref } },
     body: {
       private_only,
