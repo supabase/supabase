@@ -44,7 +44,7 @@ const EmailTemplates = () => {
       {isSuccess && (
         <>
           {builtInSMTP ? (
-            <div className="mb-4">
+            <div className="my-4">
               <EmailRateLimitsAlert />
             </div>
           ) : null}
