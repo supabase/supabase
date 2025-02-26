@@ -1,6 +1,7 @@
+import { useParams } from 'common'
 import { ChevronLeft } from 'lucide-react'
 import { Fragment, ReactNode } from 'react'
-import { useParams } from 'common'
+
 import { cn } from 'ui'
 import {
   Breadcrumb,
