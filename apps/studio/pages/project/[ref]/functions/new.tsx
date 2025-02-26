@@ -1,33 +1,36 @@
-import { useEffect, useState } from 'react'
-import { CornerDownLeft, Loader2, Book, Check } from 'lucide-react'
-import { Button, Input_Shadcn_, Label_Shadcn_, cn } from 'ui'
-import { AiIconAnimation } from 'ui'
-import { BASE_PATH } from 'lib/constants'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
-import { IS_PLATFORM } from 'lib/constants'
-import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
-import { toast } from 'sonner'
+import { Book, Check, CornerDownLeft, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
-import { useAppStateSnapshot } from 'state/app-state'
+import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
-import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
+import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
+  AiIconAnimation,
+  Button,
+  cn,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  Input_Shadcn_,
+  Label_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
 } from 'ui'
-import { useFlag } from 'hooks/ui/useFlag'
 
 const NewFunctionPage = () => {
   const router = useRouter()
@@ -37,13 +40,6 @@ const NewFunctionPage = () => {
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
   const { setAiAssistantPanel } = useAppStateSnapshot()
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
-
-  // TODO (Saxon): Remove this once the flag is fully launched
-  useEffect(() => {
-    if (!edgeFunctionCreate) {
-      router.push(`/project/${ref}/functions`)
-    }
-  }, [edgeFunctionCreate, ref, router])
 
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
@@ -74,7 +70,7 @@ Deno.serve(async (req: Request) => {
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [savedCode, setSavedCode] = useState<string>('')
 
-  const { mutateAsync: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
+  const { mutate: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
       toast.success('Successfully deployed edge function')
       if (ref && functionName) {
@@ -86,21 +82,15 @@ Deno.serve(async (req: Request) => {
   const onDeploy = async () => {
     if (isDeploying || !ref || !functionName) return
 
-    try {
-      await deployFunction({
-        projectRef: ref,
-        metadata: {
-          entrypoint_path: 'index.ts',
-          name: functionName,
-          verify_jwt: true,
-        },
-        files: files.map(({ name, content }) => ({ name, content })),
-      })
-    } catch (error) {
-      toast.error(
-        `Failed to deploy function: ${error instanceof Error ? error.message : 'Unknown error'}`
-      )
-    }
+    deployFunction({
+      projectRef: ref,
+      metadata: {
+        entrypoint_path: 'index.ts',
+        name: functionName,
+        verify_jwt: true,
+      },
+      files: files.map(({ name, content }) => ({ name, content })),
+    })
   }
 
   const handleChat = () => {
@@ -149,6 +139,13 @@ Deno.serve(async (req: Request) => {
       )
     }
   }
+
+  // TODO (Saxon): Remove this once the flag is fully launched
+  useEffect(() => {
+    if (!edgeFunctionCreate) {
+      router.push(`/project/${ref}/functions`)
+    }
+  }, [edgeFunctionCreate, ref, router])
 
   return (
     <PageLayout
