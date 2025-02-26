@@ -19,16 +19,28 @@ export const MAX_WIDTH_CLASSES_COLUMN = 'min-w-[420px]'
  */
 export const ScaffoldContainer = forwardRef<
   HTMLDivElement,
-  HTMLAttributes<HTMLDivElement> & { bottomPadding?: boolean }
->(({ className, bottomPadding, ...props }, ref) => {
+  HTMLAttributes<HTMLDivElement> & {
+    bottomPadding?: boolean
+    size?: 'small' | 'default' | 'large' | 'full'
+  }
+>(({ className, bottomPadding, size = 'default', ...props }, ref) => {
   const { aiAssistantPanel } = useAppStateSnapshot()
   const { open } = aiAssistantPanel
+
+  const maxWidthClass = {
+    small: 'max-w-[768px]',
+    default: 'max-w-[1200px]',
+    large: 'max-w-[1600px]',
+    full: 'max-w-none',
+  }[size]
+
   return (
     <div
       ref={ref}
       {...props}
       className={cn(
-        MAX_WIDTH_CLASSES,
+        'mx-auto w-full',
+        maxWidthClass,
         PADDING_CLASSES,
         bottomPadding && 'pb-16',
         open ? 'xl:px-6' : '',
