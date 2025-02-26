@@ -30,7 +30,7 @@ const ProductMenu = ({ page, menu }: ProductMenuProps) => {
                   {group.items.map((item) => {
                     const isActive = !!item.pages
                       ? item.pages.includes(page ?? '')
-                      : page === item.key
+                      : page === item.key || (page === undefined && item.key === 'main')
 
                     return (
                       <ProductMenuItem
