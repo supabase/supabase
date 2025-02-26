@@ -1,7 +1,5 @@
 import { useParams } from 'common'
-import { AiIconAnimation, Button, Dialog, DialogContent, DialogSection, DialogTrigger } from 'ui'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
-import { ChevronDown, Terminal, Code } from 'lucide-react'
+import { ChevronDown, Code, ExternalLink, Terminal } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import {
@@ -9,19 +7,31 @@ import {
   FunctionsEmptyState,
   TerminalInstructions,
 } from 'components/interfaces/Functions'
-import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import type { NextPageWithLayout } from 'types'
-import { DocsButton } from 'components/ui/DocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAppStateSnapshot } from 'state/app-state'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useAppStateSnapshot } from 'state/app-state'
+import type { NextPageWithLayout } from 'types'
+import {
+  AiIconAnimation,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogSection,
+  DialogTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 
 const FunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -83,6 +93,19 @@ const FunctionsPage: NextPageWithLayout = () => {
   )
 
   const secondaryActions = [
+    ...(!hasFunctions
+      ? [
+          <Button asChild key="edge-function-examples" type="default" icon={<ExternalLink />}>
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+            >
+              Examples
+            </a>
+          </Button>,
+        ]
+      : []),
     <DocsButton key="docs" href="https://supabase.com/docs/guides/functions" />,
     <ButtonTooltip
       type="default"

@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import { toast } from 'sonner'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
@@ -38,7 +37,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
     onSuccess: () => {
-      sendEvent({ action: TelemetryActions.SIGN_UP, properties: { category: 'conversion' } })
+      sendEvent({ action: 'sign_up', properties: { category: 'conversion' } })
     },
     onError: (error) => {
       Sentry.captureMessage('Failed to create users profile: ' + error.message)
