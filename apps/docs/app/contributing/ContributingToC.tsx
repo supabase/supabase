@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 
 import { useBreakpoint } from 'common'
 import { cn, Separator, Sheet, SheetContent, SheetHeader, SheetTrigger } from 'ui'
-import { Feedback } from '../../components/Feedback'
+import { Feedback } from '~/components/Feedback'
 
 interface TocItem extends HTMLAttributes<HTMLElement> {
   label: string
@@ -50,12 +50,9 @@ function MobileToc({ items, className }: { items: Array<TocItem>; className?: st
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    const onHashChanged = (_) => {
-      setOpen(false)
-    }
+    const onHashChanged = () => setOpen(false)
 
     window.addEventListener('hashchange', onHashChanged)
-
     return () => {
       window.removeEventListener('hashchange', onHashChanged)
     }
