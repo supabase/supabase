@@ -31,7 +31,7 @@ export function ContributingToc({ className }: { className?: string }) {
   }, [])
 
   return mobileToc ? (
-    <MobileToc items={tocItems} className={cn('')} />
+    <MobileToc items={tocItems} />
   ) : (
     <TocBase
       items={tocItems}
