@@ -12,6 +12,10 @@ sdk = [ "auth-getuser" ]
 [[errors]]
 http_status_code = 401
 message = "invalid claim: missing sub"
+
+[[errors]]
+http_status_code = 403
+message = "invalid claim: missing sub"
 ---
 
 The missing sub claim error is returned when `supabase.auth.getUser()` is called with an invalid JWT in the session or when the user attempts to register/sign in but hasn't completed the sign in when the `getUser` call is made.
