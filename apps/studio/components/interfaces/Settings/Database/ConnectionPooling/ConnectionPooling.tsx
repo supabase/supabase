@@ -394,35 +394,35 @@ export const ConnectionPooling = () => {
                           layout="horizontal"
                           label="Pooler Type"
                           description={
-                            isChangingPoolerType && (
-                              <>
+                            <>
+                              {isChangingPoolerType && (
                                 <Admonition
                                   type="warning"
                                   className="mt-2"
                                   title={poolerSwitchWarningTitle}
                                   description={poolerSwitchWarningDescription}
                                 />
-                                {type === 'PgBouncer' && !hasIpv4Addon && (
-                                  <Admonition
-                                    type="default"
-                                    className="mt-2"
-                                    title="The Dedicated Pooler does not support IPv4"
-                                    description={
-                                      <>
-                                        If you were using Supavisor for IPv6, we recommend
-                                        purchasing a dedicated IPv4 address from the{' '}
-                                        <InlineLink
-                                          href={`/project/${projectRef}/settings/addons?panel=ipv4`}
-                                        >
-                                          add-ons page
-                                        </InlineLink>{' '}
-                                        before changing your pooler type.
-                                      </>
-                                    }
-                                  />
-                                )}
-                              </>
-                            )
+                              )}
+                              {type === 'PgBouncer' && !hasIpv4Addon && (
+                                <Admonition
+                                  type="default"
+                                  className="mt-2"
+                                  title="The Dedicated Pooler does not support IPv4"
+                                  description={
+                                    <>
+                                      If you were using Supavisor for IPv6, we recommend purchasing
+                                      a dedicated IPv4 address from the{' '}
+                                      <InlineLink
+                                        href={`/project/${projectRef}/settings/addons?panel=ipv4`}
+                                      >
+                                        add-ons page
+                                      </InlineLink>
+                                      {isChangingPoolerType && ' before changing your pooler type'}.
+                                    </>
+                                  }
+                                />
+                              )}
+                            </>
                           }
                         >
                           <Select_Shadcn_
@@ -476,8 +476,8 @@ export const ConnectionPooling = () => {
                                     <div className="flex items-center gap-x-2">
                                       <p className="text-sm text-foreground">Dedicated Pooler</p>
                                       <div className="flex items-center gap-x-1">
+                                        {hasIpv4Addon && <Badge>Dedicated IPv4</Badge>}
                                         <Badge>IPv6</Badge>
-                                        {hasIpv4Addon && <Badge>IPv4 Add-on</Badge>}
                                       </div>
                                     </div>
                                   </SelectItem_Shadcn_>
