@@ -24,7 +24,7 @@ const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps)
         <p className="truncate py-2">{secret.name}</p>
       </Table.td>
       <Table.td>
-        <p className="font-mono text-sm truncate" title={secret.value}>
+        <p className="font-mono text-sm max-w-96 truncate" title={secret.value}>
           {secret.value}
         </p>
       </Table.td>
