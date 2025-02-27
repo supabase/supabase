@@ -7,7 +7,6 @@ import { Button, Select, cn } from 'ui'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
 import Solutions from '~/data/MainProducts'
 import { Organization } from '~/data/organizations'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import UpgradePlan from './UpgradePlan'
 
@@ -57,7 +56,7 @@ const MobileHeader = ({
           organizations={organizations}
           onClick={() =>
             sendTelemetryEvent({
-              action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED,
+              action: 'www_pricing_plan_cta_clicked',
               properties: {
                 plan,
                 showUpgradeText: true,
@@ -74,7 +73,7 @@ const MobileHeader = ({
             href={selectedPlan.href}
             onClick={() =>
               sendTelemetryEvent({
-                action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED,
+                action: 'www_pricing_plan_cta_clicked',
                 properties: {
                   plan,
                   showUpgradeText: false,
@@ -403,7 +402,7 @@ const PricingComparisonTable = ({
                             organizations={organizations}
                             onClick={() =>
                               sendTelemetryEvent({
-                                action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED,
+                                action: 'www_pricing_plan_cta_clicked',
                                 properties: {
                                   plan: plan.name,
                                   showUpgradeText: true,
@@ -425,7 +424,7 @@ const PricingComparisonTable = ({
                               href={plan.href}
                               onClick={() =>
                                 sendTelemetryEvent({
-                                  action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED,
+                                  action: 'www_pricing_plan_cta_clicked',
                                   properties: {
                                     plan: plan.name,
                                     showUpgradeText: false,

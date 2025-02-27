@@ -2,7 +2,8 @@ import { ReactNode } from 'react'
 
 export interface ProductMenuGroup {
   title?: string
-  key?: string
+  /** Set to "main" if page is on a '/' route */
+  key?: string | 'main'
   isPreview?: boolean
   items: ProductMenuGroupItem[]
 }
@@ -17,5 +18,5 @@ export interface ProductMenuGroupItem {
   isExternal?: boolean
   disabled?: boolean
   label?: string
-  pages?: string[]
+  pages?: (string | undefined)[]
 }

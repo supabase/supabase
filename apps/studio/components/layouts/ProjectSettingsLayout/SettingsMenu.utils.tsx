@@ -129,8 +129,9 @@ export const generateSettingsMenu = (
               {
                 name: 'Edge Functions',
                 key: 'functions',
-                url: `/project/${ref}/settings/functions`,
+                url: `/project/${ref}/functions/secrets`,
                 items: [],
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
               },
             ]
           : []),

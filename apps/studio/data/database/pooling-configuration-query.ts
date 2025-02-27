@@ -11,6 +11,9 @@ export type PoolingConfigurationVariables = {
 
 export type PoolingConfiguration = components['schemas']['SupavisorConfigResponse']
 
+/**
+ * Should rename this to Supavisor eventually since we're supporting both types of poolers
+ */
 export async function getPoolingConfiguration(
   { projectRef }: PoolingConfigurationVariables,
   signal?: AbortSignal
