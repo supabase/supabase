@@ -20,6 +20,18 @@ export type CustomerStoryType = {
 export const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
+    title: "Resend's Journey with Supabase: Scaling Email Infrastructure with Ease",
+    description:
+      'Scaling seamlessly to 5,000+ paying customers & millions of emails sent daily with Supabase',
+    organization: 'Resend',
+    imgUrl: 'images/customers/logos/resend.png',
+    logo: '/images/customers/logos/resend.png',
+    logo_inverse: '/images/customers/logos/light/resend.png',
+    url: '/customers/resend',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
     title:
       "Maergo's Express Delivery: How Supabase Helped Achieve Scalability, Speed, and Cost Saving",
     description:
