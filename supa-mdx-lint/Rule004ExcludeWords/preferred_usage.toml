@@ -21,4 +21,8 @@ words = [
         "PostgreSQL",
         "Postgres",
     ],
+    [
+        "concurrent clients",
+        "concurrent connections",
+    ],
 ]
