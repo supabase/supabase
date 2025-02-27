@@ -1,6 +1,6 @@
-import { useParams } from 'common'
-import { AiIconAnimation, Button, Dialog, DialogContent, DialogSection, DialogTrigger } from 'ui'
+import { ExternalLink } from 'lucide-react'
 
+import { useParams } from 'common'
 import {
   EdgeFunctionsListItem,
   FunctionsEmptyState,
@@ -17,10 +17,10 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useAppStateSnapshot } from 'state/app-state'
-import { ExternalLink } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
+import { AiIconAnimation, Button, Dialog, DialogContent, DialogSection, DialogTrigger } from 'ui'
 
-const FunctionsPage: NextPageWithLayout = () => {
+const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { setAiAssistantPanel } = useAppStateSnapshot()
 
@@ -48,8 +48,22 @@ const FunctionsPage: NextPageWithLayout = () => {
   )
 
   const secondaryActions = [
+    ...(!hasFunctions
+      ? [
+          <Button asChild key="edge-function-examples" type="default" icon={<ExternalLink />}>
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+            >
+              Examples
+            </a>
+          </Button>,
+        ]
+      : []),
     <DocsButton key="docs" href="https://supabase.com/docs/guides/functions" />,
     <ButtonTooltip
+      key="edge-function-create"
       type="default"
       className="px-1 pointer-events-auto"
       icon={<AiIconAnimation size={16} />}
@@ -76,20 +90,6 @@ const FunctionsPage: NextPageWithLayout = () => {
       }}
     />,
   ]
-
-  if (!hasFunctions) {
-    secondaryActions.unshift(
-      <Button asChild type="default" icon={<ExternalLink />}>
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
-        >
-          Examples
-        </a>
-      </Button>
-    )
-  }
 
   return (
     <PageLayout
@@ -142,7 +142,7 @@ const FunctionsPage: NextPageWithLayout = () => {
   )
 }
 
-FunctionsPage.getLayout = (page) => {
+EdgeFunctionsPage.getLayout = (page) => {
   return (
     <DefaultLayout>
       <EdgeFunctionsLayout>{page}</EdgeFunctionsLayout>
@@ -150,4 +150,4 @@ FunctionsPage.getLayout = (page) => {
   )
 }
 
-export default FunctionsPage
+export default EdgeFunctionsPage
