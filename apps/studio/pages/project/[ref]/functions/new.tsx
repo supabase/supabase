@@ -1,7 +1,10 @@
-import { Book, Check, CornerDownLeft, Loader2 } from 'lucide-react'
+import { AlertCircle, Book, Check } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
 
 import { useParams } from 'common'
 import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
@@ -25,12 +28,73 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
+// Array of adjectives and nouns for random function name generation
+const ADJECTIVES = [
+  'quick',
+  'clever',
+  'bright',
+  'swift',
+  'rapid',
+  'smart',
+  'smooth',
+  'dynamic',
+  'super',
+  'hyper',
+]
+const NOUNS = [
+  'function',
+  'handler',
+  'processor',
+  'responder',
+  'worker',
+  'service',
+  'api',
+  'endpoint',
+  'action',
+  'task',
+]
+
+// Function name validation regex - only allows alphanumeric characters, hyphens, and underscores
+const FUNCTION_NAME_REGEX = /^[A-Za-z0-9_-]+$/
+
+// Define form schema with yup
+const formSchema = yup.object({
+  functionName: yup
+    .string()
+    .required('Function name is required')
+    .matches(FUNCTION_NAME_REGEX, 'Only letters, numbers, hyphens, and underscores allowed'),
+})
+
+// Generate a random function name
+const generateRandomFunctionName = () => {
+  const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)]
+  const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)]
+  return `${adjective}-${noun}`
+}
+
+// Convert invalid function name to valid one
+const sanitizeFunctionName = (name: string): string => {
+  // Replace invalid characters with hyphens
+  return name.replace(/[^A-Za-z0-9_-]/g, '-')
+}
+
+// Type for the form values
+type FormValues = yup.InferType<typeof formSchema>
 
 const NewFunctionPage = () => {
   const router = useRouter()
@@ -51,28 +115,36 @@ const NewFunctionPage = () => {
       content: EDGE_FUNCTION_TEMPLATES[0].content,
     },
   ])
-  const [functionName, setFunctionName] = useState('')
   const [open, setOpen] = useState(false)
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [savedCode, setSavedCode] = useState<string>('')
 
+  // Setup form with react-hook-form and yup resolver
+  const form = useForm<FormValues>({
+    resolver: yupResolver(formSchema),
+    defaultValues: {
+      functionName: generateRandomFunctionName(),
+    },
+  })
+
   const { mutate: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
       toast.success('Successfully deployed edge function')
+      const functionName = form.getValues('functionName')
       if (ref && functionName) {
         router.push(`/project/${ref}/functions/${functionName}/details`)
       }
     },
   })
 
-  const onDeploy = async () => {
-    if (isDeploying || !ref || !functionName) return
+  const onSubmit = (values: FormValues) => {
+    if (isDeploying || !ref) return
 
     deployFunction({
       projectRef: ref,
       metadata: {
         entrypoint_path: 'index.ts',
-        name: functionName,
+        name: values.functionName,
         verify_jwt: true,
       },
       files: files.map(({ name, content }) => ({ name, content })),
@@ -126,6 +198,19 @@ const NewFunctionPage = () => {
     }
   }
 
+  // Try to sanitize function name when it's invalid
+  const handleDeploy = () => {
+    const currentName = form.getValues('functionName')
+    const isValid = FUNCTION_NAME_REGEX.test(currentName)
+
+    if (!isValid && currentName) {
+      const sanitizedName = sanitizeFunctionName(currentName)
+      form.setValue('functionName', sanitizedName, { shouldValidate: true })
+    }
+
+    form.handleSubmit(onSubmit)()
+  }
+
   // TODO (Saxon): Remove this once the flag is fully launched
   useEffect(() => {
     if (!edgeFunctionCreate) {
@@ -137,28 +222,11 @@ const NewFunctionPage = () => {
     <PageLayout
       size="full"
       isCompact
+      title="Create new edge function"
       breadcrumbs={[
         {
           label: 'Edge Functions',
           href: `/project/${ref}/functions`,
-        },
-        {
-          element: (
-            <div className="flex items-center gap-2">
-              <Label_Shadcn_ htmlFor="function-name" className="text-foreground-light sr-only">
-                Function name
-              </Label_Shadcn_>
-              <Input_Shadcn_
-                id="function-name"
-                type="text"
-                autoFocus
-                placeholder="Give your function a name..."
-                value={functionName}
-                onChange={(e) => setFunctionName(e.target.value)}
-                className="w-[400px] p-0 text-base text-foreground bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-            </div>
-          ),
         },
       ]}
       primaryActions={
@@ -235,16 +303,54 @@ const NewFunctionPage = () => {
         }}
       />
 
-      <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100">
-        <Button
-          loading={isDeploying}
-          size="medium"
-          disabled={!functionName || files.length === 0}
-          onClick={onDeploy}
+      <Form_Shadcn_ {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 gap-3"
         >
-          Deploy function
-        </Button>
-      </div>
+          <div className="flex items-center gap-3">
+            <Label_Shadcn_ htmlFor="functionName">Function name</Label_Shadcn_>
+            <FormField_Shadcn_
+              control={form.control}
+              name="functionName"
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="flex flex-col gap-0 m-0">
+                  <div className="flex items-center">
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        id="functionName"
+                        type="text"
+                        size={'large'}
+                        placeholder="Give your function a name..."
+                        className="w-[250px]"
+                        {...field}
+                      />
+                    </FormControl_Shadcn_>
+                    {form.formState.errors.functionName && (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <AlertCircle className="w-4 h-4 text-destructive ml-2" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {form.formState.errors.functionName.message}
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
+                </FormItem_Shadcn_>
+              )}
+            />
+          </div>
+          <Button
+            loading={isDeploying}
+            size="medium"
+            disabled={files.length === 0 || isDeploying}
+            onClick={handleDeploy}
+          >
+            Deploy function
+          </Button>
+        </form>
+      </Form_Shadcn_>
     </PageLayout>
   )
 }
