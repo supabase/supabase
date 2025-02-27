@@ -130,17 +130,13 @@ export const fetchAllTableRows = async ({
   }
 
   const rowsPerPage = 500
-  const THROTTLE_DELAY = 500 // 500ms between requests
+  const THROTTLE_DELAY = 500
 
+  let page = -1
   while (true) {
-    let page = -1
-    let from = 0
-    let to = 0
-    let pageData = []
-
     page += 1
-    from = page * rowsPerPage
-    to = (page + 1) * rowsPerPage - 1
+    const from = page * rowsPerPage
+    const to = (page + 1) * rowsPerPage - 1
     const query = wrapWithRoleImpersonation(queryChains.range(from, to).toSql(), {
       projectRef,
       role: impersonatedRole,
@@ -151,11 +147,9 @@ export const fetchAllTableRows = async ({
         executeSql({ projectRef, connectionString, sql: query })
       )
       rows.push(...result)
-      pageData = result
 
-      if (pageData.length < rowsPerPage) break
+      if (result.length < rowsPerPage) break
 
-      // Add throttling delay between successful requests
       await sleep(THROTTLE_DELAY)
     } catch (error) {
       console.error('Error fetching table rows:', error)
