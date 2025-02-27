@@ -89,11 +89,6 @@ const EdgeFunctionDetailsLayout = ({
         isCompact
         size="full"
         title={functionSlug ? name : 'Edge Functions'}
-        subtitle={
-          functionSlug
-            ? `https://${ref}.functions.supabase.co/${functionSlug}`
-            : 'Write and deploy code without having to manage servers'
-        }
         breadcrumbs={breadcrumbItems}
         navigationItems={navigationItems}
         primaryActions={

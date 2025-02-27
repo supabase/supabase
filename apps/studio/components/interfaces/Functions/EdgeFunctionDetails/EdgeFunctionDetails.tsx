@@ -128,7 +128,7 @@ const EdgeFunctionDetails = () => {
   }, [selectedFunction])
 
   return (
-    <div className="mx-auto flex flex-col xl:flex-row gap-8 pb-8">
+    <div className="mx-auto flex flex-col-reverse 2xl:flex-row gap-8 pb-8">
       <div className="flex-1 min-w-0 overflow-hidden">
         <ScaffoldSection isFullWidth>
           <ScaffoldSectionTitle className="mb-4">Function Configuration</ScaffoldSectionTitle>
@@ -289,14 +289,14 @@ const EdgeFunctionDetails = () => {
         />
       </div>
 
-      <div className="w-full xl:max-w-[600px] shrink-0">
+      <div className="w-full 2xl:max-w-[600px] shrink-0">
         <ScaffoldSection isFullWidth>
           <Card>
             <CardHeader>
               <CardTitle>Details</CardTitle>
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
-              <dl className="grid grid-cols-1 xl:grid-cols-[auto_1fr] gap-y-6 gap-x-10">
+              <dl className="grid grid-cols-1 xl:grid-cols-[auto_1fr] gap-y-4 xl:gap-y-6 gap-x-10">
                 <dt className="text-sm text-foreground-light">Slug</dt>
                 <dd className="text-sm lg:text-left">{selectedFunction?.slug}</dd>
 

@@ -26,7 +26,6 @@ interface PageHeaderProps {
   secondaryActions?: ReactNode
   className?: string
   isCompact?: boolean
-  pageMeta?: ReactNode
 }
 
 export const PageHeader = ({
@@ -38,7 +37,6 @@ export const PageHeader = ({
   secondaryActions,
   className,
   isCompact = false,
-  pageMeta,
 }: PageHeaderProps) => {
   const { ref } = useParams()
 
@@ -93,7 +91,6 @@ export const PageHeader = ({
             ) : isCompact ? (
               title
             ) : null}
-            {pageMeta && <div className="ml-4">{pageMeta}</div>}
           </div>
           {isCompact && (
             <div className="flex items-center gap-2">
