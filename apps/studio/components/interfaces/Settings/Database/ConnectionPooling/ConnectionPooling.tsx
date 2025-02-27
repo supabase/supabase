@@ -9,7 +9,7 @@ import z from 'zod'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { StringToPositiveNumber } from 'components/ui/Forms/Form.constants'
+import { setValueAsNullableNumber } from 'components/ui/Forms/Form.constants'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
@@ -58,9 +58,9 @@ const formId = 'pooling-configuration-form'
 
 const PoolingConfigurationFormSchema = z.object({
   type: z.union([z.literal('Supavisor'), z.literal('PgBouncer')]),
-  default_pool_size: StringToPositiveNumber,
+  default_pool_size: z.number().nullable(),
   pool_mode: z.union([z.literal('transaction'), z.literal('session'), z.literal('statement')]),
-  max_client_conn: StringToPositiveNumber,
+  max_client_conn: z.number().nullable(),
 })
 
 /**
@@ -447,7 +447,7 @@ export const ConnectionPooling = () => {
                                 )
                                 form.setValue(
                                   'max_client_conn',
-                                  pgbouncerConfig.max_client_conn ?? null
+                                  pgbouncerConfig.max_client_conn || null
                                 )
                               }
                             }}
@@ -641,6 +641,9 @@ export const ConnectionPooling = () => {
                             className="w-full"
                             value={field.value || undefined}
                             placeholder={!field.value ? `${defaultPoolSize}` : ''}
+                            {...form.register('default_pool_size', {
+                              setValueAs: setValueAsNullableNumber,
+                            })}
                           />
                         </FormControl_Shadcn_>
                         {!!maxConnData &&
@@ -703,6 +706,9 @@ export const ConnectionPooling = () => {
                             value={field.value || ''}
                             disabled={type === 'Supavisor'}
                             placeholder={!field.value ? `${defaultMaxClientConn}` : ''}
+                            {...form.register('max_client_conn', {
+                              setValueAs: setValueAsNullableNumber,
+                            })}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
