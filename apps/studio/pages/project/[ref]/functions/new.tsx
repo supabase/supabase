@@ -126,6 +126,7 @@ const NewFunctionPage = () => {
   })
 
   const { mutate: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
+    // [Joshen] To investigate: For some reason, the invalidation for list of edge functions isn't triggering
     onSuccess: () => {
       toast.success('Successfully deployed edge function')
       const functionName = form.getValues('functionName')
