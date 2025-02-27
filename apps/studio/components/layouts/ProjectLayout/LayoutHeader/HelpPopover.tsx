@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -38,7 +37,7 @@ const HelpPopover = () => {
           tooltip={{ content: { side: 'bottom', text: 'Help' } }}
           onClick={() => {
             sendEvent({
-              action: TelemetryActions.HELP_BUTTON_CLICKED,
+              action: 'help_button_clicked',
               groups: { project: project?.ref, organization: org?.slug },
             })
           }}
