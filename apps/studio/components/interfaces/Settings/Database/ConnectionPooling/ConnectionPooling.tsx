@@ -453,7 +453,7 @@ export const ConnectionPooling = () => {
                             }}
                           >
                             <FormControl_Shadcn_>
-                              <SelectTrigger_Shadcn_ className="max-w-64">
+                              <SelectTrigger_Shadcn_ className="max-w-80">
                                 <SelectValue_Shadcn_ />
                               </SelectTrigger_Shadcn_>
                             </FormControl_Shadcn_>
@@ -473,9 +473,12 @@ export const ConnectionPooling = () => {
                                       disablePgBouncerSelection && '!pointer-events-auto'
                                     )}
                                   >
-                                    <div className="flex gap-x-2 items-center">
+                                    <div className="flex items-center gap-x-2">
                                       <p className="text-sm text-foreground">Dedicated Pooler</p>
-                                      <Badge>IPv6</Badge>
+                                      <div className="flex items-center gap-x-1">
+                                        <Badge>IPv6</Badge>
+                                        {hasIpv4Addon && <Badge>IPv4 Add-on</Badge>}
+                                      </div>
                                     </div>
                                   </SelectItem_Shadcn_>
                                 </TooltipTrigger>
