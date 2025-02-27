@@ -45,20 +45,16 @@ export function openInstallGitLabIntegrationWindow(type: 'install' | 'authorize'
       : screen.height
 
   let windowUrl
-  // if (type === 'install') {
-  //   windowUrl = GITHUB_INTEGRATION_INSTALLATION_URL
-  // } else if (type === 'authorize') {
   const state = makeRandomString(32)
   localStorage.setItem(LOCAL_STORAGE_KEYS.GITLAB_AUTHORIZATION_STATE, state)
   windowUrl = `${GITLAB_INTEGRATION_AUTHORIZATION_URL}&state=${state}`
-  // }
 
   const systemZoom = width / window.screen.availWidth
   const left = (width - w) / 2 / systemZoom + dualScreenLeft
   const top = (height - h) / 2 / systemZoom + dualScreenTop
   const newWindow = window.open(
     windowUrl,
-    'GitHub',
+    'GitLab',
     `scrollbars=yes,resizable=no,status=no,location=no,toolbar=no,menubar=no,
      width=${w / systemZoom}, 
      height=${h / systemZoom}, 
