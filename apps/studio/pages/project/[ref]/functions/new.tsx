@@ -1,10 +1,10 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Book, Check } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
+import { toast } from 'sonner'
+import * as z from 'zod'
 
 import { useParams } from 'common'
 import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
@@ -41,7 +41,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 // Array of adjectives and nouns for random function name generation
 const ADJECTIVES = [
@@ -73,11 +72,11 @@ const NOUNS = [
 const FUNCTION_NAME_REGEX = /^[A-Za-z0-9_-]+$/
 
 // Define form schema with yup
-const formSchema = yup.object({
-  functionName: yup
+const FormSchema = z.object({
+  functionName: z
     .string()
-    .required('Function name is required')
-    .matches(FUNCTION_NAME_REGEX, 'Only letters, numbers, hyphens, and underscores allowed'),
+    .min(1, 'Function name is required')
+    .regex(FUNCTION_NAME_REGEX, 'Only letters, numbers, hyphens, and underscores allowed'),
 })
 
 // Generate a random function name
@@ -94,11 +93,11 @@ const sanitizeFunctionName = (name: string): string => {
 }
 
 // Type for the form values
-type FormValues = yup.InferType<typeof formSchema>
+type FormValues = z.infer<typeof FormSchema>
 
 const NewFunctionPage = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, template } = useParams()
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
@@ -119,15 +118,15 @@ const NewFunctionPage = () => {
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [savedCode, setSavedCode] = useState<string>('')
 
-  // Setup form with react-hook-form and yup resolver
   const form = useForm<FormValues>({
-    resolver: yupResolver(formSchema),
+    resolver: zodResolver(FormSchema),
     defaultValues: {
       functionName: generateRandomFunctionName(),
     },
   })
 
   const { mutate: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
+    // [Joshen] To investigate: For some reason, the invalidation for list of edge functions isn't triggering
     onSuccess: () => {
       toast.success('Successfully deployed edge function')
       const functionName = form.getValues('functionName')
@@ -218,6 +217,24 @@ const NewFunctionPage = () => {
     }
   }, [edgeFunctionCreate, ref, router])
 
+  useEffect(() => {
+    if (template) {
+      const templateMeta = EDGE_FUNCTION_TEMPLATES.find((x) => x.value === template)
+      if (templateMeta) {
+        form.reset({ functionName: template })
+        setFiles([
+          {
+            id: 1,
+            name: 'index.ts',
+            selected: true,
+            content: templateMeta.content,
+          },
+        ])
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [template])
+
   return (
     <PageLayout
       size="full"
@@ -243,7 +260,7 @@ const NewFunctionPage = () => {
                 Templates
               </Button>
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="w-[300px] p-0">
+            <PopoverContent_Shadcn_ className="w-[300px] p-0" align="end">
               <Command_Shadcn_>
                 <CommandInput_Shadcn_ placeholder="Search templates..." />
                 <CommandList_Shadcn_>

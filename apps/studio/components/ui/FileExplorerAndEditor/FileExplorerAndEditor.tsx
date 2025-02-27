@@ -1,16 +1,17 @@
-import React from 'react'
 import { Edit, File, Plus, Trash } from 'lucide-react'
-import { Button } from 'ui'
+import { useEffect, useState } from 'react'
+
 import AIEditor from 'components/ui/AIEditor'
 import {
-  TreeView,
-  TreeViewItem,
-  flattenTree,
+  Button,
   ContextMenu_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
+  ContextMenuTrigger_Shadcn_,
+  flattenTree,
+  TreeView,
+  TreeViewItem,
 } from 'ui'
 
 interface FileData {
@@ -60,6 +61,18 @@ const FileExplorerAndEditor = ({
   aiMetadata,
 }: FileExplorerAndEditorProps) => {
   const selectedFile = files.find((f) => f.selected) ?? files[0]
+
+  const [treeData, setTreeData] = useState({
+    name: '',
+    children: files.map((file) => ({
+      id: file.id.toString(),
+      name: file.name,
+      metadata: {
+        isEditing: false,
+        originalId: file.id,
+      },
+    })),
+  })
 
   const handleChange = (value: string) => {
     const updatedFiles = files.map((file) =>
@@ -132,20 +145,8 @@ const FileExplorerAndEditor = ({
     setTreeData(updatedTreeData)
   }
 
-  const [treeData, setTreeData] = React.useState({
-    name: '',
-    children: files.map((file) => ({
-      id: file.id.toString(),
-      name: file.name,
-      metadata: {
-        isEditing: false,
-        originalId: file.id,
-      },
-    })),
-  })
-
   // Update treeData when files change
-  React.useEffect(() => {
+  useEffect(() => {
     setTreeData({
       name: '',
       children: files.map((file) => ({
