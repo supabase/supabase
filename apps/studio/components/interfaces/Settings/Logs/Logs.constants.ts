@@ -365,6 +365,7 @@ export enum LogsTableName {
   STORAGE = 'storage_logs',
   POSTGREST = 'postgrest_logs',
   SUPAVISOR = 'supavisor_logs',
+  PGBOUNCER = 'pgbouncer_logs',
   WAREHOUSE = 'warehouse_logs',
   PG_CRON = 'pg_cron_logs',
 }
@@ -393,6 +394,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.STORAGE]: 'Object storage logs',
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
   [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
+  [LogsTableName.PGBOUNCER]: 'Lightweight connection pooler for PostgreSQL',
   [LogsTableName.WAREHOUSE]: 'Logs obtained from a data warehouse collection',
   [LogsTableName.PG_CRON]: 'Postgres logs from pg_cron cron jobs',
 }
