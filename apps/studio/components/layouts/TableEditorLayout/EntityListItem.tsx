@@ -130,10 +130,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         connectionString: project?.connectionString,
         table: supaTable,
       })
-
-      if (!Array.isArray(rows))
-        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
-
       const formattedRows = rows.map((row) => {
         const formattedRow = row
         Object.keys(row).map((column) => {
@@ -188,10 +184,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         connectionString: project?.connectionString,
         table: supaTable,
       })
-
-      if (!Array.isArray(rows))
-        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
-
       const formattedRows = rows.map((row) => {
         const formattedRow = row
         Object.keys(row).map((column) => {

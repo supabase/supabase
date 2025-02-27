@@ -159,7 +159,7 @@ export const fetchAllTableRows = async ({
       await sleep(THROTTLE_DELAY)
     } catch (error) {
       console.error('Error fetching table rows:', error)
-      return { data: { rows: [] } }
+      return []
     }
   }
 
