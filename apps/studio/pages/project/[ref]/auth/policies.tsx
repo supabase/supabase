@@ -26,6 +26,8 @@ import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui'
+import { AuthPoliciesLayout } from 'components/layouts/AuthLayout/AuthPoliciesLayout'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 
 /**
  * Filter tables by table name and policy name
@@ -113,7 +115,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <ScaffoldContainer size="large" className="pt-4">
       <div className="mb-4">
         <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-2">
           <SchemaSelector
@@ -209,16 +211,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         }}
         authContext="database"
       />
-    </div>
+    </ScaffoldContainer>
   )
 }
 
-AuthPoliciesPage.getLayout = (page) => (
-  <DefaultLayout>
-    <AuthLayout>
-      <div className="h-full p-4">{page}</div>
-    </AuthLayout>
-  </DefaultLayout>
-)
+AuthPoliciesPage.getLayout = (page) => <AuthPoliciesLayout>{page}</AuthPoliciesLayout>
 
 export default AuthPoliciesPage
