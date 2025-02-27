@@ -3,7 +3,6 @@ import { Home } from 'lucide-react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useContentQuery } from 'data/content/content-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -138,7 +137,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                               isAddingChart: true,
                             })
                             sendEvent({
-                              action: TelemetryActions.CUSTOM_REPORT_ADD_SQL_BLOCK_CLICKED,
+                              action: 'custom_report_add_sql_block_clicked',
                             })
                           }
                         }}

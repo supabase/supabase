@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -40,7 +39,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   useEffect(() => {
     if (isMounted.current) {
       sendEvent({
-        action: TelemetryActions.REALTIME_INSPECTOR_DATABASE_ROLE_UPDATED,
+        action: 'realtime_inspector_database_role_updated',
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     }

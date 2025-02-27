@@ -58,6 +58,12 @@ The pre-configured Supabase Grafana Dashboard is an advanced version of the [Das
 
 ### Deploying locally
 
+<Admonition type="note">
+  This method uses docker to deploy locally but the same steps can be used to deploy to a dedicated
+  server, such as [Fly](https://fly.io), [Railway](https://railway.app) or [Digital
+  Ocean](https://digitalocean.com)
+</Admonition>
+
 Prerequisites:
 
 - Must have [Docker](https://www.docker.com/products/docker-desktop/) or a Docker compatible runtime on your machine
@@ -176,6 +182,11 @@ Supabase Grafana only tracks metrics while it's active. For monitoring historica
 
 ### Deploying to Grafana cloud
 
+<Admonition type="note">
+  This section describes the Grafana cloud Supabase template, which is created and maintained by
+  Grafana.
+</Admonition>
+
 <StepHikeCompact>
 
     <StepHikeCompact.Step step={1}>
@@ -228,65 +239,6 @@ Supabase Grafana only tracks metrics while it's active. For monitoring historica
     <StepHikeCompact.Code>
         ![Add credentials](/docs/img/guides/platform/add-credentials-grafana.png)
     </StepHikeCompact.Code>
-
-    </StepHikeCompact.Step>
-
-</StepHikeCompact>
-
-### Deploying to fly.io
-
-<Admonition type="note">
-  This section explains deploying to Fly.io using the included configuration file, but deployment to
-  other hosts is also possible.
-</Admonition>
-
-<StepHikeCompact>
-
-    <StepHikeCompact.Step step={1} fullWidth>
-
-        <StepHikeCompact.Details title="Initialize project locally" >
-        Follow steps 1 through 4 for [local setups](#deploying-locally)
-        </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
-
-    <StepHikeCompact.Step step={2} >
-
-    <StepHikeCompact.Details title="Create a fly.io account">
-    If you do not already have one, create a [fly.io account](https://fly.io/app/sign-up).
-
-    Go through the [onboarding process](https://fly.io/dashboard/personal/new-launch?onboarding=1), including downloading the [Fly CLI tool](https://fly.io/docs/flyctl/install/)
-    </StepHikeCompact.Details>
-    <StepHikeCompact.Code>
-    ![Fly Registration Page](/docs/img/guides/platform/fly-signin.png)
-    </StepHikeCompact.Code>
-
-    </StepHikeCompact.Step>
-
-    <StepHikeCompact.Step step={3} >
-
-    <StepHikeCompact.Details title="Deploy your project"/>
-    <StepHikeCompact.Code>
-        Log into your Fly account through the CLI:
-        ```sh login
-        fly auth login
-        ```
-
-        Deploy your project with the Fly CLI
-        ```sh deploy_to_fly
-        fly launch --copy-config
-        fly secrets import < .env
-        ```
-    </StepHikeCompact.Code>
-
-
-    </StepHikeCompact.Step>
-    <StepHikeCompact.Step step={4} >
-
-    <StepHikeCompact.Details title="Access your project" fullWidth>
-    - Go to your [Fly.io Dashboard](https://fly.io/dashboard)  and select your project.
-    - It may take a few minutes for the project to spin up. Once it's ready, click on the project's link to view your Grafana Dashboard.
-    - When prompted, enter the username admin and the password you created earlier.
-    </StepHikeCompact.Details>
 
     </StepHikeCompact.Step>
 

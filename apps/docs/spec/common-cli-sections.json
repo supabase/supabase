@@ -354,6 +354,12 @@
             "type": "cli-command"
           }
         ]
+      },
+      {
+        "id": "supabase-inspect-report",
+        "title": "Inspect all database statistics and save output",
+        "slug": "supabase-inspect-report",
+        "type": "cli-command"
       }
     ]
   },

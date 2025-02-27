@@ -139,6 +139,8 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.SelfHosting
     case pathname.startsWith('storage'):
       return MenuId.Storage
+    case pathname.startsWith('/contributing'):
+      return MenuId.Contributing
     default:
       return MenuId.GettingStarted
   }
