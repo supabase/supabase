@@ -1,7 +1,7 @@
-import { useParams } from 'common'
 import { ChevronDown, Code, ExternalLink, Terminal } from 'lucide-react'
 import { useRouter } from 'next/router'
 
+import { useParams } from 'common'
 import {
   EdgeFunctionsListItem,
   FunctionsEmptyState,
@@ -33,7 +33,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-const FunctionsPage: NextPageWithLayout = () => {
+const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { setAiAssistantPanel } = useAppStateSnapshot()
   const router = useRouter()
@@ -108,6 +108,7 @@ const FunctionsPage: NextPageWithLayout = () => {
       : []),
     <DocsButton key="docs" href="https://supabase.com/docs/guides/functions" />,
     <ButtonTooltip
+      key="edge-function-create"
       type="default"
       className="px-1 pointer-events-auto"
       icon={<AiIconAnimation size={16} />}
@@ -186,7 +187,7 @@ const FunctionsPage: NextPageWithLayout = () => {
   )
 }
 
-FunctionsPage.getLayout = (page) => {
+EdgeFunctionsPage.getLayout = (page) => {
   return (
     <DefaultLayout>
       <EdgeFunctionsLayout>{page}</EdgeFunctionsLayout>
@@ -194,4 +195,4 @@ FunctionsPage.getLayout = (page) => {
   )
 }
 
-export default FunctionsPage
+export default EdgeFunctionsPage

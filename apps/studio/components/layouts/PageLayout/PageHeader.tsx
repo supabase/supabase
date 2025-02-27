@@ -1,7 +1,7 @@
+import { useParams } from 'common'
 import { ChevronLeft } from 'lucide-react'
 import { Fragment, ReactNode } from 'react'
 
-import { useParams } from 'common'
 import { cn } from 'ui'
 import {
   Breadcrumb,
@@ -93,7 +93,6 @@ export const PageHeader = ({
             ) : isCompact ? (
               title
             ) : null}
-            {pageMeta && <div className="ml-4">{pageMeta}</div>}
           </div>
           {isCompact && (
             <div className="flex items-center gap-2">
