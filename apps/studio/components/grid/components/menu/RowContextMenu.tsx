@@ -30,7 +30,7 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
     if (state.onEditRow) state.onEditRow(row)
   }
 
-  function isItemHidden({ data }: PredicateParams) {
+  function isItemHidden({ data }: { data: string }) {
     if (data === 'edit') return state.onEditRow == undefined
     if (data === 'delete') return !state.editable
     return false
@@ -64,12 +64,12 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
           <Clipboard size={14} />
           <span className="ml-2 text-xs">Copy cell content</span>
         </Item>
-        <Item onClick={onEditRowClick} hidden={isItemHidden} data="edit">
+        <Item onClick={onEditRowClick} hidden={() => isItemHidden({ data: 'edit' })} data="edit">
           <Edit size={14} />
           <span className="ml-2 text-xs">Edit row</span>
         </Item>
         {state.editable && <Separator />}
-        <Item onClick={onDeleteRow} hidden={isItemHidden} data="delete">
+        <Item onClick={onDeleteRow} hidden={() => isItemHidden({ data: 'delete' })} data="delete">
           <Trash size={14} stroke="red" />
           <span className="ml-2 text-xs">Delete row</span>
         </Item>
