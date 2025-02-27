@@ -24,6 +24,7 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormMessage_Shadcn_,
   Input_Shadcn_,
   Switch,
 } from 'ui'
@@ -33,12 +34,12 @@ const formId = 'realtime-configuration-form'
 
 const FormSchema = z.object({
   private_only: z.boolean(),
-  connection_pool: z.number().min(1).max(100),
-  max_concurrent_users: z.number().min(1).max(50000),
-  max_events_per_second: z.number().min(1).max(50000),
-  max_bytes_per_second: z.number().min(1).max(10000000),
-  max_channels_per_client: z.number().min(1).max(10000),
-  max_joins_per_second: z.number().min(1).max(5000),
+  connection_pool: z.coerce.number().min(1).max(100),
+  max_concurrent_users: z.coerce.number().min(1).max(50000),
+  max_events_per_second: z.coerce.number().min(1).max(50000),
+  max_bytes_per_second: z.coerce.number().min(1).max(10000000),
+  max_channels_per_client: z.coerce.number().min(1).max(10000),
+  max_joins_per_second: z.coerce.number().min(1).max(5000),
 })
 
 export const RealtimeSettings = () => {
@@ -89,7 +90,7 @@ export const RealtimeSettings = () => {
                       className="!p-0 !pt-2"
                       header={<FormSectionLabel>Channel restrictions</FormSectionLabel>}
                     >
-                      <FormSectionContent loading={isLoading}>
+                      <FormSectionContent loading={isLoading} className="!gap-y-2">
                         <FormItemLayout
                           layout="flex"
                           label="Private channels only"
@@ -127,16 +128,16 @@ export const RealtimeSettings = () => {
                         </FormSectionLabel>
                       }
                     >
-                      <FormSectionContent loading={isLoading}>
+                      <FormSectionContent loading={isLoading} className="!gap-y-2">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
                             type="number"
                             disabled={!canUpdateConfig}
                             value={field.value || ''}
-                            {...form.register('connection_pool', { valueAsNumber: true })}
                           />
                         </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
                       </FormSectionContent>
                     </FormSection>
                   )}
@@ -161,16 +162,16 @@ export const RealtimeSettings = () => {
                         </FormSectionLabel>
                       }
                     >
-                      <FormSectionContent loading={isLoading}>
+                      <FormSectionContent loading={isLoading} className="!gap-y-2">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
                             type="number"
                             disabled={!canUpdateConfig}
                             value={field.value || ''}
-                            {...form.register('max_concurrent_users', { valueAsNumber: true })}
                           />
                         </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
                       </FormSectionContent>
                     </FormSection>
                   )}
@@ -195,16 +196,16 @@ export const RealtimeSettings = () => {
                         </FormSectionLabel>
                       }
                     >
-                      <FormSectionContent loading={isLoading}>
+                      <FormSectionContent loading={isLoading} className="!gap-y-2">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
                             type="number"
                             disabled={!canUpdateConfig}
                             value={field.value || ''}
-                            {...form.register('max_events_per_second', { valueAsNumber: true })}
                           />
                         </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
                       </FormSectionContent>
                     </FormSection>
                   )}
@@ -231,7 +232,7 @@ export const RealtimeSettings = () => {
                           </FormSectionLabel>
                         }
                       >
-                        <FormSectionContent loading={isLoading} className="gap-y-1">
+                        <FormSectionContent loading={isLoading} className="!gap-y-2">
                           <FormControl_Shadcn_>
                             <Input_Shadcn_
                               {...field}
@@ -241,6 +242,7 @@ export const RealtimeSettings = () => {
                               {...form.register('max_bytes_per_second', { valueAsNumber: true })}
                             />
                           </FormControl_Shadcn_>
+                          <FormMessage_Shadcn_ />
                           {!!field.value ? (
                             <span className="text-sm text-foreground-lighter">
                               This is equivalent to {value.toFixed(2)} {unit}
@@ -271,7 +273,7 @@ export const RealtimeSettings = () => {
                         </FormSectionLabel>
                       }
                     >
-                      <FormSectionContent loading={isLoading}>
+                      <FormSectionContent loading={isLoading} className="!gap-y-2">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
@@ -281,6 +283,7 @@ export const RealtimeSettings = () => {
                             {...form.register('max_channels_per_client', { valueAsNumber: true })}
                           />
                         </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
                       </FormSectionContent>
                     </FormSection>
                   )}
@@ -305,7 +308,7 @@ export const RealtimeSettings = () => {
                         </FormSectionLabel>
                       }
                     >
-                      <FormSectionContent loading={isLoading}>
+                      <FormSectionContent loading={isLoading} className="!gap-y-2">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
@@ -315,6 +318,7 @@ export const RealtimeSettings = () => {
                             {...form.register('max_joins_per_second', { valueAsNumber: true })}
                           />
                         </FormControl_Shadcn_>
+                        <FormMessage_Shadcn_ />
                       </FormSectionContent>
                     </FormSection>
                   )}
