@@ -1,23 +1,23 @@
-import { File, Plus } from 'lucide-react'
+import React from 'react'
+import { Edit, File, Plus, Trash } from 'lucide-react'
 import { Button } from 'ui'
 import AIEditor from 'components/ui/AIEditor'
-import { TreeView, TreeViewItem, flattenTree } from 'ui'
+import {
+  TreeView,
+  TreeViewItem,
+  flattenTree,
+  ContextMenu_Shadcn_,
+  ContextMenuTrigger_Shadcn_,
+  ContextMenuContent_Shadcn_,
+  ContextMenuItem_Shadcn_,
+  ContextMenuSeparator_Shadcn_,
+} from 'ui'
 
 interface FileData {
   id: number
   name: string
   content: string
   selected?: boolean
-}
-
-interface TreeNode {
-  id: string
-  name: string
-  metadata?: {
-    isEditing?: boolean
-    originalId: number
-  }
-  children?: TreeNode[]
 }
 
 interface FileExplorerAndEditorProps {
@@ -88,11 +88,23 @@ const FileExplorerAndEditor = ({
     onFilesChange(updatedFiles)
   }
 
-  const handleDoubleClick = (id: number, currentName: string) => {
-    const newName = prompt('Enter new file name:', currentName)
-    if (newName && newName !== currentName) {
-      handleFileNameChange(id, newName)
+  const handleFileDelete = (id: number) => {
+    if (files.length <= 1) {
+      // Don't allow deleting the last file
+      return
     }
+
+    const fileToDelete = files.find((f) => f.id === id)
+    const isSelected = fileToDelete?.selected
+
+    const updatedFiles = files.filter((file) => file.id !== id)
+
+    // If the deleted file was selected, select another file
+    if (isSelected && updatedFiles.length > 0) {
+      updatedFiles[0].selected = true
+    }
+
+    onFilesChange(updatedFiles)
   }
 
   const handleFileSelect = (id: number) => {
@@ -103,7 +115,24 @@ const FileExplorerAndEditor = ({
     onFilesChange(updatedFiles)
   }
 
-  const treeData = {
+  const handleStartRename = (id: number) => {
+    const updatedTreeData = {
+      name: '',
+      children: files.map((file) => ({
+        id: file.id.toString(),
+        name: file.name,
+        metadata: {
+          isEditing: file.id === id,
+          originalId: file.id,
+        },
+      })),
+    }
+
+    // Force re-render of the TreeView with the updated metadata
+    setTreeData(updatedTreeData)
+  }
+
+  const [treeData, setTreeData] = React.useState({
     name: '',
     children: files.map((file) => ({
       id: file.id.toString(),
@@ -113,7 +142,22 @@ const FileExplorerAndEditor = ({
         originalId: file.id,
       },
     })),
-  }
+  })
+
+  // Update treeData when files change
+  React.useEffect(() => {
+    setTreeData({
+      name: '',
+      children: files.map((file) => ({
+        id: file.id.toString(),
+        name: file.name,
+        metadata: {
+          isEditing: false,
+          originalId: file.id,
+        },
+      })),
+    })
+  }, [files])
 
   return (
     <div className="flex-1 overflow-hidden flex h-full">
@@ -136,30 +180,57 @@ const FileExplorerAndEditor = ({
                   : null
 
               return (
-                <div
-                  onDoubleClick={(e) => {
-                    e.stopPropagation()
-                    if (originalId !== null) handleDoubleClick(originalId, element.name)
-                  }}
-                >
-                  <TreeViewItem
-                    {...nodeProps}
-                    isExpanded={isExpanded}
-                    isBranch={isBranch}
-                    isSelected={files.find((f) => f.id === originalId)?.selected}
-                    level={level}
-                    xPadding={16}
-                    name={element.name}
-                    icon={<File size={14} className="text-foreground-light" />}
-                    isEditing={Boolean(element.metadata?.isEditing)}
-                    onEditSubmit={(value) => {
-                      if (originalId !== null) handleFileNameChange(originalId, value)
-                    }}
-                    onClick={() => {
-                      if (originalId !== null) handleFileSelect(originalId)
-                    }}
-                  />
-                </div>
+                <ContextMenu_Shadcn_ modal={false}>
+                  <ContextMenuTrigger_Shadcn_ asChild>
+                    <div>
+                      <TreeViewItem
+                        {...nodeProps}
+                        isExpanded={isExpanded}
+                        isBranch={isBranch}
+                        isSelected={files.find((f) => f.id === originalId)?.selected}
+                        level={level}
+                        xPadding={16}
+                        name={element.name}
+                        icon={<File size={14} className="text-foreground-light" />}
+                        isEditing={Boolean(element.metadata?.isEditing)}
+                        onEditSubmit={(value) => {
+                          if (originalId !== null) handleFileNameChange(originalId, value)
+                        }}
+                        onClick={() => {
+                          if (originalId !== null) handleFileSelect(originalId)
+                        }}
+                      />
+                    </div>
+                  </ContextMenuTrigger_Shadcn_>
+                  <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
+                    <ContextMenuItem_Shadcn_
+                      className="gap-x-2"
+                      onSelect={() => {
+                        if (originalId !== null) handleStartRename(originalId)
+                      }}
+                      onFocusCapture={(e) => e.stopPropagation()}
+                    >
+                      <Edit size={14} />
+                      Rename file
+                    </ContextMenuItem_Shadcn_>
+
+                    {files.length > 1 && (
+                      <>
+                        <ContextMenuSeparator_Shadcn_ />
+                        <ContextMenuItem_Shadcn_
+                          className="gap-x-2"
+                          onSelect={() => {
+                            if (originalId !== null) handleFileDelete(originalId)
+                          }}
+                          onFocusCapture={(e) => e.stopPropagation()}
+                        >
+                          <Trash size={14} />
+                          Delete file
+                        </ContextMenuItem_Shadcn_>
+                      </>
+                    )}
+                  </ContextMenuContent_Shadcn_>
+                </ContextMenu_Shadcn_>
               )
             }}
           />
