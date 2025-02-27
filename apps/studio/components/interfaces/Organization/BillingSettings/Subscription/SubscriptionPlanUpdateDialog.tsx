@@ -33,8 +33,9 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
 
 const getRandomTweet = () => {
-  const randomIndex = Math.floor(Math.random() * tweets.length)
-  return tweets[randomIndex]
+  const filteredTweets = tweets.filter((it) => it.text.length < 180)
+  const randomIndex = Math.floor(Math.random() * filteredTweets.length)
+  return filteredTweets[randomIndex]
 }
 
 const PLAN_HEADINGS = {
@@ -618,9 +619,12 @@ const SubscriptionPlanUpdateDialog = ({
                           <div className="w-4">
                             <Check className="h-3 w-3 text-brand" strokeWidth={3} />
                           </div>
-                          <p className="text-sm">
-                            {typeof feature === 'string' ? feature : feature[0]}
-                          </p>
+                          <div className="text-sm">
+                            <p>{typeof feature === 'string' ? feature : feature[0]}</p>
+                            {Array.isArray(feature) && feature.length > 1 && (
+                              <p className="text-foreground-lighter text-xs">{feature[1]}</p>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
