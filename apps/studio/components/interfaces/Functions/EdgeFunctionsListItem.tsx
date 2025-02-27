@@ -46,7 +46,9 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       </Table.td>
       <Table.td>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
-          <p className="font-mono truncate hidden md:inline">{endpoint}</p>
+          <p title={endpoint} className="font-mono truncate hidden md:inline max-w-[30rem]">
+            {endpoint}
+          </p>
           <button
             type="button"
             className="text-foreground-lighter hover:text-foreground transition"
