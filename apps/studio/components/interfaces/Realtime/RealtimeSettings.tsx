@@ -60,7 +60,6 @@ export const RealtimeSettings = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: REALTIME_DEFAULT_CONFIG,
   })
-  const { max_bytes_per_second } = form.watch()
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (data) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -216,7 +215,7 @@ export const RealtimeSettings = () => {
                   control={form.control}
                   name="max_bytes_per_second"
                   render={({ field }) => {
-                    const { value, unit } = convertFromBytes(max_bytes_per_second ?? 0)
+                    const { value, unit } = convertFromBytes(field.value ?? 0)
                     return (
                       <FormSection
                         className="!p-0 !py-2"
@@ -242,7 +241,7 @@ export const RealtimeSettings = () => {
                               {...form.register('max_bytes_per_second', { valueAsNumber: true })}
                             />
                           </FormControl_Shadcn_>
-                          {!!max_bytes_per_second ? (
+                          {!!field.value ? (
                             <span className="text-sm text-foreground-lighter">
                               This is equivalent to {value.toFixed(2)} {unit}
                             </span>
