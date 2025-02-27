@@ -4,6 +4,7 @@ import { ResourceItem } from 'components/ui/Resource/ResourceItem'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Code, Terminal } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -19,9 +20,9 @@ import {
   DialogTrigger,
 } from 'ui'
 import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
-import TerminalInstructions from './TerminalInstructions'
+import { TerminalInstructions } from './TerminalInstructions'
 
-const FunctionsEmptyState = () => {
+export const FunctionsEmptyState = () => {
   const { ref } = useParams()
   const router = useRouter()
   const { setAiAssistantPanel } = useAppStateSnapshot()
@@ -114,19 +115,13 @@ const FunctionsEmptyState = () => {
             {EDGE_FUNCTION_TEMPLATES.map((template) => (
               <ResourceItem
                 key={template.name}
-                media={<Code strokeWidth={1.5} size={16} />}
-                onClick={() => {
-                  localStorage.setItem(
-                    'edgefunction_example',
-                    JSON.stringify({
-                      code: template.content,
-                      slug: template.value,
-                    })
-                  )
-                  router.push(`/project/${ref}/functions/new`)
-                }}
+                media={<Code strokeWidth={1.5} size={16} className="-translate-y-[9px]" />}
+                onClick={() => {}}
               >
-                {template.name}
+                <Link href={`/project/${ref}/functions/new?template=${template.value}`}>
+                  <p>{template.name}</p>
+                  <p className="text-sm text-foreground-lighter">{template.description}</p>
+                </Link>
               </ResourceItem>
             ))}
           </ResourceList>
@@ -135,5 +130,3 @@ const FunctionsEmptyState = () => {
     </>
   )
 }
-
-export default FunctionsEmptyState

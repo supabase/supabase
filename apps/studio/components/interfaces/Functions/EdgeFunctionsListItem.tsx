@@ -14,7 +14,7 @@ interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
 }
 
-const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
+export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
@@ -99,5 +99,3 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
     </Table.tr>
   )
 }
-
-export default EdgeFunctionsListItem

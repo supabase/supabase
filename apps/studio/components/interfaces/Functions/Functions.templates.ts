@@ -55,6 +55,37 @@ Deno.serve(async (req) => {
 })`,
   },
   {
+    value: 'storage-upload',
+    name: 'Supabase Storage Upload',
+    description: 'Upload files to Supabase Storage',
+    content: `// Setup type definitions for built-in Supabase Runtime APIs
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from 'jsr:@supabase/supabase-js@2'
+
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+)
+
+Deno.serve(async (req) => {
+  const formData = await req.formData()
+  const file = formData.get('file')
+  const { data, error } = await supabase
+    .storage
+    .from('your-bucket')
+    .upload(
+      \`files/\${crypto.randomUUID()}\`,
+      file,
+      { contentType: file.type }
+    )
+  if (error) throw error
+  return new Response(
+    JSON.stringify({ data }),
+    { headers: { 'Content-Type': 'application/json' }}
+  )
+})`,
+  },
+  {
     value: 'node-api',
     name: 'Node Built-in API Example',
     description: 'Example using Node.js built-in crypto and http modules',
@@ -97,16 +128,18 @@ app.listen(8000);`,
   },
   {
     value: 'openai-completion',
-    name: 'Text completion generation',
-    description: 'Generate text completions with OpenAI GPT-3',
+    name: 'OpenAI Text Completion',
+    description: 'Generate text completions using OpenAI GPT-3',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { Configuration, OpenAIApi } from 'npm:openai@3.3.0'
+
 const openAi = new OpenAIApi(
   new Configuration({
     apiKey: Deno.env.get('OPENAI_API_KEY')
   })
 )
+
 Deno.serve(async (req) => {
   const { prompt } = await req.json()
   const completion = await openAi.createCompletion({
@@ -122,13 +155,15 @@ Deno.serve(async (req) => {
   },
   {
     value: 'stripe-webhook',
-    name: 'Handle Stripe webhook events securely',
-    description: undefined,
+    name: 'Stripe Webhook Example',
+    description: 'Handle Stripe webhook events securely',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import Stripe from 'npm:stripe@12.0.0'
+
 const stripe = new Stripe(Deno.env.get('STRIPE_API_KEY')!)
 const endpointSecret = Deno.env.get('STRIPE_WEBHOOK_SIGNING_SECRET')!
+
 Deno.serve(async (req) => {
   const signature = req.headers.get('stripe-signature')
   try {
@@ -155,10 +190,13 @@ Deno.serve(async (req) => {
   },
   {
     value: 'resend-email',
-    name: 'Send emails using the Resend API',
+    name: 'Send Emails',
+    description: 'Send emails using the Resend API',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!
+
 Deno.serve(async (req) => {
   const { to, subject, html } = await req.json()
   const res = await fetch('https://api.resend.com/emails', {
@@ -182,14 +220,17 @@ Deno.serve(async (req) => {
   },
   {
     value: 'image-transform',
-    name: 'Transform images using ImageMagick WASM',
+    name: 'Image Transformation',
+    description: 'Transform images using ImageMagick WASM',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {
   ImageMagick,
   initializeImageMagick,
 } from "npm:@imagemagick/magick-wasm@0.0.30"
+
 await initializeImageMagick()
+
 Deno.serve(async (req) => {
   const formData = await req.formData()
   const file = formData.get('file')
@@ -207,10 +248,12 @@ Deno.serve(async (req) => {
   },
   {
     value: 'discord-bot',
-    name: 'Build a Slash Command Discord Bot',
+    name: 'Discord Bot Example',
+    description: 'Build a Slash Command Discord Bot',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { verifyDiscordRequest } from './_shared/discord.ts'
+
 Deno.serve(async (req) => {
   const { valid } = await verifyDiscordRequest(req)
   if (!valid) {
@@ -234,9 +277,11 @@ Deno.serve(async (req) => {
   },
   {
     value: 'websocket-server',
-    name: 'Create a real-time WebSocket server',
+    name: 'Websocket Server Example',
+    description: 'Create a real-time WebSocket server',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+
 Deno.serve((req) => {
   const upgrade = req.headers.get("upgrade") || ""
   if (upgrade.toLowerCase() != "websocket") {
@@ -252,34 +297,6 @@ Deno.serve((req) => {
     socket.send(new Date().toString())
   }
   return response
-})`,
-  },
-  {
-    value: 'storage-upload',
-    name: 'Upload files to Supabase Storage',
-    content: `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from 'jsr:@supabase/supabase-js@2'
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-)
-Deno.serve(async (req) => {
-  const formData = await req.formData()
-  const file = formData.get('file')
-  const { data, error } = await supabase
-    .storage
-    .from('your-bucket')
-    .upload(
-      \`files/\${crypto.randomUUID()}\`,
-      file,
-      { contentType: file.type }
-    )
-  if (error) throw error
-  return new Response(
-    JSON.stringify({ data }),
-    { headers: { 'Content-Type': 'application/json' }}
-  )
 })`,
   },
 ]

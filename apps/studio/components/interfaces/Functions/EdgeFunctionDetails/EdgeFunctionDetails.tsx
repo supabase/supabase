@@ -52,7 +52,7 @@ const FormSchema = z.object({
   verify_jwt: z.boolean(),
 })
 
-const EdgeFunctionDetails = () => {
+export const EdgeFunctionDetails = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -365,5 +365,3 @@ const EdgeFunctionDetails = () => {
     </div>
   )
 }
-
-export default EdgeFunctionDetails

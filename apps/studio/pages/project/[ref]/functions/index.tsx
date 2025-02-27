@@ -2,11 +2,9 @@ import { ChevronDown, Code, ExternalLink, Terminal } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import {
-  EdgeFunctionsListItem,
-  FunctionsEmptyState,
-  TerminalInstructions,
-} from 'components/interfaces/Functions'
+import { EdgeFunctionsListItem } from 'components/interfaces/Functions/EdgeFunctionsListItem'
+import { FunctionsEmptyState } from 'components/interfaces/Functions/FunctionsEmptyState'
+import { TerminalInstructions } from 'components/interfaces/Functions/TerminalInstructions'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
