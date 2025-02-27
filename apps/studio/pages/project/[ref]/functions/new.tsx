@@ -1,33 +1,99 @@
-import { useEffect, useState } from 'react'
-import { CornerDownLeft, Loader2, Book, Check } from 'lucide-react'
-import { Button, Input_Shadcn_, Label_Shadcn_, cn } from 'ui'
-import { AiIconAnimation } from 'ui'
-import { BASE_PATH } from 'lib/constants'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
-import { IS_PLATFORM } from 'lib/constants'
-import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
-import { toast } from 'sonner'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { AlertCircle, Book, Check } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import * as yup from 'yup'
+
 import { useParams } from 'common'
-import { useAppStateSnapshot } from 'state/app-state'
+import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
-import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
+import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
+  AiIconAnimation,
+  Button,
+  cn,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  Input_Shadcn_,
+  Label_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import { useFlag } from 'hooks/ui/useFlag'
+
+// Array of adjectives and nouns for random function name generation
+const ADJECTIVES = [
+  'quick',
+  'clever',
+  'bright',
+  'swift',
+  'rapid',
+  'smart',
+  'smooth',
+  'dynamic',
+  'super',
+  'hyper',
+]
+const NOUNS = [
+  'function',
+  'handler',
+  'processor',
+  'responder',
+  'worker',
+  'service',
+  'api',
+  'endpoint',
+  'action',
+  'task',
+]
+
+// Function name validation regex - only allows alphanumeric characters, hyphens, and underscores
+const FUNCTION_NAME_REGEX = /^[A-Za-z0-9_-]+$/
+
+// Define form schema with yup
+const formSchema = yup.object({
+  functionName: yup
+    .string()
+    .required('Function name is required')
+    .matches(FUNCTION_NAME_REGEX, 'Only letters, numbers, hyphens, and underscores allowed'),
+})
+
+// Generate a random function name
+const generateRandomFunctionName = () => {
+  const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)]
+  const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)]
+  return `${adjective}-${noun}`
+}
+
+// Convert invalid function name to valid one
+const sanitizeFunctionName = (name: string): string => {
+  // Replace invalid characters with hyphens
+  return name.replace(/[^A-Za-z0-9_-]/g, '-')
+}
+
+// Type for the form values
+type FormValues = yup.InferType<typeof formSchema>
 
 const NewFunctionPage = () => {
   const router = useRouter()
@@ -38,13 +104,6 @@ const NewFunctionPage = () => {
   const { setAiAssistantPanel } = useAppStateSnapshot()
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
 
-  // TODO (Saxon): Remove this once the flag is fully launched
-  useEffect(() => {
-    if (!edgeFunctionCreate) {
-      router.push(`/project/${ref}/functions`)
-    }
-  }, [edgeFunctionCreate, ref, router])
-
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
   >([
@@ -52,79 +111,43 @@ const NewFunctionPage = () => {
       id: 1,
       name: 'index.ts',
       selected: true,
-      content: `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-
-console.info('server started');
-
-Deno.serve(async (req: Request) => {
-  const data = {
-    message: 'Hello from Supabase Edge Functions!',
-  };
-
-  return new Response(
-    JSON.stringify(data),
-    { headers: { 'Content-Type': 'application/json', 'Connection': 'keep-alive' }}
-  );
-});`,
+      content: EDGE_FUNCTION_TEMPLATES[0].content,
     },
   ])
-
-  useEffect(() => {
-    // Load example code from localStorage if it exists
-    const exampleData = localStorage.getItem('edgefunction_example')
-    if (exampleData) {
-      try {
-        const { code, slug } = JSON.parse(exampleData)
-        setFiles([
-          {
-            id: 1,
-            name: 'index.ts',
-            selected: true,
-            content: code,
-          },
-        ])
-        setFunctionName(slug)
-        // Clear the example code from localStorage
-        localStorage.removeItem('edgefunction_example')
-      } catch (error) {
-        console.error('Failed to parse example data:', error)
-      }
-    }
-  }, [])
-
-  const [functionName, setFunctionName] = useState('')
   const [open, setOpen] = useState(false)
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [savedCode, setSavedCode] = useState<string>('')
 
-  const { mutateAsync: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
+  // Setup form with react-hook-form and yup resolver
+  const form = useForm<FormValues>({
+    resolver: yupResolver(formSchema),
+    defaultValues: {
+      functionName: generateRandomFunctionName(),
+    },
+  })
+
+  const { mutate: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
       toast.success('Successfully deployed edge function')
+      const functionName = form.getValues('functionName')
       if (ref && functionName) {
         router.push(`/project/${ref}/functions/${functionName}/details`)
       }
     },
   })
 
-  const onDeploy = async () => {
-    if (isDeploying || !ref || !functionName) return
+  const onSubmit = (values: FormValues) => {
+    if (isDeploying || !ref) return
 
-    try {
-      await deployFunction({
-        projectRef: ref,
-        metadata: {
-          entrypoint_path: 'index.ts',
-          name: functionName,
-          verify_jwt: true,
-        },
-        files: files.map(({ name, content }) => ({ name, content })),
-      })
-    } catch (error) {
-      toast.error(
-        `Failed to deploy function: ${error instanceof Error ? error.message : 'Unknown error'}`
-      )
-    }
+    deployFunction({
+      projectRef: ref,
+      metadata: {
+        entrypoint_path: 'index.ts',
+        name: values.functionName,
+        verify_jwt: true,
+      },
+      files: files.map(({ name, content }) => ({ name, content })),
+    })
   }
 
   const handleChat = () => {
@@ -146,23 +169,23 @@ Deno.serve(async (req: Request) => {
     })
   }
 
-  const onSelectTemplate = (templateSlug: string) => {
-    const template = EDGE_FUNCTION_TEMPLATES.find((t) => t.slug === templateSlug)
+  const onSelectTemplate = (templateValue: string) => {
+    const template = EDGE_FUNCTION_TEMPLATES.find((t) => t.value === templateValue)
     if (template) {
       setFiles((prev) =>
-        prev.map((file) => (file.selected ? { ...file, content: template.code } : file))
+        prev.map((file) => (file.selected ? { ...file, content: template.content } : file))
       )
       setOpen(false)
     }
   }
 
-  const handleTemplateMouseEnter = (code: string) => {
+  const handleTemplateMouseEnter = (content: string) => {
     if (!isPreviewingTemplate) {
       const selectedFile = files.find((f) => f.selected) ?? files[0]
       setSavedCode(selectedFile.content)
     }
     setIsPreviewingTemplate(true)
-    setFiles((prev) => prev.map((file) => (file.selected ? { ...file, content: code } : file)))
+    setFiles((prev) => prev.map((file) => (file.selected ? { ...file, content } : file)))
   }
 
   const handleTemplateMouseLeave = () => {
@@ -174,32 +197,35 @@ Deno.serve(async (req: Request) => {
     }
   }
 
+  // Try to sanitize function name when it's invalid
+  const handleDeploy = () => {
+    const currentName = form.getValues('functionName')
+    const isValid = FUNCTION_NAME_REGEX.test(currentName)
+
+    if (!isValid && currentName) {
+      const sanitizedName = sanitizeFunctionName(currentName)
+      form.setValue('functionName', sanitizedName, { shouldValidate: true })
+    }
+
+    form.handleSubmit(onSubmit)()
+  }
+
+  // TODO (Saxon): Remove this once the flag is fully launched
+  useEffect(() => {
+    if (!edgeFunctionCreate) {
+      router.push(`/project/${ref}/functions`)
+    }
+  }, [edgeFunctionCreate, ref, router])
+
   return (
     <PageLayout
       size="full"
       isCompact
+      title="Create new edge function"
       breadcrumbs={[
         {
           label: 'Edge Functions',
           href: `/project/${ref}/functions`,
-        },
-        {
-          element: (
-            <div className="flex items-center gap-2">
-              <Label_Shadcn_ htmlFor="function-name" className="text-foreground-light sr-only">
-                Function name
-              </Label_Shadcn_>
-              <Input_Shadcn_
-                id="function-name"
-                type="text"
-                autoFocus
-                placeholder="Give your function a name..."
-                value={functionName}
-                onChange={(e) => setFunctionName(e.target.value)}
-                className="w-[400px] p-0 text-base text-foreground bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-            </div>
-          ),
         },
       ]}
       primaryActions={
@@ -216,7 +242,7 @@ Deno.serve(async (req: Request) => {
                 Templates
               </Button>
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="w-[340px] p-0">
+            <PopoverContent_Shadcn_ className="w-[300px] p-0">
               <Command_Shadcn_>
                 <CommandInput_Shadcn_ placeholder="Search templates..." />
                 <CommandList_Shadcn_>
@@ -224,23 +250,28 @@ Deno.serve(async (req: Request) => {
                   <CommandGroup_Shadcn_>
                     {EDGE_FUNCTION_TEMPLATES.map((template) => (
                       <CommandItem_Shadcn_
-                        key={template.slug}
-                        value={template.slug}
-                        onSelect={(value) => onSelectTemplate(value)}
-                        onMouseEnter={() => handleTemplateMouseEnter(template.code)}
+                        key={template.value}
+                        value={template.value}
+                        onSelect={onSelectTemplate}
+                        onMouseEnter={() => handleTemplateMouseEnter(template.content)}
                         onMouseLeave={handleTemplateMouseLeave}
                         className="cursor-pointer"
                       >
-                        <div className="flex items-center overflow-hidden">
-                          <Check
-                            className={cn(
-                              'mr-2 h-4 w-4',
-                              files.some((f) => f.selected && f.content === template.code)
-                                ? 'opacity-100'
-                                : 'opacity-0'
-                            )}
-                          />
-                          <span className="flex-1 text-foreground truncate">{template.title}</span>
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center">
+                            <Check
+                              className={cn(
+                                'mr-2 h-4 w-4',
+                                files.some((f) => f.selected && f.content === template.content)
+                                  ? 'opacity-100'
+                                  : 'opacity-0'
+                              )}
+                            />
+                            <span className="text-foreground">{template.name}</span>
+                          </div>
+                          <span className="text-xs text-foreground-light pl-6">
+                            {template.description}
+                          </span>
                         </div>
                       </CommandItem_Shadcn_>
                     ))}
@@ -271,25 +302,54 @@ Deno.serve(async (req: Request) => {
         }}
       />
 
-      <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100">
-        <Button
-          loading={isDeploying}
-          size="medium"
-          disabled={!functionName || files.length === 0}
-          onClick={onDeploy}
-          iconRight={
-            isDeploying ? (
-              <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-            ) : (
-              <div className="flex items-center space-x-1">
-                <CornerDownLeft size={10} strokeWidth={1.5} />
-              </div>
-            )
-          }
+      <Form_Shadcn_ {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 gap-3"
         >
-          Deploy function
-        </Button>
-      </div>
+          <div className="flex items-center gap-3">
+            <Label_Shadcn_ htmlFor="functionName">Function name</Label_Shadcn_>
+            <FormField_Shadcn_
+              control={form.control}
+              name="functionName"
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="flex flex-col gap-0 m-0">
+                  <div className="flex items-center">
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        id="functionName"
+                        type="text"
+                        size={'large'}
+                        placeholder="Give your function a name..."
+                        className="w-[250px]"
+                        {...field}
+                      />
+                    </FormControl_Shadcn_>
+                    {form.formState.errors.functionName && (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <AlertCircle className="w-4 h-4 text-destructive ml-2" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {form.formState.errors.functionName.message}
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
+                </FormItem_Shadcn_>
+              )}
+            />
+          </div>
+          <Button
+            loading={isDeploying}
+            size="medium"
+            disabled={files.length === 0 || isDeploying}
+            onClick={handleDeploy}
+          >
+            Deploy function
+          </Button>
+        </form>
+      </Form_Shadcn_>
     </PageLayout>
   )
 }

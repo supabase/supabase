@@ -1,25 +1,25 @@
-import { Terminal, Code } from 'lucide-react'
 import { useParams } from 'common'
-import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
+import { ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import { ResourceItem } from 'components/ui/Resource/ResourceItem'
+import { ResourceList } from 'components/ui/Resource/ResourceList'
+import { useFlag } from 'hooks/ui/useFlag'
+import { Code, Terminal } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
+  AiIconAnimation,
   Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  DialogSection,
-  DialogContent,
   Dialog,
+  DialogContent,
+  DialogSection,
   DialogTrigger,
 } from 'ui'
+import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
 import TerminalInstructions from './TerminalInstructions'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useRouter } from 'next/router'
-import { AiIconAnimation } from 'ui'
-import { ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import { ResourceList } from 'components/ui/Resource/ResourceList'
-import { ResourceItem } from 'components/ui/Resource/ResourceItem'
-import { useFlag } from 'hooks/ui/useFlag'
 
 const FunctionsEmptyState = () => {
   const { ref } = useParams()
@@ -113,20 +113,20 @@ const FunctionsEmptyState = () => {
           <ResourceList>
             {EDGE_FUNCTION_TEMPLATES.map((template) => (
               <ResourceItem
-                key={template.title}
+                key={template.name}
                 media={<Code strokeWidth={1.5} size={16} />}
                 onClick={() => {
                   localStorage.setItem(
                     'edgefunction_example',
                     JSON.stringify({
-                      code: template.code,
-                      slug: template.slug,
+                      code: template.content,
+                      slug: template.value,
                     })
                   )
                   router.push(`/project/${ref}/functions/new`)
                 }}
               >
-                {template.title}
+                {template.name}
               </ResourceItem>
             ))}
           </ResourceList>

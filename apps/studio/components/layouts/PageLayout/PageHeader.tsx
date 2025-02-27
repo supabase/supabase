@@ -1,5 +1,7 @@
-import { Fragment, ReactNode } from 'react'
 import { useParams } from 'common'
+import { ChevronLeft } from 'lucide-react'
+import { Fragment, ReactNode } from 'react'
+
 import { cn } from 'ui'
 import {
   Breadcrumb,
@@ -10,7 +12,6 @@ import {
   BreadcrumbSeparator,
 } from 'ui/src/components/shadcn/ui/breadcrumb'
 import { ScaffoldDescription, ScaffoldTitle } from '../Scaffold'
-import { ChevronLeft } from 'lucide-react'
 
 interface PageHeaderProps {
   title?: string
@@ -92,7 +93,6 @@ export const PageHeader = ({
             ) : isCompact ? (
               title
             ) : null}
-            {pageMeta && <div className="ml-4">{pageMeta}</div>}
           </div>
           {isCompact && (
             <div className="flex items-center gap-2">

@@ -1,23 +1,24 @@
-import { File, Plus } from 'lucide-react'
-import { Button } from 'ui'
+import { Edit, File, Plus, Trash } from 'lucide-react'
+import { useEffect, useState } from 'react'
+
 import AIEditor from 'components/ui/AIEditor'
-import { TreeView, TreeViewItem, flattenTree } from 'ui'
+import {
+  Button,
+  ContextMenu_Shadcn_,
+  ContextMenuContent_Shadcn_,
+  ContextMenuItem_Shadcn_,
+  ContextMenuSeparator_Shadcn_,
+  ContextMenuTrigger_Shadcn_,
+  flattenTree,
+  TreeView,
+  TreeViewItem,
+} from 'ui'
 
 interface FileData {
   id: number
   name: string
   content: string
   selected?: boolean
-}
-
-interface TreeNode {
-  id: string
-  name: string
-  metadata?: {
-    isEditing?: boolean
-    originalId: number
-  }
-  children?: TreeNode[]
 }
 
 interface FileExplorerAndEditorProps {
@@ -61,6 +62,18 @@ const FileExplorerAndEditor = ({
 }: FileExplorerAndEditorProps) => {
   const selectedFile = files.find((f) => f.selected) ?? files[0]
 
+  const [treeData, setTreeData] = useState({
+    name: '',
+    children: files.map((file) => ({
+      id: file.id.toString(),
+      name: file.name,
+      metadata: {
+        isEditing: false,
+        originalId: file.id,
+      },
+    })),
+  })
+
   const handleChange = (value: string) => {
     const updatedFiles = files.map((file) =>
       file.id === selectedFile.id ? { ...file, content: value } : file
@@ -88,11 +101,23 @@ const FileExplorerAndEditor = ({
     onFilesChange(updatedFiles)
   }
 
-  const handleDoubleClick = (id: number, currentName: string) => {
-    const newName = prompt('Enter new file name:', currentName)
-    if (newName && newName !== currentName) {
-      handleFileNameChange(id, newName)
+  const handleFileDelete = (id: number) => {
+    if (files.length <= 1) {
+      // Don't allow deleting the last file
+      return
     }
+
+    const fileToDelete = files.find((f) => f.id === id)
+    const isSelected = fileToDelete?.selected
+
+    const updatedFiles = files.filter((file) => file.id !== id)
+
+    // If the deleted file was selected, select another file
+    if (isSelected && updatedFiles.length > 0) {
+      updatedFiles[0].selected = true
+    }
+
+    onFilesChange(updatedFiles)
   }
 
   const handleFileSelect = (id: number) => {
@@ -103,28 +128,50 @@ const FileExplorerAndEditor = ({
     onFilesChange(updatedFiles)
   }
 
-  const treeData = {
-    name: '',
-    children: files.map((file) => ({
-      id: file.id.toString(),
-      name: file.name,
-      metadata: {
-        isEditing: false,
-        originalId: file.id,
-      },
-    })),
+  const handleStartRename = (id: number) => {
+    const updatedTreeData = {
+      name: '',
+      children: files.map((file) => ({
+        id: file.id.toString(),
+        name: file.name,
+        metadata: {
+          isEditing: file.id === id,
+          originalId: file.id,
+        },
+      })),
+    }
+
+    // Force re-render of the TreeView with the updated metadata
+    setTreeData(updatedTreeData)
   }
+
+  // Update treeData when files change
+  useEffect(() => {
+    setTreeData({
+      name: '',
+      children: files.map((file) => ({
+        id: file.id.toString(),
+        name: file.name,
+        metadata: {
+          isEditing: false,
+          originalId: file.id,
+        },
+      })),
+    })
+  }, [files])
 
   return (
     <div className="flex-1 overflow-hidden flex h-full">
       <div className="w-64 border-r bg-surface-200 flex flex-col">
         <div className="py-4 px-6 border-b flex items-center justify-between">
-          <h3 className="text-sm font-medium">Files</h3>
+          <h3 className="text-sm font-normal font-mono uppercase text-lighter tracking-wide">
+            Files
+          </h3>
           <Button size="tiny" type="default" icon={<Plus size={14} />} onClick={addNewFile}>
             Add File
           </Button>
         </div>
-        <div className="flex-1 overflow-y-auto p-2">
+        <div className="flex-1 overflow-y-auto">
           <TreeView
             data={flattenTree(treeData)}
             aria-label="files tree"
@@ -136,30 +183,57 @@ const FileExplorerAndEditor = ({
                   : null
 
               return (
-                <div
-                  onDoubleClick={(e) => {
-                    e.stopPropagation()
-                    if (originalId !== null) handleDoubleClick(originalId, element.name)
-                  }}
-                >
-                  <TreeViewItem
-                    {...nodeProps}
-                    isExpanded={isExpanded}
-                    isBranch={isBranch}
-                    isSelected={files.find((f) => f.id === originalId)?.selected}
-                    level={level}
-                    xPadding={16}
-                    name={element.name}
-                    icon={<File size={14} className="text-foreground-light" />}
-                    isEditing={Boolean(element.metadata?.isEditing)}
-                    onEditSubmit={(value) => {
-                      if (originalId !== null) handleFileNameChange(originalId, value)
-                    }}
-                    onClick={() => {
-                      if (originalId !== null) handleFileSelect(originalId)
-                    }}
-                  />
-                </div>
+                <ContextMenu_Shadcn_ modal={false}>
+                  <ContextMenuTrigger_Shadcn_ asChild>
+                    <div>
+                      <TreeViewItem
+                        {...nodeProps}
+                        isExpanded={isExpanded}
+                        isBranch={isBranch}
+                        isSelected={files.find((f) => f.id === originalId)?.selected}
+                        level={level}
+                        xPadding={16}
+                        name={element.name}
+                        icon={<File size={14} className="text-foreground-light" />}
+                        isEditing={Boolean(element.metadata?.isEditing)}
+                        onEditSubmit={(value) => {
+                          if (originalId !== null) handleFileNameChange(originalId, value)
+                        }}
+                        onClick={() => {
+                          if (originalId !== null) handleFileSelect(originalId)
+                        }}
+                      />
+                    </div>
+                  </ContextMenuTrigger_Shadcn_>
+                  <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
+                    <ContextMenuItem_Shadcn_
+                      className="gap-x-2"
+                      onSelect={() => {
+                        if (originalId !== null) handleStartRename(originalId)
+                      }}
+                      onFocusCapture={(e) => e.stopPropagation()}
+                    >
+                      <Edit size={14} />
+                      Rename file
+                    </ContextMenuItem_Shadcn_>
+
+                    {files.length > 1 && (
+                      <>
+                        <ContextMenuSeparator_Shadcn_ />
+                        <ContextMenuItem_Shadcn_
+                          className="gap-x-2"
+                          onSelect={() => {
+                            if (originalId !== null) handleFileDelete(originalId)
+                          }}
+                          onFocusCapture={(e) => e.stopPropagation()}
+                        >
+                          <Trash size={14} />
+                          Delete file
+                        </ContextMenuItem_Shadcn_>
+                      </>
+                    )}
+                  </ContextMenuContent_Shadcn_>
+                </ContextMenu_Shadcn_>
               )
             }}
           />

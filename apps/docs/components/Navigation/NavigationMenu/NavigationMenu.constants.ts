@@ -1108,6 +1108,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/mssql',
         },
         {
+          name: 'Connecting to Notion',
+          url: '/guides/database/extensions/wrappers/notion',
+        },
+        {
           name: 'Connecting to Paddle',
           url: '/guides/database/extensions/wrappers/paddle',
         },
@@ -1947,6 +1951,13 @@ export const local_development: NavMenuConstant = {
       ],
     },
   ],
+}
+
+export const contributing: NavMenuConstant = {
+  icon: 'contributing',
+  title: 'Contributing',
+  url: '/contributing',
+  items: [{ name: 'Overview', url: '/contributing' }],
 }
 
 export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof IconPanel>>[] = [
