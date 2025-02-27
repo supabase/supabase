@@ -368,7 +368,7 @@ export const FormLayout = React.forwardRef<
     const ChildrenWrapper = () => {
       if (preTab || postTab) {
         return (
-          <PrePostTab preTab={preTab} postTab={postTab}>
+          <PrePostTab preTab={preTab} postTab={postTab} className="w-full">
             {props.children}
           </PrePostTab>
         )
