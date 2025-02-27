@@ -1,13 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
 import { Download } from 'lucide-react'
 
+import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import type { DatabaseBackup } from 'data/database/backups-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Badge } from 'ui'
-import { useParams } from 'common'
+import { TimestampInfo } from 'ui-patterns'
 
 interface BackupItemProps {
   index: number
@@ -36,7 +36,7 @@ const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProp
     },
   })
 
-  const generateSideButtons = (backup: any) => {
+  const generateSideButtons = (backup: DatabaseBackup) => {
     if (backup.status === 'COMPLETED')
       return (
         <div className="flex space-x-4">
@@ -84,20 +84,18 @@ const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProp
     return <Badge variant="warning">Backup In Progress...</Badge>
   }
 
-  const generateBackupName = (backup: any) => {
-    if (backup.status == 'COMPLETED') {
-      return `${dayjs(backup.inserted_at).format('DD MMM YYYY HH:mm:ss')} UTC`
-    }
-    return dayjs(backup.inserted_at).format('DD MMM YYYY')
-  }
-
   return (
     <div
       className={`flex h-12 items-center justify-between px-6 ${
         index ? 'border-t border-default' : ''
       }`}
     >
-      <p className="text-sm text-foreground ">{generateBackupName(backup)}</p>
+      <TimestampInfo
+        displayAs="utc"
+        utcTimestamp={backup.inserted_at}
+        labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+        className="text-left !text-sm font-mono tracking-tight"
+      />
       <div>{generateSideButtons(backup)}</div>
     </div>
   )
