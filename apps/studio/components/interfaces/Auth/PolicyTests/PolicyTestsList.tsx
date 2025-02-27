@@ -1,11 +1,11 @@
 import { ArrowRight, Loader2, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { Button, Input, Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from 'ui'
+import { Button, Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from 'ui'
 import PolicyTestItem from './PolicyTestItem'
 import { LOCAL_STORAGE_KEYS, PolicyTest, PolicyTestRole } from './types'
 import { v4 as uuidv4 } from 'uuid'
@@ -23,19 +23,66 @@ import { ImpersonationRole } from 'lib/role-impersonation'
 // Define a type for policy test status
 type PolicyTestStatus = 'passed' | 'failed' | 'running' | 'error' | 'queued'
 
+// Define type for test run status tracking
+type TestRunStatus = {
+  [key: string]: 'queued' | 'running' | 'complete' | null
+}
+
 interface PolicyTestsListProps {
   // Additional props if needed
 }
 
+// Simple direct function to execute SQL via the API
+async function executeSqlDirectly(options: {
+  projectRef: string
+  connectionString?: string
+  sql: string
+  isRoleImpersonationEnabled?: boolean
+}) {
+  try {
+    const apiUrl = `/api/v1/projects/${options.projectRef}/sql`
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sql: options.sql,
+        connectionString: options.connectionString,
+        isRoleImpersonationEnabled: options.isRoleImpersonationEnabled,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Error executing SQL')
+    }
+
+    const data = await response.json()
+    return { success: true, result: data.result }
+  } catch (error: any) {
+    return { success: false, error: { message: error.message || 'Unknown error' } }
+  }
+}
+
 const PolicyTestsList = ({}: PolicyTestsListProps) => {
   const { ref } = useParams()
-  const [newTestName, setNewTestName] = useState('')
-  const [newTestOpen, setNewTestOpen] = useState(false)
   const [isRunningAllTests, setIsRunningAllTests] = useState(false)
   const roleState = useRoleImpersonationStateSnapshot()
   const project = useSelectedProject()
   const [diagResult, setDiagResult] = useState<any>(null)
   const [showDiagResult, setShowDiagResult] = useState(false)
+  const [newTestId, setNewTestId] = useState<string | null>(null)
+
+  // Track the run status of each test
+  const [testRunStatuses, setTestRunStatuses] = useState<TestRunStatus>({})
+
+  // Queue of test IDs to run
+  const testQueueRef = useRef<string[]>([])
+
+  // Current running test index
+  const currentTestIndexRef = useRef<number>(-1)
 
   // We store tests by project ref in local storage
   const storageKey = `${LOCAL_STORAGE_KEYS.POLICY_TESTS}-${ref}`
@@ -43,7 +90,7 @@ const PolicyTestsList = ({}: PolicyTestsListProps) => {
   const [tests, setTests] = useLocalStorageQuery<PolicyTest[]>(storageKey, [])
 
   // For running diagnostics
-  const { mutate: executeSql, isLoading: isDiagnosticRunning } = useExecuteSqlMutation({
+  const { mutate: executeSql } = useExecuteSqlMutation({
     onSuccess(data) {
       setDiagResult(JSON.stringify(data.result, null, 2))
       setShowDiagResult(true)
@@ -54,162 +101,16 @@ const PolicyTestsList = ({}: PolicyTestsListProps) => {
     },
   })
 
-  // Current test state for running all tests
-  const [currentTestIndex, setCurrentTestIndex] = useState<number>(-1)
-  const [updatedTests, setUpdatedTests] = useState<PolicyTest[]>([])
-
-  // For running individual tests in the loop
-  const { mutate: executeTestSql, isLoading: isTestRunning } = useExecuteSqlMutation({
-    onSuccess(data) {
-      if (currentTestIndex === -1) return
-
-      const currentTest = updatedTests[currentTestIndex]
-      const willPass = !currentTest.expectedResult.startsWith('Error:')
-      let newStatus: PolicyTestStatus
-      let newActualResult: string
-
-      try {
-        if (!willPass) {
-          // If we expected an error but got a successful result, test failed
-          newStatus = 'failed'
-          newActualResult = JSON.stringify(data.result, null, 2)
-
-          updatedTests[currentTestIndex] = {
-            ...currentTest,
-            actualResult: newActualResult,
-            status: newStatus,
-          }
-          console.log('Test failed: Expected an error but query succeeded')
-        } else {
-          // Normal JSON comparison
-          let parsedExpected
-          try {
-            parsedExpected = JSON.parse(currentTest.expectedResult)
-          } catch (e) {
-            newStatus = 'error'
-            newActualResult = `Error: Invalid JSON in expected result`
-
-            updatedTests[currentTestIndex] = {
-              ...currentTest,
-              status: newStatus,
-              actualResult: newActualResult,
-            }
-            console.error('Error comparing results: Invalid JSON in expected result')
-            setUpdatedTests([...updatedTests])
-
-            // Also update the main tests state
-            const updatedMainTests = [...tests]
-            const mainTestIndex = updatedMainTests.findIndex((t) => t.id === currentTest.id)
-            if (mainTestIndex >= 0) {
-              updatedMainTests[mainTestIndex] = {
-                ...updatedMainTests[mainTestIndex],
-                status: newStatus,
-                actualResult: newActualResult,
-              }
-              setTests(updatedMainTests)
-            }
-
-            runNextTest()
-            return
-          }
-
-          // Compare the results
-          const actualFormatted = JSON.stringify(data.result)
-          const expectedFormatted = JSON.stringify(parsedExpected)
-          const isEqual = actualFormatted === expectedFormatted
-
-          newStatus = isEqual ? 'passed' : 'failed'
-          newActualResult = JSON.stringify(data.result, null, 2)
-
-          updatedTests[currentTestIndex] = {
-            ...currentTest,
-            actualResult: newActualResult,
-            status: newStatus,
-          }
-
-          if (isEqual) {
-            console.log('Test passed! Results match the expected output.')
-          } else {
-            console.log('Test failed. Results do not match the expected output.')
-          }
-        }
-
-        setUpdatedTests([...updatedTests])
-
-        // Also update the main tests state
-        const updatedMainTests = [...tests]
-        const mainTestIndex = updatedMainTests.findIndex((t) => t.id === currentTest.id)
-        if (mainTestIndex >= 0) {
-          updatedMainTests[mainTestIndex] = {
-            ...updatedMainTests[mainTestIndex],
-            status: newStatus,
-            actualResult: newActualResult,
-          }
-          setTests(updatedMainTests)
-        }
-
-        // Continue to the next test
-        runNextTest()
-      } catch (error) {
-        console.error('Error processing SQL result:', error)
-        failCurrentTest(
-          `Error processing SQL result: ${(error as Error).message || 'Unknown error'}`
-        )
-      }
-    },
-    onError(error: any) {
-      if (currentTestIndex === -1) return
-
-      const currentTest = updatedTests[currentTestIndex]
-      const willPass = !currentTest.expectedResult.startsWith('Error:')
-      const errorMessage = error.message || 'Unknown error occurred'
-      let newStatus: PolicyTestStatus
-      let newActualResult: string
-
-      console.error('SQL execution error:', error)
-
-      if (!willPass) {
-        // If we expect this test to fail (and it did fail), it's a pass
-        newStatus = 'passed'
-        newActualResult = `Error: ${errorMessage}`
-
-        updatedTests[currentTestIndex] = {
-          ...currentTest,
-          actualResult: newActualResult,
-          status: newStatus,
-        }
-        console.log('Test passed! Query failed as expected.')
-      } else {
-        // If we expect this test to pass but it failed, it's a failure
-        newStatus = 'error'
-        newActualResult = `Error: ${errorMessage}`
-
-        updatedTests[currentTestIndex] = {
-          ...currentTest,
-          status: newStatus,
-          actualResult: newActualResult,
-        }
-        console.error(`Failed to execute query: ${errorMessage}`)
-      }
-
-      setUpdatedTests([...updatedTests])
-
-      // Also update the main tests state
-      const updatedMainTests = [...tests]
-      const mainTestIndex = updatedMainTests.findIndex((t) => t.id === currentTest.id)
-      if (mainTestIndex >= 0) {
-        updatedMainTests[mainTestIndex] = {
-          ...updatedMainTests[mainTestIndex],
-          status: newStatus,
-          actualResult: newActualResult,
-        }
-        setTests(updatedMainTests)
-      }
-
-      // Continue to the next test
-      runNextTest()
-    },
-  })
+  // Clear the newTestId after it's been rendered
+  useEffect(() => {
+    if (newTestId) {
+      // Reset after a short delay to ensure the component has time to render
+      const timer = setTimeout(() => {
+        setNewTestId(null)
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [newTestId])
 
   // Run diagnostics to show RLS policies
   const runDiagnostics = () => {
@@ -239,219 +140,90 @@ const PolicyTestsList = ({}: PolicyTestsListProps) => {
     })
   }
 
-  // Helper function to mark the current test as failed
-  const failCurrentTest = (errorMessage: string) => {
-    if (currentTestIndex === -1 || !updatedTests[currentTestIndex]) return
+  // Format role impersonation - helper function
+  const formatImpersonationRole = (
+    role: PolicyTestRole | undefined
+  ): ImpersonationRole | undefined => {
+    if (!role) return undefined
 
-    const currentTest = updatedTests[currentTestIndex]
-    updatedTests[currentTestIndex] = {
-      ...currentTest,
-      status: 'error' as PolicyTestStatus,
-      actualResult: `Error: ${errorMessage}`,
-    }
+    if (role.role === 'anon') {
+      return {
+        type: 'postgrest',
+        role: 'anon',
+      } as ImpersonationRole
+    } else if (role.role === 'authenticated') {
+      const base = {
+        type: 'postgrest',
+        role: 'authenticated',
+        aal: role.aal || 'aal1',
+      } as Partial<ImpersonationRole>
 
-    setUpdatedTests([...updatedTests])
-
-    // Also update the main tests state to reflect the error status in the UI
-    const updatedMainTests = [...tests]
-    const mainTestIndex = updatedMainTests.findIndex((t) => t.id === currentTest.id)
-    if (mainTestIndex >= 0) {
-      updatedMainTests[mainTestIndex] = {
-        ...updatedMainTests[mainTestIndex],
-        status: 'error' as PolicyTestStatus,
-        actualResult: `Error: ${errorMessage}`,
-      }
-      setTests(updatedMainTests)
-    }
-
-    runNextTest()
-  }
-
-  // Helper function to run the next test in the queue
-  const runNextTest = async () => {
-    // Move to the next test
-    const nextIndex = currentTestIndex + 1
-
-    // If we've processed all tests, we're done
-    if (nextIndex >= updatedTests.length) {
-      // Save the final test results
-      setTests([...updatedTests])
-      setCurrentTestIndex(-1)
-      setIsRunningAllTests(false)
-      toast.success('All tests completed')
-      return
-    }
-
-    // Update the current test index
-    setCurrentTestIndex(nextIndex)
-
-    // Get the next test
-    const nextTest = updatedTests[nextIndex]
-    console.log(`Running test: ${nextTest.name} (${nextTest.id})`)
-
-    // Mark it as running
-    updatedTests[nextIndex] = { ...nextTest, status: 'running' as PolicyTestStatus }
-    setUpdatedTests([...updatedTests])
-
-    // Also update the main tests state to reflect the running status in the UI
-    const updatedMainTests = [...tests]
-    const mainTestIndex = updatedMainTests.findIndex((t) => t.id === nextTest.id)
-    if (mainTestIndex >= 0) {
-      updatedMainTests[mainTestIndex] = {
-        ...updatedMainTests[mainTestIndex],
-        status: 'running' as PolicyTestStatus,
-      }
-      setTests(updatedMainTests)
-    }
-
-    // Prepare to run the test
-    if (!project?.ref) {
-      failCurrentTest('Project reference not found')
-      return
-    }
-
-    try {
-      // Format role impersonation
-      const formatImpersonationRole = (
-        role: PolicyTestRole | undefined
-      ): ImpersonationRole | undefined => {
-        if (!role) return undefined
-
-        if (role.role === 'anon') {
-          return {
-            type: 'postgrest',
-            role: 'anon',
-          } as ImpersonationRole
-        } else if (role.role === 'authenticated') {
-          const base = {
-            type: 'postgrest',
+      if (role.email) {
+        return {
+          ...base,
+          userType: 'native',
+          user: {
+            id: role.userId || crypto.randomUUID(),
+            email: role.email,
+            is_anonymous: false,
             role: 'authenticated',
-            aal: role.aal || 'aal1',
-          } as Partial<ImpersonationRole>
-
-          if (role.email) {
-            return {
-              ...base,
-              userType: 'native',
-              user: {
-                id: role.userId || crypto.randomUUID(),
-                email: role.email,
-                is_anonymous: false,
-                role: 'authenticated',
-              },
-            } as ImpersonationRole
-          } else if (role.externalSub) {
-            let additionalClaims = {}
-            try {
-              if (role.additionalClaims) {
-                additionalClaims = JSON.parse(role.additionalClaims)
-              }
-            } catch (e) {
-              console.error('Failed to parse additional claims:', e)
-            }
-
-            return {
-              ...base,
-              userType: 'external',
-              externalAuth: {
-                sub: role.externalSub,
-                additionalClaims,
-              },
-            } as ImpersonationRole
-          }
-
-          return {
-            ...base,
-            userType: 'native',
-            user: {
-              id: crypto.randomUUID(),
-              email: 'anonymous@example.com',
-              is_anonymous: false,
-              role: 'authenticated',
-            },
-          } as ImpersonationRole
-        }
-
-        return undefined
-      }
-
-      // Wrap SQL with role impersonation
-      const prepareSql = async (sql: string, role: PolicyTestRole | undefined) => {
+          },
+        } as ImpersonationRole
+      } else if (role.externalSub) {
+        let additionalClaims = {}
         try {
-          const impersonationRole = formatImpersonationRole(role)
-
-          // Pass the project reference and role to wrapWithRoleImpersonation
-          if (project?.ref) {
-            // Import explicitly to avoid hook-related issues
-            const { wrapWithRoleImpersonation } = await import('lib/role-impersonation')
-            return await wrapWithRoleImpersonation(sql, {
-              projectRef: project.ref,
-              role: impersonationRole,
-            })
-          } else {
-            return sql
+          if (role.additionalClaims) {
+            additionalClaims = JSON.parse(role.additionalClaims)
           }
-        } catch (error) {
-          console.error('Error preparing SQL with role impersonation:', error)
-          throw error
+        } catch (e) {
+          console.error('Failed to parse additional claims:', e)
         }
+
+        return {
+          ...base,
+          userType: 'external',
+          externalAuth: {
+            sub: role.externalSub,
+            additionalClaims,
+          },
+        } as ImpersonationRole
       }
 
-      // Prepare the SQL query with role impersonation
-      const wrappedSql = await prepareSql(nextTest.sql, nextTest.role)
-      const isRoleImpersonationEnabled = Boolean(nextTest.role)
-
-      // Execute the test
-      executeTestSql({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        sql: wrappedSql,
-        isRoleImpersonationEnabled,
-      })
-
-      // Add a small delay to avoid overwhelming the database
-      await new Promise((resolve) => setTimeout(resolve, 100))
-    } catch (error: any) {
-      console.error(`Error running test ${nextTest.id}:`, error)
-      failCurrentTest(error.message || 'Unknown error during test preparation')
+      return {
+        ...base,
+        userType: 'native',
+        user: {
+          id: crypto.randomUUID(),
+          email: 'anonymous@example.com',
+          is_anonymous: false,
+          role: 'authenticated',
+        },
+      } as ImpersonationRole
     }
+
+    return undefined
   }
 
-  // Effect to start test execution after states are updated
-  useEffect(() => {
-    // Only run if we're in the "running all tests" mode and currentTestIndex is -1 (initial state)
-    if (isRunningAllTests && currentTestIndex === -1 && updatedTests.length > 0) {
-      // This effect will run after the state has been updated
-      runNextTest()
+  // Wrap SQL with role impersonation - helper function
+  const prepareSql = async (sql: string, role: PolicyTestRole | undefined) => {
+    try {
+      const impersonationRole = formatImpersonationRole(role)
+
+      // Pass the project reference and role to wrapWithRoleImpersonation
+      if (project?.ref) {
+        // Import explicitly to avoid hook-related issues
+        const { wrapWithRoleImpersonation } = await import('lib/role-impersonation')
+        return await wrapWithRoleImpersonation(sql, {
+          projectRef: project.ref,
+          role: impersonationRole,
+        })
+      } else {
+        return sql
+      }
+    } catch (error) {
+      console.error('Error preparing SQL with role impersonation:', error)
+      throw error
     }
-  }, [isRunningAllTests, currentTestIndex, updatedTests])
-
-  const runAllTests = async () => {
-    if (tests.length === 0) {
-      toast.info('No tests to run')
-      return
-    }
-
-    if (isDiagnosticRunning || isTestRunning) {
-      toast.info('Tests are already running')
-      return
-    }
-
-    // Create a copy of tests with all statuses set to 'queued'
-    const testsInProgress = tests.map((test) => ({
-      ...test,
-      status: 'queued' as PolicyTestStatus, // Use 'queued' instead of 'running'
-    }))
-
-    // Update both state variables - this will update the UI immediately
-    setTests(testsInProgress) // Update the main tests state for UI
-    setUpdatedTests(testsInProgress) // Keep the updatedTests state for test execution
-    setCurrentTestIndex(-1)
-    setIsRunningAllTests(true)
-    toast.info(`Running ${tests.length} tests...`)
-
-    // We don't call runNextTest() directly here anymore
-    // The useEffect hook will handle that after state updates
   }
 
   // Convert the global role state to our simplified test role format
@@ -491,15 +263,97 @@ const PolicyTestsList = ({}: PolicyTestsListProps) => {
     return undefined
   }
 
-  const handleAddTest = () => {
-    if (!newTestName.trim()) {
-      toast.error('Please provide a name for the test')
+  // Handle test completion and move to the next test
+  const handleTestComplete = (testId: string, finalStatus: 'passed' | 'failed' | 'error') => {
+    console.log(`Test ${testId} completed with status: ${finalStatus}`)
+
+    // Mark this test as complete
+    setTestRunStatuses((prev) => ({
+      ...prev,
+      [testId]: 'complete',
+    }))
+
+    // Move to the next test in the queue
+    moveToNextTest()
+  }
+
+  // Process the next test in the queue
+  const moveToNextTest = () => {
+    // Check if there are more tests in the queue
+    if (currentTestIndexRef.current < testQueueRef.current.length - 1) {
+      // Move to the next test
+      currentTestIndexRef.current++
+      const nextTestId = testQueueRef.current[currentTestIndexRef.current]
+
+      console.log(
+        `Moving to next test: ${nextTestId} (${currentTestIndexRef.current + 1}/${testQueueRef.current.length})`
+      )
+
+      // Mark the test as running
+      setTestRunStatuses((prev) => ({
+        ...prev,
+        [nextTestId]: 'running',
+      }))
+    } else {
+      // All tests are complete
+      console.log('All tests in queue have completed')
+      setIsRunningAllTests(false)
+      toast.success('All tests completed')
+
+      // Reset queue
+      testQueueRef.current = []
+      currentTestIndexRef.current = -1
+    }
+  }
+
+  // Run all tests in sequence
+  const runAllTests = async () => {
+    if (tests.length === 0) {
+      toast.info('No tests to run')
       return
     }
 
+    if (isRunningAllTests) {
+      toast.info('Tests are already running')
+      return
+    }
+
+    // Set running state
+    setIsRunningAllTests(true)
+    toast.info(`Running ${tests.length} tests...`)
+
+    try {
+      console.log('Starting test run...')
+
+      // Create a queue of all test IDs
+      const testIds = tests.map((test) => test.id)
+      testQueueRef.current = testIds
+      currentTestIndexRef.current = -1
+
+      // Initialize all tests as queued
+      const initialStatuses: TestRunStatus = {}
+      testIds.forEach((id) => {
+        initialStatuses[id] = 'queued'
+      })
+      setTestRunStatuses(initialStatuses)
+
+      console.log(`Queued ${testIds.length} tests for execution`)
+
+      // Start the first test
+      moveToNextTest()
+    } catch (error: any) {
+      console.error('Error setting up test run:', error)
+      toast.error(`Error running tests: ${error.message || 'Unknown error'}`)
+      setIsRunningAllTests(false)
+    }
+  }
+
+  const handleAddTest = () => {
+    // Create a new test with default values
+    const id = uuidv4()
     const newTest: PolicyTest = {
-      id: uuidv4(),
-      name: newTestName,
+      id,
+      name: `New Test ${tests.length + 1}`,
       role: convertToTestRole(),
       sql: 'SELECT * FROM your_table\nWHERE your_condition = true\nLIMIT 10;',
       expectedResult: JSON.stringify(
@@ -513,23 +367,17 @@ const PolicyTestsList = ({}: PolicyTestsListProps) => {
       ),
     }
 
-    setTests([...tests, newTest])
-    setNewTestName('')
-    setNewTestOpen(false)
-    toast.success('Test added successfully')
+    // Add the new test to the list
+    const updatedTests = [...tests, newTest]
+    setTests(updatedTests)
+
+    // Set the newTestId so we can auto-open it
+    setNewTestId(id)
   }
 
   const handleUpdateTest = (updatedTest: PolicyTest) => {
     console.log('PolicyTestsList: Updating test with ID:', updatedTest.id)
-    console.log(
-      'PolicyTestsList: Test data before update:',
-      tests.find((t) => t.id === updatedTest.id)
-    )
-    console.log('PolicyTestsList: New test data:', updatedTest)
-
     const updatedTests = tests.map((test) => (test.id === updatedTest.id ? updatedTest : test))
-    console.log('PolicyTestsList: Updated tests array:', updatedTests)
-
     setTests(updatedTests)
   }
 
@@ -541,7 +389,7 @@ const PolicyTestsList = ({}: PolicyTestsListProps) => {
 
   return (
     <ScaffoldSection isFullWidth>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-end mb-3">
         <div>
           <ScaffoldSectionTitle className="mb-1">Policy Tests</ScaffoldSectionTitle>
           <ScaffoldSectionDescription>
@@ -563,7 +411,7 @@ const PolicyTestsList = ({}: PolicyTestsListProps) => {
           >
             Run All Tests
           </Button>
-          <Button onClick={() => setNewTestOpen(true)} icon={<Plus size={16} />}>
+          <Button onClick={handleAddTest} icon={<Plus size={16} />}>
             Add Test
           </Button>
         </div>
@@ -597,53 +445,13 @@ const PolicyTestsList = ({}: PolicyTestsListProps) => {
               test={test}
               onTestUpdate={handleUpdateTest}
               onTestDelete={handleDeleteTest}
+              autoOpen={test.id === newTestId}
+              runStatus={testRunStatuses[test.id] || null}
+              onTestComplete={handleTestComplete}
             />
           ))
         )}
       </ResourceList>
-
-      <Sheet open={newTestOpen} onOpenChange={setNewTestOpen}>
-        <SheetContent className="flex flex-col gap-0">
-          <SheetHeader className="shrink-0">
-            <SheetTitle>Add New Policy Test</SheetTitle>
-          </SheetHeader>
-
-          <div className="flex-1 overflow-y-auto py-6">
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1 block">Test Name</label>
-                <Input
-                  placeholder="Enter test name"
-                  value={newTestName}
-                  onChange={(e) => setNewTestName(e.target.value)}
-                  autoFocus
-                />
-              </div>
-
-              <div className="mb-2">
-                <div className="text-sm font-medium text-foreground mb-1">
-                  Current Role for New Test
-                </div>
-                <div className="flex flex-col items-start">
-                  <RoleImpersonationPopover serviceRoleLabel="Service Role" />
-                  <div className="text-xs text-foreground-light mt-1">
-                    Select the role to use for this test
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <SheetFooter className="shrink-0">
-            <div className="flex items-center justify-end w-full gap-x-3">
-              <Button type="default" onClick={() => setNewTestOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleAddTest}>Create Test</Button>
-            </div>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
     </ScaffoldSection>
   )
 }

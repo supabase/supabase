@@ -28,18 +28,32 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useForm } from 'react-hook-form'
 
+// Define the PolicyTestStatus type (same as in PolicyTestsList)
+type PolicyTestStatus = 'passed' | 'failed' | 'running' | 'error' | 'queued'
+
 interface PolicyTestItemProps {
   test: PolicyTest
   onTestUpdate: (updatedTest: PolicyTest) => void
   onTestDelete: (testId: string) => void
   readOnly?: boolean
+  autoOpen?: boolean
+  runStatus?: 'queued' | 'running' | 'complete' | null
+  onTestComplete?: (testId: string, status: 'passed' | 'failed' | 'error') => void
 }
 
 const PolicyTestItem = observer(
-  ({ test, onTestUpdate, onTestDelete, readOnly = false }: PolicyTestItemProps) => {
+  ({
+    test,
+    onTestUpdate,
+    onTestDelete,
+    readOnly = false,
+    autoOpen = false,
+    runStatus = null,
+    onTestComplete,
+  }: PolicyTestItemProps) => {
     const { ref } = useParams()
     const project = useSelectedProject()
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(autoOpen)
     const [isRunning, setIsRunning] = useState(false)
     const [actualResult, setActualResult] = useState(test.actualResult || '')
     const [currentStatus, setCurrentStatus] = useState(test.status)
@@ -85,6 +99,14 @@ const PolicyTestItem = observer(
         syncTestRoleToGlobal(test.role)
       }
     }, [open])
+
+    // NEW EFFECT: Watch for changes to runStatus prop and run test when it changes to 'running'
+    useEffect(() => {
+      if (runStatus === 'running' && !isRunning) {
+        console.log(`Test "${test.name}" auto-triggered by runStatus prop`)
+        handleRunTest()
+      }
+    }, [runStatus])
 
     // Watch the willPass field to update the expectedResult format
     useEffect(() => {
@@ -133,6 +155,11 @@ const PolicyTestItem = observer(
             })
 
             toast.error('Test failed: Expected an error but query succeeded')
+
+            // Call onTestComplete callback if provided
+            if (onTestComplete) {
+              onTestComplete(test.id, 'failed')
+            }
           } else {
             // Normal JSON comparison as before
             // Compare the actual result with the expected result
@@ -149,15 +176,16 @@ const PolicyTestItem = observer(
             const expectedFormatted = JSON.stringify(parsedExpected)
 
             const isEqual = actualFormatted === expectedFormatted
+            const finalStatus = isEqual ? 'passed' : 'failed'
 
             // Update local state for immediate UI update
-            setCurrentStatus(isEqual ? 'passed' : 'failed')
+            setCurrentStatus(finalStatus)
 
             // Update the test status via callback
             onTestUpdate({
               ...test,
               actualResult: JSON.stringify(data.result, null, 2),
-              status: isEqual ? 'passed' : 'failed',
+              status: finalStatus,
               expectedResult: expectedResult,
             })
 
@@ -165,6 +193,11 @@ const PolicyTestItem = observer(
               toast.success('Test passed! Results match the expected output.')
             } else {
               toast.error('Test failed. Results do not match the expected output.')
+            }
+
+            // Call onTestComplete callback if provided
+            if (onTestComplete) {
+              onTestComplete(test.id, finalStatus)
             }
           }
 
@@ -182,6 +215,11 @@ const PolicyTestItem = observer(
             actualResult: `Error: Invalid JSON in expected result`,
           })
           toast.error('Error comparing results: Invalid JSON in expected result')
+
+          // Call onTestComplete callback if provided
+          if (onTestComplete) {
+            onTestComplete(test.id, 'error')
+          }
 
           // Reset loading state
           setIsRunning(false)
@@ -208,6 +246,11 @@ const PolicyTestItem = observer(
           })
 
           toast.success('Test passed! Query failed as expected.')
+
+          // Call onTestComplete callback if provided
+          if (onTestComplete) {
+            onTestComplete(test.id, 'passed')
+          }
         } else {
           // If we expect this test to pass but it failed, it's a failure
           setCurrentStatus('error')
@@ -220,6 +263,11 @@ const PolicyTestItem = observer(
           })
 
           toast.error(`Failed to execute query: ${errorMessage}`)
+
+          // Call onTestComplete callback if provided
+          if (onTestComplete) {
+            onTestComplete(test.id, 'error')
+          }
         }
 
         // Reset loading state
@@ -228,7 +276,7 @@ const PolicyTestItem = observer(
     })
 
     const handleRunTest = async () => {
-      if (isExecuting) return
+      if (isExecuting || isRunning) return
       setIsRunning(true)
       console.log('Running test:', form.getValues('name'))
 
@@ -239,6 +287,10 @@ const PolicyTestItem = observer(
       if (!sqlToExecute.trim()) {
         toast.error('Please enter SQL to execute')
         setIsRunning(false)
+        // Call onTestComplete callback for failed test
+        if (onTestComplete) {
+          onTestComplete(test.id, 'error')
+        }
         return
       }
 
@@ -263,10 +315,18 @@ const PolicyTestItem = observer(
           console.error('Error preparing SQL with role impersonation:', error)
           toast.error(`Role impersonation error: ${error.message || 'Unknown error'}`)
           setIsRunning(false)
+          // Call onTestComplete callback for failed test
+          if (onTestComplete) {
+            onTestComplete(test.id, 'error')
+          }
         }
       } else {
         toast.error('Project reference not found')
         setIsRunning(false)
+        // Call onTestComplete callback for failed test
+        if (onTestComplete) {
+          onTestComplete(test.id, 'error')
+        }
       }
     }
 
@@ -564,22 +624,14 @@ const PolicyTestItem = observer(
       }
     }
 
-    // Get role display
-    const getRoleDisplay = () => {
-      const currentRole = form.getValues('role')
-      if (!currentRole) {
-        return 'service_role'
-      } else {
-        let display = currentRole.role
-        if (currentRole.role === 'authenticated') {
-          if (currentRole.email) {
-            display += ` (${currentRole.email})`
-          } else if (currentRole.externalSub) {
-            display += ` (${currentRole.externalSub})`
-          }
-        }
-        return display
+    // Determine what status to display - prioritize runStatus over currentStatus
+    const displayStatus = (): PolicyTestStatus | undefined => {
+      // If there's an active runStatus of queued or running, show that
+      if (runStatus === 'queued' || runStatus === 'running') {
+        return runStatus as PolicyTestStatus
       }
+      // Otherwise show the current stored test status
+      return currentStatus
     }
 
     return (
@@ -592,9 +644,9 @@ const PolicyTestItem = observer(
                 {test.role ? test.role.role : 'service_role'}
               </div>
             </div>
-            {currentStatus && (
-              <Badge variant={statusVariant[currentStatus] as any}>
-                {currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1)}
+            {displayStatus() && (
+              <Badge variant={statusVariant[displayStatus() as PolicyTestStatus] as any}>
+                {(displayStatus() || '').charAt(0).toUpperCase() + (displayStatus() || '').slice(1)}
               </Badge>
             )}
           </div>
@@ -604,11 +656,15 @@ const PolicyTestItem = observer(
           <SheetContent className="flex flex-col gap-0">
             <SheetHeader className="shrink-0">
               <SheetTitle>
-                <div className="flex items-center justify-between">
-                  <div>Policy Test</div>
-                  {currentStatus && (
-                    <Badge variant={statusVariant[currentStatus] as any} className="shrink-0">
-                      {currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1)}
+                <div className="flex items-center gap-4">
+                  <div>{test.name}</div>
+                  {displayStatus() && (
+                    <Badge
+                      variant={statusVariant[displayStatus() as PolicyTestStatus] as any}
+                      className="shrink-0"
+                    >
+                      {(displayStatus() || '').charAt(0).toUpperCase() +
+                        (displayStatus() || '').slice(1)}
                     </Badge>
                   )}
                 </div>
