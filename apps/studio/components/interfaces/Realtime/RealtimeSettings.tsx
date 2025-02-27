@@ -323,10 +323,7 @@ export const RealtimeSettings = () => {
               </CardContent>
               <CardFooter className="justify-end space-x-2">
                 {form.formState.isDirty && (
-                  <Button
-                    type="default"
-                    onClick={() => form.reset((data as any) || REALTIME_DEFAULT_CONFIG)}
-                  >
+                  <Button type="default" onClick={() => form.reset(data as any)}>
                     Cancel
                   </Button>
                 )}
