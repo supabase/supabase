@@ -10,10 +10,7 @@ export type BackupsVariables = {
   projectRef?: string
 }
 
-export type DatabaseBackup = components['schemas']['Backup'] & {
-  // [Joshen] Seems like an API typing issue, status is being typed as Record<String, never>
-  status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED' | 'CANCELLED'
-}
+export type DatabaseBackup = components['schemas']['Backup']
 
 export async function getBackups({ projectRef }: BackupsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('Project ref is required')

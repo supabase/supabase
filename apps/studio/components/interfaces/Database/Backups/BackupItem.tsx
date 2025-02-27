@@ -37,7 +37,8 @@ const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProp
   })
 
   const generateSideButtons = (backup: DatabaseBackup) => {
-    if (backup.status === 'COMPLETED')
+    // [Joshen] API typing is incorrect here, status is getting typed as Record<string, never>
+    if ((backup as any).status === 'COMPLETED')
       return (
         <div className="flex space-x-4">
           <ButtonTooltip
