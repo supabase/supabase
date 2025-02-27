@@ -1,5 +1,3 @@
-import type { PoolingConfiguration } from 'data/database/pooling-configuration-query'
-
 type ConnectionStrings = {
   psql: string
   uri: string
@@ -12,19 +10,29 @@ type ConnectionStrings = {
   sqlalchemy: string
 }
 
-export const getConnectionStrings = (
+export const getConnectionStrings = ({
+  connectionInfo,
+  poolingInfo,
+  metadata,
+}: {
   connectionInfo: {
     db_user: string
     db_port: number
     db_host: string
     db_name: string
-  },
-  poolingInfo: PoolingConfiguration,
+  }
+  poolingInfo: {
+    connectionString: string
+    db_user: string
+    db_port: number
+    db_host: string
+    db_name: string
+  }
   metadata: {
     projectRef?: string
     pgVersion?: string
   }
-): {
+}): {
   direct: ConnectionStrings
   pooler: ConnectionStrings
 } => {
