@@ -1,4 +1,5 @@
-import { ExternalLink } from 'lucide-react'
+import { ChevronDown, Code, ExternalLink, Terminal } from 'lucide-react'
+import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import {
@@ -16,14 +17,26 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
-import { AiIconAnimation, Button, Dialog, DialogContent, DialogSection, DialogTrigger } from 'ui'
+import {
+  AiIconAnimation,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogSection,
+  DialogTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { setAiAssistantPanel } = useAppStateSnapshot()
-
+  const router = useRouter()
   const {
     data: functions,
     error,
@@ -31,20 +44,52 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     isError,
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })
+  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
 
   const hasFunctions = (functions ?? []).length > 0
 
   const deployButton = (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button type="primary">Deploy a new function</Button>
-      </DialogTrigger>
-      <DialogContent size="large">
-        <DialogSection padding="small">
-          <TerminalInstructions />
-        </DialogSection>
-      </DialogContent>
-    </Dialog>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button type="primary" iconRight={<ChevronDown className="w-4 h-4" strokeWidth={1.5} />}>
+          Deploy a new function
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-80">
+        <Dialog>
+          <DialogTrigger asChild>
+            <DropdownMenuItem className="gap-4" onSelect={(e) => e.preventDefault()}>
+              <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
+              <div>
+                <span className="text-foreground">Via CLI</span>
+                <p>
+                  Create an edge function locally and then deploy your function via the Supabase CLI
+                </p>
+              </div>
+            </DropdownMenuItem>
+          </DialogTrigger>
+          <DialogContent size="large">
+            <DialogSection padding="small">
+              <TerminalInstructions />
+            </DialogSection>
+          </DialogContent>
+        </Dialog>
+        {edgeFunctionCreate && (
+          <DropdownMenuItem
+            onSelect={() => router.push(`/project/${ref}/functions/new`)}
+            className="gap-4"
+          >
+            <Code className="shrink-0" size={16} strokeWidth={1.5} />
+            <div>
+              <span className="text-foreground">Via Editor</span>
+              <p>
+                Create an edge function in the Supabase Studio editor and then deploy your function
+              </p>
+            </div>
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 
   const secondaryActions = [
@@ -95,7 +140,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     <PageLayout
       size="large"
       title="Edge Functions"
-      subtitle="Server-side TypeScript functions distributed globally at the edge"
+      subtitle="Deploy edge functions to handle complex business logic"
       primaryActions={deployButton}
       secondaryActions={secondaryActions}
     >
