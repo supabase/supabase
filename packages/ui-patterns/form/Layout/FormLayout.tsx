@@ -6,8 +6,11 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Label_Shadcn_,
+  PrePostTab,
+  PrePostTabProps,
   cn,
 } from 'ui'
+
 import { SIZE } from 'ui/src/lib/constants'
 
 type Props = {
@@ -24,6 +27,8 @@ type Props = {
   labelLayout?: 'horizontal' | 'vertical'
   isReactForm?: boolean
   hideMessage?: boolean
+  preTab?: PrePostTabProps['preTab']
+  postTab?: PrePostTabProps['postTab']
   name?: string
 }
 
@@ -292,6 +297,8 @@ export const FormLayout = React.forwardRef<
       nonBoxInput = label ? false : true,
       hideMessage = false,
       isReactForm,
+      preTab,
+      postTab,
       ...props
     },
     ref
@@ -358,6 +365,17 @@ export const FormLayout = React.forwardRef<
       </>
     )
 
+    const ChildrenWrapper = () => {
+      if (preTab || postTab) {
+        return (
+          <PrePostTab preTab={preTab} postTab={postTab}>
+            {props.children}
+          </PrePostTab>
+        )
+      }
+      return props.children
+    }
+
     return (
       <div
         ref={ref}
@@ -366,7 +384,7 @@ export const FormLayout = React.forwardRef<
       >
         {flex && (
           <div className={cn(FlexContainer({ flex, align, layout }))}>
-            {props.children}
+            <ChildrenWrapper />
             {layout === 'flex-row-reverse' && renderError}
           </div>
         )}
@@ -429,7 +447,7 @@ export const FormLayout = React.forwardRef<
                 )}
                 data-formlayout-id={'nonBoxInputContainer'}
               >
-                {props.children}
+                <ChildrenWrapper />
               </div>
               {renderError}
               {renderDescription}
