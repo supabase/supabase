@@ -394,6 +394,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.STORAGE]: 'Object storage logs',
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
   [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
+  [LogsTableName.PGBOUNCER]: 'Lightweight connection pooler for PostgreSQL',
   [LogsTableName.WAREHOUSE]: 'Logs obtained from a data warehouse collection',
   [LogsTableName.PG_CRON]: 'Postgres logs from pg_cron cron jobs',
 }
