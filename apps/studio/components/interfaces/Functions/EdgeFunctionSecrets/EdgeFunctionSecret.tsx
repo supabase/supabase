@@ -5,6 +5,7 @@ import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { ProjectSecret } from 'data/secrets/secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { TimestampInfo } from 'ui-patterns'
 
 interface EdgeFunctionSecretProps {
   secret: ProjectSecret
@@ -23,18 +24,21 @@ const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps)
         <p className="truncate py-2">{secret.name}</p>
       </Table.td>
       <Table.td>
-        <div className="flex items-center space-x-2">
-          <p className="font-mono text-sm truncate" title={secret.value}>
-            {secret.value}
-          </p>
-        </div>
+        <p className="font-mono text-sm truncate" title={secret.value}>
+          {secret.value}
+        </p>
       </Table.td>
       <Table.td>
-        <div className="flex items-center space-x-2">
-          <p title={secret.updated_at}>
-            {secret.updated_at ? new Date(secret.updated_at).toLocaleString() : '-'}
-          </p>
-        </div>
+        {!!secret.updated_at ? (
+          <TimestampInfo
+            displayAs="utc"
+            utcTimestamp={secret.updated_at}
+            labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+            className="!text-sm"
+          />
+        ) : (
+          '-'
+        )}
       </Table.td>
       <Table.td>
         <div className="flex items-center justify-end">
