@@ -210,6 +210,9 @@ basicauth_credentials:
     password: password_two
 ```
 
+To enable all dashboard features outside of `localhost`, update the following value in the `./docker/.env` file:
+ - `SUPABASE_PUBLIC_URL`: The URL or IP used to access the dashboard
+
 You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 
 ## Restarting all services
