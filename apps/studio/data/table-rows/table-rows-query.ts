@@ -49,6 +49,31 @@ const getDefaultOrderByColumns = (table: SupaTable) => {
   }
 }
 
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+async function executeWithRetry(
+  fn: () => Promise<any>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<any> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn()
+    } catch (error: any) {
+      if (error?.status === 429 && attempt < maxRetries) {
+        // Get retry delay from headers or use exponential backoff
+        const retryAfter = error.headers?.get('retry-after')
+        const delayMs = retryAfter ? parseInt(retryAfter) * 1000 : baseDelay * Math.pow(2, attempt)
+        await sleep(delayMs)
+        continue
+      }
+      throw error
+    }
+  }
+}
+
 // Updated fetchAllTableRows function
 export const fetchAllTableRows = async ({
   projectRef,
@@ -104,32 +129,39 @@ export const fetchAllTableRows = async ({
     })
   }
 
-  // Starting from page 0, fetch 500 records per call
-  let page = -1
-  let from = 0
-  let to = 0
-  let pageData = []
   const rowsPerPage = 500
+  const THROTTLE_DELAY = 500 // 500ms between requests
 
-  await (async () => {
-    do {
-      page += 1
-      from = page * rowsPerPage
-      to = (page + 1) * rowsPerPage - 1
-      const query = wrapWithRoleImpersonation(queryChains.range(from, to).toSql(), {
-        projectRef,
-        role: impersonatedRole,
-      })
+  while (true) {
+    let page = -1
+    let from = 0
+    let to = 0
+    let pageData = []
 
-      try {
-        const { result } = await executeSql({ projectRef, connectionString, sql: query })
-        rows.push(...result)
-        pageData = result
-      } catch (error) {
-        return { data: { rows: [] } }
-      }
-    } while (pageData.length === rowsPerPage)
-  })()
+    page += 1
+    from = page * rowsPerPage
+    to = (page + 1) * rowsPerPage - 1
+    const query = wrapWithRoleImpersonation(queryChains.range(from, to).toSql(), {
+      projectRef,
+      role: impersonatedRole,
+    })
+
+    try {
+      const { result } = await executeWithRetry(async () =>
+        executeSql({ projectRef, connectionString, sql: query })
+      )
+      rows.push(...result)
+      pageData = result
+
+      if (pageData.length < rowsPerPage) break
+
+      // Add throttling delay between successful requests
+      await sleep(THROTTLE_DELAY)
+    } catch (error) {
+      console.error('Error fetching table rows:', error)
+      return { data: { rows: [] } }
+    }
+  }
 
   return rows.filter((row) => row[ROLE_IMPERSONATION_NO_RESULTS] !== 1)
 }
