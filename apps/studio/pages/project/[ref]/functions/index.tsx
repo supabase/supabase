@@ -2,15 +2,13 @@ import { ChevronDown, Code, ExternalLink, Terminal } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import {
-  EdgeFunctionsListItem,
-  FunctionsEmptyState,
-  TerminalInstructions,
-} from 'components/interfaces/Functions'
+import { EdgeFunctionsListItem } from 'components/interfaces/Functions/EdgeFunctionsListItem'
+import { FunctionsEmptyState } from 'components/interfaces/Functions/FunctionsEmptyState'
+import { TerminalInstructions } from 'components/interfaces/Functions/TerminalInstructions'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -93,20 +91,16 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
   )
 
   const secondaryActions = [
-    ...(!hasFunctions
-      ? [
-          <Button asChild key="edge-function-examples" type="default" icon={<ExternalLink />}>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
-            >
-              Examples
-            </a>
-          </Button>,
-        ]
-      : []),
     <DocsButton key="docs" href="https://supabase.com/docs/guides/functions" />,
+    <Button asChild key="edge-function-examples" type="default" icon={<ExternalLink />}>
+      <a
+        target="_blank"
+        rel="noreferrer"
+        href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+      >
+        Examples
+      </a>
+    </Button>,
     <ButtonTooltip
       key="edge-function-create"
       type="default"
@@ -145,18 +139,14 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
       secondaryActions={secondaryActions}
     >
       <ScaffoldContainer size="large">
-        {isLoading && (
-          <div className="pt-8">
-            <GenericSkeletonLoader />
-          </div>
-        )}
+        <ScaffoldSection isFullWidth>
+          {isLoading && <GenericSkeletonLoader />}
 
-        {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
+          {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
 
-        {isSuccess && (
-          <>
-            {hasFunctions ? (
-              <div className="py-6 space-y-4">
+          {isSuccess && (
+            <>
+              {hasFunctions ? (
                 <Table
                   head={
                     <>
@@ -176,12 +166,12 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                     </>
                   }
                 />
-              </div>
-            ) : (
-              <FunctionsEmptyState />
-            )}
-          </>
-        )}
+              ) : (
+                <FunctionsEmptyState />
+              )}
+            </>
+          )}
+        </ScaffoldSection>
       </ScaffoldContainer>
     </PageLayout>
   )
