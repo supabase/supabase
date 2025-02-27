@@ -15,7 +15,16 @@ export const PrePostTab = forwardRef<HTMLDivElement, PropsWithChildren<PrePostTa
             <span className="text-foreground-lighter text-xs font-mono">{preTab}</span>
           </div>
         )}
-        <div className="flex-1 [&_input:rounded-r-0]">{children}</div>
+        <div
+          className={cn('flex-1', {
+            '[&_input]:rounded-l-none [&_select]:rounded-l-none [&_textarea]:rounded-l-none':
+              Boolean(preTab),
+            '[&_input]:rounded-r-none [&_select]:rounded-r-none [&_textarea]:rounded-r-none':
+              Boolean(postTab),
+          })}
+        >
+          {children}
+        </div>
         {postTab && (
           <div className="border border-strong bg-surface-300 rounded-r-md px-3 flex items-center justify-center">
             <span className="text-foreground-lighter text-xs font-mono">{postTab}</span>

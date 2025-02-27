@@ -1037,6 +1037,11 @@ export const examples: Registry = [
     files: ['example/form-item-layout-post-tab.tsx'],
   },
   {
+    name: 'form-item-layout-pre-tab',
+    type: 'components:example',
+    files: ['example/form-item-layout-pre-tab.tsx'],
+  },
+  {
     name: 'info-tooltip-demo',
     type: 'components:example',
     files: ['example/info-tooltip-demo.tsx'],
