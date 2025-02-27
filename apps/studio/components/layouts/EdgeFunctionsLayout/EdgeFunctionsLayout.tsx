@@ -20,7 +20,7 @@ const EdgeFunctionsProductMenu = () => {
         {
           name: 'Functions',
           key: 'main',
-          pages: [undefined, '[functionSlug]'],
+          pages: [undefined, '[functionSlug]', 'new'],
           url: `/project/${projectRef}/functions`,
           items: [],
         },
