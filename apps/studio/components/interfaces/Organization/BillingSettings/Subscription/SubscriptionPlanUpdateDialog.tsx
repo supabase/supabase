@@ -170,14 +170,18 @@ const SubscriptionPlanUpdateDialog = ({
         if (!open) onClose()
       }}
     >
-      <DialogContent size="xlarge" className="p-0">
+      <DialogContent
+        onOpenAutoFocus={(event) => event.preventDefault()}
+        size="xlarge"
+        className="p-0"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 h-full items-stretch">
           {/* Left Column */}
           <div className="p-8 pb-8 flex flex-col">
             <div className="flex-1">
               <h3 className="text-lg font-medium mb-4">
                 {planMeta?.change_type === 'downgrade' ? 'Downgrade' : 'Upgrade'}{' '}
-                {selectedOrganization.name} to{' '}
+                {selectedOrganization?.name} to{' '}
                 {planMeta?.change_type === 'downgrade'
                   ? DOWNGRADE_PLAN_HEADINGS[(selectedTier as DowngradePlanHeadingKey) || 'default']
                   : PLAN_HEADINGS[(selectedTier as PlanHeadingKey) || 'default']}
