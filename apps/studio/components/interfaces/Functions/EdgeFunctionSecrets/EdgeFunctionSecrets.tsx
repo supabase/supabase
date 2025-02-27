@@ -68,47 +68,51 @@ const EdgeFunctionSecrets = () => {
                     icon={<Search size={14} />}
                   />
                 </div>
-                <Table
-                  head={[
-                    <Table.th key="secret-name">Name</Table.th>,
-                    <Table.th key="secret-value" className="flex items-center gap-x-2">
-                      Digest{' '}
-                      <Badge color="scale" className="font-mono">
-                        SHA256
-                      </Badge>
-                    </Table.th>,
-                    <Table.th key="actions" />,
-                  ]}
-                  body={
-                    secrets.length > 0 ? (
-                      secrets.map((secret) => (
-                        <EdgeFunctionSecret
-                          key={secret.name}
-                          secret={secret}
-                          onSelectDelete={() => setSelectedSecret(secret)}
-                        />
-                      ))
-                    ) : secrets.length === 0 && searchString.length > 0 ? (
-                      <Table.tr>
-                        <Table.td colSpan={3}>
-                          <p className="text-sm text-foreground">No results found</p>
-                          <p className="text-sm text-foreground-light">
-                            Your search for "{searchString}" did not return any results
-                          </p>
-                        </Table.td>
-                      </Table.tr>
-                    ) : (
-                      <Table.tr>
-                        <Table.td colSpan={3}>
-                          <p className="text-sm text-foreground">No secrets created</p>
-                          <p className="text-sm text-foreground-light">
-                            There are no secrets associated with your project yet
-                          </p>
-                        </Table.td>
-                      </Table.tr>
-                    )
-                  }
-                />
+
+                <div className="w-full overflow-hidden overflow-x-auto">
+                  <Table
+                    head={[
+                      <Table.th key="secret-name">Name</Table.th>,
+                      <Table.th key="secret-value" className="flex items-center gap-x-2">
+                        Digest{' '}
+                        <Badge color="scale" className="font-mono">
+                          SHA256
+                        </Badge>
+                      </Table.th>,
+                      <Table.th key="secret-updated-at">Updated at</Table.th>,
+                      <Table.th key="actions" />,
+                    ]}
+                    body={
+                      secrets.length > 0 ? (
+                        secrets.map((secret) => (
+                          <EdgeFunctionSecret
+                            key={secret.name}
+                            secret={secret}
+                            onSelectDelete={() => setSelectedSecret(secret)}
+                          />
+                        ))
+                      ) : secrets.length === 0 && searchString.length > 0 ? (
+                        <Table.tr>
+                          <Table.td colSpan={3}>
+                            <p className="text-sm text-foreground">No results found</p>
+                            <p className="text-sm text-foreground-light">
+                              Your search for "{searchString}" did not return any results
+                            </p>
+                          </Table.td>
+                        </Table.tr>
+                      ) : (
+                        <Table.tr>
+                          <Table.td colSpan={3}>
+                            <p className="text-sm text-foreground">No secrets created</p>
+                            <p className="text-sm text-foreground-light">
+                              There are no secrets associated with your project yet
+                            </p>
+                          </Table.td>
+                        </Table.tr>
+                      )
+                    }
+                  />
+                </div>
               </>
             )}
           </div>
