@@ -54,9 +54,12 @@ const REPORT_ATTRIBUTES = [
   { id: 'avg_cpu_usage', label: 'Average CPU usage' },
   { id: 'max_cpu_usage', label: 'Max CPU usage' },
   { id: 'disk_io_consumption', label: 'Disk IO consumed' },
-  { id: 'pg_stat_database_num_backends', label: 'Number of database connections' },
-  { id: 'supavisor_connections_active', label: 'Number of supavisor connections' },
-  { id: 'pgbouncer_pools_client_active_connections', label: 'Number of pgbouncer connections' },
+  { id: 'pg_stat_database_num_backends', label: 'Pooler to database connections' },
+  { id: 'supavisor_connections_active', label: 'Client to Supavisor connections' },
+  {
+    id: 'pgbouncer_pools_client_active_connections',
+    label: 'Client to PgBouncer connections',
+  },
 ]
 
 const DatabaseUsage = () => {
