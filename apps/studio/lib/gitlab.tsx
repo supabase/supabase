@@ -15,8 +15,6 @@ const GITLAB_INTEGRATION_CLIENT_ID =
       ? `<todo>`
       : `135a5e5431501d073c92cb8b767f8f4a80bc3bc961e60c268a3f417fb2cdbe50`
 
-console.log(process.env.NEXT_PUBLIC_ENVIRONMENT)
-
 const GITLAB_INTEGRATION_REDIRECT_URI =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
     ? `<todo>`
