@@ -736,6 +736,72 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.rate_limit.email_sent'
+    title: 'auth.rate_limit.email_sent'
+    tags: ['auth']
+    required: false
+    default: '2'
+    description: |
+      Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.sms_sent'
+    title: 'auth.rate_limit.sms_sent'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.anonymous_users'
+    title: 'auth.rate_limit.anonymous_users'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Number of anonymous sign-ins that can be made per hour per IP address. Requires enable_anonymous_sign_ins = true.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.token_refresh'
+    title: 'auth.rate_limit.token_refresh'
+    tags: ['auth']
+    required: false
+    default: '150'
+    description: |
+      Number of sessions that can be refreshed in a 5 minute interval per IP address.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.sign_in_sign_ups'
+    title: 'auth.rate_limit.sign_in_sign_ups'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Number of sign up and sign-in requests that can be made in a 5 minute interval per IP address (excludes anonymous users).
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.token_verifications'
+    title: 'auth.rate_limit.token_verifications'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Number of OTP / Magic link verifications that can be made in a 5 minute interval per IP address.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
   - id: 'auth.enable_signup'
     title: 'auth.enable_signup'
     tags: ['auth']
@@ -886,6 +952,17 @@ parameters:
     description: |
       Display name used as the sender for emails sent from the application.
 
+  - id: 'auth.email.smtp.rate_limit_email_sent'
+    title: 'auth.email.smtp.rate_limit_email_sent'
+    tags: ['auth']
+    required: false
+    default: '2'
+    description: |
+      Rate limit for email sending requests per hour. Controls how many emails can be sent to a single address within an hour.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
   - id: 'auth.email.template.type.subject'
     title: 'auth.email.template.<type>.subject'
     tags: ['auth']
@@ -952,6 +1029,17 @@ parameters:
     usage: |
       [auth.sms.test_otp]
       4152127777 = "123456"
+
+  - id: 'auth.sms.rate_limit_sms_sent'
+    title: 'auth.sms.rate_limit_sms_sent'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Rate limit for SMS sending requests per hour. Controls how many SMS messages can be sent to a single phone number within an hour.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
 
   - id: 'auth.sms.provider.enabled'
     title: 'auth.sms.<provider>.enabled'
