@@ -122,6 +122,24 @@ export const examples: Registry = [
     files: ['example/button-demo.tsx'],
   },
   {
+    name: 'button-sizes',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/button-sizes.tsx'],
+  },
+  {
+    name: 'button-default',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/button-default.tsx'],
+  },
+  {
+    name: 'button-warning',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/button-warning.tsx'],
+  },
+  {
     name: 'button-secondary',
     type: 'components:example',
     registryDependencies: ['button'],
@@ -314,6 +332,54 @@ export const examples: Registry = [
     files: ['example/command-dialog.tsx'],
   },
   {
+    name: 'commandmenu-demo',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-demo.tsx'],
+  },
+  {
+    name: 'commandmenu-badge',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-badge.tsx'],
+  },
+  {
+    name: 'commandmenu-icon',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-icon.tsx'],
+  },
+  {
+    name: 'commandmenu-hidden',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-hidden.tsx'],
+  },
+  {
+    name: 'commandmenu-force',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-force.tsx'],
+  },
+  {
+    name: 'commandmenu-conditional',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-conditional.tsx'],
+  },
+  {
+    name: 'commandmenu-subpage',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-subpage.tsx'],
+  },
+  {
+    name: 'commandmenu-subpage-custom',
+    type: 'components:example',
+    registryDependencies: ['commandmenu'],
+    files: ['example/commandmenu-subpage-custom.tsx'],
+  },
+  {
     name: 'context-menu-demo',
     type: 'components:example',
     registryDependencies: ['context-menu'],
@@ -364,6 +430,12 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['dialog', 'button'],
     files: ['example/dialog-close-button.tsx'],
+  },
+  {
+    name: 'dialog-centered-off',
+    type: 'components:example',
+    registryDependencies: ['dialog', 'button'],
+    files: ['example/dialog-centered-off.tsx'],
   },
   {
     name: 'drawer-demo',
@@ -647,12 +719,24 @@ export const examples: Registry = [
     registryDependencies: ['slider'],
     files: ['example/slider-demo.tsx'],
   },
-  // {
-  //   name: 'sonner-demo',
-  //   type: 'components:example',
-  //   registryDependencies: ['sonner'],
-  //   files: ['example/sonner-demo.tsx'],
-  // },
+  {
+    name: 'sonner-demo',
+    type: 'components:example',
+    registryDependencies: ['sonner'],
+    files: ['example/sonner-demo.tsx'],
+  },
+  {
+    name: 'sonner-types',
+    type: 'components:example',
+    registryDependencies: ['sonner'],
+    files: ['example/sonner-types.tsx'],
+  },
+  {
+    name: 'sonner-upload',
+    type: 'components:example',
+    registryDependencies: ['sonner'],
+    files: ['example/sonner-upload.tsx'],
+  },
   {
     name: 'switch-demo',
     type: 'components:example',
@@ -712,36 +796,6 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['textarea', 'label'],
     files: ['example/textarea-with-text.tsx'],
-  },
-  {
-    name: 'toast-demo',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-demo.tsx'],
-  },
-  {
-    name: 'toast-destructive',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-destructive.tsx'],
-  },
-  {
-    name: 'toast-simple',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-simple.tsx'],
-  },
-  {
-    name: 'toast-with-action',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-with-action.tsx'],
-  },
-  {
-    name: 'toast-with-title',
-    type: 'components:example',
-    registryDependencies: ['toast'],
-    files: ['example/toast-with-title.tsx'],
   },
   {
     name: 'toggle-group-demo',
@@ -983,14 +1037,74 @@ export const examples: Registry = [
     files: ['example/info-tooltip-demo.tsx'],
   },
   {
+    name: 'inner-side-menu-demo',
+    type: 'components:example',
+    files: ['example/inner-side-menu-demo.tsx'],
+  },
+  {
+    name: 'inner-side-menu-static-titles',
+    type: 'components:example',
+    files: ['example/inner-side-menu-static-titles.tsx'],
+  },
+  {
+    name: 'inner-side-menu-loading',
+    type: 'components:example',
+    files: ['example/inner-side-menu-loading.tsx'],
+  },
+  {
+    name: 'inner-side-menu-multiple-sections',
+    type: 'components:example',
+    files: ['example/inner-side-menu-multiple-sections.tsx'],
+  },
+  {
+    name: 'inner-side-menu-empty',
+    type: 'components:example',
+    files: ['example/inner-side-menu-empty.tsx'],
+  },
+  {
+    name: 'inner-side-menu-with-search',
+    type: 'components:example',
+    files: ['example/inner-side-menu-with-search.tsx'],
+  },
+  {
     name: 'multi-select-demo',
     type: 'components:example',
     files: ['example/multi-select-demo.tsx'],
   },
   {
-    name: 'multi-select-form',
+    name: 'multi-select-disabled',
     type: 'components:example',
-    files: ['example/multi-select-form.tsx'],
+    files: ['example/multi-select-disabled.tsx'],
+  },
+  {
+    name: 'multi-select-badge-limit-wrap',
+    type: 'components:example',
+    files: ['example/multi-select-badge-limit-wrap.tsx'],
+  },
+  {
+    name: 'multi-select-badge-limit',
+    type: 'components:example',
+    files: ['example/multi-select-badge-limit.tsx'],
+  },
+  {
+    name: 'multi-select-combobox',
+    type: 'components:example',
+    files: ['example/multi-select-combobox.tsx'],
+  },
+  {
+    name: 'multi-select-combobox-creatable',
+    type: 'components:example',
+    files: ['example/multi-select-combobox-creatable.tsx'],
+  },
+  {
+    name: 'multi-select-deletable-badge',
+    type: 'components:example',
+    files: ['example/multi-select-deletable-badge.tsx'],
+  },
+  {
+    name: 'multi-select-inline-search-input',
+    type: 'components:example',
+    files: ['example/multi-select-inline-search-input.tsx'],
   },
   {
     name: 'tree-view-demo',
@@ -1033,6 +1147,16 @@ export const examples: Registry = [
     files: ['example/modal-hide-footer.tsx'],
   },
   {
+    name: 'assistant-chat-demo',
+    type: 'components:example',
+    files: ['example/assistant-chat-demo.tsx'],
+  },
+  {
+    name: 'assistant-chat-commands',
+    type: 'components:example',
+    files: ['example/assistant-chat-commands.tsx'],
+  },
+  {
     name: 'color-usage-surface-www-and-docs',
     type: 'docs:example',
     files: ['example/color-usage-surface-www-and-docs.tsx'],
@@ -1046,5 +1170,45 @@ export const examples: Registry = [
     name: 'color-usage-surface-studio-frame',
     type: 'docs:example',
     files: ['example/color-usage-surface-studio-frame.tsx'],
+  },
+  {
+    name: 'chart-bar-demo',
+    type: 'components:example',
+    files: ['example/chart-bar-demo.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-grid',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-grid.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-axis',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-axis.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-tooltip',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-tooltip.tsx'],
+  },
+  {
+    name: 'chart-bar-demo-legend',
+    type: 'components:example',
+    files: ['example/chart-bar-demo-legend.tsx'],
+  },
+  {
+    name: 'chart-tooltip-demo',
+    type: 'components:example',
+    files: ['example/chart-tooltip-demo.tsx'],
+  },
+  {
+    name: 'expanding-textarea-demo',
+    type: 'docs:example',
+    files: ['example/expanding-textarea-demo.tsx'],
+  },
+  {
+    name: 'logs-bar-chart',
+    type: 'components:example',
+    files: ['example/logs-bar-chart.tsx'],
   },
 ]

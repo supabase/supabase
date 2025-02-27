@@ -1,0 +1,47 @@
+# A string used to distinguish different Supabase projects on the same host. Defaults to the
+# working directory name when running `supabase init`.
+project_id = "llamafile-edge"
+
+[api]
+# Disable data API since we are not using the PostgREST client in this example.
+enabled = false
+
+[db]
+# Port to use for the local database URL.
+port = 54322
+# Port used by db diff command to initialize the shadow database.
+shadow_port = 54320
+# The database major version to use. This has to be the same as your remote database's. Run `SHOW
+# server_version;` on the remote database to check.
+major_version = 15
+
+[db.seed]
+# If enabled, seeds the database after migrations during a db reset.
+enabled = false
+# Specifies an ordered list of seed files to load during db reset.
+# Supports glob patterns relative to supabase directory. For example:
+# sql_paths = ['./seeds/*.sql', '../project-src/seeds/*-load-testing.sql']
+
+[functions.llamafile]
+enabled = true
+# verify_jwt = true
+# import_map = "./functions/llamafile/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+# entrypoint = "./functions/llamafile/index.ts"
+
+[functions.llamafile-stream]
+enabled = true
+# verify_jwt = true
+# import_map = "./functions/llamafile-stream/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+# entrypoint = "./functions/llamafile-stream/index.ts"
+
+[functions.openai-sdk]
+enabled = true
+# verify_jwt = true
+# import_map = "./functions/openai-sdk/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+# entrypoint = "./functions/openai-sdk/index.ts"

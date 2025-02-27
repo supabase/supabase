@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Input, SidePanel } from 'ui'
-import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'

@@ -51,6 +51,7 @@ export type ColumnType =
   | 'text'
   | 'citext'
   | 'time'
+  | 'binary'
   | 'unknown'
 
 export interface GridForeignKey {
@@ -58,6 +59,7 @@ export interface GridForeignKey {
   targetTableName?: string | null
   targetColumnName?: string | null
   deletionAction?: string
+  updateAction?: string
 }
 
 export interface ColumnHeaderProps<R> extends RenderHeaderCellProps<R> {

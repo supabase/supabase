@@ -1,0 +1,43 @@
+---
+title = "Edge Function 'wall clock time limit reached'"
+github_url = "https://github.com/orgs/supabase/discussions/21293"
+date_created = "2024-02-15T11:42:58+00:00"
+topics = [ "functions" ]
+keywords = [ "wall clock", "limit", "time", "shutdown" ]
+database_id = "5a3a0125-84c7-463b-a886-ca53edfba5f4"
+
+[[errors]]
+http_status_code = 546
+message = "Edge Function 'wall clock time limit reached'"
+---
+
+**What Does "Wall Clock Time Limit Reached" Mean?**
+
+The message "wall clock time limit reached" typically indicates that a process has reached the maximum time allowed for execution. This time is measured by a clock, similar to a system clock or a clock on the wall. It encompasses the entire duration a process takes to complete, including any periods of inactivity or waiting.
+
+When this message appears in the context of your edge function, it means that the function has emitted a Shutdown event either after reaching the specified wall clock duration or when it hits a resource limit such as CPU time used or memory utilized.
+
+**Current Limits Explained**
+
+- Wall Clock Time Limit: Currently set at 400 seconds for the total duration your edge function can run.
+- CPU Execution Time: Limited to 200 milliseconds of active computing.
+
+This means that if your edge function completes its task within these time constraints, there's no need to be concerned about the "wall clock time limit reached" error message.
+
+Because the "wall clock time limit reached" warning can be expected in some cases. This message is hard-coded to be printed out when the worker has been terminated, even if it hasn't reached the time limit. However, if your function terminates with this warning and returns a 546 error response, then this indicates that your function is exceeding the allowed execution time, signaling a long-running task.
+
+**Steps to Troubleshoot**
+If you're facing the "wall clock time limit reached" error with a 546 error code, here are actions to take:
+
+- Review Your Function's Logic: Examine the operations within your edge function for any inefficiencies or prolonged processes. Consider optimizing code, minimizing unnecessary calculations, and implementing asynchronous operations where possible.
+
+- Divide Complex Tasks: For functions handling complex or extensive tasks, try breaking them down into smaller, discrete functions. This approach can help manage workloads more effectively and stay within time limits.
+
+- Monitor Execution Time: Use our logging or monitoring tools available to keep an eye on your function's performance. This can pinpoint where optimizations are necessary. To access logs visit: [Supabase Project Functions](https://app.supabase.com/project/_/functions) Select your function and click on Logs.
+
+- Check Our Guides: For more tips, refer to our debugging guide here: [Debugging Edge Functions](https://supabase.com/docs/guides/functions/debugging#logs--debugging)
+
+**Future Considerations**
+There are plans to make the wall clock time limit configurable per project in the future. However, currently, the only way to adjust this limit is by self-hosting [Edge Functions](https://github.com/supabase/edge-runtime/).
+
+Stay updated on changes by regularly checking our changelog [here](https://github.com/orgs/supabase/discussions/categories/changelog).

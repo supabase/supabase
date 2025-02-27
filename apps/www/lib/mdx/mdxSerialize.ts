@@ -3,14 +3,14 @@ import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
 import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 
 // mdx2 needs self-closing tags.
 // dragging an image onto a Github discussion creates an <img>
 // we need to fix this before running them through mdx
+// also checks for <br> and <hr>
 function addSelfClosingTags(htmlString: string): string {
-  const modifiedHTML = htmlString.replace(/<img[^>]*>/g, (match) => {
-    // Check if the <img> tag already has a closing slash
+  const modifiedHTML = htmlString.replace(/<img[^>]*>|<br[^>]*>|<hr[^>]*>/g, (match) => {
     if (match.endsWith('/>')) {
       return match
     } else {
@@ -18,7 +18,6 @@ function addSelfClosingTags(htmlString: string): string {
       return match.slice(0, -1) + ' />'
     }
   })
-
   return modifiedHTML
 }
 

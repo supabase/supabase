@@ -1,20 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { Badge, Button, IconDownload } from 'ui'
+import { Download } from 'lucide-react'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import type { DatabaseBackup } from 'data/database/backups-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Badge } from 'ui'
+import { useParams } from 'common'
 
 interface BackupItemProps {
   index: number
   isHealthy: boolean
-  projectRef: string
   backup: DatabaseBackup
   onSelectBackup: () => void
 }
 
-const BackupItem = ({ index, isHealthy, backup, projectRef, onSelectBackup }: BackupItemProps) => {
+const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProps) => {
+  const { ref: projectRef } = useParams()
   const canTriggerScheduledBackups = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
@@ -37,23 +40,44 @@ const BackupItem = ({ index, isHealthy, backup, projectRef, onSelectBackup }: Ba
     if (backup.status === 'COMPLETED')
       return (
         <div className="flex space-x-4">
-          <Button
+          <ButtonTooltip
             type="default"
             disabled={!isHealthy || !canTriggerScheduledBackups}
             onClick={onSelectBackup}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !isHealthy
+                  ? 'Cannot be restored as project is not active'
+                  : !canTriggerScheduledBackups
+                    ? 'You need additional permissions to trigger a restore'
+                    : undefined,
+              },
+            }}
           >
             Restore
-          </Button>
+          </ButtonTooltip>
           {!backup.isPhysicalBackup && (
-            <Button
+            <ButtonTooltip
               type="default"
-              disabled={!canTriggerScheduledBackups || isDownloading}
-              onClick={() => downloadBackup({ ref: projectRef, backup })}
+              icon={<Download />}
               loading={isDownloading}
-              icon={<IconDownload />}
+              disabled={!canTriggerScheduledBackups || isDownloading}
+              onClick={() => {
+                if (!projectRef) return console.error('Project ref is required')
+                downloadBackup({ ref: projectRef, backup })
+              }}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canTriggerScheduledBackups
+                    ? 'You need additional permissions to download backups'
+                    : undefined,
+                },
+              }}
             >
               Download
-            </Button>
+            </ButtonTooltip>
           )}
         </div>
       )

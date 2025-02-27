@@ -1,6 +1,6 @@
 import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
 import SignUpForm from 'components/interfaces/SignIn/SignUpForm'
-import { SignInLayout } from 'components/layouts'
+import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import Link from 'next/link'
 import type { NextPageWithLayout } from 'types'
 

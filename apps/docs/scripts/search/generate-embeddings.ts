@@ -1,12 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
-import dotenv from 'dotenv'
+import 'dotenv/config'
 import { parseArgs } from 'node:util'
 import { OpenAI } from 'openai'
 import { v4 as uuidv4 } from 'uuid'
 import type { Json, Section } from '../helpers.mdx'
-import { fetchSources } from './sources'
-
-dotenv.config()
+import { fetchAllSources } from './sources'
 
 const args = parseArgs({
   options: {
@@ -40,6 +38,7 @@ async function generateEmbeddings() {
 
   const supabaseClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
     process.env.SUPABASE_SERVICE_ROLE_KEY,
     {
       auth: {
@@ -55,7 +54,7 @@ async function generateEmbeddings() {
 
   const refreshDate = new Date()
 
-  const embeddingSources = await fetchSources()
+  const embeddingSources = await fetchAllSources()
 
   console.log(`Discovered ${embeddingSources.length} pages`)
 

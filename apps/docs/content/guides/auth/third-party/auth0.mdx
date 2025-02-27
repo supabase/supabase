@@ -1,0 +1,148 @@
+---
+id: 'auth-third-party-auth0'
+title: 'Auth0'
+subtitle: 'Use Auth0 with your Supabase project'
+---
+
+Auth0 can be used as a third-party authentication provider alongside Supabase Auth, or standalone, with your Supabase project.
+
+## Getting started
+
+1. First you need to add an integration to connect your Supabase project with your Auth0 tenant. You will need your tenant ID (and in some cases region ID).
+2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/settings/auth).
+3. Assign the `role: 'authenticated'` custom claim to all JWTs by using an Auth0 Action.
+4. Finally setup the Supabase client in your application.
+
+## Setup the Supabase client library
+
+<Tabs type="underlined" queryGroup="auth0-create-client">
+
+<TabPanel id="ts" label="TypeScript">
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+import Auth0Client from '@auth0/auth0-spa-js'
+
+const auth0 = new Auth0Client({
+  domain: '<AUTH0_DOMAIN>',
+  clientId: '<AUTH0_CLIENT_ID>',
+  authorizationParams: {
+    redirect_uri: '<MY_CALLBACK_URL>',
+  },
+})
+
+const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
+  accessToken: async () => {
+    const accessToken = await auth0.getTokenSilently()
+
+    // Alternatively you can use (await auth0.getIdTokenClaims()).__raw to
+    // use an ID token instead.
+
+    return accessToken
+  },
+})
+```
+
+</TabPanel>
+
+<TabPanel id="swift" label="Swift (iOS)">
+
+```swift
+import Auth0
+import Supabase
+
+extension CredentialsManager {
+  static let shared = Auth0.CredentialsManager(authentication: Auth0.authentication())
+}
+
+let supabase = SupabaseClient(
+  supabaseURL: URL(string: "https://<supabase-project>.supabase.co")!,
+  supabaseKey: "SUPABASE_ANON_KEY",
+  options: SupabaseClientOptions(
+    auth: SupabaseClientOptions.AuthOptions(
+      accessToken: {
+        try await CredentialsManager.shared.credentials().idToken
+      }
+    )
+  )
+)
+```
+
+</TabPanel>
+
+<TabPanel id="dart" label="Flutter">
+
+```dart
+import 'package:auth0_flutter/auth0_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+Future<void> main() async {
+  final auth0 = Auth0('AUTH0_DOMAIN', 'AUTH0_CLIENT_ID');
+  await Supabase.initialize(
+    url: 'https://<supabase-project>.supabase.co',
+    anonKey: 'SUPABASE_ANON_KEY',
+    accessToken: () async {
+      final credentials = await auth0.credentialsManager.credentials();
+      return credentials.accessToken;
+    },
+  );
+  runApp(const MyApp());
+}
+```
+
+</TabPanel>
+
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+import com.auth0.android.result.Credentials
+
+val supabase = createSupabaseClient(
+    "https://<supabase-project>.supabase.co",
+    "SUPABASE_ANON_KEY"
+) {
+    accessToken = {
+        val credentials: Credentials = ...; // Get credentials from Auth0
+        credentials.accessToken
+    }
+}
+```
+
+</TabPanel>
+
+</Tabs>
+
+## Add a new Third-Party Auth integration to your project
+
+In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/settings/auth) and find the Third-Party Auth section to add a new integration.
+
+In the CLI add the following config to your `supabase/config.toml` file:
+
+```toml
+[auth.third_party.auth0]
+enabled = true
+tenant = "<id>"
+tenant_region = "<region>" # if your tenant has a region
+```
+
+## Use an Auth0 Action to assign the authenticated role
+
+Your Supabase project inspects the `role` claim present in all JWTs sent to it, to assign the correct Postgres role when using the Data API, Storage or Realtime authorization.
+
+By default, Auth0 JWTs (both access token and ID token) do not contain a `role` claim in them. If you were to send such a JWT to your Supabase project, the `anon` role would be assigned when executing the Postgres query. Most of your app's logic will be accessible by the `authenticated` role.
+
+A recommended approach to do this is to configure the [`onExecutePostLogin` Auth0 Action](https://auth0.com/docs/secure/tokens/json-web-tokens/create-custom-claims#create-custom-claims) which will add the custom claim:
+
+```javascript
+exports.onExecutePostLogin = async (event, api) => {
+  api.accessToken.setCustomClaim('role', 'authenticated')
+}
+```
+
+## Limitations
+
+At this time, Auth0 tenants with the following [signing algorithms](https://auth0.com/docs/get-started/applications/signing-algorithms) are not supported:
+
+- HS256 (HMAC with SHA-256) -- also known as symmetric JWTs
+- PS256 (RSA-PSS with SHA-256)

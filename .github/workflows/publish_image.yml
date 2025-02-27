@@ -1,18 +1,10 @@
 name: Publish to Image Registry
 
 on:
-  push:
-    tags:
-      - '*'
   # run this action every Monday at 04:00 UTC (Singapore noon)
   schedule:
     - cron: '0 4 * * 1'
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Image tag'
-        required: true
-        type: string
 
 jobs:
   settings:
@@ -26,11 +18,10 @@ jobs:
           images: |
             supabase/studio
           flavor: |
-            latest=false
+            latest=true
           tags: |
-            type=ref,event=tag
             type=sha,prefix={{date 'YYYYMMDD'}}-,enable=${{ github.event_name == 'schedule' }}
-            type=raw,value=${{ inputs.version }},enable=${{ github.event_name == 'workflow_dispatch' }}
+            type=sha,prefix={{date 'YYYYMMDD'}}-,enable=${{ github.event_name == 'workflow_dispatch' }}
 
   release_x86:
     needs: settings
@@ -128,6 +119,9 @@ jobs:
       - name: Merge multi-arch manifests
         run: |
           docker buildx imagetools create -t supabase/studio:${{ needs.settings.outputs.image_version }} \
+          supabase/studio@${{ needs.release_x86.outputs.image_digest }} \
+          supabase/studio@${{ needs.release_arm.outputs.image_digest }}
+          docker buildx imagetools create -t supabase/studio:latest \
           supabase/studio@${{ needs.release_x86.outputs.image_digest }} \
           supabase/studio@${{ needs.release_arm.outputs.image_digest }}
 

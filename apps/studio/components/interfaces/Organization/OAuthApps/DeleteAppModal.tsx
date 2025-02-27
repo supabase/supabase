@@ -1,9 +1,11 @@
-import toast from 'react-hot-toast'
+import { Lock } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useOAuthAppDeleteMutation } from 'data/oauth/oauth-app-delete-mutation'
 import type { OAuthApp } from 'data/oauth/oauth-apps-query'
-import { Alert, IconLock, Modal } from 'ui'
+import { Modal } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 export interface DeleteAppModalProps {
   selectedApp?: OAuthApp
@@ -36,15 +38,17 @@ const DeleteAppModal = ({ selectedApp, onClose }: DeleteAppModalProps) => {
       onConfirm={onConfirmDelete}
     >
       <Modal.Content>
-        <Alert withIcon variant="warning" title="This action cannot be undone">
-          Deleting {selectedApp?.name} will invalidate any access tokens from this application that
-          were authorized by users.
-        </Alert>
+        <Admonition
+          type="warning"
+          title="This action cannot be undone"
+          description={`Deleting ${selectedApp?.name} will invalidate any access tokens from this application that
+          were authorized by users.`}
+        />
       </Modal.Content>
       <Modal.Content>
         <ul className="space-y-5">
           <li className="flex gap-3 text-sm">
-            <IconLock w={14} className="flex-shrink-0" />
+            <Lock size={14} className="flex-shrink-0" />
             <div>
               <strong>Before you remove this application, consider:</strong>
               <ul className="space-y-2 mt-2">

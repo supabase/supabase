@@ -1,7 +1,9 @@
-import { useParams } from 'common'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
+import { MoreVertical } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import {
   ComposableMap,
@@ -11,6 +13,15 @@ import {
   Marker,
   ZoomableGroup,
 } from 'react-simple-maps'
+
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH } from 'lib/constants'
+import type { AWS_REGIONS_KEYS } from 'shared-data'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
@@ -20,12 +31,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   ScrollArea,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-
-import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
-import { MoreVertical } from 'lucide-react'
 import { AVAILABLE_REPLICA_REGIONS, REPLICA_STATUS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
 
@@ -43,6 +52,8 @@ const MapView = ({
   onSelectDropReplica,
 }: MapViewProps) => {
   const { ref } = useParams()
+  const dbSelectorState = useDatabaseSelectorStateSnapshot()
+
   const [mount, setMount] = useState(false)
   const [zoom, setZoom] = useState<number>(1.5)
   const [center, setCenter] = useState<[number, number]>([14, 7])
@@ -51,6 +62,8 @@ const MapView = ({
     y: number
     region: { key: string; country?: string; name?: string }
   }>()
+  const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
+  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { data } = useReadReplicasQuery({ projectRef: ref })
   const databases = data ?? []
@@ -263,8 +276,10 @@ const MapView = ({
                             <Badge variant="brand">Healthy</Badge>
                           ) : database.status === REPLICA_STATUS.COMING_UP ? (
                             <Badge>Coming up</Badge>
-                          ) : database.status === REPLICA_STATUS.RESTORING ? (
+                          ) : database.status === REPLICA_STATUS.RESTARTING ? (
                             <Badge>Restarting</Badge>
+                          ) : database.status === REPLICA_STATUS.RESIZING ? (
+                            <Badge>Resizing</Badge>
                           ) : (
                             <Badge variant="warning">Unhealthy</Badge>
                           )}
@@ -283,12 +298,12 @@ const MapView = ({
                             <DropdownMenuItem
                               className="gap-x-2"
                               disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
+                              onClick={() => {
+                                setShowConnect(true)
+                                dbSelectorState.setSelectedDatabaseId(database.identifier)
+                              }}
                             >
-                              <Link
-                                href={`/project/${ref}/settings/database?connectionString=${database.identifier}`}
-                              >
-                                View connection string
-                              </Link>
+                              View connection string
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-x-2"
@@ -310,12 +325,22 @@ const MapView = ({
                             >
                               Restart replica
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="gap-x-2"
-                              onClick={() => onSelectDropReplica(database)}
-                            >
-                              Drop replica
-                            </DropdownMenuItem>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <DropdownMenuItem
+                                  className="gap-x-2 !pointer-events-auto"
+                                  disabled={!canManageReplicas}
+                                  onClick={() => onSelectDropReplica(database)}
+                                >
+                                  Drop replica
+                                </DropdownMenuItem>
+                              </TooltipTrigger>
+                              {!canManageReplicas && (
+                                <TooltipContent side="left">
+                                  You need additional permissions to drop replicas
+                                </TooltipContent>
+                              )}
+                            </Tooltip>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       )}
@@ -331,9 +356,21 @@ const MapView = ({
               databasesInSelectedRegion.length > 0 ? 'border-t' : ''
             }`}
           >
-            <Button type="default" onClick={() => onSelectDeployNewReplica(selectedRegion.key)}>
+            <ButtonTooltip
+              type="default"
+              disabled={!canManageReplicas}
+              onClick={() => onSelectDeployNewReplica(selectedRegion.key)}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canManageReplicas
+                    ? 'You need additional permissions to deploy replicas'
+                    : undefined,
+                },
+              }}
+            >
               Deploy new replica here
-            </Button>
+            </ButtonTooltip>
             <Button
               type="default"
               onClick={() => {

@@ -1,17 +1,18 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import type { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
+import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
+import { entityTypeKeys } from 'data/entity-types/keys'
+import { foreignTableKeys } from 'data/foreign-tables/keys'
 import { pgSodiumKeys } from 'data/pg-sodium-keys/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { vaultSecretsKeys } from 'data/vault/keys'
 import type { ResponseError } from 'types'
 import { getCreateFDWSql } from './fdw-create-mutation'
 import { getDeleteFDWSql } from './fdw-delete-mutation'
 import { FDW } from './fdws-query'
-import { entityTypeKeys } from 'data/entity-types/keys'
+import { fdwKeys } from './keys'
 
 export type FDWUpdateVariables = {
   projectRef?: string
@@ -72,10 +73,11 @@ export const useFDWUpdateMutation = ({
       const { projectRef } = variables
 
       await Promise.all([
+        queryClient.invalidateQueries(fdwKeys.list(projectRef), { refetchType: 'all' }),
         queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
-        queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws'])),
+        queryClient.invalidateQueries(foreignTableKeys.list(projectRef)),
         queryClient.invalidateQueries(pgSodiumKeys.list(projectRef)),
-        queryClient.invalidateQueries(sqlKeys.query(projectRef, vaultSecretsKeys.list(projectRef))),
+        queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef)),
       ])
 
       await onSuccess?.(data, variables, context)

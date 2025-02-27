@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
-import { withAuth } from 'hooks'
+import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
 
 const Header = () => {

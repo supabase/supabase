@@ -1,5 +1,6 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { fdwKeys } from './keys'
 
 export const getFDWsSql = () => {
   const sql = /* SQL */ `
@@ -62,28 +63,37 @@ export type FDW = {
   tables: FDWTable[]
 }
 
-export type FDWsResponse = {
-  result: FDW[]
-}
-
 export type FDWsVariables = {
   projectRef?: string
   connectionString?: string
 }
 
-export type FDWsData = FDWsResponse
+export async function getFDWs(
+  { projectRef, connectionString }: FDWsVariables,
+  signal?: AbortSignal
+) {
+  const sql = getFDWsSql()
+
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql, queryKey: ['fdws'] },
+    signal
+  )
+
+  return result as FDW[]
+}
+
+export type FDWsData = Awaited<ReturnType<typeof getFDWs>>
 export type FDWsError = ExecuteSqlError
 
-export const useFDWsQuery = <TData extends FDWsData = FDWsData>(
+export const useFDWsQuery = <TData = FDWsData>(
   { projectRef, connectionString }: FDWsVariables,
-  options: UseQueryOptions<ExecuteSqlData, FDWsError, TData> = {}
+  { enabled = true, ...options }: UseQueryOptions<FDWsData, FDWsError, TData> = {}
 ) =>
-  useExecuteSqlQuery(
+  useQuery<FDWsData, FDWsError, TData>(
+    fdwKeys.list(projectRef),
+    ({ signal }) => getFDWs({ projectRef, connectionString }, signal),
     {
-      projectRef,
-      connectionString,
-      sql: getFDWsSql(),
-      queryKey: ['fdws'],
-    },
-    options
+      enabled: enabled && typeof projectRef !== 'undefined',
+      ...options,
+    }
   )

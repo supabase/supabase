@@ -1,4 +1,5 @@
-import { SettingsLayout } from 'components/layouts'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
@@ -26,5 +27,9 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <SettingsLayout title="Settings">{page}</SettingsLayout>
+PageLayout.getLayout = (page) => (
+  <DefaultLayout>
+    <SettingsLayout title="Settings">{page}</SettingsLayout>
+  </DefaultLayout>
+)
 export default PageLayout

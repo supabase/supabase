@@ -1,16 +1,17 @@
-import { useEffect, useRef } from 'react'
+import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { NextSeo } from 'next-seo'
+import { useEffect, useRef } from 'react'
 import Typed from 'typed.js'
-import { Button, ButtonProps, cn, IconCommand, IconSearch } from 'ui'
-import { SearchButton } from 'ui-patterns/Cmdk'
+import { Button, ButtonProps, cn } from 'ui'
+import { CommandMenuTrigger } from 'ui-patterns/CommandMenu'
 
-import DefaultLayout from '~/components/Layouts/Default'
-import Panel from '~/components/Panel'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import { questions } from 'shared-data'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import Panel from '~/components/Panel'
 import data from '~/data/support'
+import { Search, Command } from 'lucide-react'
 
 const Index = () => {
   const router = useRouter()
@@ -41,7 +42,7 @@ const Index = () => {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image-v2.jpg`,
+              url: `https://supabase.com/images/og/supabase-og.png`,
             },
           ],
         }}
@@ -53,9 +54,12 @@ const Index = () => {
               {data.hero.h1}
             </h1>
             <p className="h1 tracking-[-1px]">{data.hero.title}</p>
-            <SearchButton className="mx-auto w-full max-w-lg">
-              <div
+            <CommandMenuTrigger>
+              <button
                 className="
+                  mx-auto
+                  w-full
+                  max-w-lg
                   flex
                   px-3
                   py-3
@@ -70,7 +74,7 @@ const Index = () => {
                   rounded"
               >
                 <div className="flex items-center flex-1 space-x-2">
-                  <IconSearch className="text-foreground-light" size={18} strokeWidth={2} />
+                  <Search className="text-foreground-light" size={18} strokeWidth={2} />
                   <p
                     ref={typerRef}
                     className="text-foreground-lighter text-sm group-hover:text-foreground-light transition"
@@ -78,12 +82,12 @@ const Index = () => {
                 </div>
                 <div className="flex items-center h-full space-x-1">
                   <div className="hidden text-foreground-lighter md:flex items-center justify-center h-5 w-10 border rounded bg-surface-300 border-foreground-lighter/30 gap-1">
-                    <IconCommand size={12} strokeWidth={1.5} />
+                    <Command size={12} strokeWidth={1.5} />
                     <span className="text-[12px]">K</span>
                   </div>
                 </div>
-              </div>
-            </SearchButton>
+              </button>
+            </CommandMenuTrigger>
           </SectionContainer>
         </div>
         <SectionContainer className="text grid gap-5 md:grid-cols-2 xl:grid-cols-3 max-w-7xl !pb-8">

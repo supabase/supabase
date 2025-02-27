@@ -127,9 +127,6 @@ apps/new-docs/*
 # UI tokens
 packages/ui/tokens/**/*.json
 
-# UI Storybook build
-packages/ui/storybook-static
-
 # For self-hosted logs: https://github.com/supabase/supabase/blob/86e3ab20abfdb9c3e666334d3d2f8efeef9ccf2c/docker/docker-compose-logging.yml#L101
 gcloud.json
 

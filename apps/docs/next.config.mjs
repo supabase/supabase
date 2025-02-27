@@ -7,7 +7,8 @@ import remarkGfm from 'remark-gfm'
 import configureBundleAnalyzer from '@next/bundle-analyzer'
 import withYaml from 'next-plugin-yaml'
 
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
+import remotePatterns from './lib/remotePatterns.js'
 
 const withBundleAnalyzer = configureBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -33,7 +34,9 @@ const withMDX = nextMdx({
 })
 
 /** @type {import('next').NextConfig} nextConfig */
+
 const nextConfig = {
+  assetPrefix: getAssetPrefix(),
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   // reactStrictMode: true,
@@ -41,17 +44,8 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/docs',
   images: {
     dangerouslyAllowSVG: true,
-    domains: [
-      'avatars.githubusercontent.com',
-      'github.com',
-      'supabase.github.io',
-      'user-images.githubusercontent.com',
-      'raw.githubusercontent.com',
-      'weweb-changelog.ghost.io',
-      'img.youtube.com',
-      'archbee-image-uploads.s3.amazonaws.com',
-      'obuldanrptloktxcffvn.supabase.co',
-    ],
+    // @ts-ignore
+    remotePatterns,
   },
   // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
   // mdxRs: true,
@@ -60,17 +54,19 @@ const nextConfig = {
       transform: 'lodash/{{member}}',
     },
   },
-  transpilePackages: [
-    'ui',
-    'ui-patterns',
-    'common',
-    'mermaid',
-    'mdx-mermaid',
-    'dayjs',
-    'shared-data',
-    'api-types',
-    'icons',
-  ],
+  transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
+  experimental: {
+    outputFileTracingIncludes: {
+      '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
+      '/guides/**/*': [
+        './content/guides/**/*',
+        './content/troubleshooting/**/*',
+        './examples/**/*',
+      ],
+      '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
+    },
+    serverComponentsExternalPackages: ['libpg-query'],
+  },
   async headers() {
     return [
       {
@@ -78,7 +74,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Strict-Transport-Security',
-            value: '',
+            value: process.env.VERCEL === '1' ? 'max-age=1200; includeSubDomains' : '',
           },
           {
             key: 'X-Robots-Tag',
@@ -89,6 +85,39 @@ const nextConfig = {
             value: 'DENY',
           },
         ],
+        has: [
+          {
+            type: 'host',
+            value: 'supabase.com',
+          },
+        ],
+      },
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value: process.env.VERCEL === '1' ? 'max-age=1200; includeSubDomains' : '',
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+        ],
+        has: [
+          {
+            type: 'host',
+            value: '(?:.+\\.vercel\\.app)',
+          },
+        ],
+      },
+      {
+        source: '/favicon/:slug*',
+        headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
       },
     ]
   },
@@ -129,6 +158,15 @@ const nextConfig = {
       },
     ]
   },
+  typescript: {
+    // WARNING: production builds can successfully complete even there are type errors
+    // Typechecking is checked separately via .github/workflows/typecheck.yml
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // We are already running linting via GH action, this will skip linting during production build on Vercel
+    ignoreDuringBuilds: true,
+  },
 }
 
 const configExport = () => {
@@ -138,3 +176,18 @@ const configExport = () => {
 }
 
 export default configExport
+
+function getAssetPrefix() {
+  // If not force enabled, but not production env, disable CDN
+  if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
+    return undefined
+  }
+
+  // Force disable CDN
+  if (process.env.FORCE_ASSET_CDN === '-1') {
+    return undefined
+  }
+
+  // @ts-ignore
+  return `https://frontend-assets.supabase.com/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
+}

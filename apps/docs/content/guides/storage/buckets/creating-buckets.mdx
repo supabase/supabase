@@ -63,6 +63,30 @@ void main() async {
 [Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+try await supabase.storage.createBucket(
+  "avatars",
+  options: BucketOptions(public: true)
+)
+```
+
+[Reference.](/docs/reference/swift/storage-createbucket)
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+supabase.storage.create_bucket(
+  'avatars',
+  options={"public": True}
+)
+```
+
+[Reference.](/docs/reference/python/storage-createbucket)
+
+</TabPanel>
 </Tabs>
 
 ## Restricting uploads

@@ -1,6 +1,6 @@
 import { Check, Lightbulb, Table2 } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -23,7 +23,7 @@ import {
   Collapsible_Shadcn_,
   cn,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { IndexAdvisorDisabledState } from './IndexAdvisorDisabledState'
 import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 
@@ -44,6 +44,8 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
     data: usedIndexes,
     isSuccess,
     isLoading,
+    isError,
+    error,
   } = useGetIndexesFromSelectQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -121,6 +123,13 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
           </p>
         </div>
         {isLoading && <GenericSkeletonLoader />}
+        {isError && (
+          <AlertError
+            projectRef={project?.ref}
+            error={error}
+            subject="Failed to retrieve indexes in use"
+          />
+        )}
         {isSuccess && (
           <div>
             {usedIndexes.length === 0 && (

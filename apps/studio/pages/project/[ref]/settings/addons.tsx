@@ -1,5 +1,6 @@
 import Addons from 'components/interfaces/Settings/Addons/Addons'
-import { SettingsLayout } from 'components/layouts'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
@@ -22,5 +23,9 @@ const ProjectAddons: NextPageWithLayout = () => {
   )
 }
 
-ProjectAddons.getLayout = (page) => <SettingsLayout title="Add ons">{page}</SettingsLayout>
+ProjectAddons.getLayout = (page) => (
+  <DefaultLayout>
+    <SettingsLayout title="Add ons">{page}</SettingsLayout>
+  </DefaultLayout>
+)
 export default ProjectAddons

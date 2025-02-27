@@ -1,8 +1,10 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -19,6 +21,7 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
+  Skeleton,
 } from 'ui'
 
 interface SchemaSelectorProps {
@@ -45,6 +48,7 @@ const SchemaSelector = ({
   onSelectCreateSchema,
 }: SchemaSelectorProps) => {
   const [open, setOpen] = useState(false)
+  const canCreateSchemas = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'schemas')
 
   const { project } = useProjectContext()
   const {
@@ -66,8 +70,14 @@ const SchemaSelector = ({
   return (
     <div className={className}>
       {isSchemasLoading && (
-        <Button type="default" className="justify-start" block size={size} loading>
-          Loading schemas...
+        <Button
+          type="default"
+          key="schema-selector-skeleton"
+          className="w-full [&>span]:w-full"
+          size={size}
+          disabled
+        >
+          <Skeleton className="w-full h-3 bg-foreground-muted" />
         </Button>
       )}
 
@@ -92,20 +102,32 @@ const SchemaSelector = ({
               size={size}
               disabled={disabled}
               type="default"
-              className={`w-full [&>span]:w-full`}
+              data-testid="schema-selector"
+              className={`w-full [&>span]:w-full !pr-1 space-x-1`}
               iconRight={
                 <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
               }
             >
-              <div className="w-full flex gap-1">
-                <p className="text-foreground-lighter">schema:</p>
-                <p className="text-foreground">
-                  {selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}
-                </p>
-              </div>
+              {selectedSchemaName ? (
+                <div className="w-full flex gap-1">
+                  <p className="text-foreground-lighter">schema</p>
+                  <p className="text-foreground">
+                    {selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}
+                  </p>
+                </div>
+              ) : (
+                <div className="w-full flex gap-1">
+                  <p className="text-foreground-lighter">Choose a schema…</p>
+                </div>
+              )}
             </Button>
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start" sameWidthAsTrigger>
+          <PopoverContent_Shadcn_
+            className="p-0 min-w-[200px]"
+            side="bottom"
+            align="start"
+            sameWidthAsTrigger
+          >
             <Command_Shadcn_>
               <CommandInput_Shadcn_ placeholder="Find schema..." />
               <CommandList_Shadcn_>
@@ -152,7 +174,7 @@ const SchemaSelector = ({
                     ))}
                   </ScrollArea>
                 </CommandGroup_Shadcn_>
-                {onSelectCreateSchema !== undefined && (
+                {onSelectCreateSchema !== undefined && canCreateSchemas && (
                   <>
                     <CommandSeparator_Shadcn_ />
                     <CommandGroup_Shadcn_>

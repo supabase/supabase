@@ -3,7 +3,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/pages/account_page.dart';
 import 'package:supabase_quickstart/pages/login_page.dart';
-import 'package:supabase_quickstart/pages/splash_page.dart';
 
 Future<void> main() async {
   await dotenv.load();
@@ -38,13 +37,22 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      initialRoute: '/',
-      routes: <String, WidgetBuilder>{
-        // Splash page is needed to ensure that authentication and page loading works correctly
-        '/': (_) => const SplashPage(),
-        '/login': (_) => const LoginPage(),
-        '/account': (_) => const AccountPage(),
-      },
+      home: supabase.auth.currentSession == null
+          ? const LoginPage()
+          : const AccountPage(),
+    );
+  }
+}
+
+extension ContextExtension on BuildContext {
+  void showSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(this).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError
+            ? Theme.of(this).colorScheme.error
+            : Theme.of(this).snackBarTheme.backgroundColor,
+      ),
     );
   }
 }

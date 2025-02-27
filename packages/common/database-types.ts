@@ -1,10 +1,4 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
   graphql_public: {
@@ -40,23 +34,118 @@ export type Database = {
           id: number
           metadata: Json | null
           page: string
-          vote: Database["public"]["Enums"]["feedback_vote"]
+          vote: Database['public']['Enums']['feedback_vote']
         }
         Insert: {
           date_created?: string
           id?: never
           metadata?: Json | null
           page: string
-          vote: Database["public"]["Enums"]["feedback_vote"]
+          vote: Database['public']['Enums']['feedback_vote']
         }
         Update: {
           date_created?: string
           id?: never
           metadata?: Json | null
           page?: string
-          vote?: Database["public"]["Enums"]["feedback_vote"]
+          vote?: Database['public']['Enums']['feedback_vote']
         }
         Relationships: []
+      }
+      last_changed: {
+        Row: {
+          checksum: string
+          heading: string
+          id: number
+          last_checked: string
+          last_updated: string
+          parent_page: string
+        }
+        Insert: {
+          checksum: string
+          heading: string
+          id?: never
+          last_checked?: string
+          last_updated?: string
+          parent_page: string
+        }
+        Update: {
+          checksum?: string
+          heading?: string
+          id?: never
+          last_checked?: string
+          last_updated?: string
+          parent_page?: string
+        }
+        Relationships: []
+      }
+      launch_weeks: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          start_date: string | null
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id: string
+          start_date?: string | null
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          start_date?: string | null
+        }
+        Relationships: []
+      }
+      meetups: {
+        Row: {
+          country: string | null
+          created_at: string
+          display_info: string | null
+          id: string
+          is_live: boolean
+          is_published: boolean
+          launch_week: string
+          link: string | null
+          start_at: string | null
+          title: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          display_info?: string | null
+          id?: string
+          is_live?: boolean
+          is_published?: boolean
+          launch_week: string
+          link?: string | null
+          start_at?: string | null
+          title?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          display_info?: string | null
+          id?: string
+          is_live?: boolean
+          is_published?: boolean
+          launch_week?: string
+          link?: string | null
+          start_at?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'meetups_launch_week_fkey'
+            columns: ['launch_week']
+            isOneToOne: false
+            referencedRelation: 'launch_weeks'
+            referencedColumns: ['id']
+          },
+        ]
       }
       page: {
         Row: {
@@ -133,19 +222,189 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "page_section_page_id_fkey"
-            columns: ["page_id"]
+            foreignKeyName: 'page_section_page_id_fkey'
+            columns: ['page_id']
             isOneToOne: false
-            referencedRelation: "page"
-            referencedColumns: ["id"]
+            referencedRelation: 'page'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      tickets: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string | null
+          game_won_at: string | null
+          id: string
+          launch_week: string
+          location: string | null
+          metadata: Json | null
+          name: string | null
+          referred_by: string | null
+          role: string | null
+          shared_on_linkedin: string | null
+          shared_on_twitter: string | null
+          ticket_number: number
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          game_won_at?: string | null
+          id?: string
+          launch_week: string
+          location?: string | null
+          metadata?: Json | null
+          name?: string | null
+          referred_by?: string | null
+          role?: string | null
+          shared_on_linkedin?: string | null
+          shared_on_twitter?: string | null
+          ticket_number?: number
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          game_won_at?: string | null
+          id?: string
+          launch_week?: string
+          location?: string | null
+          metadata?: Json | null
+          name?: string | null
+          referred_by?: string | null
+          role?: string | null
+          shared_on_linkedin?: string | null
+          shared_on_twitter?: string | null
+          ticket_number?: number
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'public_tickets_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'tickets_launch_week_fkey'
+            columns: ['launch_week']
+            isOneToOne: false
+            referencedRelation: 'launch_weeks'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'tickets_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      troubleshooting_entries: {
+        Row: {
+          api: Json | null
+          checksum: string
+          date_created: string
+          date_updated: string
+          errors: Json[] | null
+          github_id: string
+          github_url: string
+          id: string
+          keywords: string[] | null
+          title: string
+          topics: string[]
+        }
+        Insert: {
+          api?: Json | null
+          checksum: string
+          date_created?: string
+          date_updated?: string
+          errors?: Json[] | null
+          github_id: string
+          github_url: string
+          id?: string
+          keywords?: string[] | null
+          title: string
+          topics: string[]
+        }
+        Update: {
+          api?: Json | null
+          checksum?: string
+          date_created?: string
+          date_updated?: string
+          errors?: Json[] | null
+          github_id?: string
+          github_url?: string
+          id?: string
+          keywords?: string[] | null
+          title?: string
+          topics?: string[]
+        }
+        Relationships: []
+      }
+      validation_history: {
+        Row: {
+          created_at: string
+          id: number
+          tag: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          tag: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          tag?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      tickets_view: {
+        Row: {
+          company: string | null
+          created_at: string | null
+          id: string | null
+          launch_week: string | null
+          location: string | null
+          metadata: Json | null
+          name: string | null
+          platinum: boolean | null
+          referrals: number | null
+          role: string | null
+          secret: boolean | null
+          shared_on_linkedin: string | null
+          shared_on_twitter: string | null
+          ticket_number: number | null
+          username: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'tickets_launch_week_fkey'
+            columns: ['launch_week']
+            isOneToOne: false
+            referencedRelation: 'launch_weeks'
+            referencedColumns: ['id']
           },
         ]
       }
     }
-    Views: {
-      [_ in never]: never
-    }
     Functions: {
+      cleanup_last_changed_pages: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       docs_search_embeddings: {
         Args: {
           embedding: string
@@ -175,20 +434,18 @@ export type Database = {
           description: string
         }[]
       }
-      get_page_parents: {
+      get_last_revalidation_for_tags: {
         Args: {
-          page_id: number
+          tags: string[]
         }
         Returns: {
-          id: number
-          parent_page_id: number
-          path: string
-          meta: Json
+          tag: string
+          created_at: string
         }[]
       }
       hnswhandler: {
         Args: {
-          "": unknown
+          '': unknown
         }
         Returns: unknown
       }
@@ -203,25 +460,36 @@ export type Database = {
       }
       ivfflathandler: {
         Args: {
-          "": unknown
+          '': unknown
         }
         Returns: unknown
       }
-      match_page_sections: {
+      json_matches_schema: {
         Args: {
-          embedding: string
-          match_threshold: number
-          match_count: number
-          min_content_length: number
+          schema: Json
+          instance: Json
         }
-        Returns: {
-          id: number
-          page_id: number
-          slug: string
-          heading: string
-          content: string
-          similarity: number
-        }[]
+        Returns: boolean
+      }
+      jsonb_matches_schema: {
+        Args: {
+          schema: Json
+          instance: Json
+        }
+        Returns: boolean
+      }
+      jsonschema_is_valid: {
+        Args: {
+          schema: Json
+        }
+        Returns: boolean
+      }
+      jsonschema_validation_errors: {
+        Args: {
+          schema: Json
+          instance: Json
+        }
+        Returns: string[]
       }
       match_page_sections_v2: {
         Args: {
@@ -240,45 +508,61 @@ export type Database = {
           token_count: number | null
         }[]
       }
+      update_last_changed_checksum: {
+        Args: {
+          new_parent_page: string
+          new_heading: string
+          new_checksum: string
+          git_update_time: string
+          check_time: string
+        }
+        Returns: string
+      }
+      validate_troubleshooting_errors: {
+        Args: {
+          errors: Json[]
+        }
+        Returns: boolean
+      }
       vector_avg: {
         Args: {
-          "": number[]
+          '': number[]
         }
         Returns: string
       }
       vector_dims: {
         Args: {
-          "": string
+          '': string
         }
         Returns: number
       }
       vector_norm: {
         Args: {
-          "": string
+          '': string
         }
         Returns: number
       }
       vector_out: {
         Args: {
-          "": string
+          '': string
         }
         Returns: unknown
       }
       vector_send: {
         Args: {
-          "": string
+          '': string
         }
         Returns: string
       }
       vector_typmod_in: {
         Args: {
-          "": unknown[]
+          '': unknown[]
         }
         Returns: number
       }
     }
     Enums: {
-      feedback_vote: "yes" | "no"
+      feedback_vote: 'yes' | 'no'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -388,11 +672,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "objects_bucketId_fkey"
-            columns: ["bucket_id"]
+            foreignKeyName: 'objects_bucketId_fkey'
+            columns: ['bucket_id']
             isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
+            referencedRelation: 'buckets'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -465,27 +749,25 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database[Extract<keyof Database, "public">]
+type PublicSchema = Database[Extract<keyof Database, 'public'>]
 
 export type Tables<
   PublicTableNameOrOptions extends
-    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
+    | keyof (PublicSchema['Tables'] & PublicSchema['Views'])
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])
+    ? keyof (Database[PublicTableNameOrOptions['schema']]['Tables'] &
+        Database[PublicTableNameOrOptions['schema']]['Views'])
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+  ? (Database[PublicTableNameOrOptions['schema']]['Tables'] &
+      Database[PublicTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
-        PublicSchema["Views"])
-    ? (PublicSchema["Tables"] &
-        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] & PublicSchema['Views'])
+    ? (PublicSchema['Tables'] & PublicSchema['Views'])[PublicTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -493,20 +775,18 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
-    | { schema: keyof Database },
+  PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
+    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -514,20 +794,18 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
-    | { schema: keyof Database },
+  PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
+    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -535,15 +813,12 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends
-    | keyof PublicSchema["Enums"]
-    | { schema: keyof Database },
+  PublicEnumNameOrOptions extends keyof PublicSchema['Enums'] | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof Database[PublicEnumNameOrOptions['schema']]['Enums']
     : never = never,
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+  ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
+  : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
+    ? PublicSchema['Enums'][PublicEnumNameOrOptions]
     : never
-

@@ -1,37 +1,54 @@
+import { useParams } from 'common'
 import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
 import Description from 'components/interfaces/Docs/Description'
 import Param from 'components/interfaces/Docs/Param'
 import Snippets from 'components/interfaces/Docs/Snippets'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { ProjectJsonSchemaPaths } from 'data/docs/project-json-schema-query'
 
 /**
  * TODO: need to support rpc with the same name and different params type
  */
+
+interface RpcContentProps {
+  rpcId: string
+  rpcs: { [key: string]: any }
+  paths?: ProjectJsonSchemaPaths
+  selectedLang: 'bash' | 'js'
+  showApiKey: string
+  refreshDocs: () => void
+}
+
 const RpcContent = ({
-  autoApiService,
   rpcId,
   rpcs,
   paths,
   selectedLang,
-  refreshDocs,
   showApiKey,
-}: any) => {
+  refreshDocs,
+}: RpcContentProps) => {
+  const { ref: projectRef } = useParams()
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const hostEndpoint = settings?.app_config?.endpoint ?? ''
+  const endpoint = `${protocol}://${hostEndpoint ?? ''}`
+
   const meta = rpcs[rpcId]
   const pathKey = `/rpc/${rpcId}`
   const path = paths && pathKey in paths ? paths[pathKey] : undefined
   const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
 
-  if (!path) return null
-
-  const {
-    post: { parameters, summary },
-  } = path
+  const { post } = path!
+  const { parameters, summary } = post || {}
   const rpcParamsObject =
-    parameters && parameters[0] && parameters[0].schema && parameters[0].schema.properties
-      ? parameters[0].schema.properties
+    parameters && parameters[0] && parameters[0].schema && (parameters[0].schema as any).properties
+      ? (parameters[0].schema as any).properties
       : {}
   const rpcParams = Object.entries(rpcParamsObject)
     .map(([k, v]: any) => ({ name: k, ...v }))
     .filter((x) => !!x.name)
+
+  if (!path) return null
 
   return (
     <>
@@ -42,7 +59,7 @@ const RpcContent = ({
       <div className="doc-section">
         <article className="code-column text-foreground">
           <label className="font-mono text-xs uppercase text-foreground-lighter">Description</label>
-          <Description content={summary} metadata={{ rpc: rpcId }} onChange={refreshDocs} />
+          <Description content={summary ?? ''} metadata={{ rpc: rpcId }} onChange={refreshDocs} />
         </article>
         <article className="code">
           <CodeSnippet
@@ -53,7 +70,7 @@ const RpcContent = ({
               rpcCamelCase: meta.camelCase,
               rpcParams: rpcParams,
               apiKey: keyToShow,
-              endpoint: autoApiService.endpoint,
+              endpoint: endpoint,
             })}
           />
         </article>

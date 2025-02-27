@@ -1190,6 +1190,15 @@ functions:
             .Order("cities", "name", Ordering.Descending)
             .Get();
           ```
+      - id: order-parent-table-by-a-referenced-table
+        name: Order parent table by a referenced table
+        code: |
+          ```c#
+          var result = await supabase.From<City>()
+            .Select("name, country:countries(name)")
+            .Order("country(name)", Ordering.Ascending)
+            .Get();
+          ```
 
   - id: range
     title: Range()
@@ -1497,7 +1506,7 @@ functions:
         code: |
           ```c#
           var result = await supabase.From<City>()
-            .Where(x => x.Name == null
+            .Where(x => x.Name == null)
             .Get();
           ```
 
@@ -1584,7 +1593,7 @@ functions:
           with advanced operators.
 
           - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
-          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+          - `"quoted text"`: text inside quote marks will be converted to terms separated by `<->` operators, as if processed by phraseto_tsquery.
           - `OR`: the word “or” will be converted to the | operator.
           - `-`: a dash will be converted to the ! operator.
 

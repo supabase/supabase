@@ -1,9 +1,10 @@
 import type { CalculatedColumn } from 'react-data-grid'
-import { Button, IconPlus } from 'ui'
+import { Button } from 'ui'
 
+import { Plus } from 'lucide-react'
 import { ADD_COLUMN_KEY } from '../../constants'
-import { useTrackedState } from '../../store'
-import { DefaultFormatter } from '../formatter'
+import { useTrackedState } from '../../store/Store'
+import { DefaultFormatter } from '../formatter/DefaultFormatter'
 
 export const AddColumn: CalculatedColumn<any, any> = {
   key: ADD_COLUMN_KEY,
@@ -15,7 +16,6 @@ export const AddColumn: CalculatedColumn<any, any> = {
   sortable: false,
   frozen: false,
   isLastFrozenColumn: false,
-  // rowGroup: false,
   renderHeaderCell() {
     return <AddColumnHeader aria-label="Add New Row" />
   },
@@ -38,7 +38,7 @@ const AddColumnHeader = ({}: SharedInputProps) => {
   const { onAddColumn } = state
   return (
     <div className="sb-grid-add-column">
-      <Button block type="text" onClick={onAddColumn!} icon={<IconPlus />} />
+      <Button block type="text" onClick={onAddColumn!} icon={<Plus />} />
     </div>
   )
 }

@@ -1,7 +1,7 @@
 {
   "show": true,
-  "text": "Supabase has reached General Availability",
-  "launchDate": "2024-04-15T07:00:00.000-08:00",
-  "link": "https://supabase.com/ga-week",
-  "badge": "Learn more"
+  "text": "Launch Week 13",
+  "launchDate": "2024-12-02T07:00:00.000-08:00",
+  "link": "/launch-week",
+  "cta": "Learn more"
 }

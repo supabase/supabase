@@ -1,7 +1,7 @@
 [
   {
     "question": "Can I cap my usage so my bill doesn't run over?",
-    "answer": "Yes. Spend caps are on by default on the Pro plan. You can turn spend caps off for usage beyond the plan limits to pay as you grow."
+    "answer": "Yes. Spend caps are on by default on the Pro Plan. You can turn spend caps off for usage beyond the Plan limits to pay as you grow."
   },
   {
     "question": "I'm worried I could end up with a huge bill at the end of the month.",
@@ -9,7 +9,7 @@
   },
   {
     "question": "When will I be billed?",
-    "answer": "Our Pro plan is charged up front, and billed on a monthly basis. Additional usage costs are also billed at the end of the month."
+    "answer": "Our Pro Plan is charged up front, and billed on a monthly basis. Additional usage costs are also billed at the end of the month."
   },
   {
     "question": "Are you going to change your pricing in the future?",
@@ -21,11 +21,11 @@
   },
   {
     "question": "Do I get a notification if I am approaching my usage limits?",
-    "answer": "Yes, we will email you when you are within 20% of your plan limits."
+    "answer": "Yes, we will email you when you are within 20% of your Plan limits."
   },
   {
     "question": "What if I need one project for development and one for production?",
-    "answer": "We are working on multi-environment projects. For now, you can create a project for your development backend and production backend. We give you 2 free projects as part of our free plan. This means you could have a development and a production server as part of your free plan."
+    "answer": "We are working on multi-environment projects. For now, you can create a project for your development backend and production backend. We give you 2 free projects as part of our Free Plan. This means you could have a development and a production server as part of your Free Plan."
   },
   {
     "question": "Can I self-host Supabase for free?",
@@ -33,6 +33,6 @@
   },
   {
     "question": "Can I pause a free project?",
-    "answer": "Yes, you can pause a project at any time. Our Free plan gives you 2 free projects, but you can have as many paused projects as you want. Just pause and unpause them as needed."
+    "answer": "Yes, you can pause a project at any time. Our Free Plan gives you 2 free projects, but you can have as many paused projects as you want. Just pause and unpause them as needed."
   }
 ]

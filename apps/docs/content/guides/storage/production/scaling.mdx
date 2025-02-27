@@ -28,7 +28,7 @@ You have the option to set a maximum upload size for your bucket. Doing this can
 
 Once you have a substantial number of objects, you might observe that the `supabase.storage.list()` method starts to slow down. This occurs because the endpoint is quite generic and attempts to retrieve both folders and objects in a single query. While this approach is very useful for building features like the Storage viewer on the Supabase dashboard, it can impact performance with a large number of objects.
 
-If your application don't need the entire hierarchy computed you can speed up drastically the query execution for listing your objects by creating a Postgres function as following:
+If your application doesn't need the entire hierarchy computed you can speed up drastically the query execution for listing your objects by creating a Postgres function as following:
 
 ```sql
 create or replace function list_objects(

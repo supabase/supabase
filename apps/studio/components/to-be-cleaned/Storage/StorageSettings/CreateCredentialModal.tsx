@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -6,7 +7,9 @@ import { z } from 'zod'
 import { FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Dialog,
@@ -19,9 +22,9 @@ import {
   DialogTitle,
   DialogTrigger,
   Form_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -35,6 +38,12 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
   const { ref: projectRef } = useParams()
   const isProjectActive = useIsProjectActive()
   const [showSuccess, setShowSuccess] = useState(false)
+
+  const canCreateCredentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+
+  const { data: config } = useProjectStorageConfigQuery({ projectRef })
+  const isS3ConnectionEnabled = config?.features.s3Protocol.enabled
+  const disableCreation = !isProjectActive || !canCreateCredentials || !isS3ConnectionEnabled
 
   const FormSchema = z.object({
     description: z.string().min(3, {
@@ -71,20 +80,26 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
         if (!open) setShowSuccess(false)
       }}
     >
-      <Tooltip_Shadcn_>
-        <TooltipTrigger_Shadcn_ asChild>
+      <Tooltip>
+        <TooltipTrigger asChild>
           <DialogTrigger asChild>
-            <Button type="default" disabled={!isProjectActive}>
+            <Button type="default" disabled={disableCreation} className="pointer-events-auto">
               New access key
             </Button>
           </DialogTrigger>
-        </TooltipTrigger_Shadcn_>
-        {!isProjectActive && (
-          <TooltipContent_Shadcn_>
-            Restore your project to create new access keys
-          </TooltipContent_Shadcn_>
+        </TooltipTrigger>
+        {disableCreation && (
+          <TooltipContent side="bottom">
+            {!isProjectActive
+              ? 'Restore your project to create new access keys'
+              : !isS3ConnectionEnabled
+                ? 'Connection via S3 protocol is currently disabled'
+                : !canCreateCredentials
+                  ? 'You need additional permissions to create new access keys'
+                  : ''}
+          </TooltipContent>
         )}
-      </Tooltip_Shadcn_>
+      </Tooltip>
 
       <DialogContent
         onInteractOutside={(e) => {
@@ -147,7 +162,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
                 <DialogSection>
                   <FormField
                     name="description"
-                    render={({ field }) => (
+                    render={() => (
                       <FormItemLayout label="Description">
                         <Input
                           autoComplete="off"

@@ -279,7 +279,7 @@ Create a new `src/components/Avatar.vue` component that allows users to upload p
 
 ```vue src/components/Avatar.vue
 <script setup>
-import { ref, toRefs, watch } from 'vue'
+import { ref, toRefs, watchEffect } from 'vue'
 import { supabase } from '../supabase'
 
 const prop = defineProps(['path', 'size'])
@@ -324,7 +324,7 @@ const uploadAvatar = async (evt) => {
   }
 }
 
-watch(path, () => {
+watchEffect(() => {
   if (path.value) downloadImage()
 })
 </script>
@@ -365,6 +365,9 @@ And then we can add the widget to the Account page in `src/components/Account.vu
 <script>
 // Import the new component
 import Avatar from './Avatar.vue'
+//...
+const avatar_url = ref('')
+//...
 </script>
 
 <template>

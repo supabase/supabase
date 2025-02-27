@@ -1,8 +1,6 @@
+import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 import { useParams } from 'common'
-import Link from 'next/link'
-import { Button, IconExternalLink } from 'ui'
-
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import { DocsButton } from 'components/ui/DocsButton'
 import { Markdown } from '../Markdown'
 
 interface ResourceContentProps {
@@ -24,13 +22,7 @@ const ResourceContent = ({ selectedLanguage, snippet, codeSnippets }: ResourceCo
       <div className="px-4 space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="doc-heading">{snippet.title}</h2>
-          {snippet.docsUrl !== undefined && (
-            <Button asChild type="default" icon={<IconExternalLink />}>
-              <Link href={snippet.docsUrl} target="_blank" rel="noreferrer">
-                Documentation
-              </Link>
-            </Button>
-          )}
+          {snippet.docsUrl !== undefined && <DocsButton abbrev={false} href={snippet.docsUrl} />}
         </div>
         {snippet.description !== undefined && (
           <div className="doc-section">

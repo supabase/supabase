@@ -1,4 +1,4 @@
-import { enrichedOperation } from '~/lib/refGenerator/helpers'
+import type { enrichedOperation } from '~/lib/refGenerator/helpers'
 
 export interface ISpec {
   openref: any
@@ -30,7 +30,13 @@ export interface IFunctionDefinition {
   id: string
   $ref: string
   description: string
-  examples?: []
+  examples?: IFunctionExample[]
+}
+
+export interface IFunctionExample {
+  id: string
+  name: string
+  code: string
 }
 
 export interface ICommonBase {

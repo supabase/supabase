@@ -3,9 +3,9 @@
 import type * as RadixPopoverTypes from '@radix-ui/react-popover'
 import * as RadixPopover from '@radix-ui/react-popover'
 import * as React from 'react'
+import { X } from 'lucide-react'
 
 import styleHandler from '../../lib/theme/styleHandler'
-import { IconX } from '../Icon/icons/IconX'
 
 interface RootProps {
   align?: RadixPopoverTypes.PopoverContentProps['align']
@@ -26,6 +26,7 @@ interface RootProps {
   header?: React.ReactNode
   footer?: React.ReactNode
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'content'
+  'data-testid'?: string
 }
 
 /**
@@ -49,6 +50,7 @@ function Popover({
   footer,
   size = 'content',
   disabled,
+  'data-testid': dataTestId,
 }: RootProps) {
   const __styles = styleHandler('popover')
 
@@ -69,6 +71,7 @@ function Popover({
         disabled={disabled}
         className={__styles.trigger}
         aria-label={ariaLabel}
+        data-testid={dataTestId}
       >
         {children}
       </RadixPopover.Trigger>
@@ -104,7 +107,7 @@ function Close() {
 
   return (
     <RadixPopover.Close className={__styles.close}>
-      <IconX size={14} strokeWidth={2} />
+      <X size={14} strokeWidth={2} />
     </RadixPopover.Close>
   )
 }

@@ -1,9 +1,11 @@
 import { useParams } from 'common'
-import toast from 'react-hot-toast'
-import { Alert, IconLock, Modal } from 'ui'
+import { Lock } from 'lucide-react'
+import { toast } from 'sonner'
+import { Modal } from 'ui'
 
 import { useAuthorizedAppRevokeMutation } from 'data/oauth/authorized-app-revoke-mutation'
 import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
+import { Admonition } from 'ui-patterns'
 
 export interface RevokeAppModalProps {
   selectedApp?: AuthorizedApp
@@ -36,15 +38,17 @@ const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
       onConfirm={onConfirmDelete}
     >
       <Modal.Content>
-        <Alert withIcon variant="warning" title="This action cannot be undone">
-          {selectedApp?.name} application will no longer have access to your organization's settings
-          and projects.
-        </Alert>
+        <Admonition
+          type="warning"
+          title="This action cannot be undone"
+          description={`${selectedApp?.name} application will no longer have access to your organization's settings
+          and projects.`}
+        />
       </Modal.Content>
       <Modal.Content>
         <ul className="space-y-5">
           <li className="flex gap-3 text-sm">
-            <IconLock w={14} className="flex-shrink-0" />
+            <Lock size={14} className="flex-shrink-0" />
             <div>
               <strong>Before you remove this app, consider:</strong>
               <ul className="space-y-2 mt-2">

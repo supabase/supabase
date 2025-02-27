@@ -1,10 +1,11 @@
 import { useRouter } from 'next/router'
-import { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
+import { type Dispatch, type SetStateAction, useCallback, useMemo } from 'react'
 
 export type UrlStateParams = {
   [k: string]: string | string[] | undefined
 }
 
+/** @deprecated Use useQueryState from nuqs instead for URL state */
 export function useUrlState<ValueParams extends UrlStateParams>({
   replace = true,
   arrayKeys = [],

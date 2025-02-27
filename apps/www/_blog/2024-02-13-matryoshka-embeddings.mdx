@@ -325,13 +325,14 @@ Note that we are choosing to store all 3072 dimensions for each document - we'll
 Next we'll create a new Postgres function called `sub_vector` that can shorten embeddings:
 
 ```sql
-create or replace function sub_vector(v vector, dimensions int)
-returns vector
+create or replace function sub_vector(v extensions.vector, dimensions int)
+returns extensions.vector
 language plpgsql
 immutable
+set search_path = ''
 as $$
 begin
-  if dimensions > vector_dims(v) then
+  if dimensions > extensions.vector_dims(v) then
     raise exception 'dimensions must be less than or equal to the vector size';
   end if;
 
@@ -347,7 +348,7 @@ begin
         unnormed
     )
     select
-      array_agg(u.elem / r.factor)::vector
+      array_agg(u.elem / r.factor)::extensions.vector
     from
       norm r, unnormed u
   );
@@ -383,24 +384,25 @@ Finally we can create our Adaptive Retrieval match function:
 
 ```sql
 create or replace function match_documents_adaptive(
-  query_embedding vector(3072),
+  query_embedding extensions.vector(3072),
   match_count int
 )
-returns setof documents
+returns setof public.documents
 language sql
+set search_path = ''
 as $$
 with shortlist as (
   select *
-  from documents
+  from public.documents
   order by
-    sub_vector(embedding, 512)::vector(512) <#> (
-      select sub_vector(query_embedding, 512)::vector(512)
+    public.sub_vector(embedding, 512)::extensions.vector(512) operator(extensions.<#>) (
+      select public.sub_vector(query_embedding, 512)::extensions.vector(512)
     ) asc
   limit match_count * 8
 )
 select *
 from shortlist
-order by embedding <#> query_embedding asc
+order by embedding operator(extensions.<#>) query_embedding asc
 limit least(match_count, 200);
 $$;
 ```

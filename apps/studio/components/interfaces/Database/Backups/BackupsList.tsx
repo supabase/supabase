@@ -1,40 +1,32 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { AlertCircle, Clock } from 'lucide-react'
+import { Clock } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
 import { DatabaseBackup, useBackupsQuery } from 'data/database/backups-query'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BackupItem from './BackupItem'
 import BackupsEmpty from './BackupsEmpty'
 import BackupsStorageAlert from './BackupsStorageAlert'
+import { useParams } from 'common'
 
 const BackupsList = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const organization = useSelectedOrganization()
+  const { ref: projectRef } = useParams()
 
   const { project: selectedProject } = useProjectContext()
-  const projectRef = selectedProject?.ref || 'default'
   const isHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const [selectedBackup, setSelectedBackup] = useState<DatabaseBackup>()
-
-  const canTriggerScheduledBackups = useCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_job.restore.prepare'
-  )
 
   const { data: backups } = useBackupsQuery({ projectRef })
   const {
@@ -43,15 +35,17 @@ const BackupsList = () => {
     isSuccess: isSuccessBackup,
   } = useBackupRestoreMutation({
     onSuccess: () => {
-      setTimeout(() => {
-        setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
-        toast.success(
-          `Restoring database back to ${dayjs(selectedBackup?.inserted_at).format(
-            'DD MMM YYYY HH:mm:ss'
-          )}`
-        )
-        router.push(`/project/${projectRef}`)
-      }, 3000)
+      if (projectRef) {
+        setTimeout(() => {
+          setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
+          toast.success(
+            `Restoring database back to ${dayjs(selectedBackup?.inserted_at).format(
+              'DD MMM YYYY HH:mm:ss'
+            )}`
+          )
+          router.push(`/project/${projectRef}`)
+        }, 3000)
+      }
     },
   })
 
@@ -67,7 +61,8 @@ const BackupsList = () => {
         addon="pitr"
         icon={<Clock size={20} />}
         primaryText="Free Plan does not include project backups."
-        secondaryText="Upgrade to the Pro plan for up to 7 days of scheduled backups."
+        secondaryText="Upgrade to the Pro Plan for up to 7 days of scheduled backups."
+        source="backups"
       />
     )
   }
@@ -81,12 +76,6 @@ const BackupsList = () => {
           <BackupsEmpty />
         ) : (
           <>
-            {!canTriggerScheduledBackups && (
-              <InformationBox
-                icon={<AlertCircle size={16} className="text-foreground-light" strokeWidth={2} />}
-                title="You need additional permissions to trigger a scheduled backup"
-              />
-            )}
             <BackupsStorageAlert />
             <Panel>
               {sortedBackups?.map((x, i: number) => {
@@ -94,7 +83,6 @@ const BackupsList = () => {
                   <BackupItem
                     key={x.id}
                     backup={x}
-                    projectRef={projectRef}
                     index={i}
                     isHealthy={isHealthy}
                     onSelectBackup={() => setSelectedBackup(x)}
@@ -106,7 +94,7 @@ const BackupsList = () => {
         )}
       </div>
       <ConfirmationModal
-        size="medium"
+        size="small"
         confirmLabel="Confirm restore"
         confirmLabelLoading="Restoring"
         visible={selectedBackup !== undefined}
@@ -114,11 +102,12 @@ const BackupsList = () => {
         loading={isRestoring || isSuccessBackup}
         onCancel={() => setSelectedBackup(undefined)}
         onConfirm={() => {
+          if (projectRef === undefined) return console.error('Project ref required')
           if (selectedBackup === undefined) return console.error('Backup required')
           restoreFromBackup({ ref: projectRef, backup: selectedBackup })
         }}
       >
-        <p>
+        <p className="text-sm">
           Are you sure you want to restore from{' '}
           {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')}? This will destroy any new data
           written since this backup was made.

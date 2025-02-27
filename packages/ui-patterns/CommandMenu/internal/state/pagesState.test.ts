@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it } from 'vitest'
+
 import { PageType, initPagesState, type IPagesState, type PageDefinition } from './pagesState'
 
 describe('pagesState', () => {

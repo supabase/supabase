@@ -1,11 +1,14 @@
+'use client'
+
+import { useBreakpoint } from 'common'
 import { Loader2 } from 'lucide-react'
-import React, { ChangeEvent, createRef, useEffect } from 'react'
-import { TextArea } from 'ui/src/components/shadcn/ui/text-area'
+import React, { ChangeEvent, memo, useRef } from 'react'
+import { ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
-  /* The ref for the textarea */
-  textAreaRef: React.RefObject<HTMLTextAreaElement>
+  /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
+  textAreaRef?: React.RefObject<HTMLTextAreaElement>
   /* The loading state of the form */
   loading: boolean
   /* The disabled state of the form */
@@ -26,7 +29,7 @@ export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   placeholder?: string
 }
 
-const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
+const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
   (
     {
       loading = false,
@@ -43,29 +46,9 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
     },
     ref
   ) => {
-    const formRef = createRef<HTMLFormElement>()
-    const submitRef = createRef<HTMLButtonElement>()
-
-    /**
-     * This effect is used to resize the textarea based on the content
-     */
-    useEffect(() => {
-      if (textAreaRef) {
-        if (!value && textAreaRef && textAreaRef.current) {
-          textAreaRef.current.style.height = '40px'
-        } else if (textAreaRef && textAreaRef.current) {
-          const newHeight = textAreaRef.current.scrollHeight + 'px'
-          textAreaRef.current.style.height = newHeight
-        }
-      }
-    }, [value, textAreaRef])
-
-    /**
-     * This effect is used to focus the textarea when the component mounts
-     */
-    useEffect(() => {
-      textAreaRef?.current?.focus()
-    }, [value, textAreaRef])
+    const formRef = useRef<HTMLFormElement>(null)
+    const submitRef = useRef<HTMLButtonElement>(null)
+    const isMobile = useBreakpoint('md')
 
     /**
      * This function is used to handle the "Enter" key press
@@ -73,11 +56,9 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
       // Check if the pressed key is "Enter" (key code 13) without the "Shift" key
       // also checks if the commands popover is open
-      if (event.key === 'Enter' && !event.shiftKey && !commandsOpen) {
+      if (event.key === 'Enter' && event.keyCode === 13 && !event.shiftKey && !commandsOpen) {
         event.preventDefault()
-        if (submitRef.current) {
-          submitRef.current.click()
-        }
+        if (submitRef.current) submitRef.current.click()
       }
 
       // handles closing the commands popover if open
@@ -87,27 +68,27 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
     }
 
     return (
-      <form ref={formRef} className="relative" {...props} onSubmit={onSubmit}>
+      <form
+        id="assistant-chat"
+        ref={formRef}
+        {...props}
+        onSubmit={onSubmit}
+        className={cn('relative', props.className)}
+      >
         {icon && (
           <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}>
             {icon}
           </div>
         )}
-        <TextArea
+        <ExpandingTextArea
           ref={textAreaRef}
-          autoFocus
-          rows={1}
+          autoFocus={isMobile}
           disabled={disabled}
-          contentEditable
-          aria-expanded={false}
-          className={cn(
-            icon ? 'pl-12' : '',
-            'transition-all text-sm pr-10 rounded-[18px] resize-none box-border leading-6'
-          )}
+          className={cn(icon ? 'pl-12' : '', 'text-sm pr-10 rounded-[18px]')}
           placeholder={placeholder}
           spellCheck={false}
           value={value}
-          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onValueChange(event)}
+          onChange={(event) => onValueChange(event)}
           onKeyDown={handleKeyDown}
         />
         <div className="absolute right-1.5 top-1.5 flex gap-3 items-center">
@@ -137,7 +118,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
                 clipRule="evenodd"
                 d="M13.5 3V2.25H15V3V10C15 10.5523 14.5522 11 14 11H3.56062L5.53029 12.9697L6.06062 13.5L4.99996 14.5607L4.46963 14.0303L1.39641 10.9571C1.00588 10.5666 1.00588 9.93342 1.39641 9.54289L4.46963 6.46967L4.99996 5.93934L6.06062 7L5.53029 7.53033L3.56062 9.5H13.5V3Z"
                 fill="currentColor"
-              ></path>
+              />
             </svg>
           </button>
         </div>
@@ -146,6 +127,6 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
   }
 )
 
-AssistantChatForm.displayName = 'AssistantChatForm'
+AssistantChatFormComponent.displayName = 'AssistantChatFormComponent'
 
-export { AssistantChatForm }
+export const AssistantChatForm = memo(AssistantChatFormComponent)

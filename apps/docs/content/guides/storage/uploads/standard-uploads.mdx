@@ -45,6 +45,16 @@ async function uploadFile(file) {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+// Upload file using standard upload
+Future<void> uploadFile(File file) async {
+  await supabase.storage.from('bucket_name').upload('file_path', file);
+}
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -60,18 +70,17 @@ try await supabase.storage.from("bucket_name").upload(path: "file_path", file: f
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
-    install(Storage)
-}
-
-suspend fun uploadData(bytes: ByteArray) {
-    supabase.storage.from("bucket_name").upload("file_path", bytes)
-}
+supabase.storage.from("bucket_name").upload("file_path", bytes)
 
 //Or on JVM/Android: (This will stream the data from the file to supabase)
-suspend fun uploadFile(file: File) {
-    supabase.storage.from("bucket_name").upload("file_path", file)
-}
+supabase.storage.from("bucket_name").upload("file_path", file)
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket_name').upload('file_path', file)
 ```
 
 </TabPanel>
@@ -101,6 +110,17 @@ await supabase.storage.from('bucket_name').upload('file_path', file, {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+await supabase.storage.from('bucket_name').upload(
+      'file_path',
+      file,
+      fileOptions: const FileOptions(upsert: true),
+    );
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -120,6 +140,24 @@ try await supabase.storage.from("bucket_name")
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.storage.from("bucket_name").upload("file_path", bytes) {
+    upsert = true
+}
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket_name').upload('file_path', file, {
+  'upsert': 'true',
+})
+```
+
+</TabPanel>
 </Tabs>
 
 We do advise against overwriting files when possible, as our Content Delivery Network will take sometime to propagate the changes to all the edge nodes leading to stale content.
@@ -127,7 +165,7 @@ Uploading a file to a new path is the recommended way to avoid propagation delay
 
 ## Content type
 
-By default, Storage will assume the content type of an asset from the file extension. If you want to specify the content type for your asset simply pass the `contentType` option during upload.
+By default, Storage will assume the content type of an asset from the file extension. If you want to specify the content type for your asset, pass the `contentType` option during upload.
 
 <Tabs
   scrollable
@@ -148,6 +186,17 @@ await supabase.storage.from('bucket_name').upload('file_path', file, {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+await supabase.storage.from('bucket_name').upload(
+      'file_path',
+      file,
+      fileOptions: const FileOptions(contentType: 'image/jpeg'),
+    );
+```
+
+</TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -164,6 +213,24 @@ try await supabase.storage.from("bucket_name")
       contentType: "image/jpeg"
     )
   )
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.storage.from("bucket_name").upload("file_path", bytes) {
+    contentType = ContentType.Image.JPEG
+}
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+response = supabase.storage.from_('bucket_name').upload('file_path', file, {
+  'content-type': 'image/jpeg',
+})
 ```
 
 </TabPanel>

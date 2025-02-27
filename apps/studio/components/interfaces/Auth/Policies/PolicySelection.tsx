@@ -1,17 +1,8 @@
 import { noop } from 'lodash'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconEdit,
-  IconExternalLink,
-  IconGrid,
-  Modal,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Modal } from 'ui'
 
 import CardButton from 'components/ui/CardButton'
-import { FlaskConical } from 'lucide-react'
+import { Edit, ExternalLink, FlaskConical, Grid } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
 
 interface PolicySelectionProps {
@@ -48,7 +39,7 @@ const PolicySelection = ({
                   rounded bg-foreground text-background
                 "
                 >
-                  <IconGrid size={14} strokeWidth={2} />
+                  <Grid size={14} strokeWidth={2} />
                 </div>
               </div>
             }
@@ -66,7 +57,7 @@ const PolicySelection = ({
                   rounded bg-foreground text-background
                 "
                 >
-                  <IconEdit size={14} strokeWidth={2} />
+                  <Edit size={14} strokeWidth={2} />
                 </div>
               </div>
             }
@@ -86,7 +77,7 @@ const PolicySelection = ({
             <Button type="default" onClick={onToggleFeaturePreviewModal}>
               Toggle feature preview
             </Button>
-            <Button asChild type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <a
                 href="https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant"
                 target="_blank"

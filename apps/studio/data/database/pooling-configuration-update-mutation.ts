@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, patch } from 'data/fetchers'
@@ -10,6 +10,9 @@ export type PoolingConfigurationUpdateVariables = {
   ref: string
 } & components['schemas']['UpdateSupavisorConfigBody']
 
+/**
+ * Should rename this to Supavisor eventually since we're supporting both types of poolers
+ */
 export async function updatePoolingConfiguration({
   ref,
   pool_mode,

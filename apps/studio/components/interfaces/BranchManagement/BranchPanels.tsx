@@ -1,17 +1,29 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams } from 'common'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { Clock, GitPullRequest, Infinity, RefreshCw, Trash2 } from 'lucide-react'
+import {
+  ArrowRight,
+  Clock,
+  ExternalLink,
+  GitPullRequest,
+  Infinity,
+  MoreVertical,
+  RefreshCw,
+  Shield,
+  Trash2,
+} from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode, useState } from 'react'
-import toast from 'react-hot-toast'
 import { useInView } from 'react-intersection-observer'
+import { toast } from 'sonner'
 
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBranchQuery } from 'data/branches/branch-query'
 import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Badge,
   Button,
@@ -19,16 +31,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconArrowRight,
-  IconExternalLink,
-  IconMoreVertical,
-  IconShield,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
+import WorkflowLogs from './WorkflowLogs'
 
 interface BranchManagementSectionProps {
   header: string
@@ -96,16 +105,14 @@ export const BranchRow = ({
   const { ref: projectRef } = useParams()
   const isActive = projectRef === branch?.project_ref
 
+  const canDeleteBranches = useCheckPermissions(PermissionAction.DELETE, 'preview_branches')
+
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
   const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
   const createPullRequestURL =
     generateCreatePullRequestURL?.(branch.git_branch) ?? 'https://github.com'
-
-  const shouldRenderLogsButton =
-    branch.pr_number !== undefined && branch.latest_check_run_id !== undefined
-  const checkRunLogsURL = `https://github.com/${repo}/pull/${branch.pr_number}/checks?check_run_id=${branch.latest_check_run_id}`
 
   const { ref, inView } = useInView()
   const { data } = useBranchQuery(
@@ -124,6 +131,7 @@ export const BranchRow = ({
 
   const isBranchActiveHealthy = data?.status === 'ACTIVE_HEALTHY'
 
+  const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
   const [showBranchModeSwitch, setShowBranchModeSwitch] = useState(false)
 
   const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
@@ -138,9 +146,7 @@ export const BranchRow = ({
     updateBranch({ id: branch.id, projectRef, persistent: !branch.persistent })
   }
 
-  const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
-
-  const { mutate, isLoading: isResetting } = useBranchResetMutation({
+  const { mutate: resetBranch, isLoading: isResetting } = useBranchResetMutation({
     onSuccess() {
       toast.success('Success! Please allow a few seconds for the branch to reset.')
       setShowConfirmResetModal(false)
@@ -148,54 +154,38 @@ export const BranchRow = ({
   })
 
   function onConfirmReset() {
-    if (!projectRef) {
-      throw new Error('Invalid project reference')
-    }
-
-    mutate({ id: branch.id, projectRef })
+    if (!projectRef) throw new Error('Invalid project reference')
+    resetBranch({ id: branch.id, projectRef })
   }
 
   return (
     <div className="w-full flex items-center justify-between px-6 py-2.5" ref={ref}>
       <div className="flex items-center gap-x-4">
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
-            <Button
-              asChild
-              type="default"
-              className="max-w-[300px]"
-              icon={
-                isMain ? (
-                  <IconShield strokeWidth={2} className="text-amber-900" />
-                ) : branch.persistent ? (
-                  <Infinity size={16} />
-                ) : null
-              }
-            >
-              <Link href={`/project/${branch.project_ref}/branches`} title={branch.name}>
-                {branch.name}
-              </Link>
-            </Button>
-          </Tooltip.Trigger>
-          {branch.persistent && (
-            <Tooltip.Portal>
-              <Tooltip.Content side="top">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">
-                    {branch.name} is a persistent branch and will remain active even after the
-                    underlying PR is closed
-                  </span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          )}
-        </Tooltip.Root>
+        <ButtonTooltip
+          asChild
+          type="default"
+          className="max-w-[300px]"
+          icon={
+            isMain ? (
+              <Shield strokeWidth={2} className="text-amber-900" />
+            ) : branch.persistent ? (
+              <Infinity size={16} />
+            ) : null
+          }
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: branch.persistent
+                ? `${branch.name} is a persistent branch and will remain active even after the
+                    underlying PR is closed`
+                : undefined,
+            },
+          }}
+        >
+          <Link href={`/project/${branch.project_ref}/branches`} title={branch.name}>
+            {branch.name}
+          </Link>
+        </ButtonTooltip>
 
         {isActive && <Badge>Current</Badge>}
         <BranchStatusBadge
@@ -210,28 +200,38 @@ export const BranchRow = ({
       <div className="flex items-center gap-x-8">
         {isMain ? (
           <div className="flex items-center gap-x-2">
-            <Button asChild type="default" iconRight={<IconExternalLink />}>
-              <Link target="_blank" rel="noreferrer" passHref href={`https://github.com/${repo}`}>
-                View Repository
-              </Link>
-            </Button>
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <Button type="text" icon={<IconMoreVertical />} className="px-1" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
-                <Link passHref href={`/project/${projectRef}/settings/integrations`}>
-                  <DropdownMenuItem asChild className="gap-x-2">
-                    <a>Change production branch</a>
-                  </DropdownMenuItem>
-                </Link>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {repo && (
+              <>
+                <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
+                  <Link
+                    target="_blank"
+                    rel="noreferrer"
+                    passHref
+                    href={`https://github.com/${repo}`}
+                  >
+                    View Repository
+                  </Link>
+                </Button>
+                <WorkflowLogs projectRef={branch.project_ref} />
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                    <Button type="text" icon={<MoreVertical />} className="px-1" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
+                    <Link passHref href={`/project/${projectRef}/settings/integrations`}>
+                      <DropdownMenuItem asChild className="gap-x-2">
+                        <a>Change production branch</a>
+                      </DropdownMenuItem>
+                    </Link>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            )}
           </div>
         ) : (
           <div className="flex items-center gap-x-2">
             {branch.pr_number === undefined ? (
-              <Button asChild type="default" iconRight={<IconExternalLink />}>
+              <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
                 <Link passHref target="_blank" rel="noreferrer" href={createPullRequestURL}>
                   Create Pull Request
                 </Link>
@@ -246,11 +246,7 @@ export const BranchRow = ({
                 >
                   <GitPullRequest size={14} />#{branch.pr_number}
                 </Link>
-                <IconArrowRight
-                  className="mx-1 text-foreground-light"
-                  strokeWidth={1.5}
-                  size={16}
-                />
+                <ArrowRight className="mx-1 text-foreground-light" strokeWidth={1.5} size={16} />
                 <Button asChild type="default">
                   <Link
                     passHref
@@ -263,22 +259,14 @@ export const BranchRow = ({
                 </Button>
               </div>
             )}
-
-            {shouldRenderLogsButton && (
-              <Button asChild type="default" iconRight={<IconExternalLink />}>
-                <Link passHref target="_blank" rel="noreferrer" href={checkRunLogsURL}>
-                  View Logs
-                </Link>
-              </Button>
-            )}
-
+            <WorkflowLogs projectRef={branch.project_ref} />
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <Button type="text" icon={<IconMoreVertical />} className="px-1" />
+                <Button type="text" icon={<MoreVertical />} className="px-1" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild={isBranchActiveHealthy} className="w-full">
+              <DropdownMenuContent className="w-56" side="bottom" align="end">
+                <Tooltip>
+                  <TooltipTrigger asChild={isBranchActiveHealthy} className="w-full">
                     <DropdownMenuItem
                       className="gap-x-2"
                       onSelect={() => setShowConfirmResetModal(true)}
@@ -288,17 +276,17 @@ export const BranchRow = ({
                       <RefreshCw size={14} />
                       Reset Branch
                     </DropdownMenuItem>
-                  </TooltipTrigger_Shadcn_>
+                  </TooltipTrigger>
                   {!isBranchActiveHealthy && (
-                    <TooltipContent_Shadcn_ side="top">
+                    <TooltipContent side="left">
                       Branch is still initializing. Please wait for the branch to become healthy
                       before resetting
-                    </TooltipContent_Shadcn_>
+                    </TooltipContent>
                   )}
-                </Tooltip_Shadcn_>
+                </Tooltip>
 
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild={isBranchActiveHealthy} className="w-full">
+                <Tooltip>
+                  <TooltipTrigger asChild={isBranchActiveHealthy} className="w-full">
                     <DropdownMenuItem
                       className="gap-x-2"
                       onSelect={() => setShowBranchModeSwitch(true)}
@@ -315,23 +303,33 @@ export const BranchRow = ({
                         </>
                       )}
                     </DropdownMenuItem>
-                  </TooltipTrigger_Shadcn_>
+                  </TooltipTrigger>
                   {!isBranchActiveHealthy && (
-                    <TooltipContent_Shadcn_ side="top">
+                    <TooltipContent side="left">
                       Branch is still initializing. Please wait for the branch to become healthy
                       before switching modes
-                    </TooltipContent_Shadcn_>
+                    </TooltipContent>
                   )}
-                </Tooltip_Shadcn_>
+                </Tooltip>
 
-                <DropdownMenuItem
-                  className="gap-x-2"
-                  onSelect={() => onSelectDeleteBranch?.()}
-                  onClick={() => onSelectDeleteBranch?.()}
-                >
-                  <Trash2 size={14} />
-                  Delete branch
-                </DropdownMenuItem>
+                <Tooltip>
+                  <TooltipTrigger asChild={canDeleteBranches} className="w-full">
+                    <DropdownMenuItem
+                      className="gap-x-2"
+                      disabled={!canDeleteBranches}
+                      onSelect={() => onSelectDeleteBranch?.()}
+                      onClick={() => onSelectDeleteBranch?.()}
+                    >
+                      <Trash2 size={14} />
+                      Delete branch
+                    </DropdownMenuItem>
+                  </TooltipTrigger>
+                  {!canDeleteBranches && (
+                    <TooltipContent side="left">
+                      You need additional permissions to delete branches
+                    </TooltipContent>
+                  )}
+                </Tooltip>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -350,6 +348,7 @@ export const BranchRow = ({
                 Are you sure you want to reset the "{branch.name}" branch? All data will be deleted.
               </p>
             </ConfirmationModal>
+
             <ConfirmationModal
               variant={'default'}
               visible={showBranchModeSwitch}

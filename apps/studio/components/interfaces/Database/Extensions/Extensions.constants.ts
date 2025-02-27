@@ -7,10 +7,8 @@ export const HIDDEN_EXTENSIONS = [
   'pageinspect',
   'pg_buffercache',
   'pg_freespacemap',
-  'pg_prewarm',
   'pg_surgery',
   'pg_visibility',
-  'pgstattuple',
   'supabase_vault',
   'supautils',
   'intagg',
@@ -20,4 +18,8 @@ export const HIDDEN_EXTENSIONS = [
 
 export const SEARCH_TERMS: Record<string, string[]> = {
   vector: ['pgvector', 'pg_vector'],
+}
+
+export const EXTENSION_DISABLE_WARNINGS: Record<string, string> = {
+  pg_cron: 'Disabling this extension will delete all scheduled jobs. This cannot be undone.',
 }

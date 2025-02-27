@@ -7,6 +7,7 @@ export type Database = {
         Row: {
           contact_email: string
           created_at: string | null
+          start_at: string | null
           document: string | null
           id: number
           updated_at: string | null
@@ -14,6 +15,7 @@ export type Database = {
         Insert: {
           contact_email: string
           created_at?: string | null
+          start_at?: string | null
           document?: string | null
           id?: number
           updated_at?: string | null
@@ -21,6 +23,7 @@ export type Database = {
         Update: {
           contact_email?: string
           created_at?: string | null
+          start_at?: string | null
           document?: string | null
           id?: number
           updated_at?: string | null
@@ -84,6 +87,42 @@ export type Database = {
           link?: string | null
           start_at?: string | number
           title?: string | null
+        }
+        Relationships: []
+      }
+      meetups: {
+        Row: {
+          id: number
+          created_at: string | null
+          date: string | number
+          display_info: string | null
+          link: string | null
+          location: string | null
+          is_live: boolean
+          city?: string
+          timezone?: string
+        }
+        Insert: {
+          id?: number
+          created_at?: string | null
+          date?: string | number
+          display_info?: string | null
+          link?: string | null
+          location?: string | null
+          is_live?: boolean
+          city?: string
+          timezone?: string
+        }
+        Update: {
+          id?: number
+          created_at?: string | null
+          date?: string | number
+          display_info?: string | null
+          link?: string | null
+          location?: string | null
+          is_live?: boolean
+          city?: string
+          timezone?: string
         }
         Relationships: []
       }
@@ -254,6 +293,33 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: 'lw11_tickets_id_fkey'
+            columns: ['id']
+            isOneToOne: true
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      tickets_view: {
+        Row: {
+          created_at: string | null
+          platinum: boolean | null
+          id: string | null
+          metadata: Json | null
+          name: string | null
+          referrals: number | null
+          shared_on_linkedin: string | null
+          shared_on_twitter: string | null
+          ticket_number: number | null
+          username: string | null
+          secret: boolean | null
+          role: string | null
+          company: string | null
+          location: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'lw12_tickets_id_fkey'
             columns: ['id']
             isOneToOne: true
             referencedRelation: 'users'

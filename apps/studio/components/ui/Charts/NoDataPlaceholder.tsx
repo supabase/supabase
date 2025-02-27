@@ -1,6 +1,8 @@
 import { BarChart2 } from 'lucide-react'
-import { useChartSize } from './Charts.utils'
+
+import { cn } from 'ui'
 import ChartHeader from './ChartHeader'
+import { useChartSize } from './Charts.utils'
 
 interface NoDataPlaceholderProps {
   title?: string
@@ -27,15 +29,15 @@ const NoDataPlaceholder = ({
         <ChartHeader title={attribute} format={format} highlightedValue={0} />
       )}
       <div
-        className={
-          'border-control flex flex-grow w-full flex-col items-center justify-center space-y-2 border border-dashed text-center ' +
+        className={cn(
+          'border-control flex flex-grow w-full flex-col items-center justify-center space-y-2 border border-dashed text-center',
           className
-        }
+        )}
         // extra 20 px for the x ticks
         style={{ minHeight: minHeight + 20 }}
       >
         <BarChart2 size={20} className="text-border-stronger" />
-        <div>
+        <div className="px-1">
           <p className="text-foreground-light text-xs">{message}</p>
           {description && <p className="text-foreground-lighter text-xs">{description}</p>}
         </div>

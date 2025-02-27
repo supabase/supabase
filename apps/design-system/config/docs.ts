@@ -83,6 +83,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Assistant Chat',
+          href: '/docs/fragments/assistant-chat',
+          items: [],
+        },
+        {
           title: 'Modal',
           href: '/docs/fragments/modal',
           items: [],
@@ -98,6 +103,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Inner Side Menu',
+          href: '/docs/fragments/inner-side-menu',
+          items: [],
+        },
+        {
           title: 'Form Item Layout',
           href: '/docs/fragments/form-item-layout',
           items: [],
@@ -105,6 +115,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Multi Select',
           href: '/docs/fragments/multi-select',
+          items: [],
+        },
+        {
+          title: 'Logs Bar Chart',
+          href: '/docs/fragments/logs-bar-chart',
           items: [],
         },
       ],
@@ -174,6 +189,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Chart',
+          href: '/docs/components/chart',
+          items: [],
+        },
+        {
           title: 'Checkbox',
           href: '/docs/components/checkbox',
           items: [],
@@ -191,6 +211,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Command',
           href: '/docs/components/command',
+          items: [],
+        },
+        {
+          title: 'Command Menu (cmdk)',
+          href: '/docs/components/commandmenu',
           items: [],
         },
         {
@@ -325,6 +350,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Sidebar',
+          href: '/docs/components/sidebar',
+          items: [],
+        },
+        {
           title: 'Sonner',
           href: '/docs/components/sonner',
           items: [],
@@ -372,6 +402,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Tree View',
           href: '/docs/components/tree-view',
+          items: [],
+        },
+        {
+          title: 'Expanding Textarea',
+          href: '/docs/components/expanding-textarea',
           items: [],
         },
       ],

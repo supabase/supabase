@@ -1,9 +1,20 @@
-import { useParams } from 'common'
 import dayjs from 'dayjs'
 import sumBy from 'lodash/sumBy'
+import { Archive, ChevronDown, Database, Key, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import BarChart from 'components/ui/Charts/BarChart'
+import Panel from 'components/ui/Panel'
+import {
+  ProjectLogStatsVariables,
+  UsageApiCounts,
+  useProjectLogStatsQuery,
+} from 'data/analytics/project-log-stats-query'
+import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { ChartIntervals } from 'types'
 import {
   Button,
@@ -12,19 +23,8 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  IconArchive,
-  IconChevronDown,
-  IconDatabase,
-  IconKey,
-  IconZap,
   Loading,
 } from 'ui'
-
-import BarChart from 'components/ui/Charts/BarChart'
-import Panel from 'components/ui/Panel'
-import { UsageApiCounts, useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
-import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
-import { useIsFeatureEnabled } from 'hooks'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -47,9 +47,9 @@ const ProjectUsage = () => {
     'project_storage:all',
   ])
 
-  const [interval, setInterval] = useState<string>('hourly')
+  const [interval, setInterval] = useState<ProjectLogStatsVariables['interval']>('hourly')
 
-  const { data, error, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
+  const { data, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const startDateLocal = dayjs().subtract(
@@ -57,7 +57,7 @@ const ProjectUsage = () => {
     selectedInterval.startUnit as dayjs.ManipulateType
   )
   const endDateLocal = dayjs()
-  const charts = useFillTimeseriesSorted(
+  const { data: charts } = useFillTimeseriesSorted(
     data?.result || [],
     'timestamp',
     [
@@ -68,7 +68,8 @@ const ProjectUsage = () => {
     ],
     0,
     startDateLocal.toISOString(),
-    endDateLocal.toISOString()
+    endDateLocal.toISOString(),
+    5
   )
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
 
@@ -87,15 +88,20 @@ const ProjectUsage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-row items-center gap-2">
+      <div className="flex flex-row items-center gap-x-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="default" iconRight={<IconChevronDown />}>
+            <Button type="default" iconRight={<ChevronDown size={14} />}>
               <span>{selectedInterval.label}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="start">
-            <DropdownMenuRadioGroup value={interval} onValueChange={setInterval}>
+            <DropdownMenuRadioGroup
+              value={interval}
+              onValueChange={(interval) =>
+                setInterval(interval as ProjectLogStatsVariables['interval'])
+              }
+            >
               {CHART_INTERVALS.map((i) => (
                 <DropdownMenuRadioItem key={i.key} value={i.key}>
                   {i.label}
@@ -108,13 +114,13 @@ const ProjectUsage = () => {
           Statistics for past {selectedInterval.label}
         </span>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4 lg:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
         <Panel>
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
                 <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                  <IconDatabase strokeWidth={2} size={16} />
+                  <Database strokeWidth={2} size={16} />
                 </div>
               }
               title="Database"
@@ -140,7 +146,7 @@ const ProjectUsage = () => {
               <PanelHeader
                 icon={
                   <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                    <IconKey strokeWidth={2} size={16} />
+                    <Key strokeWidth={2} size={16} />
                   </div>
                 }
                 title="Auth"
@@ -166,7 +172,7 @@ const ProjectUsage = () => {
               <PanelHeader
                 icon={
                   <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                    <IconArchive strokeWidth={2} size={16} />
+                    <Archive strokeWidth={2} size={16} />
                   </div>
                 }
                 title="Storage"
@@ -192,7 +198,7 @@ const ProjectUsage = () => {
             <PanelHeader
               icon={
                 <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                  <IconZap strokeWidth={2} size={16} />
+                  <Zap strokeWidth={2} size={16} />
                 </div>
               }
               title="Realtime"

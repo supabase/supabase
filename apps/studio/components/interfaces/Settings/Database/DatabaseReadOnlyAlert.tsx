@@ -1,18 +1,12 @@
 import { useParams } from 'common'
+import { AlertTriangle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import {
-  Alert_Shadcn_,
-  IconAlertTriangle,
-  AlertTitle_Shadcn_,
-  AlertDescription_Shadcn_,
-  Button,
-  IconExternalLink,
-} from 'ui'
-
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useSelectedOrganization } from 'hooks'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useState } from 'react'
+
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ConfirmDisableReadOnlyModeModal from './DatabaseSettings/ConfirmDisableReadOnlyModal'
 
 export const DatabaseReadOnlyAlert = () => {
@@ -31,7 +25,7 @@ export const DatabaseReadOnlyAlert = () => {
     <>
       {isReadOnlyMode && (
         <Alert_Shadcn_ variant="destructive">
-          <IconAlertTriangle />
+          <AlertTriangle />
           <AlertTitle_Shadcn_>
             Project is in read-only mode and database is no longer accepting write requests
           </AlertTitle_Shadcn_>
@@ -45,14 +39,18 @@ export const DatabaseReadOnlyAlert = () => {
               </li>
               {subscription?.plan.id === 'free' ? (
                 <li>
-                  <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
-                    <a className="text underline">Upgrade to the Pro plan</a>
+                  <Link
+                    href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=databaseReadOnlyAlertUpgradePlan`}
+                  >
+                    <a className="text underline">Upgrade to the Pro Plan</a>
                   </Link>{' '}
                   to increase your database size limit to 8GB.
                 </li>
               ) : subscription?.plan.id === 'pro' && subscription?.usage_billing_enabled ? (
                 <li>
-                  <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                  <Link
+                    href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=databaseReadOnlyAlertSpendCap`}
+                  >
                     <a className="text-foreground underline">Disable your Spend Cap</a>
                   </Link>{' '}
                   to allow your project to auto-scale and expand beyond the 8GB database size limit
@@ -64,7 +62,7 @@ export const DatabaseReadOnlyAlert = () => {
             <Button type="default" onClick={() => setShowConfirmationModal(true)}>
               Disable read-only mode
             </Button>
-            <Button asChild type="default" icon={<IconExternalLink />}>
+            <Button asChild type="default" icon={<ExternalLink />}>
               <a
                 href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
                 target="_blank"

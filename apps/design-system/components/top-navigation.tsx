@@ -1,9 +1,8 @@
 // import { docsConfig } from '@/config/docs'
 import Link from 'next/link'
-import { DesignSystemMarks } from './design-system-marks'
-import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
-import { TopNavigationSearch } from './top-navigation-search'
 import { CommandMenu } from './command-menu'
+import { HomepageSvgHandler } from './homepage-svg-handler'
+import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 
 function TopNavigation() {
   return (
@@ -15,7 +14,7 @@ function TopNavigation() {
             <Link href="/">
               <h1>Supabase Design System</h1>
             </Link>
-            <DesignSystemMarks />
+            <HomepageSvgHandler name="design-system-marks" className="h-4 w-auto" />
           </div>
           {/* {docsConfig.mainNav.map((section) => (
             <>

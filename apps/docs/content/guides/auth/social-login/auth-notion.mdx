@@ -17,13 +17,13 @@ Setting up Notion logins for your application consists of 3 parts:
 ## Create your notion integration
 
 - Go to [developers.notion.com](https://developers.notion.com/).
+  {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 - Click "View my integrations" and login.
-
-![notion.so](/docs/img/guides/auth-notion/notion.png)
+  ![notion.so](/docs/img/guides/auth-notion/notion.png)
 
 - Once logged in, go to [notion.so/my-integrations](https://notion.so/my-integrations) and create a new integration.
 - When creating your integration, ensure that you select "Public integration" under "Integration type" and "Read user information including email addresses" under "Capabilities".
-- You will need to add a redirect uri, see [Add the redirect uri](#add-the-redirect-uri)
+- You will need to add a redirect URI, see [Add the redirect URI](#add-the-redirect-uri)
 - Once you've filled in the necessary fields, click "Submit" to finish creating the integration.
 
 ![notion.so](/docs/img/guides/auth-notion/notion-developer.png)
@@ -55,13 +55,31 @@ Setting up Notion logins for your application consists of 3 parts:
 >
 <TabPanel id="js" label="JavaScript">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `notion` as the `provider`:
+<CreateClientSnippet />
+
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `notion` as the `provider`:
 
 ```js
 async function signInWithNotion() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'notion',
   })
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `notion` as the `provider`:
+
+```dart
+Future<void> signInWithNotion() async {
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.notion,
+    redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+    authScreenLaunchMode:
+        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+  );
 }
 ```
 
@@ -99,9 +117,20 @@ async function signOut() {
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```kotlin
 suspend fun signOut() {

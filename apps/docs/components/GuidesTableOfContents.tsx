@@ -1,5 +1,7 @@
+'use client'
+
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import { proxy, useSnapshot } from 'valtio'
@@ -18,23 +20,32 @@ const formatSlug = (slug: string) => {
   return slug
 }
 
-const formatTOCHeader = (content: string) => {
-  let begin = false
-  const res = []
+function formatTOCHeader(content: string) {
+  let insideInlineCode = false
+  const res: Array<{ type: 'text'; value: string } | { type: 'code'; value: string }> = []
+
   for (const x of content) {
     if (x === '`') {
-      if (!begin) {
-        begin = true
-        res.push(`<code class="text-xs border rounded bg-muted">`)
+      if (!insideInlineCode) {
+        insideInlineCode = true
+        res.push({ type: 'code', value: '' })
       } else {
-        begin = false
-        res.push(`</code>`)
+        insideInlineCode = false
       }
     } else {
-      res.push(x)
+      if (insideInlineCode) {
+        res[res.length - 1].value += x
+      } else {
+        if (res.length === 0 || res[res.length - 1].type === 'code') {
+          res.push({ type: 'text', value: x })
+        } else {
+          res[res.length - 1].value += x
+        }
+      }
     }
   }
-  return res.join('')
+
+  return res
 }
 
 const tocRenderSwitch = proxy({
@@ -52,17 +63,24 @@ const useTocRerenderTrigger = () => {
   return toggleRenderFlag
 }
 
+interface TOCHeader {
+  id?: string
+  text: string
+  link: string
+  level: number
+}
+
 const GuidesTableOfContents = ({
   className,
   overrideToc,
   video,
 }: {
   className?: string
-  overrideToc?: Array<{ text: string; link: string; level: number }>
+  overrideToc?: Array<TOCHeader>
   video?: string
 }) => {
   useSubscribeTocRerender()
-  const [tocList, setTocList] = useState([])
+  const [tocList, setTocList] = useState<TOCHeader[]>([])
   const pathname = usePathname()
   const [hash] = useHash()
 
@@ -79,6 +97,7 @@ const GuidesTableOfContents = ({
       const headings = Array.from(
         document.querySelector('#sb-docs-guide-main-article')?.querySelectorAll('h2, h3') ?? []
       )
+
       const newHeadings = headings
         .filter((heading) => heading.id)
         .map((heading) => {
@@ -87,9 +106,10 @@ const GuidesTableOfContents = ({
           if (!link) return null
 
           const level = heading.tagName === 'H2' ? 2 : 3
-          return { text, link, level }
+
+          return { text, link, level } as Partial<TOCHeader>
         })
-        .filter(Boolean)
+        .filter((x): x is TOCHeader => !!x && !!x.text && !!x.link && !!x.level)
       setTocList(newHeadings)
     })
 
@@ -108,35 +128,56 @@ const GuidesTableOfContents = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hash, JSON.stringify(displayedList)])
 
-  if (!displayedList.length) return
-
-  const tocVideoPreview = `http://img.youtube.com/vi/${video}/0.jpg`
+  const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
 
   return (
-    <div className={cn('border-l', 'thin-scrollbar overflow-y-auto', 'px-2', className)}>
+    <div
+      className={cn(
+        'border-l flex flex-col gap-6 lg:gap-8',
+        'thin-scrollbar overflow-y-auto',
+        'px-2',
+        className
+      )}
+    >
       {video && (
-        <div className="relative mb-6 pl-5">
+        <div className="relative pl-5">
           <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} />
         </div>
       )}
-      <Feedback key={pathname} />
-      <span className="block font-mono text-xs uppercase text-foreground px-5 mb-6">
-        On this page
-      </span>
-      <ul className="toc-menu list-none pl-5 text-[0.8rem] grid gap-2">
-        {displayedList.map((item, i) => (
-          <li key={`${item.level}-${i}`} className={item.level === 3 ? 'ml-4' : ''}>
-            <a
-              href={`#${formatSlug(item.link)}`}
-              className="text-foreground-lighter hover:text-brand-link transition-colors"
-              dangerouslySetInnerHTML={{ __html: formatTOCHeader(removeAnchor(item.text)) }}
-            />
-          </li>
-        ))}
-      </ul>
+      <div className="pl-5">
+        <Feedback key={pathname} />
+      </div>
+      {displayedList.length > 0 && (
+        <div>
+          <span className="block font-mono text-xs uppercase text-foreground px-5 mb-3">
+            On this page
+          </span>
+          <ul className="toc-menu list-none pl-5 text-[0.8rem] grid gap-2">
+            {displayedList.map((item, i) => (
+              <li key={`${item.level}-${i}`} className={item.level === 3 ? 'ml-4' : ''}>
+                <a
+                  href={`#${formatSlug(item.link)}`}
+                  className="text-foreground-lighter hover:text-brand-link transition-colors"
+                >
+                  {formatTOCHeader(removeAnchor(item.text)).map((x, index) => (
+                    <Fragment key={index}>
+                      {x.type === 'code' ? (
+                        <code className="text-xs border rounded bg-muted">{x.value}</code>
+                      ) : (
+                        x.value
+                      )}
+                    </Fragment>
+                  ))}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }
 
 export default GuidesTableOfContents
 export { useTocRerenderTrigger }
+export type { TOCHeader }

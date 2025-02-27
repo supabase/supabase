@@ -1,6 +1,7 @@
 import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
+
 import {
   Alert,
   Button,
@@ -9,9 +10,10 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  IconClock,
 } from 'ui'
-import { DatetimeHelper, getDefaultHelper, LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from '.'
+import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD, getDefaultHelper } from './Logs.constants'
+import type { DatetimeHelper } from './Logs.types'
+import { Clock } from 'lucide-react'
 
 interface Props {
   to: string
@@ -53,7 +55,7 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
         <DropdownMenuTrigger asChild>
           <Button
             type={helperValue ? 'secondary' : 'default'}
-            icon={<IconClock size={12} />}
+            icon={<Clock size={12} />}
             className="rounded-r-none"
           >
             <span>{selectedHelper?.text || defaultHelper.text}</span>

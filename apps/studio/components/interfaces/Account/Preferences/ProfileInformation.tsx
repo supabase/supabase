@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -12,7 +12,7 @@ import {
 } from 'ui'
 import z from 'zod'
 
-import { FormActions } from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
 import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
 import type { Profile } from 'data/profile/types'
@@ -32,7 +32,10 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
   })
 
   const { mutate: updateProfile, isLoading } = useProfileUpdateMutation({
-    onSuccess: () => toast.success('Successfully saved profile'),
+    onSuccess: (data) => {
+      toast.success('Successfully saved profile')
+      form.reset({ first_name: data.first_name, last_name: data.last_name })
+    },
     onError: (error) => toast.error(`Failed to update profile: ${error.message}`),
   })
 
@@ -43,7 +46,7 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
   return (
     <>
       <Panel
-        className="mb-8"
+        className="mb-4 md:mb-8"
         title={<h5>Profile Information</h5>}
         footer={
           <FormActions
@@ -57,7 +60,7 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
         <Form_Shadcn_ {...form}>
           <form
             id={formId}
-            className="space-y-6 w-full px-8 py-8"
+            className="space-y-6 w-full p-4 md:p-8"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <FormField_Shadcn_

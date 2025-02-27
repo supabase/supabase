@@ -1,9 +1,8 @@
-import { Button, Modal } from 'ui'
-
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { TIER_QUERY_LIMITS } from '.'
-import { useSelectedOrganization } from 'hooks'
+
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { Button, Modal } from 'ui'
+import { TIER_QUERY_LIMITS } from './Logs.constants'
 
 interface Props {
   show: boolean
@@ -60,7 +59,11 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
           Close
         </Button>
         <Button asChild size="tiny">
-          <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>Upgrade</Link>
+          <Link
+            href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=logsRetentionUpgradePrompt`}
+          >
+            Upgrade
+          </Link>
         </Button>
       </Modal.Content>
     </Modal>

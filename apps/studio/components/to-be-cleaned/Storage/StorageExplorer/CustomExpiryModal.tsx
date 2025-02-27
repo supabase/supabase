@@ -4,10 +4,7 @@ import { Button, Form, Input, Listbox, Modal } from 'ui'
 
 import { DATETIME_FORMAT } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-
-export interface CustomExpiryModalProps {
-  onCopyUrl: (name: string, url: string) => void
-}
+import { useCopyUrl } from './useCopyUrl'
 
 const unitMap = {
   days: 3600 * 24,
@@ -16,9 +13,10 @@ const unitMap = {
   years: 3600 * 24 * 365,
 }
 
-const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
+const CustomExpiryModal = () => {
   const storageExplorerStore = useStorageStore()
-  const { getFileUrl, selectedFileCustomExpiry, setSelectedFileCustomExpiry } = storageExplorerStore
+  const { onCopyUrl } = useCopyUrl()
+  const { selectedFileCustomExpiry, setSelectedFileCustomExpiry } = storageExplorerStore
 
   const visible = selectedFileCustomExpiry !== undefined
   const onClose = () => setSelectedFileCustomExpiry(undefined)
@@ -38,12 +36,9 @@ const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
         initialValues={{ expiresIn: '', units: 'days' }}
         onSubmit={async (values: any, { setSubmitting }: any) => {
           setSubmitting(true)
-          onCopyUrl(
+          await onCopyUrl(
             selectedFileCustomExpiry!.name,
-            await getFileUrl(
-              selectedFileCustomExpiry!,
-              values.expiresIn * unitMap[values.units as 'days' | 'weeks' | 'months' | 'years']
-            )
+            values.expiresIn * unitMap[values.units as 'days' | 'weeks' | 'months' | 'years']
           )
           setSubmitting(false)
           onClose()

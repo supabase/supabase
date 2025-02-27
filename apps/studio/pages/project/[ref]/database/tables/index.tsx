@@ -1,18 +1,19 @@
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { useState } from 'react'
 
 import { TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
-import { DatabaseLayout } from 'components/layouts'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms'
-import type { Table } from 'data/tables/table-query'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const snap = useTableEditorStateSnapshot()
-  const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table>()
+  const [selectedTableToEdit, setSelectedTableToEdit] = useState<PostgresTable>()
 
   return (
     <>
@@ -30,6 +31,10 @@ const DatabaseTables: NextPageWithLayout = () => {
                 setSelectedTableToEdit(table)
                 snap.onDeleteTable()
               }}
+              onDuplicateTable={(table) => {
+                setSelectedTableToEdit(table)
+                snap.onDuplicateTable()
+              }}
             />
           </div>
         </ScaffoldSection>
@@ -41,6 +46,10 @@ const DatabaseTables: NextPageWithLayout = () => {
   )
 }
 
-DatabaseTables.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+DatabaseTables.getLayout = (page) => (
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
+)
 
 export default DatabaseTables

@@ -22,8 +22,6 @@ export type SQLEditorContextValues = {
   setAiInput: Dispatch<SetStateAction<string>>
   sqlDiff?: ContentDiff
   setSqlDiff: Dispatch<SetStateAction<ContentDiff | undefined>>
-  debugSolution?: string
-  setDebugSolution: Dispatch<SetStateAction<string | undefined>>
   setSelectedDiffType: Dispatch<SetStateAction<DiffType | undefined>>
 }
 
