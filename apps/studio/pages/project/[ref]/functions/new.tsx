@@ -48,21 +48,7 @@ const NewFunctionPage = () => {
       id: 1,
       name: 'index.ts',
       selected: true,
-      content: `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-
-console.info('server started');
-
-Deno.serve(async (req: Request) => {
-  const data = {
-    message: 'Hello from Supabase Edge Functions!',
-  };
-
-  return new Response(
-    JSON.stringify(data),
-    { headers: { 'Content-Type': 'application/json', 'Connection': 'keep-alive' }}
-  );
-});`,
+      content: EDGE_FUNCTION_TEMPLATES[0].content,
     },
   ])
   const [functionName, setFunctionName] = useState('')
@@ -255,15 +241,6 @@ Deno.serve(async (req: Request) => {
           size="medium"
           disabled={!functionName || files.length === 0}
           onClick={onDeploy}
-          iconRight={
-            isDeploying ? (
-              <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-            ) : (
-              <div className="flex items-center space-x-1">
-                <CornerDownLeft size={10} strokeWidth={1.5} />
-              </div>
-            )
-          }
         >
           Deploy function
         </Button>

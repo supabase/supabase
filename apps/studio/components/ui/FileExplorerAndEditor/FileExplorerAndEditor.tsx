@@ -168,7 +168,7 @@ const FileExplorerAndEditor = ({
             Add File
           </Button>
         </div>
-        <div className="flex-1 overflow-y-auto p-2">
+        <div className="flex-1 overflow-y-auto">
           <TreeView
             data={flattenTree(treeData)}
             aria-label="files tree"
