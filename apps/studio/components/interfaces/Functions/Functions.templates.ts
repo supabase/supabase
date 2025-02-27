@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     )
 
-    const { data, error } = await supabase.from('countries').select('*')
+    const { data, error } = await supabase.from('table_name').select('*')
 
     if (error) {
       throw error
