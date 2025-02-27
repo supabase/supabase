@@ -30,8 +30,7 @@ export async function getRealtimeConfiguration(
   })
   if (error) {
     if ((error as ResponseError).message === 'Custom realtime config for a project not found') {
-      // return REALTIME_DEFAULT_CONFIG
-      handleError(error)
+      return REALTIME_DEFAULT_CONFIG
     } else {
       handleError(error)
     }
