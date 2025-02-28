@@ -63,7 +63,7 @@ async function executeWithRetry(
       return await fn()
     } catch (error: any) {
       if (error?.status === 429 && attempt < maxRetries) {
-        // Get retry delay from headers or use exponential backoff
+        // Get retry delay from headers or use exponential backoff (1s, then 2s, then 4s)
         const retryAfter = error.headers?.get('retry-after')
         const delayMs = retryAfter ? parseInt(retryAfter) * 1000 : baseDelay * Math.pow(2, attempt)
         await sleep(delayMs)
