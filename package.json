@@ -60,6 +60,17 @@
     "pnpm": ">=9",
     "node": ">=20"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@9.15.5"
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
+  "packageManager": "pnpm@9.15.5",
+  "dependencies": {
+    "docs": "0.3.2-canary.0",
+    "scroll-into-view-if-needed": "^3.1.0"
+  }
 }

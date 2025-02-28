@@ -11,6 +11,18 @@ import {
 } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { Feedback } from '~/components/Feedback'
 import useHash from '~/hooks/useHash'
+import { type AnchorProviderProps, AnchorProvider } from 'components/Toc/toc.ui-pattern'
+import {
+  Toc,
+  TOCItems,
+  TocPopoverTrigger,
+  TocPopoverContent,
+  type TOCProps,
+  TOCScrollArea,
+} from 'components/Toc/toc.component'
+import ClerkTOCItems from 'components/Toc/toc.clerk'
+import { Text } from 'lucide-react'
+import { TOCItemType } from './Toc/server/get-toc'
 
 const formatSlug = (slug: string) => {
   // [Joshen] We will still provide support for headers declared like this:
@@ -72,61 +84,23 @@ interface TOCHeader {
 
 const GuidesTableOfContents = ({
   className,
-  overrideToc,
   video,
+  toc,
 }: {
   className?: string
-  overrideToc?: Array<TOCHeader>
   video?: string
+  toc: TOCItemType[]
 }) => {
   useSubscribeTocRerender()
-  const [tocList, setTocList] = useState<TOCHeader[]>([])
   const pathname = usePathname()
   const [hash] = useHash()
 
-  const displayedList = overrideToc ?? tocList
-
   useEffect(() => {
-    if (overrideToc) return
-
-    /**
-     * Because we're directly querying the DOM, needs the setTimeout so the DOM
-     * update will happen first.
-     */
-    const timeoutHandle = setTimeout(() => {
-      const headings = Array.from(
-        document.querySelector('#sb-docs-guide-main-article')?.querySelectorAll('h2, h3') ?? []
-      )
-
-      const newHeadings = headings
-        .filter((heading) => heading.id)
-        .map((heading) => {
-          const text = heading.textContent.replace('#', '')
-          const link = heading.querySelector('a')?.getAttribute('href')
-          if (!link) return null
-
-          const level = heading.tagName === 'H2' ? 2 : 3
-
-          return { text, link, level } as Partial<TOCHeader>
-        })
-        .filter((x): x is TOCHeader => !!x && !!x.text && !!x.link && !!x.level)
-      setTocList(newHeadings)
-    })
-
-    return () => clearTimeout(timeoutHandle)
-    /**
-     * window.location.href needed to recalculate toc when page changes,
-     * `useSubscribeTocRerender` above will trigger the rerender
-     */
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [overrideToc, typeof window !== 'undefined' && window.location.href])
-
-  useEffect(() => {
-    if (hash && displayedList.length > 0) {
+    if (hash && toc.length > 0) {
       highlightSelectedTocItem(hash)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hash, JSON.stringify(displayedList)])
+  }, [hash, JSON.stringify(toc)])
 
   const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
 
@@ -147,7 +121,18 @@ const GuidesTableOfContents = ({
       <div className="pl-5">
         <Feedback key={pathname} />
       </div>
-      {displayedList.length > 0 && (
+      <Toc>
+        header
+        <h3 className="inline-flex items-center gap-1.5 text-sm text-foreground-lighter">
+          <Text className="size-4" />
+          On this page
+        </h3>
+        <TOCScrollArea>
+          {true ? <ClerkTOCItems items={toc} /> : <TOCItems items={toc} />}
+        </TOCScrollArea>
+        footer
+      </Toc>
+      {/* {displayedList.length > 0 && (
         <div>
           <span className="block font-mono text-xs uppercase text-foreground px-5 mb-3">
             On this page
@@ -173,7 +158,7 @@ const GuidesTableOfContents = ({
             ))}
           </ul>
         </div>
-      )}
+      )} */}
     </div>
   )
 }
