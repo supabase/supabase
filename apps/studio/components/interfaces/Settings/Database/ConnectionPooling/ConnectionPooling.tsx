@@ -173,28 +173,28 @@ export const ConnectionPooling = () => {
   const error = useMemo(
     () =>
       allowPgBouncerSelection && type === 'PgBouncer' ? pgbouncerConfigError : supavisorConfigError,
-    [type, allowPgBouncerSelection]
+    [allowPgBouncerSelection, type, pgbouncerConfigError, supavisorConfigError]
   )
   const isLoading = useMemo(
     () =>
       allowPgBouncerSelection && type === 'PgBouncer'
         ? isLoadingPgbouncerConfig
         : isLoadingSupavisorConfig,
-    [type, allowPgBouncerSelection]
+    [allowPgBouncerSelection, type, isLoadingPgbouncerConfig, isLoadingSupavisorConfig]
   )
   const isError = useMemo(
     () =>
       allowPgBouncerSelection && type === 'PgBouncer'
         ? isErrorPgbouncerConfig
         : isErrorSupavisorConfig,
-    [type, allowPgBouncerSelection]
+    [allowPgBouncerSelection, type, isErrorPgbouncerConfig, isErrorSupavisorConfig]
   )
   const isSuccess = useMemo(
     () =>
       allowPgBouncerSelection && type === 'PgBouncer'
         ? isSuccessPgbouncerConfig
         : isSuccessSupavisorConfig,
-    [type, allowPgBouncerSelection]
+    [allowPgBouncerSelection, type, isSuccessPgbouncerConfig, isSuccessSupavisorConfig]
   )
   const isSaving = isUpdatingSupavisor || isUpdatingPgBouncer
 
