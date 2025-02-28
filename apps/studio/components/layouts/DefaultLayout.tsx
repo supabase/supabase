@@ -4,11 +4,12 @@ import { useParams } from 'common'
 import { AppBannerWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { Sidebar } from 'components/interfaces/Sidebar'
+import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
+import { useNewLayout } from 'hooks/ui/useNewLayout'
 import { SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
-import WithSidebar from './AccountLayout/WithSidebar'
 
 export interface DefaultLayoutProps {
   showProductMenu?: boolean
@@ -31,6 +32,9 @@ const DefaultLayout = ({
   showProductMenu,
   headerTitle,
 }: PropsWithChildren<DefaultLayoutProps>) => {
+  const newLayoutPreview = useNewLayout()
+  const showLayoutHeader = useShowLayoutHeader()
+
   const { ref } = useParams()
 
   return (
@@ -42,7 +46,9 @@ const DefaultLayout = ({
             <AppBannerWrapper />
             <div className="flex-shrink-0">
               <MobileNavigationBar />
-              <LayoutHeader headerTitle={headerTitle} />
+              {newLayoutPreview || showLayoutHeader ? (
+                <LayoutHeader headerTitle={headerTitle} />
+              ) : null}
             </div>
             {/* Main Content Area */}
             <div className="flex flex-1 w-full overflow-y-hidden">

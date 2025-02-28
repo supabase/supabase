@@ -5,7 +5,6 @@ import { UserDropdown } from 'components/interfaces/user-dropdown'
 import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
 import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
-import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
 import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
@@ -14,6 +13,8 @@ import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
+import { useNewLayout } from 'hooks/ui/useNewLayout'
 import { IS_PLATFORM } from 'lib/constants'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -25,9 +26,10 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
+import { HomeIcon } from './HomeIcon'
 
-const LayoutHeaderDivider = () => (
-  <span className="text-border-stronger pr-2">
+const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
+  <span className={cn('text-border-stronger pr-2', className)} {...props}>
     <svg
       viewBox="0 0 24 24"
       width="16"
@@ -47,12 +49,8 @@ const LayoutHeaderDivider = () => (
 interface LayoutHeaderProps {
   customHeaderComponents?: ReactNode
   breadcrumbs?: any[]
-  headerBorder?: boolean
   hasProductMenu?: boolean
-  customSidebarContent?: ReactNode
   headerTitle?: string
-  handleMobileMenu: Function
-  showHomeLink?: boolean
 }
 
 const LayoutHeader = ({
@@ -61,6 +59,9 @@ const LayoutHeader = ({
   hasProductMenu,
   headerTitle,
 }: LayoutHeaderProps) => {
+  const newLayoutPreview = useNewLayout()
+
+  const showLayoutHeader = useShowLayoutHeader()
   const { ref: projectRef, slug } = useParams()
   const router = useRouter()
   const selectedProject = useSelectedProject()
@@ -110,27 +111,17 @@ const LayoutHeader = ({
             </div>
           )}
           <div className="flex items-center text-sm">
-            <Link
-              href={IS_PLATFORM ? `/org/${selectedOrganization?.slug}` : `/project/${projectRef}`}
-              className="flex items-center justify-center"
-            >
-              <Image
-                alt="Supabase"
-                src={`${router.basePath}/img/supabase-logo.svg`}
-                width={18}
-                height={18}
-                className="w-[18px] h-[18px]"
-              />
-            </Link>
-
+            <HomeIcon />
             <>
               <div className="flex items-center pl-2">
-                {showOrgSelection && (
+                {showOrgSelection &&
+                // hides org dropdown for old layout
+                (newLayoutPreview || showLayoutHeader) ? (
                   <>
-                    <LayoutHeaderDivider />
+                    <LayoutHeaderDivider className="hidden md:block" />
                     <OrganizationDropdown />
                   </>
-                )}
+                ) : null}
                 <AnimatePresence>
                   {projectRef && (
                     <motion.div
@@ -186,7 +177,7 @@ const LayoutHeader = ({
               <AnimatePresence>
                 {projectRef && (
                   <motion.div
-                    className="ml-3 flex items-center gap-x-3"
+                    className="ml-3 items-center gap-x-3 hidden md:flex"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
@@ -201,7 +192,6 @@ const LayoutHeader = ({
                 )}
               </AnimatePresence>
             </>
-
             {/* Additional breadcrumbs are supplied */}
             <BreadcrumbsView defaultValue={breadcrumbs} />
           </div>

@@ -17,6 +17,7 @@ import {
   ScaffoldContainerLegacy,
   ScaffoldTitle,
 } from '../Scaffold'
+import { useNewLayout } from 'hooks/ui/useNewLayout'
 
 export interface AccountLayoutProps {
   title: string
@@ -27,6 +28,8 @@ export interface AccountLayoutProps {
 }
 
 const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<AccountLayoutProps>) => {
+  const newLayoutPreview = useNewLayout()
+
   const router = useRouter()
   const { data: organizations } = useOrganizationsQuery()
   const selectedOrganization = useSelectedOrganization()
@@ -61,6 +64,10 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   ]
 
   const currentPath = router.pathname
+
+  if (!newLayoutPreview) {
+    return children
+  }
 
   return (
     <>

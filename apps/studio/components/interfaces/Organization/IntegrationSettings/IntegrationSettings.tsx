@@ -30,6 +30,7 @@ import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
+import { useNewLayout } from 'hooks/ui/useNewLayout'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -42,6 +43,8 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 }
 
 const IntegrationSettings = () => {
+  const newLayoutPreview = useNewLayout()
+
   const org = useSelectedOrganization()
 
   const canReadGithubConnection = useCheckPermissions(
@@ -175,9 +178,11 @@ The GitHub app will watch for changes in your repository such as file changes, b
 
   return (
     <>
-      <ScaffoldContainerLegacy>
-        <ScaffoldTitle>Integrations</ScaffoldTitle>
-      </ScaffoldContainerLegacy>
+      {newLayoutPreview && (
+        <ScaffoldContainerLegacy>
+          <ScaffoldTitle>Integrations</ScaffoldTitle>
+        </ScaffoldContainerLegacy>
+      )}
       <GitHubSection />
       <ScaffoldDivider />
       <VercelSection isProjectScoped={false} />

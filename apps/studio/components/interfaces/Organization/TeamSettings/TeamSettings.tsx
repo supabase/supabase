@@ -25,8 +25,11 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { InviteMemberButton } from './InviteMemberButton'
 import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { useNewLayout } from 'hooks/ui/useNewLayout'
 
 const TeamSettings = () => {
+  const newLayoutPreview = useNewLayout()
+
   const {
     organizationMembersCreate: organizationMembersCreationEnabled,
     organizationMembersDelete: organizationMembersDeletionEnabled,
@@ -79,7 +82,7 @@ const TeamSettings = () => {
   return (
     <>
       <ScaffoldContainerLegacy>
-        <ScaffoldTitle>Team</ScaffoldTitle>
+        {newLayoutPreview && <ScaffoldTitle>Team</ScaffoldTitle>}
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">
             <Input

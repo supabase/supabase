@@ -17,8 +17,9 @@ import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useNewLayout } from 'hooks/ui/useNewLayout'
 import { Home } from 'icons'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -39,7 +40,6 @@ import {
   useSidebar,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
-import { ThemeDropdown, UserDropdown } from './UserDropdown'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -58,6 +58,10 @@ const SidebarMotion = motion(SidebarPrimitive) as FC<
 export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPrimitive> {}
 
 export const Sidebar = ({ className, ...props }: SidebarProps) => {
+  const newLayoutPreview = useNewLayout()
+
+  const { ref } = useParams()
+
   const { setOpen } = useSidebar()
   const hideSideBar = useHideSidebar()
 
@@ -71,6 +75,10 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
     if (sidebarBehaviour === 'open') setOpen(true)
     if (sidebarBehaviour === 'closed') setOpen(false)
   }, [sidebarBehaviour, setOpen])
+
+  if (!newLayoutPreview && !ref) {
+    return null
+  }
 
   return (
     <>
@@ -300,7 +308,6 @@ function ProjectLinks() {
   )
 }
 
-// Not currently used, will be part of org layout PR
 const OrganizationLinks = () => {
   const router = useRouter()
   const { slug } = useParams()
@@ -334,7 +341,7 @@ const OrganizationLinks = () => {
     },
     {
       label: 'Organization settings',
-      href: `/org/${slug}/settings/general`,
+      href: `/org/${slug}/general`,
       key: 'settings',
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
@@ -345,7 +352,18 @@ const OrganizationLinks = () => {
       <SidebarGroup className="gap-0.5">
         {navMenuItems.map((item, i) => (
           <SideBarNavLink
-            active={i === 0 ? activeRoute === undefined : activeRoute === item.key}
+            active={
+              i === 0
+                ? activeRoute === undefined
+                : item.key === 'settings'
+                  ? router.pathname.includes('/general') ||
+                    router.pathname.includes('/billing') ||
+                    router.pathname.includes('/invoices') ||
+                    router.pathname.includes('/apps') ||
+                    router.pathname.includes('/audit') ||
+                    router.pathname.includes('/documents')
+                  : activeRoute === item.key
+            }
             route={{
               label: item.label,
               link: item.href,

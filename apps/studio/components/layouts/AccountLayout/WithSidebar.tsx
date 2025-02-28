@@ -47,7 +47,7 @@ const WithSidebar = ({
         />
       )}
       <div className="flex flex-1 flex-col">
-        <LayoutHeader breadcrumbs={breadcrumbs} />
+        {/* <LayoutHeader breadcrumbs={breadcrumbs} /> */}
         <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
       </div>
       <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>

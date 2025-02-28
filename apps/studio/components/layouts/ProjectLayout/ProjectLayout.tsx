@@ -239,9 +239,9 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
         <EnableBranchingModal />
         <AISettingsModal />
         <ProjectAPIDocs />
-        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        {/* <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           {productMenu}
-        </MobileSheetNav>
+        </MobileSheetNav> */}
       </>
     )
   }

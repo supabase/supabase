@@ -3,10 +3,12 @@ import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
 import { Button, cn } from 'ui'
 import { ScaffoldContainerLegacy } from '../Scaffold'
+import { useNewLayout } from 'hooks/ui/useNewLayout'
 
 const AccountSettingsLayout = ({ children }: PropsWithChildren) => {
-  const pathname = usePathname()
+  const newLayoutPreview = useNewLayout()
 
+  const pathname = usePathname()
   const links = [
     {
       isActive: pathname === `/account/me`,
@@ -28,6 +30,10 @@ const AccountSettingsLayout = ({ children }: PropsWithChildren) => {
       key: `/account/security`,
     },
   ]
+
+  if (!newLayoutPreview) {
+    return children
+  }
 
   return (
     <ScaffoldContainerLegacy className="flex flex-row py-8 gap-20">

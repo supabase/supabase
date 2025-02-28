@@ -27,8 +27,11 @@ import Bandwidth from './Bandwidth'
 import Compute from './Compute'
 import SizeAndCounts from './SizeAndCounts'
 import TotalUsage from './TotalUsage'
+import { useNewLayout } from 'hooks/ui/useNewLayout'
 
 const Usage = () => {
+  const newLayoutPreview = useNewLayout()
+
   const { slug, projectRef } = useParams()
   const [dateRange, setDateRange] = useState<any>()
   const [selectedProjectRef, setSelectedProjectRef] = useState<string>()
@@ -117,10 +120,12 @@ const Usage = () => {
 
   return (
     <>
-      <ScaffoldContainerLegacy>
-        <ScaffoldTitle>Usage</ScaffoldTitle>
-      </ScaffoldContainerLegacy>
-      <div className="sticky top-0 border-b bg-studio z-10 overflow-hidden ">
+      {newLayoutPreview && (
+        <ScaffoldContainerLegacy>
+          <ScaffoldTitle>Usage</ScaffoldTitle>
+        </ScaffoldContainerLegacy>
+      )}
+      <div className="sticky top-0 border-b bg-studio z-[1] overflow-hidden ">
         <ScaffoldContainer className="">
           <div className="py-4 flex items-center space-x-4">
             {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}

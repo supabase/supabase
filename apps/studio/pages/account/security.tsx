@@ -5,6 +5,7 @@ import AccountLayout from 'components/layouts/AccountLayout/account-layout'
 import AccountSettingsLayout from 'components/layouts/AccountLayout/account-settings-layout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import type { NextPageWithLayout } from 'types'
@@ -61,9 +62,11 @@ const Security: NextPageWithLayout = () => {
 Security.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
-      <AccountLayout title="Security" breadcrumbs={[{ key: 'security', label: 'Security' }]}>
-        <AccountSettingsLayout>{page}</AccountSettingsLayout>
-      </AccountLayout>
+      <OrganizationLayout>
+        <AccountLayout title="Security" breadcrumbs={[{ key: 'security', label: 'Security' }]}>
+          <AccountSettingsLayout>{page}</AccountSettingsLayout>
+        </AccountLayout>
+      </OrganizationLayout>
     </DefaultLayout>
   </AppLayout>
 )

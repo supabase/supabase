@@ -3,11 +3,14 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
+import PartnerIcon from 'components/ui/PartnerIcon'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useNewLayout } from 'hooks/ui/useNewLayout'
 import {
   Badge,
   Button,
@@ -24,10 +27,10 @@ import {
   ScrollArea,
   cn,
 } from 'ui'
-import PartnerIcon from 'components/ui/PartnerIcon'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 const OrganizationDropdown = () => {
+  const newLayoutPreview = useNewLayout()
+
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const project = useSelectedProject()
@@ -47,9 +50,14 @@ const OrganizationDropdown = () => {
 
   return (
     <>
-      <Link href={`/org/${slug}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
+      <Link
+        href={newLayoutPreview ? `/org/${slug}` : `/org/${slug}/general`}
+        className="flex items-center gap-2 flex-shrink-0 text-sm"
+      >
         <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-        <span className="text-foreground max-w-32 lg:max-w-none truncate">{orgName}</span>
+        <span className="text-foreground max-w-32 lg:max-w-none truncate hidden md:block">
+          {orgName}
+        </span>
         {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
       </Link>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -92,23 +100,25 @@ const OrganizationDropdown = () => {
                   })}
                 </ScrollArea>
               </CommandGroup_Shadcn_>
-              <>
-                <CommandSeparator_Shadcn_ />
-                <CommandGroup_Shadcn_>
-                  <CommandItem_Shadcn_
-                    className="cursor-pointer w-full"
-                    onSelect={(e) => {
-                      setOpen(false)
-                      router.push(`/organizations`)
-                    }}
-                    onClick={() => setOpen(false)}
-                  >
-                    <Link href="/organizations" className="flex items-center gap-2 w-full">
-                      <p>All Organizations</p>
-                    </Link>
-                  </CommandItem_Shadcn_>
-                </CommandGroup_Shadcn_>
-              </>
+              {newLayoutPreview && (
+                <>
+                  <CommandSeparator_Shadcn_ />
+                  <CommandGroup_Shadcn_>
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer w-full"
+                      onSelect={(e) => {
+                        setOpen(false)
+                        router.push(`/organizations`)
+                      }}
+                      onClick={() => setOpen(false)}
+                    >
+                      <Link href="/organizations" className="flex items-center gap-2 w-full">
+                        <p>All Organizations</p>
+                      </Link>
+                    </CommandItem_Shadcn_>
+                  </CommandGroup_Shadcn_>
+                </>
+              )}
               {organizationCreationEnabled && (
                 <>
                   <CommandSeparator_Shadcn_ />

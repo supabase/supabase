@@ -53,6 +53,8 @@ export const LOCAL_STORAGE_KEYS = {
   UI_TABLE_EDITOR_TABS: 'supabase-ui-table-editor-tabs',
   UI_SQL_EDITOR_TABS: 'supabase-ui-sql-editor-tabs',
 
+  UI_NEW_LAYOUT_PREVIEW: 'supabase-ui-new-layout-preview',
+
   SQL_SCRATCH_PAD_BANNER_ACKNOWLEDGED: 'supabase-sql-scratch-pad-banner-acknowledged',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,

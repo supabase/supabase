@@ -16,6 +16,7 @@ import { Admonition } from 'ui-patterns'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import AccountSettingsLayout from 'components/layouts/AccountLayout/account-settings-layout'
+import OrganizationLayout from 'components/layouts/OrganizationLayout'
 
 const UserAccessTokens: NextPageWithLayout = () => {
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
@@ -70,12 +71,14 @@ const UserAccessTokens: NextPageWithLayout = () => {
 UserAccessTokens.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
-      <AccountLayout
-        title="Access Tokens"
-        breadcrumbs={[{ key: 'supabase-account-tokens', label: 'Access Tokens' }]}
-      >
-        <AccountSettingsLayout>{page}</AccountSettingsLayout>
-      </AccountLayout>
+      <OrganizationLayout>
+        <AccountLayout
+          title="Access Tokens"
+          breadcrumbs={[{ key: 'supabase-account-tokens', label: 'Access Tokens' }]}
+        >
+          <AccountSettingsLayout>{page}</AccountSettingsLayout>
+        </AccountLayout>
+      </OrganizationLayout>
     </DefaultLayout>
   </AppLayout>
 )

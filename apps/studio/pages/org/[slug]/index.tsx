@@ -18,8 +18,11 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useParams } from 'common'
 import { Button } from 'ui'
 import Link from 'next/link'
+import { useNewLayout } from 'hooks/ui/useNewLayout'
 
 const ProjectsPage: NextPageWithLayout = () => {
+  const newLayoutPreview = useNewLayout()
+
   const router = useRouter()
   const { slug } = useParams()
   const [search, setSearch] = useState('')
@@ -28,41 +31,23 @@ const ProjectsPage: NextPageWithLayout = () => {
     PROJECT_STATUS.INACTIVE,
   ])
 
-  // const { data: organizations, isError, isSuccess } = useOrganizationsQuery()
-
   useAutoProjectsPrefetch()
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
   const hasWindowLoaded = typeof window !== 'undefined'
 
-  // useEffect(() => {
-  //   if (isSuccess && hasWindowLoaded) {
-  //     const hasNoOrg = organizations.length === 0
-  //     const hasShownNewPage = localStorage.getItem(LOCAL_STORAGE_KEYS.UI_ONBOARDING_NEW_PAGE_SHOWN)
-  //     if (hasNoOrg && !hasShownNewPage) {
-  //       localStorage.setItem(LOCAL_STORAGE_KEYS.UI_ONBOARDING_NEW_PAGE_SHOWN, 'true')
-  //       router.push('/new')
-  //     }
-  //   }
-  // }, [isSuccess, hasWindowLoaded])
+  useEffect(() => {
+    // handle old layout redirect
+    // this page should not be accessible in the old layout
+    if (!newLayoutPreview && slug && router) {
+      router.push(`/org/${slug}/general`)
+    }
+  }, [newLayoutPreview, router, slug])
 
   return (
     <ScaffoldContainerLegacy>
-      {/* {isError && (
-        <div className="py-4">
-          <AlertError subject="Failed to retrieve organizations" />
-        </div>
-      )} */}
-
       <div>
         {IS_PLATFORM && projectCreationEnabled && (
-          // <HomePageActions
-          //   search={search}
-          //   filterStatus={filterStatus}
-          //   setSearch={setSearch}
-          //   setFilterStatus={setFilterStatus}
-          //   organizations={organizations}
-          // />
           <Link href={`/new/${slug}`}>
             <Button type="primary">New project</Button>
           </Link>
