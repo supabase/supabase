@@ -8,7 +8,7 @@ import { useOnChange } from '~/lib/use-on-change'
 import { useAnchorObserver } from '~/lib/use-anchor-observer'
 import { mergeRefs } from '~/lib/merge-refs'
 
-const ActiveAnchorContext = createContext<string[]>([])
+export const ActiveAnchorContext = createContext<string[]>([])
 
 const ScrollContext = createContext<RefObject<HTMLElement | null>>({
   current: null,
@@ -84,15 +84,12 @@ export const TOCItem = forwardRef<HTMLAnchorElement, TOCItemProps>(
     const anchors = useActiveAnchors()
     const anchorRef = useRef<HTMLAnchorElement>(null)
     const mergedRef = mergeRefs(anchorRef, ref)
-    console.log('containerRef', containerRef)
-    console.log('anchors', anchors)
 
     const isActive = anchors.includes(props.href.slice(1))
 
     useOnChange(isActive, (v) => {
       const element = anchorRef.current
 
-      console.log('element', element)
       if (!element) return
 
       if (v && containerRef.current) {

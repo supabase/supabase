@@ -28,6 +28,7 @@ export default function ClerkTOCItems({ items }: { items: TOCItemType[] }) {
         const element: HTMLElement | null = container.querySelector(
           `a[href="#${items[i].url.slice(1)}"]`
         )
+
         if (!element) continue
 
         const styles = getComputedStyle(element)
@@ -64,21 +65,21 @@ export default function ClerkTOCItems({ items }: { items: TOCItemType[] }) {
     <>
       {svg ? (
         <div
-          className="absolute start-0 top-0 rtl:-scale-x-100"
+          className="absolute z-50 start-0 top-0 rtl:-scale-x-100"
           style={{
             width: svg.width,
             height: svg.height,
             maskImage: `url("data:image/svg+xml,${
               // Inline SVG
               encodeURIComponent(
-                `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svg.width} ${svg.height}"><path d="${svg.path}" stroke="black" stroke-width="1" fill="none" /></svg>`
+                `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svg.width} ${svg.height}"><path d="${svg.path}" stroke="white" stroke-width="1" fill="none" /></svg>`
               )
             }")`,
           }}
         >
           <TocThumb
             containerRef={containerRef}
-            className="mt-(--fd-top) h-(--fd-height) bg-brand transition-all"
+            className="mt-[--fd-top] w-20 h-[--fd-height] bg-foreground transition-all"
           />
         </div>
       ) : null}
@@ -103,7 +104,8 @@ function getItemOffset(depth: number): number {
 }
 
 function getLineOffset(depth: number): number {
-  return depth >= 3 ? 10 : 0
+  // Change values to inset line
+  return depth >= 3 ? 0 : 0
 }
 
 function TOCItem({

@@ -1,28 +1,18 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import { proxy, useSnapshot } from 'valtio'
-import {
-  highlightSelectedTocItem,
-  removeAnchor,
-} from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
+import { highlightSelectedTocItem } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { Feedback } from '~/components/Feedback'
 import useHash from '~/hooks/useHash'
-import { type AnchorProviderProps, AnchorProvider } from 'components/Toc/toc.ui-pattern'
-import {
-  Toc,
-  TOCItems,
-  TocPopoverTrigger,
-  TocPopoverContent,
-  type TOCProps,
-  TOCScrollArea,
-} from 'components/Toc/toc.component'
-import ClerkTOCItems from 'components/Toc/toc.clerk'
+import { Toc, TOCItems, TOCScrollArea } from 'components/Toc/toc.component'
+import InsetTOCItems from '~/components/Toc/toc-inset'
 import { Text } from 'lucide-react'
-import { TOCItemType } from './Toc/server/get-toc'
+import { useTocAnchors } from '../features/docs/GuidesMdx.client'
+import { TocThumb } from './Toc/toc-thumb'
 
 const formatSlug = (slug: string) => {
   // [Joshen] We will still provide support for headers declared like this:
@@ -82,21 +72,16 @@ interface TOCHeader {
   level: number
 }
 
-const GuidesTableOfContents = ({
-  className,
-  video,
-  toc,
-}: {
-  className?: string
-  video?: string
-  toc: TOCItemType[]
-}) => {
+const GuidesTableOfContents = ({ className, video }: { className?: string; video?: string }) => {
   useSubscribeTocRerender()
   const pathname = usePathname()
   const [hash] = useHash()
+  const { toc } = useTocAnchors()
+
+  console.log('toc', toc)
 
   useEffect(() => {
-    if (hash && toc.length > 0) {
+    if (hash && toc?.length > 0) {
       highlightSelectedTocItem(hash)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,43 +107,14 @@ const GuidesTableOfContents = ({
         <Feedback key={pathname} />
       </div>
       <Toc>
-        header
         <h3 className="inline-flex items-center gap-1.5 text-sm text-foreground-lighter">
           <Text className="size-4" />
           On this page
         </h3>
         <TOCScrollArea>
-          {true ? <ClerkTOCItems items={toc} /> : <TOCItems items={toc} />}
+          {false ? <InsetTOCItems items={toc} /> : <TOCItems items={toc} />}
         </TOCScrollArea>
-        footer
       </Toc>
-      {/* {displayedList.length > 0 && (
-        <div>
-          <span className="block font-mono text-xs uppercase text-foreground px-5 mb-3">
-            On this page
-          </span>
-          <ul className="toc-menu list-none pl-5 text-[0.8rem] grid gap-2">
-            {displayedList.map((item, i) => (
-              <li key={`${item.level}-${i}`} className={item.level === 3 ? 'ml-4' : ''}>
-                <a
-                  href={`#${formatSlug(item.link)}`}
-                  className="text-foreground-lighter hover:text-brand-link transition-colors"
-                >
-                  {formatTOCHeader(removeAnchor(item.text)).map((x, index) => (
-                    <Fragment key={index}>
-                      {x.type === 'code' ? (
-                        <code className="text-xs border rounded bg-muted">{x.value}</code>
-                      ) : (
-                        x.value
-                      )}
-                    </Fragment>
-                  ))}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )} */}
     </div>
   )
 }

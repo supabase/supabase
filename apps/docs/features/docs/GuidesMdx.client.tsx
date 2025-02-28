@@ -6,9 +6,13 @@
  */
 
 import { MDXProvider } from '@mdx-js/react'
-import { useEffect, useState, type PropsWithChildren } from 'react'
+import { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react'
 import { components } from '~/features/docs/MdxBase.shared'
-import { type AnchorProviderProps, AnchorProvider } from 'components/Toc/toc.ui-pattern'
+import {
+  ActiveAnchorContext,
+  type AnchorProviderProps,
+  AnchorProvider,
+} from 'components/Toc/toc.ui-pattern'
 
 interface TOCHeader {
   id?: string
@@ -17,7 +21,17 @@ interface TOCHeader {
   level: number
 }
 
-const MDXProviderGuides = ({ children }: PropsWithChildren) => {
+const TocAnchorsContext = createContext<AnchorProviderProps | undefined>(undefined)
+
+const useTocAnchors = () => {
+  const context = useContext(TocAnchorsContext)
+  if (!context) {
+    throw new Error('useTocAnchors must be used within an TocAnchorsContext')
+  }
+  return context
+}
+
+const TocAnchorsProvider = ({ children }: PropsWithChildren) => {
   const [tocList, setTocList] = useState<TOCHeader[]>([])
 
   const displayedList = tocList
@@ -59,13 +73,18 @@ const MDXProviderGuides = ({ children }: PropsWithChildren) => {
      */
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typeof window !== 'undefined' && window.location.href])
+
   return (
-    <MDXProvider components={components}>
+    <TocAnchorsContext.Provider value={{ toc }}>
       <AnchorProvider toc={toc} single={false}>
         {children}
       </AnchorProvider>
-    </MDXProvider>
+    </TocAnchorsContext.Provider>
   )
 }
 
-export { MDXProviderGuides }
+const MDXProviderGuides = ({ children }: PropsWithChildren) => {
+  return <MDXProvider components={components}>{children}</MDXProvider>
+}
+
+export { MDXProviderGuides, TocAnchorsProvider, useTocAnchors }
