@@ -1,47 +1,45 @@
-import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm, useFieldArray } from 'react-hook-form'
+import { Loader2, Plus, Send, X } from 'lucide-react'
+import { useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 import * as z from 'zod'
+
+import { useParams } from 'common'
+import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
+import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { constructHeaders } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
+import { prettifyJSON } from 'lib/helpers'
+import { getRoleImpersonationJWT } from 'lib/role-impersonation'
+import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
+  Badge,
   Button,
+  CodeBlock,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_ as Input,
   Label_Shadcn_ as Label,
   Select_Shadcn_ as Select,
   SelectContent_Shadcn_ as SelectContent,
   SelectItem_Shadcn_ as SelectItem,
   SelectTrigger_Shadcn_ as SelectTrigger,
   SelectValue_Shadcn_ as SelectValue,
-  TextArea_Shadcn_ as Textarea,
-  Input_Shadcn_ as Input,
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
-  Badge,
-  CodeBlock,
-  Form_Shadcn_,
-  FormField_Shadcn_,
-  FormControl_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormDescription_Shadcn_,
+  TextArea_Shadcn_ as Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { constructHeaders } from 'data/fetchers'
-import { useParams } from 'common'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { getRoleImpersonationJWT } from 'lib/role-impersonation'
-import { useGetImpersonatedRole } from 'state/role-impersonation-state'
-import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
-import { IS_PLATFORM } from 'lib/constants'
-import { prettifyJSON } from 'lib/helpers'
-import { Loader2, Plus, Send, X } from 'lucide-react'
 
 interface EdgeFunctionTesterSheetProps {
   visible: boolean
@@ -86,7 +84,7 @@ const FormSchema = z.object({
 type FormValues = z.infer<typeof FormSchema>
 
 const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSheetProps) => {
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, functionSlug } = useParams()
   const [response, setResponse] = useState<ResponseData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -106,6 +104,7 @@ const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSh
       queryParams: [{ key: '', value: '' }],
     },
   })
+  const { method } = form.watch()
 
   const {
     fields: headerFields,
@@ -189,7 +188,8 @@ const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSh
         .map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
         .join('&')
 
-      const finalUrl = queryString ? `${url}?${queryString}` : url
+      const finalUrl = 'https://jzgqqkutymjvumpmrssi.supabase.red/functions/v1/test-function-001' // queryString ? `${url}?${queryString}` : url
+      console.log(finalUrl)
 
       const defaultHeaders = await constructHeaders()
       const res = await fetch('/api/edge-functions/test', {
@@ -303,7 +303,7 @@ const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSh
     <Sheet open={visible} onOpenChange={onClose}>
       <SheetContent size="default" className="flex flex-col gap-0 p-0">
         <SheetHeader>
-          <SheetTitle>Test Edge Function</SheetTitle>
+          <SheetTitle>Test {functionSlug}</SheetTitle>
         </SheetHeader>
 
         <Form_Shadcn_ {...form}>
@@ -316,11 +316,7 @@ const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSh
                 control={form.control}
                 name="method"
                 render={({ field }) => (
-                  <FormItemLayout
-                    layout="flex-row-reverse"
-                    label="Method"
-                    description="Select the HTTP method for your request"
-                  >
+                  <FormItemLayout layout="vertical" label="HTTP Method">
                     <FormControl_Shadcn_>
                       <Select
                         value={field.value}
@@ -342,27 +338,25 @@ const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSh
                   </FormItemLayout>
                 )}
               />
-              <FormField_Shadcn_
-                control={form.control}
-                name="body"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="flex-row-reverse"
-                    label="Body"
-                    description="Enter the JSON request body"
-                  >
-                    <FormControl_Shadcn_>
-                      <Textarea
-                        {...field}
-                        placeholder="Request body (JSON)"
-                        rows={3}
-                        disabled={isLoading}
-                        className="font-mono text-xs"
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
+              {method !== 'GET' && (
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="body"
+                  render={({ field }) => (
+                    <FormItemLayout layout="vertical" label="Request Body">
+                      <FormControl_Shadcn_>
+                        <Textarea
+                          {...field}
+                          placeholder="Request body (JSON)"
+                          rows={3}
+                          disabled={isLoading}
+                          className="font-mono text-xs"
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              )}
 
               {renderKeyValuePairs('headers', 'Headers')}
               {renderKeyValuePairs('queryParams', 'Query Parameters')}
@@ -415,7 +409,7 @@ const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSh
                 </div>
               ) : isLoading ? (
                 <div className="h-full flex flex-col items-center justify-center gap-2">
-                  <Loader2 size={24} className="text-foreground-muted" />
+                  <Loader2 size={24} className="text-foreground-muted animate-spin" />
                   <p className="text-sm text-foreground-light">Sending request...</p>
                 </div>
               ) : (

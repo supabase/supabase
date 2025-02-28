@@ -1,5 +1,7 @@
 import { ChevronLeft } from 'lucide-react'
+import Link from 'next/link'
 import { Fragment, ReactNode } from 'react'
+
 import { useParams } from 'common'
 import { cn } from 'ui'
 import {
@@ -58,14 +60,13 @@ export const PageHeader = ({
                         {item.element ? (
                           item.element
                         ) : item.href ? (
-                          <BreadcrumbLink
-                            className="flex items-center gap-2"
-                            href={!!ref ? item.href.replace('[ref]', ref) : item.href}
-                          >
-                            {breadcrumbs.length === 1 && !isCompact && (
-                              <ChevronLeft size={16} strokeWidth={1.5} />
-                            )}
-                            {item.label}
+                          <BreadcrumbLink asChild className="flex items-center gap-2">
+                            <Link href={!!ref ? item.href.replace('[ref]', ref) : item.href}>
+                              {breadcrumbs.length === 1 && !isCompact && (
+                                <ChevronLeft size={16} strokeWidth={1.5} />
+                              )}
+                              {item.label}
+                            </Link>
                           </BreadcrumbLink>
                         ) : (
                           <BreadcrumbPageItem className="flex items-center gap-2">
@@ -92,7 +93,6 @@ export const PageHeader = ({
             ) : isCompact ? (
               title
             ) : null}
-            {pageMeta && <div className="ml-4">{pageMeta}</div>}
           </div>
           {isCompact && (
             <div className="flex items-center gap-2">

@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useWatch } from '@ui/components/shadcn/ui/form'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -333,7 +332,7 @@ export const CreateCronJobSheet = ({
 
           if (isEditing) {
             sendEvent({
-              action: TelemetryActions.CRON_JOB_UPDATED,
+              action: 'cron_job_updated',
               properties: {
                 type: values.type,
                 schedule: schedule,
@@ -345,7 +344,7 @@ export const CreateCronJobSheet = ({
             })
           } else {
             sendEvent({
-              action: TelemetryActions.CRON_JOB_CREATED,
+              action: 'cron_job_created',
               properties: {
                 type: values.type,
                 schedule: schedule,

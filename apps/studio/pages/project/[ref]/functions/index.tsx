@@ -1,26 +1,37 @@
-import { useParams } from 'common'
-import { AiIconAnimation, Button, Dialog, DialogContent, DialogSection, DialogTrigger } from 'ui'
+import { ChevronDown, Code, ExternalLink, Terminal } from 'lucide-react'
 import { useRouter } from 'next/router'
 
-import {
-  EdgeFunctionsListItem,
-  FunctionsEmptyState,
-  TerminalInstructions,
-} from 'components/interfaces/Functions'
-import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
+import { useParams } from 'common'
+import { EdgeFunctionsListItem } from 'components/interfaces/Functions/EdgeFunctionsListItem'
+import { FunctionsEmptyState } from 'components/interfaces/Functions/FunctionsEmptyState'
+import { TerminalInstructions } from 'components/interfaces/Functions/TerminalInstructions'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import type { NextPageWithLayout } from 'types'
-import { DocsButton } from 'components/ui/DocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useAppStateSnapshot } from 'state/app-state'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import type { NextPageWithLayout } from 'types'
+import {
+  AiIconAnimation,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogSection,
+  DialogTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 
-const FunctionsPage: NextPageWithLayout = () => {
+const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { setAiAssistantPanel } = useAppStateSnapshot()
   const router = useRouter()
@@ -31,25 +42,67 @@ const FunctionsPage: NextPageWithLayout = () => {
     isError,
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })
+  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
 
   const hasFunctions = (functions ?? []).length > 0
 
   const deployButton = (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button type="primary">Deploy a new function</Button>
-      </DialogTrigger>
-      <DialogContent size="large">
-        <DialogSection padding="small">
-          <TerminalInstructions />
-        </DialogSection>
-      </DialogContent>
-    </Dialog>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button type="primary" iconRight={<ChevronDown className="w-4 h-4" strokeWidth={1.5} />}>
+          Deploy a new function
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-80">
+        <Dialog>
+          <DialogTrigger asChild>
+            <DropdownMenuItem className="gap-4" onSelect={(e) => e.preventDefault()}>
+              <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
+              <div>
+                <span className="text-foreground">Via CLI</span>
+                <p>
+                  Create an edge function locally and then deploy your function via the Supabase CLI
+                </p>
+              </div>
+            </DropdownMenuItem>
+          </DialogTrigger>
+          <DialogContent size="large">
+            <DialogSection padding="small">
+              <TerminalInstructions />
+            </DialogSection>
+          </DialogContent>
+        </Dialog>
+        {edgeFunctionCreate && (
+          <DropdownMenuItem
+            onSelect={() => router.push(`/project/${ref}/functions/new`)}
+            className="gap-4"
+          >
+            <Code className="shrink-0" size={16} strokeWidth={1.5} />
+            <div>
+              <span className="text-foreground">Via Editor</span>
+              <p>
+                Create an edge function in the Supabase Studio editor and then deploy your function
+              </p>
+            </div>
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 
   const secondaryActions = [
     <DocsButton key="docs" href="https://supabase.com/docs/guides/functions" />,
+    <Button asChild key="edge-function-examples" type="default" icon={<ExternalLink />}>
+      <a
+        target="_blank"
+        rel="noreferrer"
+        href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+      >
+        Examples
+      </a>
+    </Button>,
     <ButtonTooltip
+      key="edge-function-create"
       type="default"
       className="px-1 pointer-events-auto"
       icon={<AiIconAnimation size={16} />}
@@ -86,18 +139,14 @@ const FunctionsPage: NextPageWithLayout = () => {
       secondaryActions={secondaryActions}
     >
       <ScaffoldContainer size="large">
-        {isLoading && (
-          <div className="pt-8">
-            <GenericSkeletonLoader />
-          </div>
-        )}
+        <ScaffoldSection isFullWidth>
+          {isLoading && <GenericSkeletonLoader />}
 
-        {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
+          {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
 
-        {isSuccess && (
-          <>
-            {hasFunctions ? (
-              <div className="py-6 space-y-4">
+          {isSuccess && (
+            <>
+              {hasFunctions ? (
                 <Table
                   head={
                     <>
@@ -117,18 +166,18 @@ const FunctionsPage: NextPageWithLayout = () => {
                     </>
                   }
                 />
-              </div>
-            ) : (
-              <FunctionsEmptyState />
-            )}
-          </>
-        )}
+              ) : (
+                <FunctionsEmptyState />
+              )}
+            </>
+          )}
+        </ScaffoldSection>
       </ScaffoldContainer>
     </PageLayout>
   )
 }
 
-FunctionsPage.getLayout = (page) => {
+EdgeFunctionsPage.getLayout = (page) => {
   return (
     <DefaultLayout>
       <EdgeFunctionsLayout>{page}</EdgeFunctionsLayout>
@@ -136,4 +185,4 @@ FunctionsPage.getLayout = (page) => {
   )
 }
 
-export default FunctionsPage
+export default EdgeFunctionsPage

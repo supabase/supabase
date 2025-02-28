@@ -1,0 +1,64 @@
+name: '[Docs] Lint v2 (scheduled)'
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+env:
+  CARGO_NET_GIT_FETCH_WITH_CLI: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  lint-all:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            supa-mdx-lint.config.toml
+            supa-mdx-lint
+            apps/docs/content
+      - name: cache cargo
+        id: cache-cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: 1b63d22ef9b987f802cba06f01ec0da4b8eb4847
+      - name: install linter
+        if: steps.cache-cargo.outputs.cache-hit != 'true'
+        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 1b63d22ef9b987f802cba06f01ec0da4b8eb4847
+      - name: run linter
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          supa-mdx-lint apps/docs/content || {
+            echo "Linter failed, attempting to fix errors..."
+            git config --global user.name 'github-docs-bot'
+            git config --global user.email 'github-docs-bot@supabase.com'
+            BRANCH_NAME="bot/docs-lint-fixes"
+            EXISTING_BRANCH=$(git ls-remote --heads origin $BRANCH_NAME)
+            if [ -n "$EXISTING_BRANCH" ]; then
+              git checkout $BRANCH_NAME
+            else
+              git checkout -b $BRANCH_NAME
+            fi
+            supa-mdx-lint apps/docs/content --fix || FIX_FAILED=1
+            git add .
+            git commit -m '[bot] fix lint errors' || true
+            git push origin $BRANCH_NAME
+            if [ -z "$EXISTING_BRANCH" ]; then
+              gh pr create --title '[bot] fix lint errors' --body 'This PR fixes lint errors in the documentation.' --head $BRANCH_NAME
+            fi
+            if [ "${FIX_FAILED:-0}" -eq 1 ]; then
+              echo "Fix did not correct all errors."
+              exit 1
+            fi
+          }

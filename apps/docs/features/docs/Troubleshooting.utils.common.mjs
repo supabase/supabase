@@ -158,7 +158,12 @@ export async function getAllTroubleshootingEntriesInternal() {
             ].includes(child.type)
         )
       }
+
+      if (node.type === 'link' || node.type === 'image') {
+        canonicalizeUrl(node)
+      }
     })
+
     const contentWithoutJsx = toMarkdown(mdxTree, {
       extensions: [gfmToMarkdown()],
     })
@@ -172,6 +177,16 @@ export async function getAllTroubleshootingEntriesInternal() {
   })
 
   return (await Promise.all(troubleshootingFiles)).filter((x) => x != null)
+}
+
+/**
+ *
+ * @param {import('mdast').Image | import('mdast').Link} node
+ */
+function canonicalizeUrl(node) {
+  if (node.url.startsWith('/')) {
+    node.url === 'https://supabase.com' + node.url
+  }
 }
 
 /**
