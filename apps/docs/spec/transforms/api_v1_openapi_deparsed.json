@@ -3592,6 +3592,9 @@
                       },
                       "value": {
                         "type": "string"
+                      },
+                      "updated_at": {
+                        "type": "string"
                       }
                     },
                     "required": ["name", "value"]
@@ -4749,6 +4752,376 @@
           }
         },
         "tags": ["Projects"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/auth/signing-keys": {
+      "post": {
+        "operationId": "createSigningKeyForProject",
+        "summary": "[Alpha] Create a new signing key for the project in standby status",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "algorithm": {
+                    "type": "string",
+                    "enum": ["EdDSA", "ES256", "RS256", "HS256"]
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["in_use", "standby"]
+                  }
+                },
+                "required": ["algorithm"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "[Alpha] Create a new signing key for the project in standby status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "algorithm": {
+                      "type": "string",
+                      "enum": ["EdDSA", "ES256", "RS256", "HS256"]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["in_use", "standby"]
+                    }
+                  },
+                  "required": ["algorithm"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "listSigningKeysForProject",
+        "summary": "[Alpha] List all signing keys for the project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "keys": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "algorithm": {
+                            "type": "string",
+                            "enum": ["EdDSA", "ES256", "RS256", "HS256"]
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": ["in_use", "previously_used", "revoked", "standby"]
+                          },
+                          "public_jwk": {
+                            "nullable": true
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        },
+                        "required": ["id", "algorithm", "status", "created_at", "updated_at"],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": ["keys"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/auth/signing-keys/{id}": {
+      "get": {
+        "operationId": "getSigningKeyForProject",
+        "summary": "[Alpha] Get information about a signing key",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "algorithm": {
+                      "type": "string",
+                      "enum": ["EdDSA", "ES256", "RS256", "HS256"]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["in_use", "previously_used", "revoked", "standby"]
+                    },
+                    "public_jwk": {
+                      "nullable": true
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["id", "algorithm", "status", "created_at", "updated_at"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Auth"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteSigningKey",
+        "summary": "[Alpha] Remove a signing key from a project, where the status is previously_used",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "algorithm": {
+                      "type": "string",
+                      "enum": ["EdDSA", "ES256", "RS256", "HS256"]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["in_use", "previously_used", "revoked", "standby"]
+                    },
+                    "public_jwk": {
+                      "nullable": true
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["id", "algorithm", "status", "created_at", "updated_at"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patchSigningKey",
+        "summary": "[Alpha] Update a signing key, mainly its status",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": ["in_use", "previously_used", "revoked", "standby"]
+                  }
+                },
+                "required": ["status"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "algorithm": {
+                      "type": "string",
+                      "enum": ["EdDSA", "ES256", "RS256", "HS256"]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["in_use", "previously_used", "revoked", "standby"]
+                    },
+                    "public_jwk": {
+                      "nullable": true
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["id", "algorithm", "status", "created_at", "updated_at"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"],
         "security": [
           {
             "bearer": []
@@ -12284,6 +12657,9 @@
           },
           "value": {
             "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
           }
         },
         "required": ["name", "value"]
@@ -12732,6 +13108,102 @@
           }
         },
         "required": ["name", "healthy", "status"]
+      },
+      "CreateSigningKeyBody": {
+        "type": "object",
+        "properties": {
+          "algorithm": {
+            "type": "string",
+            "enum": ["EdDSA", "ES256", "RS256", "HS256"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["in_use", "standby"]
+          }
+        },
+        "required": ["algorithm"],
+        "additionalProperties": false
+      },
+      "SigningKeysResponse": {
+        "type": "object",
+        "properties": {
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "algorithm": {
+                  "type": "string",
+                  "enum": ["EdDSA", "ES256", "RS256", "HS256"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["in_use", "previously_used", "revoked", "standby"]
+                },
+                "public_jwk": {
+                  "nullable": true
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updated_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": ["id", "algorithm", "status", "created_at", "updated_at"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["keys"],
+        "additionalProperties": false
+      },
+      "SigningKeyResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "algorithm": {
+            "type": "string",
+            "enum": ["EdDSA", "ES256", "RS256", "HS256"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["in_use", "previously_used", "revoked", "standby"]
+          },
+          "public_jwk": {
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["id", "algorithm", "status", "created_at", "updated_at"],
+        "additionalProperties": false
+      },
+      "UpdateSigningKeyBody": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["in_use", "previously_used", "revoked", "standby"]
+          }
+        },
+        "required": ["status"],
+        "additionalProperties": false
       },
       "StorageFeatureImageTransformation": {
         "type": "object",
