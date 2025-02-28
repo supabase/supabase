@@ -115,11 +115,11 @@ export const TimestampInfo = ({
           { 'bg-surface-100': copied }
         )}
       >
-        <div className="flex items-center gap-x-2 text-left truncate w-40">
+        <div className="flex items-center gap-x-2 text-left truncate">
           <p>{label}</p>
           <div className="border-t w-full border-dashed" />
         </div>
-        <div className="relative flex items-center gap-x-2 w-full">
+        <div className="relative flex items-center gap-x-2 flex-grow">
           <div className="border-t w-full border-dashed z-10" />
           {copied && (
             <span className="flex items-center justify-end w-full absolute inset-0 flex items-right text-brand-600 bg-surface-100">
@@ -145,9 +145,9 @@ export const TimestampInfo = ({
             : timestampUtcFormatter({ utcTimestamp, format: labelFormat })}
         </span>
       </TooltipTrigger>
-      <TooltipContent align={align} side="right" className="font-mono p-0 py-1">
+      <TooltipContent align={align} side="right" className="font-mono p-0 py-1 min-w-80">
         <TooltipRow label="UTC" value={utc} />
-        <TooltipRow label={`${localTimezone}`} value={local} />
+        <TooltipRow label={localTimezone} value={local} />
         <TooltipRow label="Relative" value={relative} />
         <TooltipRow label="Timestamp" value={String(utcTimestamp)} />
       </TooltipContent>
