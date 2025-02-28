@@ -113,7 +113,7 @@ export const ConnectionPooling = () => {
     isLoading: isLoadingPgbouncerConfig,
     isError: isErrorPgbouncerConfig,
     isSuccess: isSuccessPgbouncerConfig,
-  } = usePgbouncerConfigQuery({ projectRef }, { enabled: allowPgBouncerSelection })
+  } = usePgbouncerConfigQuery({ projectRef })
 
   const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,
@@ -169,22 +169,32 @@ export const ConnectionPooling = () => {
       max_client_conn: null,
     },
   })
-  const { type, default_pool_size, max_client_conn } = form.watch()
+  const { type, default_pool_size } = form.watch()
   const error = useMemo(
-    () => (type === 'PgBouncer' ? pgbouncerConfigError : supavisorConfigError),
-    [type]
+    () =>
+      allowPgBouncerSelection && type === 'PgBouncer' ? pgbouncerConfigError : supavisorConfigError,
+    [allowPgBouncerSelection, type, pgbouncerConfigError, supavisorConfigError]
   )
   const isLoading = useMemo(
-    () => (type === 'PgBouncer' ? isLoadingPgbouncerConfig : isLoadingSupavisorConfig),
-    [type]
+    () =>
+      allowPgBouncerSelection && type === 'PgBouncer'
+        ? isLoadingPgbouncerConfig
+        : isLoadingSupavisorConfig,
+    [allowPgBouncerSelection, type, isLoadingPgbouncerConfig, isLoadingSupavisorConfig]
   )
   const isError = useMemo(
-    () => (type === 'PgBouncer' ? isErrorPgbouncerConfig : isErrorSupavisorConfig),
-    [type]
+    () =>
+      allowPgBouncerSelection && type === 'PgBouncer'
+        ? isErrorPgbouncerConfig
+        : isErrorSupavisorConfig,
+    [allowPgBouncerSelection, type, isErrorPgbouncerConfig, isErrorSupavisorConfig]
   )
   const isSuccess = useMemo(
-    () => (type === 'PgBouncer' ? isSuccessPgbouncerConfig : isSuccessSupavisorConfig),
-    [type]
+    () =>
+      allowPgBouncerSelection && type === 'PgBouncer'
+        ? isSuccessPgbouncerConfig
+        : isSuccessSupavisorConfig,
+    [allowPgBouncerSelection, type, isSuccessPgbouncerConfig, isSuccessSupavisorConfig]
   )
   const isSaving = isUpdatingSupavisor || isUpdatingPgBouncer
 
