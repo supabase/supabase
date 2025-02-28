@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { capitalize } from 'lodash'
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import z from 'zod'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -17,14 +18,13 @@ import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { usePgbouncerConfigurationUpdateMutation } from 'data/database/pgbouncer-config-update-mutation'
 import { usePgbouncerStatusQuery } from 'data/database/pgbouncer-status-query'
-import { useSupavisorConfigurationQuery } from 'data/database/pooling-configuration-query'
-import { useSupavisorConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
+import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
+import { useSupavisorConfigurationUpdateMutation } from 'data/database/supavisor-configuration-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
-import { toast } from 'sonner'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
   AlertDescription_Shadcn_,
@@ -113,9 +113,7 @@ export const ConnectionPooling = () => {
     isLoading: isLoadingPgbouncerConfig,
     isError: isErrorPgbouncerConfig,
     isSuccess: isSuccessPgbouncerConfig,
-  } = usePgbouncerConfigQuery({
-    projectRef,
-  })
+  } = usePgbouncerConfigQuery({ projectRef }, { enabled: allowPgBouncerSelection })
 
   const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,
