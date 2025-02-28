@@ -2,10 +2,9 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 
 import { data as DevelopersData } from 'data/Developers'
-import {
-  jobsCount,
-  latestBlogPosts,
-} from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
+import staticContent from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
+
+const { jobsCount, latestBlogPosts } = staticContent
 
 type LinkProps = {
   text: string
