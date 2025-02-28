@@ -1,5 +1,5 @@
 import { AuditLogs } from 'components/interfaces/Account'
-import AccountLayout from 'components/layouts/AccountLayout/account-layout'
+import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'

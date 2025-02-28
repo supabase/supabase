@@ -7,7 +7,7 @@ import {
   NewAccessTokenButton,
   NewTokenBanner,
 } from 'components/interfaces/Account'
-import AccountLayout from 'components/layouts/AccountLayout/account-layout'
+import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 import type { NextPageWithLayout } from 'types'
@@ -15,7 +15,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import AccountSettingsLayout from 'components/layouts/AccountLayout/account-settings-layout'
+import AccountSettingsLayout from 'components/layouts/AccountLayout/AccountSettingsLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 
 const UserAccessTokens: NextPageWithLayout = () => {
