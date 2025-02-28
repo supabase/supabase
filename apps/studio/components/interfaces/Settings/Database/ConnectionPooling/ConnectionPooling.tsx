@@ -226,7 +226,6 @@ export const ConnectionPooling = () => {
     type === 'PgBouncer' ? pgbouncerConfig?.pool_mode === null : supavisorConfig?.pool_mode === null
   const disablePoolModeSelection =
     type === 'Supavisor' && supavisorConfig?.pool_mode === 'transaction'
-  console.log({ type, poolmode: supavisorConfig?.pool_mode })
   const disablePgBouncerSelection = computeSize === 'Nano'
   const showPoolModeWarning = type === 'Supavisor' && supavisorConfig?.pool_mode === 'session'
   const isChangingPoolerType =
