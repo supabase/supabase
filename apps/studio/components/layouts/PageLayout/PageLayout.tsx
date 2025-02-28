@@ -20,14 +20,15 @@ interface PageLayoutProps {
   subtitle?: string
   icon?: ReactNode
   breadcrumbs?: Array<{
-    label: string
+    label?: string
     href?: string
+    element?: ReactNode
   }>
   primaryActions?: ReactNode
   secondaryActions?: ReactNode
   navigationItems?: NavigationItem[]
   className?: string
-  size?: 'default' | 'full'
+  size?: 'default' | 'full' | 'large' | 'small'
   isCompact?: boolean
 }
 
@@ -46,7 +47,7 @@ interface PageLayoutProps {
  * @param title - Title rendered in page header
  * @param subtitle - Subtitle rendered in page header, below title
  * @param icon - Icon rendered in Page header, to the left of title and subtitle
- * @param breadcrumbs - Breadcrumbs rendered in page header, above title
+ * @param breadcrumbs - Breadcrumbs rendered in page header, above title. Can be string labels with hrefs or custom elements
  * @param primaryActions - TBD
  * @param secondaryActions - TBD
  * @param navigationItems - Tab navigation rendered below the page header
@@ -70,8 +71,9 @@ export const PageLayout = ({
   const router = useRouter()
 
   return (
-    <div className="w-full">
+    <div className="w-full min-h-full flex flex-col items-stretch">
       <ScaffoldContainer
+        size={size}
         className={cn(
           'w-full mx-auto',
           size === 'full' &&
@@ -96,7 +98,7 @@ export const PageLayout = ({
 
         {/* Navigation section */}
         {navigationItems.length > 0 && (
-          <NavMenu className={cn('mt-4', size === 'full' && 'border-none')}>
+          <NavMenu className={cn(isCompact ? 'mt-2' : 'mt-4', size === 'full' && 'border-none')}>
             {navigationItems.map((item) => (
               <NavMenuItem key={item.label} active={router.asPath === item.href}>
                 {item.href ? (

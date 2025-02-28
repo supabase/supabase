@@ -21,7 +21,7 @@ interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Coll
   removeBorder?: boolean
 }
 
-const TerminalInstructions = forwardRef<
+export const TerminalInstructions = forwardRef<
   ElementRef<typeof Collapsible_Shadcn_>,
   TerminalInstructionsProps
 >(({ closable = false, removeBorder = false, ...props }, ref) => {
@@ -158,5 +158,3 @@ const TerminalInstructions = forwardRef<
 })
 
 TerminalInstructions.displayName = 'TerminalInstructions'
-
-export default TerminalInstructions
