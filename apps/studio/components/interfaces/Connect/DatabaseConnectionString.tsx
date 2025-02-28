@@ -135,7 +135,10 @@ export const DatabaseConnectionString = () => {
       ? getConnectionStrings({
           connectionInfo,
           poolingInfo: {
-            connectionString: poolingConfiguration.connectionString,
+            connectionString:
+              'connection_string' in poolingConfiguration
+                ? poolingConfiguration.connection_string
+                : poolingConfiguration.connectionString,
             db_host: poolingConfiguration.db_host,
             db_name: poolingConfiguration.db_name,
             db_port: poolingConfiguration.db_port,

@@ -169,22 +169,32 @@ export const ConnectionPooling = () => {
       max_client_conn: null,
     },
   })
-  const { type, default_pool_size, max_client_conn } = form.watch()
+  const { type, default_pool_size } = form.watch()
   const error = useMemo(
-    () => (type === 'PgBouncer' ? pgbouncerConfigError : supavisorConfigError),
-    [type]
+    () =>
+      allowPgBouncerSelection && type === 'PgBouncer' ? pgbouncerConfigError : supavisorConfigError,
+    [type, allowPgBouncerSelection]
   )
   const isLoading = useMemo(
-    () => (type === 'PgBouncer' ? isLoadingPgbouncerConfig : isLoadingSupavisorConfig),
-    [type]
+    () =>
+      allowPgBouncerSelection && type === 'PgBouncer'
+        ? isLoadingPgbouncerConfig
+        : isLoadingSupavisorConfig,
+    [type, allowPgBouncerSelection]
   )
   const isError = useMemo(
-    () => (type === 'PgBouncer' ? isErrorPgbouncerConfig : isErrorSupavisorConfig),
-    [type]
+    () =>
+      allowPgBouncerSelection && type === 'PgBouncer'
+        ? isErrorPgbouncerConfig
+        : isErrorSupavisorConfig,
+    [type, allowPgBouncerSelection]
   )
   const isSuccess = useMemo(
-    () => (type === 'PgBouncer' ? isSuccessPgbouncerConfig : isSuccessSupavisorConfig),
-    [type]
+    () =>
+      allowPgBouncerSelection && type === 'PgBouncer'
+        ? isSuccessPgbouncerConfig
+        : isSuccessSupavisorConfig,
+    [type, allowPgBouncerSelection]
   )
   const isSaving = isUpdatingSupavisor || isUpdatingPgBouncer
 
