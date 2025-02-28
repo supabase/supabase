@@ -28,10 +28,7 @@ const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
     const allowPgBouncerSelection = useFlag('dualPoolerSupport')
 
     const { data: settings } = useProjectSettingsV2Query({ projectRef })
-    const { data: pgbouncerConfig } = usePgbouncerConfigQuery(
-      { projectRef },
-      { enabled: allowPgBouncerSelection }
-    )
+    const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
     const { data: supavisorConfig } = useSupavisorConfigurationQuery({ projectRef })
 
     const isPgBouncerEnabled = allowPgBouncerSelection && !!pgbouncerConfig?.pgbouncer_enabled
@@ -47,7 +44,10 @@ const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
         ? getConnectionStringsV2({
             connectionInfo,
             poolingInfo: {
-              connectionString: poolingConfiguration.connectionString,
+              connectionString:
+                'connection_string' in poolingConfiguration
+                  ? poolingConfiguration.connection_string
+                  : poolingConfiguration.connectionString,
               db_host: poolingConfiguration.db_host,
               db_name: poolingConfiguration.db_name,
               db_port: poolingConfiguration.db_port,

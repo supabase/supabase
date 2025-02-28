@@ -33,10 +33,7 @@ const IPv4SidePanel = () => {
   const visible = panel === 'ipv4'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: pgbouncerConfig } = usePgbouncerConfigQuery(
-    { projectRef },
-    { enabled: allowPgBouncerSelection }
-  )
+  const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
