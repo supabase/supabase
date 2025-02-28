@@ -113,12 +113,7 @@ const EdgeFunctionDetailsLayout = ({
             )}
             <DocsButton href="https://supabase.com/docs/guides/functions" />
             {edgeFunctionCreate && !!functionSlug && (
-              <Button
-                type="default"
-                size="tiny"
-                icon={<Send size={16} />}
-                onClick={() => setIsOpen(true)}
-              >
+              <Button type="default" icon={<Send />} onClick={() => setIsOpen(true)}>
                 Test
               </Button>
             )}

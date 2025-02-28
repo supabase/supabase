@@ -27,7 +27,6 @@ interface PageHeaderProps {
   secondaryActions?: ReactNode
   className?: string
   isCompact?: boolean
-  pageMeta?: ReactNode
 }
 
 export const PageHeader = ({
@@ -39,7 +38,6 @@ export const PageHeader = ({
   secondaryActions,
   className,
   isCompact = false,
-  pageMeta,
 }: PageHeaderProps) => {
   const { ref } = useParams()
 
