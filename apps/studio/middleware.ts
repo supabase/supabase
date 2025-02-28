@@ -10,7 +10,6 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/sql/suggest',
   '/ai/sql/generate-v2',
   '/ai/sql/generate-v3',
-  '/edge-functions/test',
   '/ai/edge-function/complete',
   '/ai/onboarding/design',
   '/ai/sql/complete',
@@ -20,6 +19,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/docs',
   '/get-ip-address',
   '/get-utc-time',
+  '/edge-functions/test',
 ]
 
 export function middleware(request: NextRequest) {

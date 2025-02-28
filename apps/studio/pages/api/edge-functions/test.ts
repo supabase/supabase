@@ -1,13 +1,23 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { constructHeaders, handleError } from 'data/fetchers'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({
-      error: { message: `Method ${req.method} Not Allowed` },
-    })
-  }
+  const { method } = req
 
+  switch (method) {
+    case 'POST':
+      return handlePost(req, res)
+    default:
+      return new Response(
+        JSON.stringify({ data: null, error: { message: `Method ${method} Not Allowed` } }),
+        {
+          status: 405,
+          headers: { 'Content-Type': 'application/json', Allow: 'POST' },
+        }
+      )
+  }
+}
+
+async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { url, method, body: requestBody, headers: customHeaders } = req.body
 

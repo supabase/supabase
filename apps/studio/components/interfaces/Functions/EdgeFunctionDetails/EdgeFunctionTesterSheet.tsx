@@ -10,7 +10,7 @@ import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { constructHeaders } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { prettifyJSON } from 'lib/helpers'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
@@ -182,7 +182,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
       const finalUrl = queryString ? `${url}?${queryString}` : url
 
       const defaultHeaders = await constructHeaders()
-      const res = await fetch('/api/edge-functions/test', {
+      const res = await fetch(`${BASE_PATH}/api/edge-functions/test`, {
         method: 'POST',
         headers: {
           ...defaultHeaders,
