@@ -31,7 +31,29 @@ export async function getPoolingConfiguration(
 export type PoolingConfigurationData = Awaited<ReturnType<typeof getPoolingConfiguration>>
 export type PoolingConfigurationError = ResponseError
 
+/**
+ * @deprecated use useSupavisorConfigurationQuery isntead
+ */
 export const usePoolingConfigurationQuery = <TData = PoolingConfigurationData>(
+  { projectRef }: PoolingConfigurationVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<PoolingConfigurationData, PoolingConfigurationError, TData> = {}
+) =>
+  useQuery<PoolingConfigurationData, PoolingConfigurationError, TData>(
+    databaseKeys.poolingConfiguration(projectRef),
+    ({ signal }) => getPoolingConfiguration({ projectRef }, signal),
+    {
+      enabled: enabled && typeof projectRef !== 'undefined',
+      ...options,
+    }
+  )
+
+/**
+ * Just a duplicate of usePoolingConfigurationQuery until we move everything over
+ */
+export const useSupavisorConfigurationQuery = <TData = PoolingConfigurationData>(
   { projectRef }: PoolingConfigurationVariables,
   {
     enabled = true,
