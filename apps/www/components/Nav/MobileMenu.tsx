@@ -15,7 +15,6 @@ import { ChevronRight } from 'lucide-react'
 import ProductModulesData from '~/data/ProductModules'
 import { jobsCount } from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 interface Props {
@@ -250,7 +249,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                         legacyBehavior
                         onClick={() =>
                           sendTelemetryEvent({
-                            action: TelemetryActions.SIGN_IN_BUTTON_CLICKED,
+                            action: 'sign_in_button_clicked',
                             properties: { buttonLocation: 'Mobile Nav' },
                           })
                         }
@@ -267,7 +266,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                         legacyBehavior
                         onClick={() =>
                           sendTelemetryEvent({
-                            action: TelemetryActions.START_PROJECT_BUTTON_CLICKED,
+                            action: 'start_project_button_clicked',
                             properties: { buttonLocation: 'Mobile Nav' },
                           })
                         }

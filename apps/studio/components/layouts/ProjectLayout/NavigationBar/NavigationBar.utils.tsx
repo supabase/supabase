@@ -1,3 +1,5 @@
+import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
+
 import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
 import { generateAuthMenu } from 'components/layouts/AuthLayout/AuthLayout.utils'
 import { generateDatabaseMenu } from 'components/layouts/DatabaseLayout/DatabaseMenu.utils'
@@ -16,7 +18,6 @@ import {
   TableEditor,
 } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
 
 export const generateToolRoutes = (
   ref?: string,

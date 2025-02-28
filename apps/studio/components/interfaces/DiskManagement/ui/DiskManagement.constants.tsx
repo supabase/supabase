@@ -57,11 +57,6 @@ export const DISK_LIMITS = {
   },
 }
 
-export const DISK_TYPE_LABELS = {
-  [DiskType.GP3]: 'General Purpose SSD (gp3)',
-  [DiskType.IO2]: 'Provisioned IOPS SSD (io2)',
-}
-
 interface PlanDetails {
   includedDiskGB: { gp3: number; io2: number }
 }

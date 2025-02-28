@@ -16,12 +16,16 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLints } from 'hooks/misc/useLints'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useNewLayout } from 'hooks/ui/useNewLayout'
 import { Home } from 'icons'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
@@ -40,6 +44,9 @@ import {
   useSidebar,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
+import { useIsAPIDocsSidePanelEnabled } from './App/FeaturePreview/FeaturePreviewContext'
+import { ThemeDropdown } from './ThemeDropdown'
+import { UserDropdown } from './UserDropdown'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -49,9 +56,6 @@ export const DEFAULT_SIDEBAR_BEHAVIOR = 'expandable'
 const SidebarMotion = motion(SidebarPrimitive) as FC<
   ComponentProps<typeof SidebarPrimitive> & {
     transition?: MotionProps['transition']
-    initial?: MotionProps['initial']
-    animate?: MotionProps['animate']
-    exit?: MotionProps['exit']
   }
 >
 
@@ -66,7 +70,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
   const hideSideBar = useHideSidebar()
 
   const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
     DEFAULT_SIDEBAR_BEHAVIOR
   )
 
@@ -85,10 +89,11 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
       <AnimatePresence>
         {!hideSideBar && (
           <SidebarMotion
-            transition={{
-              duration: 0.1,
-            }}
             {...props}
+            transition={{
+              delay: 0.4,
+              duration: 0.4,
+            }}
             overflowing={sidebarBehaviour === 'expandable'}
             collapsible="icon"
             variant="sidebar"
@@ -137,6 +142,14 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
   const setCommandMenuOpen = useSetCommandMenuOpen()
   const { ref: projectRef } = useParams()
 
+  // temporary logic to show settings route in sidebar footer
+  // this will be removed once we move to an updated org/project nav
+  const router = useRouter()
+  const { ref } = useParams()
+  const { project } = useProjectContext()
+  const settingsRoutes = generateSettingsRoutes(ref, project)
+  const activeRoute = router.pathname.split('/')[3]
+
   return (
     <>
       <AnimatePresence mode="wait">
@@ -160,6 +173,15 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
       </AnimatePresence>
       <SidebarFooter>
         <SidebarMenu className="group-data-[state=expanded]:p-0">
+          <SidebarGroup className="p-0 gap-0.5">
+            {settingsRoutes.map((route) => (
+              <SideBarNavLink
+                key={`settings-routes-${route.key}`}
+                route={route}
+                active={activeRoute === route.key}
+              />
+            ))}
+          </SidebarGroup>
           <SidebarGroup className="p-0">
             <SideBarNavLink
               key="cmdk"
@@ -170,6 +192,11 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
               }}
               onClick={() => setCommandMenuOpen(true)}
             />
+          </SidebarGroup>
+        </SidebarMenu>
+        <SidebarMenu className="group-data-[state=expanded]:p-0">
+          <SidebarGroup className="p-0">
+            {IS_PLATFORM ? <UserDropdown /> : <ThemeDropdown />}
           </SidebarGroup>
         </SidebarMenu>
         <SidebarGroup className="p-0">{footer}</SidebarGroup>
@@ -189,7 +216,7 @@ export function SideBarNavLink({
   onClick?: () => void
 } & ComponentPropsWithoutRef<typeof SidebarMenuButton>) {
   const [sidebarBehaviour] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
     DEFAULT_SIDEBAR_BEHAVIOR
   )
 
@@ -223,10 +250,29 @@ export function SideBarNavLink({
   )
 }
 
+const ActiveDot = (errorArray: any[], warningArray: any[]) => {
+  return (
+    <div
+      className={cn(
+        'absolute flex h-2 w-2 left-[18px] group-data-[state=expanded]:left-[20px] top-2 z-10 rounded-full',
+        errorArray.length > 0
+          ? 'bg-destructive-600'
+          : warningArray.length > 0
+            ? 'bg-warning-600'
+            : 'bg-transparent'
+      )}
+    />
+  )
+}
+
 function ProjectLinks() {
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
+  const snap = useAppStateSnapshot()
+  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const { securityLints, errorLints } = useLints()
+  const showWarehouse = useFlag('warehouse')
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -266,7 +312,6 @@ function ProjectLinks() {
             linkElement: <ProjectIndexPageLink projectRef={ref} />,
           }}
         />
-
         {toolRoutes.map((route, i) => (
           <SideBarNavLink
             key={`tools-routes-${i}`}
@@ -287,14 +332,55 @@ function ProjectLinks() {
       </SidebarGroup>
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
-        {otherRoutes.map((route, i) => (
-          <SideBarNavLink
-            key={`other-routes-${i}`}
-            route={route}
-            active={activeRoute === route.key}
-          />
-        ))}
+        {otherRoutes.map((route, i) => {
+          if (route.key === 'api' && isNewAPIDocsEnabled) {
+            return (
+              <SideBarNavLink
+                key={`other-routes-${i}`}
+                route={{
+                  label: route.label,
+                  icon: route.icon,
+                  key: route.key,
+                }}
+                onClick={() => {
+                  snap.setShowProjectApiDocs(true)
+                }}
+              />
+            )
+          } else if (route.key === 'advisors') {
+            return (
+              <div className="relative" key={route.key}>
+                {ActiveDot(errorLints, securityLints)}
+                <SideBarNavLink
+                  key={`other-routes-${i}`}
+                  route={route}
+                  active={activeRoute === route.key}
+                />
+              </div>
+            )
+          } else if (route.key === 'logs') {
+            // TODO: Undo this when warehouse flag is removed
+            const label = showWarehouse ? 'Logs & Analytics' : route.label
+            const newRoute = { ...route, label }
+            return (
+              <SideBarNavLink
+                key={`other-routes-${i}`}
+                route={newRoute}
+                active={activeRoute === newRoute.key}
+              />
+            )
+          } else {
+            return (
+              <SideBarNavLink
+                key={`other-routes-${i}`}
+                route={route}
+                active={activeRoute === route.key}
+              />
+            )
+          }
+        })}
       </SidebarGroup>
+      {/* Settings routes to be added in with project/org nav */}
       <SidebarGroup className="gap-0.5">
         {settingsRoutes.map((route, i) => (
           <SideBarNavLink

@@ -185,7 +185,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               <ResizableHandle
                 withHandle
                 disabled={resizableSidebar ? false : true}
-                className="hidden md:block"
+                className="hidden md:flex"
               />
             )}
             <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col w-full">

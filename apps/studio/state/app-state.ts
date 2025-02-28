@@ -1,8 +1,9 @@
+import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import type { Message as MessageType } from 'ai/react'
+
 import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
-import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 
 export type CommonDatabaseEntity = {

@@ -1,3 +1,8 @@
+import { AnimatePresence, motion } from 'framer-motion'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ReactNode, useMemo } from 'react'
+
 import { useParams } from 'common'
 import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Connect from 'components/interfaces/Connect/Connect'
@@ -10,23 +15,18 @@ import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import { AnimatePresence, motion } from 'framer-motion'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
 import { useNewLayout } from 'hooks/ui/useNewLayout'
 import { IS_PLATFORM } from 'lib/constants'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ReactNode, useMemo } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
-import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
 import { HomeIcon } from './HomeIcon'
+import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -93,91 +93,38 @@ const LayoutHeader = ({
   const showOrgSelection = slug || (selectedOrganization && projectRef)
 
   return (
-    <>
-      <header className={cn('flex h-12 items-center flex-shrink-0 border-b')}>
-        <div className={cn('flex items-center justify-between py-2 pl-4 pr-3 flex-1')}>
-          {hasProductMenu && (
-            <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
-              <button
-                title="Menu dropdown button"
-                className={cn(
-                  'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
-                )}
-                onClick={() => setMobileMenuOpen(true)}
-              >
-                <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
-                <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
-              </button>
-            </div>
-          )}
-          <div className="flex items-center text-sm">
-            <HomeIcon />
-            <>
-              <div className="flex items-center pl-2">
-                {showOrgSelection &&
-                // hides org dropdown for old layout
-                (newLayoutPreview || showLayoutHeader) ? (
-                  <>
-                    <LayoutHeaderDivider className="hidden md:block" />
-                    <OrganizationDropdown />
-                  </>
-                ) : null}
-                <AnimatePresence>
-                  {projectRef && (
-                    <motion.div
-                      className="flex items-center"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{
-                        duration: 0.15,
-                        ease: 'easeOut',
-                      }}
-                    >
-                      <LayoutHeaderDivider />
-                      <ProjectDropdown />
-
-                      {exceedingLimits && (
-                        <div className="ml-2">
-                          <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                            <Badge variant="destructive">Exceeding usage limits</Badge>
-                          </Link>
-                        </div>
-                      )}
-
-                      {selectedProject && isBranchingEnabled && (
-                        <>
-                          <LayoutHeaderDivider />
-                          <BranchDropdown />
-                        </>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                <AnimatePresence>
-                  {headerTitle && (
-                    <motion.div
-                      className="flex items-center"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{
-                        duration: 0.15,
-                        ease: 'easeOut',
-                      }}
-                    >
-                      <LayoutHeaderDivider />
-                      <span className="text-foreground">{headerTitle}</span>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
+    <header className={cn('flex h-12 items-center flex-shrink-0 border-b')}>
+      <div className={cn('flex items-center justify-between py-2 pl-4 pr-3 flex-1')}>
+        {hasProductMenu && (
+          <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
+            <button
+              title="Menu dropdown button"
+              className={cn(
+                'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
+              )}
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+              <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+            </button>
+          </div>
+        )}
+        <div className="flex items-center text-sm">
+          <HomeIcon />
+          <>
+            <div className="flex items-center pl-2">
+              {showOrgSelection &&
+              // hides org dropdown for old layout
+              (newLayoutPreview || showLayoutHeader) ? (
+                <>
+                  <LayoutHeaderDivider className="hidden md:block" />
+                  <OrganizationDropdown />
+                </>
+              ) : null}
               <AnimatePresence>
                 {projectRef && (
                   <motion.div
-                    className="ml-3 items-center gap-x-3 hidden md:flex"
+                    className="flex items-center"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
@@ -186,52 +133,96 @@ const LayoutHeader = ({
                       ease: 'easeOut',
                     }}
                   >
-                    <Connect />
-                    {!isBranchingEnabled && <EnableBranchingButton />}
+                    <LayoutHeaderDivider />
+                    <ProjectDropdown />
+
+                    {exceedingLimits && (
+                      <div className="ml-2">
+                        <Link href={`/org/${selectedOrganization?.slug}/usage`}>
+                          <Badge variant="destructive">Exceeding usage limits</Badge>
+                        </Link>
+                      </div>
+                    )}
+
+                    {selectedProject && isBranchingEnabled && (
+                      <>
+                        <LayoutHeaderDivider />
+                        <BranchDropdown />
+                      </>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
-            </>
-            {/* Additional breadcrumbs are supplied */}
-            <BreadcrumbsView defaultValue={breadcrumbs} />
-          </div>
-          <div className="flex items-center gap-x-2">
-            {customHeaderComponents && customHeaderComponents}
-            {IS_PLATFORM && (
-              <>
-                <FeedbackDropdown />
-                <NotificationsPopoverV2 />
-                <HelpPopover />
-                <UserDropdown />
-              </>
-            )}
-          </div>
+
+              <AnimatePresence>
+                {headerTitle && (
+                  <motion.div
+                    className="flex items-center"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{
+                      duration: 0.15,
+                      ease: 'easeOut',
+                    }}
+                  >
+                    <LayoutHeaderDivider />
+                    <span className="text-foreground">{headerTitle}</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <AnimatePresence>
+              {projectRef && (
+                <motion.div
+                  className="ml-3 items-center gap-x-3 hidden md:flex"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{
+                    duration: 0.15,
+                    ease: 'easeOut',
+                  }}
+                >
+                  <Connect />
+                  {!isBranchingEnabled && <EnableBranchingButton />}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
+          {/* Additional breadcrumbs are supplied */}
+          <BreadcrumbsView defaultValue={breadcrumbs} />
         </div>
-        <AnimatePresence initial={false}>
-          {!!projectRef && !aiAssistantPanel.open && (
-            <motion.div
-              className="border-l h-full flex items-center justify-center flex-shrink-0"
-              initial={{ opacity: 0, x: 0, width: 0 }}
-              animate={{ opacity: 1, x: 0, width: 48 }}
-              exit={{ opacity: 0, x: 0, width: 0 }}
-              transition={{
-                duration: 0.15,
-                ease: 'easeOut',
-              }}
-            >
-              <AssistantButton />
-            </motion.div>
+        <div className="flex items-center gap-x-2">
+          {customHeaderComponents && customHeaderComponents}
+          {IS_PLATFORM && (
+            <>
+              <FeedbackDropdown />
+              <NotificationsPopoverV2 />
+              <HelpPopover />
+              <UserDropdown />
+            </>
           )}
-        </AnimatePresence>
-      </header>
-      {/* {!isOrgPage && (
-        <motion.div
-          layoutId="layout-header-bottom-border"
-          className="bg-border h-px w-full"
-          initial={true}
-        />
-      )} */}
-    </>
+        </div>
+      </div>
+      <AnimatePresence initial={false}>
+        {!!projectRef && !aiAssistantPanel.open && (
+          <motion.div
+            className="border-l h-full flex items-center justify-center flex-shrink-0"
+            initial={{ opacity: 0, x: 0, width: 0 }}
+            animate={{ opacity: 1, x: 0, width: 48 }}
+            exit={{ opacity: 0, x: 0, width: 0 }}
+            transition={{
+              duration: 0.15,
+              ease: 'easeOut',
+            }}
+          >
+            <AssistantButton />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
   )
 }
 

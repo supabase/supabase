@@ -2,7 +2,6 @@ import { Edit } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import useNewQuery from 'components/interfaces/SQLEditor/hooks'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -93,7 +92,7 @@ export const EditQueryButton = ({
           handleEditInSQLEditor()
         }
         sendEvent({
-          action: TelemetryActions.ASSISTANT_EDIT_IN_SQL_EDITOR_CLICKED,
+          action: 'assistant_edit_in_sql_editor_clicked',
           properties: {
             isInSQLEditor,
             isInNewSnippet,
