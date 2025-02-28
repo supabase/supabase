@@ -28,10 +28,7 @@ const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
     const allowPgBouncerSelection = useFlag('dualPoolerSupport')
 
     const { data: settings } = useProjectSettingsV2Query({ projectRef })
-    const { data: pgbouncerConfig } = usePgbouncerConfigQuery(
-      { projectRef },
-      { enabled: allowPgBouncerSelection }
-    )
+    const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
     const { data: supavisorConfig } = useSupavisorConfigurationQuery({ projectRef })
 
     const isPgBouncerEnabled = allowPgBouncerSelection && !!pgbouncerConfig?.pgbouncer_enabled
