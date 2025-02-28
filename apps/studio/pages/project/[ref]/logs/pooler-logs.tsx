@@ -5,6 +5,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import { Loading } from 'components/ui/Loading'
 import { usePgbouncerStatusQuery } from 'data/database/pgbouncer-status-query'
+import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import type { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
@@ -13,9 +14,10 @@ export const LogPage: NextPageWithLayout = () => {
   const { data: pgBouncerStatus, isLoading: pgBouncerLoading } = usePgbouncerStatusQuery({
     projectRef: ref ?? 'default',
   })
+  const { isLoading } = useSupavisorConfigurationQuery({ projectRef: ref ?? 'default' })
 
   // this prevents initial load of pooler logs before config has been retrieved
-  if (pgBouncerLoading) return <Loading />
+  if (pgBouncerLoading || isLoading) return <Loading />
 
   function getPoolerTable() {
     if (!IS_PLATFORM) {
