@@ -32,6 +32,7 @@ import type { NextPageWithLayout } from 'types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useProjectPgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -48,19 +49,6 @@ DatabaseReport.getLayout = (page) => (
 )
 
 export default DatabaseReport
-
-const REPORT_ATTRIBUTES = [
-  { id: 'ram_usage', label: 'Memory usage' },
-  { id: 'avg_cpu_usage', label: 'Average CPU usage' },
-  { id: 'max_cpu_usage', label: 'Max CPU usage' },
-  { id: 'disk_io_consumption', label: 'Disk IO consumed' },
-  { id: 'pg_stat_database_num_backends', label: 'Pooler to database connections' },
-  { id: 'supavisor_connections_active', label: 'Client to Supavisor connections' },
-  {
-    id: 'pgbouncer_pools_client_active_connections',
-    label: 'Client to PgBouncer connections',
-  },
-]
 
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
@@ -90,6 +78,26 @@ const DatabaseUsage = () => {
     },
   })
 
+  const { data: pgBouncerConfig } = useProjectPgbouncerConfigQuery({
+    projectRef: ref ?? 'default',
+  })
+  const isPgBouncerEnabled = pgBouncerConfig?.pgbouncer_enabled
+
+  const REPORT_ATTRIBUTES = [
+    { id: 'ram_usage', label: 'Memory usage' },
+    { id: 'avg_cpu_usage', label: 'Average CPU usage' },
+    { id: 'max_cpu_usage', label: 'Max CPU usage' },
+    { id: 'disk_io_consumption', label: 'Disk IO consumed' },
+    { id: 'pg_stat_database_num_backends', label: 'Pooler to database connections' },
+    { id: 'supavisor_connections_active', label: 'Client to Supavisor connections' },
+    isPgBouncerEnabled
+      ? {
+          id: 'pgbouncer_pools_client_active_connections',
+          label: 'Client to dedicated pooler connections',
+        }
+      : null,
+  ]
+
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
@@ -108,7 +116,7 @@ const DatabaseUsage = () => {
     REPORT_ATTRIBUTES.forEach((attr) => {
       queryClient.invalidateQueries(
         analyticsKeys.infraMonitoring(ref, {
-          attribute: attr.id,
+          attribute: attr?.id,
           startDate: period_start.date,
           endDate: period_start.end,
           interval,
@@ -234,7 +242,7 @@ const DatabaseUsage = () => {
             </div>
             <div className="space-y-6">
               {dateRange &&
-                REPORT_ATTRIBUTES.map((attr) => (
+                REPORT_ATTRIBUTES.filter((attr) => attr !== null).map((attr) => (
                   <ChartHandler
                     key={attr.id}
                     provider="infra-monitoring"
