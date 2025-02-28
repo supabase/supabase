@@ -9,6 +9,9 @@ export type ProjectAddonsVariables = {
   projectRef?: string
 }
 
+// [Joshen] For any customer facing text - let's use "Add-on" hyphenated
+// Will need to address consistency across the dashboard
+
 export async function getProjectAddons(
   { projectRef }: ProjectAddonsVariables,
   signal?: AbortSignal
