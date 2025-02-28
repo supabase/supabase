@@ -1,4 +1,3 @@
-// filename: examples/edge-functions/supabase/functions/wasm-modules/index.ts
 import { add } from "./add-wasm/pkg/add_wasm.js";
 
 Deno.serve(async (req) => {
