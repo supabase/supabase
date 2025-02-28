@@ -1219,6 +1219,31 @@
         }
       }
     },
+    "/object/list-v2/{bucketName}": {
+      "post": {
+        "summary": "Search for objects under a prefix",
+        "tags": ["object"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prefix": { "type": "string", "examples": ["folder/subfolder"] },
+                  "limit": { "type": "integer", "minimum": 1, "examples": [10] },
+                  "cursor": { "type": "string" },
+                  "with_delimiter": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          { "schema": { "type": "string" }, "in": "path", "name": "bucketName", "required": true }
+        ],
+        "responses": { "200": { "description": "Default Response" } }
+      }
+    },
     "/object/list/{bucketName}": {
       "post": {
         "summary": "Search for objects under a prefix",
