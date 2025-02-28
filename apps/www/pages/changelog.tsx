@@ -1,6 +1,5 @@
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
 import { createAppAuth } from '@octokit/auth-app'
-import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { Octokit as OctokitRest } from '@octokit/rest'
 import dayjs from 'dayjs'
 import { GitCommit } from 'lucide-react'
@@ -95,6 +94,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   // uses the graphql api
   async function fetchDiscussions(owner: string, repo: string, categoryId: string, cursor: string) {
     const { Octokit } = await import('@octokit/core')
+    const { paginateGraphql } = await import('@octokit/plugin-paginate-graphql')
     const ExtendedOctokit = Octokit.plugin(paginateGraphql)
     type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
 
