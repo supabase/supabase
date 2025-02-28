@@ -4,6 +4,7 @@ import * as Primitive from './toc.ui-pattern'
 import React, { type ComponentProps, type HTMLAttributes, type ReactNode, useRef } from 'react'
 import { TocThumb } from './toc-thumb'
 import { cn, ScrollArea, ScrollViewport } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 export interface TOCProps {
   /**
@@ -25,7 +26,7 @@ export function Toc(props: HTMLAttributes<HTMLDivElement>) {
       id="nd-toc"
       {...props}
       className={cn(
-        'sticky pl-0 top-[calc(var[(--fd-banner-height)]+var(--fd-nav-height))] h-(--fd-toc-height) pb-2 pt-12',
+        'sticky top-[calc(var[(--fd-banner-height)]+var(--fd-nav-height))] h-(--fd-toc-height)',
         'max-md:hidden',
         props.className
       )}
@@ -45,8 +46,10 @@ export function Toc(props: HTMLAttributes<HTMLDivElement>) {
 
 export function TocItemsEmpty() {
   return (
-    <div className="rounded-lg border bg-fd-card p-3 text-xs text-fd-muted-foreground">
-      No Headings
+    <div className="!pl-5 text-xs text-foreground-lighter flex flex-col gap-4">
+      <ShimmeringLoader className="ml-2 h-2 w-20 p-0 rounded-sm" />
+      <ShimmeringLoader className="ml-7 h-2 w-20 p-0 rounded-sm" />
+      <ShimmeringLoader className="ml-7 h-2 w-14 p-0 rounded-sm" />
     </div>
   )
 }
@@ -71,7 +74,13 @@ export function TOCScrollArea({
   )
 }
 
-export function TOCItems({ items }: { items: TOCItemType[] }) {
+export function TOCItems({
+  items,
+  showTrack = false,
+}: {
+  items: TOCItemType[]
+  showTrack?: boolean
+}) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   if (items.length === 0) return <TocItemsEmpty />
@@ -82,7 +91,10 @@ export function TOCItems({ items }: { items: TOCItemType[] }) {
         containerRef={containerRef}
         className="absolute start-0 mt-[--fd-top] h-[--fd-height] w-px bg-foreground transition-all"
       />
-      <div ref={containerRef} className="flex flex-col border-s border-foreground/10">
+      <div
+        ref={containerRef}
+        className={cn('flex flex-col pl-5 border-foreground/10', showTrack && 'border-s')}
+      >
         {items.map((item) => (
           <TOCItem key={item.url} item={item} />
         ))}

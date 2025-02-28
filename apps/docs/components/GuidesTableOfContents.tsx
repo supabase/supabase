@@ -12,7 +12,6 @@ import { Toc, TOCItems, TOCScrollArea } from 'components/Toc/toc.component'
 import InsetTOCItems from '~/components/Toc/toc-inset'
 import { Text } from 'lucide-react'
 import { useTocAnchors } from '../features/docs/GuidesMdx.client'
-import { TocThumb } from './Toc/toc-thumb'
 
 const formatSlug = (slug: string) => {
   // [Joshen] We will still provide support for headers declared like this:
@@ -78,8 +77,6 @@ const GuidesTableOfContents = ({ className, video }: { className?: string; video
   const [hash] = useHash()
   const { toc } = useTocAnchors()
 
-  console.log('toc', toc)
-
   useEffect(() => {
     if (hash && toc?.length > 0) {
       highlightSelectedTocItem(hash)
@@ -94,6 +91,7 @@ const GuidesTableOfContents = ({ className, video }: { className?: string; video
       className={cn(
         'border-l flex flex-col gap-6 lg:gap-8',
         'thin-scrollbar overflow-y-auto',
+        'overflow-visible',
         'px-2',
         className
       )}
@@ -106,13 +104,10 @@ const GuidesTableOfContents = ({ className, video }: { className?: string; video
       <div className="pl-5">
         <Feedback key={pathname} />
       </div>
-      <Toc>
-        <h3 className="inline-flex items-center gap-1.5 text-sm text-foreground-lighter">
-          <Text className="size-4" />
-          On this page
-        </h3>
+      <Toc className="-ml-[calc(0.25rem+6px)]">
         <TOCScrollArea>
-          {false ? <InsetTOCItems items={toc} /> : <TOCItems items={toc} />}
+          {/* {false ? <InsetTOCItems items={toc} /> : <TOCItems items={toc} />} */}
+          <TOCItems items={toc} />
         </TOCScrollArea>
       </Toc>
     </div>
