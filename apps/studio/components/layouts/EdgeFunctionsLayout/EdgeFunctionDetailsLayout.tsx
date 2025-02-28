@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import EdgeFunctionTesterSheet from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
+import { EdgeFunctionTesterSheet } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import APIDocsButton from 'components/ui/APIDocsButton'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -44,9 +44,6 @@ const EdgeFunctionDetailsLayout = ({
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
 
   const name = selectedFunction?.name || ''
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint ?? ''
-  const functionUrl = `${protocol}://${endpoint}/functions/v1/${functionSlug}`
 
   const breadcrumbItems = [
     {
@@ -69,10 +66,6 @@ const EdgeFunctionDetailsLayout = ({
           label: 'Logs',
           href: `/project/${ref}/functions/${functionSlug}/logs`,
         },
-        // {
-        //   label: 'Code',
-        //   href: `/project/${ref}/functions/${functionSlug}/code`,
-        // },
         {
           label: 'Details',
           href: `/project/${ref}/functions/${functionSlug}/details`,
@@ -133,11 +126,7 @@ const EdgeFunctionDetailsLayout = ({
         }
       >
         {children}
-        <EdgeFunctionTesterSheet
-          visible={isOpen}
-          onClose={() => setIsOpen(false)}
-          url={functionUrl}
-        />
+        <EdgeFunctionTesterSheet visible={isOpen} onClose={() => setIsOpen(false)} />
       </PageLayout>
     </EdgeFunctionsLayout>
   )

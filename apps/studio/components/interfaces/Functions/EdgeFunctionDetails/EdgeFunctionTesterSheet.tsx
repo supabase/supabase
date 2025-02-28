@@ -40,26 +40,13 @@ import {
   TextArea_Shadcn_ as Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { HTTP_METHODS } from './EdgeFunctionDetails.constants'
+import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
 
 interface EdgeFunctionTesterSheetProps {
   visible: boolean
   onClose: () => void
-  url: string
 }
-
-type ResponseData = {
-  status: number
-  headers: Record<string, string>
-  body: string
-}
-
-type ErrorWithStatus = Error & {
-  cause?: {
-    status: number
-  }
-}
-
-const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'] as const
 
 const FormSchema = z.object({
   method: z.enum(HTTP_METHODS),
@@ -83,7 +70,7 @@ const FormSchema = z.object({
 
 type FormValues = z.infer<typeof FormSchema>
 
-const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSheetProps) => {
+export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
   const { ref: projectRef, functionSlug } = useParams()
   const [response, setResponse] = useState<ResponseData | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -94,6 +81,10 @@ const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSh
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
   const getImpersonatedRole = useGetImpersonatedRole()
   const { serviceKey } = getAPIKeys(settings)
+
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint ?? ''
+  const url = `${protocol}://${endpoint}/functions/v1/${functionSlug}`
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -188,8 +179,7 @@ const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSh
         .map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
         .join('&')
 
-      const finalUrl = 'https://jzgqqkutymjvumpmrssi.supabase.red/functions/v1/test-function-001' // queryString ? `${url}?${queryString}` : url
-      console.log(finalUrl)
+      const finalUrl = queryString ? `${url}?${queryString}` : url
 
       const defaultHeaders = await constructHeaders()
       const res = await fetch('/api/edge-functions/test', {
@@ -365,20 +355,22 @@ const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSh
             <div className="h-full bg-surface-100 border-t flex-1 flex flex-col overflow-hidden">
               {response ? (
                 <div className="h-full bg-surface-100 flex flex-col overflow-hidden">
-                  <div className="flex gap-2 items-center p-5 text-sm pb-3">
-                    Function responded with
-                    <Badge variant={response.status >= 400 ? 'destructive' : 'success'}>
-                      {response.status}
-                    </Badge>
-                  </div>
                   {error ? (
-                    <p className="px-5 text-sm text-foreground-light">{error}</p>
+                    <>
+                      <div className="flex gap-2 items-center p-5 text-sm pb-3">
+                        Function responded with
+                        <Badge variant={response.status >= 400 ? 'destructive' : 'success'}>
+                          {response.status}
+                        </Badge>
+                      </div>
+                      <p className="px-5 text-sm text-foreground-light">{error}</p>
+                    </>
                   ) : (
                     <Tabs
                       defaultValue="body"
                       className="h-full flex-1 flex flex-col overflow-hidden"
                     >
-                      <TabsList className="gap-4 px-5">
+                      <TabsList className="gap-4 px-5 pt-2">
                         <div className="flex items-center gap-4 flex-1">
                           <TabsTrigger className="text-sm" value="body">
                             Body
@@ -387,6 +379,12 @@ const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSh
                             Headers
                           </TabsTrigger>
                         </div>
+                        <Badge
+                          variant={response.status >= 400 ? 'destructive' : 'success'}
+                          className="-translate-y-1"
+                        >
+                          {response.status}
+                        </Badge>
                       </TabsList>
                       <TabsContent value="body" className="mt-0 flex-1 overflow-auto p-0">
                         <CodeBlock
@@ -434,5 +432,3 @@ const EdgeFunctionTesterSheet = ({ visible, onClose, url }: EdgeFunctionTesterSh
     </Sheet>
   )
 }
-
-export default EdgeFunctionTesterSheet

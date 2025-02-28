@@ -148,7 +148,7 @@ export const EdgeFunctionDetails = () => {
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
-                            className="w-full"
+                            className="w-64"
                             disabled={!canUpdateEdgeFunction}
                           />
                         </FormControl_Shadcn_>
