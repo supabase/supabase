@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { Button, cn } from 'ui'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 interface Props {
@@ -30,7 +29,7 @@ const CTABanner = ({ darkerBg, className }: Props) => {
             href="https://supabase.com/dashboard"
             onClick={() =>
               sendTelemetryEvent({
-                action: TelemetryActions.START_PROJECT_BUTTON_CLICKED,
+                action: 'start_project_button_clicked',
                 properties: { buttonLocation: 'CTA Banner' },
               })
             }
@@ -43,7 +42,7 @@ const CTABanner = ({ darkerBg, className }: Props) => {
             href="/contact/sales"
             onClick={() =>
               sendTelemetryEvent({
-                action: TelemetryActions.REQUEST_DEMO_BUTTON_CLICKED,
+                action: 'request_demo_button_clicked',
                 properties: { buttonLocation: 'CTA Banner' },
               })
             }

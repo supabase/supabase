@@ -6,7 +6,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Button, SidePanel, Tabs } from 'ui'
@@ -172,7 +171,7 @@ const SpreadsheetImport = ({
     } else {
       saveContent({ file: uploadedFile, ...spreadsheetData, selectedHeaders, resolve })
       sendEvent({
-        action: TelemetryActions.IMPORT_DATA_ADDED,
+        action: 'import_data_added',
         groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     }

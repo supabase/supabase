@@ -1,15 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { capitalize } from 'lodash'
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import z from 'zod'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { StringToPositiveNumber } from 'components/ui/Forms/Form.constants'
+import { setValueAsNullableNumber } from 'components/ui/Forms/Form.constants'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
@@ -24,7 +25,6 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
-import { toast } from 'sonner'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
   AlertDescription_Shadcn_,
@@ -58,9 +58,9 @@ const formId = 'pooling-configuration-form'
 
 const PoolingConfigurationFormSchema = z.object({
   type: z.union([z.literal('Supavisor'), z.literal('PgBouncer')]),
-  default_pool_size: StringToPositiveNumber,
+  default_pool_size: z.number().nullable(),
   pool_mode: z.union([z.literal('transaction'), z.literal('session'), z.literal('statement')]),
-  max_client_conn: StringToPositiveNumber,
+  max_client_conn: z.number().nullable(),
 })
 
 /**
@@ -196,7 +196,7 @@ export const ConnectionPooling = () => {
   // [Joshen] These are labels just for user-facing texts
   const formattedCurrentPooler =
     currentPooler === 'PgBouncer' ? 'the Dedicated Pooler' : currentPooler
-  const formattedTargetPooler = type === 'PgBouncer' ? 'the Dedicated Pooler' : currentPooler
+  const formattedTargetPooler = type === 'PgBouncer' ? 'the Dedicated Pooler' : type
 
   const hasIpv4Addon = !!addons?.selected_addons.find((addon) => addon.type === 'ipv4')
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
@@ -239,7 +239,7 @@ export const ConnectionPooling = () => {
           ref: projectRef,
           pgbouncer_enabled: true,
           ignore_startup_parameters: pgbouncerConfig.ignore_startup_parameters ?? '',
-          pool_mode: pgbouncerConfig.pool_mode as 'transaction' | 'session' | 'statement',
+          pool_mode: pool_mode as 'transaction' | 'session' | 'statement',
           max_client_conn,
           default_pool_size: default_pool_size as number | undefined,
         },
@@ -392,35 +392,35 @@ export const ConnectionPooling = () => {
                           layout="horizontal"
                           label="Pooler Type"
                           description={
-                            isChangingPoolerType && (
-                              <>
+                            <>
+                              {isChangingPoolerType && (
                                 <Admonition
                                   type="warning"
                                   className="mt-2"
                                   title={poolerSwitchWarningTitle}
                                   description={poolerSwitchWarningDescription}
                                 />
-                                {type === 'PgBouncer' && !hasIpv4Addon && (
-                                  <Admonition
-                                    type="default"
-                                    className="mt-2"
-                                    title="The Dedicated Pooler does not support IPv4"
-                                    description={
-                                      <>
-                                        If you were using Supavisor for IPv6, we recommend
-                                        purchasing a dedicated IPv4 address from the{' '}
-                                        <InlineLink
-                                          href={`/project/${projectRef}/settings/addons?panel=ipv4`}
-                                        >
-                                          add-ons page
-                                        </InlineLink>{' '}
-                                        before changing your pooler type.
-                                      </>
-                                    }
-                                  />
-                                )}
-                              </>
-                            )
+                              )}
+                              {type === 'PgBouncer' && !hasIpv4Addon && (
+                                <Admonition
+                                  type="default"
+                                  className="mt-2"
+                                  title="The Dedicated Pooler does not support IPv4"
+                                  description={
+                                    <>
+                                      If you were using Supavisor for IPv6, we recommend purchasing
+                                      a dedicated IPv4 address from the{' '}
+                                      <InlineLink
+                                        href={`/project/${projectRef}/settings/addons?panel=ipv4`}
+                                      >
+                                        add-ons page
+                                      </InlineLink>
+                                      {isChangingPoolerType && ' before changing your pooler type'}.
+                                    </>
+                                  }
+                                />
+                              )}
+                            </>
                           }
                         >
                           <Select_Shadcn_
@@ -445,13 +445,13 @@ export const ConnectionPooling = () => {
                                 )
                                 form.setValue(
                                   'max_client_conn',
-                                  pgbouncerConfig.max_client_conn ?? null
+                                  pgbouncerConfig.max_client_conn || null
                                 )
                               }
                             }}
                           >
                             <FormControl_Shadcn_>
-                              <SelectTrigger_Shadcn_ className="max-w-64">
+                              <SelectTrigger_Shadcn_ className="max-w-80">
                                 <SelectValue_Shadcn_ />
                               </SelectTrigger_Shadcn_>
                             </FormControl_Shadcn_>
@@ -471,9 +471,12 @@ export const ConnectionPooling = () => {
                                       disablePgBouncerSelection && '!pointer-events-auto'
                                     )}
                                   >
-                                    <div className="flex gap-x-2 items-center">
+                                    <div className="flex items-center gap-x-2">
                                       <p className="text-sm text-foreground">Dedicated Pooler</p>
-                                      <Badge>IPv6</Badge>
+                                      <div className="flex items-center gap-x-1">
+                                        {hasIpv4Addon && <Badge>Dedicated IPv4</Badge>}
+                                        <Badge>IPv6</Badge>
+                                      </div>
                                     </div>
                                   </SelectItem_Shadcn_>
                                 </TooltipTrigger>
@@ -639,6 +642,9 @@ export const ConnectionPooling = () => {
                             className="w-full"
                             value={field.value || undefined}
                             placeholder={!field.value ? `${defaultPoolSize}` : ''}
+                            {...form.register('default_pool_size', {
+                              setValueAs: setValueAsNullableNumber,
+                            })}
                           />
                         </FormControl_Shadcn_>
                         {!!maxConnData &&
@@ -701,6 +707,9 @@ export const ConnectionPooling = () => {
                             value={field.value || ''}
                             disabled={type === 'Supavisor'}
                             placeholder={!field.value ? `${defaultMaxClientConn}` : ''}
+                            {...form.register('max_client_conn', {
+                              setValueAs: setValueAsNullableNumber,
+                            })}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>

@@ -4,7 +4,6 @@ import { forwardRef, useRef } from 'react'
 import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
 import { memo } from 'react-tracked'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { formatClipboardValue } from 'components/grid/utils/common'
 import { TableGridInnerLoadingState } from 'components/interfaces/TableGridEditor/LoadingState'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
@@ -224,7 +223,7 @@ export const Grid = memo(
                                     onClick={() => {
                                       onImportData()
                                       sendEvent({
-                                        action: TelemetryActions.IMPORT_DATA_BUTTON_CLICKED,
+                                        action: 'import_data_button_clicked',
                                         properties: { tableType: 'Existing Table' },
                                         groups: {
                                           project: project?.ref ?? 'Unknown',
