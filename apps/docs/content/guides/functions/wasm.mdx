@@ -1,3 +1,4 @@
+# filename: apps/docs/content/guides/functions/wasm.mdx
 ---
 id: 'function-wasm'
 title: 'Using Wasm modules'
@@ -77,7 +78,7 @@ Before deploying the Edge Function, we need to ensure it bundles the Wasm module
 
 ```toml
 [functions.wasm-add]
-static_files = [ "./functions/wasm-add/add-wasm/pkg/*.wasm"]
+static_files = [ "./functions/wasm-add/add-wasm/pkg/*"]
 ```
 
 Deploy the function by running:
