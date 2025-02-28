@@ -6,7 +6,6 @@ import { cn } from 'ui/src/lib/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
-import { Clipboard } from 'lucide-react'
 
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
@@ -94,7 +93,7 @@ export const TimestampInfo = ({
     const [copied, setCopied] = useState(false)
 
     return (
-      <span
+      <div
         onPointerDown={(e) => {
           e.stopPropagation()
         }}
@@ -112,23 +111,24 @@ export const TimestampInfo = ({
           }, 1000)
         }}
         className={cn(
-          'relative cursor-default grid grid-cols-2 gap-2 hover:bg-surface-100 px-2 py-1 group',
+          'relative cursor-pointer flex gap-y-2 gap-x-0.5 hover:bg-surface-100 px-2 py-1 group',
           { 'bg-surface-100': copied }
         )}
       >
-        <span className="text-right truncate">{label}:</span>
-        <div className="relative">
+        <div className="flex items-center gap-x-2 text-left truncate">
+          <p>{label}</p>
+          <div className="border-t w-full border-dashed" />
+        </div>
+        <div className="relative flex items-center gap-x-2 flex-grow">
+          <div className="border-t w-full border-dashed z-10" />
           {copied && (
-            <span className="absolute inset-0 flex items-center text-brand-600 bg-surface-100">
+            <span className="flex items-center justify-end w-full absolute inset-0 flex items-right text-brand-600 bg-surface-100">
               Copied!
             </span>
           )}
-          <span className="flex items-center gap-x-2">
-            {value}
-            <Clipboard size={12} className="opacity-0 group-hover:opacity-100 transition" />
-          </span>
+          <span className="flex items-center gap-x-2 justify-end whitespace-nowrap">{value}</span>
         </div>
-      </span>
+      </div>
     )
   }
 
@@ -145,9 +145,9 @@ export const TimestampInfo = ({
             : timestampUtcFormatter({ utcTimestamp, format: labelFormat })}
         </span>
       </TooltipTrigger>
-      <TooltipContent align={align} side="right" className="font-mono p-0 py-1">
+      <TooltipContent align={align} side="right" className="font-mono p-0 py-1 min-w-80">
         <TooltipRow label="UTC" value={utc} />
-        <TooltipRow label={`${localTimezone}`} value={local} />
+        <TooltipRow label={localTimezone} value={local} />
         <TooltipRow label="Relative" value={relative} />
         <TooltipRow label="Timestamp" value={String(utcTimestamp)} />
       </TooltipContent>
