@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import AlertError from 'components/ui/AlertError'
+import { DateRangePicker } from 'components/ui/DateRangePicker'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -113,7 +113,7 @@ const Usage = () => {
   return (
     <>
       <ScaffoldContainer className="sticky top-0 border-b bg-studio z-10 overflow-hidden">
-        <div className="py-4 flex items-center space-x-4">
+        <div className="py-4 flex flex-col md:flex-row md:items-center gap-4">
           {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
 
           {isErrorSubscription && (
@@ -138,7 +138,7 @@ const Usage = () => {
               <Listbox
                 size="tiny"
                 name="schema"
-                className="w-[180px]"
+                className="w-full md:w-[180px]"
                 value={selectedProjectRef}
                 onChange={(value: any) => {
                   if (value === 'all-projects') setSelectedProjectRef(undefined)
@@ -190,7 +190,7 @@ const Usage = () => {
           >
             <DocsButton
               abbrev={false}
-              href="https://supabase.com/docs/guides/platform/org-based-billing"
+              href="https://supabase.com/docs/guides/platform/billing-on-supabase#organization-based-billing"
             />
           </Admonition>
         </ScaffoldContainer>

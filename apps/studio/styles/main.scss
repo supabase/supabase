@@ -8,19 +8,39 @@
 @import '~ui/build/css/themes/classic-dark.css';
 
 :root {
-  --chart-1: 12 76% 61%;
+  --chart-1: hsl(var(--brand-default));
   --chart-2: 173 58% 39%;
   --chart-3: 197 37% 24%;
   --chart-4: 43 74% 66%;
   --chart-5: 27 87% 67%;
+  --chart-warning: hsl(var(--warning-default));
+  --chart-destructive: hsl(var(--destructive-default));
+  --sidebar-background: var(--background-dash-sidebar);
+  --sidebar-foreground: var(--foreground-default);
+  --sidebar-primary: var(--foreground-default);
+  --sidebar-primary-foreground: var(--warning-default);
+  --sidebar-accent: var(--background-selection);
+  --sidebar-accent-foreground: var(--foreground-default);
+  --sidebar-border: var(--border-default);
+  --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
 .dark {
-  --chart-1: 220 70% 50%;
+  --chart-1: hsl(var(--brand-default));
   --chart-2: 160 60% 45%;
   --chart-3: 30 80% 55%;
   --chart-4: 280 65% 60%;
   --chart-5: 340 75% 55%;
+  --chart-warning: hsl(var(--warning-default));
+  --chart-destructive: hsl(var(--destructive-default));
+  --sidebar-background: var(--background-dash-sidebar);
+  --sidebar-foreground: var(--foreground-default);
+  --sidebar-primary: var(--foreground-default);
+  --sidebar-primary-foreground: var(--warning-default);
+  --sidebar-accent: var(--background-selection);
+  --sidebar-accent-foreground: var(--foreground-default);
+  --sidebar-border: var(--border-default);
+  --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
 @layer utilities {
@@ -44,9 +64,7 @@ body,
 .main {
   @apply bg-studio relative;
   @apply text-foreground;
-  height: 100%;
-  padding: 0;
-  margin: 0;
+  @apply overflow-x-clip;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 }
@@ -268,4 +286,18 @@ div[data-radix-portal]:not(.portal--toast) {
 
 .settings-container {
   @apply mx-auto max-w-4xl xl:max-w-6xl;
+}
+
+.react-grid-item.react-grid-placeholder {
+  @apply bg-brand-500 #{!important};
+}
+
+.react-grid-item > .react-resizable-handle::after {
+  content: '';
+  position: absolute;
+  right: 3px !important;
+  bottom: 3px !important;
+  width: 6px !important;
+  height: 6px !important;
+  @apply border-strong dark:border-r-2 dark:border-b-2 dark:border-overlay #{!important};
 }

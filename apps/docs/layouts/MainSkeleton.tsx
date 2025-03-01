@@ -54,6 +54,10 @@ const levelsData = {
     icon: 'edge-functions',
     name: 'Edge Functions',
   },
+  telemetry: {
+    icon: 'telemetry',
+    name: 'Telemetry',
+  },
   realtime: {
     icon: 'realtime',
     name: 'Realtime',
@@ -77,6 +81,10 @@ const levelsData = {
   platform: {
     icon: 'platform',
     name: 'Platform',
+  },
+  contributing: {
+    icon: 'contributing',
+    name: 'Contributing',
   },
   resources: {
     icon: 'resources',
@@ -372,6 +380,8 @@ function SidebarSkeleton({
   const menuId = _menuId ?? getMenuId(pathname)
 
   const mobileMenuOpen = useMenuMobileOpen()
+
+  console.log('menuName', menuName, menuId)
 
   return (
     <div className={cn('flex flex-row h-full relative', className)}>

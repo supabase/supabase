@@ -1,8 +1,6 @@
-import { useContext } from 'react'
 import * as Sentry from '@sentry/nextjs'
 
-import FlagContext from 'components/ui/Flag/FlagContext'
-import { FlagProviderStore } from 'components/ui/Flag/FlagProvider'
+import { useFeatureFlags } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { trackFeatureFlag } from 'lib/posthog'
@@ -13,7 +11,7 @@ const isObjectEmpty = (obj: Object) => {
 
 export function useFlag<T = boolean>(name: string) {
   const project = useSelectedProject()
-  const flagStore = useContext(FlagContext) as FlagProviderStore
+  const flagStore = useFeatureFlags()
 
   const store = flagStore.configcat
 
@@ -29,8 +27,9 @@ export function useFlag<T = boolean>(name: string) {
   return store[name] as T
 }
 
+// TODO(Alaister): move this to packages/common/feature-flags.tsx and rename to useFlag
 export function usePHFlag<T = string | boolean>(name: string) {
-  const flagStore = useContext(FlagContext) as FlagProviderStore
+  const flagStore = useFeatureFlags()
   // [Joshen] Prepend PH flags with "PH" in local storage for easier identification of PH flags
   const [trackedValue, setTrackedValue] = useLocalStorageQuery(`ph_${name}`, '')
 

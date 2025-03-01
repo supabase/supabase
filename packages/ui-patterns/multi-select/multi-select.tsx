@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useEffect } from 'react'
 import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
+import React, { useEffect } from 'react'
 
-import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 import { VariantProps, cva } from 'class-variance-authority'
+import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 
-import { cn, Badge, useOnClickOutside } from 'ui'
+import { Badge, cn, useOnClickOutside } from 'ui'
 import {
   Command,
   CommandEmpty,
@@ -30,6 +30,12 @@ interface MultiSelectContextProps {
 }
 
 const MultiSelectContext = React.createContext<MultiSelectContextProps | null>(null)
+
+const commandItemClass = cn(
+  'relative text-foreground-lighter text-left px-2 py-1.5 rounded',
+  'hover:text-foreground hover:!bg-overlay-hover w-full flex items-center space-x-2',
+  'peer-data-[value=true]:bg-overlay-hover peer-data-[value=true]:text-strong'
+)
 
 function useMultiSelect() {
   const context = React.useContext(MultiSelectContext)
@@ -211,6 +217,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
         setOpen(true)
+        setInputValue('')
 
         if (IS_INLINE_MODE) {
           event.stopPropagation()
@@ -229,6 +236,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
         ref={inputRef}
         onClick={(e) => !isDeleteHovered && handleTriggerClick(e)}
         disabled={disabled}
+        type="button"
         role="combobox"
         className={cn(
           'flex w-full min-w-[200px] min-h-[40px] items-center justify-between rounded-md border',
@@ -247,7 +255,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
             'flex gap-1 -ml-1 overflow-hidden flex-1',
             IS_BADGE_LIMIT_WRAP && 'flex-wrap',
             !IS_BADGE_LIMIT_WRAP &&
-              'overflow-x-scroll scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
+              'overflow-x-auto scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
           )}
         >
           {visibleBadges.map((value) => (
@@ -257,7 +265,8 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
                 <div
                   onMouseEnter={() => setIsDeleteHovered(true)}
                   onMouseLeave={() => setIsDeleteHovered(false)}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation()
                     toggleValue(value)
                     setIsDeleteHovered(false)
                   }}
@@ -419,21 +428,55 @@ MultiSelector.Content = MultiSelectorContent
 
 const MultiSelectorList = React.forwardRef<
   React.ElementRef<typeof CommandList>,
-  React.ComponentPropsWithoutRef<typeof CommandList>
->(({ className, children }, ref) => {
+  React.ComponentPropsWithoutRef<typeof CommandList> & {
+    creatable?: boolean
+  }
+>(({ className, children, creatable = false }, ref) => {
+  const { open, inputValue, setInputValue, toggleValue } = useMultiSelect()
+
+  const options = !!children
+    ? Array.isArray(children)
+      ? (children as React.ReactNode[])
+      : typeof children === 'object' && 'props' in children
+        ? children.props.children
+        : []
+    : []
+  const availableOptions = options
+    .filter((x: any) => !!x.props.value)
+    .map((x: any) => x.props.value.toLowerCase())
+  const isOptionExists = availableOptions.some((x: string) => x === inputValue.toLowerCase())
+
   return (
     <CommandList
       ref={ref}
       className={cn(
-        'p-2 flex flex-col gap-2 scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg w-full',
-        'max-h-[300px] overflow-y-auto',
+        'p-2 flex flex-col gap-2 scrollbar-thin scrollbar-track-transparent transition-colors',
+        'scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted',
+        'scrollbar-thumb-rounded-lg w-full max-h-[300px] overflow-y-auto',
         className
       )}
     >
       {children}
-      <CommandEmpty>
-        <span className="text-foreground-muted">No results found</span>
-      </CommandEmpty>
+      {creatable && inputValue.length > 0 && !isOptionExists ? (
+        <CommandItem
+          role="option"
+          onSelect={() => {
+            open && toggleValue(inputValue)
+            setInputValue('')
+          }}
+          className={commandItemClass}
+        >
+          Create "{inputValue}"
+        </CommandItem>
+      ) : creatable && options.length === 0 ? (
+        <div className="p-2 py-1.5 text-xs text-foreground-lighter font-italic">
+          Type to add a value
+        </div>
+      ) : (
+        <CommandEmpty>
+          <span className="text-foreground-muted">No results found</span>
+        </CommandEmpty>
+      )}
     </CommandList>
   )
 })
@@ -457,15 +500,7 @@ const MultiSelectorItem = React.forwardRef<
         open && toggleValue(value)
         setInputValue('')
       }}
-      className={cn(
-        'relative',
-        'text-foreground-lighter text-left',
-        'px-2 py-1.5 rounded',
-        'hover:text-foreground hover:!bg-overlay-hover',
-        'w-full flex items-center space-x-2',
-        'peer-data-[value=true]:bg-overlay-hover peer-data-[value=true]:text-strong',
-        className
-      )}
+      className={cn(commandItemClass, className)}
       {...props}
     >
       <div

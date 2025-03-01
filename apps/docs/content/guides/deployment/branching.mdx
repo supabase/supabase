@@ -4,7 +4,7 @@ description: 'Use Supabase Branches to test and preview changes.'
 subtitle: 'Use Supabase Branches to test and preview changes'
 ---
 
-Use branching to safely and easily experiment with changes to your Supabase project.
+Use branching to safely experiment with changes to your Supabase project.
 
 Supabase branches work like Git branches. They let you create and test changes like new configurations, database schemas, or features in a separate, temporary instance without affecting your production setup.
 
@@ -24,7 +24,14 @@ If you understand Git, you already understand Supabase Branching.
 - **Supabase Project**: You need an existing Supabase project.
 - **GitHub Repository**: Your project must be connected to a GitHub repository containing your Supabase directory.
 
-You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Preview Environments pause automatically after <SharedData data="config">branching.inactivity_period_in_minutes</SharedData> minutes of inactivity. Note that `pg_cron` executions will be impacted by inactivity related pausing.
+You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials.
+
+Preview Environments auto-pause after <SharedData data="config">branching.inactivity_period_in_minutes</SharedData> minutes of inactivity. Upon receiving a new request to your database or REST API, the paused branch will automatically resume to serve the request. The implications of this architecture means
+
+- `pg_cron` jobs will not execute in an auto-paused database.
+- Larger variance in request latency due to database cold starts.
+
+If you need higher performance guarantees on your Preview Environment, you can switch individual branches to [persistent](/docs/guides/deployment/branching#persistent-branches) so they are not auto-paused.
 
 <Image
   zoomable
@@ -43,7 +50,7 @@ Preview Branch instances contain no data by default. You must include a seed fil
 
 ## Git providers
 
-To manage code changes, your Supabase project must be connected to a Git repository. At this stage, we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](https://github.com/orgs/supabase/discussions/18936) for GitLab, BitBucket, and non-Git based Branching.
+To manage code changes, your Supabase project must be connected to a Git repository. At this stage, we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](https://github.com/orgs/supabase/discussions/18936) for GitLab, Bitbucket, and non-Git based Branching.
 
 ### Branching with GitHub
 
@@ -66,7 +73,7 @@ Supabase Branching follows the [Trunk Based Development](https://trunkbaseddevel
   }}
 />
 
-When you merge your Git branch into the production branch, all new migrations will be applied to your Production environment based on the changes made to your [`config.toml`](/docs/guides/local-development/cli/config).
+When you merge your Git branch into the production branch, all new migrations will be applied to your Production environment. If you have declared Storage buckets or Edge Functions in `config.toml`, they will also be deployed automatically. All other configurations, including API, Auth, and seed files, will be ignored by default.
 
 <Admonition type="note" label="Data changes are not merged into production." />
 
@@ -330,7 +337,7 @@ The Supabase CLI provides two options: [manual migrations](https://supabase.com/
     <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Make schema changes locally" fullWidth>
 
-            Start supabase locally:
+            Start Supabase locally:
 
             <CH.Code lineNumbers={false}>
 
@@ -498,7 +505,7 @@ When Branching is enabled, your `config.toml` settings automatically sync to all
 
 ### Basic configuration
 
-To update configuration for a Supabase branch, simply modify `config.toml` and push to git. The Supabase integration will detect the changes and apply them to the corresponding branch.
+To update configuration for a Supabase branch, modify `config.toml` and push to git. The Supabase integration will detect the changes and apply them to the corresponding branch.
 
 ### Remote-specific configuration
 
@@ -576,8 +583,10 @@ For branching to work with Vercel, you also need the [Vercel GitHub integration]
 
 </Admonition>
 
-Supabase automatically updates your Vercel project with the correct environment variables for the corresponding preview branches.
-The synchronization happens at the time of Pull Request being opened, not at the time of branch creation.
+And make sure you have [connected](/dashboard/org/_/integrations) your Supabase project to your Vercel project.
+
+Supabase automatically updates your Vercel project with the correct environment variables for the corresponding preview branches. The synchronization happens at the time of Pull Request being opened, not at the time of branch creation.
+
 As branching integration is tied to the Preview Deployments feature in Vercel, there are possible race conditions between Supabase setting correct variables, and Vercel running a deployment process. Because of that, Supabase is always automatically re-deploying the most recent deployment of the given pull request.
 
 ## Other Git providers
@@ -613,7 +622,7 @@ The new preview branch is reseeded from the `./supabase/seed.sql` file by defaul
 
 ### Deployment failures
 
-A deployment might fail for various reasons, including invalid SQL statements and schema conflicts in migrations. Errors within the `config.toml` config or something else.
+A deployment might fail for various reasons, including invalid SQL statements and schema conflicts in migrations, errors within the `config.toml` config, or something else.
 
 To check the error message, see the Supabase workflow run for your branch under the [View logs](/dashboard/project/_/branches) section.
 

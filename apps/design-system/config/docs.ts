@@ -117,6 +117,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/multi-select',
           items: [],
         },
+        {
+          title: 'Logs Bar Chart',
+          href: '/docs/fragments/logs-bar-chart',
+          items: [],
+        },
       ],
     },
     {
@@ -342,6 +347,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Slider',
           href: '/docs/components/slider',
+          items: [],
+        },
+        {
+          title: 'Sidebar',
+          href: '/docs/components/sidebar',
           items: [],
         },
         {

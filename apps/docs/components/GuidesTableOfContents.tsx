@@ -128,41 +128,52 @@ const GuidesTableOfContents = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hash, JSON.stringify(displayedList)])
 
-  if (!displayedList.length) return
-
   const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
 
   return (
-    <div className={cn('border-l', 'thin-scrollbar overflow-y-auto', 'px-2', className)}>
+    <div
+      className={cn(
+        'border-l flex flex-col gap-6 lg:gap-8',
+        'thin-scrollbar overflow-y-auto',
+        'px-2',
+        className
+      )}
+    >
       {video && (
-        <div className="relative mb-6 pl-5">
+        <div className="relative pl-5">
           <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} />
         </div>
       )}
-      <Feedback key={pathname} />
-      <span className="block font-mono text-xs uppercase text-foreground px-5 mb-6">
-        On this page
-      </span>
-      <ul className="toc-menu list-none pl-5 text-[0.8rem] grid gap-2">
-        {displayedList.map((item, i) => (
-          <li key={`${item.level}-${i}`} className={item.level === 3 ? 'ml-4' : ''}>
-            <a
-              href={`#${formatSlug(item.link)}`}
-              className="text-foreground-lighter hover:text-brand-link transition-colors"
-            >
-              {formatTOCHeader(removeAnchor(item.text)).map((x, index) => (
-                <Fragment key={index}>
-                  {x.type === 'code' ? (
-                    <code className="text-xs border rounded bg-muted">{x.value}</code>
-                  ) : (
-                    x.value
-                  )}
-                </Fragment>
-              ))}
-            </a>
-          </li>
-        ))}
-      </ul>
+      <div className="pl-5">
+        <Feedback key={pathname} />
+      </div>
+      {displayedList.length > 0 && (
+        <div>
+          <span className="block font-mono text-xs uppercase text-foreground px-5 mb-3">
+            On this page
+          </span>
+          <ul className="toc-menu list-none pl-5 text-[0.8rem] grid gap-2">
+            {displayedList.map((item, i) => (
+              <li key={`${item.level}-${i}`} className={item.level === 3 ? 'ml-4' : ''}>
+                <a
+                  href={`#${formatSlug(item.link)}`}
+                  className="text-foreground-lighter hover:text-brand-link transition-colors"
+                >
+                  {formatTOCHeader(removeAnchor(item.text)).map((x, index) => (
+                    <Fragment key={index}>
+                      {x.type === 'code' ? (
+                        <code className="text-xs border rounded bg-muted">{x.value}</code>
+                      ) : (
+                        x.value
+                      )}
+                    </Fragment>
+                  ))}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }

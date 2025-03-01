@@ -1,11 +1,14 @@
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
 
 import { useParams } from 'common'
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Connect from 'components/interfaces/Connect/Connect'
 import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
 import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
+import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
 import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
@@ -14,6 +17,7 @@ import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
@@ -43,21 +47,21 @@ interface LayoutHeaderProps {
   breadcrumbs?: any[]
   headerBorder?: boolean
   showProductMenu?: boolean
-  customSidebarContent?: ReactNode
-  handleMobileMenu: Function
 }
 
 const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
   headerBorder = true,
-  showProductMenu,
-  handleMobileMenu,
+  showProductMenu = true,
 }: LayoutHeaderProps) => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganization?.slug,
@@ -91,7 +95,7 @@ const LayoutHeader = ({
             className={cn(
               'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
             )}
-            onClick={() => handleMobileMenu()}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
             <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
@@ -99,15 +103,31 @@ const LayoutHeader = ({
         </div>
       )}
       <div className="relative flex flex-1 overflow-hidden">
-        <div className="flex w-full items-center justify-between py-2 pl-1 pr-3 md:px-3 flex-nowrap overflow-x-auto">
+        <div className="flex w-full items-center justify-between py-2 pl-1 pr-3 md:px-3 flex-nowrap overflow-x-auto no-scrollbar">
           <div className="flex items-center text-sm">
             {projectRef && (
+              <Link
+                href={IS_PLATFORM ? '/projects' : `/project/default`}
+                className="ml-1 mr-2 hidden md:flex items-center"
+              >
+                <img
+                  alt="Supabase"
+                  src={`${router.basePath}/img/supabase-logo.svg`}
+                  className="w-5 cursor-pointer rounded"
+                />
+              </Link>
+            )}
+
+            {!IS_PLATFORM && (
+              <div className="ml-3 text-xs text-foreground-light">Default project</div>
+            )}
+
+            {projectRef && IS_PLATFORM && (
               <>
                 <div className="flex items-center">
                   <OrganizationDropdown />
                   <LayoutHeaderDivider />
                   <ProjectDropdown />
-
                   {exceedingLimits && (
                     <div className="ml-2">
                       <Link href={`/org/${selectedOrganization?.slug}/usage`}>
@@ -115,7 +135,6 @@ const LayoutHeader = ({
                       </Link>
                     </div>
                   )}
-
                   {selectedProject && isBranchingEnabled && (
                     <>
                       <LayoutHeaderDivider />
@@ -125,12 +144,11 @@ const LayoutHeader = ({
                 </div>
 
                 <div className="ml-3 flex items-center gap-x-3">
-                  <Connect />
                   {!isBranchingEnabled && <EnableBranchingButton />}
+                  <Connect />
                 </div>
               </>
             )}
-
             {/* Additional breadcrumbs are supplied */}
             <BreadcrumbsView defaultValue={breadcrumbs} />
           </div>
@@ -149,8 +167,15 @@ const LayoutHeader = ({
         <div className="absolute md:hidden right-0 h-full w-3 bg-gradient-to-l from-background-dash-sidebar to-transparent pointer-events-none" />
       </div>
       {!!projectRef && (
-        <div className="border-l flex-0 h-full">
-          <AssistantButton />
+        <div className="flex h-full items-center">
+          {isInlineEditorEnabled && (
+            <div className="border-l flex-0 h-full">
+              <InlineEditorButton />
+            </div>
+          )}
+          <div className="border-l flex-0 h-full">
+            <AssistantButton />
+          </div>
         </div>
       )}
     </div>

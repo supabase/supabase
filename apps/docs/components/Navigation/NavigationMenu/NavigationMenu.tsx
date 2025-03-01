@@ -19,11 +19,12 @@ enum MenuId {
   Queues = 'queues',
   Platform = 'platform',
   Deployment = 'deployment',
-  MonitoringTroubleshooting = 'monitoring_troubleshooting',
+  Telemetry = 'telemetry',
   Resources = 'resources',
   SelfHosting = 'self_hosting',
   Integrations = 'integrations',
   LocalDevelopment = 'local_development',
+  Contributing = 'contributing',
   RefJavaScriptV1 = 'reference_javascript_v1',
   RefJavaScriptV2 = 'reference_javascript_v2',
   RefDartV1 = 'reference_dart_v1',
@@ -92,7 +93,7 @@ const menus: Menu[] = [
     type: 'guide',
   },
   {
-    id: MenuId.MonitoringTroubleshooting,
+    id: MenuId.Telemetry,
     type: 'guide',
   },
   {
@@ -126,6 +127,10 @@ const menus: Menu[] = [
   },
   {
     id: MenuId.LocalDevelopment,
+    type: 'guide',
+  },
+  {
+    id: MenuId.Contributing,
     type: 'guide',
   },
   {

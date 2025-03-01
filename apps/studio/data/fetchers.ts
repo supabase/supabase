@@ -1,31 +1,29 @@
 import * as Sentry from '@sentry/nextjs'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
 import createClient from 'openapi-fetch'
+import { ResponseError } from 'types'
 import type { paths } from './api' // generated from openapi-typescript
 
 const DEFAULT_HEADERS = {
-  'Content-Type': 'application/json',
   Accept: 'application/json',
 }
 
 // This file will eventually replace what we currently have in lib/fetchWrapper, but will be currently unused until we get to that refactor
 
-const {
-  get: _get,
-  post: _post,
-  put: _put,
-  patch: _patch,
-  del: _del,
-  head: _head,
-  trace: _trace,
-  options: _options,
-} = createClient<paths>({
+const client = createClient<paths>({
   // [Joshen] Just FYI, the replace is temporary until we update env vars API_URL to remove /platform or /v1 - should just be the base URL
   baseUrl: API_URL?.replace('/platform', ''),
   referrerPolicy: 'no-referrer-when-downgrade',
   headers: DEFAULT_HEADERS,
+  credentials: 'include',
+  querySerializer: {
+    array: {
+      style: 'form',
+      explode: false,
+    },
+  },
 })
 
 export async function constructHeaders(headersInit?: HeadersInit | undefined) {
@@ -42,139 +40,85 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
   return headers
 }
 
-export const get: typeof _get = async (url, init) => {
-  const headers = await constructHeaders(init?.headers)
+// Middleware
+client.use(
+  {
+    // Middleware to add authorization headers to the request
+    async onRequest({ request }) {
+      const headers = await constructHeaders()
+      headers.forEach((value, key) => request.headers.set(key, value))
 
-  // on self-hosted, we don't have a /platform prefix
-  if (!IS_PLATFORM && url.startsWith('/platform')) {
-    // @ts-ignore
-    url = url.replace('/platform', '')
+      return request
+    },
+  },
+  {
+    // Middleware to format errors
+    async onResponse({ request, response }) {
+      if (response.ok) {
+        return response
+      }
+
+      // handle errors
+      try {
+        // attempt to parse the response body as JSON
+        let body = await response.clone().json()
+
+        // add code field to body
+        body.code = response.status
+        body.requestId = request.headers.get('X-Request-Id')
+
+        return new Response(JSON.stringify(body), {
+          headers: response.headers,
+          status: response.status,
+          statusText: response.statusText,
+        })
+      } catch {
+        // noop
+      }
+
+      return response
+    },
+  }
+)
+
+export const {
+  GET: get,
+  POST: post,
+  PUT: put,
+  PATCH: patch,
+  DELETE: del,
+  HEAD: head,
+  TRACE: trace,
+  OPTIONS: options,
+} = client
+
+export const handleError = (error: unknown): never => {
+  if (error && typeof error === 'object') {
+    const errorMessage =
+      'msg' in error && typeof error.msg === 'string'
+        ? error.msg
+        : 'message' in error && typeof error.message === 'string'
+          ? error.message
+          : undefined
+
+    const errorCode = 'code' in error && typeof error.code === 'number' ? error.code : undefined
+    const requestId =
+      'requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined
+
+    if (errorMessage) {
+      throw new ResponseError(errorMessage, errorCode, requestId)
+    }
   }
 
-  return await _get(url, {
-    credentials: 'include',
-    ...init,
-    headers,
-  })
-}
-
-export const post: typeof _post = async (url, init) => {
-  const headers = await constructHeaders(init?.headers)
-
-  // on self-hosted, we don't have a /platform prefix
-  if (!IS_PLATFORM && url.startsWith('/platform')) {
-    // @ts-ignore
-    url = url.replace('/platform', '')
+  if (error !== null && typeof error === 'object' && 'stack' in error) {
+    console.error(error.stack)
   }
 
-  return await _post(url, {
-    credentials: 'include',
-    ...init,
-    headers,
-  })
-}
-
-export const put: typeof _put = async (url, init) => {
-  const headers = await constructHeaders(init?.headers)
-
-  // on self-hosted, we don't have a /platform prefix
-  if (!IS_PLATFORM && url.startsWith('/platform')) {
-    // @ts-ignore
-    url = url.replace('/platform', '')
-  }
-
-  return await _put(url, {
-    credentials: 'include',
-    ...init,
-    headers,
-  })
-}
-
-export const patch: typeof _patch = async (url, init) => {
-  const headers = await constructHeaders(init?.headers)
-
-  // on self-hosted, we don't have a /platform prefix
-  if (!IS_PLATFORM && url.startsWith('/platform')) {
-    // @ts-ignore
-    url = url.replace('/platform', '')
-  }
-
-  return await _patch(url, {
-    credentials: 'include',
-    ...init,
-    headers,
-  })
-}
-
-export const del: typeof _del = async (url, init) => {
-  const headers = await constructHeaders(init?.headers)
-
-  // on self-hosted, we don't have a /platform prefix
-  if (!IS_PLATFORM && url.startsWith('/platform')) {
-    // @ts-ignore
-    url = url.replace('/platform', '')
-  }
-
-  return await _del(url, {
-    credentials: 'include',
-    ...init,
-    headers,
-  })
-}
-
-export const head: typeof _head = async (url, init) => {
-  const headers = await constructHeaders(init?.headers)
-
-  // on self-hosted, we don't have a /platform prefix
-  if (!IS_PLATFORM && url.startsWith('/platform')) {
-    // @ts-ignore
-    url = url.replace('/platform', '')
-  }
-
-  return await _head(url, {
-    credentials: 'include',
-    ...init,
-    headers,
-  })
-}
-
-export const trace: typeof _trace = async (url, init) => {
-  const headers = await constructHeaders(init?.headers)
-
-  return await _trace(url, {
-    credentials: 'include',
-    ...init,
-    headers,
-  })
-}
-
-export const options: typeof _options = async (url, init) => {
-  const headers = await constructHeaders(init?.headers)
-
-  return await _options(url, {
-    credentials: 'include',
-    ...init,
-    headers,
-  })
-}
-
-export const handleError = (error: any): never => {
-  if (error && typeof error.msg === 'string') {
-    throw new Error(error.msg || 'API error happened while trying to communicate with the server.')
-  }
-
-  if (error && typeof error.message === 'string') {
-    throw new Error(
-      error.message || 'API error happened while trying to communicate with the server.'
-    )
-  }
-
-  console.error(error.stack)
   // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
   // add handling for it.
   Sentry.captureException(error)
 
   // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
   // up in the UI.
-  throw new Error('API error happened while trying to communicate with the server.')
+  throw new ResponseError(undefined)
 }

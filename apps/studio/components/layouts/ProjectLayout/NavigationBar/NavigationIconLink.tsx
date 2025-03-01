@@ -7,12 +7,11 @@ import {
   forwardRef,
   isValidElement,
 } from 'react'
-import { cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import type { Route } from 'components/ui/ui.types'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
 
 interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   route: Route
@@ -21,12 +20,13 @@ interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorEleme
 
 const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonProps>(
   ({ route, isActive = false, onClick = noop, ...props }, ref) => {
-    const snap = useAppStateSnapshot()
-
-    const [allowNavPanelToExpand] = useLocalStorageQuery(
+    const [storedAllowNavPanel] = useLocalStorageQuery(
       LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
       true
     )
+    // Don't allow the nav panel to expand in playwright tests
+    const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
+
     const iconClasses = [
       'absolute left-0 top-0 flex rounded items-center h-10 w-10 items-center justify-center text-foreground-lighter', // Layout
       'group-hover/item:text-foreground-light',
@@ -75,7 +75,6 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
           {route.icon}
         </span>
         <span
-          aria-hidden={snap.navigationPanelOpen || undefined}
           className={cn(
             'min-w-[128px] text-sm text-foreground-light',
             'group-hover/item:text-foreground',
@@ -93,12 +92,12 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
 
     if (!allowNavPanelToExpand) {
       return (
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>{linkContent}</TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="right">
+        <Tooltip>
+          <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
+          <TooltipContent side="right">
             <span>{route.label}</span>
-          </TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipContent>
+        </Tooltip>
       )
     }
 

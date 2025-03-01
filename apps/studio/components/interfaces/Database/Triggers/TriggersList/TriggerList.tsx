@@ -15,9 +15,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
 
@@ -84,14 +84,14 @@ const TriggerList = ({
       {_triggers.map((x: any) => (
         <Table.tr key={x.id}>
           <Table.td className="space-x-2">
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ className="cursor-default truncate max-w-48 inline-block">
+            <Tooltip>
+              <TooltipTrigger className="cursor-default truncate max-w-48 inline-block">
                 {x.name}
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom" align="center">
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="center">
                 {x.name}
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+              </TooltipContent>
+            </Tooltip>
           </Table.td>
 
           <Table.td className="break-all">
@@ -139,7 +139,13 @@ const TriggerList = ({
                       <Button type="default" className="px-1" icon={<MoreVertical />} />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="bottom" align="end" className="w-52">
-                      <DropdownMenuItem className="space-x-2" onClick={() => editTrigger(x)}>
+                      <DropdownMenuItem
+                        className="space-x-2"
+                        onClick={() => {
+                          const sql = generateTriggerCreateSQL(x)
+                          editTrigger(x)
+                        }}
+                      >
                         <Edit2 size={14} />
                         <p>Edit trigger</p>
                       </DropdownMenuItem>

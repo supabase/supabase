@@ -1,54 +1,69 @@
 import { Auth, Realtime, Storage } from 'icons'
-import { ActivityIcon, DatabaseIcon, ServerIcon, HeartIcon } from 'lucide-react'
+import { ActivityIcon, DatabaseIcon, HeartIcon, ServerIcon } from 'lucide-react'
+import { ReactNode } from 'react'
+
+export type Metric = {
+  key: string
+  label: string
+  provider?: string
+  category?: MetricCategory
+  id?: string
+}
+
+type MetricCategory = {
+  label: string
+  icon: (className?: string) => ReactNode
+  key: string
+}
 
 export const METRIC_CATEGORIES = {
   API: {
     label: 'All API usage',
-    icon: <ActivityIcon size={16} />,
+    icon: (className?: string) => <ActivityIcon size={16} className={className} />,
     key: 'api',
   },
   API_DATABASE: {
     label: 'Database API',
-    icon: <DatabaseIcon size={16} />,
+    icon: (className?: string) => <DatabaseIcon size={16} className={className} />,
     key: 'api_database',
   },
   API_AUTH: {
     label: 'Auth API',
-    icon: <Auth size={16} />,
+    icon: (className?: string) => <Auth size={16} className={className} />,
     key: 'api_auth',
   },
   API_STORAGE: {
     label: 'Storage API',
-    icon: <Storage size={16} />,
+    icon: (className?: string) => <Storage size={16} className={className} />,
     key: 'api_storage',
   },
   API_REALTIME: {
     label: 'Realtime API',
-    icon: <Realtime size={16} />,
+    icon: (className?: string) => <Realtime size={16} className={className} />,
     key: 'api_realtime',
   },
   INSTANCE: {
     label: 'Instance health',
-    icon: <HeartIcon size={16} />,
+    icon: (className?: string) => <HeartIcon size={16} className={className} />,
     key: 'instance',
   },
   SUPAVISOR: {
     label: 'Supavisor',
-    icon: <ServerIcon size={16} />,
+    icon: (className?: string) => <ServerIcon size={16} className={className} />,
     key: 'supavisor',
   },
 }
 
-export const METRICS = [
+export const METRICS: Metric[] = [
   {
     key: 'avg_cpu_usage',
-    label: 'Average CPU % usage',
+    label: 'Average CPU % Usage',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
   {
     key: 'max_cpu_usage',
-    label: 'Max CPU % usage',
+    label: 'Max CPU % Usage',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
@@ -66,7 +81,7 @@ export const METRICS = [
   },
   {
     key: 'ram_usage',
-    label: 'Memory % usage',
+    label: 'Memory % Usage',
     provider: 'infra-monitoring',
     category: METRIC_CATEGORIES.INSTANCE,
   },
@@ -189,13 +204,13 @@ export const METRICS = [
   },
   {
     key: 'total_auth_patch_requests',
-    label: 'Auth PATCH requests',
+    label: 'Auth PATCH Requests',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_AUTH,
   },
   {
     key: 'total_auth_options_requests',
-    label: 'Auth OPTIONS requests',
+    label: 'Auth OPTIONS Requests',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_AUTH,
   },

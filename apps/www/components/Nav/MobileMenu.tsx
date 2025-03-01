@@ -13,6 +13,9 @@ import { useKey } from 'react-use'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { ChevronRight } from 'lucide-react'
 import ProductModulesData from '~/data/ProductModules'
+import { jobsCount } from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
+
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 interface Props {
   open: boolean
@@ -23,6 +26,7 @@ interface Props {
 const MobileMenu = ({ open, setOpen, menu }: Props) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
+  const sendTelemetryEvent = useSendTelemetryEvent()
   const container = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { duration: 0.15, staggerChildren: 0.05, ease: DEFAULT_EASE } },
@@ -105,6 +109,7 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                   key={link.text}
                   url={link.url}
                   label={link.text}
+                  counter={link.text === 'Careers' && jobsCount > 0 ? jobsCount : undefined}
                   className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay !mt-0"
                 />
               ))}
@@ -238,14 +243,34 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
                     </Link>
                   ) : (
                     <>
-                      <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
+                      <Link
+                        href="https://supabase.com/dashboard"
+                        passHref
+                        legacyBehavior
+                        onClick={() =>
+                          sendTelemetryEvent({
+                            action: 'sign_in_button_clicked',
+                            properties: { buttonLocation: 'Mobile Nav' },
+                          })
+                        }
+                      >
                         <Button block type="default" asChild>
                           <a type={undefined} className="h-10 py-4">
                             Sign in
                           </a>
                         </Button>
                       </Link>
-                      <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
+                      <Link
+                        href="https://supabase.com/dashboard"
+                        passHref
+                        legacyBehavior
+                        onClick={() =>
+                          sendTelemetryEvent({
+                            action: 'start_project_button_clicked',
+                            properties: { buttonLocation: 'Mobile Nav' },
+                          })
+                        }
+                      >
                         <Button block asChild>
                           <a type={undefined} className="h-10 py-4">
                             Start your project

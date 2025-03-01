@@ -10,6 +10,7 @@ let octokitInstance: Octokit
 
 function octokit() {
   if (!octokitInstance) {
+    // https://github.com/gr2m/universal-github-app-jwt?tab=readme-ov-file#converting-pkcs1-to-pkcs8
     const privateKeyPkcs8 = crypto
       .createPrivateKey(process.env.DOCS_GITHUB_APP_PRIVATE_KEY)
       .export({
@@ -30,7 +31,7 @@ function octokit() {
   return octokitInstance
 }
 
-export async function getGitHubFileContents({
+async function getGitHubFileContents({
   org,
   repo,
   path,

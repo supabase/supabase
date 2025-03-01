@@ -1,17 +1,5 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import saveAs from 'file-saver'
-import {
-  Clipboard,
-  Copy,
-  Download,
-  Edit,
-  Eye,
-  Lock,
-  MoreHorizontal,
-  Table2,
-  Trash,
-  Unlock,
-} from 'lucide-react'
+import { Clipboard, Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -26,6 +14,7 @@ import {
   formatTableRowsToSQL,
   getEntityLintDetails,
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
+import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
@@ -35,6 +24,7 @@ import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { copyToClipboard } from 'lib/helpers'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   cn,
@@ -46,14 +36,18 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TreeViewItemVariant,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { copyToClipboard } from 'lib/helpers'
 
 export interface EntityListItemProps {
-  id: number
+  id: number | string
   projectRef: string
   isLocked: boolean
+  isActive?: boolean
 }
 
 const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
@@ -61,6 +55,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   projectRef,
   item: entity,
   isLocked,
+  isActive: _isActive,
 }) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
@@ -210,133 +205,28 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     }
   }
 
-  const EntityTooltipTrigger = ({ entity }: { entity: Entity }) => {
-    let tooltipContent = null
-
-    switch (entity.type) {
-      case ENTITY_TYPE.TABLE:
-        if (tableHasLints) {
-          tooltipContent = 'RLS disabled'
-        }
-        break
-      case ENTITY_TYPE.VIEW:
-        if (viewHasLints) {
-          tooltipContent = 'Security definer view'
-        }
-        break
-      case ENTITY_TYPE.MATERIALIZED_VIEW:
-        if (materializedViewHasLints) {
-          tooltipContent = 'Security definer view'
-        }
-        break
-      case ENTITY_TYPE.FOREIGN_TABLE:
-        tooltipContent = 'RLS is not enforced on foreign tables'
-        break
-      default:
-        break
-    }
-
-    if (tooltipContent) {
-      return (
-        <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-          <Tooltip.Trigger className="min-w-4" asChild>
-            <Unlock
-              size={14}
-              strokeWidth={2}
-              className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
-            />
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="bottom"
-              className={[
-                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                'border border-background',
-                'text-xs text-foreground',
-              ].join(' ')}
-            >
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              {tooltipContent}
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-      )
-    }
-
-    return null
-  }
-
   return (
-    <div className="px-2">
-      <EditorTablePageLink
-        title={entity.name}
-        id={String(entity.id)}
-        href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
-        role="button"
-        aria-label={`View ${entity.name}`}
-        className={cn(
-          'w-full',
-          'flex items-center gap-2',
-          'py-1 px-2',
-          'text-light',
-          'rounded-md',
-          isActive ? 'bg-selection' : 'hover:bg-surface-200 focus:bg-surface-200',
-          'group',
-          'transition'
-        )}
-      >
-        <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-          <Tooltip.Trigger className="min-w-4" asChild>
-            {entity.type === ENTITY_TYPE.TABLE ? (
-              <Table2
-                size={15}
-                strokeWidth={1.5}
-                className={cn(
-                  'text-foreground-muted group-hover:text-foreground-lighter',
-                  isActive && 'text-foreground-lighter',
-                  'transition-colors'
-                )}
-              />
-            ) : entity.type === ENTITY_TYPE.VIEW ? (
-              <Eye
-                size={15}
-                strokeWidth={1.5}
-                className={cn(
-                  'text-foreground-muted group-hover:text-foreground-lighter',
-                  isActive && 'text-foreground-lighter',
-                  'transition-colors'
-                )}
-              />
-            ) : (
-              <div
-                className={cn(
-                  'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
-                  entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
-                  entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
-                  entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                    'text-foreground-light bg-border-stronger'
-                )}
-              >
-                {Object.entries(ENTITY_TYPE)
-                  .find(([, value]) => value === entity.type)?.[0]?.[0]
-                  ?.toUpperCase()}
-              </div>
-            )}
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="bottom"
-              className={[
-                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                'border border-background',
-                'text-xs text-foreground capitalize',
-              ].join(' ')}
-            >
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              {formatTooltipText(entity.type)}
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+    <EditorTablePageLink
+      title={entity.name}
+      id={String(entity.id)}
+      href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
+      role="button"
+      aria-label={`View ${entity.name}`}
+      className={cn(
+        TreeViewItemVariant({
+          isSelected: isActive,
+        }),
+        'px-4'
+      )}
+    >
+      <>
+        {isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
+        <Tooltip disableHoverableContent={true}>
+          <TooltipTrigger className="min-w-4">
+            <EntityTypeIcon type={entity.type} isActive={isActive} />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">{formatTooltipText(entity.type)}</TooltipContent>
+        </Tooltip>
         <div
           className={cn(
             'truncate',
@@ -354,12 +244,18 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           >
             {entity.name}
           </span>
-          <EntityTooltipTrigger entity={entity} />
+          <EntityTooltipTrigger
+            entity={entity}
+            isActive={isActive}
+            tableHasLints={tableHasLints}
+            viewHasLints={viewHasLints}
+            materializedViewHasLints={materializedViewHasLints}
+          />
         </div>
 
         {canEdit && (
           <DropdownMenu>
-            <DropdownMenuTrigger className="text-foreground-lighter transition-all hover:text-foreground data-[state=open]:text-foreground">
+            <DropdownMenuTrigger className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-[state=open]:text-foreground">
               <MoreHorizontal size={14} strokeWidth={2} />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="start" className="w-44">
@@ -457,9 +353,67 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-      </EditorTablePageLink>
-    </div>
+      </>
+    </EditorTablePageLink>
   )
+}
+
+const EntityTooltipTrigger = ({
+  entity,
+  isActive,
+  tableHasLints,
+  viewHasLints,
+  materializedViewHasLints,
+}: {
+  entity: Entity
+  isActive: boolean
+  tableHasLints: boolean
+  viewHasLints: boolean
+  materializedViewHasLints: boolean
+}) => {
+  let tooltipContent = ''
+
+  switch (entity.type) {
+    case ENTITY_TYPE.TABLE:
+      if (tableHasLints) {
+        tooltipContent = 'RLS disabled'
+      }
+      break
+    case ENTITY_TYPE.VIEW:
+      if (viewHasLints) {
+        tooltipContent = 'Security definer view'
+      }
+      break
+    case ENTITY_TYPE.MATERIALIZED_VIEW:
+      if (materializedViewHasLints) {
+        tooltipContent = 'Security definer view'
+      }
+      break
+    case ENTITY_TYPE.FOREIGN_TABLE:
+      tooltipContent = 'RLS is not enforced on foreign tables'
+      break
+    default:
+      break
+  }
+
+  if (tooltipContent) {
+    return (
+      <Tooltip disableHoverableContent={true}>
+        <TooltipTrigger className="min-w-4">
+          <Unlock
+            size={14}
+            strokeWidth={2}
+            className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
+          />
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          <span>{tooltipContent}</span>
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  return null
 }
 
 export default EntityListItem
