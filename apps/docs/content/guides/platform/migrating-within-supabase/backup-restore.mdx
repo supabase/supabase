@@ -266,10 +266,11 @@ async function listAllFiles(bucket, path = '') {
  * Creates a bucket in the new Supabase project if it doesn't exist.
  */
 async function ensureBucketExists(bucketName, options = {}) {
-  const { data: existingBucket, error: getBucketError } = await newSupabase.storage.getBucket(bucketName)
+  const { data: existingBucket, error: getBucketError } =
+    await newSupabase.storage.getBucket(bucketName)
 
   // The error message might be different than expected - it could be "Bucket not found" instead of "The resource was not found"
-  if (getBucketError && !getBucketError.message.includes("not found")) {
+  if (getBucketError && !getBucketError.message.includes('not found')) {
     throw new Error(`❌ Error checking if bucket '${bucketName}' exists: ${getBucketError.message}`)
   }
 
@@ -288,7 +289,9 @@ async function ensureBucketExists(bucketName, options = {}) {
  */
 async function migrateFile(sourceBucketName, targetBucketName, file) {
   try {
-    const { data, error: downloadError } = await oldSupabase.storage.from(sourceBucketName).download(file.fullPath)
+    const { data, error: downloadError } = await oldSupabase.storage
+      .from(sourceBucketName)
+      .download(file.fullPath)
     if (downloadError) throw new Error(`Download failed: ${downloadError.message}`)
 
     // Preserve all available metadata from the original file
@@ -298,13 +301,20 @@ async function migrateFile(sourceBucketName, targetBucketName, file) {
       cacheControl: file.metadata?.cacheControl,
     }
 
-    const { error: uploadError } = await newSupabase.storage.from(targetBucketName).upload(file.fullPath, data, uploadOptions)
+    const { error: uploadError } = await newSupabase.storage
+      .from(targetBucketName)
+      .upload(file.fullPath, data, uploadOptions)
     if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`)
 
-    console.log(`✅ Migrated ${file.fullPath} in bucket '${sourceBucketName}' to '${targetBucketName}'`)
+    console.log(
+      `✅ Migrated ${file.fullPath} in bucket '${sourceBucketName}' to '${targetBucketName}'`
+    )
     return { success: true, path: file.fullPath }
   } catch (err) {
-    console.error(`❌ Error migrating ${file.fullPath} in bucket '${targetBucketName}':`, err.message)
+    console.error(
+      `❌ Error migrating ${file.fullPath} in bucket '${targetBucketName}':`,
+      err.message
+    )
     return { success: false, path: file.fullPath, error: err.message }
   }
 }
@@ -332,21 +342,23 @@ async function migrateBuckets() {
   // Ask for confirmation before proceeding
   const readline = require('readline').createInterface({
     input: process.stdin,
-    output: process.stdout
-  });
+    output: process.stdout,
+  })
 
-  console.log('\n⚠️ WARNING: This migration may overwrite files in the target project if they have the same paths.');
-  console.log('⚠️ It is recommended to back up your target project before proceeding.');
+  console.log(
+    '\n⚠️ WARNING: This migration may overwrite files in the target project if they have the same paths.'
+  )
+  console.log('⚠️ It is recommended to back up your target project before proceeding.')
 
-  const answer = await new Promise(resolve => {
-    readline.question('Do you want to proceed with the migration? (yes/no): ', resolve);
-  });
+  const answer = await new Promise((resolve) => {
+    readline.question('Do you want to proceed with the migration? (yes/no): ', resolve)
+  })
 
-  readline.close();
+  readline.close()
 
   if (answer.toLowerCase() !== 'yes') {
-    console.log('Migration canceled by user.');
-    return { canceled: true };
+    console.log('Migration canceled by user.')
+    return { canceled: true }
   }
 
   console.log('\n📦 Fetching all buckets from old project...')
@@ -357,45 +369,50 @@ async function migrateBuckets() {
   console.log(`✅ Found ${oldBuckets.length} buckets to migrate.`)
 
   // Check for existing buckets in the target project
-  const { data: existingBuckets, error: existingBucketsError } = await newSupabase.storage.listBuckets()
-  if (existingBucketsError) throw new Error(`❌ Error fetching existing buckets: ${existingBucketsError.message}`)
+  const { data: existingBuckets, error: existingBucketsError } =
+    await newSupabase.storage.listBuckets()
+  if (existingBucketsError)
+    throw new Error(`❌ Error fetching existing buckets: ${existingBucketsError.message}`)
 
-  const existingBucketNames = existingBuckets.map(b => b.name)
-  const conflictingBuckets = oldBuckets.filter(b => existingBucketNames.includes(b.name))
+  const existingBucketNames = existingBuckets.map((b) => b.name)
+  const conflictingBuckets = oldBuckets.filter((b) => existingBucketNames.includes(b.name))
 
   // Default conflict strategy (2 = merge files)
-  let conflictStrategy = 2;
+  let conflictStrategy = 2
 
   if (conflictingBuckets.length > 0) {
     console.log('\n⚠️ The following buckets already exist in the target project:')
-    conflictingBuckets.forEach(b => console.log(`  - ${b.name}`))
+    conflictingBuckets.forEach((b) => console.log(`  - ${b.name}`))
 
-    const conflictAnswer = await new Promise(resolve => {
+    const conflictAnswer = await new Promise((resolve) => {
       const rl = require('readline').createInterface({
         input: process.stdin,
-        output: process.stdout
-      });
-      rl.question('\nHow do you want to handle existing buckets?\n' +
-                 '1. Skip existing buckets\n' +
-                 '2. Merge files (may overwrite existing files)\n' +
-                 '3. Rename buckets in target (add suffix "_migrated")\n' +
-                 '4. Cancel migration\n' +
-                 'Enter your choice (1-4): ', answer => {
-        rl.close();
-        resolve(answer);
-      });
-    });
+        output: process.stdout,
+      })
+      rl.question(
+        '\nHow do you want to handle existing buckets?\n' +
+          '1. Skip existing buckets\n' +
+          '2. Merge files (may overwrite existing files)\n' +
+          '3. Rename buckets in target (add suffix "_migrated")\n' +
+          '4. Cancel migration\n' +
+          'Enter your choice (1-4): ',
+        (answer) => {
+          rl.close()
+          resolve(answer)
+        }
+      )
+    })
 
     if (conflictAnswer === '4') {
-      console.log('Migration canceled by user.');
-      return { canceled: true };
+      console.log('Migration canceled by user.')
+      return { canceled: true }
     }
 
     // Store the conflict resolution strategy
-    conflictStrategy = parseInt(conflictAnswer);
+    conflictStrategy = parseInt(conflictAnswer)
     if (isNaN(conflictStrategy) || conflictStrategy < 1 || conflictStrategy > 3) {
-      console.log('Invalid choice. Migration canceled.');
-      return { canceled: true };
+      console.log('Invalid choice. Migration canceled.')
+      return { canceled: true }
     }
   }
 
@@ -406,7 +423,7 @@ async function migrateBuckets() {
     totalFiles: 0,
     successfulFiles: 0,
     failedFiles: 0,
-    failedFilesList: []
+    failedFilesList: [],
   }
 
   for (const bucket of oldBuckets) {
@@ -414,18 +431,18 @@ async function migrateBuckets() {
     console.log(`\n📁 Processing bucket: ${bucketName}`)
 
     // Handle bucket conflicts based on user choice
-    let targetBucketName = bucketName;
+    let targetBucketName = bucketName
 
     if (existingBucketNames.includes(bucketName)) {
       if (conflictStrategy === 1) {
-        console.log(`⏩ Skipping bucket '${bucketName}' as it already exists in target project`);
-        migrationStats.skippedBuckets++;
-        continue;
+        console.log(`⏩ Skipping bucket '${bucketName}' as it already exists in target project`)
+        migrationStats.skippedBuckets++
+        continue
       } else if (conflictStrategy === 3) {
-        targetBucketName = `${bucketName}_migrated`;
-        console.log(`🔄 Renaming bucket to '${targetBucketName}' in target project`);
+        targetBucketName = `${bucketName}_migrated`
+        console.log(`🔄 Renaming bucket to '${targetBucketName}' in target project`)
       } else {
-        console.log(`🔄 Merging files into existing bucket '${bucketName}' in target project`);
+        console.log(`🔄 Merging files into existing bucket '${bucketName}' in target project`)
       }
     }
 
@@ -434,8 +451,8 @@ async function migrateBuckets() {
       await ensureBucketExists(targetBucketName, {
         public: bucket.public,
         fileSizeLimit: bucket.file_size_limit,
-        allowedMimeTypes: bucket.allowed_mime_types
-      });
+        allowedMimeTypes: bucket.allowed_mime_types,
+      })
     }
 
     const files = await listAllFiles(bucketName)
@@ -450,20 +467,24 @@ async function migrateBuckets() {
       console.log(`🚀 Processing batch ${i + 1}/${batches.length} (${batch.length} files)`)
 
       // Process each batch in parallel, limiting concurrency
-      const results = await Promise.all(batch.map(file => {
-        // Pass both source and target bucket names
-        return migrateFile(bucketName, targetBucketName, file);
-      }));
+      const results = await Promise.all(
+        batch.map((file) => {
+          // Pass both source and target bucket names
+          return migrateFile(bucketName, targetBucketName, file)
+        })
+      )
 
       // Update statistics
-      const batchSuccesses = results.filter(r => r.success).length
-      const batchFailures = results.filter(r => !r.success)
+      const batchSuccesses = results.filter((r) => r.success).length
+      const batchFailures = results.filter((r) => !r.success)
 
       migrationStats.successfulFiles += batchSuccesses
       migrationStats.failedFiles += batchFailures.length
-      migrationStats.failedFilesList.push(...batchFailures.map(f => f.path))
+      migrationStats.failedFilesList.push(...batchFailures.map((f) => f.path))
 
-      console.log(`✅ Completed batch ${i + 1}/${batches.length}: ${batchSuccesses} succeeded, ${batchFailures.length} failed`)
+      console.log(
+        `✅ Completed batch ${i + 1}/${batches.length}: ${batchSuccesses} succeeded, ${batchFailures.length} failed`
+      )
     }
 
     migrationStats.processedBuckets++
@@ -471,12 +492,16 @@ async function migrateBuckets() {
 
   // Print summary
   console.log('\n📊 Migration Summary:')
-  console.log(`Buckets: ${migrationStats.processedBuckets}/${migrationStats.totalBuckets} processed, ${migrationStats.skippedBuckets} skipped`)
-  console.log(`Files: ${migrationStats.successfulFiles} succeeded, ${migrationStats.failedFiles} failed (${migrationStats.totalFiles} total)`)
+  console.log(
+    `Buckets: ${migrationStats.processedBuckets}/${migrationStats.totalBuckets} processed, ${migrationStats.skippedBuckets} skipped`
+  )
+  console.log(
+    `Files: ${migrationStats.successfulFiles} succeeded, ${migrationStats.failedFiles} failed (${migrationStats.totalFiles} total)`
+  )
 
   if (migrationStats.failedFiles > 0) {
     console.log('\n⚠️ Failed files:')
-    migrationStats.failedFilesList.forEach(path => console.log(`  - ${path}`))
+    migrationStats.failedFilesList.forEach((path) => console.log(`  - ${path}`))
     return migrationStats
   }
 
@@ -485,7 +510,7 @@ async function migrateBuckets() {
 
 // Run migration and handle top-level errors
 migrateBuckets()
-  .then(stats => {
+  .then((stats) => {
     if (stats.failedFiles > 0) {
       console.log(`\n⚠️ Migration completed with ${stats.failedFiles} failed files.`)
       process.exit(1)
@@ -494,7 +519,7 @@ migrateBuckets()
       process.exit(0)
     }
   })
-  .catch(err => {
+  .catch((err) => {
     console.error('❌ Fatal error during migration:', err.message)
     process.exit(1)
   })
