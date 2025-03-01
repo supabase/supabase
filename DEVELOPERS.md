@@ -36,7 +36,7 @@ To ensure a positive and inclusive environment, please read our [code of conduct
 
 You will need to install and configure the following dependencies on your machine to build [Supabase](https://supabase.com):
 
-- [Git](http://git-scm.com/)
+- [Git](https://git-scm.com/)
 - [Node.js v20.x (LTS)](http://nodejs.org)
 - [pnpm](https://pnpm.io/) version 9.x.x or higher
 - [make](https://www.gnu.org/software/make/) or the equivalent to `build-essentials` for your OS
