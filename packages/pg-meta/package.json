@@ -22,6 +22,6 @@
     "pg": "^8.13.1",
     "postgres-array": "^3.0.2",
     "typescript": "~5.5.0",
-    "vitest": "^2.1.8"
+    "vitest": "^3.0.0"
   }
 }

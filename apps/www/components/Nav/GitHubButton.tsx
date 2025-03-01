@@ -1,7 +1,8 @@
-import React from 'react'
 import { Button } from 'ui'
-import { githubStars } from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
+import staticContent from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+
+const { githubStars } = staticContent
 
 const GitHubButton = () => {
   const kFormatter = (num: number) => {
