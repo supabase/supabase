@@ -235,31 +235,68 @@ const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
 const oldSupabase = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY)
 const newSupabase = createClient(NEW_PROJECT_URL, NEW_PROJECT_SERVICE_KEY)
 
+function createLoadingAnimation(message) {
+  const readline = require('readline')
+  const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
+  let i = 0
+  let timer
+  let stopped = false
+
+  const animate = () => {
+    if (stopped) return
+    process.stdout.write(`\r${frames[i]} ${message}`)
+    i = (i + 1) % frames.length
+    timer = setTimeout(animate, 80)
+  }
+
+  animate()
+
+  return {
+    stop: (finalMessage = '') => {
+      stopped = true
+      clearTimeout(timer)
+      readline.clearLine(process.stdout, 0)
+      readline.cursorTo(process.stdout, 0)
+      process.stdout.write(`✓ ${finalMessage || message}\n`)
+    },
+  }
+}
+
 /**
  * Lists all files in a bucket, handling nested folders recursively.
  */
 async function listAllFiles(bucket, path = '') {
-  console.log(`📂 Listing files in '${bucket}${path ? '/' + path : ''}'...`)
-  const { data, error } = await oldSupabase.storage.from(bucket).list(path, { limit: 1000 })
-  if (error) throw new Error(`❌ Error listing files in bucket '${bucket}': ${error.message}`)
+  const loader = createLoadingAnimation(`Listing files in '${bucket}${path ? '/' + path : ''}'...`)
 
-  if (!data || data.length === 0) {
-    console.log(`ℹ️ No files found in '${bucket}${path ? '/' + path : ''}'`)
-    return []
-  }
-
-  let files = []
-  for (const item of data) {
-    if (!item.metadata) {
-      // Folder - recurse
-      const subFiles = await listAllFiles(bucket, `${path}${item.name}/`)
-      files = files.concat(subFiles)
-    } else {
-      // File
-      files.push({ fullPath: `${path}${item.name}`, metadata: item.metadata })
+  try {
+    const { data, error } = await oldSupabase.storage.from(bucket).list(path, { limit: 1000 })
+    if (error) {
+      loader.stop(`Error listing files in '${bucket}${path ? '/' + path : ''}'`)
+      throw new Error(`❌ Error listing files in bucket '${bucket}': ${error.message}`)
     }
+
+    if (!data || data.length === 0) {
+      loader.stop(`No files found in '${bucket}${path ? '/' + path : ''}'`)
+      return []
+    }
+
+    let files = []
+    for (const item of data) {
+      if (!item.metadata) {
+        loader.stop(`Found folder '${item.name}' in '${bucket}${path ? '/' + path : ''}'`)
+        const subFiles = await listAllFiles(bucket, `${path}${item.name}/`)
+        files = files.concat(subFiles)
+      } else {
+        files.push({ fullPath: `${path}${item.name}`, metadata: item.metadata })
+      }
+    }
+
+    loader.stop(`Found ${files.length} files in '${bucket}${path ? '/' + path : ''}'`)
+    return files
+  } catch (error) {
+    loader.stop()
+    throw error
   }
-  return files
 }
 
 /**
@@ -269,7 +306,6 @@ async function ensureBucketExists(bucketName, options = {}) {
   const { data: existingBucket, error: getBucketError } =
     await newSupabase.storage.getBucket(bucketName)
 
-  // The error message might be different than expected - it could be "Bucket not found" instead of "The resource was not found"
   if (getBucketError && !getBucketError.message.includes('not found')) {
     throw new Error(`❌ Error checking if bucket '${bucketName}' exists: ${getBucketError.message}`)
   }
@@ -288,11 +324,18 @@ async function ensureBucketExists(bucketName, options = {}) {
  * Migrates a single file from the old project to the new one.
  */
 async function migrateFile(sourceBucketName, targetBucketName, file) {
+  const loader = createLoadingAnimation(
+    `Migrating ${file.fullPath} in bucket '${sourceBucketName}' to '${targetBucketName}'...`
+  )
+
   try {
     const { data, error: downloadError } = await oldSupabase.storage
       .from(sourceBucketName)
       .download(file.fullPath)
-    if (downloadError) throw new Error(`Download failed: ${downloadError.message}`)
+    if (downloadError) {
+      loader.stop(`Failed to migrate ${file.fullPath}: Download error`)
+      throw new Error(`Download failed: ${downloadError.message}`)
+    }
 
     // Preserve all available metadata from the original file
     const uploadOptions = {
@@ -304,10 +347,13 @@ async function migrateFile(sourceBucketName, targetBucketName, file) {
     const { error: uploadError } = await newSupabase.storage
       .from(targetBucketName)
       .upload(file.fullPath, data, uploadOptions)
-    if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`)
+    if (uploadError) {
+      loader.stop(`Failed to migrate ${file.fullPath}: Upload error`)
+      throw new Error(`Upload failed: ${uploadError.message}`)
+    }
 
-    console.log(
-      `✅ Migrated ${file.fullPath} in bucket '${sourceBucketName}' to '${targetBucketName}'`
+    loader.stop(
+      `Migrated ${file.fullPath} in bucket '${sourceBucketName}' to '${targetBucketName}'`
     )
     return { success: true, path: file.fullPath }
   } catch (err) {
@@ -319,9 +365,6 @@ async function migrateFile(sourceBucketName, targetBucketName, file) {
   }
 }
 
-/**
- * Splits an array into smaller chunks of a given size.
- */
 function chunkArray(array, size) {
   const chunks = []
   for (let i = 0; i < array.length; i += size) {
@@ -332,14 +375,13 @@ function chunkArray(array, size) {
 
 /**
  * Migrates all buckets and files from the old Supabase project to the new one.
- * Limits concurrent file uploads using batch processing (10 files at a time).
+ * Processes files in parallel within batches for efficiency.
  */
 async function migrateBuckets() {
   console.log('🔄 Starting Supabase Storage migration...')
   console.log(`📦 Source project: ${OLD_PROJECT_URL}`)
   console.log(`📦 Target project: ${NEW_PROJECT_URL}`)
 
-  // Ask for confirmation before proceeding
   const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -357,8 +399,8 @@ async function migrateBuckets() {
   readline.close()
 
   if (answer.toLowerCase() !== 'yes') {
-    console.log('Migration canceled by user.')
-    return { canceled: true }
+    console.log('Migration cancelled by user.')
+    return { cancelled: true }
   }
 
   console.log('\n📦 Fetching all buckets from old project...')
@@ -368,7 +410,6 @@ async function migrateBuckets() {
   if (bucketListError) throw new Error(`❌ Error fetching buckets: ${bucketListError.message}`)
   console.log(`✅ Found ${oldBuckets.length} buckets to migrate.`)
 
-  // Check for existing buckets in the target project
   const { data: existingBuckets, error: existingBucketsError } =
     await newSupabase.storage.listBuckets()
   if (existingBucketsError)
@@ -377,7 +418,6 @@ async function migrateBuckets() {
   const existingBucketNames = existingBuckets.map((b) => b.name)
   const conflictingBuckets = oldBuckets.filter((b) => existingBucketNames.includes(b.name))
 
-  // Default conflict strategy (2 = merge files)
   let conflictStrategy = 2
 
   if (conflictingBuckets.length > 0) {
@@ -404,15 +444,14 @@ async function migrateBuckets() {
     })
 
     if (conflictAnswer === '4') {
-      console.log('Migration canceled by user.')
-      return { canceled: true }
+      console.log('Migration cancelled by user.')
+      return { cancelled: true }
     }
 
-    // Store the conflict resolution strategy
     conflictStrategy = parseInt(conflictAnswer)
     if (isNaN(conflictStrategy) || conflictStrategy < 1 || conflictStrategy > 3) {
-      console.log('Invalid choice. Migration canceled.')
-      return { canceled: true }
+      console.log('Invalid choice. Migration cancelled.')
+      return { cancelled: true }
     }
   }
 
@@ -430,7 +469,6 @@ async function migrateBuckets() {
     const bucketName = bucket.name
     console.log(`\n📁 Processing bucket: ${bucketName}`)
 
-    // Handle bucket conflicts based on user choice
     let targetBucketName = bucketName
 
     if (existingBucketNames.includes(bucketName)) {
@@ -459,22 +497,15 @@ async function migrateBuckets() {
     console.log(`✅ Found ${files.length} files in bucket '${bucketName}'.`)
     migrationStats.totalFiles += files.length
 
-    // Split files into batches of 10 to limit parallel requests
     const batches = chunkArray(files, 10)
 
     for (let i = 0; i < batches.length; i++) {
-      const batch = batches[i]
-      console.log(`🚀 Processing batch ${i + 1}/${batches.length} (${batch.length} files)`)
+      console.log(`\n🚀 Processing batch ${i + 1}/${batches.length} (${batches[i].length} files)`)
 
-      // Process each batch in parallel, limiting concurrency
       const results = await Promise.all(
-        batch.map((file) => {
-          // Pass both source and target bucket names
-          return migrateFile(bucketName, targetBucketName, file)
-        })
+        batches[i].map((file) => migrateFile(bucketName, targetBucketName, file))
       )
 
-      // Update statistics
       const batchSuccesses = results.filter((r) => r.success).length
       const batchFailures = results.filter((r) => !r.success)
 
@@ -488,9 +519,9 @@ async function migrateBuckets() {
     }
 
     migrationStats.processedBuckets++
+    console.log(`✅ Completed bucket '${bucketName}' migration`)
   }
 
-  // Print summary
   console.log('\n📊 Migration Summary:')
   console.log(
     `Buckets: ${migrationStats.processedBuckets}/${migrationStats.totalBuckets} processed, ${migrationStats.skippedBuckets} skipped`
@@ -508,7 +539,6 @@ async function migrateBuckets() {
   return migrationStats
 }
 
-// Run migration and handle top-level errors
 migrateBuckets()
   .then((stats) => {
     if (stats.failedFiles > 0) {
