@@ -5,10 +5,12 @@ import { UseFormReturn } from 'react-hook-form'
 import { components } from 'api-types'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
+import { InstanceSpecs } from 'lib/constants'
 import { cn, FormField_Shadcn_, RadioGroupCard, RadioGroupCardItem, Skeleton } from 'ui'
 import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -22,7 +24,6 @@ import {
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { NoticeBar } from '../ui/NoticeBar'
-import { InstanceSpecs } from 'lib/constants'
 
 /**
  * to do: this could be a type from api-types
@@ -121,6 +122,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
             layout="horizontal"
             label={'Compute size'}
             id={field.name}
+            className="md:flex lg:grid gap-4 lg:gap-2"
             labelOptional={
               <>
                 <BillingChangeBadge
@@ -135,8 +137,16 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   free={showUpgradeBadge && form.watch('computeSize') === 'ci_micro' ? true : false}
                 />
                 <p className="text-foreground-lighter">
-                  Hardware resources allocated to your postgres database
+                  Hardware resources allocated to your Postgres database
                 </p>
+
+                <div className="mt-3">
+                  <DocsButton
+                    abbrev={false}
+                    href="https://supabase.com/docs/guides/platform/compute-and-disk"
+                  />
+                </div>
+
                 <NoticeBar
                   showIcon={false}
                   type="default"
@@ -186,7 +196,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                         lockedOption && 'opacity-50'
                       )}
                       disabled={disabled || lockedOption}
-                      // @ts-expect-error
                       label={
                         <>
                           {showUpgradeBadge && compute.identifier === 'ci_micro' && (

@@ -9,18 +9,19 @@ import { SupabaseGrid } from 'components/grid/SupabaseGrid'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DocsButton } from 'components/ui/DocsButton'
-import { sqlKeys } from 'data/sql/keys'
 import {
   Entity,
   isMaterializedView,
   isTableLike,
   isView,
 } from 'data/table-editor/table-editor-types'
+import { tableRowKeys } from 'data/table-rows/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
+import { TableRowsData } from 'data/table-rows/table-rows-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import useLatest from 'hooks/misc/useLatest'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -28,13 +29,12 @@ import type { Dictionary } from 'types'
 import GridHeaderActions from './GridHeaderActions'
 import { TableGridSkeletonLoader } from './LoadingState'
 import NotFoundState from './NotFoundState'
+import { convertByteaToHex } from './SidePanelEditor/RowEditor/RowEditor.utils'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
 
 export interface TableGridEditorProps {
-  /** Theme for the editor */
   theme?: 'dark' | 'light'
-
   isLoadingSelectedTable?: boolean
   selectedTable?: Entity
 }
@@ -61,20 +61,16 @@ const TableGridEditor = ({
     async onMutate({ projectRef, table, configuration, payload }) {
       const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
 
-      const queryKey = sqlKeys.query(projectRef, [
-        table.schema,
-        table.name,
-        { table: { name: table.name, schema: table.schema } },
-      ])
+      const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
 
       await queryClient.cancelQueries(queryKey)
 
-      const previousRowsQueries = queryClient.getQueriesData<{ result: any[] }>(queryKey)
+      const previousRowsQueries = queryClient.getQueriesData<TableRowsData>(queryKey)
 
-      queryClient.setQueriesData<{ result: any[] }>(queryKey, (old) => {
+      queryClient.setQueriesData<TableRowsData>(queryKey, (old) => {
         return {
-          result:
-            old?.result.map((row) => {
+          rows:
+            old?.rows.map((row) => {
               // match primary keys
               if (
                 Object.entries(row)
@@ -128,7 +124,7 @@ const TableGridEditor = ({
 
   const isViewSelected = isView(selectedTable) || isMaterializedView(selectedTable)
   const isTableSelected = isTableLike(selectedTable)
-  const isLocked = EXCLUDED_SCHEMAS.includes(selectedTable?.schema ?? '')
+  const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
   const canEditViaTableEditor = isTableSelected && !isLocked
 
   const gridTable = parseSupaTable(selectedTable)
@@ -175,9 +171,13 @@ const TableGridEditor = ({
 
     const identifiers = {} as Dictionary<any>
     isTableLike(selectedTable) &&
-      selectedTable.primary_keys.forEach(
-        (column) => (identifiers[column.name] = previousRow[column.name])
-      )
+      selectedTable.primary_keys.forEach((column) => {
+        const col = selectedTable.columns.find((c) => c.name === column.name)
+        identifiers[column.name] =
+          col?.format === 'bytea'
+            ? convertByteaToHex(previousRow[column.name])
+            : previousRow[column.name]
+      })
 
     const configuration = { identifiers }
     if (Object.keys(identifiers).length === 0) {

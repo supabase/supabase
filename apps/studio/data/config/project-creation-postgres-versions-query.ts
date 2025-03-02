@@ -31,7 +31,7 @@ export async function getPostgresCreationVersions(
   })
 
   if (error) handleError(error)
-  return data as ProjectCreationPostgresVersionsResponse
+  return data
 }
 
 export type ProjectCreationPostgresVersionData = Awaited<
@@ -59,4 +59,17 @@ export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationP
       ...options,
     }
   )
+}
+
+export const useAvailableOrioleImageVersion = ({
+  cloudProvider,
+  dbRegion,
+  organizationSlug,
+}: ProjectCreationPostgresVersionsVariables) => {
+  const { data } = useProjectCreationPostgresVersionsQuery({
+    cloudProvider,
+    dbRegion,
+    organizationSlug,
+  })
+  return (data?.available_versions ?? []).find((x) => x.postgres_engine === '17-oriole')
 }

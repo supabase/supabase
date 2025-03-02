@@ -230,8 +230,8 @@
     "tags": ["Utility"],
     "link": "/guides/database/extensions/pg_cron",
     "github_url": "https://github.com/citusdata/pg_cron",
-    "product": "Supabase Cron Jobs",
-    "product_url": "/project/{ref}/integrations/cron-jobs"
+    "product": "Supabase Cron",
+    "product_url": "/project/{ref}/integrations/cron"
   },
   {
     "name": "pg_freespacemap",
@@ -283,15 +283,6 @@
     "comment": "prewarm relation data",
     "tags": ["Admin", "Utility"],
     "link": "https://www.postgresql.org/docs/current/pgprewarm.html",
-    "github_url": null,
-    "product": null,
-    "product_url": null
-  },
-  {
-    "name": "pg_stat_monitor",
-    "comment": "The pg_stat_monitor is a PostgreSQL Query Performance Monitoring tool, based on PostgreSQL contrib module pg_stat_statements. pg_stat_monitor provides aggregated statistics, client information, plan details including plan, and histogram information.",
-    "tags": ["Utility"],
-    "link": "/guides/database/extensions/pg_stat_monitor",
     "github_url": null,
     "product": null,
     "product_url": null
@@ -487,7 +478,7 @@
     "name": "postgres_fdw",
     "comment": "foreign-data wrapper for remote PostgreSQL servers",
     "tags": ["Admin"],
-    "link": "https://www.postgresql.org/docs/current/postgres-fdw.html",
+    "link": "/guides/database/extensions/postgres_fdw",
     "github_url": null,
     "product": null,
     "product_url": null
@@ -598,6 +589,12 @@
     "github_url": "https://github.com/pgvector/pgvector",
     "product": "Supabase Vector",
     "product_url": null
+  },
+  {
+    "name": "pg_repack",
+    "comment": "Optimize physical storage and remove bloat from tables and indexes",
+    "tags": ["Admin", "Utility"],
+    "link": "/guides/database/extensions/pg_repack"
   },
   {
     "name": "wrappers",

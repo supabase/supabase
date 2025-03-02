@@ -2,6 +2,7 @@ import { ExternalLink } from 'lucide-react'
 
 import { EnumeratedTypes } from 'components/interfaces/Database'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import {
   ScaffoldContainer,
   ScaffoldSection,
@@ -17,7 +18,7 @@ const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer>
       <ScaffoldSection>
-        <ScaffoldSectionContent>
+        <ScaffoldSectionContent className="!col-span-12">
           <FormHeader
             className="!mb-0"
             title="Database Enumerated Types"
@@ -33,7 +34,9 @@ const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
 }
 
 DatabaseEnumeratedTypes.getLayout = (page) => (
-  <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
 )
 
 export default DatabaseEnumeratedTypes

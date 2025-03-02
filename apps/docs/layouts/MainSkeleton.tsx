@@ -30,6 +30,14 @@ const levelsData = {
     icon: 'database',
     name: 'Database',
   },
+  cron: {
+    icon: 'cron',
+    name: 'Cron',
+  },
+  queues: {
+    icon: 'queues',
+    name: 'Queues',
+  },
   api: {
     icon: 'rest',
     name: 'REST API',
@@ -45,6 +53,10 @@ const levelsData = {
   functions: {
     icon: 'edge-functions',
     name: 'Edge Functions',
+  },
+  telemetry: {
+    icon: 'telemetry',
+    name: 'Telemetry',
   },
   realtime: {
     icon: 'realtime',
@@ -69,6 +81,10 @@ const levelsData = {
   platform: {
     icon: 'platform',
     name: 'Platform',
+  },
+  contributing: {
+    icon: 'contributing',
+    name: 'Contributing',
   },
   resources: {
     icon: 'resources',
@@ -336,7 +352,7 @@ interface SkeletonProps extends PropsWithChildren {
   NavigationMenu?: ReactNode
   hideFooter?: boolean
   className?: string
-  additionalNavItems?: Partial<NavMenuSection>[]
+  additionalNavItems?: Record<string, Partial<NavMenuSection>[]>
 }
 
 function TopNavSkeleton({ children }) {
@@ -364,6 +380,8 @@ function SidebarSkeleton({
   const menuId = _menuId ?? getMenuId(pathname)
 
   const mobileMenuOpen = useMenuMobileOpen()
+
+  console.log('menuName', menuName, menuId)
 
   return (
     <div className={cn('flex flex-row h-full relative', className)}>

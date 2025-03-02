@@ -3,7 +3,7 @@
   "info": {
     "title": "Supabase Storage API",
     "description": "API documentation for Supabase Storage",
-    "version": "0.0.1"
+    "version": "0.0.0"
   },
   "components": {
     "schemas": {
@@ -37,12 +37,12 @@
     "/upload/resumable/": {
       "post": {
         "summary": "Handle POST request for TUS Resumable uploads",
-        "tags": ["object"],
+        "tags": ["resumable"],
         "responses": { "200": { "description": "Default Response" } }
       },
       "options": {
         "summary": "Handle OPTIONS request for TUS Resumable uploads",
-        "tags": ["object"],
+        "tags": ["resumable"],
         "description": "Handle OPTIONS request for TUS Resumable uploads",
         "responses": { "200": { "description": "Default Response" } }
       }
@@ -50,22 +50,68 @@
     "/upload/resumable/{wildcard}": {
       "post": {
         "summary": "Handle POST request for TUS Resumable uploads",
-        "tags": ["object"],
+        "tags": ["resumable"],
         "responses": { "200": { "description": "Default Response" } }
       },
       "put": {
         "summary": "Handle PUT request for TUS Resumable uploads",
-        "tags": ["object"],
+        "tags": ["resumable"],
         "responses": { "200": { "description": "Default Response" } }
       },
       "patch": {
         "summary": "Handle PATCH request for TUS Resumable uploads",
-        "tags": ["object"],
+        "tags": ["resumable"],
+        "responses": { "200": { "description": "Default Response" } }
+      },
+      "delete": {
+        "summary": "Handle DELETE request for TUS Resumable uploads",
+        "tags": ["resumable"],
         "responses": { "200": { "description": "Default Response" } }
       },
       "options": {
         "summary": "Handle OPTIONS request for TUS Resumable uploads",
-        "tags": ["object"],
+        "tags": ["resumable"],
+        "description": "Handle OPTIONS request for TUS Resumable uploads",
+        "responses": { "200": { "description": "Default Response" } }
+      }
+    },
+    "/upload/resumable/sign/": {
+      "post": {
+        "summary": "Handle POST request for TUS Resumable uploads",
+        "tags": ["resumable"],
+        "responses": { "200": { "description": "Default Response" } }
+      },
+      "options": {
+        "summary": "Handle OPTIONS request for TUS Resumable uploads",
+        "tags": ["resumable"],
+        "description": "Handle OPTIONS request for TUS Resumable uploads",
+        "responses": { "200": { "description": "Default Response" } }
+      }
+    },
+    "/upload/resumable/sign/{wildcard}": {
+      "post": {
+        "summary": "Handle POST request for TUS Resumable uploads",
+        "tags": ["resumable"],
+        "responses": { "200": { "description": "Default Response" } }
+      },
+      "put": {
+        "summary": "Handle PUT request for TUS Resumable uploads",
+        "tags": ["resumable"],
+        "responses": { "200": { "description": "Default Response" } }
+      },
+      "patch": {
+        "summary": "Handle PATCH request for TUS Resumable uploads",
+        "tags": ["resumable"],
+        "responses": { "200": { "description": "Default Response" } }
+      },
+      "delete": {
+        "summary": "Handle DELETE request for TUS Resumable uploads",
+        "tags": ["resumable"],
+        "responses": { "200": { "description": "Default Response" } }
+      },
+      "options": {
+        "summary": "Handle OPTIONS request for TUS Resumable uploads",
+        "tags": ["resumable"],
         "description": "Handle OPTIONS request for TUS Resumable uploads",
         "responses": { "200": { "description": "Default Response" } }
       }
@@ -486,8 +532,8 @@
       },
       "get": {
         "summary": "Get object",
-        "tags": ["deprecated"],
-        "description": "use GET /object/authenticated/{bucketName} instead",
+        "tags": ["object"],
+        "description": "Serve objects",
         "parameters": [
           {
             "schema": { "type": "string" },
@@ -501,13 +547,6 @@
             "example": "folder/cat.png",
             "in": "path",
             "name": "*",
-            "required": true
-          },
-          {
-            "schema": { "type": "string" },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
             "required": true
           }
         ],
@@ -692,6 +731,12 @@
                           { "type": "null" }
                         ]
                       },
+                      "user_metadata": {
+                        "anyOf": [
+                          { "type": "object", "additionalProperties": true },
+                          { "type": "null" }
+                        ]
+                      },
                       "buckets": {
                         "type": "object",
                         "properties": {
@@ -834,7 +879,8 @@
                       "examples": [
                         "/object/sign/upload/avatars/folder/cat.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2ZvbGRlci9jYXQucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.s7Gt8ME80iREVxPhH01ZNv8oUn4XtaWsmiQ5csiUHn4"
                       ]
-                    }
+                    },
+                    "token": { "type": "string" }
                   },
                   "required": ["url"]
                 }
@@ -1128,6 +1174,7 @@
                 "properties": {
                   "bucketId": { "type": "string", "examples": ["avatars"] },
                   "sourceKey": { "type": "string", "examples": ["folder/cat.png"] },
+                  "destinationBucket": { "type": "string", "examples": ["users"] },
                   "destinationKey": { "type": "string", "examples": ["folder/newcat.png"] }
                 },
                 "required": ["bucketId", "sourceKey", "destinationKey"]
@@ -1240,6 +1287,12 @@
                           { "type": "null" }
                         ]
                       },
+                      "user_metadata": {
+                        "anyOf": [
+                          { "type": "object", "additionalProperties": true },
+                          { "type": "null" }
+                        ]
+                      },
                       "buckets": {
                         "type": "object",
                         "properties": {
@@ -1343,8 +1396,8 @@
     "/object/info/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Retrieve object info",
-        "tags": ["deprecated"],
-        "description": "use HEAD /object/authenticated/{bucketName} instead",
+        "tags": ["object"],
+        "description": "Object Info",
         "parameters": [
           {
             "schema": { "type": "string" },
@@ -1358,13 +1411,6 @@
             "example": "folder/cat.png",
             "in": "path",
             "name": "*",
-            "required": true
-          },
-          {
-            "schema": { "type": "string" },
-            "example": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs",
-            "in": "header",
-            "name": "authorization",
             "required": true
           }
         ],
@@ -1388,9 +1434,18 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "sourceKey": { "type": "string", "examples": ["folder/source.png"] },
                   "bucketId": { "type": "string", "examples": ["avatars"] },
-                  "destinationKey": { "type": "string", "examples": ["folder/destination.png"] }
+                  "sourceKey": { "type": "string", "examples": ["folder/source.png"] },
+                  "destinationBucket": { "type": "string", "examples": ["users"] },
+                  "destinationKey": { "type": "string", "examples": ["folder/destination.png"] },
+                  "metadata": {
+                    "type": "object",
+                    "properties": {
+                      "cacheControl": { "type": "string" },
+                      "mimetype": { "type": "string" }
+                    }
+                  },
+                  "copyMetadata": { "type": "boolean", "examples": [true] }
                 },
                 "required": ["sourceKey", "bucketId", "destinationKey"]
               }
@@ -1416,7 +1471,59 @@
                   "description": "Successful response",
                   "type": "object",
                   "properties": {
-                    "Key": { "type": "string", "examples": ["folder/destination.png"] }
+                    "Id": { "type": "string" },
+                    "Key": { "type": "string", "examples": ["folder/destination.png"] },
+                    "name": { "type": "string" },
+                    "bucket_id": { "type": "string" },
+                    "owner": { "type": "string" },
+                    "owner_id": { "type": "string" },
+                    "version": { "type": "string" },
+                    "id": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+                    "updated_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+                    "created_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+                    "last_accessed_at": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
+                    "metadata": {
+                      "anyOf": [
+                        { "type": "object", "additionalProperties": true },
+                        { "type": "null" }
+                      ]
+                    },
+                    "user_metadata": {
+                      "anyOf": [
+                        { "type": "object", "additionalProperties": true },
+                        { "type": "null" }
+                      ]
+                    },
+                    "buckets": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "name": { "type": "string" },
+                        "owner": { "type": "string" },
+                        "public": { "type": "boolean" },
+                        "file_size_limit": { "type": ["null", "integer"] },
+                        "allowed_mime_types": {
+                          "type": ["null", "array"],
+                          "items": { "type": "string" }
+                        },
+                        "created_at": { "type": "string" },
+                        "updated_at": { "type": "string" }
+                      },
+                      "required": ["id", "name"],
+                      "additionalProperties": false,
+                      "examples": [
+                        {
+                          "id": "bucket2",
+                          "name": "bucket2",
+                          "public": false,
+                          "file_size_limit": 1000000,
+                          "allowed_mime_types": ["image/png", "image/jpeg"],
+                          "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
+                          "created_at": "2021-02-17T04:43:32.770206+00:00",
+                          "updated_at": "2021-02-17T04:43:32.770206+00:00"
+                        }
+                      ]
+                    }
                   },
                   "required": ["Key"]
                 }
@@ -1500,7 +1607,7 @@
     "/render/image/authenticated/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Render an authenticated image with the given transformations",
-        "tags": ["object"],
+        "tags": ["transformation"],
         "parameters": [
           {
             "schema": { "type": "integer", "minimum": 0 },
@@ -1571,7 +1678,7 @@
     "/render/image/sign/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Render an authenticated image with the given transformations",
-        "tags": ["object"],
+        "tags": ["transformation"],
         "parameters": [
           {
             "schema": { "type": "string" },
@@ -1617,7 +1724,7 @@
     "/render/image/public/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Render a public image with the given transformations",
-        "tags": ["object"],
+        "tags": ["transformation"],
         "parameters": [
           {
             "schema": { "type": "integer", "minimum": 0 },
@@ -1684,11 +1791,40 @@
           }
         }
       }
+    },
+    "/s3/{Bucket}/{wildcard}": {
+      "put": { "tags": ["s3"], "responses": { "200": { "description": "Default Response" } } },
+      "post": { "tags": ["s3"], "responses": { "200": { "description": "Default Response" } } },
+      "delete": { "tags": ["s3"], "responses": { "200": { "description": "Default Response" } } },
+      "get": { "tags": ["s3"], "responses": { "200": { "description": "Default Response" } } }
+    },
+    "/s3/{Bucket}": {
+      "delete": { "tags": ["s3"], "responses": { "200": { "description": "Default Response" } } },
+      "put": { "tags": ["s3"], "responses": { "200": { "description": "Default Response" } } },
+      "post": { "tags": ["s3"], "responses": { "200": { "description": "Default Response" } } },
+      "get": { "tags": ["s3"], "responses": { "200": { "description": "Default Response" } } }
+    },
+    "/s3/{Bucket}/": {
+      "delete": { "tags": ["s3"], "responses": { "200": { "description": "Default Response" } } },
+      "put": { "tags": ["s3"], "responses": { "200": { "description": "Default Response" } } },
+      "post": { "tags": ["s3"], "responses": { "200": { "description": "Default Response" } } },
+      "get": { "tags": ["s3"], "responses": { "200": { "description": "Default Response" } } }
+    },
+    "/s3/": {
+      "get": { "tags": ["s3"], "responses": { "200": { "description": "Default Response" } } }
+    },
+    "/health/": {
+      "get": {
+        "summary": "healthcheck",
+        "responses": { "200": { "description": "Default Response" } }
+      }
     }
   },
   "tags": [
     { "name": "object", "description": "Object end-points" },
     { "name": "bucket", "description": "Bucket end-points" },
-    { "name": "deprecated", "description": "Deprecated end-points" }
+    { "name": "s3", "description": "S3 end-points" },
+    { "name": "transformation", "description": "Image transformation" },
+    { "name": "resumable", "description": "Resumable Upload end-points" }
   ]
 }

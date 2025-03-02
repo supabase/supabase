@@ -222,10 +222,10 @@ export {
 } from './src/components/shadcn/ui/tabs'
 
 export {
-  TooltipProvider as TooltipProvider_Shadcn_,
-  Tooltip as Tooltip_Shadcn_,
-  TooltipTrigger as TooltipTrigger_Shadcn_,
-  TooltipContent as TooltipContent_Shadcn_,
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
 } from './src/components/shadcn/ui/tooltip'
 
 export {
@@ -250,6 +250,7 @@ export * from './src/components/radio-group-card'
 export * from './src/components/TreeView'
 
 export * from './src/components/shadcn/ui/chart'
+export * from './src/components/shadcn/ui/sidebar'
 
 // links
 

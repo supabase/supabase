@@ -132,7 +132,11 @@ const NotificationsPopoverV2 = () => {
           }
         />
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-[450px] overflow-hidden" side="bottom" align="end">
+      <PopoverContent_Shadcn_
+        className="p-0 w-screen md:w-[450px] overflow-hidden"
+        side="bottom"
+        align="end"
+      >
         <div className="px-4">
           <p className="pt-4 pb-1 text-sm">Notifications</p>
           <div className="flex items-center">

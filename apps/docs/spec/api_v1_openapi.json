@@ -88,6 +88,35 @@
         "security": [{ "bearer": [] }]
       }
     },
+    "/v1/branches/{branch_id}/push": {
+      "post": {
+        "operationId": "v1-push-a-branch",
+        "summary": "Pushes a database branch",
+        "description": "Pushes the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse" }
+              }
+            }
+          },
+          "500": { "description": "Failed to push database branch" }
+        },
+        "tags": ["Environments"],
+        "security": [{ "bearer": [] }]
+      }
+    },
     "/v1/branches/{branch_id}/reset": {
       "post": {
         "operationId": "v1-reset-a-branch",
@@ -107,7 +136,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BranchResetResponse" }
+                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse" }
               }
             }
           },
@@ -130,7 +159,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/V1ProjectResponse" }
+                  "items": { "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse" }
                 }
               }
             }
@@ -146,7 +175,9 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/V1CreateProjectBody" } }
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V1CreateProjectBodyDto" }
+            }
           }
         },
         "responses": {
@@ -192,7 +223,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/CreateOrganizationBodyV1" }
+              "schema": { "$ref": "#/components/schemas/CreateOrganizationV1Dto" }
             }
           }
         },
@@ -282,11 +313,48 @@
         "security": [{ "oauth2": ["write"] }]
       }
     },
+    "/v1/oauth/revoke": {
+      "post": {
+        "operationId": "v1-revoke-token",
+        "summary": "[Beta] Revoke oauth app authorization and it's corresponding tokens",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/OAuthRevokeTokenBodyDto" }
+            }
+          }
+        },
+        "responses": { "204": { "description": "" } },
+        "tags": ["OAuth"],
+        "security": [{ "oauth2": ["write"] }]
+      }
+    },
     "/v1/snippets": {
       "get": {
         "operationId": "v1-list-all-snippets",
         "summary": "Lists SQL snippets for the logged in user",
         "parameters": [
+          { "name": "cursor", "required": false, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string", "minimum": 1, "maximum": 100 }
+          },
+          {
+            "name": "sort_by",
+            "required": false,
+            "in": "query",
+            "schema": { "enum": ["name", "inserted_at"], "type": "string" }
+          },
+          {
+            "name": "sort_order",
+            "required": false,
+            "in": "query",
+            "schema": { "enum": ["asc", "desc"], "type": "string" }
+          },
           {
             "name": "project_ref",
             "required": false,
@@ -312,7 +380,12 @@
         "operationId": "v1-get-a-snippet",
         "summary": "Gets a specific SQL snippet",
         "parameters": [
-          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "format": "uuid", "type": "string" }
+          }
         ],
         "responses": {
           "200": {
@@ -338,7 +411,8 @@
             "in": "path",
             "description": "Project ref",
             "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
-          }
+          },
+          { "name": "reveal", "required": true, "in": "query", "schema": { "type": "boolean" } }
         ],
         "responses": {
           "200": {
@@ -366,7 +440,8 @@
             "in": "path",
             "description": "Project ref",
             "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
-          }
+          },
+          { "name": "reveal", "required": true, "in": "query", "schema": { "type": "boolean" } }
         ],
         "requestBody": {
           "required": true,
@@ -398,7 +473,8 @@
             "description": "Project ref",
             "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
           },
-          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } },
+          { "name": "reveal", "required": true, "in": "query", "schema": { "type": "boolean" } }
         ],
         "requestBody": {
           "required": true,
@@ -406,6 +482,31 @@
             "application/json": { "schema": { "$ref": "#/components/schemas/UpdateApiKeyBody" } }
           }
         },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
+            }
+          }
+        },
+        "tags": ["Secrets"],
+        "security": [{ "bearer": [] }]
+      },
+      "get": {
+        "operationId": "getApiKey",
+        "summary": "[Alpha] Get API key",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } },
+          { "name": "reveal", "required": true, "in": "query", "schema": { "type": "boolean" } }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -428,7 +529,8 @@
             "description": "Project ref",
             "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
           },
-          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } },
+          { "name": "reveal", "required": true, "in": "query", "schema": { "type": "boolean" } }
         ],
         "responses": {
           "200": {
@@ -940,7 +1042,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/V1ProjectResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse" }
+              }
             }
           },
           "500": { "description": "Failed to retrieve project" }
@@ -1540,6 +1644,7 @@
               }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to retrieve project's service health status" }
         },
         "tags": ["Projects"],
@@ -1938,6 +2043,113 @@
         "security": [{ "bearer": [] }]
       }
     },
+    "/v1/projects/{ref}/pause": {
+      "post": {
+        "operationId": "v1-pause-a-project",
+        "summary": "Pauses the given project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" }, "403": { "description": "" } },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/restore": {
+      "get": {
+        "operationId": "v1-list-available-restore-versions",
+        "summary": "Lists available restore versions for the given project",
+        "parameters": [
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetProjectAvailableRestoreVersionsResponse"
+                }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      },
+      "post": {
+        "operationId": "v1-restore-a-project",
+        "summary": "Restores the given project",
+        "parameters": [
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RestoreProjectBodyDto" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "" }, "403": { "description": "" } },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/restore/cancel": {
+      "post": {
+        "operationId": "v1-cancel-a-project-restoration",
+        "summary": "Cancels the given project restoration",
+        "parameters": [
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "" }, "403": { "description": "" } },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/analytics/endpoints/logs.all": {
+      "get": {
+        "operationId": "getLogs",
+        "summary": "Gets project's logs",
+        "parameters": [
+          {
+            "name": "iso_timestamp_end",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "iso_timestamp_start",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          { "name": "sql", "required": false, "in": "query", "schema": { "type": "string" } },
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1AnalyticsResponse" }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Analytics"],
+        "security": [{ "bearer": [] }]
+      }
+    },
     "/v1/projects/{ref}/database/query": {
       "post": {
         "operationId": "v1-run-a-query",
@@ -1991,11 +2203,67 @@
         "security": [{ "bearer": [] }]
       }
     },
+    "/v1/projects/{ref}/database/context": {
+      "get": {
+        "operationId": "getDatabaseMetadata",
+        "summary": "Gets database metadata for the given project.",
+        "description": "This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.",
+        "deprecated": true,
+        "parameters": [
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetProjectDbMetadataResponseDto" }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Database"],
+        "security": [{ "bearer": [] }]
+      }
+    },
     "/v1/projects/{ref}/functions": {
+      "get": {
+        "operationId": "v1-list-all-functions",
+        "summary": "List all functions",
+        "description": "Returns all functions you've previously added to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/FunctionResponse" }
+                }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to retrieve project's functions" }
+        },
+        "tags": ["Edge Functions"],
+        "security": [{ "bearer": [] }]
+      },
       "post": {
         "operationId": "v1-create-a-function",
         "summary": "Create a function",
-        "description": "Creates a function and adds it to the specified project.",
+        "description": "This endpoint is deprecated - use the deploy endpoint. Creates a function and adds it to the specified project.",
+        "deprecated": true,
         "parameters": [
           {
             "name": "ref",
@@ -2060,10 +2328,10 @@
         "tags": ["Edge Functions"],
         "security": [{ "bearer": [] }]
       },
-      "get": {
-        "operationId": "v1-list-all-functions",
-        "summary": "List all functions",
-        "description": "Returns all functions you've previously added to the specified project.",
+      "put": {
+        "operationId": "v1-bulk-update-functions",
+        "summary": "Bulk update functions",
+        "description": "Bulk update functions. It will create a new function or replace existing. The operation is idempotent. NOTE: You will need to manually bump the version.",
         "parameters": [
           {
             "name": "ref",
@@ -2073,20 +2341,78 @@
             "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/BulkUpdateFunctionBody" }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/FunctionResponse" }
-                }
+                "schema": { "$ref": "#/components/schemas/BulkUpdateFunctionResponse" }
               }
             }
           },
           "403": { "description": "" },
-          "500": { "description": "Failed to retrieve project's functions" }
+          "500": { "description": "Failed to update functions" }
+        },
+        "tags": ["Edge Functions"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/functions/deploy": {
+      "post": {
+        "operationId": "v1-deploy-a-function",
+        "summary": "Deploy a function",
+        "description": "A new endpoint to deploy functions. It will create if function does not exist.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          },
+          {
+            "name": "bundleOnly",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "boolean" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": { "$ref": "#/components/schemas/FunctionDeployBody" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DeployFunctionResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to deploy function" }
         },
         "tags": ["Edge Functions"],
         "security": [{ "bearer": [] }]
@@ -2576,54 +2902,59 @@
       "BranchDetailResponse": {
         "type": "object",
         "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "INACTIVE",
+              "ACTIVE_HEALTHY",
+              "ACTIVE_UNHEALTHY",
+              "COMING_UP",
+              "UNKNOWN",
+              "GOING_DOWN",
+              "INIT_FAILED",
+              "REMOVED",
+              "RESTORING",
+              "UPGRADING",
+              "PAUSING",
+              "RESTORE_FAILED",
+              "RESTARTING",
+              "PAUSE_FAILED",
+              "RESIZING"
+            ]
+          },
           "db_port": { "type": "integer" },
           "ref": { "type": "string" },
           "postgres_version": { "type": "string" },
           "postgres_engine": { "type": "string" },
           "release_channel": { "type": "string" },
-          "status": {
-            "enum": [
-              "ACTIVE_HEALTHY",
-              "ACTIVE_UNHEALTHY",
-              "COMING_UP",
-              "GOING_DOWN",
-              "INACTIVE",
-              "INIT_FAILED",
-              "REMOVED",
-              "RESTARTING",
-              "UNKNOWN",
-              "UPGRADING",
-              "PAUSING",
-              "RESTORING",
-              "RESTORE_FAILED",
-              "PAUSE_FAILED",
-              "RESIZING"
-            ],
-            "type": "string"
-          },
           "db_host": { "type": "string" },
           "db_user": { "type": "string" },
           "db_pass": { "type": "string" },
           "jwt_secret": { "type": "string" }
         },
         "required": [
+          "status",
           "db_port",
           "ref",
           "postgres_version",
           "postgres_engine",
           "release_channel",
-          "status",
           "db_host"
         ]
       },
       "UpdateBranchBody": {
         "type": "object",
         "properties": {
+          "reset_on_push": {
+            "type": "boolean",
+            "deprecated": true,
+            "description": "This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead."
+          },
           "branch_name": { "type": "string" },
           "git_branch": { "type": "string" },
-          "reset_on_push": { "type": "boolean" },
           "persistent": { "type": "boolean" },
           "status": {
+            "type": "string",
             "enum": [
               "CREATING_PROJECT",
               "RUNNING_MIGRATIONS",
@@ -2631,8 +2962,7 @@
               "MIGRATIONS_FAILED",
               "FUNCTIONS_DEPLOYED",
               "FUNCTIONS_FAILED"
-            ],
-            "type": "string"
+            ]
           }
         }
       },
@@ -2640,16 +2970,13 @@
         "type": "object",
         "properties": {
           "pr_number": { "type": "integer", "format": "int32" },
-          "latest_check_run_id": { "type": "integer", "format": "int64" },
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "project_ref": { "type": "string" },
-          "parent_project_ref": { "type": "string" },
-          "is_default": { "type": "boolean" },
-          "git_branch": { "type": "string" },
-          "reset_on_push": { "type": "boolean" },
-          "persistent": { "type": "boolean" },
+          "latest_check_run_id": {
+            "type": "number",
+            "deprecated": true,
+            "description": "This field is deprecated and will not be populated."
+          },
           "status": {
+            "type": "string",
             "enum": [
               "CREATING_PROJECT",
               "RUNNING_MIGRATIONS",
@@ -2657,21 +2984,26 @@
               "MIGRATIONS_FAILED",
               "FUNCTIONS_DEPLOYED",
               "FUNCTIONS_FAILED"
-            ],
-            "type": "string"
+            ]
           },
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "project_ref": { "type": "string" },
+          "parent_project_ref": { "type": "string" },
+          "is_default": { "type": "boolean" },
+          "git_branch": { "type": "string" },
+          "persistent": { "type": "boolean" },
           "created_at": { "type": "string" },
           "updated_at": { "type": "string" }
         },
         "required": [
+          "status",
           "id",
           "name",
           "project_ref",
           "parent_project_ref",
           "is_default",
-          "reset_on_push",
           "persistent",
-          "status",
           "created_at",
           "updated_at"
         ]
@@ -2681,7 +3013,7 @@
         "properties": { "message": { "type": "string" } },
         "required": ["message"]
       },
-      "BranchResetResponse": {
+      "BranchUpdateResponse": {
         "type": "object",
         "properties": { "workflow_run_id": { "type": "string" }, "message": { "type": "string" } },
         "required": ["workflow_run_id", "message"]
@@ -2696,7 +3028,7 @@
         },
         "required": ["host", "version", "postgres_engine", "release_channel"]
       },
-      "V1ProjectResponse": {
+      "V1ProjectWithDatabaseResponse": {
         "type": "object",
         "properties": {
           "id": { "type": "string", "description": "Id of your project" },
@@ -2712,72 +3044,45 @@
             "description": "Creation timestamp",
             "example": "2023-03-29T16:32:59Z"
           },
-          "database": { "$ref": "#/components/schemas/V1DatabaseResponse" },
           "status": {
+            "type": "string",
             "enum": [
+              "INACTIVE",
               "ACTIVE_HEALTHY",
               "ACTIVE_UNHEALTHY",
               "COMING_UP",
+              "UNKNOWN",
               "GOING_DOWN",
-              "INACTIVE",
               "INIT_FAILED",
               "REMOVED",
-              "RESTARTING",
-              "UNKNOWN",
+              "RESTORING",
               "UPGRADING",
               "PAUSING",
-              "RESTORING",
               "RESTORE_FAILED",
+              "RESTARTING",
               "PAUSE_FAILED",
               "RESIZING"
-            ],
-            "type": "string"
-          }
+            ]
+          },
+          "database": { "$ref": "#/components/schemas/V1DatabaseResponse" }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+        "required": ["id", "organization_id", "name", "region", "created_at", "status", "database"]
       },
-      "DesiredInstanceSize": {
-        "type": "string",
-        "enum": [
-          "micro",
-          "small",
-          "medium",
-          "large",
-          "xlarge",
-          "2xlarge",
-          "4xlarge",
-          "8xlarge",
-          "12xlarge",
-          "16xlarge"
-        ]
-      },
-      "ReleaseChannel": {
-        "type": "string",
-        "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
-      },
-      "PostgresEngine": {
-        "type": "string",
-        "description": "Postgres engine version. If not provided, the latest version will be used.",
-        "enum": ["15"]
-      },
-      "V1CreateProjectBody": {
+      "V1CreateProjectBodyDto": {
         "type": "object",
         "properties": {
           "db_pass": { "type": "string", "description": "Database password" },
-          "name": {
-            "type": "string",
-            "description": "Name of your project, should not contain dots"
-          },
+          "name": { "type": "string", "description": "Name of your project" },
           "organization_id": { "type": "string", "description": "Slug of your organization" },
           "plan": {
             "type": "string",
             "enum": ["free", "pro"],
-            "description": "Subscription Plan is now set on organization level and is ignored in this request",
-            "example": "free",
-            "deprecated": true
+            "deprecated": true,
+            "description": "Subscription Plan is now set on organization level and is ignored in this request"
           },
           "region": {
             "type": "string",
+            "description": "Region you want your server to reside in",
             "enum": [
               "us-east-1",
               "us-east-2",
@@ -2797,35 +3102,88 @@
               "ca-central-1",
               "ap-south-1",
               "sa-east-1"
-            ],
-            "description": "Region you want your server to reside in",
-            "example": "us-east-1"
+            ]
           },
           "kps_enabled": {
             "type": "boolean",
             "deprecated": true,
             "description": "This field is deprecated and is ignored in this request"
           },
-          "desired_instance_size": { "$ref": "#/components/schemas/DesiredInstanceSize" },
+          "desired_instance_size": {
+            "type": "string",
+            "enum": [
+              "micro",
+              "small",
+              "medium",
+              "large",
+              "xlarge",
+              "2xlarge",
+              "4xlarge",
+              "8xlarge",
+              "12xlarge",
+              "16xlarge"
+            ]
+          },
           "template_url": {
             "type": "string",
+            "format": "uri",
             "description": "Template URL used to create the project from the CLI.",
             "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
-          },
-          "release_channel": { "$ref": "#/components/schemas/ReleaseChannel" },
-          "postgres_engine": { "$ref": "#/components/schemas/PostgresEngine" }
+          }
         },
-        "required": ["db_pass", "name", "organization_id", "region"]
+        "required": ["db_pass", "name", "organization_id", "region"],
+        "additionalProperties": false,
+        "hideDefinitions": ["release_channel", "postgres_engine"]
+      },
+      "V1ProjectResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "Id of your project" },
+          "organization_id": { "type": "string", "description": "Slug of your organization" },
+          "name": { "type": "string", "description": "Name of your project" },
+          "region": {
+            "type": "string",
+            "description": "Region of your project",
+            "example": "us-east-1"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp",
+            "example": "2023-03-29T16:32:59Z"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "INACTIVE",
+              "ACTIVE_HEALTHY",
+              "ACTIVE_UNHEALTHY",
+              "COMING_UP",
+              "UNKNOWN",
+              "GOING_DOWN",
+              "INIT_FAILED",
+              "REMOVED",
+              "RESTORING",
+              "UPGRADING",
+              "PAUSING",
+              "RESTORE_FAILED",
+              "RESTARTING",
+              "PAUSE_FAILED",
+              "RESIZING"
+            ]
+          }
+        },
+        "required": ["id", "organization_id", "name", "region", "created_at", "status"]
       },
       "OrganizationResponseV1": {
         "type": "object",
         "properties": { "id": { "type": "string" }, "name": { "type": "string" } },
         "required": ["id", "name"]
       },
-      "CreateOrganizationBodyV1": {
+      "CreateOrganizationV1Dto": {
         "type": "object",
         "properties": { "name": { "type": "string" } },
-        "required": ["name"]
+        "required": ["name"],
+        "additionalProperties": false
       },
       "OAuthTokenBody": {
         "type": "object",
@@ -2849,6 +3207,16 @@
           "refresh_token": { "type": "string" }
         },
         "required": ["expires_in", "token_type", "access_token", "refresh_token"]
+      },
+      "OAuthRevokeTokenBodyDto": {
+        "type": "object",
+        "properties": {
+          "client_id": { "type": "string", "format": "uuid" },
+          "client_secret": { "type": "string" },
+          "refresh_token": { "type": "string" }
+        },
+        "required": ["client_id", "client_secret", "refresh_token"],
+        "additionalProperties": false
       },
       "SnippetProject": {
         "type": "object",
@@ -2875,7 +3243,7 @@
           "type": { "type": "string", "enum": ["sql"] },
           "visibility": { "type": "string", "enum": ["user", "project", "org", "public"] },
           "name": { "type": "string" },
-          "description": { "type": "string" },
+          "description": { "type": "string", "nullable": true },
           "project": { "$ref": "#/components/schemas/SnippetProject" },
           "owner": { "$ref": "#/components/schemas/SnippetUser" },
           "updated_by": { "$ref": "#/components/schemas/SnippetUser" }
@@ -2887,6 +3255,7 @@
           "type",
           "visibility",
           "name",
+          "description",
           "project",
           "owner",
           "updated_by"
@@ -2895,7 +3264,8 @@
       "SnippetList": {
         "type": "object",
         "properties": {
-          "data": { "type": "array", "items": { "$ref": "#/components/schemas/SnippetMeta" } }
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/SnippetMeta" } },
+          "cursor": { "type": "string" }
         },
         "required": ["data"]
       },
@@ -2917,7 +3287,7 @@
           "type": { "type": "string", "enum": ["sql"] },
           "visibility": { "enum": ["user", "project", "org", "public"], "type": "string" },
           "name": { "type": "string" },
-          "description": { "type": "string" },
+          "description": { "type": "string", "nullable": true },
           "project": { "$ref": "#/components/schemas/SnippetProject" },
           "owner": { "$ref": "#/components/schemas/SnippetUser" },
           "updated_by": { "$ref": "#/components/schemas/SnippetUser" },
@@ -2930,6 +3300,7 @@
           "type",
           "visibility",
           "name",
+          "description",
           "project",
           "owner",
           "updated_by",
@@ -2944,10 +3315,14 @@
       "ApiKeyResponse": {
         "type": "object",
         "properties": {
+          "type": {
+            "nullable": true,
+            "type": "string",
+            "enum": ["publishable", "secret", "legacy"]
+          },
           "name": { "type": "string" },
           "api_key": { "type": "string" },
           "id": { "type": "string", "nullable": true },
-          "type": { "nullable": true, "type": "object" },
           "prefix": { "type": "string", "nullable": true },
           "description": { "type": "string", "nullable": true },
           "hash": { "type": "string", "nullable": true },
@@ -2981,6 +3356,30 @@
             "allOf": [{ "$ref": "#/components/schemas/ApiKeySecretJWTTemplate" }]
           }
         }
+      },
+      "DesiredInstanceSize": {
+        "type": "string",
+        "enum": [
+          "micro",
+          "small",
+          "medium",
+          "large",
+          "xlarge",
+          "2xlarge",
+          "4xlarge",
+          "8xlarge",
+          "12xlarge",
+          "16xlarge"
+        ]
+      },
+      "ReleaseChannel": {
+        "type": "string",
+        "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+      },
+      "PostgresEngine": {
+        "type": "string",
+        "description": "Postgres engine version. If not provided, the latest version will be used.",
+        "enum": ["15", "17-oriole"]
       },
       "CreateBranchBody": {
         "type": "object",
@@ -3412,14 +3811,20 @@
         "properties": { "enabled": { "type": "boolean" } },
         "required": ["enabled"]
       },
+      "StorageFeatureS3Protocol": {
+        "type": "object",
+        "properties": { "enabled": { "type": "boolean" } },
+        "required": ["enabled"]
+      },
       "StorageFeatures": {
         "type": "object",
         "properties": {
           "imageTransformation": {
             "$ref": "#/components/schemas/StorageFeatureImageTransformation"
-          }
+          },
+          "s3Protocol": { "$ref": "#/components/schemas/StorageFeatureS3Protocol" }
         },
-        "required": ["imageTransformation"]
+        "required": ["imageTransformation", "s3Protocol"]
       },
       "StorageConfigResponse": {
         "type": "object",
@@ -3447,6 +3852,7 @@
           "effective_cache_size": { "type": "string" },
           "logical_decoding_work_mem": { "type": "string" },
           "maintenance_work_mem": { "type": "string" },
+          "track_activity_query_size": { "type": "string" },
           "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
           "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
           "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
@@ -3461,6 +3867,7 @@
           "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
           "shared_buffers": { "type": "string" },
           "statement_timeout": { "type": "string" },
+          "track_commit_timestamp": { "type": "boolean" },
           "wal_keep_size": { "type": "string" },
           "wal_sender_timeout": { "type": "string" },
           "work_mem": { "type": "string" },
@@ -3473,6 +3880,7 @@
           "effective_cache_size": { "type": "string" },
           "logical_decoding_work_mem": { "type": "string" },
           "maintenance_work_mem": { "type": "string" },
+          "track_activity_query_size": { "type": "string" },
           "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
           "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
           "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
@@ -3487,6 +3895,7 @@
           "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
           "shared_buffers": { "type": "string" },
           "statement_timeout": { "type": "string" },
+          "track_commit_timestamp": { "type": "boolean" },
           "wal_keep_size": { "type": "string" },
           "wal_sender_timeout": { "type": "string" },
           "work_mem": { "type": "string" },
@@ -3507,11 +3916,11 @@
       "SupavisorConfigResponse": {
         "type": "object",
         "properties": {
+          "database_type": { "type": "string", "enum": ["PRIMARY", "READ_REPLICA"] },
           "db_port": { "type": "integer" },
           "default_pool_size": { "type": "integer", "nullable": true },
           "max_client_conn": { "type": "integer", "nullable": true },
           "identifier": { "type": "string" },
-          "database_type": { "enum": ["PRIMARY", "READ_REPLICA"], "type": "string" },
           "is_using_scram_auth": { "type": "boolean" },
           "db_user": { "type": "string" },
           "db_host": { "type": "string" },
@@ -3520,11 +3929,11 @@
           "pool_mode": { "enum": ["transaction", "session"], "type": "string" }
         },
         "required": [
+          "database_type",
           "db_port",
           "default_pool_size",
           "max_client_conn",
           "identifier",
-          "database_type",
           "is_using_scram_auth",
           "db_user",
           "db_host",
@@ -4120,20 +4529,93 @@
         },
         "required": ["id", "type", "inserted_at", "updated_at"]
       },
+      "ProjectAvailableRestoreVersion": {
+        "type": "object",
+        "properties": {
+          "version": { "type": "string" },
+          "release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+          },
+          "postgres_engine": { "type": "string", "enum": ["13", "14", "15", "17", "17-oriole"] }
+        },
+        "required": ["version", "release_channel", "postgres_engine"]
+      },
+      "GetProjectAvailableRestoreVersionsResponse": {
+        "type": "object",
+        "properties": {
+          "available_versions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ProjectAvailableRestoreVersion" }
+          }
+        },
+        "required": ["available_versions"]
+      },
+      "RestoreProjectBodyDto": {
+        "type": "object",
+        "properties": {},
+        "hideDefinitions": ["release_channel", "postgres_engine"]
+      },
+      "V1AnalyticsResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "oneOf": [
+              {
+                "properties": {
+                  "code": { "type": "number" },
+                  "errors": {
+                    "type": "array",
+                    "items": {
+                      "properties": {
+                        "domain": { "type": "string" },
+                        "location": { "type": "string" },
+                        "locationType": { "type": "string" },
+                        "message": { "type": "string" },
+                        "reason": { "type": "string" }
+                      }
+                    }
+                  },
+                  "message": { "type": "string" },
+                  "status": { "type": "string" }
+                }
+              },
+              { "type": "string" }
+            ]
+          },
+          "result": { "type": "array", "items": { "type": "object" } }
+        }
+      },
       "V1RunQueryBody": {
         "type": "object",
         "properties": { "query": { "type": "string" } },
         "required": ["query"]
       },
-      "V1CreateFunctionBody": {
+      "GetProjectDbMetadataResponseDto": {
         "type": "object",
         "properties": {
-          "slug": { "type": "string", "pattern": "/^[A-Za-z0-9_-]+$/" },
-          "name": { "type": "string" },
-          "body": { "type": "string" },
-          "verify_jwt": { "type": "boolean" }
+          "databases": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "schemas": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": { "name": { "type": "string" } },
+                    "required": ["name"],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": ["name", "schemas"],
+              "additionalProperties": true
+            }
+          }
         },
-        "required": ["slug", "name", "body"]
+        "required": ["databases"]
       },
       "FunctionResponse": {
         "type": "object",
@@ -4151,6 +4633,78 @@
           "import_map_path": { "type": "string" }
         },
         "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
+      },
+      "V1CreateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "slug": { "type": "string", "pattern": "/^[A-Za-z0-9_-]+$/" },
+          "name": { "type": "string" },
+          "body": { "type": "string" },
+          "verify_jwt": { "type": "boolean" }
+        },
+        "required": ["slug", "name", "body"]
+      },
+      "BulkUpdateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "version": { "type": "integer" },
+          "created_at": { "type": "integer", "format": "int64" },
+          "id": { "type": "string" },
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "status": { "enum": ["ACTIVE", "REMOVED", "THROTTLED"], "type": "string" },
+          "verify_jwt": { "type": "boolean" },
+          "import_map": { "type": "boolean" },
+          "entrypoint_path": { "type": "string" },
+          "import_map_path": { "type": "string" }
+        },
+        "required": ["version", "id", "slug", "name", "status"]
+      },
+      "BulkUpdateFunctionResponse": {
+        "type": "object",
+        "properties": {
+          "functions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/FunctionResponse" }
+          }
+        },
+        "required": ["functions"]
+      },
+      "FunctionDeployMetadata": {
+        "type": "object",
+        "properties": {
+          "entrypoint_path": { "type": "string" },
+          "import_map_path": { "type": "string" },
+          "static_patterns": { "type": "array", "items": { "type": "string" } },
+          "verify_jwt": { "type": "boolean" },
+          "name": { "type": "string" }
+        },
+        "required": ["entrypoint_path"]
+      },
+      "FunctionDeployBody": {
+        "type": "object",
+        "properties": {
+          "file": { "type": "array", "items": { "type": "string", "format": "binary" } },
+          "metadata": { "$ref": "#/components/schemas/FunctionDeployMetadata" }
+        },
+        "required": ["file", "metadata"]
+      },
+      "DeployFunctionResponse": {
+        "type": "object",
+        "properties": {
+          "version": { "type": "integer" },
+          "created_at": { "type": "integer", "format": "int64" },
+          "updated_at": { "type": "integer", "format": "int64" },
+          "id": { "type": "string" },
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "status": { "enum": ["ACTIVE", "REMOVED", "THROTTLED"], "type": "string" },
+          "verify_jwt": { "type": "boolean" },
+          "import_map": { "type": "boolean" },
+          "entrypoint_path": { "type": "string" },
+          "import_map_path": { "type": "string" }
+        },
+        "required": ["version", "id", "slug", "name", "status"]
       },
       "FunctionSlugResponse": {
         "type": "object",

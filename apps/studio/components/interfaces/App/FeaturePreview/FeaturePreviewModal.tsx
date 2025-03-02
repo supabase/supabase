@@ -3,15 +3,19 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useParams } from 'common'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const FeaturePreviewModal = () => {
   const snap = useAppStateSnapshot()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
+  const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
   const enableFunctionsAssistant = useFlag('functionsAssistantV2')
 
   const selectedFeaturePreview =
@@ -21,6 +25,24 @@ const FeaturePreviewModal = () => {
   const isNotReleased =
     selectedFeatureKey === 'supabase-ui-functions-assistant' && !enableFunctionsAssistant
 
+  const { flags, onUpdateFlag } = featurePreviewContext
+  const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
+  const isSelectedFeatureEnabled = flags[selectedFeatureKey]
+
+  const toggleFeature = () => {
+    onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
+    sendEvent({
+      action: isSelectedFeatureEnabled ? 'feature_preview_disabled' : 'feature_preview_enabled',
+      properties: { feature: selectedFeatureKey },
+      groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
+  }
+
+  function handleCloseFeaturePreviewModal() {
+    snap.setShowFeaturePreviewModal(false)
+    snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
+  }
+
   // this modal can be triggered on other pages
   // Update local state when valtio state changes
   useEffect(() => {
@@ -29,23 +51,14 @@ const FeaturePreviewModal = () => {
     }
   }, [snap.selectedFeaturePreview])
 
-  const { flags, onUpdateFlag } = featurePreviewContext
-  const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
-  const isSelectedFeatureEnabled = flags[selectedFeatureKey]
-
-  const toggleFeature = () => {
-    onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
-    sendEvent({
-      category: 'ui_feature_previews',
-      action: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
-      label: selectedFeatureKey,
-    })
-  }
-
-  function handleCloseFeaturePreviewModal() {
-    snap.setShowFeaturePreviewModal(false)
-    snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
-  }
+  useEffect(() => {
+    if (snap.showFeaturePreviewModal) {
+      sendEvent({
+        action: 'feature_previews_clicked',
+        groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
+    }
+  }, [snap.showFeaturePreviewModal])
 
   return (
     <Modal

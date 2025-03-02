@@ -44,7 +44,10 @@ export const INFRA_ACTIVITY_METRICS: CategoryMeta[] = [
             name: 'Compute Add-Ons',
             url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
           },
-          { name: 'High CPU Usage', url: 'https://supabase.com/docs/guides/platform/exhaust-cpu' },
+          {
+            name: 'High CPU Usage',
+            url: 'https://supabase.com/docs/guides/troubleshooting/high-cpu-usage',
+          },
           {
             name: 'Metrics',
             url: 'https://supabase.com/docs/guides/platform/metrics',
@@ -58,14 +61,17 @@ export const INFRA_ACTIVITY_METRICS: CategoryMeta[] = [
         name: 'Memory',
         unit: 'percentage',
         description:
-          'Memory usage of your server.\nYou might observe elevated memory usage, even with little to no load. Besides Postgres, a wide range of services is running under the hood resulting in an elevated base memory usage.',
+          'Memory usage of your server.\nYou might observe elevated memory usage, even with little to no load. Besides Postgres, a wide range of services are running under the hood resulting in an elevated base memory usage.',
         chartDescription: '',
         links: [
           {
             name: 'Compute Add-Ons',
             url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
           },
-          { name: 'High RAM Usage', url: 'https://supabase.com/docs/guides/platform/exhaust-ram' },
+          {
+            name: 'High RAM Usage',
+            url: 'https://supabase.com/docs/guides/troubleshooting/exhaust-ram',
+          },
           {
             name: 'Metrics',
             url: 'https://supabase.com/docs/guides/platform/metrics',
@@ -84,8 +90,8 @@ export const INFRA_ACTIVITY_METRICS: CategoryMeta[] = [
             url: 'https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops',
           },
           {
-            name: 'Interpreting Disk IO budget',
-            url: 'https://supabase.com/docs/guides/platform/compute-add-ons#bursting-and-disk-io-budget',
+            name: 'High Disk I/O',
+            url: 'https://supabase.com/docs/guides/troubleshooting/exhaust-disk-io',
           },
           {
             name: 'Metrics',
@@ -93,7 +99,7 @@ export const INFRA_ACTIVITY_METRICS: CategoryMeta[] = [
           },
         ],
         description:
-          'The disk performance of your workload is determined by the Disk IO bandwidth.\nSmaller compute instances (below 4XL) can burst up to their largest throughput and IOPS for 30 minutes in a day. Beyond that, the performance reverts to the baseline. Your disk IO budget gets replenished throughout the day.',
+          'The disk performance of your workload is determined by the Disk IO bandwidth.\nSmaller compute instances (below 4XL) can burst above their baseline disk throughput and IOPS for short periods of time. Beyond that, the performance reverts to the baseline.',
         chartDescription: '',
       },
     ],

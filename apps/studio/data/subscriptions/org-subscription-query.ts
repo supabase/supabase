@@ -50,6 +50,7 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
     ({ signal }) => getOrgSubscription({ orgSlug }, signal),
     {
       enabled: enabled && canReadSubscriptions && typeof orgSlug !== 'undefined',
+      staleTime: 60 * 60 * 1000, // 60 minutes
       ...options,
     }
   )

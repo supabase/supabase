@@ -28,16 +28,16 @@ functions:
 
       ### OAuth and OTP link verification
 
-      [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification. 
+      [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification.
 
       **On Desktop platforms (JVM, MacOS\*, Linux, Windows)**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login. The success page can be customized via `AuthConfig#httpCallbackConfig` \
       \* If no deeplinks are being used.
 
-      *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`* 
+      *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
 
       **On Android, iOS & MacOS**, OAuth and OTP verification use deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you can use [Native Google Auth](/docs/guides/auth/social-login/auth-google?platform=android). \
       **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically. \
-      **tvOS & watchOS** currently have no default implementation. Feel free to create a PR. 
+      **tvOS & watchOS** currently have no default implementation. Feel free to create a PR.
 
       You always make your own implementation and use `auth.parseSessionFromFragment(fragment)` or `auth.parseSessionFromUrl(url)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing after receiving a callback.
       Then you can simply use `auth.importSession(session)`.
@@ -449,8 +449,8 @@ functions:
         code: |
           ```kotlin
           val city = City(name = "The Shire", countryId = 554)
-          val result = supabase.from("cities").insert(city) { 
-              select() 
+          val result = supabase.from("cities").insert(city) {
+              select()
           }.decodeSingle<City>()
           ```
       - id: bulk-create
@@ -487,15 +487,15 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("countries").update(
+          supabase.from("characters").update(
               {
-                 Country::name setTo "Australia"
+                 Country::name setTo "Han Solo"
                  //or
-                 set("name", "Australia")
+                 set("name", "Han Solo")
               }
           ) {
               filter {
-                  Country::id eq 1
+                  Character::id eq 1
                   //or
                   eq("id", 1)
               }
@@ -505,31 +505,31 @@ functions:
         name: Update a record and return it
         code: |
           ```kotlin
-          val newCountry = supabase.from("countries").update(
+          val newCharacter = supabase.from("characters").update(
               {
-                 Country::name setTo "Australia"
+                 Character::name setTo "Han Solo"
                  //or
-                 set("name", "Australia")
+                 set("name", "Han Solo")
               }
           ) {
               select()
               filter {
-                  Country::id eq 1
+                  Character::id eq 1
                   //or
                   eq("id", 1)
               }
-          }.decodeSingle<Country>()
+          }.decodeSingle<Character>()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Australia');
+              (1, 'Han');
             ```
         response: |
           ```json
@@ -537,7 +537,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Australia"
+                "name": "Han Solo"
               }
             ],
             "status": 200,
@@ -786,8 +786,8 @@ functions:
                      City::population lt 700000
                   }
                   or { //when either one of the filters are true
-                     City::name eq "London"
-                     City::name eq "Berlin"
+                     City::name eq "Hobbiton"
+                     City::name eq "Edoras"
                   }
               }
           }
@@ -842,15 +842,15 @@ functions:
           ```kotlin
           val columns = Columns.raw("""
               name,
-              cities!inner (
+              instruments!inner (
                   name
               )
           """.trimIndent())
-          supabase.from("countries").select(
+          supabase.from("orchestral_sections").select(
                 columns = columns
           ) {
               filter {
-                  eq("cities.name", "Bali")
+                  eq("instruments.name", "flute")
               }
           }
           ```
@@ -858,34 +858,34 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
           response: |
             ```json
             {
               "data": [
                 {
-                  "name": "Indonesia",
-                  "cities": [
+                  "name": "strings",
+                  "instruments": [
                     {
-                      "name": "Bali"
+                      "name": "flute"
                     }
                   ]
                 }
@@ -917,10 +917,10 @@ functions:
               filter {
                   or {
                       Country::id eq 2
-                      Country::name eq "Algeria"
+                      Country::name eq "Mordor"
                       //or
                       eq("id", 2)
-                      eq("name", "Algeria")
+                      eq("name", "Mordor")
                   }
               }
           }
@@ -935,7 +935,7 @@ functions:
                       Country::id gt 3
                       and {
                          Country::id eq 1
-                         Country::name eq "Afghanistan"
+                         Country::name eq "Mordor"
                       }
                   }
               }
@@ -1008,9 +1008,9 @@ functions:
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
               filter {
-                  City::name eq "San Francisco"
+                  City::name eq "Hobbiton"
                   //or
-                  eq("name", "San Francisco")
+                  eq("name", "Hobbiton")
               }
           }
           ```
@@ -1580,9 +1580,9 @@ functions:
           ```kotlin
           supabase.from("cities").select(columns = Columns.list("name")) {
               filter {
-                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
+                 City::name isIn listOf("Hobbiton", "Edoras")
                  //or
-                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+                 isIn("name", listOf("Hobbiton", "Edoras"))
               }
           }
           ```
@@ -1593,9 +1593,9 @@ functions:
           val toUpdate = City(name = "Mordor")
           supabase.from("cities").update(toUpdate) {
               filter {
-                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
+                 City::name isIn listOf("Hobbiton", "Edoras")
                  //or
-                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+                 isIn("name", listOf("Hobbiton", "Edoras"))
               }
           }
           ```
@@ -1605,9 +1605,9 @@ functions:
           ```kotlin
           supabase.from("cities").delete {
               filter {
-                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
+                 City::name isIn listOf("Hobbiton", "Edoras")
                  //or
-                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+                 isIn("name", listOf("Hobbiton", "Edoras"))
               }
           }
           ```
@@ -1617,9 +1617,9 @@ functions:
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
               filter {
-                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
+                 City::name isIn listOf("Hobbiton", "Edoras")
                  //or
-                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
+                 isIn("name", listOf("Hobbiton", "Edoras"))
               }
           }
           ```
@@ -2225,24 +2225,24 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.from("countries").select {
+          supabase.from("characters").select {
               filter {
-                 filter(column = "name", operator = FilterOperator.IN, value = "('Algeria', 'Japan')")
-              } 
+                 filter(column = "name", operator = FilterOperator.IN, value = "('Han', 'Katniss')")
+              }
           }
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -2250,7 +2250,7 @@ functions:
             "data": [
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Han"
               }
             ],
             "status": 200,
@@ -2265,15 +2265,15 @@ functions:
           ```kotlin
           val columns = Columns.raw("""
               name,
-              cities!inner (
+              instruments!inner (
                   name
               )
           """.trimIndent())
-          supabase.from("countries").select(
+          supabase.from("orchestral_sections").select(
              columns = columns
           ) {
               filter {
-                  filter(column = "cities.name", operator = FilterOperator.EQ, value = "Bali")
+                  filter(column = "instruments.name", operator = FilterOperator.EQ, value = "flute")
               }
           }
           ```
@@ -2281,34 +2281,34 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'flute'),
+              (2, 'violin');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 1, 'violin'),
+              (2, 2, 'flute');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Indonesia",
-                "cities": [
+                "name": "woodwinds",
+                "instruments": [
                   {
-                    "name": "Bali"
+                    "name": "flute"
                   }
                 ]
               }
@@ -2342,7 +2342,7 @@ functions:
         name: With `upsert()`
         code: |
           ```kotlin
-          val toUpsert = Country(id = 2, name = "Algeria")
+          val toUpsert = Country(id = 2, name = "Mordor")
           val count = supabase.from("countries").upsert(toUpsert) {
               select()
           }.decodeSingle<Country>()
@@ -2356,7 +2356,7 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'The Shire');
             ```
         response: |
           ```json
@@ -2364,7 +2364,7 @@ functions:
             "data": [
               {
                 "id": 2,
-                "name": "Algeria"
+                "name": "Mordor"
               }
             ],
             "status": 201,
@@ -2400,22 +2400,22 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.from("countries").select(columns = Columns.list("id", "name")) {
-             order(column = "id", order = Order.ASCENDING)
+          supabase.from("characters").select(columns = Columns.list("id", "name")) {
+             order(column = "id", order = Order.DESCENDING)
           }
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
@@ -2423,15 +2423,15 @@ functions:
             "data": [
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "Han"
               },
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "Leia"
               },
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "Luke"
               }
             ],
             "status": 200,
@@ -2446,57 +2446,57 @@ functions:
           ```kotlin
           val columns = Columns.raw("""
               name,
-              cities (
+              instruments (
                   name
               )
           """.trimIndent())
-          supabase.from("countries").select(
+          supabase.from("orchestral_sections").select(
               columns = columns
           ) {
-              order(column = "id", order = Order.ASCENDING, referencedTable = "cities")
+              order(column = "id", order = Order.DESCENDING, referencedTable = "instruments")
           }
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'United States'),
-              (2, 'Vanuatu');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
+              (1, 1, 'harp'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "United States",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "New York City"
+                    "name": "violin"
                   },
                   {
-                    "name": "Atlanta"
+                    "name": "harp"
                   }
                 ]
               },
               {
-                "name": "Vanuatu",
-                "cities": []
+                "name": "woodwinds",
+                "instruments": []
               }
             ],
             "status": 200,
@@ -2506,6 +2506,64 @@ functions:
         description: |
           Ordering on foreign tables doesn't affect the ordering of
           the parent table.
+        hideCodeBlock: true
+      - id: order-parent-table-by-a-referenced-table
+        name: Order parent table by a referenced table
+        code: |
+          ```kotlin
+          val columns = Columns.raw("""
+              name,
+              section:orchestral_sections(name)
+          """.trimIndent())
+          supabase.from("instruments").select(
+              columns = columns
+          ) {
+              order(column = "orchestral_sections(name)", order = Order.ASCENDING)
+          }
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              orchestral_sections (id int8 primary key, name text);
+            create table
+              instruments (
+                id int8 primary key,
+                section_id int8 not null references orchestral_sections,
+                name text
+              );
+
+            insert into
+              orchestral_sections (id, name)
+            values
+              (1, 'strings'),
+              (2, 'woodwinds');
+            insert into
+              instruments (id, section_id, name)
+            values
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "violin",
+                "section": { "name": "strings" }
+              },
+              {
+                "name": "flute",
+                "section": { "name": "woodwinds" }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Ordering with `referenced_table(col)` affects the ordering of the
+          parent table.
         hideCodeBlock: true
 
   - id: limit
@@ -2527,7 +2585,7 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.from("countries").select {
+          supabase.from("characters").select {
               limit(count = 1)
           }
           ```
@@ -2535,21 +2593,21 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Luke"
               }
             ],
             "status": 200,
@@ -2564,47 +2622,47 @@ functions:
           ```kotlin
           val columns = Columns.raw("""
               name,
-              cities (
+              instruments (
                   name
               )
           """)
-          supabase.from("countries").select(
+          supabase.from("orchestral_sections").select(
               columns = columns
           ) {
-              limit(count = 1, referencedTable = "cities")
+              limit(count = 1, referencedTable = "instruments")
           }
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'United States');
+              (1, 'strings');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
+              (1, 1, 'harp'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "United States",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "Atlanta"
+                    "name": "harp"
                   }
                 ]
               }
@@ -2636,7 +2694,7 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.from("countries").select {
+          supabase.from("characters").select {
               range(1L..5L)
           }
           ```
@@ -2644,24 +2702,24 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "Luke"
               },
               {
-                "name": "Albania"
+                "name": "Leia"
               }
             ],
             "status": 200,
@@ -2678,7 +2736,7 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          val result = supabase.from("countries").select(Columns.list("name")) {
+          val result = supabase.from("characters").select(Columns.list("name")) {
               limit(1)
               single()
           }
@@ -2687,20 +2745,20 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
             "data": {
-              "name": "Afghanistan"
+              "name": "Luke"
             },
             "status": 200,
             "statusText": "OK"
@@ -2717,7 +2775,7 @@ functions:
         name: Return data as CSV
         code: |
           ```kotlin
-          val (csvData, _) = supabase.from("countries").select {
+          val (csvData, _) = supabase.from("characters").select {
               csv()
           }
           ```
@@ -2725,19 +2783,19 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```json
           {
-            "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
+            "data": "id,name\n1,Luke\n2,Leia\n3,Han",
             "status": 200,
             "statusText": "OK"
           }
@@ -2788,7 +2846,7 @@ functions:
         name: Get the execution plan
         code: |
           ```kotlin
-          val result = supabase.from("countries").select {
+          val result = supabase.from("characters").select {
               explain()
           }
           ```
@@ -2796,20 +2854,20 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
             ```
         response: |
           ```
           Aggregate  (cost=33.34..33.36 rows=1 width=112)
             ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
-                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+                  ->  Seq Scan on characters  (cost=0.00..22.00 rows=1200 width=40)
           ```
         description: |
           By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
@@ -2825,7 +2883,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val supabase = createSupabaseClient(supabaseURL = "https://xyzcompany.supabase.co'", supabaseKey = "public-anon-key") { ... }
+          val supabase = createSupabaseClient(supabaseUrl = "https://xyzcompany.supabase.co'", supabaseKey = "public-anon-key") { ... }
           val auth = supabase.auth
           ```
   - id: sign-up
@@ -3293,7 +3351,7 @@ functions:
     title: 'Verify OTPs'
     $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
     notes: |
-      - Verifying an OTP is done through either `verifyPhoneOtp` or `verifyEmailOtp`.     
+      - Verifying an OTP is done through either `verifyPhoneOtp` or `verifyEmailOtp`.
       - The verification type used should be determined based on the corresponding auth method called before using `verifyPhoneOtp`/`verifyEmailOtp` to sign up / sign-in a user.
     params:
       - name: type
@@ -3812,7 +3870,7 @@ functions:
         code: |
           ```kotlin
           val factor = supabase.auth.mfa.enroll(factorType = FactorType.Phone, friendlyName = "Your friendly Name") {
-                phone = "+123456789" 
+                phone = "+123456789"
           }
 
           // Use the id to create a challenge and send an SMS with a code to the user.
@@ -4585,8 +4643,6 @@ functions:
           }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe(blockUntilSubscribed = true)
-
-          channel.broadcast(event = "message", Message("I joined!", "John"))
           ```
       - id: listen-to-presence-updates
         name: Listen to presence updates
@@ -4600,7 +4656,7 @@ functions:
           }
 
           //if you want more control and want to receive the raw data, use the `presenceChangeFlow` method
-          val presenceFlow = channel.presenceDataFlow<PresenceState>() 
+          val presenceFlow = channel.presenceDataFlow<PresenceState>()
 
           //Collect the flow
           presenceFlow.onEach {
@@ -4772,7 +4828,41 @@ functions:
           You have two methods you can use if you want to listen for updates on a specific database row:
           - `postgresSingleDataFlow` fetches the initial data matching the filter and then emits updates based on realtime events.
           - `postgresChangeFlow` emits the raw data received by realtime. To filter the realtime queries, use the `filter` method.
-
+  - id: broadcast-message
+    title: broadcastMessage()
+    description: |
+      Broadcast a message to all connected clients to a channel.
+    notes: |
+      - When using REST you don't need to subscribe to the channel
+    $ref: '@supabase/realtime-js.RealtimeChannel.send'
+    examples:
+      - id: send-a-message
+        name: Send a message via websocket
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val channel = supabase.channel("room1")
+          channel.subscribe(blockUntilSubscribed = true)
+          channel.broadcast("cursor-pos", message = buildJsonObject {
+            put("x", 10)
+            put("y", 20)
+          })
+          ```
+        response: |
+          ```
+          ok | timed out | error
+          ```
+      - id: send-a-message-via-rest
+        name: Send a message via REST
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val channel = supabase.channel("room1")
+          channel.broadcast("cursor-pos", message = buildJsonObject {
+            put("x", 10)
+            put("y", 20)
+          })
+          ```
   - id: remove-channel
     description: |
       Unsubscribes and removes Realtime channel from Realtime client.

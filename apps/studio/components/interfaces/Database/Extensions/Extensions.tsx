@@ -57,11 +57,11 @@ const Extensions = () => {
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <Input
-            size="small"
+            size="tiny"
             placeholder="Search for an extension"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
-            className="w-64"
+            className="w-52"
             icon={<Search size={14} />}
           />
           <DocsButton href="https://supabase.com/docs/guides/database/extensions" />

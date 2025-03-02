@@ -3,13 +3,13 @@ import { toast } from 'sonner'
 
 import { Query } from 'components/grid/query/Query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
 import type { ResponseError } from 'types'
+import { tableRowKeys } from './keys'
 
 export type TableRowTruncateVariables = {
   projectRef: string
   connectionString?: string
-  table: { name: string; schema?: string }
+  table: { id: number; name: string; schema?: string }
 }
 
 export function getTableRowTruncateSql({ table }: Pick<TableRowTruncateVariables, 'table'>) {
@@ -51,7 +51,7 @@ export const useTableRowTruncateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef, table } = variables
-        await queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name]))
+        await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

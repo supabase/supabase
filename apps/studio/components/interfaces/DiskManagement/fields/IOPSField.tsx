@@ -15,7 +15,6 @@ import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import { ComputeSizeRecommendationSection } from '../ui/ComputeSizeRecommendationSection'
 import {
   COMPUTE_BASELINE_IOPS,
-  DISK_LIMITS,
   DiskType,
   RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
 } from '../ui/DiskManagement.constants'

@@ -20,9 +20,9 @@ import {
   Badge,
   Button,
   Input,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
@@ -55,11 +55,14 @@ const InfrastructureInfo = () => {
   const { current_app_version, current_app_version_release_channel, latest_app_version } =
     data || {}
   const isOnLatestVersion = current_app_version === latest_app_version
-  const currentPgVersion = (current_app_version ?? '').split('supabase-postgres-')[1]
+  const currentPgVersion = (current_app_version ?? '')
+    .split('supabase-postgres-')[1]
+    ?.replace('-orioledb', '')
   const isOnNonGenerallyAvailableReleaseChannel =
     current_app_version_release_channel && current_app_version_release_channel !== 'ga'
       ? current_app_version_release_channel
       : undefined
+  const isOrioleDb = (current_app_version ?? '').includes('orioledb')
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const isInactive = project?.status === 'INACTIVE'
@@ -131,30 +134,44 @@ const InfrastructureInfo = () => {
                           label="Postgres version"
                           actions={[
                             isOnNonGenerallyAvailableReleaseChannel && (
-                              <Tooltip_Shadcn_>
-                                <TooltipTrigger_Shadcn_>
+                              <Tooltip>
+                                <TooltipTrigger>
                                   <Badge variant="warning" className="mr-1 capitalize">
                                     {isOnNonGenerallyAvailableReleaseChannel}
                                   </Badge>
-                                </TooltipTrigger_Shadcn_>
-                                <TooltipContent_Shadcn_ side="bottom" className="w-44 text-center">
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="w-44 text-center">
                                   This project uses a {isOnNonGenerallyAvailableReleaseChannel}{' '}
                                   database version release
-                                </TooltipContent_Shadcn_>
-                              </Tooltip_Shadcn_>
+                                </TooltipContent>
+                              </Tooltip>
+                            ),
+                            isOrioleDb && (
+                              <>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Badge variant="default" className="mr-1">
+                                      OrioleDB
+                                    </Badge>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom" className="w-44 text-center">
+                                    This project uses OrioleDB
+                                  </TooltipContent>
+                                </Tooltip>
+                              </>
                             ),
                             isOnLatestVersion && (
-                              <Tooltip_Shadcn_>
-                                <TooltipTrigger_Shadcn_>
+                              <Tooltip>
+                                <TooltipTrigger>
                                   <Badge variant="brand" className="mr-1">
                                     Latest
                                   </Badge>
-                                </TooltipTrigger_Shadcn_>
-                                <TooltipContent_Shadcn_ side="bottom" className="w-52 text-center">
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="w-52 text-center">
                                   Project is on the latest version of Postgres that Supabase
                                   supports
-                                </TooltipContent_Shadcn_>
-                              </Tooltip_Shadcn_>
+                                </TooltipContent>
+                              </Tooltip>
                             ),
                           ]}
                         />

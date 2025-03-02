@@ -9,6 +9,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import InfoTooltip from '~/features/ui/InfoTooltip'
 
 // Common components
 import { CH } from '@code-hike/mdx/components'
@@ -48,6 +49,7 @@ import ProjectSetup from './MDX/project_setup.mdx'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
+import PostgresInstallation from './MDX/postgres_installation.mdx'
 
 // Icons
 import {
@@ -153,6 +155,7 @@ const components = {
   OAuthPkceFlow,
   Options,
   Param,
+  InfoTooltip,
   ProjectConfigVariables,
   ProjectSetup,
   QuickstartIntro,
@@ -162,6 +165,7 @@ const components = {
   SharedData,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
+  PostgresInstallation,
   SqlToRest,
   StepHikeCompact,
   table: Table,

@@ -75,7 +75,7 @@ const SOC2 = () => {
             {isSuccess && (
               <div className="flex items-center justify-center h-full">
                 {currentPlan?.id === 'free' || currentPlan?.id === 'pro' ? (
-                  <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                  <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=soc2`}>
                     <Button type="default">Upgrade to Team</Button>
                   </Link>
                 ) : (

@@ -29,7 +29,7 @@ npx nuxi init nuxt-user-management
 cd nuxt-user-management
 ```
 
-Then let's install the only additional dependency: [NuxtSupabase](https://supabase.nuxtjs.org/). We only need to import NuxtSupabase as a dev dependency.
+Then let's install the only additional dependency: [Nuxt Supabase](https://supabase.nuxtjs.org/). We only need to import Nuxt Supabase as a dev dependency.
 
 ```bash
 npm install @nuxtjs/supabase --save-dev
@@ -44,7 +44,7 @@ SUPABASE_KEY="YOUR_SUPABASE_ANON_KEY"
 ```
 
 These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
-Amazing thing about [NuxtSupabase](https://supabase.nuxtjs.org/) is that setting environment variables is all we need to do in order to start using Supabase.
+Amazing thing about [Nuxt Supabase](https://supabase.nuxtjs.org/) is that setting environment variables is all we need to do in order to start using Supabase.
 No need to initialize Supabase. The library will take care of it automatically.
 
 ### App styling (optional)
@@ -110,7 +110,7 @@ const handleLogin = async () => {
 
 ### User state
 
-To access the user information, use the composable [useSupabaseUser](https://supabase.nuxtjs.org/usage/composables/usesupabaseuser) provided by the Supabase Nuxt module.
+To access the user information, use the composable [`useSupabaseUser`](https://supabase.nuxtjs.org/usage/composables/usesupabaseuser) provided by the Supabase Nuxt module.
 
 ### Account component
 

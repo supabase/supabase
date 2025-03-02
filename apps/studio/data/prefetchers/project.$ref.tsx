@@ -1,11 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ComponentProps, PropsWithChildren, useCallback } from 'react'
+import { PropsWithChildren, useCallback } from 'react'
 
 import { prefetchProjectLogRequestsCount } from 'data/analytics/project-log-requests-count-query'
 import { prefetchProjectLogStats } from 'data/analytics/project-log-stats-query'
 import { prefetchProjectDetail } from 'data/projects/project-detail-query'
+import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
 
 export function usePrefetchProjectIndexPage() {
   const router = useRouter()
@@ -40,11 +40,9 @@ export function usePrefetchProjectIndexPage() {
   )
 }
 
-type LinkProps = ComponentProps<typeof Link>
-
-interface ProjectIndexPageLinkProps extends Omit<LinkProps, 'href'> {
+interface ProjectIndexPageLinkProps extends Omit<PrefetchableLinkProps, 'href' | 'prefetcher'> {
   projectRef?: string
-  href?: LinkProps['href']
+  href?: PrefetchableLinkProps['href']
 }
 
 export function ProjectIndexPageLink({
@@ -56,12 +54,12 @@ export function ProjectIndexPageLink({
   const prefetch = usePrefetchProjectIndexPage()
 
   return (
-    <Link
+    <PrefetchableLink
       href={href || `/project/${projectRef}`}
-      onMouseEnter={() => prefetch({ projectRef })}
+      prefetcher={() => prefetch({ projectRef })}
       {...props}
     >
       {children}
-    </Link>
+    </PrefetchableLink>
   )
 }

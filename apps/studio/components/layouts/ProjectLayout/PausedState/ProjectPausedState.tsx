@@ -25,7 +25,7 @@ import { setProjectStatus } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useFlag, usePHFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
@@ -75,6 +75,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const selectedOrganization = useSelectedOrganization()
   const enforceNinetyDayUnpauseExpiry = useFlag('enforceNinetyDayUnpauseExpiry')
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
+  const enableProBenefitWording = usePHFlag('proBenefitWording')
 
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
@@ -107,6 +108,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { data: availablePostgresVersions } = useProjectUnpausePostgresVersionsQuery({
     projectRef: project?.ref,
   })
+  const availableVersions = availablePostgresVersions?.available_versions || []
 
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
@@ -173,8 +175,8 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   return (
     <>
       <div className="space-y-4">
-        <div className="w-full mx-auto mb-16 max-w-7xl">
-          <div className="mx-6 flex h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-8">
+        <div className="w-full mx-auto mb-8 md:mb-16 max-w-7xl">
+          <div className="mx-6 flex md:h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-4 md:p-8">
             <div className="grid w-[550px] gap-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
                 <PauseCircle className="text-foreground-light" size={50} strokeWidth={1.5} />
@@ -215,7 +217,9 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                         ) : isFreePlan ? (
                           <>
                             <p className="text-sm text-foreground-light text-center">
-                              To prevent future pauses, consider upgrading to Pro.
+                              {enableProBenefitWording === 'variant-a'
+                                ? 'Upgrade to Pro plan to prevent future pauses and use Pro features like branching, compute upgrades, and daily backups.'
+                                : 'To prevent future pauses, consider upgrading to Pro.'}
                             </p>
                             <Alert_Shadcn_>
                               <AlertTitle_Shadcn_>
@@ -286,7 +290,9 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   </ButtonTooltip>
                   {isFreePlan ? (
                     <Button asChild type="primary">
-                      <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`}>
+                      <Link
+                        href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=projectPausedStateRestore`}
+                      >
                         Upgrade to Pro
                       </Link>
                     </Button>
@@ -322,33 +328,49 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     render={({ field }) => (
                       <FormItemLayout label="Select the version of Postgres to restore to">
                         <FormControl_Shadcn_>
-                          <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger_Shadcn_>
+                          <Select_Shadcn_
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={availableVersions.length <= 1}
+                          >
+                            <SelectTrigger_Shadcn_ className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
                               <SelectValue_Shadcn_ placeholder="Select a Postgres version" />
                             </SelectTrigger_Shadcn_>
                             <SelectContent_Shadcn_>
                               <SelectGroup_Shadcn_>
-                                {(availablePostgresVersions?.available_versions || [])?.map(
-                                  (value) => {
-                                    const postgresVersion =
-                                      value.version.split('supabase-postgres-')[1]
-                                    return (
-                                      <SelectItem_Shadcn_
-                                        key={formatValue(value)}
-                                        value={formatValue(value)}
-                                      >
-                                        <div className="flex items-center gap-3">
-                                          <span className="text-foreground">{postgresVersion}</span>
+                                {availableVersions.map((value) => {
+                                  const postgresVersion = value.version
+                                    .split('supabase-postgres-')[1]
+                                    ?.replace('-orioledb', '')
+                                  return (
+                                    <SelectItem_Shadcn_
+                                      key={formatValue(value)}
+                                      value={formatValue(value)}
+                                      className="w-full [&>:nth-child(2)]:w-full"
+                                    >
+                                      <div className="flex flex-row items-center justify-between w-full">
+                                        <span className="text-foreground">{postgresVersion}</span>
+                                        <div>
                                           {value.release_channel !== 'ga' && (
                                             <Badge variant="warning" className="mr-1 capitalize">
                                               {value.release_channel}
                                             </Badge>
                                           )}
+                                          {value.postgres_engine.includes('oriole-preview') && (
+                                            <span>
+                                              <Badge variant="warning" className="mr-1">
+                                                OrioleDB
+                                              </Badge>
+                                              <Badge variant="warning" className="mr-1">
+                                                Preview
+                                              </Badge>
+                                            </span>
+                                          )}
                                         </div>
-                                      </SelectItem_Shadcn_>
-                                    )
-                                  }
-                                )}
+                                      </div>
+                                    </SelectItem_Shadcn_>
+                                  )
+                                })}
                               </SelectGroup_Shadcn_>
                             </SelectContent_Shadcn_>
                           </Select_Shadcn_>

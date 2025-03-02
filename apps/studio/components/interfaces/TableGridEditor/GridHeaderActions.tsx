@@ -1,11 +1,10 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { useTrackedState } from 'components/grid/store/Store'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -15,6 +14,7 @@ import { useDatabasePoliciesQuery } from 'data/database-policies/database-polici
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import {
   Entity,
   isTableLike,
@@ -25,20 +25,22 @@ import {
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
+import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export interface GridHeaderActionsProps {
   table: Entity
@@ -48,6 +50,7 @@ export interface GridHeaderActionsProps {
 const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
 
   // need project lints to get security status for views
   const { data: lints = [] } = useProjectLintsQuery({
@@ -60,7 +63,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const isMaterializedView = isTableLikeMaterializedView(table)
 
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
-  const isLocked = EXCLUDED_SCHEMAS.includes(table.schema)
+  const isLocked = PROTECTED_SCHEMAS.includes(table.schema)
 
   const { mutate: updateTable } = useTableUpdateMutation({
     onError: (error) => {
@@ -71,10 +74,10 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
     },
   })
 
-  const [showEnableRealtime, setShowEnableRealtime] = useState(false)
   const [open, setOpen] = useState(false)
+  const [showEnableRealtime, setShowEnableRealtime] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
-
+  const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
   const state = useTrackedState()
   const { selectedRows } = state
   const showHeaderActions = selectedRows.size === 0
@@ -131,6 +134,8 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
       table.schema
     )
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const toggleRealtime = async () => {
     if (!project) return console.error('Project is required')
     if (!realtimePublication) return console.error('Unable to find realtime publication')
@@ -143,6 +148,18 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
       : realtimeEnabledTables
           .filter((x: any) => x.id != table.id)
           .map((x: any) => `${x.schema}.${x.name}`)
+
+    sendEvent({
+      action: 'realtime_toggle_table_clicked',
+      properties: {
+        newState: exists ? 'disabled' : 'enabled',
+        origin: 'tableGridHeader',
+      },
+      groups: {
+        project: project?.ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
+    })
 
     updatePublications({
       projectRef: project?.ref,
@@ -175,18 +192,18 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
       {showHeaderActions && (
         <div className="flex items-center gap-x-2">
           {isReadOnly && (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <div className="border border-strong rounded bg-overlay-hover px-3 py-1 text-xs">
                   Viewing as read-only
                 </div>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom">
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
                 You need additional permissions to manage your project's data
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+              </TooltipContent>
+            </Tooltip>
           )}
-          {isTable ? (
+          {isTable && !isLocked ? (
             table.rls_enabled ? (
               <>
                 {policies.length < 1 && !isLocked ? (
@@ -300,7 +317,15 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                     APIs.
                   </p>
 
-                  <div className="mt-2">
+                  <div className="mt-2 flex items-center gap-2">
+                    <Button
+                      type="secondary"
+                      onClick={() => {
+                        setIsAutofixViewSecurityModalOpen(true)
+                      }}
+                    >
+                      Autofix
+                    </Button>
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
@@ -372,7 +397,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
-                        href="https://github.com/orgs/supabase/discussions/21647"
+                        href="https://supabase.com/docs/guides/database/extensions/wrappers/overview#security"
                       >
                         Learn more
                       </Link>
@@ -425,6 +450,13 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           )}
         </div>
       </ConfirmationModal>
+
+      <ViewEntityAutofixSecurityModal
+        table={table}
+        isAutofixViewSecurityModalOpen={isAutofixViewSecurityModalOpen}
+        setIsAutofixViewSecurityModalOpen={setIsAutofixViewSecurityModalOpen}
+      />
+
       {isTable && (
         <ConfirmModal
           danger={table.rls_enabled}

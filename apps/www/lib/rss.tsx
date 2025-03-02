@@ -25,7 +25,7 @@ const generateRssItem = (post: any): string => {
   const formattedDate = dayjs(post.date)
     .utcOffset(0, true)
     .startOf('day')
-    .format('ddd, DD MMM YYYY HH:mm:ss [-7 GMT]')
+    .format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
 
   return `<item>
   <guid>https://supabase.com${encodedPath}</guid>
@@ -45,7 +45,7 @@ export const generateRss = (posts: any[], authorID?: string): string => {
   const formattedDate = dayjs(posts[0].date)
     .utcOffset(0, true)
     .startOf('day')
-    .format('ddd, DD MMM YYYY HH:mm:ss [-7 GMT]')
+    .format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
 
   if (authorID) {
     return `

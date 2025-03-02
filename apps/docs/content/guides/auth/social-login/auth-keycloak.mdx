@@ -10,16 +10,16 @@ To enable Keycloak Auth for your project, you need to set up an Keycloak OAuth a
 
 To get started with Keycloak, you can run it in a docker container with: `docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:latest start-dev`
 
-This guide will be assuming that you are running keycloak in a docker container as described in the command above.
+This guide will be assuming that you are running Keycloak in a docker container as described in the command above.
 
 Keycloak OAuth consists of five broad steps:
 
-- Create a new client in your specified keycloak realm.
+- Create a new client in your specified Keycloak realm.
 - Obtain the `issuer` from the "OpenID Endpoint Configuration". This will be used as the `Keycloak URL`.
-- Ensure that the new client has the "Client Protocol" set to "openid-connect" and the "Access Type" is set to "confidential".
+- Ensure that the new client has the "Client Protocol" set to `openid-connect` and the "Access Type" is set to "confidential".
 - The `Client ID` of the client created will be used as the `client id`.
 - Obtain the `Secret` from the credentials tab which will be used as the `client secret`.
-- Add the callback url of your application to your allowlist.
+- Add the callback URL of your application to your allowlist.
 
 ## Access your Keycloak admin console
 
@@ -43,7 +43,7 @@ The "Client ID" of the created client will serve as the `client_id` when you mak
 
 After you've created the client successfully, ensure that you set the following settings:
 
-1. The "Client Protocol" should be set to "openid-connect".
+1. The "Client Protocol" should be set to `openid-connect`.
 2. The "Access Type" should be set to "confidential".
 3. The "Valid Redirect URIs" should be set to: `https://<project-ref>.supabase.co/auth/v1/callback`.
 
@@ -72,7 +72,7 @@ Since Keycloak version 22, the `openid` scope must be passed. Add this to the [`
 
 <CreateClientSnippet />
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `keycloak` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `keycloak` as the `provider`:
 
 ```js
 async function signInWithKeycloak() {
@@ -88,7 +88,7 @@ async function signInWithKeycloak() {
 </TabPanel>
 <TabPanel id="flutter" label="Flutter">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `keycloak` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `keycloak` as the `provider`:
 
 ```dart
 Future<void> signInWithKeycloak() async {
@@ -163,5 +163,5 @@ suspend fun signOut() {
 
 ## Resources
 
-- You can find the keycloak openid endpoint configuration under the realm settings.
+- You can find the Keycloak OpenID endpoint configuration under the realm settings.
   ![Keycloak OpenID Endpoint Configuration](/docs/img/guides/auth-keycloak/keycloak-openid-endpoint-config.png)

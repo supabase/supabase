@@ -2,7 +2,6 @@ import { useRouter } from 'next/router'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
-import { useFlag } from 'hooks/ui/useFlag'
 import { PROVIDERS } from 'lib/constants'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -20,25 +19,26 @@ interface RegionSelectorProps {
   cloudProvider: CloudProvider
   field: ControllerRenderProps<any, 'dbRegion'>
   form: UseFormReturn<any>
+  layout?: 'vertical' | 'horizontal'
 }
 
 // [Joshen] Let's use a library to maintain the flag SVGs in the future
 // I tried using https://flagpack.xyz/docs/development/react/ but couldn't get it to render
 // ^ can try again next time
 
-export const RegionSelector = ({ cloudProvider, field }: RegionSelectorProps) => {
+export const RegionSelector = ({
+  cloudProvider,
+  field,
+  layout = 'horizontal',
+}: RegionSelectorProps) => {
   const router = useRouter()
-  const newRegions = ['EAST_US_2', 'WEST_EU_3', 'CENTRAL_EU_2', 'NORTH_EU']
-  const enableNewRegions = useFlag('enableNewRegions')
 
   const showNonProdFields =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
   const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
-  const regionsArray = enableNewRegions
-    ? Object.entries(availableRegions)
-    : Object.entries(availableRegions).filter(([key]) => !newRegions.includes(key))
+  const regionsArray = Object.entries(availableRegions)
 
   const { isLoading: isLoadingDefaultRegion } = useDefaultRegionQuery({
     cloudProvider,
@@ -46,7 +46,7 @@ export const RegionSelector = ({ cloudProvider, field }: RegionSelectorProps) =>
 
   return (
     <FormItemLayout
-      layout="horizontal"
+      layout={layout}
       label="Region"
       description={
         <>

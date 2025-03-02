@@ -121,6 +121,8 @@ export const parseValue = (originalValue: any, format: string) => {
       return originalValue
     } else if (typeof originalValue === 'number' || !format) {
       return originalValue
+    } else if (format === 'bytea') {
+      return convertByteaToHex(originalValue)
     } else if (typeof originalValue === 'object') {
       return JSON.stringify(originalValue)
     } else if (typeof originalValue === 'boolean') {
@@ -210,7 +212,6 @@ export const generateRowObjectFromFields = (
         rowObject[field.name] = tryParseJson(value)
       }
     } else if (field.format === 'bool' && value) {
-      if (field.name === 'bool_default_true') console.log(field)
       if (value === 'null') rowObject[field.name] = null
       else rowObject[field.name] = value === 'true'
     } else if (DATETIME_TYPES.includes(field.format)) {
@@ -262,4 +263,8 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
  */
 export const isValueTruncated = (value: string | null | undefined) => {
   return value?.endsWith('...') && (value ?? '').length > MAX_CHARACTERS
+}
+
+export const convertByteaToHex = (value: { type: 'Buffer'; data: number[] }) => {
+  return `\\x${Buffer.from(value.data).toString('hex')}`
 }

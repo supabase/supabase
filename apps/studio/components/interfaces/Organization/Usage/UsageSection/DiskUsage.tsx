@@ -12,7 +12,7 @@ import {
   AlertTitle_Shadcn_,
   AlertDescription_Shadcn_,
 } from 'ui'
-import MotionNumber from 'motion-number'
+import MotionNumber from '@number-flow/react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -53,18 +53,33 @@ const DiskUsage = ({
     }
   )
 
+  const relevantProjects = useMemo(() => {
+    return diskUsage
+      ? diskUsage.projects
+          .filter((project) => {
+            // We do want to show branches that are exceeding the 8 GB limit, as people could have persistent or very long-living branches
+            const isBranchExceedingFreeQuota =
+              project.is_branch && project.databases.some((db) => (db.disk_volume_size_gb ?? 8) > 8)
+
+            const isActiveProject = project.status !== PROJECT_STATUS.INACTIVE
+
+            const isHostedOnAws = project.databases.every((db) => db.cloud_provider === 'AWS')
+
+            return (
+              (!project.is_branch || isBranchExceedingFreeQuota) && isActiveProject && isHostedOnAws
+            )
+          })
+          .filter((it) => it.ref === projectRef || !projectRef)
+      : []
+  }, [diskUsage, projectRef])
+
   const hasProjectsExceedingDiskSize = useMemo(() => {
-    if (diskUsage) {
-      return diskUsage.projects.some((it) =>
-        it.databases.some(
-          (db) =>
-            db.type === 'READ_REPLICA' || (db.disk_volume_size_gb && db.disk_volume_size_gb > 8)
-        )
+    return relevantProjects.some((it) =>
+      it.databases.some(
+        (db) => db.type === 'READ_REPLICA' || (db.disk_volume_size_gb && db.disk_volume_size_gb > 8)
       )
-    } else {
-      return false
-    }
-  }, [diskUsage])
+    )
+  }, [relevantProjects])
 
   const gp3UsageInPeriod = usage?.usages.find(
     (it) => it.metric === PricingMetric.DISK_SIZE_GB_HOURS_GP3
@@ -72,14 +87,6 @@ const DiskUsage = ({
   const io2UsageInPeriod = usage?.usages.find(
     (it) => it.metric === PricingMetric.DISK_SIZE_GB_HOURS_IO2
   )
-
-  const relevantProjects = useMemo(() => {
-    return diskUsage
-      ? diskUsage.projects
-          .filter((it) => !it.is_branch && it.status !== PROJECT_STATUS.INACTIVE)
-          .filter((it) => it.ref === projectRef || !projectRef)
-      : []
-  }, [diskUsage, projectRef])
 
   return (
     <div id={attribute.anchor} className="scroll-my-12">
@@ -139,7 +146,7 @@ const DiskUsage = ({
                   <p className="text-sm">Current disk size per project</p>
                   <p className="text-sm text-foreground-light">
                     Breakdown of disk per project. Head to your project's disk management section to
-                    see database space used.
+                    see database size used.
                   </p>
                 </div>
 
@@ -178,7 +185,7 @@ const DiskUsage = ({
                           {project.name}
                         </span>
                         <Button asChild type="default" size={'tiny'}>
-                          <Link href={`/project/${project.ref}/settings/database#disk-management`}>
+                          <Link href={`/project/${project.ref}/settings/compute-and-disk`}>
                             Manage Disk
                           </Link>
                         </Button>
@@ -190,9 +197,6 @@ const DiskUsage = ({
                               <MotionNumber
                                 value={totalDiskUsage}
                                 style={{ lineHeight: 0.8 }}
-                                transition={{
-                                  y: { type: 'spring', duration: 0.35, bounce: 0 },
-                                }}
                                 className="font-mono"
                               />
                             </span>{' '}

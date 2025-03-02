@@ -4,12 +4,12 @@ import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'
+import { IntegrationConnectionItem } from 'components/interfaces/Integrations/VercelGithub/IntegrationConnection'
 import {
   EmptyIntegrationConnection,
   IntegrationConnectionHeader,
   IntegrationInstallation,
-} from 'components/interfaces/Integrations/IntegrationPanels'
+} from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
 import {
   ScaffoldContainer,
@@ -31,9 +31,11 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { Button, cn } from 'ui'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
+import PartnerIcon from 'components/ui/PartnerIcon'
 
 const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const project = useSelectedProject()

@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
+import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
@@ -11,14 +13,17 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { formatCurrency } from 'lib/helpers'
+import { ExternalLink } from 'lucide-react'
 import { useAddonsPagePanel } from 'state/addons-page'
-import { Alert, AlertDescription_Shadcn_, Alert_Shadcn_, Button, Radio, SidePanel, cn } from 'ui'
-import { ExternalLink, AlertTriangle } from 'lucide-react'
+import { Button, Radio, SidePanel, cn } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const IPv4SidePanel = () => {
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
+  const allowPgBouncerSelection = useFlag('dualPoolerSupport')
 
   const [selectedOption, setSelectedOption] = useState<string>('ipv4_none')
 
@@ -28,6 +33,7 @@ const IPv4SidePanel = () => {
   const visible = panel === 'ipv4'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
+  const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
@@ -58,6 +64,7 @@ const IPv4SidePanel = () => {
   const isFreePlan = subscription?.plan?.id === 'free'
   const hasChanges = selectedOption !== (subscriptionIpV4Option?.variant.identifier ?? 'ipv4_none')
   const selectedIPv4 = availableOptions.find((option) => option.identifier === selectedOption)
+  const isPgBouncerEnabled = allowPgBouncerSelection && !!pgbouncerConfig?.pgbouncer_enabled
 
   useEffect(() => {
     if (visible) {
@@ -116,14 +123,31 @@ const IPv4SidePanel = () => {
             database via a IPv4 address.
           </p>
 
-          <p className="text-sm">
-            If you are connecting via our connection pooler, you do not need this add-on as our
-            pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
-            <Link href={`/project/${projectRef}/settings/database`} className="text-brand">
-              project database settings
-            </Link>
-            .
-          </p>
+          {isPgBouncerEnabled ? (
+            <Admonition
+              type="default"
+              title="The Dedicated Pooler does not support IPv4 addresses"
+              description="If you are connecting to your database via the Dedicated Pooler, you may need this add-on if your network does not support communicating via IPv6. Alternatively, you may consider switching to Supavisor which support IPv4 addresses."
+            >
+              <Button asChild type="default" className="mt-2">
+                <Link
+                  href={`/project/${projectRef}/settings/database#connection-pooler`}
+                  className="!no-underline"
+                >
+                  Connection Pooler settings
+                </Link>
+              </Button>
+            </Admonition>
+          ) : (
+            <p className="text-sm">
+              If you are connecting via the Supavisor connection pooler, you do not need this add-on
+              as our pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
+              <InlineLink href={`/project/${projectRef}/settings/database#connection-pooler`}>
+                project database settings
+              </InlineLink>
+              .
+            </p>
+          )}
 
           <div className={cn('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
             <Radio.Group
@@ -187,10 +211,12 @@ const IPv4SidePanel = () => {
 
           {hasChanges && (
             <>
-              <Alert withIcon variant="info" title="Potential downtime">
-                There might be some downtime when enabling the add-on since some DNS clients might
-                have cached the old DNS entry. Generally, this should be less than a minute.
-              </Alert>
+              <Admonition
+                type="note"
+                title="Potential downtime"
+                description="There might be some downtime when enabling the add-on since some DNS clients might
+                have cached the old DNS entry. Generally, this should be less than a minute."
+              />
               {selectedOption !== 'ipv4_none' && (
                 <p className="text-sm text-foreground-light">
                   By default, this is only applied to the Primary database for your project. If{' '}
@@ -216,20 +242,16 @@ const IPv4SidePanel = () => {
           )}
 
           {isFreePlan && (
-            <Alert
-              withIcon
-              variant="info"
-              title="IPv4 add-on is unavailable on the Free Plan"
-              actions={
-                <Button asChild type="default">
-                  <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
-                    View available plans
-                  </Link>
-                </Button>
-              }
-            >
-              Upgrade your plan to enable a IPv4 address for your project
-            </Alert>
+            <Admonition type="note" title="IPv4 add-on is unavailable on the Free Plan">
+              <p>Upgrade your plan to enable a IPv4 address for your project</p>
+              <Button asChild type="default">
+                <Link
+                  href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=ipv4SidePanel`}
+                >
+                  View available plans
+                </Link>
+              </Button>
+            </Admonition>
           )}
         </div>
       </SidePanel.Content>

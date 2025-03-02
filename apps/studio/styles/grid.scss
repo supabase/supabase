@@ -132,8 +132,7 @@
 
 /* select row */
 .rdg-row[aria-selected='true'] {
-  @apply bg-surface-200/50 dark:bg-surface-200/75;
-  @apply hover:bg-surface-200;
+  @apply bg-surface-200;
 }
 
 .tab-cursor {
