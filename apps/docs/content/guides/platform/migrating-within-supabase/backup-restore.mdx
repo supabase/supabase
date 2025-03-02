@@ -399,8 +399,8 @@ async function migrateBuckets() {
   readline.close()
 
   if (answer.toLowerCase() !== 'yes') {
-    console.log('Migration cancelled by user.')
-    return { cancelled: true }
+    console.log('Migration canceled by user.')
+    return { canceled: true }
   }
 
   console.log('\n📦 Fetching all buckets from old project...')
@@ -444,14 +444,14 @@ async function migrateBuckets() {
     })
 
     if (conflictAnswer === '4') {
-      console.log('Migration cancelled by user.')
-      return { cancelled: true }
+      console.log('Migration canceled by user.')
+      return { canceled: true }
     }
 
     conflictStrategy = parseInt(conflictAnswer)
     if (isNaN(conflictStrategy) || conflictStrategy < 1 || conflictStrategy > 3) {
-      console.log('Invalid choice. Migration cancelled.')
-      return { cancelled: true }
+      console.log('Invalid choice. Migration canceled.')
+      return { canceled: true }
     }
   }
 
