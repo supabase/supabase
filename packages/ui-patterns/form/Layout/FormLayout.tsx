@@ -366,6 +366,7 @@ export const FormLayout = React.forwardRef<
       >
         {flex && (
           <div className={cn(FlexContainer({ flex, align, layout }))}>
+            {props.children}
             {layout === 'flex-row-reverse' && renderError}
           </div>
         )}
