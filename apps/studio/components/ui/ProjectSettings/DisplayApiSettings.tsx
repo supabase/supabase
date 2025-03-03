@@ -149,7 +149,7 @@ const DisplayApiSettings = ({
                       (legacy ? 'Prefer using Secret API keys instead.' : '')
                 }
               />
-              {hasServiceRoleKeyLeak && x.tags === 'service_role' && (
+              {true && x.tags === 'service_role' && (
                 <Alert_Shadcn_ variant="destructive" className="my-4">
                   <WarningIcon />
                   <AlertTitle_Shadcn_>Urgent: Service Role key leak detected</AlertTitle_Shadcn_>

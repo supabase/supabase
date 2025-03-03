@@ -15,7 +15,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   const projectRef = req.headers['x-project'] as string
-  console.log('the ref', projectRef)
 
   if (!projectRef) {
     return res.status(400).json({ error: 'Project reference is required' })
