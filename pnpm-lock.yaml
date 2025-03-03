@@ -7171,8 +7171,8 @@ packages:
     resolution: {integrity: sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w==}
     engines: {node: '>= 4'}
 
-  dompurify@2.5.8:
-    resolution: {integrity: sha512-o1vSNgrmYMQObbSSvF/1brBYEQPHhV1+gsmrusO7/GXtp1T9rCS8cXFqVxK/9crT1jA6Ccv+5MTSjBNqr7Sovw==}
+  dompurify@2.5.6:
+    resolution: {integrity: sha512-zUTaUBO8pY4+iJMPE1B9XlO2tXVYIcEA4SNGtvDELzTSCQO7RzH+j7S180BmhmJId78lqGU2z19vgVx2Sxs/PQ==}
 
   domutils@3.1.0:
     resolution: {integrity: sha512-H78uMmQtI2AhgDJjWeQmHwJJ2bLPD3GMmO7Zja/ZZh84wkm+4ut+IUnUdRa8uCGX88DiVx1j6FRe1XfxEgjEZA==}
@@ -14903,12 +14903,6 @@ snapshots:
       lodash: 4.17.21
       postcss: 8.5.3
 
-  '@mertasan/tailwindcss-variables@2.7.0(autoprefixer@10.4.16(postcss@8.5.3))(postcss@8.5.3)':
-    dependencies:
-      autoprefixer: 10.4.16(postcss@8.5.3)
-      lodash: 4.17.21
-      postcss: 8.5.3
-
   '@monaco-editor/loader@1.4.0(monaco-editor@0.33.0)':
     dependencies:
       monaco-editor: 0.33.0
@@ -19575,7 +19569,7 @@ snapshots:
     dependencies:
       domelementtype: 2.3.0
 
-  dompurify@2.5.8: {}
+  dompurify@2.5.6: {}
 
   domutils@3.1.0:
     dependencies:
@@ -24929,7 +24923,7 @@ snapshots:
       classnames: 2.3.2
       core-js: 3.35.0
       decko: 1.2.0
-      dompurify: 2.5.8
+      dompurify: 2.5.6
       eventemitter3: 4.0.7
       json-pointer: 0.6.2
       lunr: 2.3.9
