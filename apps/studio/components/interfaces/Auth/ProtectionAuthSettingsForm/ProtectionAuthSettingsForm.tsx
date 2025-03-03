@@ -32,6 +32,7 @@ import {
   SelectValue_Shadcn_,
   Switch,
   WarningIcon,
+  PrePostTab,
 } from 'ui'
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 
@@ -225,18 +226,22 @@ const ProtectionAuthSettingsForm = () => {
                       >
                         <FormControl_Shadcn_>
                           <div className="flex items-center gap-2">
-                            <Input_Shadcn_
-                              {...field}
-                              type={hidden ? 'password' : 'text'}
-                              disabled={!canUpdateConfig}
-                              endContent={
+                            <PrePostTab
+                              postTab={
                                 <Button
-                                  type="default"
+                                  type="text"
+                                  className="p-0"
                                   onClick={() => setHidden(!hidden)}
                                   icon={hidden ? <Eye /> : <EyeOff />}
                                 />
                               }
-                            />
+                            >
+                              <Input_Shadcn_
+                                {...field}
+                                type={hidden ? 'password' : 'text'}
+                                disabled={!canUpdateConfig}
+                              />
+                            </PrePostTab>
                           </div>
                         </FormControl_Shadcn_>
                       </FormItemLayout>

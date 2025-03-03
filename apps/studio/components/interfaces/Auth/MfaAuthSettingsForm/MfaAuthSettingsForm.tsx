@@ -34,6 +34,7 @@ import {
   SelectValue_Shadcn_,
   Switch,
   WarningIcon,
+  PrePostTab,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -290,16 +291,17 @@ const MfaAuthSettingsForm = () => {
                       description="How many MFA factors can be enrolled at once per user."
                     >
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          type="number"
-                          min={0}
-                          max={30}
-                          {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                          value={field.value || 0}
-                          disabled={!canUpdateConfig}
-                          endContent={<span className="text-foreground-light">factors</span>}
-                        />
+                        <PrePostTab postTab="factors">
+                          <Input_Shadcn_
+                            type="number"
+                            min={0}
+                            max={30}
+                            {...field}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            value={field.value || 0}
+                            disabled={!canUpdateConfig}
+                          />
+                        </PrePostTab>
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}

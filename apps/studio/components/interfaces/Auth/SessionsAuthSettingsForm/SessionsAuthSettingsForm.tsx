@@ -28,6 +28,7 @@ import {
   Form_Shadcn_,
   Input,
   Input_Shadcn_,
+  PrePostTab,
   Switch,
   WarningIcon,
 } from 'ui'
@@ -209,15 +210,16 @@ const SessionsAuthSettingsForm = () => {
                         description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
                       >
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            type="number"
-                            min={0}
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                            value={field.value || 0}
-                            disabled={!canUpdateConfig}
-                            endContent={<span className="text-foreground-light">seconds</span>}
-                          />
+                          <PrePostTab postTab="seconds">
+                            <Input_Shadcn_
+                              type="number"
+                              min={0}
+                              {...field}
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              value={field.value || 0}
+                              disabled={!canUpdateConfig}
+                            />
+                          </PrePostTab>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
@@ -300,19 +302,16 @@ const SessionsAuthSettingsForm = () => {
                     >
                       <div className="flex items-center">
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            type="number"
-                            min={0}
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                            value={field.value || 0}
-                            disabled={!canUpdateConfig || !isProPlanAndUp}
-                            endContent={
-                              <span className="text-foreground-light">
-                                <HoursOrNeverText value={field.value || 0} />
-                              </span>
-                            }
-                          />
+                          <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
+                            <Input_Shadcn_
+                              type="number"
+                              min={0}
+                              {...field}
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              value={field.value || 0}
+                              disabled={!canUpdateConfig || !isProPlanAndUp}
+                            />
+                          </PrePostTab>
                         </FormControl_Shadcn_>
                       </div>
                     </FormItemLayout>
@@ -332,19 +331,16 @@ const SessionsAuthSettingsForm = () => {
                     >
                       <div className="flex items-center">
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            type="number"
-                            min={0}
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                            value={field.value || 0}
-                            disabled={!canUpdateConfig || !isProPlanAndUp}
-                            endContent={
-                              <span className="text-foreground-light">
-                                <HoursOrNeverText value={field.value || 0} />
-                              </span>
-                            }
-                          />
+                          <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
+                            <Input_Shadcn_
+                              type="number"
+                              min={0}
+                              {...field}
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              value={field.value || 0}
+                              disabled={!canUpdateConfig || !isProPlanAndUp}
+                            />
+                          </PrePostTab>
                         </FormControl_Shadcn_>
                       </div>
                     </FormItemLayout>

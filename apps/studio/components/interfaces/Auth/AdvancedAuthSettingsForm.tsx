@@ -27,6 +27,7 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  PrePostTab,
   WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -192,18 +193,19 @@ export const AdvancedAuthSettingsForm = () => {
                     >
                       <FormControl_Shadcn_>
                         <div className="relative">
-                          <Input_Shadcn_
-                            type="number"
-                            min={5}
-                            max={30}
-                            {...field}
-                            onChange={(e) => {
-                              const value = parseInt(e.target.value)
-                              field.onChange(isNaN(value) || value < 5 ? 5 : value)
-                            }}
-                            disabled={!canUpdateConfig || promptTeamsEnterpriseUpgrade}
-                            endContent="seconds"
-                          />
+                          <PrePostTab postTab="seconds">
+                            <Input_Shadcn_
+                              type="number"
+                              min={5}
+                              max={30}
+                              {...field}
+                              onChange={(e) => {
+                                const value = parseInt(e.target.value)
+                                field.onChange(isNaN(value) || value < 5 ? 5 : value)
+                              }}
+                              disabled={!canUpdateConfig || promptTeamsEnterpriseUpgrade}
+                            />
+                          </PrePostTab>
                         </div>
                       </FormControl_Shadcn_>
                     </FormItemLayout>

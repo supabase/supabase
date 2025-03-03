@@ -27,6 +27,7 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  PrePostTab,
   Switch,
   WarningIcon,
 } from 'ui'
@@ -383,15 +384,14 @@ const SmtpForm = () => {
                               description="How long between each email can a new email be sent via your SMTP server."
                             >
                               <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  type="number"
-                                  value={field.value}
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
-                                  disabled={!canUpdateConfig}
-                                  endContent={
-                                    <span className="text-foreground-light">seconds</span>
-                                  }
-                                />
+                                <PrePostTab postTab="seconds">
+                                  <Input_Shadcn_
+                                    type="number"
+                                    value={field.value}
+                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                    disabled={!canUpdateConfig}
+                                  />
+                                </PrePostTab>
                               </FormControl_Shadcn_>
                             </FormItemLayout>
                           )}
@@ -425,21 +425,25 @@ const SmtpForm = () => {
                               description="For security reasons, the password is write-only. Once saved, it cannot be retrieved or displayed."
                             >
                               <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  {...field}
-                                  type={hidden ? 'password' : 'text'}
-                                  placeholder={
-                                    authConfig?.SMTP_PASS === null ? 'SMTP Password' : '••••••••'
-                                  }
-                                  disabled={!canUpdateConfig}
-                                  endContent={
+                                <PrePostTab
+                                  postTab={
                                     <Button
-                                      type="default"
-                                      icon={hidden ? <Eye /> : <EyeOff />}
+                                      type="text"
+                                      className="p-0"
                                       onClick={() => setHidden(!hidden)}
+                                      icon={hidden ? <Eye /> : <EyeOff />}
                                     />
                                   }
-                                />
+                                >
+                                  <Input_Shadcn_
+                                    {...field}
+                                    type={hidden ? 'password' : 'text'}
+                                    placeholder={
+                                      authConfig?.SMTP_PASS === null ? 'SMTP Password' : '••••••••'
+                                    }
+                                    disabled={!canUpdateConfig}
+                                  />
+                                </PrePostTab>
                               </FormControl_Shadcn_>
                             </FormItemLayout>
                           )}
