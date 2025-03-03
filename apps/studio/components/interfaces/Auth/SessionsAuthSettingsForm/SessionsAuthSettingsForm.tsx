@@ -214,8 +214,6 @@ const SessionsAuthSettingsForm = () => {
                               type="number"
                               min={0}
                               {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                              value={field.value || 0}
                               disabled={!canUpdateConfig}
                             />
                           </PrePostTab>
@@ -306,8 +304,6 @@ const SessionsAuthSettingsForm = () => {
                               type="number"
                               min={0}
                               {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                              value={field.value || 0}
                               disabled={!canUpdateConfig || !isProPlanAndUp}
                             />
                           </PrePostTab>
@@ -335,8 +331,6 @@ const SessionsAuthSettingsForm = () => {
                               type="number"
                               min={0}
                               {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                              value={field.value || 0}
                               disabled={!canUpdateConfig || !isProPlanAndUp}
                             />
                           </PrePostTab>
