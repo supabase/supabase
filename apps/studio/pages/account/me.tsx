@@ -71,7 +71,6 @@ const ProfileCard = () => {
         <>
           {profileUpdateEnabled && isSuccess ? <ProfileInformation /> : null}
           <AccountIdentities />
-          {/* <AccountInformation /> */}
         </>
       )}
 

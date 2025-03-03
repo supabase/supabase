@@ -9,7 +9,8 @@ import Panel from 'components/ui/Panel'
 import { useUnlinkIdentityMutation } from 'data/profile/profile-unlink-identity-mutation'
 import { useSession } from 'lib/auth'
 import { BASE_PATH } from 'lib/constants'
-import { cn, Dialog, DialogContent, DialogHeader, DialogTitle } from 'ui'
+import Link from 'next/link'
+import { Button, cn, Dialog, DialogContent, DialogHeader, DialogTitle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   ChangeEmailAddressForm,
@@ -28,7 +29,7 @@ export const AccountIdentities = () => {
   const { mutate: unlinkIdentity, isLoading } = useUnlinkIdentityMutation({
     onSuccess: () => {
       toast.success(
-        `Successfully unlinked ${getProviderName(selectedProviderUnlink ?? '')} identity. Identities will be updated when you log out and log back in.`
+        `Successfully unlinked ${getProviderName(selectedProviderUnlink ?? '')} identity!`
       )
       setSelectedProviderUnlink(undefined)
     },
@@ -84,6 +85,11 @@ export const AccountIdentities = () => {
                 </div>
               </div>
               <div className="flex items-center gap-x-1">
+                {provider === 'email' && (
+                  <Button asChild type="default">
+                    <Link href="/reset-password">Reset password</Link>
+                  </Button>
+                )}
                 <ButtonTooltip
                   type="text"
                   icon={<Edit />}

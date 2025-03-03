@@ -24,6 +24,7 @@ export const useUnlinkIdentityMutation = ({
 > = {}) => {
   return useMutation((vars) => unlinkIdentity(vars), {
     async onSuccess(data, variables, context) {
+      await auth.getUserIdentities()
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

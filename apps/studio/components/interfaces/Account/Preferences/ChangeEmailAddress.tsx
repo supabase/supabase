@@ -118,6 +118,7 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
             )}
           />
         </DialogSection>
+
         <DialogFooter>
           <Button type="default" disabled={isLoading} onClick={() => onClose()}>
             Cancel
