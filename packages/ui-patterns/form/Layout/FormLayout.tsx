@@ -293,8 +293,6 @@ export const FormLayout = React.forwardRef<
       nonBoxInput = label ? false : true,
       hideMessage = false,
       isReactForm,
-      preTab,
-      postTab,
       ...props
     },
     ref
@@ -430,7 +428,9 @@ export const FormLayout = React.forwardRef<
                   })
                 )}
                 data-formlayout-id={'nonBoxInputContainer'}
-              ></div>
+              >
+                {props.children}
+              </div>
               {renderError}
               {renderDescription}
             </>
