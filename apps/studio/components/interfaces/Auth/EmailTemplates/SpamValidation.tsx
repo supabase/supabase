@@ -1,18 +1,7 @@
 import { Markdown } from 'components/interfaces/Markdown'
 import { ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
 import { Check, MailWarning } from 'lucide-react'
-import {
-  cn,
-  Separator,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  WarningIcon,
-  CheckIcon,
-} from 'ui'
+import { Separator, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 interface SpamValidationProps {
   validationResult?: ValidateSpamResponse
