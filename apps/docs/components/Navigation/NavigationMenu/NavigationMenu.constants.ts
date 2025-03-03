@@ -2377,6 +2377,7 @@ export const deployment: NavMenuConstant = {
         },
         { name: 'Maturity model', url: '/guides/deployment/maturity-model' },
         { name: 'Production checklist', url: '/guides/deployment/going-into-prod' },
+        { name: 'SOC 2 compliance', url: '/guides/security/soc-2-compliance' },
       ],
     },
     {
