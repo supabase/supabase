@@ -909,6 +909,24 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         }
       },
+      "@supabase/auth-js.AuthInvalidJwtError.constructor": {
+        "name": "@supabase/auth-js.AuthInvalidJwtError.constructor",
+        "params": [
+          {
+            "name": "message",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "AuthInvalidJwtError"
+          }
+        }
+      },
       "@supabase/auth-js.AuthInvalidTokenResponseError.constructor": {
         "name": "@supabase/auth-js.AuthInvalidTokenResponseError.constructor",
         "params": [],
@@ -5733,6 +5751,223 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         },
         "comment": {
           "shortText": "Log in an existing user by exchanging an Auth Code issued during the PKCE flow."
+        }
+      },
+      "@supabase/auth-js.GoTrueClient.getClaims": {
+        "name": "@supabase/auth-js.GoTrueClient.getClaims",
+        "params": [
+          {
+            "name": "jwt",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            },
+            "isOptional": true
+          },
+          {
+            "name": "jwks",
+            "type": {
+              "type": "object",
+              "properties": [
+                {
+                  "name": "keys",
+                  "type": {
+                    "type": "array",
+                    "elemType": {
+                      "type": "object",
+                      "name": "JWK",
+                      "properties": [
+                        {
+                          "name": "alg",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "isOptional": true
+                        },
+                        {
+                          "name": "key_ops",
+                          "type": {
+                            "type": "array",
+                            "elemType": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            }
+                          }
+                        },
+                        {
+                          "name": "kid",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "isOptional": true
+                        },
+                        {
+                          "name": "kty",
+                          "type": {
+                            "type": "union",
+                            "subTypes": [
+                              {
+                                "type": "literal",
+                                "value": "RSA"
+                              },
+                              {
+                                "type": "literal",
+                                "value": "EC"
+                              },
+                              {
+                                "type": "literal",
+                                "value": "oct"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "promise",
+            "name": "Promise",
+            "awaited": {
+              "type": "union",
+              "subTypes": [
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "object",
+                        "properties": [
+                          {
+                            "name": "claims",
+                            "type": {
+                              "type": "nameOnly",
+                              "name": "JwtPayload"
+                            }
+                          },
+                          {
+                            "name": "header",
+                            "type": {
+                              "name": "JwtHeader",
+                              "type": "object",
+                              "properties": [
+                                {
+                                  "name": "alg",
+                                  "type": {
+                                    "type": "union",
+                                    "subTypes": [
+                                      {
+                                        "type": "literal",
+                                        "value": "RS256"
+                                      },
+                                      {
+                                        "type": "literal",
+                                        "value": "ES256"
+                                      },
+                                      {
+                                        "type": "literal",
+                                        "value": "HS256"
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "name": "kid",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "typ",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "name": "signature",
+                            "type": {
+                              "type": "nameOnly",
+                              "name": "Uint8Array"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "nameOnly",
+                        "name": "AuthError"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "comment": {
+          "tags": [
+            {
+              "tag": "experimental",
+              "text": "This method may change in future versions."
+            },
+            {
+              "tag": "description",
+              "text": "Gets the claims from a JWT. If the JWT is symmetric JWTs, it will call getUser() to verify against the server. If the JWT is asymmetric, it will be verified against the JWKS using the WebCrypto API.\\n"
+            }
+          ]
         }
       },
       "@supabase/auth-js.GoTrueClient.getSession": {
@@ -21308,6 +21543,39 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         }
       },
+      "@supabase/postgrest-js.PostgrestBuilder.overrideTypes": {
+        "name": "@supabase/postgrest-js.PostgrestBuilder.overrideTypes",
+        "params": [],
+        "comment": {
+          "shortText": "Override the type of the returned \`data\` field in the response.",
+          "returns": "A PostgrestBuilder instance with the new type\\n",
+          "tags": [
+            {
+              "tag": "example",
+              "text": "\\n\`\`\`typescript\\n// Merge with existing types (default behavior)\\nconst query = supabase\\n  .from('users')\\n  .select()\\n  .overrideTypes<{ custom_field: string }>()\\n\\n// Replace existing types completely\\nconst replaceQuery = supabase\\n  .from('users')\\n  .select()\\n  .overrideTypes<{ id: number; name: string }, { merge: false }>()\\n\`\`\`"
+            }
+          ]
+        }
+      },
+      "@supabase/postgrest-js.PostgrestBuilder.returns": {
+        "name": "@supabase/postgrest-js.PostgrestBuilder.returns",
+        "params": [],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "CheckMatchingArrayTypes"
+          }
+        },
+        "comment": {
+          "shortText": "Override the type of the returned \`data\`.",
+          "tags": [
+            {
+              "tag": "deprecated",
+              "text": "Use overrideTypes<yourType, { merge: false }>() method at the end of your call chain instead\\n"
+            }
+          ]
+        }
+      },
       "@supabase/postgrest-js.PostgrestBuilder.setHeader": {
         "name": "@supabase/postgrest-js.PostgrestBuilder.setHeader",
         "params": [
@@ -23903,6 +24171,20 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         ]
       },
+      "@supabase/postgrest-js.PostgrestFilterBuilder.overrideTypes": {
+        "name": "@supabase/postgrest-js.PostgrestFilterBuilder.overrideTypes",
+        "params": [],
+        "comment": {
+          "shortText": "Override the type of the returned \`data\` field in the response.",
+          "returns": "A PostgrestBuilder instance with the new type\\n",
+          "tags": [
+            {
+              "tag": "example",
+              "text": "\\n\`\`\`typescript\\n// Merge with existing types (default behavior)\\nconst query = supabase\\n  .from('users')\\n  .select()\\n  .overrideTypes<{ custom_field: string }>()\\n\\n// Replace existing types completely\\nconst replaceQuery = supabase\\n  .from('users')\\n  .select()\\n  .overrideTypes<{ id: number; name: string }, { merge: false }>()\\n\`\`\`"
+            }
+          ]
+        }
+      },
       "@supabase/postgrest-js.PostgrestFilterBuilder.range": {
         "name": "@supabase/postgrest-js.PostgrestFilterBuilder.range",
         "params": [
@@ -24325,7 +24607,13 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Override the type of the returned \`data\`."
+          "shortText": "Override the type of the returned \`data\`.",
+          "tags": [
+            {
+              "tag": "deprecated",
+              "text": "Use overrideTypes<yourType, { merge: false }>() method at the end of your call chain instead\\n"
+            }
+          ]
         }
       },
       "@supabase/postgrest-js.PostgrestFilterBuilder.rollback": {
@@ -25898,6 +26186,20 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         ]
       },
+      "@supabase/postgrest-js.PostgrestTransformBuilder.overrideTypes": {
+        "name": "@supabase/postgrest-js.PostgrestTransformBuilder.overrideTypes",
+        "params": [],
+        "comment": {
+          "shortText": "Override the type of the returned \`data\` field in the response.",
+          "returns": "A PostgrestBuilder instance with the new type\\n",
+          "tags": [
+            {
+              "tag": "example",
+              "text": "\\n\`\`\`typescript\\n// Merge with existing types (default behavior)\\nconst query = supabase\\n  .from('users')\\n  .select()\\n  .overrideTypes<{ custom_field: string }>()\\n\\n// Replace existing types completely\\nconst replaceQuery = supabase\\n  .from('users')\\n  .select()\\n  .overrideTypes<{ id: number; name: string }, { merge: false }>()\\n\`\`\`"
+            }
+          ]
+        }
+      },
       "@supabase/postgrest-js.PostgrestTransformBuilder.range": {
         "name": "@supabase/postgrest-js.PostgrestTransformBuilder.range",
         "params": [
@@ -25975,7 +26277,13 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Override the type of the returned \`data\`."
+          "shortText": "Override the type of the returned \`data\`.",
+          "tags": [
+            {
+              "tag": "deprecated",
+              "text": "Use overrideTypes<yourType, { merge: false }>() method at the end of your call chain instead\\n"
+            }
+          ]
         }
       },
       "@supabase/postgrest-js.PostgrestTransformBuilder.rollback": {
