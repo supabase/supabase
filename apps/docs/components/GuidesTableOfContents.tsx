@@ -38,33 +38,27 @@ const GuidesTableOfContents = ({ className, video }: { className?: string; video
   const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
 
   return (
-    <div
-      className={cn(
-        'border-l flex flex-col gap-6 lg:gap-8',
-        'thin-scrollbar overflow-y-auto',
-        'overflow-visible',
-        'px-2',
-        className
-      )}
-    >
-      {video && (
-        <div className="relative pl-5">
-          <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} />
+    <div className={cn('thin-scrollbar overflow-y-auto h-fit', 'px-px', className)}>
+      <div className={cn('relative border-l flex flex-col gap-6 lg:gap-8 px-2', 'h-fit')}>
+        {video && (
+          <div className="relative pl-5">
+            <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} />
+          </div>
+        )}
+        <div className="pl-5">
+          <Feedback key={pathname} />
         </div>
-      )}
-      <div className="pl-5">
-        <Feedback key={pathname} />
+        {toc.length !== 0 && (
+          <Toc className="-ml-[calc(0.25rem+6px)]">
+            <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-[calc(1.5rem+6px)]">
+              On this page
+            </h3>
+            <TOCScrollArea>
+              <TOCItems items={toc} />
+            </TOCScrollArea>
+          </Toc>
+        )}
       </div>
-      {toc.length !== 0 && (
-        <Toc className="-ml-[calc(0.25rem+6px)]">
-          <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-[calc(1.5rem+6px)]">
-            On this page
-          </h3>
-          <TOCScrollArea>
-            <TOCItems items={toc} />
-          </TOCScrollArea>
-        </Toc>
-      )}
     </div>
   )
 }

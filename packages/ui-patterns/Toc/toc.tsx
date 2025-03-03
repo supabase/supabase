@@ -13,12 +13,10 @@ export interface TOCProps {
    * Custom content in TOC container, before the main TOC
    */
   header?: ReactNode
-
   /**
    * Custom content in TOC container, after the main TOC
    */
   footer?: ReactNode
-
   children: ReactNode
 }
 
@@ -27,19 +25,14 @@ export function Toc(props: HTMLAttributes<HTMLDivElement>) {
     <div
       id="toc"
       {...props}
-      className={cn(
-        'sticky top-[--header-height] h-[--toc-height]',
-        'max-md:hidden',
-        props.className
-      )}
+      className={cn('sticky top-[--header-height] h-fit max-md:hidden', props.className)}
       style={
         {
           ...props.style,
-          '--toc-height': 'calc(100dvh - var(--header-height) - 3rem',
         } as object
       }
     >
-      <div className="flex h-full w-[--toc-width] max-w-full flex-col gap-3 pe-4">
+      <div className="flex h-fit w-[--toc-width] max-w-full flex-col gap-3 pe-4">
         {props.children}
       </div>
     </div>
