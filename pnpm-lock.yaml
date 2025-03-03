@@ -1834,12 +1834,18 @@ importers:
       framer-motion:
         specifier: ^11.1.9
         version: 11.11.17(@emotion/is-prop-valid@1.2.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      github-slugger:
+        specifier: ^2.0.0
+        version: 2.0.0
       lodash:
         specifier: '*'
         version: 4.17.21
       lucide-react:
         specifier: '*'
         version: 0.436.0(react@18.2.0)
+      mdast:
+        specifier: ^3.0.0
+        version: 3.0.0
       monaco-editor:
         specifier: '*'
         version: 0.33.0
@@ -1885,6 +1891,9 @@ importers:
       recharts:
         specifier: ^2.8.0
         version: 2.12.7(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      remark:
+        specifier: ^15.0.1
+        version: 15.0.1(supports-color@8.1.1)
       remark-gfm:
         specifier: ^4.0.0
         version: 4.0.0(supports-color@8.1.1)
@@ -1906,6 +1915,9 @@ importers:
       ui:
         specifier: workspace:*
         version: link:../ui
+      unist-util-visit:
+        specifier: ^5.0.0
+        version: 5.0.0
       valtio:
         specifier: '*'
         version: 1.12.0(@types/react@18.3.3)(react@18.2.0)
@@ -1931,6 +1943,9 @@ importers:
       '@types/lodash':
         specifier: ^4.17.5
         version: 4.17.5
+      '@types/mdast':
+        specifier: ^3.0.0
+        version: 3.0.15
       '@types/node':
         specifier: 'catalog:'
         version: 20.12.11
@@ -18065,7 +18080,7 @@ snapshots:
 
   '@types/hast@3.0.4':
     dependencies:
-      '@types/unist': 3.0.3
+      '@types/unist': 2.0.8
 
   '@types/hoist-non-react-statics@3.3.2':
     dependencies:

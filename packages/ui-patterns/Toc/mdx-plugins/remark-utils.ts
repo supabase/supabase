@@ -1,10 +1,9 @@
-import type { RootContent } from 'mdast';
+// import type { RootContent } from 'mdast'
 
-export function flattenNode(node: RootContent): string {
-  if ('children' in node)
-    return node.children.map((child) => flattenNode(child)).join('');
+export function flattenNode(node: any): string {
+  if ('children' in node) return node.children.map((child: any) => flattenNode(child)).join('')
 
-  if ('value' in node) return node.value;
+  if ('value' in node) return node.value
 
-  return '';
+  return ''
 }

@@ -1,6 +1,6 @@
 import { remark } from 'remark'
-import type { ReactNode } from 'react'
 import { remarkHeading } from '../mdx-plugins/remark-heading'
+import type { ReactNode } from 'react'
 import type { PluggableList } from 'unified'
 import type { Compatible } from 'vfile'
 
@@ -36,7 +36,7 @@ export function getTableOfContents(
 ): TableOfContents | Promise<TableOfContents> {
   if (remarkPlugins) {
     return remark()
-      .use(remarkPlugins)
+      .use(remarkPlugins as any)
       .use(remarkHeading)
       .process(content)
       .then((result) => {
