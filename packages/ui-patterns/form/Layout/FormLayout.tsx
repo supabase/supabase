@@ -8,7 +8,6 @@ import {
   Label_Shadcn_,
   cn,
 } from 'ui'
-
 import { SIZE } from 'ui/src/lib/constants'
 
 type Props = {
