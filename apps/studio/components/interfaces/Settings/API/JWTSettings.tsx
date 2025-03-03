@@ -226,6 +226,11 @@ const JWTSettings = () => {
                                 <p className="text-sm opacity-50">
                                   A random secret will be created, or you can create your own.
                                 </p>
+                                <p className="text-sm opacity-50">
+                                  This will invalidate all existing API keys, including your{' '}
+                                  <code className="text-xs">service_role</code> and{' '}
+                                  <code className="text-xs">anon</code> keys.
+                                </p>
                               </div>
                               <div className="flex flex-col items-end">
                                 {isUpdatingJwtSecret ? (
@@ -244,13 +249,13 @@ const JWTSettings = () => {
                                       },
                                     }}
                                   >
-                                    Generate a new secret
+                                    Generate new API Keys
                                   </ButtonTooltip>
                                 ) : (
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button type="default" iconRight={<ChevronDown size={14} />}>
-                                        <span>Generate a new secret</span>
+                                        <span>Generate new API Keys</span>
                                       </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" side="bottom">
@@ -259,7 +264,7 @@ const JWTSettings = () => {
                                         onClick={() => setIsGeneratingKey(true)}
                                       >
                                         <RefreshCw size={16} />
-                                        <p>Generate a random secret</p>
+                                        <p>Generate new API Keys</p>
                                       </DropdownMenuItem>
                                       <DropdownMenuSeparator />
                                       <DropdownMenuItem
