@@ -309,6 +309,7 @@ allow_list = [
     "supabase-community",
     "supabase-flutter",
     "supabase-gdscript",
+    "supabase-grafana",
     "supabase-go",
     "supabase-js",
     "supabase-kt",
