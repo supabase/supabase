@@ -135,6 +135,7 @@ allow_list = [
     "Drizzle",
     "EnterpriseDB",
     "Entra",
+    "ePHI",
     "Erlang",
     "Figma",
     "Firestore",
