@@ -1,17 +1,19 @@
 import { Edit, Unlink } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useSession } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
+import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
 import { useUnlinkIdentityMutation } from 'data/profile/profile-unlink-identity-mutation'
-import { useSession } from 'lib/auth'
 import { BASE_PATH } from 'lib/constants'
-import Link from 'next/link'
 import { Button, cn, Dialog, DialogContent, DialogHeader, DialogTitle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import {
   ChangeEmailAddressForm,
   GitHubChangeEmailAddress,
@@ -21,12 +23,14 @@ import {
 export const AccountIdentities = () => {
   const router = useRouter()
   const session = useSession()
-  const identities = session?.user.identities ?? []
+
+  const { data, isLoading, isSuccess } = useProfileIdentitiesQuery()
+  const identities = data?.identities ?? []
 
   const [selectedProviderUnlink, setSelectedProviderUnlink] = useState<string>()
   const [selectedProviderUpdateEmail, setSelectedProviderUpdateEmail] = useState<string>()
 
-  const { mutate: unlinkIdentity, isLoading } = useUnlinkIdentityMutation({
+  const { mutate: unlinkIdentity, isLoading: isUnlinking } = useUnlinkIdentityMutation({
     onSuccess: () => {
       toast.success(
         `Successfully unlinked ${getProviderName(selectedProviderUnlink ?? '')} identity!`
@@ -52,64 +56,74 @@ export const AccountIdentities = () => {
   return (
     <>
       <Panel className="mb-4 md:mb-8" title={<h5>Account Identities</h5>}>
-        {identities.map((identity) => {
-          const { identity_id, provider } = identity
-          const username = identity.identity_data?.user_name
-          const providerName = getProviderName(provider)
-          const iconKey =
-            provider === 'github'
-              ? 'github-icon'
-              : provider === 'email'
-                ? 'email-icon2'
-                : 'saml-icon'
+        {isLoading && (
+          <Panel.Content>
+            <ShimmeringLoader />
+          </Panel.Content>
+        )}
+        {isSuccess &&
+          identities.map((identity) => {
+            const { identity_id, provider } = identity
+            const username = identity.identity_data?.user_name
+            const providerName = getProviderName(provider)
+            const iconKey =
+              provider === 'github'
+                ? 'github-icon'
+                : provider === 'email'
+                  ? 'email-icon2'
+                  : 'saml-icon'
 
-          return (
-            <Panel.Content
-              key={identity_id}
-              className={cn('flex justify-between', identities.length > 1 ? 'last:border-t' : '')}
-            >
-              <div className="flex gap-x-4">
-                <Image
-                  className={cn(iconKey === 'github-icon' ? 'invert' : '')}
-                  src={`${BASE_PATH}/img/icons/${iconKey}.svg`}
-                  width={30}
-                  height={30}
-                  alt={`${identity.provider} icon`}
-                />
-                <div className="">
-                  <p className="text-sm capitalize">{providerName}</p>
-                  <p className="text-sm text-foreground-lighter">
-                    {!!username ? <span>{username} • </span> : null}
-                    {(identity as any).email}
-                  </p>
+            return (
+              <Panel.Content
+                key={identity_id}
+                className={cn('flex justify-between', identities.length > 1 ? 'last:border-t' : '')}
+              >
+                <div className="flex gap-x-4">
+                  <Image
+                    className={cn(iconKey === 'github-icon' ? 'invert' : '')}
+                    src={`${BASE_PATH}/img/icons/${iconKey}.svg`}
+                    width={30}
+                    height={30}
+                    alt={`${identity.provider} icon`}
+                  />
+                  <div>
+                    <div className="flex items-center gap-x-2">
+                      <p className="text-sm capitalize">{providerName}</p>
+                      {/* [Joshen] Below is not supported yet, but ideal UX */}
+                      {/* {false && <Badge>Logged in as</Badge>} */}
+                    </div>
+                    <p className="text-sm text-foreground-lighter">
+                      {!!username ? <span>{username} • </span> : null}
+                      {(identity as any).email}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-x-1">
-                {provider === 'email' && (
-                  <Button asChild type="default">
-                    <Link href="/reset-password">Reset password</Link>
-                  </Button>
-                )}
-                <ButtonTooltip
-                  type="text"
-                  icon={<Edit />}
-                  className="w-7"
-                  onClick={() => setSelectedProviderUpdateEmail(provider)}
-                  tooltip={{ content: { side: 'bottom', text: 'Update email address' } }}
-                />
-                {identities.length > 1 && (
+                <div className="flex items-center gap-x-1">
+                  {provider === 'email' && (
+                    <Button asChild type="default">
+                      <Link href="/reset-password">Reset password</Link>
+                    </Button>
+                  )}
                   <ButtonTooltip
                     type="text"
-                    icon={<Unlink />}
+                    icon={<Edit />}
                     className="w-7"
-                    onClick={() => setSelectedProviderUnlink(provider)}
-                    tooltip={{ content: { side: 'bottom', text: 'Unlink identity' } }}
+                    onClick={() => setSelectedProviderUpdateEmail(provider)}
+                    tooltip={{ content: { side: 'bottom', text: 'Update email address' } }}
                   />
-                )}
-              </div>
-            </Panel.Content>
-          )
-        })}
+                  {identities.length > 1 && (
+                    <ButtonTooltip
+                      type="text"
+                      icon={<Unlink />}
+                      className="w-7"
+                      onClick={() => setSelectedProviderUnlink(provider)}
+                      tooltip={{ content: { side: 'bottom', text: 'Unlink identity' } }}
+                    />
+                  )}
+                </div>
+              </Panel.Content>
+            )
+          })}
       </Panel>
 
       <Dialog
@@ -138,7 +152,7 @@ export const AccountIdentities = () => {
 
       <ConfirmationModal
         variant="warning"
-        loading={isLoading}
+        loading={isUnlinking}
         visible={!!selectedProviderUnlink}
         title={`Unlink ${getProviderName(selectedProviderUnlink ?? '')} identity`}
         onCancel={() => setSelectedProviderUnlink(undefined)}
