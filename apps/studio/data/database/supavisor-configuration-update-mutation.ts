@@ -12,14 +12,13 @@ type SupavisorConfigurationUpdateVariables = {
 
 export async function updateSupavisorConfiguration({
   ref,
-  pool_mode,
   default_pool_size,
 }: SupavisorConfigurationUpdateVariables) {
   if (!ref) return console.error('Project ref is required')
 
   const { data, error } = await patch('/platform/projects/{ref}/config/supavisor', {
     params: { path: { ref } },
-    body: { default_pool_size, pool_mode },
+    body: { default_pool_size, pool_mode: 'transaction' },
   })
 
   if (error) handleError(error)
