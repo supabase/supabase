@@ -1,8 +1,8 @@
 'use client'
 
-import type { AnchorHTMLAttributes, ReactNode, RefObject } from 'react'
 import { createContext, forwardRef, useContext, useMemo, useRef } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
+import type { AnchorHTMLAttributes, ReactNode, RefObject } from 'react'
 import type { TableOfContents } from './server/get-toc'
 
 import { mergeRefs, useAnchorObserver, useOnChange } from 'common'

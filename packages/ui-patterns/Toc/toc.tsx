@@ -5,7 +5,6 @@ import * as Primitive from './toc-primitive'
 import { type ComponentProps, Fragment, type HTMLAttributes, type ReactNode, useRef } from 'react'
 import { TocThumb } from './toc-thumb'
 import { cn, ScrollArea, ScrollViewport } from 'ui'
-import ShimmeringLoader from '../ShimmeringLoader'
 import { removeAnchor } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
 
 export interface TOCProps {
@@ -35,16 +34,6 @@ export function Toc(props: HTMLAttributes<HTMLDivElement>) {
       <div className="flex h-fit w-[--toc-width] max-w-full flex-col gap-3 pe-4">
         {props.children}
       </div>
-    </div>
-  )
-}
-
-export function TocItemsEmpty() {
-  return (
-    <div className="!pl-5 text-xs text-foreground-lighter flex flex-col gap-4">
-      <ShimmeringLoader className="ml-2 h-2 w-20 p-0 rounded-sm" />
-      <ShimmeringLoader className="ml-7 h-2 w-20 p-0 rounded-sm" />
-      <ShimmeringLoader className="ml-7 h-2 w-14 p-0 rounded-sm" />
     </div>
   )
 }
