@@ -1,9 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
-import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -16,6 +15,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
+import { useQueryState } from 'nuqs'
 import { Button, Form, Input, Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
@@ -27,13 +27,13 @@ export interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
   provider: Provider
   isActive: boolean
-  queryProvider?: string
 }
 
-export const ProviderForm = ({ config, provider, isActive, queryProvider }: ProviderFormProps) => {
+export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
+  const { ref: projectRef } = useParams()
+  const [urlProvider, setUrlProvider] = useQueryState('provider', { defaultValue: '' })
+
   const [open, setOpen] = useState(false)
-  const { ref: projectRef, provider: urlProvider } = useParams()
-  const router = useRouter()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
@@ -116,30 +116,19 @@ export const ProviderForm = ({ config, provider, isActive, queryProvider }: Prov
     )
   }
 
+  // Handle clicking on a provider in the list
+  const handleProviderClick = () => setUrlProvider(provider.title)
+
+  const handleOpenChange = (isOpen: boolean) => {
+    // Remove provider query param from URL when closed
+    if (!isOpen) setUrlProvider(null)
+  }
+
   // Open or close the form based on the query parameter
   useEffect(() => {
-    const isProviderInQuery =
-      typeof router.query.provider === 'string' &&
-      router.query.provider.toLowerCase() === provider.title.toLowerCase()
+    const isProviderInQuery = urlProvider.toLowerCase() === provider.title.toLowerCase()
     setOpen(isProviderInQuery)
-  }, [router.query.provider, provider.title])
-
-  // Update URL when form is closed via the Sheet's onOpenChange
-  const handleOpenChange = (isOpen: boolean) => {
-    if (!isOpen && router.query.provider === provider.title) {
-      // Remove provider query param when closed
-      const query = { ...router.query }
-      delete query.provider
-      router.replace({ pathname: router.pathname, query }, undefined, { shallow: true })
-    }
-  }
-
-  // Handle clicking on a provider in the list
-  const handleProviderClick = () => {
-    // Update URL with provider query param
-    const query = { ...router.query, provider: provider.title }
-    router.replace({ pathname: router.pathname, query }, undefined, { shallow: true })
-  }
+  }, [urlProvider, provider.title])
 
   return (
     <>

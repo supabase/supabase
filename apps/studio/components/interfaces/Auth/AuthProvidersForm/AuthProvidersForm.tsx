@@ -1,6 +1,5 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import {
@@ -24,8 +23,6 @@ import { ProviderForm } from './ProviderForm'
 
 export const AuthProvidersForm = () => {
   const { ref: projectRef } = useParams()
-  const router = useRouter()
-  const { provider: queryProvider } = router.query
   const {
     isLoading,
     error: authConfigError,
@@ -98,7 +95,6 @@ export const AuthProvidersForm = () => {
                   config={authConfig!}
                   provider={providerSchema as unknown as Provider}
                   isActive={isActive}
-                  queryProvider={queryProvider as string}
                 />
               )
             })}
