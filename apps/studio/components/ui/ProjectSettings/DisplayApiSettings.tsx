@@ -43,9 +43,11 @@ const DisplayApiSettings = ({
   const apiKeys = settings?.service_api_keys ?? []
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
+
   const { data: hasServiceRoleKeyLeak } = useServiceRoleKeyLeakQuery({
-    projectRef: 'bzembqluzmwrjuidwley', // remove before merging
+    projectRef: projectRef,
   })
+
   return (
     <>
       <Panel

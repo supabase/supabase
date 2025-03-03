@@ -20,12 +20,13 @@ import { number, object } from 'yup'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { uuidv4 } from 'lib/helpers'
 import {
@@ -38,21 +39,18 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Form,
   Input,
   InputNumber,
   Modal,
   WarningIcon,
-  Form,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
 } from './API.constants'
-import { Admonition } from 'ui-patterns'
-import { FormActions } from 'components/ui/Forms/FormActions'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 
 const schema = object({
   JWT_EXP: number()
