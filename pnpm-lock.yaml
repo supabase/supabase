@@ -587,8 +587,8 @@ importers:
         specifier: 'catalog:'
         version: 2.11.3
       '@supabase/shared-types':
-        specifier: 0.1.74
-        version: 0.1.74
+        specifier: 0.1.80
+        version: 0.1.80
       '@supabase/sql-to-rest':
         specifier: ^0.1.6
         version: 0.1.6(encoding@0.1.13)(supports-color@8.1.1)
@@ -5158,8 +5158,8 @@ packages:
   '@supabase/realtime-js@2.11.3':
     resolution: {integrity: sha512-rMMGtZy2MaSBlNXP5hJZx+ij5JtQGPuBQ7/izE1oKlR1A6SzbN0VWeFTdmDHVa1gcJ72zpQAjbSmByIG6uz/eA==}
 
-  '@supabase/shared-types@0.1.74':
-    resolution: {integrity: sha512-vYbNA6JtV4PNTSuyRQsRBn6v99WMKCBN5wgS2Ezl3n4EGgCoJCvHyQFbNEwbf1vvZVum/j1bAAK3n3io1jxiqA==}
+  '@supabase/shared-types@0.1.80':
+    resolution: {integrity: sha512-U2ACit34Up5OzB53dthb50YVGcAUzkuWn0Wq9fXWDdfl4Wlp+euWKSSVUMUIQo+bf2phu3V/PmVHEWR6dpls1g==}
 
   '@supabase/sql-to-rest@0.1.6':
     resolution: {integrity: sha512-06KgjeINtc6405XQvfnchBE1azEsU8G2NElfadmvVHKmHa5l2bFzjbtFbpaYgpgTzccHlcDmBaCgedVf2Gyl8Q==}
@@ -14903,6 +14903,12 @@ snapshots:
       lodash: 4.17.21
       postcss: 8.5.3
 
+  '@mertasan/tailwindcss-variables@2.7.0(autoprefixer@10.4.16(postcss@8.5.3))(postcss@8.5.3)':
+    dependencies:
+      autoprefixer: 10.4.16(postcss@8.5.3)
+      lodash: 4.17.21
+      postcss: 8.5.3
+
   '@monaco-editor/loader@1.4.0(monaco-editor@0.33.0)':
     dependencies:
       monaco-editor: 0.33.0
@@ -17223,7 +17229,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@supabase/shared-types@0.1.74': {}
+  '@supabase/shared-types@0.1.80': {}
 
   '@supabase/sql-to-rest@0.1.6(encoding@0.1.13)(supports-color@8.1.1)':
     dependencies:
