@@ -132,8 +132,13 @@ export const AdvancedAuthSettingsForm = () => {
 
     setIsUpdatingDatabaseForm(true)
 
+    const config = {
+      DB_MAX_POOL_SIZE:
+        values.DB_MAX_POOL_SIZE === '' ? undefined : Number(values.DB_MAX_POOL_SIZE),
+    }
+
     updateAuthConfig(
-      { projectRef: projectRef, config: values },
+      { projectRef: projectRef, config },
       {
         onError: (error) => {
           toast.error(`Failed to update database connection settings: ${error?.message}`)
