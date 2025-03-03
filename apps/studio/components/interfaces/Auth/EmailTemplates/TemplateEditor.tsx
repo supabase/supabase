@@ -335,15 +335,16 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                     </div>
                   )}
                 </TabsContent_Shadcn_>
-                <TabsContent_Shadcn_ value="preview">
+                <TabsContent_Shadcn_ value="preview" className="pt-0 mt-0">
+                  <iframe
+                    className="!mb-0 mt-0 overflow-hidden h-96 w-full"
+                    title={id}
+                    srcDoc={bodyValue}
+                  />
                   <Admonition
                     type="default"
                     title="The preview may differ slightly from the actual rendering in the email client"
-                  />
-                  <iframe
-                    className="!mb-0 overflow-hidden h-96 w-full rounded border"
-                    title={id}
-                    srcDoc={bodyValue}
+                    className="rounded-none border-0 mb-0"
                   />
                 </TabsContent_Shadcn_>
               </Tabs_Shadcn_>
