@@ -296,8 +296,6 @@ const MfaAuthSettingsForm = () => {
                             min={0}
                             max={30}
                             {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                            value={field.value || 0}
                             disabled={!canUpdateConfig}
                           />
                         </PrePostTab>
@@ -400,8 +398,6 @@ const MfaAuthSettingsForm = () => {
                           min={6}
                           max={30}
                           {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 6)}
-                          value={field.value || 6}
                           disabled={!canUpdateConfig || !isProPlanAndUp}
                         />
                       </FormControl_Shadcn_>
