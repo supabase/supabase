@@ -1663,7 +1663,7 @@ By building on Supabase's SOC 2 compliant platform, you gain a significant advan
     icon: ShieldCheck,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/security/compliance',
+    docsUrl: 'https://supabase.com/docs/guides/security/soc-2-compliance',
     slug: 'soc-2-compliance',
     status: {
       stage: PRODUCT_STAGES.GA,
