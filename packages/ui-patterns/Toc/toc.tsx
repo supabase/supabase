@@ -2,10 +2,11 @@
 
 import type { TOCItemType } from './server/get-toc'
 import * as Primitive from './toc-primitive'
-import { type ComponentProps, type HTMLAttributes, type ReactNode, useRef } from 'react'
+import { type ComponentProps, Fragment, type HTMLAttributes, type ReactNode, useRef } from 'react'
 import { TocThumb } from './toc-thumb'
 import { cn, ScrollArea, ScrollViewport } from 'ui'
 import ShimmeringLoader from '../ShimmeringLoader'
+import { removeAnchor } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
 
 export interface TOCProps {
   /**
@@ -24,10 +25,10 @@ export interface TOCProps {
 export function Toc(props: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      id="nd-toc"
+      id="toc"
       {...props}
       className={cn(
-        'sticky top-[var(--header-height)] h-(--toc-height)',
+        'sticky top-[--header-height] h-[--toc-height]',
         'max-md:hidden',
         props.className
       )}
@@ -84,7 +85,7 @@ export function TOCItems({
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  if (items.length === 0) return <TocItemsEmpty />
+  if (items.length === 0) return null
 
   return (
     <>
@@ -95,7 +96,7 @@ export function TOCItems({
       <div
         ref={containerRef}
         className={cn(
-          'toc-menu list-none text-[0.8rem] flex flex-col pl-[calc(0.75rem+5px)] border-foreground/10',
+          'list-none text-[0.8rem] flex flex-col pl-[calc(0.75rem+5px)] border-foreground/10',
           showTrack && 'border-s'
         )}
       >
@@ -107,10 +108,46 @@ export function TOCItems({
   )
 }
 
+const formatSlug = (slug: string) => {
+  // [Joshen] We will still provide support for headers declared like this:
+  //    ## REST API {#rest-api-overview}
+  // At least for now, this was a docusaurus thing.
+  if (slug.includes('#')) return slug.split('#')[1]
+  return slug
+}
+
+function formatTOCHeader(content: string) {
+  let insideInlineCode = false
+  const res: Array<{ type: 'text'; value: string } | { type: 'code'; value: string }> = []
+
+  for (const x of content) {
+    if (x === '`') {
+      if (!insideInlineCode) {
+        insideInlineCode = true
+        res.push({ type: 'code', value: '' })
+      } else {
+        insideInlineCode = false
+      }
+    } else {
+      if (insideInlineCode) {
+        res[res.length - 1].value += x
+      } else {
+        if (res.length === 0 || res[res.length - 1].type === 'code') {
+          res.push({ type: 'text', value: x })
+        } else {
+          res[res.length - 1].value += x
+        }
+      }
+    }
+  }
+
+  return res
+}
+
 function TOCItem({ item }: { item: TOCItemType }) {
   return (
     <Primitive.TOCItem
-      href={item.url}
+      href={`#${formatSlug(item.url)}`}
       className={cn(
         'text-foreground-lighter hover:text-brand-link transition-colors py-1 [overflow-wrap:anywhere] first:pt-0 last:pb-0 data-[active=true]:text-foreground',
         item.depth <= 2 && 'ps-3',
@@ -118,7 +155,15 @@ function TOCItem({ item }: { item: TOCItemType }) {
         item.depth >= 4 && 'ps-8'
       )}
     >
-      {item.title}
+      {formatTOCHeader(removeAnchor(item.title)).map((x, index) => (
+        <Fragment key={index}>
+          {x.type === 'code' ? (
+            <code className="text-xs border rounded bg-muted">{x.value}</code>
+          ) : (
+            x.value
+          )}
+        </Fragment>
+      ))}
     </Primitive.TOCItem>
   )
 }

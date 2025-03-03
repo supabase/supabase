@@ -1,51 +1,12 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { useEffect } from 'react'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import { proxy, useSnapshot } from 'valtio'
-import { highlightSelectedTocItem } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { Feedback } from '~/components/Feedback'
-import useHash from '~/hooks/useHash'
 import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns'
 import { useTocAnchors } from '../features/docs/GuidesMdx.client'
-
-const formatSlug = (slug: string) => {
-  // [Joshen] We will still provide support for headers declared like this:
-  //    ## REST API {#rest-api-overview}
-  // At least for now, this was a docusaurus thing.
-  if (slug.includes('#')) return slug.split('#')[1]
-  return slug
-}
-
-function formatTOCHeader(content: string) {
-  let insideInlineCode = false
-  const res: Array<{ type: 'text'; value: string } | { type: 'code'; value: string }> = []
-
-  for (const x of content) {
-    if (x === '`') {
-      if (!insideInlineCode) {
-        insideInlineCode = true
-        res.push({ type: 'code', value: '' })
-      } else {
-        insideInlineCode = false
-      }
-    } else {
-      if (insideInlineCode) {
-        res[res.length - 1].value += x
-      } else {
-        if (res.length === 0 || res[res.length - 1].type === 'code') {
-          res.push({ type: 'text', value: x })
-        } else {
-          res[res.length - 1].value += x
-        }
-      }
-    }
-  }
-
-  return res
-}
 
 const tocRenderSwitch = proxy({
   renderFlag: 0,
@@ -72,15 +33,7 @@ interface TOCHeader {
 const GuidesTableOfContents = ({ className, video }: { className?: string; video?: string }) => {
   useSubscribeTocRerender()
   const pathname = usePathname()
-  const [hash] = useHash()
   const { toc } = useTocAnchors()
-
-  useEffect(() => {
-    if (hash && toc?.length > 0) {
-      highlightSelectedTocItem(hash)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hash, JSON.stringify(toc)])
 
   const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
 
@@ -102,15 +55,16 @@ const GuidesTableOfContents = ({ className, video }: { className?: string; video
       <div className="pl-5">
         <Feedback key={pathname} />
       </div>
-      <Toc className="-ml-[calc(0.25rem+6px)]">
-        <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-[calc(1.5rem+6px)]">
-          On this page
-        </h3>
-        <TOCScrollArea>
-          {/* {false ? <InsetTOCItems items={toc} /> : <TOCItems items={toc} />} */}
-          <TOCItems items={toc} />
-        </TOCScrollArea>
-      </Toc>
+      {toc.length !== 0 && (
+        <Toc className="-ml-[calc(0.25rem+6px)]">
+          <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-[calc(1.5rem+6px)]">
+            On this page
+          </h3>
+          <TOCScrollArea>
+            <TOCItems items={toc} />
+          </TOCScrollArea>
+        </Toc>
+      )}
     </div>
   )
 }
