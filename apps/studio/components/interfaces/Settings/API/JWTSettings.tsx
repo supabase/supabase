@@ -225,9 +225,10 @@ const JWTSettings = () => {
                                   A random secret will be created, or you can create your own.
                                 </p>
                                 <p className="text-sm opacity-50">
-                                  This will invalidate all existing API keys, including your{' '}
+                                  This will invalidate your{' '}
                                   <code className="text-xs">service_role</code> and{' '}
-                                  <code className="text-xs">anon</code> keys.
+                                  <code className="text-xs">anon</code> API keys, and sign out all
+                                  users authenticated through Supabase Auth.
                                 </p>
                               </div>
                               <div className="flex flex-col items-end">
@@ -247,7 +248,7 @@ const JWTSettings = () => {
                                       },
                                     }}
                                   >
-                                    Generate new API Keys
+                                    Generate a random secret
                                   </ButtonTooltip>
                                 ) : (
                                   <DropdownMenu>
