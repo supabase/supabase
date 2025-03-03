@@ -16,6 +16,7 @@ import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
@@ -68,8 +69,11 @@ export const HooksListing = () => {
   }
 
   return (
-    <div className="pb-4">
-      <FormHeader title="All hooks" actions={<AddHookDropdown onSelectHook={setSelectedHook} />} />
+    <ScaffoldSection isFullWidth>
+      <div className="flex justify-between items-center mb-4">
+        <ScaffoldSectionTitle>All hooks</ScaffoldSectionTitle>
+        <AddHookDropdown onSelectHook={setSelectedHook} />
+      </div>
 
       {hooks.filter((h) => isValidHook(h)).length === 0 && (
         <div
@@ -155,6 +159,6 @@ export const HooksListing = () => {
           )}
         </div>
       </ConfirmationModal>
-    </div>
+    </ScaffoldSection>
   )
 }
