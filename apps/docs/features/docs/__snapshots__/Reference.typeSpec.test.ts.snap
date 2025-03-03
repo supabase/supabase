@@ -5970,6 +5970,212 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           ]
         }
       },
+      "@supabase/auth-js.GoTrueClient.getClaims": {
+        "name": "@supabase/auth-js.GoTrueClient.getClaims",
+        "params": [
+          {
+            "name": "jwt",
+            "type": {
+              "type": "intrinsic",
+              "name": "string"
+            },
+            "isOptional": true
+          },
+          {
+            "name": "jwks",
+            "type": {
+              "type": "object",
+              "properties": [
+                {
+                  "name": "keys",
+                  "type": {
+                    "type": "array",
+                    "elemType": {
+                      "type": "object",
+                      "name": "JWK",
+                      "properties": [
+                        {
+                          "name": "alg",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "isOptional": true
+                        },
+                        {
+                          "name": "key_ops",
+                          "type": {
+                            "type": "array",
+                            "elemType": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            }
+                          }
+                        },
+                        {
+                          "name": "kid",
+                          "type": {
+                            "type": "intrinsic",
+                            "name": "string"
+                          },
+                          "isOptional": true
+                        },
+                        {
+                          "name": "kty",
+                          "type": {
+                            "type": "union",
+                            "subTypes": [
+                              {
+                                "type": "literal",
+                                "value": "RSA"
+                              },
+                              {
+                                "type": "literal",
+                                "value": "EC"
+                              },
+                              {
+                                "type": "literal",
+                                "value": "oct"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "promise",
+            "name": "Promise",
+            "awaited": {
+              "type": "union",
+              "subTypes": [
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "object",
+                        "properties": [
+                          {
+                            "name": "claims",
+                            "type": {
+                              "type": "nameOnly",
+                              "name": "JwtPayload"
+                            }
+                          },
+                          {
+                            "name": "header",
+                            "type": {
+                              "name": "JwtHeader",
+                              "type": "object",
+                              "properties": [
+                                {
+                                  "name": "alg",
+                                  "type": {
+                                    "type": "union",
+                                    "subTypes": [
+                                      {
+                                        "type": "literal",
+                                        "value": "RS256"
+                                      },
+                                      {
+                                        "type": "literal",
+                                        "value": "ES256"
+                                      },
+                                      {
+                                        "type": "literal",
+                                        "value": "HS256"
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "name": "kid",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "typ",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "name": "signature",
+                            "type": {
+                              "type": "nameOnly",
+                              "name": "Uint8Array"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "nameOnly",
+                        "name": "AuthError"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "comment": {}
+      },
       "@supabase/auth-js.GoTrueClient.getSession": {
         "name": "@supabase/auth-js.GoTrueClient.getSession",
         "params": [],
@@ -26569,6 +26775,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "type": {
               "type": "intrinsic",
               "name": "string"
+            },
+            "comment": {
+              "shortText": "Topic name can be any string."
             }
           },
           {
@@ -26648,9 +26857,19 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             }
           },
           {
-            "name": "socket"
+            "name": "socket",
+            "type": {
+              "type": "nameOnly",
+              "name": "RealtimeClient"
+            }
           }
-        ]
+        ],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "RealtimeChannel"
+          }
+        }
       },
       "@supabase/realtime-js.RealtimeChannel.on": {
         "name": "@supabase/realtime-js.RealtimeChannel.on",
@@ -26691,6 +26910,12 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             }
           }
         ],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "RealtimeChannel"
+          }
+        },
         "comment": {
           "shortText": "Creates an event handler that listens to changes."
         },
@@ -26772,7 +26997,16 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   }
                 }
               }
-            ]
+            ],
+            "ret": {
+              "type": {
+                "type": "nameOnly",
+                "name": "RealtimeChannel"
+              }
+            },
+            "comment": {
+              "shortText": "Creates an event handler that listens to changes."
+            }
           },
           {
             "params": [
@@ -26851,7 +27085,16 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   }
                 }
               }
-            ]
+            ],
+            "ret": {
+              "type": {
+                "type": "nameOnly",
+                "name": "RealtimeChannel"
+              }
+            },
+            "comment": {
+              "shortText": "Creates an event handler that listens to changes."
+            }
           },
           {
             "params": [
@@ -26924,9 +27167,18 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                         "type": "union",
                         "name": "RealtimePostgresChangesPayload",
                         "subTypes": [
-                          null,
-                          null,
-                          null
+                          {
+                            "type": "nameOnly",
+                            "name": "RealtimePostgresInsertPayload"
+                          },
+                          {
+                            "type": "nameOnly",
+                            "name": "RealtimePostgresUpdatePayload"
+                          },
+                          {
+                            "type": "nameOnly",
+                            "name": "RealtimePostgresDeletePayload"
+                          }
                         ]
                       }
                     }
@@ -26939,7 +27191,16 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   }
                 }
               }
-            ]
+            ],
+            "ret": {
+              "type": {
+                "type": "nameOnly",
+                "name": "RealtimeChannel"
+              }
+            },
+            "comment": {
+              "shortText": "Creates an event handler that listens to changes."
+            }
           },
           {
             "params": [
@@ -27022,7 +27283,16 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   }
                 }
               }
-            ]
+            ],
+            "ret": {
+              "type": {
+                "type": "nameOnly",
+                "name": "RealtimeChannel"
+              }
+            },
+            "comment": {
+              "shortText": "Creates an event handler that listens to changes."
+            }
           },
           {
             "params": [
@@ -27105,7 +27375,16 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   }
                 }
               }
-            ]
+            ],
+            "ret": {
+              "type": {
+                "type": "nameOnly",
+                "name": "RealtimeChannel"
+              }
+            },
+            "comment": {
+              "shortText": "Creates an event handler that listens to changes."
+            }
           },
           {
             "params": [
@@ -27188,7 +27467,16 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   }
                 }
               }
-            ]
+            ],
+            "ret": {
+              "type": {
+                "type": "nameOnly",
+                "name": "RealtimeChannel"
+              }
+            },
+            "comment": {
+              "shortText": "Creates an event handler that listens to changes."
+            }
           },
           {
             "params": [
@@ -27256,10 +27544,16 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   }
                 },
                 "comment": {
-                  "shortText": "Function to be invoked when event handler is triggered.\\n"
+                  "shortText": "Function to be invoked when event handler is triggered."
                 }
               }
             ],
+            "ret": {
+              "type": {
+                "type": "nameOnly",
+                "name": "RealtimeChannel"
+              }
+            },
             "comment": {
               "shortText": "The following is placed here to display on supabase.com/docs/reference/javascript/subscribe."
             }
@@ -27331,7 +27625,16 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   }
                 }
               }
-            ]
+            ],
+            "ret": {
+              "type": {
+                "type": "nameOnly",
+                "name": "RealtimeChannel"
+              }
+            },
+            "comment": {
+              "shortText": "Creates an event handler that listens to changes."
+            }
           },
           {
             "params": [
@@ -27366,7 +27669,16 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   }
                 }
               }
-            ]
+            ],
+            "ret": {
+              "type": {
+                "type": "nameOnly",
+                "name": "RealtimeChannel"
+              }
+            },
+            "comment": {
+              "shortText": "Creates an event handler that listens to changes."
+            }
           }
         ]
       },
@@ -27463,7 +27775,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               }
             },
             "comment": {
-              "shortText": "Options to be used during the send process\\n"
+              "shortText": "Options to be used during the send process"
             }
           }
         ],
@@ -27536,6 +27848,12 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             }
           }
         ],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "RealtimeChannel"
+          }
+        },
         "comment": {
           "shortText": "Subscribe registers your client with the server"
         }
@@ -27632,8 +27950,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Leaves the channel.",
-          "text": "Unsubscribes from server events, and instructs channel to terminate on server.\\nTriggers onClose() hooks.\\n\\nTo receive leave acknowledgements, use the a \`receive\` hook to bind to the server ack, ie:\\nchannel.unsubscribe().receive(\\"ok\\", () => alert(\\"left!\\") )\\n"
+          "shortText": "Leaves the channel.\\n\\nUnsubscribes from server events, and instructs channel to terminate on server.\\nTriggers onClose() hooks.\\n\\nTo receive leave acknowledgements, use the a \`receive\` hook to bind to the server ack, ie:\\nchannel.unsubscribe().receive(\\"ok\\", () => alert(\\"left!\\") )"
         }
       },
       "@supabase/realtime-js.RealtimeChannel.untrack": {
@@ -27724,6 +28041,33 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               "type": "object",
               "properties": [
                 {
+                  "name": "accessToken",
+                  "type": {
+                    "type": "function",
+                    "params": [],
+                    "ret": {
+                      "type": {
+                        "type": "promise",
+                        "name": "Promise",
+                        "awaited": {
+                          "type": "union",
+                          "subTypes": [
+                            {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            {
+                              "type": "literal",
+                              "value": null
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "isOptional": true
+                },
+                {
                   "name": "decode",
                   "type": {
                     "type": "nameOnly",
@@ -27773,25 +28117,8 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                 {
                   "name": "log_level",
                   "type": {
-                    "type": "union",
-                    "subTypes": [
-                      {
-                        "type": "literal",
-                        "value": "info"
-                      },
-                      {
-                        "type": "literal",
-                        "value": "debug"
-                      },
-                      {
-                        "type": "literal",
-                        "value": "warn"
-                      },
-                      {
-                        "type": "literal",
-                        "value": "error"
-                      }
-                    ]
+                    "type": "nameOnly",
+                    "name": "LogLevel"
                   },
                   "isOptional": true
                 },
@@ -27800,6 +28127,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                   "type": {
                     "type": "nameOnly",
                     "name": "Function"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "logLevel",
+                  "type": {
+                    "type": "nameOnly",
+                    "name": "LogLevel"
                   },
                   "isOptional": true
                 },
@@ -27857,65 +28192,20 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     "name": "string"
                   },
                   "isOptional": true
-                },
-                {
-                  "type": "function",
-                  "name": "accessToken",
-                  "params": [],
-                  "ret": {
-                    "type": {
-                      "type": "promise",
-                      "name": "Promise",
-                      "awaited": {
-                        "type": "union",
-                        "subTypes": [
-                          {
-                            "type": "literal",
-                            "value": null
-                          },
-                          {
-                            "type": "intrinsic",
-                            "name": "string"
-                          }
-                        ]
-                      }
-                    }
-                  }
                 }
               ]
             },
             "isOptional": true
           }
         ],
-        "comment": {
-          "shortText": "Initializes the Socket."
-        }
-      },
-      "@supabase/realtime-js.RealtimeClient._workerObjectUrl": {
-        "name": "@supabase/realtime-js.RealtimeClient._workerObjectUrl",
-        "params": [
-          {
-            "name": "url",
-            "type": {
-              "type": "union",
-              "subTypes": [
-                {
-                  "type": "intrinsic",
-                  "name": "undefined"
-                },
-                {
-                  "type": "intrinsic",
-                  "name": "string"
-                }
-              ]
-            }
-          }
-        ],
         "ret": {
           "type": {
-            "type": "intrinsic",
-            "name": "string"
+            "type": "nameOnly",
+            "name": "RealtimeClient"
           }
+        },
+        "comment": {
+          "shortText": "Initializes the Socket."
         }
       },
       "@supabase/realtime-js.RealtimeClient.channel": {
@@ -28004,7 +28294,13 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               ]
             }
           }
-        ]
+        ],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "RealtimeChannel"
+          }
+        }
       },
       "@supabase/realtime-js.RealtimeClient.connect": {
         "name": "@supabase/realtime-js.RealtimeClient.connect",
@@ -28054,7 +28350,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             },
             "isOptional": true,
             "comment": {
-              "shortText": "A custom reason for the disconnect.\\n"
+              "shortText": "A custom reason for the disconnect."
             }
           }
         ],
@@ -28078,8 +28374,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Returns the URL of the websocket.",
-          "returns": "string The URL of the websocket.\\n"
+          "shortText": "Returns the URL of the websocket."
         }
       },
       "@supabase/realtime-js.RealtimeClient.flushSendBuffer": {
@@ -28100,7 +28395,11 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "params": [],
         "ret": {
           "type": {
-            "type": "array"
+            "type": "array",
+            "elemType": {
+              "type": "nameOnly",
+              "name": "RealtimeChannel"
+            }
           }
         },
         "comment": {
@@ -28153,8 +28452,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Logs the message.",
-          "text": "For customized logging, \`this.logger\` can be overridden.\\n"
+          "shortText": "Logs the message.\\n\\nFor customized logging, \`this.logger\` can be overridden."
         }
       },
       "@supabase/realtime-js.RealtimeClient.push": {
@@ -28213,8 +28511,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Push out a message if the socket is connected.",
-          "text": "If the socket is not connected, the message gets enqueued within a local buffer, and sent out when a connection is next established.\\n"
+          "shortText": "Push out a message if the socket is connected.\\n\\nIf the socket is not connected, the message gets enqueued within a local buffer, and sent out when a connection is next established."
         }
       },
       "@supabase/realtime-js.RealtimeClient.removeAllChannels": {
@@ -28256,8 +28553,12 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "params": [
           {
             "name": "channel",
+            "type": {
+              "type": "nameOnly",
+              "name": "RealtimeChannel"
+            },
             "comment": {
-              "shortText": "A RealtimeChannel instance\\n"
+              "shortText": "A RealtimeChannel instance"
             }
           }
         ],
@@ -28325,7 +28626,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               ]
             },
             "comment": {
-              "shortText": "A JWT string to override the token set on the client.\\n"
+              "shortText": "A JWT string to override the token set on the client."
             }
           }
         ],
@@ -28340,8 +28641,7 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           }
         },
         "comment": {
-          "shortText": "Sets the JWT access token used for channel subscription authorization and Realtime RLS.",
-          "text": "If param is null it will use the \`accessToken\` callback function or the token set on the client.\\n\\nOn callback used, it will set the value of the token internal to the client.\\n"
+          "shortText": "Sets the JWT access token used for channel subscription authorization and Realtime RLS.\\n\\nIf param is null it will use the \`accessToken\` callback function or the token set on the client.\\n\\nOn callback used, it will set the value of the token internal to the client."
         }
       },
       "@supabase/realtime-js.RealtimePresence.constructor": {
@@ -28349,6 +28649,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
         "params": [
           {
             "name": "channel",
+            "type": {
+              "type": "nameOnly",
+              "name": "RealtimeChannel"
+            },
             "comment": {
               "shortText": "The RealtimeChannel"
             }
@@ -28357,14 +28661,20 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             "name": "opts",
             "type": {
               "type": "nameOnly",
-              "name": "@types/phoenix.PresenceOpts"
+              "name": "PresenceOpts"
             },
             "isOptional": true,
             "comment": {
-              "shortText": "The options,\\n       for example \`{events: {state: 'state', diff: 'diff'}}\`\\n"
+              "shortText": "The options,\\n       for example \`{events: {state: 'state', diff: 'diff'}}\`"
             }
           }
         ],
+        "ret": {
+          "type": {
+            "type": "nameOnly",
+            "name": "RealtimePresence"
+          }
+        },
         "comment": {
           "shortText": "Initializes the Presence."
         }
