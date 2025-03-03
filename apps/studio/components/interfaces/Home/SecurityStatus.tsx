@@ -89,7 +89,9 @@ export const SecurityStatus = () => {
                         <div>
                           <p className="text-xs">Service Role Key Leak</p>
                           <p className="text-xs text-foreground-light">
-                            Your service role key grants full read and write access to your database and Auth admin APIs. Do not use it within a browser and rotate the JWT secret immediately.
+                            Your service role key grants full read and write access to your database
+                            and Auth admin APIs. Do not use it within a browser and rotate the JWT
+                            secret immediately.
                           </p>
                         </div>
                       </div>
