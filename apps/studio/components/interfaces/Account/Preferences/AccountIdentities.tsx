@@ -1,38 +1,48 @@
 import { Edit, Unlink } from 'lucide-react'
 import Image from 'next/image'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import Panel from 'components/ui/Panel'
-import { useSession } from 'lib/auth'
-import { BASE_PATH } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import Panel from 'components/ui/Panel'
+import { useUnlinkIdentityMutation } from 'data/profile/profile-unlink-identity-mutation'
+import { useSession } from 'lib/auth'
+import { BASE_PATH } from 'lib/constants'
 import { cn, Dialog, DialogContent, DialogHeader, DialogTitle } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   ChangeEmailAddressForm,
   GitHubChangeEmailAddress,
   SSOChangeEmailAddress,
 } from './ChangeEmailAddress'
 
-// Unlink
-// Update email
-// View existing identities
-
-// Hide unlink if only identity
-// How about reset password?
-
 export const AccountIdentities = () => {
   const router = useRouter()
   const session = useSession()
   const identities = session?.user.identities ?? []
 
-  const [updateProvider, setUpdateProvider] = useState<string>()
+  const [selectedProviderUnlink, setSelectedProviderUnlink] = useState<string>()
+  const [selectedProviderUpdateEmail, setSelectedProviderUpdateEmail] = useState<string>()
+
+  const { mutate: unlinkIdentity, isLoading } = useUnlinkIdentityMutation({
+    onSuccess: () => {
+      toast.success(
+        `Successfully unlinked ${getProviderName(selectedProviderUnlink ?? '')} identity. Identities will be updated when you log out and log back in.`
+      )
+      setSelectedProviderUnlink(undefined)
+    },
+  })
 
   const [_, message] = router.asPath.split('#message=')
 
   const getProviderName = (provider: string) =>
     provider === 'github' ? 'GitHub' : provider === 'sso' ? 'SSO' : provider
+
+  const onConfirmUnlinkIdentity = async () => {
+    const identity = identities.find((i) => i.provider === selectedProviderUnlink)
+    if (identity) unlinkIdentity(identity)
+  }
 
   useEffect(() => {
     if (message) toast.success(message.replaceAll('+', ' '))
@@ -78,7 +88,7 @@ export const AccountIdentities = () => {
                   type="text"
                   icon={<Edit />}
                   className="w-7"
-                  onClick={() => setUpdateProvider(provider)}
+                  onClick={() => setSelectedProviderUpdateEmail(provider)}
                   tooltip={{ content: { side: 'bottom', text: 'Update email address' } }}
                 />
                 {identities.length > 1 && (
@@ -86,7 +96,7 @@ export const AccountIdentities = () => {
                     type="text"
                     icon={<Unlink />}
                     className="w-7"
-                    onClick={() => console.log('unlink', provider)}
+                    onClick={() => setSelectedProviderUnlink(provider)}
                     tooltip={{ content: { side: 'bottom', text: 'Unlink identity' } }}
                   />
                 )}
@@ -97,28 +107,44 @@ export const AccountIdentities = () => {
       </Panel>
 
       <Dialog
-        open={!!updateProvider}
+        open={!!selectedProviderUpdateEmail}
         onOpenChange={(open: boolean) => {
-          if (!open) setUpdateProvider(undefined)
+          if (!open) setSelectedProviderUpdateEmail(undefined)
         }}
       >
         <DialogContent>
           <DialogHeader className="border-b">
             <DialogTitle>
-              {updateProvider !== 'email'
-                ? `Updating email address for ${getProviderName(updateProvider ?? '')} identity`
+              {selectedProviderUpdateEmail !== 'email'
+                ? `Updating email address for ${getProviderName(selectedProviderUpdateEmail ?? '')} identity`
                 : 'Update email address'}
             </DialogTitle>
           </DialogHeader>
-          {updateProvider === 'github' ? (
+          {selectedProviderUpdateEmail === 'github' ? (
             <GitHubChangeEmailAddress />
-          ) : updateProvider === 'sso' ? (
+          ) : selectedProviderUpdateEmail === 'sso' ? (
             <SSOChangeEmailAddress />
           ) : (
-            <ChangeEmailAddressForm onClose={() => setUpdateProvider(undefined)} />
+            <ChangeEmailAddressForm onClose={() => setSelectedProviderUpdateEmail(undefined)} />
           )}
         </DialogContent>
       </Dialog>
+
+      <ConfirmationModal
+        variant="warning"
+        loading={isLoading}
+        visible={!!selectedProviderUnlink}
+        title={`Unlink ${getProviderName(selectedProviderUnlink ?? '')} identity`}
+        onCancel={() => setSelectedProviderUnlink(undefined)}
+        onConfirm={() => onConfirmUnlinkIdentity()}
+        confirmLabel="Unlink identity"
+        confirmLabelLoading="Unlinking identity"
+        alert={{
+          base: { variant: 'warning' },
+          title: `Confirm to unlink ${getProviderName(selectedProviderUnlink ?? '')} identity from account`,
+          description: 'This action cannot be undone',
+        }}
+      />
     </>
   )
 }

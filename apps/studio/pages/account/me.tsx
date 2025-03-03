@@ -1,6 +1,5 @@
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { AccountIdentities } from 'components/interfaces/Account/Preferences/AccountIdentities'
-import { AccountInformation } from 'components/interfaces/Account/Preferences/AccountInformation'
 import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
@@ -72,7 +71,7 @@ const ProfileCard = () => {
         <>
           {profileUpdateEnabled && isSuccess ? <ProfileInformation /> : null}
           <AccountIdentities />
-          <AccountInformation />
+          {/* <AccountInformation /> */}
         </>
       )}
 
