@@ -6,8 +6,6 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Label_Shadcn_,
-  PrePostTab,
-  PrePostTabProps,
   cn,
 } from 'ui'
 
@@ -27,8 +25,6 @@ type Props = {
   labelLayout?: 'horizontal' | 'vertical'
   isReactForm?: boolean
   hideMessage?: boolean
-  preTab?: PrePostTabProps['preTab']
-  postTab?: PrePostTabProps['postTab']
   name?: string
 }
 
@@ -365,17 +361,6 @@ export const FormLayout = React.forwardRef<
       </>
     )
 
-    const ChildrenWrapper = () => {
-      if (preTab || postTab) {
-        return (
-          <PrePostTab preTab={preTab} postTab={postTab} className="w-full">
-            {props.children}
-          </PrePostTab>
-        )
-      }
-      return props.children
-    }
-
     return (
       <div
         ref={ref}
@@ -384,7 +369,6 @@ export const FormLayout = React.forwardRef<
       >
         {flex && (
           <div className={cn(FlexContainer({ flex, align, layout }))}>
-            <ChildrenWrapper />
             {layout === 'flex-row-reverse' && renderError}
           </div>
         )}
@@ -446,9 +430,7 @@ export const FormLayout = React.forwardRef<
                   })
                 )}
                 data-formlayout-id={'nonBoxInputContainer'}
-              >
-                <ChildrenWrapper />
-              </div>
+              ></div>
               {renderError}
               {renderDescription}
             </>
