@@ -1,8 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
+import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -26,11 +27,13 @@ export interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
   provider: Provider
   isActive: boolean
+  queryProvider?: string
 }
 
-export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
+export const ProviderForm = ({ config, provider, isActive, queryProvider }: ProviderFormProps) => {
   const [open, setOpen] = useState(false)
   const { ref: projectRef, provider: urlProvider } = useParams()
+  const router = useRouter()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
@@ -113,10 +116,35 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     )
   }
 
+  // Open or close the form based on the query parameter
+  useEffect(() => {
+    const isProviderInQuery =
+      typeof router.query.provider === 'string' &&
+      router.query.provider.toLowerCase() === provider.title.toLowerCase()
+    setOpen(isProviderInQuery)
+  }, [router.query.provider, provider.title])
+
+  // Update URL when form is closed via the Sheet's onOpenChange
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen && router.query.provider === provider.title) {
+      // Remove provider query param when closed
+      const query = { ...router.query }
+      delete query.provider
+      router.replace({ pathname: router.pathname, query }, undefined, { shallow: true })
+    }
+  }
+
+  // Handle clicking on a provider in the list
+  const handleProviderClick = () => {
+    // Update URL with provider query param
+    const query = { ...router.query, provider: provider.title }
+    router.replace({ pathname: router.pathname, query }, undefined, { shallow: true })
+  }
+
   return (
     <>
       <ResourceItem
-        onClick={() => setOpen(true)}
+        onClick={handleProviderClick}
         media={
           <img
             src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}.svg`}
@@ -143,7 +171,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
         {provider.title}
       </ResourceItem>
 
-      <Sheet open={open} onOpenChange={setOpen}>
+      <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetContent className="flex flex-col gap-0">
           <SheetHeader className="shrink-0 flex items-center gap-4">
             <img
