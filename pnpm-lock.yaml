@@ -14903,12 +14903,6 @@ snapshots:
       lodash: 4.17.21
       postcss: 8.5.3
 
-  '@mertasan/tailwindcss-variables@2.7.0(autoprefixer@10.4.16(postcss@8.5.3))(postcss@8.5.3)':
-    dependencies:
-      autoprefixer: 10.4.16(postcss@8.5.3)
-      lodash: 4.17.21
-      postcss: 8.5.3
-
   '@monaco-editor/loader@1.4.0(monaco-editor@0.33.0)':
     dependencies:
       monaco-editor: 0.33.0
