@@ -54,6 +54,7 @@ const FlowingLine = ({
               y1="-20"
               x2="2"
               y2={y2 - y1 + 26}
+              // [Joshen] JFYI this is causing some looped console errors whenever the Connect UI is opens
               animate={{
                 y1: [-20, y2 - y1 + 26],
                 y2: [0, y2 - y1 + 46],
