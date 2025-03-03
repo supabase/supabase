@@ -254,7 +254,7 @@ const JWTSettings = () => {
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button type="default" iconRight={<ChevronDown size={14} />}>
-                                        <span>Generate new API Keys</span>
+                                        <span>Generate a new secret</span>
                                       </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" side="bottom">
@@ -263,7 +263,7 @@ const JWTSettings = () => {
                                         onClick={() => setIsGeneratingKey(true)}
                                       >
                                         <RefreshCw size={16} />
-                                        <p>Generate new API Keys</p>
+                                        <p>Generate a new secret</p>
                                       </DropdownMenuItem>
                                       <DropdownMenuSeparator />
                                       <DropdownMenuItem
