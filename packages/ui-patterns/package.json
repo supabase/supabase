@@ -36,6 +36,7 @@
     "reactflow": "*",
     "recharts": "^2.8.0",
     "remark-gfm": "^4.0.0",
+    "scroll-into-view-if-needed": "^3.1.0",
     "sonner": "^1.5.0",
     "sql-formatter": "^15.0.0",
     "sse.js": "^2.2.0",

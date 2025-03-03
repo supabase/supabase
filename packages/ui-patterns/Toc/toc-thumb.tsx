@@ -1,7 +1,8 @@
+'use client'
+
 import { type HTMLAttributes, type RefObject, useEffect, useRef } from 'react'
-import * as Primitive from './toc.ui-pattern'
-import { useOnChange } from '~/lib/use-on-change'
-import { useEffectEvent } from '~/lib/use-effect-event'
+import * as Primitive from './toc-primitive'
+import { useEffectEvent, useOnChange } from 'common'
 
 export type TOCThumb = [top: number, height: number]
 
@@ -16,8 +17,6 @@ function calc(container: HTMLElement, active: string[]): TOCThumb {
   for (const item of active) {
     const element = container.querySelector<HTMLElement>(`a[href="#${item}"]`)
 
-    console.log('item', item)
-    console.log('element', element)
     if (!element) continue
 
     const styles = getComputedStyle(element)
@@ -32,8 +31,8 @@ function calc(container: HTMLElement, active: string[]): TOCThumb {
 }
 
 function update(element: HTMLElement, info: TOCThumb): void {
-  element.style.setProperty('--fd-top', `${info[0]}px`)
-  element.style.setProperty('--fd-height', `${info[1]}px`)
+  element.style.setProperty('--toc-top', `${info[0]}px`)
+  element.style.setProperty('--toc-height', `${info[1]}px`)
 }
 
 export function TocThumb({

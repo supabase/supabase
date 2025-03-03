@@ -8,9 +8,7 @@ import { proxy, useSnapshot } from 'valtio'
 import { highlightSelectedTocItem } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { Feedback } from '~/components/Feedback'
 import useHash from '~/hooks/useHash'
-import { Toc, TOCItems, TOCScrollArea } from 'components/Toc/toc.component'
-import InsetTOCItems from '~/components/Toc/toc-inset'
-import { Text } from 'lucide-react'
+import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns'
 import { useTocAnchors } from '../features/docs/GuidesMdx.client'
 
 const formatSlug = (slug: string) => {
@@ -105,6 +103,9 @@ const GuidesTableOfContents = ({ className, video }: { className?: string; video
         <Feedback key={pathname} />
       </div>
       <Toc className="-ml-[calc(0.25rem+6px)]">
+        <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-[calc(1.5rem+6px)]">
+          On this page
+        </h3>
         <TOCScrollArea>
           {/* {false ? <InsetTOCItems items={toc} /> : <TOCItems items={toc} />} */}
           <TOCItems items={toc} />

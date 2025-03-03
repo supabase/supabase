@@ -8,11 +8,7 @@
 import { MDXProvider } from '@mdx-js/react'
 import { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react'
 import { components } from '~/features/docs/MdxBase.shared'
-import {
-  ActiveAnchorContext,
-  type AnchorProviderProps,
-  AnchorProvider,
-} from 'components/Toc/toc.ui-pattern'
+import { type AnchorProviderProps, AnchorProvider } from 'ui-patterns'
 
 interface TOCHeader {
   id?: string

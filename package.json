@@ -68,9 +68,5 @@
     "database",
     "auth"
   ],
-  "packageManager": "pnpm@9.15.5",
-  "dependencies": {
-    "docs": "0.3.2-canary.0",
-    "scroll-into-view-if-needed": "^3.1.0"
-  }
+  "packageManager": "pnpm@9.15.5"
 }

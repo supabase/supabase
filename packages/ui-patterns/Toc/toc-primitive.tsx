@@ -1,12 +1,11 @@
 'use client'
+
 import type { AnchorHTMLAttributes, ReactNode, RefObject } from 'react'
 import { createContext, forwardRef, useContext, useMemo, useRef } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import type { TableOfContents } from './server/get-toc'
 
-import { useOnChange } from '~/lib/use-on-change'
-import { useAnchorObserver } from '~/lib/use-anchor-observer'
-import { mergeRefs } from '~/lib/merge-refs'
+import { mergeRefs, useAnchorObserver, useOnChange } from 'common'
 
 export const ActiveAnchorContext = createContext<string[]>([])
 

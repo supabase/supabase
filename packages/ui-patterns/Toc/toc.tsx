@@ -1,10 +1,11 @@
 'use client'
+
 import type { TOCItemType } from './server/get-toc'
-import * as Primitive from './toc.ui-pattern'
-import React, { type ComponentProps, type HTMLAttributes, type ReactNode, useRef } from 'react'
+import * as Primitive from './toc-primitive'
+import { type ComponentProps, type HTMLAttributes, type ReactNode, useRef } from 'react'
 import { TocThumb } from './toc-thumb'
 import { cn, ScrollArea, ScrollViewport } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import ShimmeringLoader from '../ShimmeringLoader'
 
 export interface TOCProps {
   /**
@@ -26,18 +27,18 @@ export function Toc(props: HTMLAttributes<HTMLDivElement>) {
       id="nd-toc"
       {...props}
       className={cn(
-        'sticky top-[calc(var[(--fd-banner-height)]+var(--fd-nav-height))] h-(--fd-toc-height)',
+        'sticky top-[var(--header-height)] h-(--toc-height)',
         'max-md:hidden',
         props.className
       )}
       style={
         {
           ...props.style,
-          '--fd-toc-height': 'calc(100dvh - var(--fd-banner-height) - var(--fd-nav-height))',
+          '--toc-height': 'calc(100dvh - var(--header-height) - 3rem',
         } as object
       }
     >
-      <div className="flex h-full w-[--fd-toc-width] max-w-full flex-col gap-3 pe-4">
+      <div className="flex h-full w-[--toc-width] max-w-full flex-col gap-3 pe-4">
         {props.children}
       </div>
     </div>
@@ -89,11 +90,14 @@ export function TOCItems({
     <>
       <TocThumb
         containerRef={containerRef}
-        className="absolute start-0 mt-[--fd-top] h-[--fd-height] w-px bg-foreground transition-all"
+        className="absolute start-0 mt-[--toc-top] h-[--toc-height] w-px bg-foreground transition-all"
       />
       <div
         ref={containerRef}
-        className={cn('flex flex-col pl-5 border-foreground/10', showTrack && 'border-s')}
+        className={cn(
+          'toc-menu list-none text-[0.8rem] flex flex-col pl-[calc(0.75rem+5px)] border-foreground/10',
+          showTrack && 'border-s'
+        )}
       >
         {items.map((item) => (
           <TOCItem key={item.url} item={item} />
@@ -108,7 +112,7 @@ function TOCItem({ item }: { item: TOCItemType }) {
     <Primitive.TOCItem
       href={item.url}
       className={cn(
-        'prose py-1.5 text-sm text-foreground-lighter transition-colors [overflow-wrap:anywhere] first:pt-0 last:pb-0 data-[active=true]:text-foreground',
+        'text-foreground-lighter hover:text-brand-link transition-colors py-1 [overflow-wrap:anywhere] first:pt-0 last:pb-0 data-[active=true]:text-foreground',
         item.depth <= 2 && 'ps-3',
         item.depth === 3 && 'ps-6',
         item.depth >= 4 && 'ps-8'

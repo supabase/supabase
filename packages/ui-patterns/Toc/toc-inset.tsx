@@ -1,12 +1,13 @@
 'use client'
+
 import type { TOCItemType } from './server/get-toc'
-import * as Primitive from './toc.ui-pattern'
+import * as TocPrimitive from './toc-primitive'
 import { useEffect, useRef, useState } from 'react'
 import { TocThumb } from './toc-thumb'
-import { TocItemsEmpty } from './toc.component'
+import { TocItemsEmpty } from './toc'
 import { cn } from 'ui'
 
-export default function ClerkTOCItems({ items }: { items: TOCItemType[] }) {
+export default function TocInsetItems({ items }: { items: TOCItemType[] }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   const [svg, setSvg] = useState<{
@@ -122,7 +123,7 @@ function TOCItem({
     lowerOffset = getLineOffset(lower)
 
   return (
-    <Primitive.TOCItem
+    <TocPrimitive.TOCItem
       href={item.url}
       style={{
         paddingInlineStart: getItemOffset(item.depth),
@@ -156,6 +157,6 @@ function TOCItem({
         }}
       />
       {item.title}
-    </Primitive.TOCItem>
+    </TocPrimitive.TOCItem>
   )
 }
