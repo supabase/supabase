@@ -2,8 +2,8 @@ import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 
 import Panel from 'components/ui/Panel'
-import type { Profile } from 'data/profile/types'
 import { useSession } from 'lib/auth'
+import { useProfile } from 'lib/profile'
 import {
   Button,
   CollapsibleContent_Shadcn_,
@@ -13,8 +13,11 @@ import {
   Label_Shadcn_,
 } from 'ui'
 
-const AccountInformation = ({ profile }: { profile?: Profile }) => {
+export const AccountInformation = () => {
   const session = useSession()
+  const { profile } = useProfile()
+
+  const isEmailProvider = session?.user.app_metadata.provider === 'email'
 
   return (
     <Panel
@@ -63,7 +66,7 @@ const AccountInformation = ({ profile }: { profile?: Profile }) => {
                   </CollapsibleTrigger_Shadcn_>
                   <CollapsibleContent_Shadcn_ className=" mt-2">
                     <div className="bg-surface-200 p-4 rounded-lg grid gap-4">
-                      {session?.user.app_metadata.provider === 'email' ? (
+                      {isEmailProvider ? (
                         <div>
                           <ol className="text-sm ml-4 pl-2 list-decimal">
                             <li>Create a new account with the new email</li>
@@ -98,7 +101,7 @@ const AccountInformation = ({ profile }: { profile?: Profile }) => {
               </div>
             </div>
           </div>
-          {session?.user.app_metadata.provider === 'email' && (
+          {isEmailProvider && (
             <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4">
               <div className="flex flex-col space-y-2 col-span-4 ">
                 <p className="text-foreground-light break-all">Password</p>
@@ -115,5 +118,3 @@ const AccountInformation = ({ profile }: { profile?: Profile }) => {
     </Panel>
   )
 }
-
-export default AccountInformation

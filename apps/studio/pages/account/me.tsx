@@ -1,5 +1,7 @@
-import { AccountInformation, AnalyticsSettings } from 'components/interfaces/Account/Preferences'
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
+import { AccountIdentities } from 'components/interfaces/Account/Preferences/AccountIdentities'
+import { AccountInformation } from 'components/interfaces/Account/Preferences/AccountInformation'
+import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
@@ -48,7 +50,7 @@ export default User
 
 const ProfileCard = () => {
   const profileUpdateEnabled = useIsFeatureEnabled('profile:update')
-  const { profile, error, isLoading, isError, isSuccess } = useProfile()
+  const { error, isLoading, isError, isSuccess } = useProfile()
 
   return (
     <article>
@@ -68,10 +70,9 @@ const ProfileCard = () => {
       )}
       {isSuccess && (
         <>
-          <section>
-            <AccountInformation profile={profile} />
-          </section>
-          {profileUpdateEnabled && isSuccess ? <ProfileInformation profile={profile!} /> : null}
+          {profileUpdateEnabled && isSuccess ? <ProfileInformation /> : null}
+          <AccountIdentities />
+          <AccountInformation />
         </>
       )}
 

@@ -4,7 +4,7 @@ import Panel from 'components/ui/Panel'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 import { useAppStateSnapshot } from 'state/app-state'
 
-const AnalyticsSettings = () => {
+export const AnalyticsSettings = () => {
   const snap = useAppStateSnapshot()
   const { mutate: sendReset } = useSendResetMutation()
 
@@ -27,5 +27,3 @@ const AnalyticsSettings = () => {
     </Panel>
   )
 }
-
-export default AnalyticsSettings
