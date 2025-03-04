@@ -952,17 +952,6 @@ parameters:
     description: |
       Display name used as the sender for emails sent from the application.
 
-  - id: 'auth.email.smtp.rate_limit_email_sent'
-    title: 'auth.email.smtp.rate_limit_email_sent'
-    tags: ['auth']
-    required: false
-    default: '2'
-    description: |
-      Rate limit for email sending requests per hour. Controls how many emails can be sent to a single address within an hour.
-    links:
-      - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
-
   - id: 'auth.email.template.type.subject'
     title: 'auth.email.template.<type>.subject'
     tags: ['auth']
@@ -1029,17 +1018,6 @@ parameters:
     usage: |
       [auth.sms.test_otp]
       4152127777 = "123456"
-
-  - id: 'auth.sms.rate_limit_sms_sent'
-    title: 'auth.sms.rate_limit_sms_sent'
-    tags: ['auth']
-    required: false
-    default: '30'
-    description: |
-      Rate limit for SMS sending requests per hour. Controls how many SMS messages can be sent to a single phone number within an hour.
-    links:
-      - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
 
   - id: 'auth.sms.provider.enabled'
     title: 'auth.sms.<provider>.enabled'
