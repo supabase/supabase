@@ -8,10 +8,9 @@ tocVideo: '4Roog4PAmZ8'
 
 In this tutorial you will learn how to build and edge API to generate, stream, store, and cache speech from text using Supabase Edge Functions, Supabase Storage, and ElevenLabs.`
 
-<Tip title="Prefer to jump straight to the code?" icon="lightbulb">
-  Find the [example project on
-  GitHub](https://github.com/elevenlabs/elevenlabs-examples/tree/main/examples/text-to-speech/supabase/stream-and-cache-storage).
-</Tip>
+<Admonition type="tip">
+  Find the [example project on GitHub](https://github.com/elevenlabs/elevenlabs-examples/tree/main/examples/text-to-speech/supabase/stream-and-cache-storage).
+</Admonition>
 
 ## Requirements
 
@@ -42,11 +41,11 @@ allowed_mime_types = ["audio/mp3"]
 objects_path = "./audio"
 ```
 
-<Note>
+<Admonition type="tip">
   Upon running `supabase start` this will create a new storage bucket in your local Supabase
   project. Should you want to push this to your hosted Supabase project, you can run `supabase seed
   buckets --linked`.
-</Note>
+</Admonition>
 
 ### Configure background tasks for Supabase Edge Functions
 
@@ -57,10 +56,10 @@ To use background tasks in Supabase Edge Functions when developing locally, you 
 policy = "per_worker"
 ```
 
-<Note>
+<Admonition type="tip">
   When running with `per_worker` policy, Function won't auto-reload on edits. You will need to
   manually restart it by running `supabase functions serve`.
-</Note>
+</Admonition>
 
 ### Create a Supabase Edge Function for Speech generation
 
@@ -188,124 +187,6 @@ Deno.serve(async (req) => {
   }
 });
 ```
-
-### Code deep dive
-
-There's a couple of things worth noting about the code. Let's step through it step by step.
-
-<Steps>
-  <Step title="Handle the incoming request">
-    To handle the incoming request, use the `Deno.serve` handler. In the demo we don't validate the request origin, but you can for example validate the request origin, or append a user access token and validate it with [Supabase Auth](https://supabase.com/docs/guides/functions/auth).
-
-    From the incoming request, the function extracts the `text` and `voiceId` parameters. The `voiceId` parameter is optional and defaults to the ElevenLabs ID for the "Allison" voice.
-
-    Using the `object-hash` library, the function generates a hash from the request parameters. This hash is used to check for existing audio files in Supabase Storage.
-
-    ```ts {1,5-8}
-    Deno.serve(async (req) => {
-    // To secure your function for production, you can for example validate the request origin,
-    // or append a user access token and validate it with Supabase Auth.
-    console.log("Request origin", req.headers.get("host"));
-    const url = new URL(req.url);
-    const params = new URLSearchParams(url.search);
-    const text = params.get("text");
-    const voiceId = params.get("voiceId") ?? "JBFqnCBsd6RMkjVDRZzb";
-
-    const requestHash = hash.MD5({ text, voiceId });
-    console.log("Request hash", requestHash);
-
-    // ...
-    })
-    ```
-
-  </Step>
-  <Step title="Check for existing audio file in Supabase Storage">
-    Supabase Storage comes with a [smart CDN built-in](https://supabase.com/docs/guides/storage/cdn/smart-cdn) allowing you to easily cache and serve your files.
-
-    Here, the function checks for an existing audio file in Supabase Storage. If the file exists, the function returns the file from Supabase Storage.
-
-    ```ts {4,9}
-    const { data } = await supabase
-      .storage
-      .from("audio")
-      .createSignedUrl(`${requestHash}.mp3`, 60);
-
-    if (data) {
-      console.log("Audio file found in storage", data);
-      const storageRes = await fetch(data.signedUrl);
-      if (storageRes.ok) return storageRes;
-    }
-    ```
-
-  </Step>
-
-  <Step title="Generate Speech as a stream and split into two branches">
-    Using the streaming capabilities of the ElevenLabs API, the function generates a stream. The benefit here is that even for larger text, you can start streaming the audio back to your user immediately, and then upload the stream to Supabase Storage in the background.
-
-    This allows for the best possible user experience, making even large text blocks feel magically quick. The magic here happens on line 17, where the `stream.tee()` method branches the readablestream into two branches: one for the browser and one for Supabase Storage.
-
-    ```ts {1,17,20,22-27}
-    try {
-      const response = await client.textToSpeech.convertAsStream(voiceId, {
-        output_format: "mp3_44100_128",
-        model_id: "eleven_multilingual_v2",
-        text,
-      });
-
-      const stream = new ReadableStream({
-        async start(controller) {
-          for await (const chunk of response) {
-            controller.enqueue(chunk);
-          }
-          controller.close();
-        },
-      });
-
-      // Branch stream to Supabase Storage
-      const [browserStream, storageStream] = stream.tee();
-
-      // Upload to Supabase Storage in the background
-      EdgeRuntime.waitUntil(uploadAudioToStorage(storageStream, requestHash));
-
-      // Return the streaming response immediately
-      return new Response(browserStream, {
-        headers: {
-          "Content-Type": "audio/mpeg",
-        },
-      });
-    } catch (error) {
-      console.log("error", { error });
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-    ```
-
-  </Step>
-  <Step title="Upload the audio stream to Supabase Storage in the background">
-    The `EdgeRuntime.waitUntil` method on line 20 in the previous step is used to upload the audio stream to Supabase Storage in the background using the `uploadAudioToStorage` function. This allows the function to return the streaming response immediately to the browser, while the audio is being uploaded to Supabase Storage.
-
-    Once the storage object has been created, the next time your users makes a request with the same parameters, the function will return the audio file from the Supabase Storage CDN.
-
-    ```ts {2,8-10}
-    // Upload audio to Supabase Storage in a background task
-    async function uploadAudioToStorage(
-      stream: ReadableStream,
-      requestHash: string,
-    ) {
-      const { data, error } = await supabase.storage
-        .from("audio")
-        .upload(`${requestHash}.mp3`, stream, {
-          contentType: "audio/mp3",
-        });
-
-      console.log("Storage upload result", { data, error });
-    }
-    ```
-
-  </Step>
-</Steps>
 
 ## Run locally
 

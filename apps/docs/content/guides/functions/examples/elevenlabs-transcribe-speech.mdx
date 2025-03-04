@@ -10,10 +10,9 @@ In this tutorial you will learn how to build a Telegram bot that transcribes aud
 
 To check out what the end result will look like, you can test out the [t.me/ElevenLabsScribeBot](https://t.me/ElevenLabsScribeBot)
 
-<Tip title="Prefer to jump straight to the code?" icon="lightbulb">
-  Find the [example project on
-  GitHub](https://github.com/elevenlabs/elevenlabs-examples/tree/main/examples/speech-to-text/telegram-transcription-bot).
-</Tip>
+<Admonition type="tip">
+  Find the [example project on GitHub](https://github.com/elevenlabs/elevenlabs-examples/tree/main/examples/speech-to-text/telegram-transcription-bot).
+</Admonition>
 
 ## Requirements
 
@@ -29,7 +28,7 @@ To check out what the end result will look like, you can test out the [t.me/Elev
 
 Use the [BotFather](https://t.me/BotFather) to create a new Telegram bot. Run the `/newbot` command and follow the instructions to create a new bot. At the end, you will receive your secret bot token. Note it down securely for the next step.
 
-![BotFather](/assets/images/cookbooks/scribe/telegram-bot/bot-father.png)
+![BotFather](/docs/img/guides/functions/elevenlabs/bot-father.png)
 
 ### Create a Supabase project locally
 
@@ -236,150 +235,6 @@ Deno.serve(async (req) => {
 });
 ```
 
-### Code deep dive
-
-There's a couple of things worth noting about the code. Let's step through it step by step.
-
-<Steps>
-  <Step title="Handling the incoming request">
-    To handle the incoming request, use the `Deno.serve` handler. The handler checks whether the request has the correct secret and then passes the request to the `handleUpdate` function.
-
-    ```ts {1,6,10}
-    const handleUpdate = webhookCallback(bot, 'std/http');
-
-    Deno.serve(async (req) => {
-      try {
-        const url = new URL(req.url);
-        if (url.searchParams.get('secret') !== Deno.env.get('FUNCTION_SECRET')) {
-          return new Response('not allowed', { status: 405 });
-        }
-
-        return await handleUpdate(req);
-      } catch (err) {
-        console.error(err);
-      }
-    });
-    ```
-
-  </Step>
-  <Step title="Handle voice, audio, and video messages">
-    The grammY frameworks provides a convenient way to [filter](https://grammy.dev/guide/filter-queries#combining-multiple-queries) for specific message types. In this case, the bot is listening for voice, audio, and video messages.
-
-    Using the request context, the bot extracts the file metadata and then uses [Supabase Background Tasks](https://supabase.com/docs/guides/functions/background-tasks) `EdgeRuntime.waitUntil` to run the transcription in the background.
-
-    This way you can provide an immediate response to the user and handle the transcription of the file in the background.
-
-    ```ts {1,3,12,24}
-    bot.on([':voice', ':audio', ':video'], async (ctx) => {
-      try {
-        const file = await ctx.getFile();
-        const fileURL = `https://api.telegram.org/file/bot${telegramBotToken}/${file.file_path}`;
-        const fileMeta = ctx.message?.video ?? ctx.message?.voice ?? ctx.message?.audio;
-
-        if (!fileMeta) {
-          return ctx.reply('No video|audio|voice metadata found. Please try again.');
-        }
-
-        // Run the transcription in the background.
-        EdgeRuntime.waitUntil(
-          scribe({
-            fileURL,
-            fileType: fileMeta.mime_type!,
-            duration: fileMeta.duration,
-            chatId: ctx.chat.id,
-            messageId: ctx.message?.message_id!,
-            username: ctx.from?.username || '',
-          })
-        );
-
-        // Reply to the user immediately to let them know we received their file.
-        return ctx.reply('Received. Scribing...');
-      } catch (error) {
-        console.error(error);
-        return ctx.reply(
-          'Sorry, there was an error getting the file. Please try again with a smaller file!'
-        );
-      }
-    });
-    ```
-
-  </Step>
-
-  <Step title="Transcription with the ElevenLabs API">
-    Finally, in the background worker, the bot uses the ElevenLabs JavaScript SDK to transcribe the file. Once the transcription is complete, the bot replies to the user with the transcript and writes a log entry to the Supabase database using [supabase-js](https://supabase.com/docs/reference/javascript).
-
-    ```ts {29-38,43-46,54-65}
-    const elevenLabsClient = new ElevenLabsClient({
-      apiKey: Deno.env.get('ELEVENLABS_API_KEY') || '',
-    });
-
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') || '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-    );
-
-    async function scribe({
-      fileURL,
-      fileType,
-      duration,
-      chatId,
-      messageId,
-      username,
-    }: {
-      fileURL: string;
-      fileType: string;
-      duration: number;
-      chatId: number;
-      messageId: number;
-      username: string;
-    }) {
-      let transcript: string | null = null;
-      let languageCode: string | null = null;
-      let errorMsg: string | null = null;
-      try {
-        const sourceFileArrayBuffer = await fetch(fileURL).then((res) => res.arrayBuffer());
-        const sourceBlob = new Blob([sourceFileArrayBuffer], {
-          type: fileType,
-        });
-
-        const scribeResult = await elevenLabsClient.speechToText.convert({
-          file: sourceBlob,
-          model_id: 'scribe_v1',
-          tag_audio_events: false,
-        });
-
-        transcript = scribeResult.text;
-        languageCode = scribeResult.language_code;
-
-        // Reply to the user with the transcript
-        await bot.api.sendMessage(chatId, transcript, {
-          reply_parameters: { message_id: messageId },
-        });
-      } catch (error) {
-        errorMsg = error.message;
-        console.log(errorMsg);
-        await bot.api.sendMessage(chatId, 'Sorry, there was an error. Please try again.', {
-          reply_parameters: { message_id: messageId },
-        });
-      }
-      // Write log to Supabase.
-      const logLine = {
-        file_type: fileType,
-        duration,
-        chat_id: chatId,
-        message_id: messageId,
-        username,
-        language_code: languageCode,
-        error: errorMsg,
-      };
-      console.log({ logLine });
-      await supabase.from('transcription_logs').insert({ ...logLine, transcript });
-    }
-    ```
-
-  </Step>
-</Steps>
-
 ## Deploy to Supabase
 
 If you haven't already, create a new Supabase account at [database.new](https://database.new) and link the local project to your Supabase account:
@@ -398,7 +253,7 @@ supabase db push
 
 Navigate to the [table editor](https://supabase.com/dashboard/project/_/editor) in your Supabase dashboard and you should see and empty `transcription_logs` table.
 
-![Empty table](/assets/images/cookbooks/scribe/telegram-bot/supa-empty-table.png)
+![Empty table](/docs/img/guides/functions/elevenlabs/supa-empty-table.png)
 
 Lastly, run the following command to deploy the Edge Function:
 
@@ -408,7 +263,7 @@ supabase functions deploy --no-verify-jwt scribe-bot
 
 Navigate to the [Edge Functions view](https://supabase.com/dashboard/project/_/functions) in your Supabase dashboard and you should see the `scribe-bot` function deployed. Make a note of the function URL as you'll need it later, it should look something like `https://<project-ref>.functions.supabase.co/scribe-bot`.
 
-![Edge Function deployed](/assets/images/cookbooks/scribe/telegram-bot/supa-edge-function-deployed.png)
+![Edge Function deployed](/docs/img/guides/functions/elevenlabs/supa-edge-function-deployed.png)
 
 ### Set up the webhook
 
@@ -420,7 +275,7 @@ https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook?url=https://<PROJECT
 
 Note that the `FUNCTION_SECRET` is the secret you set in your `.env` file.
 
-![Set webhook](/assets/images/cookbooks/scribe/telegram-bot/set-webhook.png)
+![Set webhook](/docs/img/guides/functions/elevenlabs/set-webhook.png)
 
 ### Set the function secrets
 
@@ -434,8 +289,8 @@ supabase secrets set --env-file supabase/functions/.env
 
 Finally you can test the bot by sending it a voice message, audio or video file.
 
-![Test the bot](/assets/images/cookbooks/scribe/telegram-bot/test-bot.png)
+![Test the bot](/docs/img/guides/functions/elevenlabs/test-bot.png)
 
 After you see the transcript as a reply, navigate back to your table editor in the Supabase dashboard and you should see a new row in your `transcription_logs` table.
 
-![New row in table](/assets/images/cookbooks/scribe/telegram-bot/supa-new-row.png)
+![New row in table](/docs/img/guides/functions/elevenlabs/supa-new-row.png)
