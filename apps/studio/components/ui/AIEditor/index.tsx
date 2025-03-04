@@ -313,7 +313,7 @@ const AIEditor = ({
       ) : (
         <div className="w-full h-full relative">
           <Editor
-            theme="vs-dark"
+            theme="supabase"
             language={language}
             value={currentValue}
             options={defaultOptions}

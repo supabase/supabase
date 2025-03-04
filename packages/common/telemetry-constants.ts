@@ -1034,6 +1034,21 @@ export interface StudioPricingSidePanelOpenedEvent {
 }
 
 /**
+ * User clicks on grafana banner in studio Reports page.
+ *
+ * @group Events
+ * @source studio
+ * @page /reports/database
+ */
+export interface ReportsDatabaseGrafanaBannerClickedEvent {
+  action: 'reports_database_grafana_banner_clicked'
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1097,3 +1112,4 @@ export type TelemetryEvent =
   | SqlEditorQueryRunButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
+  | ReportsDatabaseGrafanaBannerClickedEvent
