@@ -67,17 +67,25 @@ Below are some ways to connect to the Postgres MCP server using popular AI tools
 
 #### Cursor
 
-1. Open Cursor and navigate to **Cursor Settings**.
-1. Under the **Features** tab, tap **+ Add new MCP server** under the **MCP Servers** section.
-1. Enter the following details:
+1. Open Cursor and open `.cursor/mcp.json` file. Create the file if it doesn't exist.
+1. Add the following configuration:
 
-   - **Name**: Supabase (or your project name)
-   - **Type**: command
-   - **Command**: `npx -y @modelcontextprotocol/server-postgres <connection-string>`
+   ```json
+   {
+     "mcpServers": {
+       "supabase": {
+         "command": "npx",
+         "args": ["-y", "@modelcontextprotocol/server-postgres", "<connection-string>"]
+       }
+     }
+   }
+   ```
 
-     (replace `<connection-string>` with your connection string)
+   Replace `<connection-string>` with your connection string.
 
-1. You should see a green active status after the server is successfully connected.
+1. Save the configuration file.
+
+1. Open Cursor and navigate to **Settings/MCP**. You should see a green active status after the server is successfully connected.
 
 #### Claude desktop
 

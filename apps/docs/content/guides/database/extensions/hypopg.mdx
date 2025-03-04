@@ -4,7 +4,7 @@ title: 'HypoPG: Hypothetical indexes'
 description: 'Quickly check if an index can be used without creating it.'
 ---
 
-`HypoPG` is PostgreSQL extension for creating hypothetical/virtual indexes. HypoPG allows users to rapidly create hypothetical/virtual indexes that have no resource cost (CPU, disk, memory) that are visible to the PostgreSQL query planner.
+`HypoPG` is Postgres extension for creating hypothetical/virtual indexes. HypoPG allows users to rapidly create hypothetical/virtual indexes that have no resource cost (CPU, disk, memory) that are visible to the Postgres query planner.
 
 The motivation for HypoPG is to allow users to quickly search for an index to improve a slow query without consuming server resources or waiting for them to build.
 
@@ -62,7 +62,7 @@ from
   generate_series(1, 10000) id;
 ```
 
-We can generate an explain plan for a description of how the PostgreSQL query planner
+We can generate an explain plan for a description of how the Postgres query planner
 intends to execute the query.
 
 {/* prettier-ignore */}
@@ -78,7 +78,7 @@ explain select * from account where id=1;
 
 Using HypoPG, we can create a hypothetical index on the `account(id)` column to check if it would be useful to the query planner and then re-run the explain plan.
 
-Note that the virtual indexes created by HypoPG are only visible in the PostgreSQL connection that they were created in. Supabase connects to PostgreSQL through a connection pooler so the `hypopg_create_index` statement and the `explain` statement should be executed in a single query.
+Note that the virtual indexes created by HypoPG are only visible in the Postgres connection that they were created in. Supabase connects to Postgres through a connection pooler so the `hypopg_create_index` statement and the `explain` statement should be executed in a single query.
 
 {/* prettier-ignore */}
 ```sql

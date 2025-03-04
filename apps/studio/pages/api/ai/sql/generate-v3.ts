@@ -12,7 +12,7 @@ const pgMetaSchemasList = pgMeta.schemas.list()
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!openAiKey) {
-    return res.status(400).json({
+    return res.status(500).json({
       error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
     })
   }
@@ -105,7 +105,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         # You write row level security policies.
   
         Your purpose is to generate a policy with the constraints given by the user.
-        - First, use getSchema to retrieve more information about a schema or schemas that will contain policies, usually the public schema.
+        - First, use getSchemaTables to retrieve more information about a schema or schemas that will contain policies, usually the public schema.
         - Then retrieve existing RLS policies and guidelines on how to write policies using the getRlsKnowledge tool .
         - Then write new policies or update existing policies based on the prompt
         - When asked to suggest policies, either alter existing policies or add new ones to the public schema.
