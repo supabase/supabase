@@ -281,7 +281,6 @@ export const ConnectionPooling = () => {
         {
           ref: projectRef,
           default_pool_size,
-          pool_mode: pool_mode as 'transaction' | 'session',
         },
         {
           onSuccess: (data) => {
@@ -524,100 +523,102 @@ export const ConnectionPooling = () => {
                     />
                   )}
 
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="pool_mode"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="horizontal"
-                        label="Pool Mode"
-                        description={
-                          <>
-                            {disablePoolModeSelection && (
-                              <Alert_Shadcn_ className="mt-0">
-                                <AlertTitle_Shadcn_ className="text-foreground">
-                                  Pool mode is permanently set to Transaction on port 6543
-                                </AlertTitle_Shadcn_>
-                                <AlertDescription_Shadcn_>
-                                  You can use Session mode by connecting to the pooler on port 5432
-                                  instead
-                                </AlertDescription_Shadcn_>
-                              </Alert_Shadcn_>
-                            )}
-                            {showPoolModeWarning && (
-                              <>
-                                {field.value === 'transaction' ? (
-                                  <Admonition
-                                    type="warning"
-                                    title="Pool mode will be set to transaction permanently on port 6543"
-                                    description="This will take into effect once saved. If you are using Session mode with port 6543 in your applications, please update to use port 5432 instead before saving."
-                                  />
-                                ) : (
-                                  <>
-                                    <Panel.Notice
-                                      layout="vertical"
-                                      className="border rounded-lg"
-                                      title="Deprecating Session Mode on Port 6543"
-                                      description="On February 28, 2025, Supavisor is deprecating Session Mode on port 6543. Please update your application/database clients to use port 5432 for Session Mode."
-                                      href="https://github.com/orgs/supabase/discussions/32755"
-                                      buttonText="Read the announcement"
-                                    />
+                  {type === 'PgBouncer' && (
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="pool_mode"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          layout="horizontal"
+                          label="Pool Mode"
+                          description={
+                            <>
+                              {disablePoolModeSelection && (
+                                <Alert_Shadcn_ className="mt-0">
+                                  <AlertTitle_Shadcn_ className="text-foreground">
+                                    Pool mode is permanently set to Transaction on port 6543
+                                  </AlertTitle_Shadcn_>
+                                  <AlertDescription_Shadcn_>
+                                    You can use Session mode by connecting to the pooler on port
+                                    5432 instead
+                                  </AlertDescription_Shadcn_>
+                                </Alert_Shadcn_>
+                              )}
+                              {showPoolModeWarning && (
+                                <>
+                                  {field.value === 'transaction' ? (
                                     <Admonition
-                                      className="mt-2"
-                                      showIcon={false}
-                                      type="default"
-                                      title="Set to transaction mode to use both pooling modes concurrently"
-                                      description="Session mode can be used concurrently with transaction mode by
+                                      type="warning"
+                                      title="Pool mode will be set to transaction permanently on port 6543"
+                                      description="This will take into effect once saved. If you are using Session mode with port 6543 in your applications, please update to use port 5432 instead before saving."
+                                    />
+                                  ) : (
+                                    <>
+                                      <Panel.Notice
+                                        layout="vertical"
+                                        className="border rounded-lg"
+                                        title="Deprecating Session Mode on Port 6543"
+                                        description="On February 28, 2025, Supavisor is deprecating Session Mode on port 6543. Please update your application/database clients to use port 5432 for Session Mode."
+                                        href="https://github.com/orgs/supabase/discussions/32755"
+                                        buttonText="Read the announcement"
+                                      />
+                                      <Admonition
+                                        className="mt-2"
+                                        showIcon={false}
+                                        type="default"
+                                        title="Set to transaction mode to use both pooling modes concurrently"
+                                        description="Session mode can be used concurrently with transaction mode by
                                                     using 5432 for session and 6543 for transaction. However, by
                                                     configuring the pooler mode to session here, you will not be able
                                                     to use transaction mode at the same time."
-                                    />
-                                  </>
-                                )}
-                              </>
-                            )}
-                            <p className="mt-2">
-                              Specify when a connection can be returned to the pool.{' '}
-                              <span
-                                tabIndex={0}
-                                onClick={() => snap.setShowPoolingModeHelper(true)}
-                                className="transition cursor-pointer underline underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-foreground"
-                              >
-                                Learn more about pool modes
-                              </span>
-                              .
-                            </p>
-                          </>
-                        }
-                      >
-                        <FormControl_Shadcn_>
-                          <Listbox
-                            disabled={disablePoolModeSelection}
-                            value={field.value}
-                            className="w-full"
-                            onChange={(value) => field.onChange(value)}
-                          >
-                            <Listbox.Option
-                              key="transaction"
-                              label="Transaction"
-                              value="transaction"
+                                      />
+                                    </>
+                                  )}
+                                </>
+                              )}
+                              <p className="mt-2">
+                                Specify when a connection can be returned to the pool.{' '}
+                                <span
+                                  tabIndex={0}
+                                  onClick={() => snap.setShowPoolingModeHelper(true)}
+                                  className="transition cursor-pointer underline underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-foreground"
+                                >
+                                  Learn more about pool modes
+                                </span>
+                                .
+                              </p>
+                            </>
+                          }
+                        >
+                          <FormControl_Shadcn_>
+                            <Listbox
+                              disabled={disablePoolModeSelection}
+                              value={field.value}
+                              className="w-full"
+                              onChange={(value) => field.onChange(value)}
                             >
-                              <p>Transaction mode</p>
-                              <p className="text-xs text-foreground-lighter">
-                                {TRANSACTION_MODE_DESCRIPTION}
-                              </p>
-                            </Listbox.Option>
-                            <Listbox.Option key="session" label="Session" value="session">
-                              <p>Session mode</p>
-                              <p className="text-xs text-foreground-lighter">
-                                {SESSION_MODE_DESCRIPTION}
-                              </p>
-                            </Listbox.Option>
-                          </Listbox>
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
+                              <Listbox.Option
+                                key="transaction"
+                                label="Transaction"
+                                value="transaction"
+                              >
+                                <p>Transaction mode</p>
+                                <p className="text-xs text-foreground-lighter">
+                                  {TRANSACTION_MODE_DESCRIPTION}
+                                </p>
+                              </Listbox.Option>
+                              <Listbox.Option key="session" label="Session" value="session">
+                                <p>Session mode</p>
+                                <p className="text-xs text-foreground-lighter">
+                                  {SESSION_MODE_DESCRIPTION}
+                                </p>
+                              </Listbox.Option>
+                            </Listbox>
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      )}
+                    />
+                  )}
 
                   <FormField_Shadcn_
                     control={form.control}
