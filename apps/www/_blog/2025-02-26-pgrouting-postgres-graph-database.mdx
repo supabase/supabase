@@ -64,7 +64,7 @@ One of the most challenging aspects of managing projects is determining the “c
   }}
 />
 
-Using pgRouting, you can model your task's dependencies, using graph algorithms to find the critical path. Suppose we have a table tasks with task dependencies modeled as a graph:
+Using pgRouting, you can model your task's dependencies, using graph algorithms to find the critical path. Suppose we have a table tasks with task dependencies modelled as a graph:
 
 ```sql
 -- Create the tasks table with dependencies
@@ -296,10 +296,10 @@ Now we can use the `pgr_dijkstra()` function to find the shortest or most releva
 <details>
   <summary>Tangent: ranking recommendations</summary>
   <div>
-     Since it's “just postgres” it's simple enough to rank the results using an `order by` clause. For example, if we stored the `pgr_dijkstra()` results above in a table called “recommendations”, we use this a query like this to sort the paths by the highest ranking:
+     Since it's “just Postgres” it's simple enough to rank the results using an `order by` clause. For example, if we stored the `pgr_dijkstra()` results above in a table called “recommendations”, we use this a query like this to sort the paths by the highest ranking:
   </div>
   <div>
-  
+
 ```sql
 select videos.title, sum(weight) as recommendation_score
 from
@@ -316,5 +316,5 @@ order by recommendation_score desc;
 
 pgRouting is a powerful extension for Postgres that can be used to solve a wide range of graph-based problems. Check out the [pgRouting docs](https://docs.pgrouting.org/latest/en/index.html) for more information on how to use it. You can also use it on Supabase:
 
-- Docs: [pgrouting: Geospatial Routing](/docs/guides/database/extensions/pgrouting)
+- Docs: [pgRouting: Geospatial Routing](/docs/guides/database/extensions/pgrouting)
 - Launch a new Postgres database: [database.new](https://database.new)

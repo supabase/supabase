@@ -1,0 +1,4 @@
+Rule001HeadingCase = false
+Rule002AdmonitionTypes = false
+Rule003Spelling = "include('../../supa-mdx-lint/Rule003Spelling.toml')"
+Rule004ExcludeWords = false

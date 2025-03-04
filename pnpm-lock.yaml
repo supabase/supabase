@@ -443,8 +443,8 @@ importers:
         specifier: ^3.410.0
         version: 3.468.0
       '@supabase/supa-mdx-lint':
-        specifier: 0.2.6-alpha
-        version: 0.2.6-alpha
+        specifier: 0.2.7-alpha
+        version: 0.2.7-alpha
       '@types/common-tags':
         specifier: ^1.8.4
         version: 1.8.4
@@ -1182,6 +1182,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.1.1
         version: 3.3.1(react-hook-form@7.47.0(react@18.2.0))
+      '@supabase/supa-mdx-lint':
+        specifier: 0.2.7-alpha
+        version: 0.2.7-alpha
       '@types/animejs':
         specifier: ^3.1.12
         version: 3.1.12
@@ -5167,49 +5170,49 @@ packages:
   '@supabase/storage-js@2.7.1':
     resolution: {integrity: sha512-asYHcyDR1fKqrMpytAS1zjyEfvxuOIp1CIXX7ji4lHHcJKqyk+sLl/Vxgm4sN6u8zvuUtae9e4kDxQP2qrwWBA==}
 
-  '@supabase/supa-mdx-lint-darwin@0.2.6-alpha':
-    resolution: {integrity: sha512-tDyl2SWfuFb5yckD1cyd5CfmkAbvx9onaxXFrMTP/1bB/sYM3RI2BJQ7/lfZy0jcIiMvc70LroJe5EYx37yYsQ==}
+  '@supabase/supa-mdx-lint-darwin@0.2.7-alpha':
+    resolution: {integrity: sha512-XkTu6iw30mVkA/POAut6PU1DFSP5Y0B5ZufOQauej3ZMfZ7HmFvsPVPE2sINABWXFEVCcvF2RmV6kW9zcO2TyQ==}
     engines: {node: '>=10'}
     os: [darwin]
 
-  '@supabase/supa-mdx-lint-linux-arm64@0.2.6-alpha':
-    resolution: {integrity: sha512-y51H1VW4VIpsFB/ui8GEU1h15tPp9fL8p2NMDltNEUrjSYpH7hzbj+surxy/FA0JdXllpqNV+7UvDm/FIz/Klg==}
+  '@supabase/supa-mdx-lint-linux-arm64@0.2.7-alpha':
+    resolution: {integrity: sha512-wae2K5PpDzkGf6XG/VldzeyJpzXrnpYyhHJ09f0M1AlIXnQU5mm5D1glQAELQ0fv8DyLDAdRimakh4esYHvNhg==}
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [linux, freebsd]
 
-  '@supabase/supa-mdx-lint-linux-arm@0.2.6-alpha':
-    resolution: {integrity: sha512-8UOMo8nRUDtaDuFjMlSjtaA6WjuZVRz5jRFFoFotm16QxA4+JMS00g6rmYl2nyt6Vjj/bCiFdS60oOWzPHFtBQ==}
+  '@supabase/supa-mdx-lint-linux-arm@0.2.7-alpha':
+    resolution: {integrity: sha512-8i56O7tvlkMKoEz8vXoW+QJB1SO+z55zxYXFB9dk2+Kk5Q9MeZITzuPCLjcBapmVzNGQ0b64wr/TuPKLNZb6PQ==}
     engines: {node: '>=10'}
     cpu: [arm]
     os: [linux, freebsd]
 
-  '@supabase/supa-mdx-lint-linux-i686@0.2.6-alpha':
-    resolution: {integrity: sha512-Vjcn3hGNsw4V9x6RpI9S75byeqlkHbkVNPtKihm4hof9hgaMoxEA+/EPX7f0L/1rnPR39dkV1rbBojoV/XBd6w==}
+  '@supabase/supa-mdx-lint-linux-i686@0.2.7-alpha':
+    resolution: {integrity: sha512-dUQQAlwCz7NbN5FqdSYfgOhIBubZ+Hep6AD51XC5Klt4bRVlANP+1bb4j25fjTvDD7yL2ej26nVwjIEau3yy+A==}
     engines: {node: '>=10'}
     cpu: [x86, ia32]
     os: [linux, freebsd]
 
-  '@supabase/supa-mdx-lint-linux-x64@0.2.6-alpha':
-    resolution: {integrity: sha512-nq0GB/WaqKyt4LWvx1+Z7XboSIlWtKmmqxyG1OtTQPcgKrImHvGrOJ3GuoUEcpJ9JyByCb2Tj3BJ6zIV8ngIJQ==}
+  '@supabase/supa-mdx-lint-linux-x64@0.2.7-alpha':
+    resolution: {integrity: sha512-eqSK+3h5oVgMw/fnBvMfYq69U66DDXXlHDLXd93OkhHIdR9VC7d5gKpdGMqZU3Q73Sp088R+9TrSkv4SI63+Qg==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [linux, freebsd]
 
-  '@supabase/supa-mdx-lint-win32-i686@0.2.6-alpha':
-    resolution: {integrity: sha512-htjCjhElGSt9LTrtFHtN+iCsVHa4fZmVBBQPsO6Tqsubis00voFInKXkQGDsMkT9swOyEBCAaYe7XK3FEnYEXA==}
+  '@supabase/supa-mdx-lint-win32-i686@0.2.7-alpha':
+    resolution: {integrity: sha512-pFaxZToEU6lXnc6mbcVzdv9efVpZQvNi4qQucrjE1Al+zrtrK5sar/Y86PEjyd4izH/LJUIrORdtP0Nu9PdHHA==}
     engines: {node: '>=10'}
     cpu: [x86, ia32]
     os: [win32]
 
-  '@supabase/supa-mdx-lint-win32-x64@0.2.6-alpha':
-    resolution: {integrity: sha512-/hyZAA6SWMJsiPYeofN4NPkf6X/Fcywtls9I83PVFGYMaiK5jU2AvnjC22rMQSWgEFKKrF9K75yU7Qsd5teSpg==}
+  '@supabase/supa-mdx-lint-win32-x64@0.2.7-alpha':
+    resolution: {integrity: sha512-qk+mWEH3nlbjiXMax2hke4wV5Ywb0jDiEXoUrvkzzcfKt0LVueFrIDpamC9urxujOUvbQEfZSWgOjdN2pq3RsA==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [win32]
 
-  '@supabase/supa-mdx-lint@0.2.6-alpha':
-    resolution: {integrity: sha512-rfp+xsnTaQ/UB5LNNZEh6w00JxxkZMoZnjjIgb/TBvqr/E1DbWyLHSyWwMD8sBoC+LX8q20ym75GRAXhvxIONA==}
+  '@supabase/supa-mdx-lint@0.2.7-alpha':
+    resolution: {integrity: sha512-+psEjFjYOZcvD16q/+FgrvD/MvwEMEwH+9KV3gno3aOq/D3qAxCMgmaFNb0vNxWzJd1nrtP2Fshbuz/v8Hwx5w==}
     hasBin: true
 
   '@supabase/supabase-js@2.47.14':
@@ -17238,36 +17241,36 @@ snapshots:
     dependencies:
       '@supabase/node-fetch': 2.6.15
 
-  '@supabase/supa-mdx-lint-darwin@0.2.6-alpha':
+  '@supabase/supa-mdx-lint-darwin@0.2.7-alpha':
     optional: true
 
-  '@supabase/supa-mdx-lint-linux-arm64@0.2.6-alpha':
+  '@supabase/supa-mdx-lint-linux-arm64@0.2.7-alpha':
     optional: true
 
-  '@supabase/supa-mdx-lint-linux-arm@0.2.6-alpha':
+  '@supabase/supa-mdx-lint-linux-arm@0.2.7-alpha':
     optional: true
 
-  '@supabase/supa-mdx-lint-linux-i686@0.2.6-alpha':
+  '@supabase/supa-mdx-lint-linux-i686@0.2.7-alpha':
     optional: true
 
-  '@supabase/supa-mdx-lint-linux-x64@0.2.6-alpha':
+  '@supabase/supa-mdx-lint-linux-x64@0.2.7-alpha':
     optional: true
 
-  '@supabase/supa-mdx-lint-win32-i686@0.2.6-alpha':
+  '@supabase/supa-mdx-lint-win32-i686@0.2.7-alpha':
     optional: true
 
-  '@supabase/supa-mdx-lint-win32-x64@0.2.6-alpha':
+  '@supabase/supa-mdx-lint-win32-x64@0.2.7-alpha':
     optional: true
 
-  '@supabase/supa-mdx-lint@0.2.6-alpha':
+  '@supabase/supa-mdx-lint@0.2.7-alpha':
     optionalDependencies:
-      '@supabase/supa-mdx-lint-darwin': 0.2.6-alpha
-      '@supabase/supa-mdx-lint-linux-arm': 0.2.6-alpha
-      '@supabase/supa-mdx-lint-linux-arm64': 0.2.6-alpha
-      '@supabase/supa-mdx-lint-linux-i686': 0.2.6-alpha
-      '@supabase/supa-mdx-lint-linux-x64': 0.2.6-alpha
-      '@supabase/supa-mdx-lint-win32-i686': 0.2.6-alpha
-      '@supabase/supa-mdx-lint-win32-x64': 0.2.6-alpha
+      '@supabase/supa-mdx-lint-darwin': 0.2.7-alpha
+      '@supabase/supa-mdx-lint-linux-arm': 0.2.7-alpha
+      '@supabase/supa-mdx-lint-linux-arm64': 0.2.7-alpha
+      '@supabase/supa-mdx-lint-linux-i686': 0.2.7-alpha
+      '@supabase/supa-mdx-lint-linux-x64': 0.2.7-alpha
+      '@supabase/supa-mdx-lint-win32-i686': 0.2.7-alpha
+      '@supabase/supa-mdx-lint-win32-x64': 0.2.7-alpha
       node-pty: 1.0.0
 
   '@supabase/supabase-js@2.47.14':

@@ -1,4 +1,4 @@
-name: '[Docs] Lint v2'
+name: '[Blog] Spellcheck'
 on:
   pull_request:
 
@@ -9,28 +9,28 @@ permissions:
   pull-requests: write
 
 jobs:
-  supa-mdx-lint:
-    name: supa-mdx-lint
+  spellcheck:
+    name: spellcheck
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           sparse-checkout: |
-            supa-mdx-lint.config.toml
             supa-mdx-lint
-            apps/docs/content
+            apps/www/supa-mdx-lint.config.toml
+            apps/www/_blog
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 #v3.0.2
         id: filter
         with:
           filters: |
-            docs:
-              - 'apps/docs/content/**'
+            blog:
               - 'supa-mdx-lint/**'
-              - 'supa-mdx-lint.config.toml'
+              - 'apps/www/_blog/**'
+              - 'apps/www/supa-mdx-lint.config.toml'
       - name: cache cargo
         id: cache-cargo
-        if: steps.filter.outputs.docs == 'true'
+        if: steps.filter.outputs.blog == 'true'
         uses: actions/cache@v4
         with:
           path: |
@@ -40,21 +40,21 @@ jobs:
             ~/.cargo/git/db/
           key: a9e03acc6f20c0a36d6311974348b6f2f57e8292
       - name: install linter
-        if: steps.filter.outputs.docs == 'true' && steps.cache-cargo.outputs.cache-hit != 'true'
+        if: steps.filter.outputs.blog == 'true' && steps.cache-cargo.outputs.cache-hit != 'true'
         run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev a9e03acc6f20c0a36d6311974348b6f2f57e8292
       - name: install reviewdog
-        if: steps.filter.outputs.docs == 'true'
+        if: steps.filter.outputs.blog == 'true'
         uses: reviewdog/action-setup@3f401fe1d58fe77e10d665ab713057375e39b887 # v1.3.0
         with:
           reviewdog_version: v0.20.2
       - name: run linter
-        if: steps.filter.outputs.docs == 'true'
+        if: steps.filter.outputs.blog == 'true'
         env:
           BASE_REF: ${{ github.base_ref }}
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -o pipefail
           git diff --name-only origin/$BASE_REF HEAD \
-            | { grep -E "^apps/docs/content/" || test $? = 1; } \
-            | xargs -r supa-mdx-lint --format rdf \
+            | { grep -E "^apps/www/_blog/" || test $? = 1; } \
+            | xargs -r supa-mdx-lint --config apps/www/supa-mdx-lint.config.toml --format rdf \
             | reviewdog -f=rdjsonl -reporter=github-pr-review

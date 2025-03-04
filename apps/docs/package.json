@@ -114,7 +114,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.410.0",
-    "@supabase/supa-mdx-lint": "0.2.6-alpha",
+    "@supabase/supa-mdx-lint": "0.2.7-alpha",
     "@types/common-tags": "^1.8.4",
     "@types/estree": "1.0.5",
     "@types/hast": "^2.3.4",

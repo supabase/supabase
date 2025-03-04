@@ -10,6 +10,7 @@
     "export": "next export",
     "start": "next start",
     "lint": "next lint",
+    "lint:blog": "supa-mdx-lint _blog/202[5-9]-*",
     "clean": "rimraf node_modules",
     "typecheck": "pnpm run content:build && tsc --noEmit",
     "content:build": "contentlayer2 build && node scripts/generateStaticContent.mjs",
@@ -81,6 +82,7 @@
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.1.1",
+    "@supabase/supa-mdx-lint": "0.2.7-alpha",
     "@types/animejs": "^3.1.12",
     "@types/classnames": "^2.3.1",
     "@types/common-tags": "^1.8.4",
