@@ -1,0 +1,32 @@
+---
+id: 'hipaa-compliance'
+title: 'HIPAA Compliance and Supabase'
+description: 'Supabase provides a HIPAA compliant environment and helps you meet your compliance controls.'
+---
+
+The [Health Insurance Portability and Accountability Act (HIPAA)](https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html) is a comprehensive law that protects individuals' health information while ensuring the continuity of health insurance coverage. It sets standards for privacy and security that must be followed by all entities that handle Protected Health Information (PHI).
+
+Under HIPAA, both covered entities and business associates have distinct responsibilities to ensure the protection of PHI. Supabase acts as a business associate for customers (the covered entity) who wish to provide healthcare related services. As a business assocatiate, Supabase has a number of obligations and has undergone auditing of the security and privacy controls that are in place to meet these. Supabase has signed a Business Associate Agreement (BAA) with all of our vendors who would have access to PHI, such as AWS, and ensure that we follow their terms listed in the agreements. Similarly when a customer signs a BAA with us, they have some responsibilities they agree to when using Supabase to store PHI.
+
+### Customer responsibilities
+
+Covered entities (the customer) are organizations that directly handle PHI, such as health plans, healthcare clearinghouses, and healthcare providers that conduct certain electronic transactions.
+
+1. **Compliance with HIPAA Rules**: Covered entities must comply with the [HIPAA Privacy Rule](https://www.hhs.gov/hipaa/for-professionals/privacy/index.html), [Security Rule](https://www.hhs.gov/hipaa/for-professionals/security/index.html), and [Breach Notification Rule](https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html) to protect the privacy and security of PHI.
+2. **Business Associate Agreements (BAAs)**: If a covered entity engages a business associate to help carry out its healthcare activities, it must have a written BAA. This agreement outlines the business associate's responsibilities and requires them to comply with HIPAA Rules.
+3. **Internal Compliance Programs**: Covered entities are responsible for implementing internal processes and compliance programs to ensure they meet HIPAA requirements.
+
+### Supabase responsibilities
+
+Supabase as the business associate, and the vendors used by Supabase, are the entities that perform functions or activities on behalf of the customer.
+
+1. **Direct Liability**: Supabase is directly liable for compliance with certain provisions of the HIPAA Rules. This means Supabase has implement safeguards to protect PHI and report breaches to the customer.
+2. **Compliance with BAAs**: Supabase must comply with the terms of the BAA, which includes implementing appropriate administrative, physical, and technical safeguards to protect PHI.
+3. **Vendor Management**: Supabase must also ensure that our vendors, who may have access to PHI, comply with HIPAA Rules. This is done through a BAA with each vendor.
+
+## Resources
+
+1. [Health Insurance Portability and Accountability Act (HIPAA)](https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html)
+2. [HIPAA Privacy Rule](https://www.hhs.gov/hipaa/for-professionals/privacy/index.html)
+3. [Security Rule](https://www.hhs.gov/hipaa/for-professionals/security/index.html)
+4. [Breach Notification Rule](https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html)
