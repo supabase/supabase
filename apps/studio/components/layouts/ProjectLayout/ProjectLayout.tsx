@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
+import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
@@ -83,8 +84,13 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const [isClient, setIsClient] = useState(false)
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
-    const { aiAssistantPanel, setAiAssistantPanel, mobileMenuOpen, setMobileMenuOpen } =
-      useAppStateSnapshot()
+    const {
+      editorPanel,
+      aiAssistantPanel,
+      setAiAssistantPanel,
+      mobileMenuOpen,
+      setMobileMenuOpen,
+    } = useAppStateSnapshot()
     const { open } = aiAssistantPanel
 
     const projectName = selectedProject?.name
@@ -179,7 +185,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               <ResizableHandle
                 withHandle
                 disabled={resizableSidebar ? false : true}
-                className="hidden md:block"
+                className="hidden md:flex"
               />
             )}
             <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col w-full">
@@ -210,7 +216,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                     )}
                   </main>
                 </ResizablePanel>
-                {isClient && aiAssistantPanel.open && (
+                {isClient && (aiAssistantPanel.open || editorPanel.open) && (
                   <>
                     <ResizableHandle withHandle />
                     <ResizablePanel
@@ -221,7 +227,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                         '2xl:min-w-[500px] 2xl:max-w-[600px]'
                       )}
                     >
-                      <AIAssistantPanel />
+                      {aiAssistantPanel.open && <AIAssistantPanel />}
+                      {editorPanel.open && <EditorPanel />}
                     </ResizablePanel>
                   </>
                 )}

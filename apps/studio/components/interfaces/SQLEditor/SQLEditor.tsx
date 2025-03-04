@@ -9,7 +9,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
@@ -49,9 +48,8 @@ import {
   cn,
 } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
-import { AskAIWidget } from './AskAIWidget'
+import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
-import InlineWidget from './InlineWidget'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
   ROWS_PER_PAGE_OPTIONS,
@@ -318,7 +316,7 @@ export const SQLEditor = () => {
         })
 
         sendEvent({
-          action: TelemetryActions.SQL_EDITOR_QUERY_RUN_BUTTON_CLICKED,
+          action: 'sql_editor_query_run_button_clicked',
           groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
         })
       }
@@ -419,7 +417,7 @@ export const SQLEditor = () => {
       }
 
       sendEvent({
-        action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
+        action: 'assistant_sql_diff_handler_evaluated',
         properties: { handlerAccepted: true },
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
@@ -444,7 +442,7 @@ export const SQLEditor = () => {
 
   const discardAiHandler = useCallback(() => {
     sendEvent({
-      action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
+      action: 'assistant_sql_diff_handler_evaluated',
       properties: { handlerAccepted: false },
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
@@ -687,29 +685,26 @@ export const SQLEditor = () => {
                           }}
                         />
                         {showWidget && (
-                          <InlineWidget
+                          <ResizableAIWidget
                             editor={diffEditorRef.current!}
                             id="ask-ai-diff"
-                            heightInLines={3}
-                            afterLineNumber={0}
-                            beforeLineNumber={Math.max(0, promptState.startLineNumber - 1)}
-                          >
-                            <AskAIWidget
-                              onSubmit={(prompt: string) => {
-                                handlePrompt(prompt, {
-                                  beforeSelection: promptState.beforeSelection,
-                                  selection: promptState.selection || defaultSqlDiff.modified,
-                                  afterSelection: promptState.afterSelection,
-                                })
-                              }}
-                              value={promptInput}
-                              onChange={setPromptInput}
-                              onAccept={acceptAiHandler}
-                              onReject={discardAiHandler}
-                              isDiffVisible={true}
-                              isLoading={isCompletionLoading}
-                            />
-                          </InlineWidget>
+                            value={promptInput}
+                            onChange={setPromptInput}
+                            onSubmit={(prompt: string) => {
+                              handlePrompt(prompt, {
+                                beforeSelection: promptState.beforeSelection,
+                                selection: promptState.selection || defaultSqlDiff.modified,
+                                afterSelection: promptState.afterSelection,
+                              })
+                            }}
+                            onAccept={acceptAiHandler}
+                            onReject={discardAiHandler}
+                            onCancel={resetPrompt}
+                            isDiffVisible={true}
+                            isLoading={isCompletionLoading}
+                            startLineNumber={Math.max(0, promptState.startLineNumber)}
+                            endLineNumber={promptState.endLineNumber}
+                          />
                         )}
                       </div>
                     )}
@@ -741,27 +736,24 @@ export const SQLEditor = () => {
                         }}
                       />
                       {editorRef.current && promptState.isOpen && !isDiffOpen && (
-                        <InlineWidget
+                        <ResizableAIWidget
                           editor={editorRef.current}
                           id="ask-ai"
-                          afterLineNumber={promptState.endLineNumber}
-                          beforeLineNumber={Math.max(0, promptState.startLineNumber - 1)}
-                          heightInLines={2}
-                        >
-                          <AskAIWidget
-                            value={promptInput}
-                            onChange={setPromptInput}
-                            onSubmit={(prompt: string) => {
-                              handlePrompt(prompt, {
-                                beforeSelection: promptState.beforeSelection,
-                                selection: promptState.selection,
-                                afterSelection: promptState.afterSelection,
-                              })
-                            }}
-                            isDiffVisible={false}
-                            isLoading={isCompletionLoading}
-                          />
-                        </InlineWidget>
+                          value={promptInput}
+                          onChange={setPromptInput}
+                          onSubmit={(prompt: string) => {
+                            handlePrompt(prompt, {
+                              beforeSelection: promptState.beforeSelection,
+                              selection: promptState.selection,
+                              afterSelection: promptState.afterSelection,
+                            })
+                          }}
+                          onCancel={resetPrompt}
+                          isDiffVisible={false}
+                          isLoading={isCompletionLoading}
+                          startLineNumber={Math.max(0, promptState.startLineNumber)}
+                          endLineNumber={promptState.endLineNumber}
+                        />
                       )}
                       <AnimatePresence>
                         {!promptState.isOpen && !editorRef.current?.getValue() && (

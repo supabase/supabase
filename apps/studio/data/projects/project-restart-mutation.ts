@@ -10,7 +10,7 @@ export type ProjectRestartVariables = {
   identifier?: string
 }
 
-type RestartProjectBody = components['schemas']['RestartProjectInfo']
+type RestartProjectBody = components['schemas']['RestartProjectBodyDto']
 
 export async function restartProject({ ref, identifier }: ProjectRestartVariables) {
   const payload: RestartProjectBody = {}

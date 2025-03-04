@@ -65,7 +65,7 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
 
               <TableRow>
                 <TableCell>Auth Third-Party MAUs</TableCell>
-                <TableCell>50</TableCell>
+                <TableCell>100,000</TableCell>
                 <TableCell>$0.00325 per user</TableCell>
               </TableRow>
 

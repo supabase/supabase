@@ -9,7 +9,6 @@ import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams, useSearchParamsShallow } from 'common/hooks'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { Markdown } from 'components/interfaces/Markdown'
 import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
@@ -186,12 +185,12 @@ export const AIAssistant = ({
 
     if (content.includes('Help me to debug')) {
       sendEvent({
-        action: TelemetryActions.ASSISTANT_DEBUG_SUBMITTED,
+        action: 'assistant_debug_submitted',
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     } else {
       sendEvent({
-        action: TelemetryActions.ASSISTANT_PROMPT_SUBMITTED,
+        action: 'assistant_prompt_submitted',
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     }

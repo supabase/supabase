@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -79,7 +78,7 @@ const SQLTemplates = () => {
               onClick={(sql, title) => {
                 handleNewQuery(sql, title)
                 sendEvent({
-                  action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED,
+                  action: 'sql_editor_template_clicked',
                   properties: { templateName: title },
                   groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
                 })
