@@ -1,19 +1,14 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
 export type EdgeFunctionsDeployVariables = {
   projectRef: string
-  metadata: {
-    entrypoint_path?: string
-    import_map_path?: string
-    name?: string
-    static_patterns?: string[]
-    verify_jwt?: boolean
-  }
+  metadata: components['schemas']['FunctionDeployMetadata']
   files: { name: string; content: string }[]
 }
 
@@ -28,7 +23,7 @@ export async function deployEdgeFunction({
     params: { path: { ref: projectRef }, query: { slug: metadata.name } },
     body: {
       file: files as any,
-      metadata: metadata,
+      metadata,
     },
     bodySerializer(body) {
       const formData = new FormData()
@@ -66,7 +61,7 @@ export const useEdgeFunctionDeployMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await Promise.all([queryClient.invalidateQueries(edgeFunctionsKeys.list(projectRef))])
+        await queryClient.invalidateQueries(edgeFunctionsKeys.list(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
