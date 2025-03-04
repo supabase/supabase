@@ -24,6 +24,31 @@ Supabase as the business associate, and the vendors used by Supabase, are the en
 2. **Compliance with BAAs**: Supabase must comply with the terms of the BAA, which includes implementing appropriate administrative, physical, and technical safeguards to protect ePHI.
 3. **Vendor Management**: Supabase must also ensure that our vendors, who may have access to ePHI, comply with HIPAA Rules. This is done through a BAA with each vendor.
 
+## Staying compliant and secure
+
+Compliance is a continuous process and should not be treated as a point-in-time audit of controls. Supabase applies all the necessary privacy and security controls to ensure HIPAA compliance at audit time, but also has additional checks and monitoring in place to ensure those controls are not disabled or altered in between audit periods. Customers commit to doing the same in their HIPAA environments. Supabase provides a growing set of checks that warn customers of changes to their projects that disable or weaken HIPAA required controls. Customers will receive warnings and guidance via the Security Advisor, however the responsiblity of applying the recommended controls falls directly to the customer.
+
+Our [shared responsibility model](/docs/guides/deployment/shared-responsibility-model) document discusses both HIPAA and general data management best practices, and how this responsibility is shared between customers and Supabase.
+
+## Frequently asked questions
+
+**What is the difference between SOC 2 and HIPAA?**
+
+Both are frameworks for protecting sensitive data, however they serve two different purposes. They share many security and privacy controls and meeting the controls of one normally means being close to complying with the other.
+
+The main differentiator comes down to purpose and scope.
+
+- SOC 2 is not industry-specific and can be applied to any service organization that handles customer data.
+- HIPAA is a federal regulation in the United States. HIPAA sets standards for the privacy and security of PHI/ePHI, ensuring that patient data is handled confidentially and securely.
+
+**Are Supabase HIPAA environments also SOC 2 compliant?**
+
+Yes. Supabase applies the same SOC 2 controls to all environments, with additional controls being applied to HIPAA environments.
+
+**How often is Supabase audited?**
+
+Supabase undergoes annual audits. The HIPAA controls are audited during the same audit period as the SOC 2 controls.
+
 ## Resources
 
 1. [Health Insurance Portability and Accountability Act (HIPAA)](https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html)
@@ -31,3 +56,4 @@ Supabase as the business associate, and the vendors used by Supabase, are the en
 3. [Security Rule](https://www.hhs.gov/hipaa/for-professionals/security/index.html)
 4. [Breach Notification Rule](https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html)
 5. [Configuring HIPAA projects](/docs/guides/platform/hipaa-projects) on Supabase
+6. [Shared Responsibility Model](/docs/guides/deployment/shared-responsibility-model)
