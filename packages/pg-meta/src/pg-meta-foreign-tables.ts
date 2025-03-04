@@ -4,36 +4,14 @@ import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList, coalesceRowsToArray } from './helpers'
 import { FOREIGN_TABLES_SQL } from './sql/foreign-tables'
 import { COLUMNS_SQL } from './sql/columns'
+import { pgColumnArrayZod } from './pg-meta-columns'
 
 export const pgForeignTableZod = z.object({
   id: z.number(),
   schema: z.string(),
   name: z.string(),
   comment: z.string().nullable(),
-  columns: z
-    .array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        table_id: z.number(),
-        ordinal_position: z.number(),
-        data_type: z.string(),
-        format: z.string(),
-        is_nullable: z.boolean(),
-        is_identity: z.boolean(),
-        is_generated: z.boolean(),
-        is_updatable: z.boolean(),
-        is_unique: z.boolean(),
-        enums: z.array(z.string()),
-        check: z.string().nullable(),
-        default_value: z.string().nullable(),
-        schema: z.string(),
-        table: z.string(),
-        comment: z.string().nullable(),
-        identity_generation: z.string().nullable(),
-      })
-    )
-    .optional(),
+  columns: pgColumnArrayZod.optional(),
 })
 
 export type PGForeignTable = z.infer<typeof pgForeignTableZod>
