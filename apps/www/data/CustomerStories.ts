@@ -20,6 +20,18 @@ export type CustomerStoryType = {
 export const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
+    title: 'Scaling Innovation with Supabase: Meshy’s Migration to Cost-Effective Authentication',
+    description:
+      'Discover how a rapidly growing Meshy migrated from an expensive authentication model with Auth0 to Supabase Auth, and significantly reduced their costs.',
+    organization: 'Meshy',
+    imgUrl: 'images/customers/logos/meshy.png',
+    logo: '/images/customers/logos/meshy.png',
+    logo_inverse: '/images/customers/logos/light/meshy.png',
+    url: '/customers/meshy',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
     title:
       'Scaling Beyond No-Code: asap.work’s Journey to a Faster, Flexible Solution with Supabase',
     description:
