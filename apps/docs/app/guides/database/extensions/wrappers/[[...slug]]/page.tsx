@@ -51,6 +51,13 @@ const pageMap = [
     remoteFile: 'bigquery.md',
   },
   {
+    slug: 'clerk',
+    meta: {
+      title: 'Clerk',
+    },
+    remoteFile: 'clerk.md',
+  },
+  {
     slug: 'clickhouse',
     meta: {
       title: 'ClickHouse',
@@ -84,6 +91,13 @@ const pageMap = [
       title: 'MSSQL',
     },
     remoteFile: 'mssql.md',
+  },
+  {
+    slug: 'notion',
+    meta: {
+      title: 'Notion',
+    },
+    remoteFile: 'notion.md',
   },
   {
     slug: 'paddle',

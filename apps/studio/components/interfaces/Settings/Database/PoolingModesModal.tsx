@@ -3,7 +3,7 @@ import { AlertTriangleIcon } from 'lucide-react'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { DocsButton } from 'components/ui/DocsButton'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
@@ -27,7 +27,7 @@ export const PoolingModesModal = () => {
   const snap = useDatabaseSettingsStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
 
-  const { data } = usePoolingConfigurationQuery({ projectRef: projectRef })
+  const { data } = useSupavisorConfigurationQuery({ projectRef: projectRef })
   const primaryConfig = data?.find((x) => x.identifier === state.selectedDatabaseId)
 
   const navigateToPoolerSettings = () => {

@@ -2,7 +2,6 @@ import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -33,9 +32,7 @@ const FeaturePreviewModal = () => {
   const toggleFeature = () => {
     onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
     sendEvent({
-      action: isSelectedFeatureEnabled
-        ? TelemetryActions.FEATURE_PREVIEW_DISABLED
-        : TelemetryActions.FEATURE_PREVIEW_ENABLED,
+      action: isSelectedFeatureEnabled ? 'feature_preview_disabled' : 'feature_preview_enabled',
       properties: { feature: selectedFeatureKey },
       groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
@@ -57,7 +54,7 @@ const FeaturePreviewModal = () => {
   useEffect(() => {
     if (snap.showFeaturePreviewModal) {
       sendEvent({
-        action: TelemetryActions.FEATURE_PREVIEWS_CLICKED,
+        action: 'feature_previews_clicked',
         groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     }

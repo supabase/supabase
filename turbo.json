@@ -70,7 +70,8 @@
         "AWS_SECRET_ACCESS_KEY",
         "FORCE_ASSET_CDN",
         "ASSET_CDN_S3_ENDPOINT",
-        "SITE_NAME"
+        "SITE_NAME",
+        "VERCEL_URL"
       ],
       "outputs": [".next/**", "!.next/cache/**"]
     },
