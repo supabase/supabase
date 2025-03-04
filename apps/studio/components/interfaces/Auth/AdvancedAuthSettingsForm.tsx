@@ -31,13 +31,14 @@ import {
   WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { StringNumberOrNull } from 'components/ui/Forms/Form.constants'
 
 const FormSchema = z.object({
   API_MAX_REQUEST_DURATION: z.coerce
     .number()
     .min(5, 'Must be 5 or larger')
     .max(30, 'Must be a value no greater than 30'),
-  DB_MAX_POOL_SIZE: z.union([z.string().nullable(), z.coerce.number()]),
+  DB_MAX_POOL_SIZE: StringNumberOrNull,
 })
 
 export const AdvancedAuthSettingsForm = () => {
@@ -132,8 +133,12 @@ export const AdvancedAuthSettingsForm = () => {
 
     setIsUpdatingDatabaseForm(true)
 
+    const config = {
+      DB_MAX_POOL_SIZE: values.DB_MAX_POOL_SIZE,
+    }
+
     updateAuthConfig(
-      { projectRef: projectRef, config: values },
+      { projectRef: projectRef, config },
       {
         onError: (error) => {
           toast.error(`Failed to update database connection settings: ${error?.message}`)
