@@ -4,6 +4,7 @@ import type { Data, Transformer } from 'unified'
 import { visit } from 'unist-util-visit'
 import type { TOCItemType } from '../server/get-toc'
 import { flattenNode } from './remark-utils'
+import type { VFile } from 'vfile'
 
 const slugger = new Slugger()
 
@@ -43,7 +44,7 @@ export function remarkHeading({
   customId = true,
   generateToc = true,
 }: RemarkHeadingOptions = {}): Transformer<Root, Root> {
-  return (root, file) => {
+  return (root: Root, file: VFile) => {
     const toc: TOCItemType[] = []
     slugger.reset()
 

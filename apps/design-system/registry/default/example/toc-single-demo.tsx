@@ -1,3 +1,4 @@
+'use client'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns'
 
