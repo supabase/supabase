@@ -2037,6 +2037,10 @@ export const security: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/security' },
     {
+      name: 'Product security',
+      url: '/guides/security/product-security',
+    },
+    {
       name: 'Compliance',
       url: undefined,
       items: [{ name: 'SOC 2', url: '/guides/security/soc-2-compliance' }],
