@@ -317,6 +317,43 @@ export interface paths {
     patch: operations['v1-update-auth-service-config']
     trace?: never
   }
+  '/v1/projects/{ref}/config/auth/signing-keys': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Alpha] List all signing keys for the project */
+    get: operations['listSigningKeysForProject']
+    put?: never
+    /** [Alpha] Create a new signing key for the project in standby status */
+    post: operations['createSigningKeyForProject']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/auth/signing-keys/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Alpha] Get information about a signing key */
+    get: operations['getSigningKeyForProject']
+    put?: never
+    post?: never
+    /** [Alpha] Remove a signing key from a project, where the status is previously_used */
+    delete: operations['deleteSigningKey']
+    options?: never
+    head?: never
+    /** [Alpha] Update a signing key, mainly its status */
+    patch: operations['patchSigningKey']
+    trace?: never
+  }
   '/v1/projects/{ref}/config/auth/sso/providers': {
     parameters: {
       query?: never
@@ -1517,6 +1554,12 @@ export interface components {
       name: string
       value: string
     }
+    CreateSigningKeyBody: {
+      /** @enum {string} */
+      algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
+      /** @enum {string} */
+      status?: 'in_use' | 'standby'
+    }
     CreateThirdPartyAuthBody: {
       custom_jwks?: Record<string, never>
       jwks_url?: string
@@ -1851,6 +1894,34 @@ export interface components {
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
+    }
+    SigningKeyResponse: {
+      /** @enum {string} */
+      algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
+      /** Format: date-time */
+      created_at: string
+      /** Format: uuid */
+      id: string
+      public_jwk?: unknown
+      /** @enum {string} */
+      status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
+      /** Format: date-time */
+      updated_at: string
+    }
+    SigningKeysResponse: {
+      keys: {
+        /** @enum {string} */
+        algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
+        /** Format: date-time */
+        created_at: string
+        /** Format: uuid */
+        id: string
+        public_jwk?: unknown
+        /** @enum {string} */
+        status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
+        /** Format: date-time */
+        updated_at: string
+      }[]
     }
     SnippetContent: {
       favorite: boolean
@@ -2222,6 +2293,10 @@ export interface components {
       id: string
       saml?: components['schemas']['SamlDescriptor']
       updated_at?: string
+    }
+    UpdateSigningKeyBody: {
+      /** @enum {string} */
+      status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
     }
     UpdateStorageConfigBody: {
       features?: components['schemas']['StorageFeatures']
@@ -3259,6 +3334,147 @@ export interface operations {
       }
       /** @description Failed to update project's auth config */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  listSigningKeysForProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SigningKeysResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  createSigningKeyForProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateSigningKeyBody']
+      }
+    }
+    responses: {
+      /** @description [Alpha] Create a new signing key for the project in standby status */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateSigningKeyBody']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  getSigningKeyForProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SigningKeyResponse']
+        }
+      }
+    }
+  }
+  deleteSigningKey: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SigningKeyResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  patchSigningKey: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateSigningKeyBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SigningKeyResponse']
+        }
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }

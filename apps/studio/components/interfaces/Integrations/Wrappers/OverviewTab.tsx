@@ -45,8 +45,10 @@ export const WrapperOverviewTab = () => {
   const isWrappersExtensionInstalled = !!wrappersExtension?.installed_version
   const hasRequiredVersion =
     (wrappersExtension?.installed_version ?? '') >= (wrapperMeta?.minimumExtensionVersion ?? '')
+  // [Joshen] Default version is what's on the DB, so if the installed version is already the default version
+  // but still doesnt meet the minimum extension version, then DB upgrade is required
   const databaseNeedsUpgrading =
-    wrappersExtension?.installed_version !== wrappersExtension?.default_version
+    wrappersExtension?.installed_version === wrappersExtension?.default_version
 
   return (
     <IntegrationOverviewTab
