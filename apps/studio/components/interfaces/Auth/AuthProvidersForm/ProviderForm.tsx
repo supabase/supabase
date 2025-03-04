@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
@@ -15,6 +15,7 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
+import { useQueryState } from 'nuqs'
 import { Button, Form, Input, Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
@@ -29,8 +30,10 @@ export interface ProviderFormProps {
 }
 
 export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
+  const { ref: projectRef } = useParams()
+  const [urlProvider, setUrlProvider] = useQueryState('provider', { defaultValue: '' })
+
   const [open, setOpen] = useState(false)
-  const { ref: projectRef, provider: urlProvider } = useParams()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
@@ -113,10 +116,24 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     )
   }
 
+  // Handle clicking on a provider in the list
+  const handleProviderClick = () => setUrlProvider(provider.title)
+
+  const handleOpenChange = (isOpen: boolean) => {
+    // Remove provider query param from URL when closed
+    if (!isOpen) setUrlProvider(null)
+  }
+
+  // Open or close the form based on the query parameter
+  useEffect(() => {
+    const isProviderInQuery = urlProvider.toLowerCase() === provider.title.toLowerCase()
+    setOpen(isProviderInQuery)
+  }, [urlProvider, provider.title])
+
   return (
     <>
       <ResourceItem
-        onClick={() => setOpen(true)}
+        onClick={handleProviderClick}
         media={
           <img
             src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}.svg`}
@@ -143,7 +160,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
         {provider.title}
       </ResourceItem>
 
-      <Sheet open={open} onOpenChange={setOpen}>
+      <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetContent className="flex flex-col gap-0">
           <SheetHeader className="shrink-0 flex items-center gap-4">
             <img

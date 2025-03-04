@@ -58,6 +58,8 @@ export * from './src/components/Upload'
 export * from './src/components/Form'
 export * from './src/components/ExpandingTextArea'
 
+export * from './src/components/PrePostTab'
+
 // layout
 export * from './src/components/LoadingLine'
 
