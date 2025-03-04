@@ -15,7 +15,6 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'common/telemetry-constants'
 import {
   Entity,
   isTableLike,
@@ -151,7 +150,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           .map((x: any) => `${x.schema}.${x.name}`)
 
     sendEvent({
-      action: TelemetryActions.REALTIME_TOGGLE_TABLE_CLICKED,
+      action: 'realtime_toggle_table_clicked',
       properties: {
         newState: exists ? 'disabled' : 'enabled',
         origin: 'tableGridHeader',

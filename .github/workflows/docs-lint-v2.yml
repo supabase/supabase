@@ -1,20 +1,11 @@
 name: '[Docs] Lint v2'
 on:
   pull_request:
-    paths:
-      - '.github/workflows/docs-lint-v2.yml'
-      - 'supa-mdx-lint.config.toml'
-      - 'apps/docs/content/**'
-  push:
-    branches:
-      - master
-  workflow_dispatch:
 
 env:
   CARGO_NET_GIT_FETCH_WITH_CLI: true
 
 permissions:
-  contents: write
   pull-requests: write
 
 jobs:
@@ -29,8 +20,17 @@ jobs:
             supa-mdx-lint.config.toml
             supa-mdx-lint
             apps/docs/content
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 #v3.0.2
+        id: filter
+        with:
+          filters: |
+            docs:
+              - 'apps/docs/content/**'
+              - 'supa-mdx-lint/**'
+              - 'supa-mdx-lint.config.toml'
       - name: cache cargo
         id: cache-cargo
+        if: steps.filter.outputs.docs == 'true'
         uses: actions/cache@v4
         with:
           path: |
@@ -38,16 +38,17 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: 0be447eba738c3fd56698eff8ad01fa56c2391d7
+          key: 1b63d22ef9b987f802cba06f01ec0da4b8eb4847
       - name: install linter
-        if: steps.cache-cargo.outputs.cache-hit != 'true'
-        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 0be447eba738c3fd56698eff8ad01fa56c2391d7
+        if: steps.filter.outputs.docs == 'true' && steps.cache-cargo.outputs.cache-hit != 'true'
+        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 1b63d22ef9b987f802cba06f01ec0da4b8eb4847
       - name: install reviewdog
+        if: steps.filter.outputs.docs == 'true'
         uses: reviewdog/action-setup@3f401fe1d58fe77e10d665ab713057375e39b887 # v1.3.0
         with:
           reviewdog_version: v0.20.2
-      - name: run linter on PR
-        if: github.event_name == 'pull_request'
+      - name: run linter
+        if: steps.filter.outputs.docs == 'true'
         env:
           BASE_REF: ${{ github.base_ref }}
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,31 +58,3 @@ jobs:
             | { grep -E "^apps/docs/content/" || test $? = 1; } \
             | xargs -r supa-mdx-lint --format rdf \
             | reviewdog -f=rdjsonl -reporter=github-pr-review
-      - name: run linter on push or workflow dispatch
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          supa-mdx-lint apps/docs/content || {
-            echo "Linter failed, attempting to fix errors..."
-            git config --global user.name 'github-docs-bot'
-            git config --global user.email 'github-docs-bot@supabase.com'
-            BRANCH_NAME="bot/docs-lint-fixes"
-            EXISTING_BRANCH=$(git ls-remote --heads origin $BRANCH_NAME)
-            if [ -n "$EXISTING_BRANCH" ]; then
-              git checkout $BRANCH_NAME
-            else
-              git checkout -b $BRANCH_NAME
-            fi
-            supa-mdx-lint apps/docs/content --fix || FIX_FAILED=1
-            git add .
-            git commit -m '[bot] fix lint errors' || true
-            git push origin $BRANCH_NAME
-            if [ -z "$EXISTING_BRANCH" ]; then
-              gh pr create --title '[bot] fix lint errors' --body 'This PR fixes lint errors in the documentation.' --head $BRANCH_NAME
-            fi
-            if [ "${FIX_FAILED:-0}" -eq 1 ]; then
-              echo "Fix did not correct all errors."
-              exit 1
-            fi
-          }
