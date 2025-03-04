@@ -39,7 +39,7 @@ const GuidesTableOfContents = ({ className, video }: { className?: string; video
 
   return (
     <div className={cn('thin-scrollbar overflow-y-auto h-fit', 'px-px', className)}>
-      <div className={cn('w-full relative border-l flex flex-col gap-6 lg:gap-8 px-2', 'h-fit')}>
+      <div className="w-full relative border-l flex flex-col gap-6 lg:gap-8 px-2 h-fit">
         {video && (
           <div className="relative pl-5">
             <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} />
