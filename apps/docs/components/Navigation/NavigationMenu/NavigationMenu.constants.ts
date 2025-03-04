@@ -2030,6 +2030,20 @@ export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof Ico
   },
 ]
 
+export const security: NavMenuConstant = {
+  icon: 'platform',
+  title: 'Security',
+  url: '/guides/security',
+  items: [
+    { name: 'Overview', url: '/guides/security' },
+    {
+      name: 'Compliance',
+      url: undefined,
+      items: [{ name: 'SOC 2', url: '/guides/security/soc-2-compliance' }],
+    },
+  ],
+}
+
 export const platform: NavMenuConstant = {
   icon: 'platform',
   title: 'Platform',
@@ -2377,6 +2391,7 @@ export const deployment: NavMenuConstant = {
         },
         { name: 'Maturity model', url: '/guides/deployment/maturity-model' },
         { name: 'Production checklist', url: '/guides/deployment/going-into-prod' },
+        { name: 'SOC 2 compliance', url: '/guides/security/soc-2-compliance' },
       ],
     },
     {
