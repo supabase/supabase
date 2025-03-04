@@ -2,7 +2,6 @@ import { useRouter } from 'next/router'
 import { DragEvent, memo, ReactNode, useContext, useEffect, useMemo, useRef } from 'react'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -151,7 +150,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
 
   const language = children[0].props.className?.replace('language-', '') || 'sql'
   const rawContent = children[0].props.children[0]
-  const propsMatch = rawContent.match(/--\s*props:\s*(\{[^}]+\})/)
+  const propsMatch = rawContent.match(/(?:--|\/\/)\s*props:\s*(\{[^}]+\})/)
 
   const snippetProps: AssistantSnippetProps = useMemo(
     () => (propsMatch ? JSON.parse(propsMatch[1]) : {}),
@@ -164,7 +163,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
   const runQuery = snippetProps.runQuery === 'true'
 
   // Strip props from the content for both SQL and edge functions
-  const cleanContent = rawContent.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
+  const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
 
   const isDraggableToReports =
     supportSQLBlocks && canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
@@ -181,7 +180,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
 
   const onRunQuery = async (queryType: 'select' | 'mutation') => {
     sendEvent({
-      action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED,
+      action: 'assistant_suggestion_run_query_clicked',
       properties: {
         queryType,
         ...(queryType === 'mutation'

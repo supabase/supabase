@@ -2,16 +2,17 @@ import { ChevronDown } from 'lucide-react'
 import { HTMLAttributes, ReactNode, useState } from 'react'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
+import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -33,6 +34,8 @@ import {
   CONNECTION_PARAMETERS,
   DATABASE_CONNECTION_TYPES,
   DatabaseConnectionType,
+  IPV4_ADDON_TEXT,
+  PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT,
 } from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings } from './DatabaseSettings.utils'
@@ -55,19 +58,28 @@ export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
   const org = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
+  const allowPgBouncerSelection = useFlag('dualPoolerSupport')
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
 
   const {
-    data: poolingInfo,
-    error: poolingInfoError,
-    isLoading: isLoadingPoolingInfo,
-    isError: isErrorPoolingInfo,
-    isSuccess: isSuccessPoolingInfo,
-  } = usePoolingConfigurationQuery({
-    projectRef,
-  })
-  const poolingConfiguration = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+    data: pgbouncerConfig,
+    error: pgbouncerError,
+    isLoading: isLoadingPgbouncerConfig,
+    isError: isErrorPgbouncerConfig,
+    isSuccess: isSuccessPgBouncerConfig,
+  } = usePgbouncerConfigQuery({ projectRef })
+  const {
+    data: supavisorConfig,
+    error: supavisorConfigError,
+    isLoading: isLoadingSupavisorConfig,
+    isError: isErrorSupavisorConfig,
+    isSuccess: isSuccessSupavisorConfig,
+  } = useSupavisorConfigurationQuery({ projectRef })
+  const isPgBouncerEnabled = allowPgBouncerSelection && !!pgbouncerConfig?.pgbouncer_enabled
+  const poolingConfiguration = isPgBouncerEnabled
+    ? pgbouncerConfig
+    : supavisorConfig?.find((x) => x.identifier === state.selectedDatabaseId)
 
   const {
     data: databases,
@@ -77,10 +89,19 @@ export const DatabaseConnectionString = () => {
     isSuccess: isSuccessReadReplicas,
   } = useReadReplicasQuery({ projectRef })
 
-  const error = poolingInfoError || readReplicasError
-  const isLoading = isLoadingPoolingInfo || isLoadingReadReplicas
-  const isError = isErrorPoolingInfo || isErrorReadReplicas
-  const isSuccess = isSuccessPoolingInfo && isSuccessReadReplicas
+  const poolerError = isPgBouncerEnabled ? pgbouncerError : supavisorConfigError
+  const isLoadingPoolerConfig = isPgBouncerEnabled
+    ? isLoadingPgbouncerConfig
+    : isLoadingSupavisorConfig
+  const isErrorPoolerConfig = isPgBouncerEnabled ? isErrorPgbouncerConfig : isErrorSupavisorConfig
+  const isSuccessPoolerConfig = isPgBouncerEnabled
+    ? isSuccessPgBouncerConfig
+    : isSuccessSupavisorConfig
+
+  const error = poolerError || readReplicasError
+  const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas
+  const isError = isErrorPoolerConfig || isErrorReadReplicas
+  const isSuccess = isSuccessPoolerConfig && isSuccessReadReplicas
 
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
@@ -103,16 +124,27 @@ export const DatabaseConnectionString = () => {
     const connectionType = connectionInfo?.label ?? 'Unknown'
     const lang = connectionInfo?.lang ?? 'Unknown'
     sendEvent({
-      action: TelemetryActions.CONNECTION_STRING_COPIED,
+      action: 'connection_string_copied',
       properties: { connectionType, lang, connectionMethod },
       groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
   }
 
   const connectionStrings =
-    isSuccessPoolingInfo && poolingConfiguration !== undefined
-      ? getConnectionStrings(connectionInfo, poolingConfiguration, {
-          projectRef,
+    isSuccessSupavisorConfig && poolingConfiguration !== undefined
+      ? getConnectionStrings({
+          connectionInfo,
+          poolingInfo: {
+            connectionString:
+              'connection_string' in poolingConfiguration
+                ? poolingConfiguration.connection_string
+                : poolingConfiguration.connectionString,
+            db_host: poolingConfiguration.db_host,
+            db_name: poolingConfiguration.db_name,
+            db_port: poolingConfiguration.db_port,
+            db_user: poolingConfiguration.db_user,
+          },
+          metadata: { projectRef },
         })
       : {
           direct: {
@@ -173,6 +205,22 @@ export const DatabaseConnectionString = () => {
 
   // [Refactor] See if we can do this in an immutable way, technically not a good practice to do this
   let stepNumber = 0
+
+  const ipv4AddOnUrl = {
+    text: 'IPv4 add-on',
+    url: `/project/${projectRef}/settings/addons?panel=ipv4`,
+  }
+  const ipv4SettingsUrl = {
+    text: 'IPv4 settings',
+    url: `/project/${projectRef}/settings/addons?panel=ipv4`,
+  }
+  const poolerSettingsUrl = {
+    text: 'Pooler settings',
+    url: `/project/${projectRef}/settings/database#connection-pooling`,
+  }
+  const buttonLinks = !ipv4Addon
+    ? [ipv4AddOnUrl, ...(isPgBouncerEnabled ? [poolerSettingsUrl] : [])]
+    : [ipv4SettingsUrl, ...(isPgBouncerEnabled ? [poolerSettingsUrl] : [])]
 
   return (
     <div className="flex flex-col">
@@ -280,16 +328,13 @@ export const DatabaseConnectionString = () => {
                 ipv4Status={{
                   type: !ipv4Addon ? 'error' : 'success',
                   title: !ipv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
-                  description: ipv4Addon && 'Connections are IPv4 proxied with IPv4 addon.',
-                  link: !ipv4Addon
-                    ? {
-                        text: 'IPv4 addon',
-                        url: `/project/${projectRef}/settings/addons?panel=ipv4`,
-                      }
-                    : {
-                        text: 'IPv4 settings',
-                        url: `/project/${projectRef}/settings/addons?panel=ipv4`,
-                      },
+                  description:
+                    isPgBouncerEnabled && !ipv4Addon
+                      ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
+                      : !isPgBouncerEnabled
+                        ? 'Use Session Pooler if on a IPv4 network or purchase IPv4 add-on'
+                        : IPV4_ADDON_TEXT,
+                  links: buttonLinks,
                 }}
                 parameters={[
                   { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
@@ -304,13 +349,20 @@ export const DatabaseConnectionString = () => {
                 lang={lang}
                 type="transaction"
                 title="Transaction pooler"
+                badge={isPgBouncerEnabled ? 'Dedicated Pooler' : 'Supavisor'}
                 fileTitle={fileTitle}
                 description="Ideal for stateless applications like serverless functions where each interaction with Postgres is brief and isolated."
                 connectionString={connectionStrings['pooler'][selectedTab]}
                 ipv4Status={{
-                  type: 'success',
-                  title: 'IPv4 compatible',
-                  description: 'Transaction pooler connections are IPv4 proxied for free.',
+                  type: isPgBouncerEnabled && !ipv4Addon ? 'error' : 'success',
+                  title: isPgBouncerEnabled && !ipv4Addon ? 'IPv4 incompatible' : 'IPv4 compatible',
+                  description:
+                    isPgBouncerEnabled && !ipv4Addon
+                      ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
+                      : !isPgBouncerEnabled
+                        ? 'Transaction pooler connections are IPv4 proxied for free.'
+                        : IPV4_ADDON_TEXT,
+                  links: isPgBouncerEnabled ? buttonLinks : undefined,
                 }}
                 notice={['Does not support PREPARE statements']}
                 parameters={[
@@ -325,7 +377,7 @@ export const DatabaseConnectionString = () => {
                 ]}
                 onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
               />
-              {ipv4Addon && (
+              {ipv4Addon && !isPgBouncerEnabled && (
                 <Admonition
                   type="warning"
                   title="Highly recommended to not use Session Pooler"
@@ -342,13 +394,24 @@ export const DatabaseConnectionString = () => {
                 lang={lang}
                 type="session"
                 title="Session pooler"
+                badge={isPgBouncerEnabled ? 'Dedicated Pooler' : 'Supavisor'}
                 fileTitle={fileTitle}
-                description="Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network."
+                description={
+                  isPgBouncerEnabled
+                    ? 'Recommended if you need to use prepared statements, or other features that are only available in Session mode.'
+                    : 'Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network.'
+                }
                 connectionString={connectionStrings['pooler'][selectedTab].replace('6543', '5432')}
                 ipv4Status={{
-                  type: 'success',
-                  title: 'IPv4 compatible',
-                  description: 'Session pooler connections are IPv4 proxied for free.',
+                  type: isPgBouncerEnabled && !ipv4Addon ? 'error' : 'success',
+                  title: isPgBouncerEnabled && !ipv4Addon ? 'IPv4 incompatible' : 'IPv4 compatible',
+                  description:
+                    isPgBouncerEnabled && !ipv4Addon
+                      ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
+                      : !isPgBouncerEnabled
+                        ? 'Session pooler connections are IPv4 proxied for free'
+                        : IPV4_ADDON_TEXT,
+                  links: isPgBouncerEnabled ? buttonLinks : undefined,
                 }}
                 parameters={[
                   { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },

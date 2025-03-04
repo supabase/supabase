@@ -288,11 +288,9 @@ const InfrastructureActivity = () => {
                           </p>
                         ) : (
                           <p className="text-sm text-foreground-light">
-                            Your current compute can burst up to{' '}
-                            {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps for
-                            30 minutes a day and reverts to the baseline performance of{' '}
+                            Your current compute can burst above the baseline disk throughput of{' '}
                             {currentComputeInstanceSpecs.baseline_disk_io_mbs?.toLocaleString()}{' '}
-                            Mbps.
+                            Mbps for short periods of time.
                           </p>
                         )}
                       </div>
@@ -307,18 +305,18 @@ const InfrastructureActivity = () => {
                           </p>
                         </div>
                         <div className="flex items-center justify-between border-b py-1">
+                          <p className="text-xs text-foreground-light">Baseline IO Bandwidth</p>
+                          <p className="text-xs">
+                            {currentComputeInstanceSpecs.baseline_disk_io_mbs?.toLocaleString()}{' '}
+                            Mbps
+                          </p>
+                        </div>
+                        <div className="flex items-center justify-between border-b py-1">
                           <p className="text-xs text-foreground-light">
                             Maximum IO Bandwidth (burst limit)
                           </p>
                           <p className="text-xs">
                             {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps
-                          </p>
-                        </div>
-                        <div className="flex items-center justify-between border-b py-1">
-                          <p className="text-xs text-foreground-light">Baseline IO Bandwidth</p>
-                          <p className="text-xs">
-                            {currentComputeInstanceSpecs.baseline_disk_io_mbs?.toLocaleString()}{' '}
-                            Mbps
                           </p>
                         </div>
                         {currentComputeInstanceSpecs.max_disk_io_mbs !==

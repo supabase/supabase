@@ -1,9 +1,9 @@
-import { streamText } from 'ai'
 import { openai } from '@ai-sdk/openai'
+import pgMeta from '@supabase/pg-meta'
+import { streamText } from 'ai'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getTools } from '../sql/tools'
-import { executeSql } from 'data/sql/execute-sql-query'
-import pgMeta from '@supabase/pg-meta'
 
 export const maxDuration = 30
 const openAiKey = process.env.OPENAI_API_KEY
@@ -68,6 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       # You generate and debug SQL
       The generated SQL (must be valid SQL), and must adhere to the following:
+      - Always retrieve public schema information first
       - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
       - Always use semicolons
       - Use vector(384) data type for any embedding/vector related query
@@ -96,8 +97,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       # You write row level security policies.
 
-      Your purpose is to generate a policy with the constraints given by the user.
-      - First, use getSchema to retrieve more information about a schema or schemas that will contain policies, usually the public schema.
+      Your purpose is to generate a policy with the constraints given by the user using the getRlsKnowledge tool.
+      - First, use getSchemaTables to retrieve more information about a schema or schemas that will contain policies, usually the public schema.
       - Then retrieve existing RLS policies and guidelines on how to write policies using the getRlsKnowledge tool .
       - Then write new policies or update existing policies based on the prompt
       - When asked to suggest policies, either alter existing policies or add new ones to the public schema.
@@ -126,10 +127,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             
             Instructions:
             1. Only modify the selected text based on this prompt: ${prompt}
-            2. Your response should be ONLY the modified selection text, nothing else. Remove selected text if needed.
-            3. Do not wrap in code blocks or markdown
-            4. You can respond with one word or multiple words
-            5. Ensure the modified text flows naturally within the current line
+            2. Get schema tables information using the getSchemaTables tool
+            3. Get existing RLS policies and guidelines on how to write policies using the getRlsKnowledge tool
+            4. Write new policies or update existing policies based on the prompt
+            5. Your response should be ONLY the modified selection text, nothing else. Remove selected text if needed.
+            6. Do not wrap in code blocks or markdown
+            7. You can respond with one word or multiple words
+            8. Ensure the modified text flows naturally within the current line
             6. Avoid duplicating SQL keywords (SELECT, FROM, WHERE, etc) when considering the full statement
             7. If there is no surrounding context (before or after), make sure your response is a complete valid SQL statement that can be run and resolves the prompt.
             

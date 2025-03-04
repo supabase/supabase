@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Lock, Unlock } from 'lucide-react'
-import { useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -42,7 +41,6 @@ const PolicyTableRowHeader = ({
   const isRealtimeSchema = table.schema === 'realtime'
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
-  const [_, setEditView] = useQueryState('view', { defaultValue: '' })
 
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
@@ -117,7 +115,7 @@ const PolicyTableRowHeader = ({
               onClick={() => {
                 setAiAssistantPanel({
                   open: true,
-                  initialInput: `Create a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
+                  initialInput: `Create and name a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
                 })
               }}
               tooltip={{
