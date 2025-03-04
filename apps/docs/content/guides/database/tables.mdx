@@ -90,7 +90,7 @@ You must define the "data type" when you create a column.
 
 ### Data types
 
-Every column is a predefined type. PostgreSQL provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions) if the default types don't fit your needs. You can use any data type that Postgres supports via the SQL editor. We only support a subset of these in the Table Editor in an effort to keep the experience simple for people with less experience with databases.
+Every column is a predefined type. Postgres provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions) if the default types don't fit your needs. You can use any data type that Postgres supports via the SQL editor. We only support a subset of these in the Table Editor in an effort to keep the experience simple for people with less experience with databases.
 
 <details>
 <summary>Show/Hide default data types</summary>
@@ -122,7 +122,7 @@ Every column is a predefined type. PostgreSQL provides many [default types](http
 | `money`                           |               | currency amount                                                  |
 | `numeric`                         | `decimal`     | exact numeric of selectable precision                            |
 | `path`                            |               | geometric path on a plane                                        |
-| `pg_lsn`                          |               | PostgreSQL Log Sequence Number                                   |
+| `pg_lsn`                          |               | Postgres Log Sequence Number                                     |
 | `pg_snapshot`                     |               | user-level transaction ID snapshot                               |
 | `point`                           |               | geometric point on a plane                                       |
 | `polygon`                         |               | closed geometric path on a plane                                 |
@@ -320,7 +320,7 @@ psql -h DATABASE_URL -p 5432 -d postgres -U postgres \
   -c "\COPY movies FROM './movies.csv';"
 ```
 
-Additionally use the `DELIMITER`, `HEADER` and `FORMAT` options as defined in the PostgreSQL [COPY](https://www.postgresql.org/docs/current/sql-copy.html) docs.
+Additionally use the `DELIMITER`, `HEADER` and `FORMAT` options as defined in the Postgres [COPY](https://www.postgresql.org/docs/current/sql-copy.html) docs.
 
 ```bash
 psql -h DATABASE_URL -p 5432 -d postgres -U postgres \
@@ -569,7 +569,7 @@ Without a view, we would need to go into every dependent query to add the new ru
 
 #### Logical organization
 
-With views, we can give our query a name. This is extremely useful for teams working with the same database. Instead of guessing what a query is supposed to do, a well-named view can easily explain it. For example, by looking at the name of the view **transcripts**, we can infer that the underlying query might involve the **students**, **courses**, and **grades** tables.
+With views, we can give our query a name. This is extremely useful for teams working with the same database. Instead of guessing what a query is supposed to do, a well-named view can explain it. For example, by looking at the name of the view **transcripts**, we can infer that the underlying query might involve the **students**, **courses**, and **grades** tables.
 
 #### Security
 
@@ -621,6 +621,6 @@ Creating a materialized view is not a solution to inefficient queries. You shoul
 
 - [Official Docs: Create table](https://www.postgresql.org/docs/current/sql-createtable.html)
 - [Official Docs: Create view](https://www.postgresql.org/docs/12/sql-createview.html)
-- [PostgreSQL Tutorial: Create tables](https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-create-table/)
-- [PostgreSQL Tutorial: Add column](https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-add-column/)
-- [PostgreSQL Tutorial: Views](https://www.postgresqltutorial.com/postgresql-views/)
+- [Postgres Tutorial: Create tables](https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-create-table/)
+- [Postgres Tutorial: Add column](https://www.postgresqltutorial.com/postgresql-tutorial/postgresql-add-column/)
+- [Postgres Tutorial: Views](https://www.postgresqltutorial.com/postgresql-views/)

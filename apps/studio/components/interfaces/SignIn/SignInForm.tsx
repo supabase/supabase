@@ -8,7 +8,6 @@ import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
 import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -62,7 +61,10 @@ const SignInForm = () => {
         }
 
         toast.success(`Signed in successfully!`, { id: toastId })
-        sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
+        sendEvent({
+          action: 'sign_in',
+          properties: { category: 'account', method: 'email' },
+        })
         addLoginEvent({})
 
         await queryClient.resetQueries()

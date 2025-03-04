@@ -31,7 +31,6 @@ export default defineConfig({
             name: 'Authentication setup',
             testDir: './tests',
             testMatch: /.*\.setup\.ts/,
-            use: { headless: false },
           },
         ]
       : []),
