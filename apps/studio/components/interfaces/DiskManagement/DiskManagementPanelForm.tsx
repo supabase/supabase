@@ -41,9 +41,9 @@ import {
   RadioGroupCard,
   RadioGroupCardItem,
   Separator,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -316,7 +316,7 @@ export function DiskManagementPanelForm() {
               <Link
                 target="_blank"
                 rel="noreferrer"
-                href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}
+                href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=diskManagementPanelDiskSize`}
               >
                 Upgrade plan
               </Link>
@@ -437,20 +437,20 @@ export function DiskManagementPanelForm() {
                                     ? `between ${minIOPS} and ${maxIOPS.toLocaleString()} based on your disk size.`
                                     : `at least ${minIOPS}`}
                                 </span>
-                                <Tooltip_Shadcn_>
-                                  <TooltipTrigger_Shadcn_ asChild>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
                                     <HelpCircle
                                       size={14}
                                       className="transition hover:text-foreground"
                                     />
-                                  </TooltipTrigger_Shadcn_>
-                                  <TooltipContent_Shadcn_ side="bottom">
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom">
                                     For io2 storage type, min IOPS is at {minIOPS}, while max IOPS
                                     is at 1000 * disk size in GB or{' '}
                                     {IOPS_RANGE[DiskType.IO2].max.toLocaleString()}, whichever is
                                     lower
-                                  </TooltipContent_Shadcn_>
-                                </Tooltip_Shadcn_>
+                                  </TooltipContent>
+                                </Tooltip>
                               </div>
                             ) : (
                               <div className="flex items-center gap-x-2">
@@ -460,20 +460,20 @@ export function DiskManagementPanelForm() {
                                     ? `between ${minIOPS.toLocaleString()} and ${maxIOPS.toLocaleString()} based on your disk size.`
                                     : `at least ${minIOPS.toLocaleString()}`}
                                 </span>
-                                <Tooltip_Shadcn_>
-                                  <TooltipTrigger_Shadcn_ asChild>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
                                     <HelpCircle
                                       size={14}
                                       className="transition hover:text-foreground"
                                     />
-                                  </TooltipTrigger_Shadcn_>
-                                  <TooltipContent_Shadcn_ side="bottom" className="w-64">
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom" className="w-64">
                                     For gp3 storage type, min IOPS is at {minIOPS} while max IOPS is
                                     at 500 * disk size in GB or{' '}
                                     {IOPS_RANGE[DiskType.GP3].max.toLocaleString()}, whichever is
                                     lower
-                                  </TooltipContent_Shadcn_>
-                                </Tooltip_Shadcn_>
+                                  </TooltipContent>
+                                </Tooltip>
                               </div>
                             )}
                             {!form.formState.errors.provisionedIOPS &&
@@ -559,18 +559,18 @@ export function DiskManagementPanelForm() {
                                       Throughput must be between {minThroughput.toLocaleString()}{' '}
                                       and {maxThroughput?.toLocaleString()} MB/s based on your IOPS.
                                     </span>
-                                    <Tooltip_Shadcn_>
-                                      <TooltipTrigger_Shadcn_ asChild>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
                                         <HelpCircle
                                           size={14}
                                           className="transition hover:text-foreground"
                                         />
-                                      </TooltipTrigger_Shadcn_>
-                                      <TooltipContent_Shadcn_ side="bottom" className="w-64">
+                                      </TooltipTrigger>
+                                      <TooltipContent side="bottom" className="w-64">
                                         Min throughput is at 125MB/s, while max throughput is at
                                         0.25MB/s * IOPS or 1,000, whichever is lower
-                                      </TooltipContent_Shadcn_>
-                                    </Tooltip_Shadcn_>
+                                      </TooltipContent>
+                                    </Tooltip>
                                   </div>
                                   {!form.formState.errors.throughput &&
                                     field.value !== undefined &&

@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { ExternalLink, Info } from 'lucide-react'
@@ -35,6 +34,9 @@ import {
   Modal,
   Radio,
   SidePanel,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   WarningIcon,
 } from 'ui'
 
@@ -280,7 +282,9 @@ const ComputeInstanceSidePanel = () => {
                   title="Changing your compute size is only available on the Pro Plan"
                   actions={
                     <Button asChild type="default">
-                      <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                      <Link
+                        href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=computeInstanceSidePanel`}
+                      >
                         View available plans
                       </Link>
                     </Button>
@@ -339,35 +343,19 @@ const ComputeInstanceSidePanel = () => {
                             </span>
                           </div>
                           {option.price_interval === 'hourly' && (
-                            <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger>
-                                <div className="flex items-center">
-                                  <Info
-                                    size={14}
-                                    strokeWidth={2}
-                                    className="hover:text-foreground-light"
-                                  />
-                                </div>
-                              </Tooltip.Trigger>
-                              <Tooltip.Portal>
-                                <Tooltip.Content side="bottom">
-                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                  <div
-                                    className={[
-                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                      'border border-background',
-                                    ].join(' ')}
-                                  >
-                                    <div className="flex items-center space-x-1">
-                                      <p className="text-foreground text-sm">
-                                        ${Number(option.price * 672).toFixed(0)} - $
-                                        {Number(option.price * 744).toFixed(0)} per month
-                                      </p>
-                                    </div>
-                                  </div>
-                                </Tooltip.Content>
-                              </Tooltip.Portal>
-                            </Tooltip.Root>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Info
+                                  size={14}
+                                  strokeWidth={2}
+                                  className="hover:text-foreground-light"
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
+                                ${Number(option.price * 672).toFixed(0)} - $
+                                {Number(option.price * 744).toFixed(0)} per month
+                              </TooltipContent>
+                            </Tooltip>
                           )}
                         </div>
                       </div>
@@ -383,7 +371,7 @@ const ComputeInstanceSidePanel = () => {
                 usage-based item and you're billed at the end of your billing cycle based on your
                 compute usage. Read more about{' '}
                 <Link
-                  href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                  href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                   target="_blank"
                   rel="noreferrer"
                   className="underline"

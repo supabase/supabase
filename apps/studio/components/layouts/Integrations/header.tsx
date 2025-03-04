@@ -64,7 +64,7 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
               <motion.div
                 layout
                 transition={layoutTransition}
-                className="px-10 flex flex-col gap-5"
+                className="px-4 md:px-10 flex flex-col gap-5"
               >
                 {/* Navigation link back to integrations landing */}
                 <div className="flex items-center gap-0.5">

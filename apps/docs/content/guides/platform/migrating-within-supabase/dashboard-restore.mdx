@@ -71,7 +71,7 @@ Here is a non-exhaustive list of items that are commonly asked about and will be
     <StepHikeCompact.Details title="Get the new database connection string" fullWidth>
       Go to the [project page](/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
 
-      <Admonition type="info">
+      <Admonition type="note">
         Use the Session pooler connection string by default. If your ISP supports IPv6, use the direct connection string.
       </Admonition>
 
@@ -90,7 +90,7 @@ Here is a non-exhaustive list of items that are commonly asked about and will be
 <StepHikeCompact.Step step={2}>
   <StepHikeCompact.Details title="Get the database password" fullWidth>
     <Admonition type="caution">
-      It can take a few minutes for the database password reset to take effect. Especially if multiple password resets are done. 
+      It can take a few minutes for the database password reset to take effect. Especially if multiple password resets are done.
     </Admonition>
     Reset the password in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
 
@@ -162,7 +162,7 @@ There are circumstances where this method can fail and if it does, you should re
 
 "**psql: error: connection to server at "aws-0-us-east-1.pooler.supabase.com" (44.216.29.125), port 5432 failed: received invalid response to GSSAPI negotiation:**"
 
-You are possibly using psql and postgres version 15 or lower. Completely remove the Postgresql installation and install the latest version as per the instructions above to resolve this issue.
+You are possibly using psql and Postgres version 15 or lower. Completely remove the Postgres installation and install the latest version as per the instructions above to resolve this issue.
 
 "**psql: error: connection to server at "aws-0-us-east-1.pooler.supabase.com" (44.216.29.125), port 5432 failed: error received from server in SCRAM exchange: Wrong password**"
 

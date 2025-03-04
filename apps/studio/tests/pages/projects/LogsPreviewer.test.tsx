@@ -13,11 +13,15 @@ import { render } from '../../helpers'
 
 // [Joshen] There's gotta be a much better way to mock these things so that it applies for ALL tests
 // Since these are easily commonly used things across all pages/components that we might be testing for
-vi.mock('common', () => ({
-  useParams: vi.fn().mockReturnValue({}),
-  useIsLoggedIn: vi.fn(),
-  isBrowser: false,
-}))
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    useParams: vi.fn().mockReturnValue({}),
+    useIsLoggedIn: vi.fn(),
+    isBrowser: false,
+    LOCAL_STORAGE_KEYS: (actual as any).LOCAL_STORAGE_KEYS,
+  }
+})
 vi.mock('lib/gotrue', () => ({
   auth: { onAuthStateChange: vi.fn() },
 }))

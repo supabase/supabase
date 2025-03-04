@@ -5,6 +5,8 @@ import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   Popover,
@@ -17,6 +19,10 @@ import { useProjectContext } from '../ProjectContext'
 const HelpPopover = () => {
   const router = useRouter()
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
+
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const projectRef = project?.parent_project_ref ?? router.query.ref
   const supportUrl = `/support/new${projectRef ? `?ref=${projectRef}` : ''}`
 
@@ -29,6 +35,12 @@ const HelpPopover = () => {
           className="px-1"
           icon={<HelpCircle size={16} strokeWidth={1.5} className="text-foreground-light" />}
           tooltip={{ content: { side: 'bottom', text: 'Help' } }}
+          onClick={() => {
+            sendEvent({
+              action: 'help_button_clicked',
+              groups: { project: project?.ref, organization: org?.slug },
+            })
+          }}
         />
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0 py-5" align="end" side="bottom">

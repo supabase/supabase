@@ -24,7 +24,7 @@ Setting up OAuth with Azure consists of four broad steps:
 
 - Under Microsoft Entra ID, select _App registrations_ in the side panel and select _New registration._
 - Choose a name and select your preferred option for the supported account types.
-- Specify a _Web_ _Redirect URI_. It should should look like this: `https://<project-ref>.supabase.co/auth/v1/callback`
+- Specify a _Web_ _Redirect URI_. It should look like this: `https://<project-ref>.supabase.co/auth/v1/callback`
 - Finally, select _Register_ at the bottom of the screen.
 
 ![Register an application.](/docs/img/guides/auth-azure/azure-register-app.png)
@@ -103,6 +103,7 @@ By default, Supabase Auth uses the _common_ Microsoft tenant (`https://login.mic
 
 If your app is registered as _Personal Microsoft accounts only_ for the _Supported account types_ set Microsoft tenant to _consumers_ (`https://login.microsoftonline.com/consumers`).
 
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 If your app is registered as _My organization only_ for the _Supported account types_ you may want to configure Supabase Auth with the organization's tenant URL. This will use the tenant's authorization flows instead, and will limit access at the Supabase Auth level to Microsoft accounts arising from only the specified tenant.
 
 Configure this by storing a value under _Azure Tenant URL_ in the Supabase Auth provider configuration page for Azure that has the following format `https://login.microsoftonline.com/<tenant-id>`.
@@ -126,7 +127,7 @@ Supabase Auth requires that Azure returns a valid email address. Therefore you m
 
 <CreateClientSnippet />
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `azure` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `azure` as the `provider`:
 
 ```js
 async function signInWithAzure() {
@@ -142,7 +143,7 @@ async function signInWithAzure() {
 </TabPanel>
 <TabPanel id="flutter" label="Flutter">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `azure` as the `provider`:
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `azure` as the `provider`:
 
 ```dart
 Future<void> signInWithAzure() async {

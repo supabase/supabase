@@ -25,12 +25,16 @@ functions:
         name: Initialize Client
         code: |
           ```swift
+          import Supabase
+
           let client = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "public-anon-key")
           ```
       - id: initialize-client-custom-options
         name: Initialize Client with custom options
         code: |
           ```swift
+          import Supabase
+
           let client = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "public-anon-key",
@@ -49,10 +53,34 @@ functions:
             )
           )
           ```
+      - id: initialize-client-with-logging
+        name: Initialize Client with Logging
+        code: |
+          ```swift
+          import Supabase
+
+          struct AppLogger: SupabaseLogger {
+            func log(message: SupabaseLogMessage) {
+              print(message.description)
+            }
+          }
+
+          let client = SupabaseClient(
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
+            supabaseKey: "public-anon-key",
+            options: SupabaseClientOptions(
+              global: SupabaseClientOptions.GlobalOptions(
+                logger: AppLogger()
+              )
+            )
+          )
+          ```
       - id: api-schemas
         name: With custom schemas
         code: |
           ```swift
+          import Supabase
+
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "public-anon-key",
@@ -1223,13 +1251,13 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          struct Country: Decodable {
+          struct Instrument: Decodable {
             let id: Int
             let name: String
           }
 
-          let countries: [Country] = try await supabase
-            .from("countries")
+          let instruments: [Instrument] = try await supabase
+            .from("instruments")
             .select()
             .execute()
             .value
@@ -1238,14 +1266,14 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
@@ -1253,15 +1281,15 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "violin"
               },
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "viola"
               },
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "cello"
               }
             ],
             "status": 200,
@@ -1272,12 +1300,12 @@ functions:
         name: Selecting specific columns
         code: |
           ```swift
-          struct Country: Decodable {
+          struct Instrument: Decodable {
             let name: String
           }
 
-          let countries: [Country] = try await supabase
-            .from("countries")
+          let instruments: [Instrument] = try await supabase
+            .from("instruments")
             .select("name")
             .execute()
             .value
@@ -1286,27 +1314,27 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "violin"
               },
               {
-                "name": "Albania"
+                "name": "viola"
               },
               {
-                "name": "Algeria"
+                "name": "cello"
               }
             ],
             "status": 200,
@@ -1319,21 +1347,21 @@ functions:
           If your database has foreign key relationships, you can query related tables too.
         code: |
           ```swift
-          struct Country: Decodable {
+          struct OrchestralSection: Decodable {
             let name: String
-            let cities: [City]
+            let instruments: [Instrument]
           }
 
-          struct City: Decodable {
+          struct Instrument: Decodable {
             let name: String
           }
 
-          let countries: [Country] = try await supabase
-            .from("countries")
+          let orchestralSections: [OrchestralSection] = try await supabase
+            .from("orchestral_sections")
             .select(
               """
                 name,
-                cities (
+                instruments (
                   name
                 )
               """
@@ -1345,42 +1373,42 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Germany",
+                "name": "strings",
                 "cities": [
                   {
-                    "name": "Munich"
+                    "name": "violin"
                   }
                 ]
               },
               {
-                "name": "Indonesia",
+                "name": "woodwinds",
                 "cities": [
                   {
-                    "name": "Bali"
+                    "name": "flute"
                   }
                 ]
               }
@@ -1565,19 +1593,19 @@ functions:
         name: Filtering through foreign tables
         code: |
           ```swift
-          struct City: Decodable {
+          struct Instrument: Decodable {
             let name: String
-            let countries: [Country]?
+            let orchestralSections: [OrchestralSection]?
           }
 
-          struct Country: Decodable {
+          struct OrchestralSection: Decodable {
             let name: String
           }
 
-          let cities: [City] = try await supabase
-            .from("cities")
-            .select("name, countries(*)")
-            .eq("countries.name", value: "Estonia")
+          let instruments: [Instrument] = try await supabase
+            .from("instruments")
+            .select("name, orchestral_sections(*)")
+            .eq("orchestral_sections.name", value: "percussion")
             .execute()
             .value
           ```
@@ -1585,36 +1613,36 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Bali",
-                "countries": null
+                "name": "flute",
+                "orchestral_sections": null
               },
               {
-                "name": "Munich",
-                "countries": null
+                "name": "violin",
+                "orchestral_sections": null
               }
             ],
             "status": 200,
@@ -1630,53 +1658,53 @@ functions:
         name: Querying foreign table with count
         code: |
           ```swift
-          struct Country: Decodable {
+          struct OrchestralSection: Decodable {
             let id: UUID
             let name: String
-            let cities: [City]
+            let instruments: [Instrument]
           }
 
-          struct City: Decodable {
+          struct Instrument: Decodable {
             let count: Int
           }
 
-          let countries: [Country] = try await supabase
-            .from("countries")
-            .select("*, cities(count)")
+          let orchestralSections: [OrchestralSection] = try await supabase
+            .from("orchestral_sections")
+            .select("*, instruments(count)")
             .execute()
             .value
           ```
         data:
           sql: |
             ```sql
-            create table countries (
+            create table orchestral_sections (
               "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text
             );
 
-            create table cities (
+            create table instruments (
               "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text,
-              "country_id" "uuid" references public.countries on delete cascade
+              "section_id" "uuid" references public.orchestral_sections on delete cascade
             );
 
-            with country as (
-              insert into countries (name)
-              values ('united kingdom') returning id
+            with section as (
+              insert into orchestral_sections (name)
+              values ('strings') returning id
             )
-            insert into cities (name, country_id) values
-            ('London', (select id from country)),
-            ('Manchester', (select id from country)),
-            ('Liverpool', (select id from country)),
-            ('Bristol', (select id from country));
+            insert into instruments (name, section_id) values
+            ('violin', (select id from section)),
+            ('viola', (select id from section)),
+            ('cello', (select id from section)),
+            ('double bass', (select id from section));
             ```
         response: |
           ```json
           [
             {
               "id": "693694e7-d993-4360-a6d7-6294e325d9b6",
-              "name": "United Kingdom",
-              "cities": [
+              "name": "strings",
+              "instruments": [
                 {
                   "count": 4
                 }
@@ -1693,7 +1721,7 @@ functions:
         code: |
           ```swift
           let count = try await supabase
-            .from("countries")
+            .from("instruments")
             .select("*", head: true, count: .exact)
             .execute()
             .count
@@ -1702,14 +1730,14 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'dulcimer'),
+              (2, 'harp'),
+              (3, 'tuba');
             ```
         response: |
           ```json
@@ -1757,7 +1785,7 @@ functions:
             insert into
               users (id, name, address)
             values
-              (1, 'Avdotya', '{"city":"Saint Petersburg"}');
+              (1, 'Frodo', '{"city":"Hobbiton"}');
             ```
         response: |
           ```json
@@ -1765,8 +1793,8 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Avdotya",
-                "city": "Saint Petersburg"
+                "name": "Frodo",
+                "city": "Hobbiton"
               }
             ],
             "status": 200,
@@ -1783,64 +1811,64 @@ functions:
         name: Querying foreign table with inner join
         code: |
           ```swift
-          struct City: Decodable {
+          struct Instrument: Decodable {
             let name: String
           }
 
-          struct Country: Decodable {
+          struct OrchestralSection: Decodable {
             let name: String
-            let cities: [City]
+            let instruments: [Instrument]
           }
 
-          let countries: [Country] = try await supabase
-            .from("countries")
-            .select("name, cities!inner(name)")
-            .eq("name", value: "united kingdom")
+          let orchestralSections: [OrchestralSection] = try await supabase
+            .from("orchestral_sections")
+            .select("name, instruments!inner(name)")
+            .eq("name", value: "strings")
             .execute()
             .value
           ```
         data:
           sql: |
             ```sql
-            create table countries (
+            create table orchestral_sections (
               "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text
             );
 
-            create table cities (
+            create table instruments (
               "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text,
-              "country_id" "uuid" references public.countries on delete cascade
+              "section_id" "uuid" references public.orchestral_sections on delete cascade
             );
 
-            with country as (
-              insert into countries (name)
-              values ('united kingdom') returning id
+            with section as (
+              insert into orchestral_sections (name)
+              values ('strings') returning id
             )
-            insert into cities (name, country_id) values
-            ('London', (select id from country)),
-            ('Manchester', (select id from country)),
-            ('Liverpool', (select id from country)),
-            ('Bristol', (select id from country));
+            insert into instruments (name, section_id) values
+            ('violin', (select id from section)),
+            ('viola', (select id from section)),
+            ('cello', (select id from section)),
+            ('double bass', (select id from section));
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "united kingdom",
-                "cities": [
+                "name": "strings",
+                "instruments": [
                   {
-                    "name": "London"
+                    "name": "violin"
                   },
                   {
-                    "name": "Manchester"
+                    "name": "viola"
                   },
                   {
-                    "name": "Liverpool"
+                    "name": "cello"
                   },
                   {
-                    "name": "Bristol"
+                    "name": "double bass"
                   }
                 ]
               }
@@ -1851,7 +1879,7 @@ functions:
           ```
         description: |
           If you don't want to return the foreign table contents, you can leave the parenthesis empty.
-          Like `.select('name, countries!inner()')`.
+          Like `.select('name, instruments!inner()')`.
         hideCodeBlock: true
       - id: switching-schemas-per-query
         name: Switching schemas per query
@@ -1895,23 +1923,23 @@ functions:
         name: Create a record
         code: |
           ```swift
-          struct Country: Encodable {
+          struct Instrument: Encodable {
             let id: Int
             let name: String
           }
 
-          let country = Country(id: 1, name: "Denmark")
+          let instrument = Instrument(id: 1, name: "ukelele")
 
           try await supabase
-            .from("countries")
-            .insert(country)
+            .from("instruments")
+            .insert(instrument)
             .execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
             ```
         response: |
           ```json
@@ -1926,14 +1954,14 @@ functions:
         name: Create a record and return it
         code: |
           ```swift
-          struct Country: Codable {
+          struct Instrument: Codable {
             let id: Int
             let name: String
           }
 
-          let country: Country = try await supabase
-            .from("countries")
-            .insert(Country(id: 1, name: "Denmark"))
+          let instrument: Instrument = try await supabase
+            .from("instruments")
+            .insert(Instrument(id: 1, name: "banjo"))
             .select()
             // specify you want a single value returned, otherwise it returns a list.
             .single()
@@ -1944,7 +1972,7 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
             ```
         response: |
           ```json
@@ -1952,7 +1980,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Denmark"
+                "name": "banjo"
               }
             ],
             "status": 201,
@@ -1964,26 +1992,26 @@ functions:
         name: Bulk create
         code: |
           ```swift
-          struct Country: Encodable {
+          struct Instrument: Encodable {
             let id: Int
             let name: String
           }
 
-          let countries = [
-            Country(id: 1, name: "Nepal"),
-            Country(id: 1, name: "Vietnam"),
+          let instruments = [
+            Instrument(id: 1, name: "xylophone"),
+            Instrument(id: 1, name: "tuba"),
           ]
 
           try await supabase
-            .from("countries")
-            .insert(countries)
+            .from("instruments")
+            .insert(instruments)
             .execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
             ```
         response: |
           ```json
@@ -1992,7 +2020,7 @@ functions:
               "code": "23505",
               "details": "Key (id)=(1) already exists.",
               "hint": null,
-              "message": "duplicate key value violates unique constraint \"countries_pkey\""
+              "message": "duplicate key value violates unique constraint \"instruments_pkey\""
             },
             "status": 409,
             "statusText": "Conflict"
@@ -2013,8 +2041,8 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
-            .update(["name": "Australia"])
+            .from("instruments")
+            .update(["name": "piano"])
             .eq("id", value: 1)
             .execute()
           ```
@@ -2026,12 +2054,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Taiwan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -2046,14 +2074,14 @@ functions:
         name: Update a record and return it
         code: |
           ```swift
-          struct Country: Decodable {
+          struct Instrument: Decodable {
             let id: Int
             let name: String
           }
 
-          let country: Country = try await supabase
-            .from("countries")
-            .update(["name": "Australia"])
+          let instrument: Instrument = try await supabase
+            .from("instruments")
+            .update(["name": "piano"])
             .eq("id", value: 1)
             .select()
              // If you know this query should return a single object, append a `single()` modifier to it.
@@ -2065,12 +2093,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Taiwan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -2078,7 +2106,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Australia"
+                "name": "piano"
               }
             ],
             "status": 200,
@@ -2167,25 +2195,25 @@ functions:
         name: Upsert your data
         code: |
           ```swift
-          struct Country: Encodable {
+          struct Instrument: Encodable {
             let id: Int
             let name: String
           }
           try await supabase
-            .from("countries")
-            .upsert(Country(id: 1, name: "Albania"))
+            .from("instruments")
+            .upsert(Instrument(id: 1, name: "piano"))
             .execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -2193,7 +2221,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Albania"
+                "name": "piano"
               }
             ],
             "status": 201,
@@ -2206,15 +2234,15 @@ functions:
         name: Bulk Upsert your data
         code: |
           ```swift
-          struct Country: Encodable {
+          struct Instrument: Encodable {
             let id: Int
             let name: String
           }
           try await supabase
-            .from("countries")
+            .from("instruments")
             .upsert([
-              Country(id: 1, name: "Albania"),
-              Country(id: 2, name: "Algeria"),
+              Instrument(id: 1, name: "piano"),
+              Instrument(id: 2, name: "harp"),
             ])
             .execute()
           ```
@@ -2222,12 +2250,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -2235,11 +2263,11 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Albania"
+                "name": "piano"
               },
               {
                 "id": 2,
-                "name": "Algeria"
+                "name": "harp"
               }
             ],
             "status": 201,
@@ -2324,7 +2352,7 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("instruments")
             .delete()
             .eq("id", value: 1)
             .execute()
@@ -2333,12 +2361,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Spain');
+              (1, 'mandolin');
             ```
         response: |
           ```json
@@ -2449,13 +2477,13 @@ functions:
         name: Call a Postgres function with filters
         code: |
           ```swift
-          struct Country: Decodable {
+          struct Instrument: Decodable {
             let id: Int
             let name: String
           }
 
-          let country: Country = await supabase
-            .rpc("list_stored_countries")
+          let instrument: Instrument = await supabase
+            .rpc("list_stored_instruments")
             .eq("id", value: 1)
             .single()
             .execute()
@@ -2465,13 +2493,13 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'France'),
-              (2, 'United Kingdom');
+              (1, 'klaxon'),
+              (2, 'marimba');
 
             create function list_stored_countries() returns setof countries as $$
               select * from countries;
@@ -2482,7 +2510,7 @@ functions:
           {
             "data": {
               "id": 1,
-              "name": "France"
+              "name": "klaxon"
             },
             "status": 200,
             "statusText": "OK"
@@ -2613,49 +2641,49 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("orchestral_sections")
             .select(
               """
                 name,
-                cities!inner (
+                instruments!inner (
                   name
                 )
               """
             )
-            .eq("cities.name", value: "Bali")
+            .eq("instruments.name", value: "flute")
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
           response: |
             ```json
             {
               "data": [
                 {
-                  "name": "Indonesia",
-                  "cities": [
+                  "name": "woodwinds",
+                  "instruments": [
                     {
-                      "name": "Bali"
+                      "name": "flute"
                     }
                   ]
                 }
@@ -2682,32 +2710,32 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("instruments")
             .select("name")
-            .or("id.eq.2,name.eq.Algeria")
+            .or("id.eq.2,name.eq.cello")
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Albania"
+                "name": "viola"
               },
               {
-                "name": "Algeria"
+                "name": "cello"
               }
             ],
             "status": 200,
@@ -2721,29 +2749,29 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("instruments")
             .select("name")
-            .or("id.gt.3,and(id.eq.1,name.eq.Afghanistan)")
+            .or("id.gt.3,and(id.eq.1,name.eq.violin)")
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         reponse: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "violin"
               }
             ],
             "status": 200,
@@ -2760,7 +2788,7 @@ functions:
       - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
 
         ```swift
-        .not("name", operator: .eq, value: "Paris")
+        .not("name", operator: .eq, value: "violin")
         .not("arraycol", operator: .cs, value: #"{"a","b"}"#) // Use Postgres array {} for array column and 'cs' for contains.
         .not("rangecol", operator: .cs, value: "(1,2]") // Use Postgres range syntax for range column.
         .not("id", operator: .in, value: "(6,7)")  // Use Postgres list () and 'in' for in_ filter.
@@ -2773,7 +2801,7 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("instruments")
             .select()
             .not("name", operator: .is, value: "")
             .execute()
@@ -2787,29 +2815,29 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("instruments")
             .select("name")
-            .match(["id": 2, "name": "Albania"])
+            .match(["id": 2, "name": "viola"])
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Albania"
+                "name": "viola"
               }
             ],
             "status": 200,
@@ -2834,22 +2862,22 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("instruments")
             .select()
-            .filter("name", operator: "in", value: #"("Algeria","Japan")"#)
+            .filter("name", operator: "in", value: #"("cello","guzheng")"#)
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
@@ -2857,7 +2885,7 @@ functions:
             "data": [
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "cello"
               }
             ],
             "status": 200,
@@ -2871,49 +2899,49 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("orchestral_sections")
             .select(
               """
                 name,
-                cities!inner (
+                instruments!inner (
                   name
                 )
               """
             )
-            .filter("cities.name", operator: "eq", value: "Bali")
+            .filter("instruments.name", operator: "eq", value: "flute")
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Indonesia",
+                "name": "woodwinds",
                 "cities": [
                   {
-                    "name": "Bali"
+                    "name": "flute"
                   }
                 ]
               }
@@ -2945,8 +2973,8 @@ functions:
         code: |
           ```swift
             try await supabase
-              .from("countries")
-              .upsert(CountryModel(id: 1, name: "Algeria"))
+              .from("instruments")
+              .upsert(InstrumentModel(id: 1, name: "piano"))
               .select()
               .execute()
           ```
@@ -2954,12 +2982,12 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
@@ -2967,7 +2995,7 @@ functions:
             "data": [
               {
                 "id": 1,
-                "name": "Algeria"
+                "name": "piano"
               }
             ],
             "status": 201,
@@ -2986,7 +3014,7 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("instruments")
             .select("id, name")
             .order("id", ascending: false)
             .execute()
@@ -2995,14 +3023,14 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```swifton
@@ -3010,15 +3038,15 @@ functions:
             "data": [
               {
                 "id": 3,
-                "name": "Algeria"
+                "name": "cello"
               },
               {
                 "id": 2,
-                "name": "Albania"
+                "name": "viola"
               },
               {
                 "id": 1,
-                "name": "Afghanistan"
+                "name": "viola"
               }
             ],
             "status": 200,
@@ -3032,58 +3060,58 @@ functions:
         code: |
           ```swift
             try await supabase
-              .from("countries")
+              .from("orchestral_sections")
               .select(
                 """
                   name,
-                  cities (
+                  instruments (
                     name
                   )
                 """
               )
-              .order("name", ascending: false, referencedTable: "cities")
+              .order("name", ascending: false, referencedTable: "instruments")
               .execute()
             ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'United States'),
-              (2, 'Vanuatu');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
+              (1, 1, 'harp'),
+              (2, 1, 'violin');
             ```
         response: |
           ```swifton
           {
             "data": [
               {
-                "name": "United States",
+                "name": "strings",
                 "cities": [
                   {
-                    "name": "New York City"
+                    "name": "violin"
                   },
                   {
-                    "name": "Atlanta"
+                    "name": "harp"
                   }
                 ]
               },
               {
-                "name": "Vanuatu",
+                "name": "woodwinds",
                 "cities": []
               }
             ],
@@ -3094,6 +3122,66 @@ functions:
         description: |
           Ordering on foreign tables doesn't affect the ordering of
           the parent table.
+        hideCodeBlock: true
+      - id: order-parent-table-by-a-referenced-table
+        name: Order parent table by a referenced table
+        code: |
+          ```swift
+            try await supabase
+              .from("instruments")
+              .select(
+                """
+                  name,
+                  section:orchestral_sections (
+                    name
+                  )
+                """
+              )
+              .order("section(name)", ascending: true)
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              orchestral_sections (id int8 primary key, name text);
+            create table
+              instruments (
+                id int8 primary key,
+                section_id int8 not null references orchestral_sections,
+                name text
+              );
+
+            insert into
+              orchestral_sections (id, name)
+            values
+              (1, 'strings'),
+              (2, 'woodwinds');
+            insert into
+              instruments (id, section_id, name)
+            values
+              (1, 1, 'violin'),
+              (2, 2, 'flute');
+            ```
+        response: |
+          ```swifton
+          {
+            "data": [
+              {
+                "name": "violin",
+                "country": { "name": "strings" }
+              },
+              {
+                "name": "flute",
+                "country": { "name": "woodwinds" }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Ordering with `referenced_table(col)` affects the ordering of the
+          parent table.
         hideCodeBlock: true
 
   - id: limit
@@ -3106,7 +3194,7 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("instruments")
             .select("id, name")
             .limit(1)
             .execute()
@@ -3115,21 +3203,21 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "violin"
               }
             ],
             "status": 200,
@@ -3143,49 +3231,49 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("orchestral_sections")
             .select(
               """
               name,
-              cities (
+              instruments (
                 name
               )
               """
             )
-            .limit(1, referencedTable: "cities")
+            .limit(1, referencedTable: "instruments")
             .execute()
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'United States');
+              (1, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
+              (1, 1, 'flute'),
+              (2, 1, 'oboe');
             ```
         response: |
           ```json
           {
             "data": [
               {
-                "name": "United States",
+                "name": "woodwinds",
                 "cities": [
                   {
-                    "name": "Atlanta"
+                    "name": "flute"
                   }
                 ]
               }
@@ -3205,15 +3293,8 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
-            .select(
-              """
-                name,
-                cities (
-                  name
-                )
-              """
-            )
+            .from("instruments")
+            .select("name")
             .range(from: 0, to: 1)
             .execute()
           ```
@@ -3221,24 +3302,24 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```swifton
           {
             "data": [
               {
-                "name": "Afghanistan"
+                "name": "violin"
               },
               {
-                "name": "Albania"
+                "name": "viola"
               }
             ],
             "status": 200,
@@ -3258,7 +3339,7 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("instruments")
             .select("name")
             .limit(1)
             .single()
@@ -3268,20 +3349,20 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           {
             "data": {
-              "name": "Afghanistan"
+              "name": "violin"
             },
             "status": 200,
             "statusText": "OK"
@@ -3297,7 +3378,7 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("instruments")
             .select()
             .csv()
             .execute()
@@ -3306,19 +3387,19 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           {
-            "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
+            "data": "id,name\n1,violin\n2,viola\n3,cello",
             "status": 200,
             "statusText": "OK"
           }
@@ -3343,7 +3424,7 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("instruments")
             .select()
             .explain()
             .execute()
@@ -3353,20 +3434,20 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```
           Aggregate  (cost=33.34..33.36 rows=1 width=112)
             ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
-                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+                  ->  Seq Scan on instruments  (cost=0.00..22.00 rows=1200 width=40)
           ```
         description: |
           By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
@@ -3378,7 +3459,7 @@ functions:
         code: |
           ```swift
           try await supabase
-            .from("countries")
+            .from("instruments")
             .select()
             .explain(
               analyze: true,
@@ -3391,23 +3472,23 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```
           Aggregate  (cost=33.34..33.36 rows=1 width=112) (actual time=0.041..0.041 rows=1 loops=1)
-            Output: NULL::bigint, count(ROW(countries.id, countries.name)), COALESCE(json_agg(ROW(countries.id, countries.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
+            Output: NULL::bigint, count(ROW(instruments.id, instruments.name)), COALESCE(json_agg(ROW(instruments.id, instruments.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
             ->  Limit  (cost=0.00..18.33 rows=1000 width=40) (actual time=0.005..0.006 rows=3 loops=1)
-                  Output: countries.id, countries.name
-                  ->  Seq Scan on public.countries  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
-                        Output: countries.id, countries.name
+                  Output: instruments.id, instruments.name
+                  ->  Seq Scan on public.instruments  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
+                        Output: instruments.id, instruments.name
           Query Identifier: -4730654291623321173
           Planning Time: 0.407 ms
           Execution Time: 0.119 ms
@@ -3944,7 +4025,7 @@ functions:
             DeleteAction.self,
             schema: "public",
             table: "users",
-            filter: "id=eq.1"
+            filter: .eq(id, value: 1)
           )
 
           await channel.subscribe()
@@ -3963,7 +4044,7 @@ functions:
             DeleteAction.self,
             schema: "public",
             table: "users",
-            filter: "id=eq.1"
+            filter: .eq(id, value: 1)
           ) { deletion in
             print("Deleted: \(deletion.oldRecord)")
           }

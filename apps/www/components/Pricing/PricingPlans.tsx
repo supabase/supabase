@@ -1,14 +1,11 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
+import { Check } from 'lucide-react'
 import { pickFeatures, pickFooter, plans } from 'shared-data/plans'
 import { Button, cn } from 'ui'
 import { Organization } from '~/data/organizations'
-import gaEvents from '~/lib/gaEvents'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import UpgradePlan from './UpgradePlan'
-import { Check } from 'lucide-react'
 
 interface PricingPlansProps {
   organizations?: Organization[]
@@ -16,12 +13,7 @@ interface PricingPlansProps {
 }
 
 const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansProps) => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
@@ -35,7 +27,14 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
             const footer = pickFooter(plan)
 
             const sendPricingEvent = () => {
-              sendTelemetryEvent(gaEvents[`www_pricing_hero_plan_${plan.name.toLowerCase()}`])
+              sendTelemetryEvent({
+                action: 'www_pricing_plan_cta_clicked',
+                properties: {
+                  plan: plan.name,
+                  showUpgradeText: isUpgradablePlan && hasExistingOrganizations ? true : false,
+                  section: 'main',
+                },
+              })
             }
 
             return (

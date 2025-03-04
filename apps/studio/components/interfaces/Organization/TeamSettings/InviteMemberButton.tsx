@@ -53,9 +53,9 @@ import {
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
   Switch,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -188,22 +188,22 @@ export const InviteMemberButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <Button
               disabled={!canInviteMembers}
-              className="pointer-events-auto"
+              className="pointer-events-auto flex-grow md:flex-grow-0"
               onClick={() => setIsOpen(true)}
             >
               Invite
             </Button>
-          </TooltipTrigger_Shadcn_>
+          </TooltipTrigger>
           {!canInviteMembers && (
-            <TooltipContent_Shadcn_ side="bottom">
+            <TooltipContent side="bottom">
               You need additional permissions to invite a member to this organization
-            </TooltipContent_Shadcn_>
+            </TooltipContent>
           )}
-        </Tooltip_Shadcn_>
+        </Tooltip>
       </DialogTrigger>
       <DialogContent size="medium">
         <DialogHeader>
@@ -408,7 +408,9 @@ export const InviteMemberButton = () => {
                       {isSuccessSubscription &&
                         (currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
                           <Button asChild type="default">
-                            <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                            <Link
+                              href={`/org/${slug}/billing?panel=subscriptionPlan&source=inviteMemberSSO`}
+                            >
                               Upgrade to Team
                             </Link>
                           </Button>

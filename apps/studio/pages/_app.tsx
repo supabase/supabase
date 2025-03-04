@@ -18,11 +18,9 @@ import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
-import { TooltipProvider } from '@radix-ui/react-tooltip'
 import * as Sentry from '@sentry/nextjs'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { FeatureFlagProvider, PageTelemetry, ThemeProvider, useThemeSandbox } from 'common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -32,25 +30,28 @@ import Head from 'next/head'
 import { ErrorInfo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
+import { FeatureFlagProvider, PageTelemetry, ThemeProvider, useThemeSandbox } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import { AppBannerWrapper, RouteValidationWrapper } from 'components/interfaces/App'
+import { RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
 import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
 import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
 import GroupsTelemetry from 'components/ui/GroupsTelemetry'
 import { useRootQueryClient } from 'data/query-client'
+import { customFont, sourceCodePro } from 'fonts'
 import { AuthProvider } from 'lib/auth'
 import { getFlags as getConfigCatFlags } from 'lib/configcat'
 import { API_URL, BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
-import { SonnerToaster } from 'ui'
-import { useConsent } from 'ui-patterns'
+import { SonnerToaster, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
+import { useConsent } from 'ui-patterns/ConsentToast'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -112,9 +113,15 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <Head>
                   <title>Supabase</title>
                   <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                  {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
+                  <style
+                    dangerouslySetInnerHTML={{
+                      __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+                    }}
+                  />
                 </Head>
                 <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
-                <TooltipProvider>
+                <TooltipProvider delayDuration={0}>
                   <RouteValidationWrapper>
                     <ThemeProvider
                       defaultTheme="system"
@@ -124,15 +131,14 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     >
                       <AppBannerContextProvider>
                         <CommandProvider>
-                          <AppBannerWrapper>
-                            <FeaturePreviewContextProvider>
-                              {getLayout(<Component {...pageProps} />)}
-                              <StudioCommandMenu />
-                              <GenerateSql />
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                          </AppBannerWrapper>
+                          <FeaturePreviewContextProvider>
+                            {getLayout(<Component {...pageProps} />)}
+                            <StudioCommandMenu />
+                            <GenerateSql />
+                            <FeaturePreviewModal />
+                          </FeaturePreviewContextProvider>
                           <SonnerToaster position="top-right" />
+                          <MonacoThemeProvider />
                         </CommandProvider>
                       </AppBannerContextProvider>
                     </ThemeProvider>

@@ -17,7 +17,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 <StepHikeCompact>
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Create a custom user for Prisma">
-      - In the [SQL Editor](https://supabase.com/dashboard/project/_/sql/new), create a Prisma db-user with full privileges on the public schema.
+      - In the [SQL Editor](https://supabase.com/dashboard/project/_/sql/new), create a Prisma DB user with full privileges on the public schema.
       - This gives you better control over Prisma's access and makes it easier to monitor using Supabase tools like the [Query Performance Dashboard](https://supabase.com/dashboard/project/_/advisors/query-performance) and [Log Explorer](https://supabase.com/dashboard/project/_/logs/explorer).
       <Admonition type="note" label="password manager">
 
@@ -56,7 +56,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
     <StepHikeCompact.Step step={2}>
         <StepHikeCompact.Details title="Create a Prisma Project">
-        Create a new prisma Project on your computer
+        Create a new Prisma Project on your computer
         </StepHikeCompact.Details>
 
         <StepHikeCompact.Code>
@@ -98,11 +98,11 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="yarn_initiate" label="yarn">
               ```bash
               yarn init -y
-              yarn install prisma typescript ts-node @types/node --save-dev
+              yarn add prisma typescript ts-node @types/node --save-dev
 
-              yarn dlx tsc --init
+              npx tsc --init
 
-              yarn dlx prisma init
+              npx prisma init
               ```
             </TabPanel>
             <TabPanel id="bun_initiate" label="bun">
@@ -140,7 +140,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
                   In your .env file, set the DATABASE_URL variable to your connection string
                     ```text .env
                     # Used for Prisma Migrations and within your application
-                    DATABASE_URL="postgres://[DB-USER].[PROJECT-REF]:[PRISMA-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
+                    DATABASE_URL="postgres://[DB-USER].[PROJECT-REF]:[PRISMA-PASSWORD]@[DB-REGION].pooler.supabase.com:5432/postgres"
                     ```
 
                     Change your string's `[DB-USER]` to `prisma` and add the password you created in step 1
@@ -166,7 +166,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
                     postgres://prisma.[PROJECT-REF]...
                     ```
 
-                    In your schema.prisma file, edit your datasource db configs to reference your DIRECT_URL
+                    In your schema.prisma file, edit your `datasource db` configs to reference your DIRECT_URL
                     ```text schema.prisma
                     datasource db {
                       provider  = "postgresql"
@@ -241,7 +241,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             </TabPanel>
             <TabPanel id="yarn_migrate" label="yarn">
             ```bash
-            yarn dlx prisma migrate dev --name first_prisma_migration
+            npx prisma migrate dev --name first_prisma_migration
 
             ```
             </TabPanel>
@@ -269,7 +269,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             npx prisma db pull
             ```
 
-            Create a migraton file
+            Create a migration file
             ```bash
             mkdir -p prisma/migrations/0_init_supabase
             ```
@@ -295,7 +295,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             pnpx prisma db pull
             ```
 
-            Create a migraton file
+            Create a migration file
             ```bash
             mkdir -p prisma/migrations/0_init_supabase
             ```
@@ -318,17 +318,17 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
           <TabPanel id="yarn_sync" label="yarn">
             ```bash
-            yarn dlx prisma db pull
+            npx prisma db pull
             ```
 
-            Create a migraton file
+            Create a migration file
             ```bash
             mkdir -p prisma/migrations/0_init_supabase
             ```
 
             Synchronize the migrations
             ```bash
-              yarn dlx prisma migrate diff \
+              npx prisma migrate diff \
               --from-empty \
               --to-schema-datamodel prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
@@ -338,7 +338,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             </Admonition>
 
             ```bash
-            yarn dlx prisma migrate resolve --applied 0_init_supabase
+            npx prisma migrate resolve --applied 0_init_supabase
             ```
           </TabPanel>
 
@@ -347,7 +347,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             bunx prisma db pull
             ```
 
-            Create a migraton file
+            Create a migration file
             ```bash
             mkdir -p prisma/migrations/0_init_supabase
             ```
@@ -378,7 +378,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
   </StepHikeCompact.Step>
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Install the prisma client">
-    Install the prisma client and generate its model
+    Install the Prisma client and generate its model
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -403,8 +403,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
       </TabPanel>
       <TabPanel id="yarn_client" label="yarn">
           ```sh
-          yarn install @prisma/client
-          yarn dlx prisma generate
+          yarn add @prisma/client
+          npx prisma generate
           ```
       </TabPanel>
       <TabPanel id="bun_client" label="bun">

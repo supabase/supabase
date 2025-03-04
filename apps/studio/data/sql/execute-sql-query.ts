@@ -65,7 +65,7 @@ export async function executeSql(
       },
     },
     body: { query: sql },
-    headers: Object.fromEntries(headers),
+    headers,
   })
 
   if (error) {

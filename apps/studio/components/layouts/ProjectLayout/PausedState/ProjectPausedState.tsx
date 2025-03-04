@@ -25,7 +25,7 @@ import { setProjectStatus } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useFlag, usePHFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
@@ -75,6 +75,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const selectedOrganization = useSelectedOrganization()
   const enforceNinetyDayUnpauseExpiry = useFlag('enforceNinetyDayUnpauseExpiry')
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
+  const enableProBenefitWording = usePHFlag('proBenefitWording')
 
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
@@ -174,8 +175,8 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   return (
     <>
       <div className="space-y-4">
-        <div className="w-full mx-auto mb-16 max-w-7xl">
-          <div className="mx-6 flex h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-8">
+        <div className="w-full mx-auto mb-8 md:mb-16 max-w-7xl">
+          <div className="mx-6 flex md:h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-4 md:p-8">
             <div className="grid w-[550px] gap-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
                 <PauseCircle className="text-foreground-light" size={50} strokeWidth={1.5} />
@@ -216,7 +217,9 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                         ) : isFreePlan ? (
                           <>
                             <p className="text-sm text-foreground-light text-center">
-                              To prevent future pauses, consider upgrading to Pro.
+                              {enableProBenefitWording === 'variant-a'
+                                ? 'Upgrade to Pro plan to prevent future pauses and use Pro features like branching, compute upgrades, and daily backups.'
+                                : 'To prevent future pauses, consider upgrading to Pro.'}
                             </p>
                             <Alert_Shadcn_>
                               <AlertTitle_Shadcn_>
@@ -287,7 +290,9 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   </ButtonTooltip>
                   {isFreePlan ? (
                     <Button asChild type="primary">
-                      <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`}>
+                      <Link
+                        href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=projectPausedStateRestore`}
+                      >
                         Upgrade to Pro
                       </Link>
                     </Button>

@@ -1,35 +1,30 @@
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
-
 import { useParams } from 'common'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
+import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { PROJECT_STATUS } from 'lib/constants'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
-import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
-import MobileNavigationBar from './NavigationBar/MobileNavigationBar'
-import MobileViewNav from './NavigationBar/MobileViewNav'
-import NavigationBar from './NavigationBar/NavigationBar'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
-import { ProjectContextProvider } from './ProjectContext'
 import { ResizingState } from './ResizingState'
 import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
@@ -67,8 +62,6 @@ export interface ProjectLayoutProps {
   isBlocking?: boolean
   product?: string
   productMenu?: ReactNode
-  hideHeader?: boolean
-  hideIconBar?: boolean
   selectedTable?: string
   resizableSidebar?: boolean
 }
@@ -82,8 +75,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       product = '',
       productMenu,
       children,
-      hideHeader = false,
-      hideIconBar = false,
       selectedTable,
       resizableSidebar = false,
     },
@@ -91,11 +82,15 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
   ) => {
     const router = useRouter()
     const [isClient, setIsClient] = useState(false)
-    const [isSheetOpen, setIsSheetOpen] = useState(false)
-    const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
-    const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+    const {
+      editorPanel,
+      aiAssistantPanel,
+      setAiAssistantPanel,
+      mobileMenuOpen,
+      setMobileMenuOpen,
+    } = useAppStateSnapshot()
     const { open } = aiAssistantPanel
 
     const projectName = selectedProject?.name
@@ -111,10 +106,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const ignorePausedState =
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
-
-    const handleMobileMenu = () => {
-      setIsSheetOpen(true)
-    }
 
     useEffect(() => {
       setIsClient(true)
@@ -133,122 +124,125 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
 
-    return (
-      <AppLayout>
-        <ProjectContextProvider projectRef={projectRef}>
-          <Head>
-            <title>
-              {title
-                ? `${title} | Supabase`
-                : selectedTable
-                  ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
-                  : projectName
-                    ? `${projectName} | ${organizationName} | Supabase`
-                    : organizationName
-                      ? `${organizationName} | Supabase`
-                      : 'Supabase'}
-            </title>
-            <meta name="description" content="Supabase Studio" />
-          </Head>
-          <div className="flex flex-col md:flex-row h-full">
-            {/* Left-most navigation side bar to access products */}
-            {!hideIconBar && <NavigationBar />}
-            {/* Top Nav to access products from mobile */}
-            {!hideIconBar && <MobileNavigationBar />}
-            {showProductMenu && productMenu && !(!hideHeader && IS_PLATFORM) && (
-              <MobileViewNav title={product} handleMobileMenu={handleMobileMenu} />
-            )}
+    const sideBarIsOpen = true // @mildtomato - var for later to use collapsible sidebar
 
-            {/* Product menu bar */}
-            <ResizablePanelGroup
-              className="flex h-full"
-              direction="horizontal"
-              autoSaveId="project-layout"
-            >
-              {/* Existing desktop menu */}
+    return (
+      <>
+        <Head>
+          <title>
+            {title
+              ? `${title} | Supabase`
+              : selectedTable
+                ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
+                : projectName
+                  ? `${projectName} | ${organizationName} | Supabase`
+                  : organizationName
+                    ? `${organizationName} | Supabase`
+                    : 'Supabase'}
+          </title>
+          <meta name="description" content="Supabase Studio" />
+        </Head>
+        <div className="flex flex-row h-full w-full">
+          <ResizablePanelGroup className="" direction="horizontal" autoSaveId="project-layout">
+            {showProductMenu && productMenu && (
               <ResizablePanel
+                order={1}
+                maxSize={33}
+                defaultSize={1}
                 id="panel-left"
                 className={cn(
-                  'hidden md:flex',
-                  resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64',
-                  {
-                    '!hidden': !showProductMenu || !productMenu,
-                  }
+                  'hidden md:block',
+                  'transition-all duration-[120ms]',
+                  sideBarIsOpen
+                    ? resizableSidebar
+                      ? 'min-w-64 max-w-[32rem]'
+                      : 'min-w-64 max-w-64'
+                    : 'w-0 flex-shrink-0 max-w-0'
                 )}
-                defaultSize={0}
               >
-                <MenuBarWrapper
-                  isLoading={isLoading}
-                  isBlocking={isBlocking}
-                  productMenu={productMenu}
-                >
-                  <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-                </MenuBarWrapper>
+                {sideBarIsOpen && (
+                  <AnimatePresence initial={false}>
+                    <motion.div
+                      initial={{ width: 0, opacity: 0, height: '100%' }}
+                      animate={{ width: 'auto', opacity: 1, height: '100%' }}
+                      exit={{ width: 0, opacity: 0, height: '100%' }}
+                      className="h-full"
+                      transition={{ duration: 0.12 }}
+                    >
+                      <MenuBarWrapper
+                        isLoading={isLoading}
+                        isBlocking={isBlocking}
+                        productMenu={productMenu}
+                      >
+                        <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+                      </MenuBarWrapper>
+                    </motion.div>
+                  </AnimatePresence>
+                )}
               </ResizablePanel>
+            )}
+            {showProductMenu && productMenu && sideBarIsOpen && (
               <ResizableHandle
-                className={cn('hidden md:flex', { '!hidden': !showProductMenu || !productMenu })}
                 withHandle
                 disabled={resizableSidebar ? false : true}
+                className="hidden md:flex"
               />
-              <ResizablePanel id="panel-right" className="h-full flex flex-col">
-                {!hideHeader && IS_PLATFORM && (
-                  <LayoutHeader
-                    showProductMenu={!!(showProductMenu && productMenu)}
-                    handleMobileMenu={handleMobileMenu}
-                  />
-                )}
-                <ResizablePanelGroup
-                  className="h-full w-full overflow-x-hidden flex-1"
-                  direction="horizontal"
-                  autoSaveId="project-layout-content"
+            )}
+            <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col w-full">
+              <ResizablePanelGroup
+                className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
+                direction="horizontal"
+                autoSaveId="project-layout-content"
+              >
+                <ResizablePanel
+                  id="panel-content"
+                  className={cn('w-full xl:min-w-[600px] bg-dash-sidebar')}
                 >
-                  <ResizablePanel id="panel-content" className="w-full md:min-w-[600px]">
-                    <main
-                      className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
-                      ref={ref}
-                    >
-                      {showPausedState ? (
-                        <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                          <div className="w-full">
-                            <ProjectPausedState product={product} />
-                          </div>
+                  <main
+                    className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
+                    ref={ref}
+                  >
+                    {showPausedState ? (
+                      <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                        <div className="w-full">
+                          <ProjectPausedState product={product} />
                         </div>
-                      ) : (
-                        <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                          <ResourceExhaustionWarningBanner />
-                          {children}
-                        </ContentWrapper>
+                      </div>
+                    ) : (
+                      <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                        <ResourceExhaustionWarningBanner />
+                        {children}
+                      </ContentWrapper>
+                    )}
+                  </main>
+                </ResizablePanel>
+                {isClient && (aiAssistantPanel.open || editorPanel.open) && (
+                  <>
+                    <ResizableHandle withHandle />
+                    <ResizablePanel
+                      id="panel-assistant"
+                      className={cn(
+                        'border-l xl:border-l-0 bg fixed z-40 md:absolute md:z-0 right-0 top-0 md:top-[48px] bottom-0 xl:relative xl:top-0',
+                        'w-screen h-[100dvh] md:h-auto md:w-auto md:min-w-[400px] max-w-[500px]',
+                        '2xl:min-w-[500px] 2xl:max-w-[600px]'
                       )}
-                    </main>
-                  </ResizablePanel>
-                  {isClient && aiAssistantPanel.open && (
-                    <>
-                      <ResizableHandle />
-                      <ResizablePanel
-                        id="panel-assistant"
-                        className={cn(
-                          'bg absolute right-0 top-[48px] bottom-0 xl:relative xl:top-0',
-                          'min-w-[400px] max-w-[500px]',
-                          '2xl:min-w-[500px] 2xl:max-w-[600px]'
-                        )}
-                      >
-                        <AIAssistantPanel />
-                      </ResizablePanel>
-                    </>
-                  )}
-                </ResizablePanelGroup>
-              </ResizablePanel>
-            </ResizablePanelGroup>
-          </div>
-
-          <EnableBranchingModal />
-          <AISettingsModal />
-          <ProjectAPIDocs />
-        </ProjectContextProvider>
-        <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                    >
+                      {aiAssistantPanel.open && <AIAssistantPanel />}
+                      {editorPanel.open && <EditorPanel />}
+                    </ResizablePanel>
+                  </>
+                )}
+              </ResizablePanelGroup>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
+        <EnableBranchingModal />
+        <AISettingsModal />
+        <ProjectAPIDocs />
+        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           {productMenu}
         </MobileSheetNav>
-      </AppLayout>
+      </>
     )
   }
 )

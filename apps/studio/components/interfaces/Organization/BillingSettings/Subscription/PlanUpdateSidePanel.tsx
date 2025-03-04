@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -22,18 +23,20 @@ import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import type { OrgPlan, SubscriptionTier } from 'data/subscriptions/types'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useFlag, usePHFlag } from 'hooks/ui/useFlag'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Button, Modal, SidePanel, cn } from 'ui'
 import DowngradeModal from './DowngradeModal'
-import EnterpriseCard from './EnterpriseCard'
+import { EnterpriseCard } from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
+import SubscriptionPlanUpdateDialog from './SubscriptionPlanUpdateDialog'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import UpgradeSurveyModal from './UpgradeModal'
 
@@ -41,10 +44,12 @@ const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const queryClient = useQueryClient()
   const originalPlanRef = useRef<string>()
   const allowOrioleDB = useFlag('allowOrioleDb')
+  const newPlanUpdateDialog = usePHFlag('newPlanUpdateDialog')
 
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)
@@ -97,7 +102,6 @@ const PlanUpdateSidePanel = () => {
 
   const billingViaPartner = subscription?.billing_via_partner === true
   const billingPartner = subscription?.billing_partner
-  const paymentViaInvoice = subscription?.payment_method_type === 'invoice'
 
   const {
     data: subscriptionPreview,
@@ -112,17 +116,23 @@ const PlanUpdateSidePanel = () => {
     orgProjects.filter((it) => it.status !== 'INACTIVE' && it.status !== 'GOING_DOWN').length > 0
   const subscriptionPlanMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
 
-  const expandUsageFee = (fee: string) => {
-    setUsageFeesExpanded([...usageFeesExpanded, fee])
-  }
-
-  const collapseUsageFee = (fee: string) => {
-    setUsageFeesExpanded(usageFeesExpanded.filter((item) => item !== fee))
-  }
-
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
+      const source = Array.isArray(router.query.source)
+        ? router.query.source[0]
+        : router.query.source
+      const properties: StudioPricingSidePanelOpenedEvent['properties'] = {
+        currentPlan: subscription?.plan?.name,
+      }
+      if (source) {
+        properties.origin = source
+      }
+      sendEvent({
+        action: 'studio_pricing_side_panel_opened',
+        properties,
+        groups: { organization: slug ?? 'Unknown' },
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
@@ -142,10 +152,14 @@ const PlanUpdateSidePanel = () => {
     }
   }
 
+  const planMeta = selectedTier
+    ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
+    : null
+
   const onUpdateSubscription = async () => {
     if (!slug) return console.error('org slug is required')
     if (!selectedTier) return console.error('Selected plan is required')
-    if (!selectedPaymentMethod && !paymentViaInvoice) {
+    if (!selectedPaymentMethod && subscription?.payment_method_type !== 'invoice') {
       return toast.error('Please select a payment method')
     }
 
@@ -172,9 +186,13 @@ const PlanUpdateSidePanel = () => {
     updateOrgSubscription({ slug, tier, paymentMethod: selectedPaymentMethod })
   }
 
-  const planMeta = selectedTier
-    ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
-    : null
+  const expandUsageFee = (fee: string) => {
+    setUsageFeesExpanded([...usageFeesExpanded, fee])
+  }
+
+  const collapseUsageFee = (fee: string) => {
+    setUsageFeesExpanded(usageFeesExpanded.filter((item) => item !== fee))
+  }
 
   return (
     <>
@@ -260,7 +278,17 @@ const PlanUpdateSidePanel = () => {
                           hasOrioleProjects ||
                           !canUpdateSubscription
                         }
-                        onClick={() => setSelectedTier(plan.id as any)}
+                        onClick={() => {
+                          setSelectedTier(plan.id as any)
+                          sendEvent({
+                            action: 'studio_pricing_plan_cta_clicked',
+                            properties: {
+                              selectedPlan: plan.name,
+                              currentPlan: subscription?.plan?.name,
+                            },
+                            groups: { organization: slug ?? 'Unknown' },
+                          })
+                        }}
                         tooltip={{
                           content: {
                             side: 'bottom',
@@ -329,218 +357,242 @@ const PlanUpdateSidePanel = () => {
         projects={orgProjects}
       />
 
-      <Modal
-        loading={isUpdating}
-        alignFooter="right"
-        size="xlarge"
-        visible={selectedTier !== undefined && selectedTier !== 'tier_free'}
-        onCancel={() => setSelectedTier(undefined)}
-        onConfirm={onUpdateSubscription}
-        dialogOverlayProps={{ className: 'pointer-events-none' }}
-        header={`Confirm ${planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'} to ${subscriptionPlanMeta?.name}`}
-      >
-        <Modal.Content>
-          {subscriptionPreviewError && (
-            <AlertError
-              error={subscriptionPreviewError}
-              subject="Failed to preview subscription."
-            />
-          )}
-          {subscriptionPreviewIsLoading && (
-            <div className="space-y-2">
-              <span className="text-sm">Estimating monthly costs...</span>
-              <ShimmeringLoader />
-              <ShimmeringLoader className="w-3/4" />
-              <ShimmeringLoader className="w-1/2" />
-            </div>
-          )}
-          {subscriptionPreviewInitialized && (
-            <div>
-              <Table
-                className="mt-2"
-                borderless={true}
-                head={[
-                  <Table.th key="header-item">Item</Table.th>,
-                  <Table.th key="header-count" className="text-right pr-4">
-                    Usage
-                  </Table.th>,
-                  <Table.th key="header-unit-price">Unit Price</Table.th>,
-                  <Table.th key="header-price" className="text-right">
-                    Cost
-                  </Table.th>,
-                ]}
-                body={
-                  <>
-                    {subscriptionPreview.breakdown.map((item) => (
-                      <>
-                        <Table.tr key={item.description}>
-                          <Table.td>
-                            {item.breakdown && item.breakdown.length > 0 && (
-                              <Button
-                                type="text"
-                                className="!pl-0 !pr-1"
-                                icon={
-                                  <ChevronRight
-                                    className={cn(
-                                      'transition',
-                                      usageFeesExpanded.includes(item.description) && 'rotate-90'
-                                    )}
-                                  />
-                                }
-                                onClick={() =>
-                                  usageFeesExpanded.includes(item.description)
-                                    ? collapseUsageFee(item.description)
-                                    : expandUsageFee(item.description)
-                                }
-                              />
-                            )}
-                            {item.description ?? 'Unknown'}{' '}
-                            {item.description.endsWith('Compute') && ` (Hours)`}
-                          </Table.td>
-                          <Table.td className="text-right pr-4 tabular-nums">
-                            {item.quantity?.toLocaleString()}
-                          </Table.td>
-                          <Table.td>
-                            {item.unit_price_desc
-                              ? item.unit_price_desc
-                              : item.unit_price === 0
-                                ? 'FREE'
-                                : item.unit_price
-                                  ? `${formatCurrency(item.unit_price)}`
-                                  : ''}
-                          </Table.td>
-                          <Table.td className="text-right">
-                            {formatCurrency(item.total_price)}
-                          </Table.td>
-                        </Table.tr>
+      {newPlanUpdateDialog === 'variant-a' ? (
+        <SubscriptionPlanUpdateDialog
+          selectedTier={selectedTier}
+          selectedOrganization={selectedOrganization}
+          onClose={() => setSelectedTier(undefined)}
+          subscriptionPlanMeta={subscriptionPlanMeta}
+          planMeta={planMeta}
+          subscriptionPreviewError={subscriptionPreviewError}
+          subscriptionPreviewIsLoading={subscriptionPreviewIsLoading}
+          subscriptionPreviewInitialized={subscriptionPreviewInitialized}
+          subscriptionPreview={subscriptionPreview}
+          billingViaPartner={billingViaPartner}
+          billingPartner={billingPartner}
+          subscription={subscription}
+          slug={slug}
+          currentPlanMeta={{
+            ...availablePlans.find((p) => p.id === subscription?.plan?.id),
+            features:
+              subscriptionsPlans.find((plan) => plan.id === `tier_${subscription?.plan?.id}`)
+                ?.features || [],
+          }}
+        />
+      ) : (
+        <Modal
+          loading={isUpdating}
+          alignFooter="right"
+          size="xlarge"
+          visible={selectedTier !== undefined && selectedTier !== 'tier_free'}
+          onCancel={() => setSelectedTier(undefined)}
+          onConfirm={onUpdateSubscription}
+          dialogOverlayProps={{ className: 'pointer-events-none' }}
+          header={`Confirm ${planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'} to ${subscriptionPlanMeta?.name}`}
+        >
+          <Modal.Content>
+            {subscriptionPreviewError && (
+              <AlertError
+                error={subscriptionPreviewError}
+                subject="Failed to preview subscription."
+              />
+            )}
+            {subscriptionPreviewIsLoading && (
+              <div className="space-y-2">
+                <span className="text-sm">Estimating monthly costs...</span>
+                <ShimmeringLoader />
+                <ShimmeringLoader className="w-3/4" />
+                <ShimmeringLoader className="w-1/2" />
+              </div>
+            )}
+            {subscriptionPreviewInitialized && (
+              <div>
+                <Table
+                  className="mt-2"
+                  borderless={true}
+                  head={[
+                    <Table.th key="header-item">Item</Table.th>,
+                    <Table.th key="header-count" className="text-right pr-4">
+                      Usage
+                    </Table.th>,
+                    <Table.th key="header-unit-price">Unit Price</Table.th>,
+                    <Table.th key="header-price" className="text-right">
+                      Cost
+                    </Table.th>,
+                  ]}
+                  body={
+                    <>
+                      {subscriptionPreview.breakdown.map((item) => (
+                        <>
+                          <Table.tr key={item.description}>
+                            <Table.td>
+                              {item.breakdown && item.breakdown.length > 0 && (
+                                <Button
+                                  type="text"
+                                  className="!pl-0 !pr-1"
+                                  icon={
+                                    <ChevronRight
+                                      className={cn(
+                                        'transition',
+                                        usageFeesExpanded.includes(item.description) && 'rotate-90'
+                                      )}
+                                    />
+                                  }
+                                  onClick={() =>
+                                    usageFeesExpanded.includes(item.description)
+                                      ? collapseUsageFee(item.description)
+                                      : expandUsageFee(item.description)
+                                  }
+                                />
+                              )}
+                              {item.description ?? 'Unknown'}{' '}
+                              {item.description.endsWith('Compute') && ` (Hours)`}
+                            </Table.td>
+                            <Table.td className="text-right pr-4 tabular-nums">
+                              {item.quantity?.toLocaleString()}
+                            </Table.td>
+                            <Table.td>
+                              {item.unit_price_desc
+                                ? item.unit_price_desc
+                                : item.unit_price === 0
+                                  ? 'FREE'
+                                  : item.unit_price
+                                    ? `${formatCurrency(item.unit_price)}`
+                                    : ''}
+                            </Table.td>
+                            <Table.td className="text-right">
+                              {formatCurrency(item.total_price)}
+                            </Table.td>
+                          </Table.tr>
 
-                        {usageFeesExpanded.includes(item.description) &&
-                          item.breakdown &&
-                          item.breakdown.length > 0 &&
-                          item.breakdown.map((project) => (
-                            <Table.tr key={project.project_ref}>
-                              <Table.td className="!pl-12">{project.project_name}</Table.td>
-                              <Table.td className="text-right pr-4 tabular-nums">
-                                {project.usage}
-                              </Table.td>
-                              <Table.td />
-                              <Table.td />
-                            </Table.tr>
-                          ))}
-                      </>
-                    ))}
+                          {usageFeesExpanded.includes(item.description) &&
+                            item.breakdown &&
+                            item.breakdown.length > 0 &&
+                            item.breakdown.map((project) => (
+                              <Table.tr key={project.project_ref}>
+                                <Table.td className="!pl-12">{project.project_name}</Table.td>
+                                <Table.td className="text-right pr-4 tabular-nums">
+                                  {project.usage}
+                                </Table.td>
+                                <Table.td />
+                                <Table.td />
+                              </Table.tr>
+                            ))}
+                        </>
+                      ))}
 
-                    <Table.tr>
-                      <Table.td className="font-medium">
-                        Monthly Costs (excluding over-usage and credits)
-                      </Table.td>
-                      <Table.td />
-                      <Table.td />
-                      <Table.td className="text-right font-medium">
-                        {formatCurrency(
-                          Math.round(
-                            subscriptionPreview.breakdown.reduce(
-                              (prev, cur) => prev + cur.total_price,
-                              0
-                            )
-                          ) ?? 0
-                        )}
-                      </Table.td>
-                    </Table.tr>
-                  </>
-                }
-              ></Table>
+                      <Table.tr>
+                        <Table.td className="font-medium">
+                          Monthly Costs (excluding over-usage and credits)
+                        </Table.td>
+                        <Table.td />
+                        <Table.td />
+                        <Table.td className="text-right font-medium">
+                          {formatCurrency(
+                            Math.round(
+                              subscriptionPreview.breakdown.reduce(
+                                (prev, cur) => prev + cur.total_price,
+                                0
+                              )
+                            ) ?? 0
+                          )}
+                        </Table.td>
+                      </Table.tr>
+                    </>
+                  }
+                ></Table>
 
-              <InformationBox
-                className="mt-4"
-                title="Usage-billing for Compute"
-                icon={<Info />}
-                defaultVisibility={true}
-                hideCollapse={true}
-                description={
-                  <div>
-                    <p className="text-sm mt-2">
-                      Each project is a dedicated server and database. Paid plans come with $10 of
-                      Compute Credits to cover one project on the default Micro Compute size or
-                      parts of any compute addon. Additional unpaused projects on paid plans will
-                      incur compute usage costs starting at $10 per month, billed hourly.
-                    </p>
-
-                    {subscription?.plan?.id === 'free' && (
+                <InformationBox
+                  className="mt-4"
+                  title="Usage-billing for Compute"
+                  icon={<Info />}
+                  defaultVisibility={true}
+                  hideCollapse={true}
+                  description={
+                    <div>
                       <p className="text-sm mt-2">
-                        Mixing paid and non-paid projects in a single organization is not possible.
-                        If you want projects to be on the Free Plan, use self-serve project
-                        transfers.
+                        Each project is a dedicated server and database. Paid plans come with $10 of
+                        Compute Credits to cover one project on the default Micro Compute size or
+                        parts of any compute addon. Additional unpaused projects on paid plans will
+                        incur compute usage costs starting at $10 per month, billed hourly.
                       </p>
-                    )}
 
-                    <div className="space-x-3 mt-2">
-                      <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                        <Link
-                          href="https://supabase.com/docs/guides/platform/org-based-billing"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          How billing works
-                        </Link>
-                      </Button>
                       {subscription?.plan?.id === 'free' && (
+                        <p className="text-sm mt-2">
+                          Mixing paid and non-paid projects in a single organization is not
+                          possible. If you want projects to be on the Free Plan, use self-serve
+                          project transfers.
+                        </p>
+                      )}
+
+                      <div className="space-x-3 mt-2">
                         <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                           <Link
-                            href="https://supabase.com/docs/guides/platform/project-transfer"
+                            href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                             target="_blank"
                             rel="noreferrer"
                           >
-                            Project transfers
+                            How billing for Compute works
                           </Link>
                         </Button>
-                      )}
+                        {subscription?.plan?.id === 'free' && (
+                          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                            <Link
+                              href="https://supabase.com/docs/guides/platform/project-transfer"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Project transfers
+                            </Link>
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                }
-              />
-            </div>
-          )}
-        </Modal.Content>
-
-        <Modal.Content>
-          {!billingViaPartner ? (
-            <div className="py-4 space-y-2">
-              <p className="text-sm">
-                Upon clicking confirm, your monthly invoice will be adjusted and your credit card
-                will be charged immediately. Changing the plan resets your billing cycle and may
-                result in a prorated charge for previous usage.
-              </p>
-
-              <div className="!mt-4">
-                <PaymentMethodSelection
-                  selectedPaymentMethod={selectedPaymentMethod}
-                  onSelectPaymentMethod={setSelectedPaymentMethod}
+                  }
                 />
               </div>
-            </div>
-          ) : (
-            <div className="py-4 space-y-2">
-              <p className="text-sm">
-                This organization is billed through our partner{' '}
-                {billingPartnerLabel(billingPartner)}.{' '}
-                {billingPartner === 'aws' ? (
-                  <>The organization's credit balance will be decreased accordingly.</>
-                ) : (
-                  <>You will be charged by them directly.</>
-                )}
-              </p>
-              {billingViaPartner &&
-                billingPartner === 'fly' &&
-                subscriptionPreview?.plan_change_type === 'downgrade' && (
-                  <p className="text-sm">
-                    Your organization will be downgraded at the end of your current billing cycle.
-                  </p>
-                )}
-            </div>
-          )}
-        </Modal.Content>
-      </Modal>
+            )}
+          </Modal.Content>
+
+          <Modal.Content>
+            {!billingViaPartner ? (
+              <div className="py-4 space-y-2">
+                <p className="text-sm">
+                  Upon clicking confirm, your monthly invoice will be adjusted and your credit card
+                  will be charged immediately. Changing the plan resets your billing cycle and may
+                  result in a prorated charge for previous usage.
+                </p>
+
+                <div className="!mt-4">
+                  <PaymentMethodSelection
+                    selectedPaymentMethod={selectedPaymentMethod}
+                    onSelectPaymentMethod={setSelectedPaymentMethod}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="py-4 space-y-2">
+                <p className="text-sm">
+                  This organization is billed through our partner{' '}
+                  {billingPartnerLabel(billingPartner)}.{' '}
+                  {billingPartner === 'aws' ? (
+                    <>The organization's credit balance will be decreased accordingly.</>
+                  ) : (
+                    <>You will be charged by them directly.</>
+                  )}
+                </p>
+                {billingViaPartner &&
+                  billingPartner === 'fly' &&
+                  subscriptionPreview?.plan_change_type === 'downgrade' && (
+                    <p className="text-sm">
+                      Your organization will be downgraded at the end of your current billing cycle.
+                    </p>
+                  )}
+              </div>
+            )}
+          </Modal.Content>
+        </Modal>
+      )}
 
       <MembersExceedLimitModal
         visible={showDowngradeError}

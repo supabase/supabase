@@ -5,7 +5,7 @@ import { useDrag, useDrop } from 'react-dnd'
 
 import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { useDispatch, useTrackedState } from '../../store/Store'
 import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu'
@@ -126,30 +126,33 @@ export function ColumnHeader<R>({
         <div className="sb-grid-column-header__inner">
           {renderColumnIcon(columnType, { name: column.name as string, foreignKey })}
           {isPrimaryKey && (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_>
+            <Tooltip>
+              <TooltipTrigger>
                 <div className="sb-grid-column-header__inner__primary-key">
                   <Key size={14} strokeWidth={2} />
                 </div>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom" className="font-normal">
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="font-normal">
                 Primary key
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+              </TooltipContent>
+            </Tooltip>
           )}
           <span className="sb-grid-column-header__inner__name" title={hoverValue}>
             {column.name}
           </span>
-          <span className="sb-grid-column-header__inner__format">{columnFormat}</span>
+          <span className="sb-grid-column-header__inner__format">
+            {columnFormat}
+            {columnFormat === 'bytea' ? ` (hex)` : ''}
+          </span>
           {isEncrypted && (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_>
+            <Tooltip>
+              <TooltipTrigger>
                 <Lock size={14} strokeWidth={2} />
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom" className="font-normal">
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="font-normal">
                 Encrypted column
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
         <ColumnMenu column={column} isEncrypted={isEncrypted} />
@@ -167,11 +170,11 @@ function renderColumnIcon(
     case 'foreign_key':
       // [Joshen] Look into this separately but this should be a hover card instead
       return (
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_>
+        <Tooltip>
+          <TooltipTrigger>
             <Link size={14} strokeWidth={2} />
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
             <div className="font-normal">
               <p className="text-xs text-foreground-light">Foreign key relation:</p>
               <div className="flex items-center space-x-1">
@@ -193,8 +196,8 @@ function renderColumnIcon(
                 </p>
               )}
             </div>
-          </TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipContent>
+        </Tooltip>
       )
     default:
       return null

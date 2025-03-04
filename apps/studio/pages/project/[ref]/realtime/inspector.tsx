@@ -3,6 +3,7 @@ import type { NextPageWithLayout } from 'types'
 
 import { RealtimeInspector } from 'components/interfaces/Realtime/Inspector'
 import RealtimeLayout from 'components/layouts/RealtimeLayout/RealtimeLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
@@ -17,7 +18,9 @@ export const InspectorPage: NextPageWithLayout = () => {
 }
 
 InspectorPage.getLayout = (page) => (
-  <RealtimeLayout title="Realtime Inspector">{page}</RealtimeLayout>
+  <DefaultLayout>
+    <RealtimeLayout title="Realtime Inspector">{page}</RealtimeLayout>
+  </DefaultLayout>
 )
 
 export default InspectorPage

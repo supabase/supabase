@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.6.8
+  version: 2.15.8
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1118,6 +1118,7 @@ commands:
       - management-api
     links: []
     subcommands:
+      - supabase-postgres-config-delete
       - supabase-postgres-config-get
       - supabase-postgres-config-update
     flags: []
@@ -1162,6 +1163,33 @@ commands:
     usage: supabase postgres-config get
     subcommands: []
     flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-postgres-config-delete
+    title: supabase postgres-config delete
+    summary: Delete specific Postgres database config overrides
+    description: |
+      Delete specific config overrides, reverting them to their default values.
+    tags: []
+    links: []
+    usage: supabase postgres-config delete [flags]
+    subcommands: []
+    flags:
+      - id: config
+        name: --config <strings>
+        description: Config keys to delete (comma-separated)
+        default_value: '[]'
+      - id: no-restart
+        name: --no-restart
+        description: Do not restart the database after deleting config.
+        default_value: 'false'
       - id: experimental
         name: --experimental
         description: enable experimental features
@@ -2711,6 +2739,10 @@ commands:
         name: --import-map <string>
         description: Path to import map file.
         default_value: ''
+      - id: jobs
+        name: -j, --jobs <uint>
+        description: Maximum number of parallel jobs.
+        default_value: '1'
       - id: no-verify-jwt
         name: --no-verify-jwt
         description: Disable JWT verification for the Function.
@@ -2719,6 +2751,14 @@ commands:
         name: --project-ref <string>
         description: Project ref of the Supabase project.
         default_value: ''
+      - id: use-api
+        name: --use-api
+        description: Use Management API to bundle functions.
+        default_value: 'false'
+      - id: use-docker
+        name: --use-docker
+        description: Use Docker to bundle functions.
+        default_value: 'true'
   - id: supabase-functions-delete
     title: supabase functions delete
     summary: Delete a Function from Supabase

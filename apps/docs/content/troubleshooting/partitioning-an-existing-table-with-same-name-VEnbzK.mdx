@@ -2,8 +2,9 @@
 title = "Partitioning an existing table with same name"
 github_url = "https://github.com/orgs/supabase/discussions/21380"
 date_created = "2024-02-20T08:39:24+00:00"
-topics = ["database"]
-keywords = ["partitioning", "table", "postgresql", "constraint", "index"]
+topics = [ "database" ]
+keywords = [ "partitioning", "table", "postgresql", "constraint", "index" ]
+database_id = "3142f418-028e-4ab1-8f82-a7096be90422"
 ---
 
 Our documentation on table partitioning here: https://supabase.com/docs/guides/database/partitions
@@ -24,7 +25,7 @@ LIKE option will copy column definitions, constraints etc. from source table aut
 
 - Indices definition will be copied with INCLUDING ALL option. They will be propagated during insertion of data into a new parent table.
 
-- Of course you can hold old table for your data to be safe indefinitely. Do not delete it outright! Your queries after renaming will not use it. Indexes etc. work behind the scenes, you are not required to know its names. (In reality indices for a "new" partitioned table will be new, but you won't see it if you have used LIKE..INCLUDING ALL option).
+- Of course you can hold old table for your data to be safe indefinitely. Do not delete it outright! Your queries after renaming will not use it. Indexes etc. work behind the scenes, you are not required to know its names. (In reality indices for a "new" partitioned table will be new, but you won't see it if you have used `LIKE..INCLUDING ALL` option).
 
 - Triggers will be needed to re-create for "parent" partitioned table using `CREATE TRIGGER` clause https://www.postgresql.org/docs/16/sql-createtrigger.html
 

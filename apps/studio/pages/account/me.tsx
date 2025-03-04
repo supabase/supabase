@@ -1,11 +1,14 @@
-import {
-  AccountInformation,
-  AnalyticsSettings,
-  ThemeSettings,
-} from 'components/interfaces/Account/Preferences'
+import { AccountInformation, AnalyticsSettings } from 'components/interfaces/Account/Preferences'
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
+import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import {
+  ScaffoldContainer,
+  ScaffoldDescription,
+  ScaffoldHeader,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -15,9 +18,15 @@ import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
   return (
-    <div className="my-2">
+    <ScaffoldContainer>
+      <ScaffoldHeader>
+        <ScaffoldTitle>User Preferences</ScaffoldTitle>
+        <ScaffoldDescription>
+          Manage your profile, account settings, and preferences for your Supabase experience
+        </ScaffoldDescription>
+      </ScaffoldHeader>
       <ProfileCard />
-    </div>
+    </ScaffoldContainer>
   )
 }
 
@@ -42,7 +51,7 @@ const ProfileCard = () => {
   const { profile, error, isLoading, isError, isSuccess } = useProfile()
 
   return (
-    <article className="max-w-4xl p-4">
+    <article>
       {isLoading && (
         <Panel>
           <div className="p-4">

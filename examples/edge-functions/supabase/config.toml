@@ -75,4 +75,4 @@ objects_path = "./buckets/images"
 import_map = "./functions/import_map.json"
 
 [functions.wasm-modules]
-static_files = [ "./functions/wasm-modules/add-wasm/pkg/add_wasm_bg.wasm"]
+static_files = [ "./functions/wasm-modules/add-wasm/pkg/*.wasm"]
