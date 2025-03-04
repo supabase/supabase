@@ -1,28 +1,39 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Code, Monitor } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { editor } from 'monaco-editor'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
+import { useForm } from 'react-hook-form'
 
 import { useParams } from 'common'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { FormActions } from 'components/ui/Forms/FormActions'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import InformationBox from 'components/ui/InformationBox'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { FormSchema } from 'types'
 import {
-  Form,
-  Input,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  Label_Shadcn_,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SpamValidation } from './SpamValidation'
 
 interface TemplateEditorProps {
@@ -32,6 +43,9 @@ interface TemplateEditorProps {
 const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+
+  // Add a ref to the code editor
+  const editorRef = useRef<editor.IStandaloneCodeEditor>()
 
   // [Joshen] Error state is handled in the parent
   const { data: authConfig, isSuccess } = useAuthConfigQuery({ projectRef })
@@ -49,15 +63,6 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
 
   const { id, properties } = template
 
-  const formId = `auth-config-email-templates-${id}`
-  const INITIAL_VALUES = useMemo(() => {
-    const result: { [x: string]: string } = {}
-    Object.keys(properties).forEach((key) => {
-      result[key] = ((authConfig && authConfig[key as keyof typeof authConfig]) ?? '') as string
-    })
-    return result
-  }, [authConfig, properties])
-
   const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT` as keyof typeof authConfig
   const messageProperty = properties[messageSlug]
   const builtInSMTP =
@@ -74,7 +79,33 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
   const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
 
-  const onSubmit = (values: any, { resetForm }: any) => {
+  // Create form values
+  const INITIAL_VALUES = useMemo(() => {
+    const result: { [x: string]: string } = {}
+    Object.keys(properties).forEach((key) => {
+      result[key] = ((authConfig && authConfig[key as keyof typeof authConfig]) ?? '') as string
+    })
+    return result
+  }, [authConfig, properties])
+
+  // Setup React Hook Form
+  const form = useForm({
+    defaultValues: INITIAL_VALUES,
+  })
+
+  // Update form values when authConfig changes
+  useEffect(() => {
+    if (authConfig) {
+      const values: { [key: string]: string } = {}
+      Object.keys(properties).forEach((key) => {
+        values[key] = ((authConfig && authConfig[key as keyof typeof authConfig]) ?? '') as string
+      })
+      form.reset(values)
+      setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+    }
+  }, [authConfig, properties, messageSlug, form])
+
+  const onSubmit = (values: any) => {
     if (!projectRef) return console.error('Project ref is required')
 
     setIsSavingTemplate(true)
@@ -112,10 +143,6 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                 onSuccess: () => {
                   setIsSavingTemplate(false)
                   toast.success('Successfully updated settings')
-                  resetForm({
-                    values: values,
-                    initialValues: values,
-                  })
                   setHasUnsavedChanges(false) // Reset the unsaved changes state
                 },
               }
@@ -157,140 +184,202 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
-  return (
-    <Form id={formId} className="!border-t-0" initialValues={INITIAL_VALUES} onSubmit={onSubmit}>
-      {({ resetForm, values, initialValues }: any) => {
-        const message = (authConfig && authConfig[messageSlug]) ?? ''
-        const hasChanges =
-          JSON.stringify(values) !== JSON.stringify(initialValues) || message !== bodyValue
+  // Single useMemo hook to parse and prepare message variables
+  const messageVariables = useMemo(() => {
+    if (!messageProperty?.description) return []
 
-        return (
+    // Parse bullet point format: - `{{ .Variable }}` : Description
+    const lines = messageProperty.description.split('\n')
+    const variables: { variable: string; description: string }[] = []
+
+    for (const line of lines) {
+      // Match lines that start with a bullet point followed by a variable in the format {{ .Variable }}
+      // Handle variations in formatting (with or without backticks, different spacing)
+      const match = line.match(/-\s*`?({{\s*\.\w+\s*}})`?\s*(?::|-)?\s*(.+)/)
+      if (match && match[1] && match[2]) {
+        variables.push({
+          variable: match[1].replace(/`/g, '').trim(),
+          description: match[2].trim(),
+        })
+      }
+    }
+
+    return variables
+  }, [messageProperty?.description])
+
+  // Check if form values have changed
+  const formValues = form.watch()
+  const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(INITIAL_VALUES)
+  const hasChanges = hasFormChanges || ((authConfig && authConfig[messageSlug]) ?? '') !== bodyValue
+
+  // Function to insert text at cursor position
+  const insertTextAtCursor = (text: string) => {
+    if (!editorRef.current) return
+
+    const editor = editorRef.current
+    const selection = editor.getSelection()
+
+    if (selection) {
+      const range = {
+        startLineNumber: selection.startLineNumber,
+        startColumn: selection.startColumn,
+        endLineNumber: selection.endLineNumber,
+        endColumn: selection.endColumn,
+      }
+
+      editor.executeEdits('insert-variable', [
+        {
+          range,
+          text,
+          forceMoveMarkers: true,
+        },
+      ])
+
+      // Focus the editor after insertion
+      editor.focus()
+    }
+  }
+
+  return (
+    <Form_Shadcn_ {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <CardContent>
+          {Object.keys(properties).map((x: string) => {
+            const property = properties[x]
+            if (property.type === 'string' && x !== messageSlug) {
+              return (
+                <FormField_Shadcn_
+                  key={x}
+                  control={form.control}
+                  name={x}
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label={property.title}
+                      description={
+                        property.description ? (
+                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                            {property.description}
+                          </ReactMarkdown>
+                        ) : null
+                      }
+                      labelOptional={
+                        property.descriptionOptional ? (
+                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                            {property.descriptionOptional}
+                          </ReactMarkdown>
+                        ) : null
+                      }
+                    >
+                      <FormControl_Shadcn_>
+                        <Input_Shadcn_ id={x} {...field} disabled={!canUpdateConfig} />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              )
+            }
+            return null
+          })}
+        </CardContent>
+
+        {messageProperty && (
           <>
-            <FormSection className="!border-t-0 pb-8 !pt-4">
-              <FormSectionContent loading={false}>
-                {Object.keys(properties).map((x: string) => {
-                  const property = properties[x]
-                  if (property.type === 'string') {
-                    return (
-                      <div key={x} className="space-y-3">
-                        <label className="col-span-12 text-sm text-foreground lg:col-span-5">
-                          {property.title}
-                        </label>
-                        <Input
-                          size="small"
-                          layout="vertical"
-                          id={x}
-                          key={x}
-                          name={x}
-                          descriptionText={
-                            property.description ? (
-                              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                                {property.description}
-                              </ReactMarkdown>
-                            ) : null
-                          }
-                          labelOptional={
-                            property.descriptionOptional ? (
-                              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                                {property.descriptionOptional}
-                              </ReactMarkdown>
-                            ) : null
-                          }
-                          disabled={!canUpdateConfig}
-                        />
-                      </div>
-                    )
-                  }
-                })}
-              </FormSectionContent>
-            </FormSection>
-            <FormSection className="!mt-0 grid-cols-12 !border-t-0 !pt-0 pb-7">
-              <FormSectionContent fullWidth loading={false}>
-                {messageProperty && (
-                  <>
-                    <div className="space-y-3">
-                      <FormSectionLabel>
-                        <span>{messageProperty.title}</span>
-                      </FormSectionLabel>
-                      <InformationBox
-                        defaultVisibility
-                        title="Message variables"
-                        hideCollapse={false}
-                        description={
-                          messageProperty.description && (
-                            <ReactMarkdown>{messageProperty.description}</ReactMarkdown>
-                          )
-                        }
-                      />
-                    </div>
-                    <Tabs_Shadcn_ defaultValue="source">
-                      <TabsList_Shadcn_ className="gap-3">
-                        <TabsTrigger_Shadcn_ value="source" className="gap-2">
-                          <Code size={14} />
-                          Source
-                        </TabsTrigger_Shadcn_>
-                        <TabsTrigger_Shadcn_ value="preview" className="gap-2">
-                          <Monitor size={14} />
-                          Preview
-                        </TabsTrigger_Shadcn_>
-                      </TabsList_Shadcn_>
-                      <TabsContent_Shadcn_ value="source" className="-space-y-px">
-                        <CodeEditor
-                          id="code-id"
-                          language="html"
-                          isReadOnly={!canUpdateConfig}
-                          className="!mb-0 relative h-96 overflow-hidden rounded border rounded-b-none"
-                          onInputChange={(e: string | undefined) => {
-                            setBodyValue(e ?? '')
-                            if (bodyValue !== e) setHasUnsavedChanges(true)
-                          }}
-                          options={{ wordWrap: 'on', contextmenu: false }}
-                          value={bodyValue}
-                        />
-                        <SpamValidation validationResult={validationResult} />
-                      </TabsContent_Shadcn_>
-                      <TabsContent_Shadcn_ value="preview">
-                        <Admonition
-                          type="default"
-                          title="The preview may differ slightly from the actual rendering in the email client"
-                        />
-                        <iframe
-                          className="!mb-0 overflow-hidden h-96 w-full rounded border"
-                          title={id}
-                          srcDoc={bodyValue}
-                        />
-                      </TabsContent_Shadcn_>
-                    </Tabs_Shadcn_>
-                  </>
-                )}
-                <div className="col-span-12 flex w-full">
-                  <FormActions
-                    handleReset={() => {
-                      resetForm({
-                        values: authConfig,
-                        initialValues: authConfig,
-                      })
-                      setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+            <CardContent className="p-0">
+              <Label_Shadcn_ className="p-6 pb-4 block">Message body</Label_Shadcn_>
+              <Tabs_Shadcn_ defaultValue="source">
+                <TabsList_Shadcn_ className="gap-3 px-6">
+                  <TabsTrigger_Shadcn_ value="source" className="gap-2">
+                    <Code size={14} />
+                    Source
+                  </TabsTrigger_Shadcn_>
+                  <TabsTrigger_Shadcn_ value="preview" className="gap-2">
+                    <Monitor size={14} />
+                    Preview
+                  </TabsTrigger_Shadcn_>
+                </TabsList_Shadcn_>
+                <TabsContent_Shadcn_ value="source" className="p-0 mt-0">
+                  <CodeEditor
+                    id="code-id"
+                    language="html"
+                    isReadOnly={!canUpdateConfig}
+                    className="!mb-0 relative h-96 overflow-hidden p-0"
+                    onInputChange={(e: string | undefined) => {
+                      setBodyValue(e ?? '')
+                      if (bodyValue !== e) setHasUnsavedChanges(true)
                     }}
-                    form={formId}
-                    isSubmitting={isSavingTemplate}
-                    hasChanges={hasChanges}
-                    disabled={!canUpdateConfig}
-                    helper={
-                      preventSaveFromSpamCheck
-                        ? 'Please rectify all spam warnings before saving while using the built-in email service'
-                        : !canUpdateConfig
-                          ? 'You need additional permissions to update authentication settings'
-                          : undefined
-                    }
+                    options={{ wordWrap: 'on', contextmenu: false, padding: { top: 16 } }}
+                    value={bodyValue}
+                    editorRef={editorRef}
                   />
-                </div>
-              </FormSectionContent>
-            </FormSection>
+                  {messageVariables.length > 0 && (
+                    <div className="px-6 py-3 border-t bg-surface-200">
+                      <div className="flex flex-wrap gap-1">
+                        {messageVariables.map(({ variable, description }) => (
+                          <Tooltip key={variable}>
+                            <TooltipTrigger asChild>
+                              <Button
+                                type="outline"
+                                size="tiny"
+                                className="rounded-full"
+                                onClick={() => insertTextAtCursor(variable)}
+                              >
+                                {variable}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">
+                              <p>{description || 'Variable description not available'}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </TabsContent_Shadcn_>
+                <TabsContent_Shadcn_ value="preview" className="pt-0 mt-0">
+                  <iframe
+                    className="!mb-0 mt-0 overflow-hidden h-96 w-full"
+                    title={id}
+                    srcDoc={bodyValue}
+                  />
+                  <Admonition
+                    type="default"
+                    title="The preview may differ slightly from the actual rendering in the email client"
+                    className="rounded-none border-0 mb-0"
+                  />
+                </TabsContent_Shadcn_>
+              </Tabs_Shadcn_>
+            </CardContent>
+            <CardContent>
+              <SpamValidation validationResult={validationResult} />
+            </CardContent>
+            <CardFooter className="justify-end space-x-2">
+              {hasChanges && (
+                <Button
+                  type="default"
+                  onClick={() => {
+                    form.reset(INITIAL_VALUES)
+                    setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+                    setHasUnsavedChanges(false)
+                  }}
+                >
+                  Cancel
+                </Button>
+              )}
+              <Button
+                type="primary"
+                htmlType="submit"
+                disabled={
+                  !canUpdateConfig || isSavingTemplate || !hasChanges || preventSaveFromSpamCheck
+                }
+                loading={isSavingTemplate}
+              >
+                Save changes
+              </Button>
+            </CardFooter>
           </>
-        )
-      }}
-    </Form>
+        )}
+      </form>
+    </Form_Shadcn_>
   )
 }
 
