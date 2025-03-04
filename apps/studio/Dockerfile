@@ -51,7 +51,7 @@ CMD ["pnpm", "dev:studio"]
 # Compile Next.js
 FROM dev AS builder
 
-RUN pnpm dlx turbo@2.3.3 run build --filter studio -- --no-lint
+RUN pnpm --filter studio exec next build
 
 # Copy only compiled code and dependencies
 FROM base AS production

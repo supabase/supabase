@@ -3,6 +3,7 @@ import schemas from './pg-meta-schemas'
 import * as functions from './pg-meta-functions'
 import tablePrivileges from './pg-meta-table-privileges'
 import indexes from './pg-meta-indexes'
+import columnPrivileges from './pg-meta-column-privileges'
 
 export default {
   roles,
@@ -10,4 +11,5 @@ export default {
   functions,
   tablePrivileges,
   indexes,
+  columnPrivileges,
 }
