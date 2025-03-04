@@ -32,7 +32,7 @@ import type { NextPageWithLayout } from 'types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useProjectPgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
+import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -78,7 +78,7 @@ const DatabaseUsage = () => {
     },
   })
 
-  const { data: pgBouncerConfig } = useProjectPgbouncerConfigQuery({
+  const { data: pgBouncerConfig } = usePgbouncerConfigQuery({
     projectRef: ref ?? 'default',
   })
   const isPgBouncerEnabled = pgBouncerConfig?.pgbouncer_enabled
