@@ -78,6 +78,10 @@ const levelsData = {
     icon: 'reference-cli',
     name: 'Local Development',
   },
+  security: {
+    icon: 'platform',
+    name: 'Security',
+  },
   platform: {
     icon: 'platform',
     name: 'Platform',
