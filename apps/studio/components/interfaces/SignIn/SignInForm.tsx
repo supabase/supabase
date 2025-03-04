@@ -8,7 +8,7 @@ import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
 
-import { TelemetryActions } from 'common/telemetry-constants'
+import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
 import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
@@ -30,6 +30,7 @@ const SignInForm = () => {
   const captchaRef = useRef<HCaptcha>(null)
 
   const { mutate: sendEvent } = useSendEventMutation()
+  const { mutate: addLoginEvent } = useAddLoginEvent()
 
   const onSignIn = async ({ email, password }: { email: string; password: string }) => {
     const toastId = toast.loading('Signing in...')
@@ -60,7 +61,12 @@ const SignInForm = () => {
         }
 
         toast.success(`Signed in successfully!`, { id: toastId })
-        sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
+        sendEvent({
+          action: 'sign_in',
+          properties: { category: 'account', method: 'email' },
+        })
+        addLoginEvent({})
+
         await queryClient.resetQueries()
         const returnTo = getReturnToPath()
         // since we're already on the /sign-in page, prevent redirect loops

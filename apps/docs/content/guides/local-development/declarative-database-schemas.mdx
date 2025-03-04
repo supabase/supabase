@@ -136,7 +136,7 @@ Some entities like views and enums expect columns to be declared in a specific o
     <StepHikeCompact.Code>
 
 ```bash Terminal
-supabase diff -f add_age
+supabase db diff -f add_age
 ```
 
     </StepHikeCompact.Code>
@@ -162,11 +162,28 @@ alter table "public"."employees" add column "age" smallint not null;
   </StepHikeCompact.Step>
 </StepHikeCompact>
 
+<StepHikeCompact>
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Apply the pending migration">
+      Start the database locally and apply the pending migration.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash Terminal
+supabase start && supabase migration up
+```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
 ### Managing dependencies
 
 As your database schema evolves, you will probably start using more advanced entities like views and functions. These entities are notoriously verbose to manage using plain migrations because the entire body must be recreated whenever there is a change. Using declarative schema, you can now edit them in-place so it’s much easier to review.
 
-```sql
+```sql supabase/schemas/employees.sql
 create table "employees" (
   "id" integer not null,
   "name" text,
@@ -185,9 +202,9 @@ AS $$
 $$;
 ```
 
-Your schema files are run in lexicographic order. If you need to declare foreign keys between multiple tables, remember to create the parent table first. For example, your `supabase` directory may end up with the following structure.
+Your schema files are run in lexicographic order by default. The order is important when you have foreign keys between multiple tables as the parent table must be created first. For example, your `supabase` directory may end up with the following structure.
 
-```sql
+```bash
 .
 └── supabase/
     ├── schemas/
@@ -198,6 +215,26 @@ Your schema files are run in lexicographic order. If you need to declare foreign
         ├── 20241005112233_add_employee_age.sql
         └── 20241006112233_add_managers_table.sql
 ```
+
+For small projects with only a few tables, the default schema order may be sufficient. However, as your project grows, you might need more control over the order in which schemas are applied. To specify a custom order for applying the schemas, you can declare them explicitly in `config.toml`. Any glob patterns will evaluated, deduplicated, and sorted in lexicographic order. For example, the following pattern ensures `employees.sql` is always executed first.
+
+```toml supabase/config.toml
+[db.migrations]
+schema_paths = [
+  "./schemas/employees.sql",
+  "./schemas/*.sql",
+]
+```
+
+### Pulling in your production schema
+
+To set up declarative schemas on a existing project, you can pull in your production schema by running:
+
+```bash Terminal
+supabase db dump > supabase/schemas/prod.sql
+```
+
+From there, you can start breaking down your schema into smaller files and generate migrations. You can do this all at once, or incrementally as you make changes to your schema.
 
 ## Known caveats
 
@@ -228,4 +265,4 @@ If you need to use any of the entities below, remember to add them through [vers
 - [partitions are not tracked](https://github.com/djrobstep/migra/issues/186)
 - [`alter publication ... add table ...`](https://github.com/supabase/cli/issues/883)
 - [create domain statements are ignored](https://github.com/supabase/cli/issues/2137)
-- verbose to have grants from default privileges
+- [grant statements are duplicated from default privileges](https://github.com/supabase/cli/issues/1864)

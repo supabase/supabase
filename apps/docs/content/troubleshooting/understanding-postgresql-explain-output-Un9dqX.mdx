@@ -12,11 +12,11 @@ sdk = [ "explain" ]
 
 ### Introduction
 
-This guide is designed to help you understand how to use the PostgreSQL [EXPLAIN and EXPLAIN ANALYZE](https://www.postgresql.org/docs/current/sql-explain.html) commands to optimize and debug SQL queries. Understanding the output of these commands can help you improve the performance of your applications by optimizing database interactions.
+This guide is designed to help you understand how to use the Postgres [EXPLAIN and EXPLAIN ANALYZE](https://www.postgresql.org/docs/current/sql-explain.html) commands to optimize and debug SQL queries. Understanding the output of these commands can help you improve the performance of your applications by optimizing database interactions.
 
 ### What is explain?
 
-The PostgreSQL EXPLAIN command shows the execution plan of a SQL query. This plan describes how the PostgreSQL database will execute the query, including how tables will be scanned—by using sequential scans, index scans, etc.—and how rows will be joined.
+The Postgres EXPLAIN command shows the execution plan of a SQL query. This plan describes how the Postgres database will execute the query, including how tables will be scanned—by using sequential scans, index scans, etc.—and how rows will be joined.
 
 ### How to use explain in Supabase
 
@@ -97,7 +97,7 @@ Planning Time: 0.135 ms
 
 - **Rows Removed by Filter:** 999: Indicates that many rows were checked against the filter, but most did not match the criteria.
 
-- **Planning Time: 0.135 ms:** Planning Time refers to the amount of time the PostgreSQL query planner takes to analyze the query and create an execution plan. This time is measured in milliseconds.
+- **Planning Time: 0.135 ms:** Planning Time refers to the amount of time the Postgres query planner takes to analyze the query and create an execution plan. This time is measured in milliseconds.
 
 ### You might be asking yourself now, why there is two different sets of metrics : `(cost=0.42..2.64 rows=1 width=164) (actual time=0.020..0.021 rows=1 loops=1)`?
 
@@ -111,7 +111,7 @@ To answer you, one is for the estimated cost and performance, and another for th
 
 ### How to read a complex explain output
 
-First, you have to understand that a PostgreSQL execution plan is a tree structure consisting of several nodes. The top node (the Aggregate above) is at the top, and lower nodes are indented and start with an arrow (->). Nodes with the same indentation are on the same level (for example, the two relations combined with a join).
+First, you have to understand that a Postgres execution plan is a tree structure consisting of several nodes. The top node (the Aggregate above) is at the top, and lower nodes are indented and start with an arrow (->). Nodes with the same indentation are on the same level (for example, the two relations combined with a join).
 
 Here's an example:
 
@@ -129,11 +129,11 @@ Aggregate Node (Top Node)
             └──> Seq Scan on activities
 ```
 
-PostgreSQL executes a plan top down, that is, it starts with producing the first result row for the top node. The executor processes lower nodes “on demand”, that is, it fetches only as many result rows from them as it needs to calculate the next result of the upper node. This influences how you have to read “cost” and “time”: the startup time for the upper node is at least as high as the startup time of the lower nodes, and the same holds for the total time. If you want to find the net time spent in a node, you have to subtract the time spent in the lower nodes. Parallel queries make that even more complicated.
+Postgres executes a plan top down, that is, it starts with producing the first result row for the top node. The executor processes lower nodes “on demand”, that is, it fetches only as many result rows from them as it needs to calculate the next result of the upper node. This influences how you have to read “cost” and “time”: the startup time for the upper node is at least as high as the startup time of the lower nodes, and the same holds for the total time. If you want to find the net time spent in a node, you have to subtract the time spent in the lower nodes. Parallel queries make that even more complicated.
 
 On top of that, you have to multiply the cost and the time with the number of “loops” to get the total time spent in a node.
 
-### Common nodes in PostgreSQL explain output
+### Common nodes in Postgres explain output
 
 | Node Type             | Description                                                                  |
 | --------------------- | ---------------------------------------------------------------------------- |
