@@ -6,7 +6,6 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -273,7 +272,7 @@ const FeedbackWidget = ({
               onClick={() => {
                 sendFeedback()
                 sendEvent({
-                  action: TelemetryActions.SEND_FEEDBACK_BUTTON_CLICKED,
+                  action: 'send_feedback_button_clicked',
                   groups: { project: ref, organization: org?.slug },
                 })
               }}

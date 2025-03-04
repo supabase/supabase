@@ -1,6 +1,5 @@
 export const COLUMNS_SQL = /* SQL */ `
 -- Adapted from information_schema.columns
-
 SELECT
   c.oid :: int8 AS table_id,
   nc.nspname AS schema,

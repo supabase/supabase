@@ -4,6 +4,7 @@ import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList, coalesceRowsToArray } from './helpers'
 import { VIEWS_SQL } from './sql/views'
 import { COLUMNS_SQL } from './sql/columns'
+import { pgColumnArrayZod } from './pg-meta-columns'
 
 export const pgViewZod = z.object({
   id: z.number(),
@@ -11,30 +12,7 @@ export const pgViewZod = z.object({
   name: z.string(),
   is_updatable: z.boolean(),
   comment: z.string().nullable(),
-  columns: z
-    .array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        table_id: z.number(),
-        ordinal_position: z.number(),
-        data_type: z.string(),
-        format: z.string(),
-        is_nullable: z.boolean(),
-        is_identity: z.boolean(),
-        is_generated: z.boolean(),
-        is_updatable: z.boolean(),
-        is_unique: z.boolean(),
-        enums: z.array(z.string()),
-        check: z.string().nullable(),
-        default_value: z.string().nullable(),
-        schema: z.string(),
-        table: z.string(),
-        comment: z.string().nullable(),
-        identity_generation: z.string().nullable(),
-      })
-    )
-    .optional(),
+  columns: pgColumnArrayZod.optional(),
 })
 
 export type PGView = z.infer<typeof pgViewZod>

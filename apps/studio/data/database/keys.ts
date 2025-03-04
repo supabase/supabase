@@ -35,4 +35,8 @@ export const databaseKeys = {
     ['projects', projectRef, 'database-size'] as const,
   maxConnections: (projectRef: string | undefined) =>
     ['projects', projectRef, 'max-connections'] as const,
+  pgbouncerStatus: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'pgbouncer', 'status'] as const,
+  pgbouncerConfig: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'pgbouncer', 'config'] as const,
 }

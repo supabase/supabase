@@ -20,6 +20,31 @@ export type CustomerStoryType = {
 export const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
+    title: 'Scaling Innovation with Supabase: Meshy’s Migration to Cost-Effective Authentication',
+    description:
+      'Discover how a rapidly growing Meshy migrated from an expensive authentication model with Auth0 to Supabase Auth, and significantly reduced their costs.',
+    organization: 'Meshy',
+    imgUrl: 'images/customers/logos/meshy.png',
+    logo: '/images/customers/logos/meshy.png',
+    logo_inverse: '/images/customers/logos/light/meshy.png',
+    url: '/customers/meshy',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
+    title:
+      'Scaling Beyond No-Code: asap.work’s Journey to a Faster, Flexible Solution with Supabase',
+    description:
+      'asap.work is a construction recruitment startup founded by industry experts from Adecco and Manpower. Using their knowledge and experience of the construction recruitment industry, asap.work focuses on providing a fair marketplace for temporary construction workers and fair pricing for clients.',
+    organization: 'Asap.work',
+    imgUrl: 'images/customers/logos/asap-work.png',
+    logo: '/images/customers/logos/asap-work.png',
+    logo_inverse: '/images/customers/logos/light/asap-work.png',
+    url: '/customers/asap-work',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
     title:
       "Maergo's Express Delivery: How Supabase Helped Achieve Scalability, Speed, and Cost Saving",
     description:

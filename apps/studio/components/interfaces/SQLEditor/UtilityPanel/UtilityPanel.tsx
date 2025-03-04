@@ -4,6 +4,8 @@ import { useParams } from 'common'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { Snippet } from 'data/content/sql-folders-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
 import { ChartConfig } from './ChartConfig'
@@ -41,10 +43,13 @@ const UtilityPanel = ({
   onDebug,
 }: UtilityPanelProps) => {
   const { ref } = useParams()
+  const org = useSelectedOrganization()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const snippet = snapV2.snippets[id]?.snippet
   const result = snapV2.results[id]?.[0]
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
@@ -119,6 +124,24 @@ const UtilityPanel = ({
               type="text"
               results={result.rows as any[]}
               fileName={`Supabase Snippet ${snippet.name}`}
+              onDownloadAsCSV={() =>
+                sendEvent({
+                  action: 'sql_editor_result_download_csv_clicked',
+                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
+                })
+              }
+              onCopyAsMarkdown={() => {
+                sendEvent({
+                  action: 'sql_editor_result_copy_markdown_clicked',
+                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
+                })
+              }}
+              onCopyAsJSON={() => {
+                sendEvent({
+                  action: 'sql_editor_result_copy_json_clicked',
+                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
+                })
+              }}
             />
           )}
         </div>
