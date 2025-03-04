@@ -26,7 +26,33 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
   const LogDetails = () => {
     if (error) return <LogErrorState error={error} />
     if (!log) return <LogDetailEmptyState />
-    return <DefaultPreviewSelectionRenderer log={log} />
+
+    switch (queryType) {
+      // case 'warehouse':
+      //   return <WarehouseSelectionRenderer log={log} />
+      case 'api':
+        const status = log?.metadata?.[0]?.response?.[0]?.status_code
+        const method = log?.metadata?.[0]?.request?.[0]?.method
+        const path = log?.metadata?.[0]?.request?.[0]?.path
+        const user_agent = log?.metadata?.[0]?.request?.[0]?.headers[0].user_agent
+        const { id, metadata, timestamp, event_message, ...rest } = log
+
+        const apiLog = {
+          id,
+          status,
+          method,
+          path,
+          user_agent,
+          timestamp,
+          event_message,
+          metadata,
+          ...rest,
+        }
+
+        return <DefaultPreviewSelectionRenderer log={apiLog} />
+      default:
+        return <DefaultPreviewSelectionRenderer log={log} />
+    }
   }
 
   return (

@@ -25,12 +25,16 @@ functions:
         name: Initialize Client
         code: |
           ```swift
+          import Supabase
+
           let client = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "public-anon-key")
           ```
       - id: initialize-client-custom-options
         name: Initialize Client with custom options
         code: |
           ```swift
+          import Supabase
+
           let client = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "public-anon-key",
@@ -53,6 +57,8 @@ functions:
         name: Initialize Client with Logging
         code: |
           ```swift
+          import Supabase
+
           struct AppLogger: SupabaseLogger {
             func log(message: SupabaseLogMessage) {
               print(message.description)
@@ -73,6 +79,8 @@ functions:
         name: With custom schemas
         code: |
           ```swift
+          import Supabase
+
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "public-anon-key",
@@ -4017,7 +4025,7 @@ functions:
             DeleteAction.self,
             schema: "public",
             table: "users",
-            filter: "id=eq.1"
+            filter: .eq(id, value: 1)
           )
 
           await channel.subscribe()
@@ -4036,7 +4044,7 @@ functions:
             DeleteAction.self,
             schema: "public",
             table: "users",
-            filter: "id=eq.1"
+            filter: .eq(id, value: 1)
           ) { deletion in
             print("Deleted: \(deletion.oldRecord)")
           }
