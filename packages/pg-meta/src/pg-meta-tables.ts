@@ -4,27 +4,7 @@ import { TABLES_SQL } from './sql/tables'
 import { COLUMNS_SQL } from './sql/columns'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { ident, literal } from './pg-format'
-
-const pgTableColumnZod = z.object({
-  id: z.string().regex(/^(\d+)\.(\d+)$/),
-  table_id: z.number().optional(),
-  name: z.string(),
-  schema: z.string(),
-  table: z.string(),
-  is_identity: z.boolean(),
-  is_generated: z.boolean(),
-  is_nullable: z.boolean(),
-  is_unique: z.boolean(),
-  is_updatable: z.boolean(),
-  identity_generation: z.string().nullable(),
-  default_value: z.string().nullable(),
-  data_type: z.string(),
-  format: z.string(),
-  enums: z.array(z.string()),
-  check: z.string().nullable(),
-  comment: z.string().nullable(),
-  ordinal_position: z.number(),
-})
+import { pgColumnArrayZod } from './pg-meta-columns'
 
 const pgTablePrimaryKeyZod = z.object({
   table_id: z.number(),
@@ -58,7 +38,7 @@ const pgTableZod = z.object({
   comment: z.string().nullable(),
   primary_keys: z.array(pgTablePrimaryKeyZod),
   relationships: z.array(pgTableRelationshipZod),
-  columns: z.array(pgTableColumnZod).optional(),
+  columns: pgColumnArrayZod.optional(),
 })
 
 const pgTableArrayZod = z.array(pgTableZod)
