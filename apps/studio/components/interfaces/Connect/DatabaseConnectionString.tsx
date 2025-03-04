@@ -377,7 +377,7 @@ export const DatabaseConnectionString = () => {
                 ]}
                 onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
               />
-              {ipv4Addon && (
+              {ipv4Addon && !isPgBouncerEnabled && (
                 <Admonition
                   type="warning"
                   title="Highly recommended to not use Session Pooler"
