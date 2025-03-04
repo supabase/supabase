@@ -7,12 +7,12 @@ import { PROJECT_STATUS } from 'lib/constants'
 import { ResponseError } from 'types'
 import { lintKeys } from './keys'
 
-export type ProjectLintsVariables = {
+type ProjectLintsVariables = {
   projectRef?: string
 }
-export type ProjectLintResponse = components['schemas']['ProjectLintResponse']
-export type Lint = ProjectLintResponse
-export type LINT_TYPES = ProjectLintResponse['name']
+type ProjectLintResponse = components['schemas']['GetProjectLintsResponseDto']
+export type Lint = ProjectLintResponse[0]
+export type LINT_TYPES = ProjectLintResponse[0]['name']
 
 export async function getProjectLints({ projectRef }: ProjectLintsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('Project ref is required')
