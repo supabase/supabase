@@ -207,6 +207,7 @@ allow_list = [
     "PGAudit",
     "PGroonga",
     "PgBouncer",
+    "PHI",
     "PingIdentity",
     # For historical purposes
     "POSTGRES",
