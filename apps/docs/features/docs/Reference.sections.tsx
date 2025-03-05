@@ -12,7 +12,6 @@ import {
 import ApiSchema from '~/components/ApiSchema'
 import { REFERENCES } from '~/content/navigation.references'
 import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
-import { MDXProviderReference } from '~/features/docs/Reference.mdx.client'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import {
   getApiEndpointById,
@@ -48,18 +47,16 @@ async function RefSections({ libraryId, version }: RefSectionsProps) {
   flattenedSections = trimIntro(flattenedSections)
 
   return (
-    <MDXProviderReference>
-      <div className="flex flex-col my-16 gap-16">
-        {flattenedSections
-          .filter((section) => section.type !== 'category')
-          .map((section, idx) => (
-            <Fragment key={`${section.id}-${idx}`}>
-              <SectionDivider />
-              <SectionSwitch libraryId={libraryId} version={version} section={section} />
-            </Fragment>
-          ))}
-      </div>
-    </MDXProviderReference>
+    <div className="flex flex-col my-16 gap-16">
+      {flattenedSections
+        .filter((section) => section.type !== 'category')
+        .map((section, idx) => (
+          <Fragment key={`${section.id}-${idx}`}>
+            <SectionDivider />
+            <SectionSwitch libraryId={libraryId} version={version} section={section} />
+          </Fragment>
+        ))}
+    </div>
   )
 }
 
