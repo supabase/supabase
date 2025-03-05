@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
-import { useDockerHubStudioVersionsQuery } from 'data/misc/docker-hub-versions-query'
+import { useCLIReleaseVersionQuery } from 'data/misc/cli-release-version-query'
 import { STUDIO_VERSION } from 'lib/constants'
 import {
   Badge,
@@ -25,29 +25,38 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
+/**
+ * TODO: Chat with Qiao how we can pass the CLI version into the env var for STUDIO_VERSION
+ * Ideally we can also mark the beta version via STUDIO_VERSION too
+ *
+ */
+
 export const LocalVersionPopover = () => {
-  const { data } = useDockerHubStudioVersionsQuery()
-  const hasLatestVersionCheck = !!data?.latest
+  const { data, isSuccess } = useCLIReleaseVersionQuery()
+  const hasLatestCLIVersion = isSuccess && !!data?.latest
   const isLatestVersion = data?.latest === STUDIO_VERSION
 
-  const approximateNextRelease = !!data?.last_updated_at
-    ? dayjs(data?.last_updated_at).utc().add(14, 'day').format('DD MMM YYYY')
+  // [Joshen] This is just scaffolding
+  const isBeta = true ///(data?.latest ?? '').includes('beta')
+
+  const approximateNextRelease = !!data?.published_at
+    ? dayjs(data?.published_at).utc().add(14, 'day').format('DD MMM YYYY')
     : undefined
+
+  if (!isSuccess) return null
 
   return (
     <Popover_Shadcn_>
       <PopoverTrigger_Shadcn_ className="flex items-center">
-        <Badge variant={isLatestVersion ? 'default' : 'brand'}>
-          {isLatestVersion ? 'Latest' : 'Update available'}
+        <Badge variant={isBeta ? 'warning' : isLatestVersion ? 'default' : 'brand'}>
+          {isBeta ? 'Beta' : isLatestVersion ? 'Latest' : 'Update available'}
         </Badge>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ align="end" className="w-80 px-0">
-        {hasLatestVersionCheck ? (
-          !isLatestVersion ? (
+        {hasLatestCLIVersion ? (
+          !isBeta && !isLatestVersion ? (
             <div className="px-4 mb-3">
-              <p className="text-sm mb-2">
-                A new version of Supabase Studio is available and can be updated via the CLI:
-              </p>
+              <p className="text-sm mb-2">A new version of Supabase CLI is available:</p>
               <Tabs_Shadcn_ defaultValue="macos">
                 <TabsList_Shadcn_ className="mt-2">
                   <TabsTrigger_Shadcn_ className="px-2 text-xs" value="macos">
@@ -87,15 +96,21 @@ export const LocalVersionPopover = () => {
             </div>
           ) : (
             <div className="px-4 mb-3">
-              <p className="text-sm">You're on the latest version of Studio</p>
+              {isBeta ? (
+                <p className="text-sm">You're on the Beta version of Supabase CLI</p>
+              ) : (
+                <p className="text-sm">You're on the latest version of Supabase CLI</p>
+              )}
             </div>
           )
         ) : null}
 
         <div className="flex flex-col gap-y-2 px-4">
           <p className="text-xs text-foreground-lighter">
-            All available image versions of Supabase Studio can be found on our{' '}
-            <InlineLink href="https://hub.docker.com/r/supabase/studio/tags">Docker Hub</InlineLink>
+            All available release versions of the CLI can be found on our{' '}
+            <InlineLink href="https://github.com/supabase/cli/releases">
+              GitHub repository
+            </InlineLink>
             .
           </p>
         </div>
@@ -155,7 +170,7 @@ export const LocalVersionPopover = () => {
             <p className="text-xs">Current version:</p>
             <p className="text-sm font-mono">{STUDIO_VERSION}</p>
           </div>
-          {hasLatestVersionCheck && !isLatestVersion && (
+          {hasLatestCLIVersion && !isLatestVersion && !isBeta && (
             <div className="flex flex-col gap-y-1">
               <p className="text-xs">Available version:</p>
               <p className="text-sm font-mono">{data.latest}</p>
