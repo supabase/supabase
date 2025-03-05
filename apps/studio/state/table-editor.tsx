@@ -136,6 +136,13 @@ export const createTableEditorState = () => {
     },
 
     /* Rows */
+    selectedRows: proxySet<number>(),
+    allRowsSelected: false,
+    setSelectedRows: (rows: Set<number>, selectAll?: boolean) => {
+      state.allRowsSelected = selectAll ?? false
+      state.selectedRows = proxySet(rows)
+    },
+
     onAddRow: () => {
       state.ui = {
         open: 'side-panel',
@@ -161,6 +168,12 @@ export const createTableEditorState = () => {
         open: 'confirmation-dialog',
         confirmationDialog: { type: 'row', rows, numRows, allRowsSelected, callback },
       }
+    },
+
+    /* Cells */
+    selectedCellPosition: null as { idx: number; rowIdx: number } | null,
+    setSelectedCellPosition: (position: { idx: number; rowIdx: number } | null) => {
+      state.selectedCellPosition = position
     },
 
     /* Misc */
@@ -221,3 +234,5 @@ export const useTableEditorStateSnapshot = (options?: Parameters<typeof useSnaps
   const state = useContext(TableEditorStateContext)
   return useSnapshot(state, options)
 }
+
+export type TableEditorStateSnapshot = ReturnType<typeof useTableEditorStateSnapshot>
