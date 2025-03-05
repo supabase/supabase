@@ -28,17 +28,17 @@ export const METRIC_CATEGORIES = {
     key: 'api_database',
   },
   API_AUTH: {
-    label: 'Auth API',
+    label: 'Authentication',
     icon: (className?: string) => <Auth size={16} className={className} />,
     key: 'api_auth',
   },
   API_STORAGE: {
-    label: 'Storage API',
+    label: 'Storage',
     icon: (className?: string) => <Storage size={16} className={className} />,
     key: 'api_storage',
   },
   API_REALTIME: {
-    label: 'Realtime API',
+    label: 'Realtime',
     icon: (className?: string) => <Realtime size={16} className={className} />,
     key: 'api_realtime',
   },
@@ -54,6 +54,7 @@ export const METRIC_CATEGORIES = {
   },
 }
 
+// [Joshen] Eventually we can remove some charts here from DEPRECATED_REPORTS from Reports.constants.ts
 export const METRICS: Metric[] = [
   {
     key: 'avg_cpu_usage',
@@ -94,6 +95,12 @@ export const METRICS: Metric[] = [
   {
     key: 'total_realtime_requests',
     label: 'Realtime Connection Requests',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_REALTIME,
+  },
+  {
+    key: 'total_realtime_ingress',
+    label: 'Realtime Connection Ingress',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_REALTIME,
   },
@@ -143,6 +150,12 @@ export const METRICS: Metric[] = [
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_DATABASE,
   },
+  {
+    key: 'total_rest_options_requests',
+    label: 'API OPTIONS Requests',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_DATABASE,
+  },
 
   /**
    * Auth
@@ -161,6 +174,12 @@ export const METRICS: Metric[] = [
     category: METRIC_CATEGORIES.API_AUTH,
   },
   {
+    key: 'total_auth_ingress',
+    label: 'Auth Ingress',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_AUTH,
+  },
+  {
     key: 'total_auth_egress',
     label: 'Auth Egress',
     provider: 'daily-stats',
@@ -169,6 +188,30 @@ export const METRICS: Metric[] = [
   {
     key: 'total_auth_requests',
     label: 'Auth Requests',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_AUTH,
+  },
+  {
+    key: 'total_auth_get_requests',
+    label: 'Auth GET Requests',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_AUTH,
+  },
+  {
+    key: 'total_auth_post_requests',
+    label: 'Auth POST Requests',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_AUTH,
+  },
+  {
+    key: 'total_auth_patch_requests',
+    label: 'Auth PATCH Requests',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_AUTH,
+  },
+  {
+    key: 'total_auth_options_requests',
+    label: 'Auth OPTIONS Requests',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API_AUTH,
   },
@@ -219,6 +262,12 @@ export const METRICS: Metric[] = [
     category: METRIC_CATEGORIES.API_STORAGE,
   },
   {
+    key: 'total_storage_options_requests',
+    label: 'Storage OPTIONS Requests',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_STORAGE,
+  },
+  {
     key: 'total_auth_delete_requests',
     label: 'Auth DELETE Requests',
     provider: 'daily-stats',
@@ -237,6 +286,12 @@ export const METRICS: Metric[] = [
     label: 'All GET Requests',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API,
+  },
+  {
+    key: 'total_storage_patch_requests',
+    label: 'Storage PATCH Requests',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API_STORAGE,
   },
   {
     key: 'total_requests',
@@ -266,6 +321,12 @@ export const METRICS: Metric[] = [
   {
     key: 'total_delete_requests',
     label: 'All DELETE Requests',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.API,
+  },
+  {
+    key: 'total_options_requests',
+    label: 'All OPTIONS Requests',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API,
   },
