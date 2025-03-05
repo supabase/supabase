@@ -28,7 +28,7 @@ export default function ViewEntityAutofixSecurityModal({
       connectionString: project?.connectionString,
     },
     {
-      enabled: isViewLike(table),
+      enabled: isAutofixViewSecurityModalOpen && isViewLike(table),
     }
   )
 
