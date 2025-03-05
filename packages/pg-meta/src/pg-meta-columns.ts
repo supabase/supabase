@@ -26,7 +26,7 @@ const pgColumnZod = z.object({
 })
 
 export const pgColumnArrayZod = z.array(pgColumnZod)
-export const pgColumnOptionalZod = z.optional(pgColumnZod)
+const pgColumnOptionalZod = z.optional(pgColumnZod)
 
 export type PGColumn = z.infer<typeof pgColumnZod>
 

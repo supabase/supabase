@@ -24,3 +24,7 @@ export function filterByList(include?: string[], exclude?: string[], defaultExcl
   }
   return ''
 }
+
+export function exceptionIdentifierNotFound(entityName: string, whereClause: string) {
+  return `raise exception 'Cannot find ${entityName} with: %', ${literal(whereClause)};`
+}
