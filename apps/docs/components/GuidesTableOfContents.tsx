@@ -3,25 +3,9 @@
 import { usePathname } from 'next/navigation'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
-import { proxy, useSnapshot } from 'valtio'
 import { Feedback } from '~/components/Feedback'
 import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns'
 import { useTocAnchors } from '../features/docs/GuidesMdx.client'
-
-const tocRenderSwitch = proxy({
-  renderFlag: 0,
-  toggleRenderFlag: () => void (tocRenderSwitch.renderFlag = (tocRenderSwitch.renderFlag + 1) % 2),
-})
-
-const useSubscribeTocRerender = () => {
-  const { renderFlag } = useSnapshot(tocRenderSwitch)
-  return void renderFlag // Prevent it from being detected as unused code
-}
-
-const useTocRerenderTrigger = () => {
-  const { toggleRenderFlag } = useSnapshot(tocRenderSwitch)
-  return toggleRenderFlag
-}
 
 interface TOCHeader {
   id?: string
@@ -31,7 +15,6 @@ interface TOCHeader {
 }
 
 const GuidesTableOfContents = ({ className, video }: { className?: string; video?: string }) => {
-  useSubscribeTocRerender()
   const pathname = usePathname()
   const { toc } = useTocAnchors()
 
@@ -64,5 +47,4 @@ const GuidesTableOfContents = ({ className, video }: { className?: string; video
 }
 
 export default GuidesTableOfContents
-export { useTocRerenderTrigger }
 export type { TOCHeader }

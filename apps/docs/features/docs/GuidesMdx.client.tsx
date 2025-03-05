@@ -1,5 +1,7 @@
 'use client'
 
+import { proxy, useSnapshot } from 'valtio'
+
 /**
  * The MDXProvider is necessary so that MDX partials will have access
  * to components.
@@ -27,8 +29,24 @@ const useTocAnchors = () => {
   return context
 }
 
+const useTocRerenderTrigger = () => {
+  const { toggleRenderFlag } = useSnapshot(tocRenderSwitch)
+  return toggleRenderFlag
+}
+
+const tocRenderSwitch = proxy({
+  renderFlag: 0,
+  toggleRenderFlag: () => void (tocRenderSwitch.renderFlag = (tocRenderSwitch.renderFlag + 1) % 2),
+})
+
+const useSubscribeTocRerender = () => {
+  const { renderFlag } = useSnapshot(tocRenderSwitch)
+  return void renderFlag // Prevent it from being detected as unused code
+}
+
 const TocAnchorsProvider = ({ children }: PropsWithChildren) => {
   const [tocList, setTocList] = useState<TOCHeader[]>([])
+  useSubscribeTocRerender()
 
   const displayedList = tocList
   const toc = displayedList.map((item) => ({
@@ -83,4 +101,4 @@ const MDXProviderGuides = ({ children }: PropsWithChildren) => {
   return <MDXProvider components={components}>{children}</MDXProvider>
 }
 
-export { MDXProviderGuides, TocAnchorsProvider, useTocAnchors }
+export { MDXProviderGuides, TocAnchorsProvider, useTocAnchors, useTocRerenderTrigger }
