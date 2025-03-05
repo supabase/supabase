@@ -82,7 +82,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { aiAssistantPanel } = useAppStateSnapshot()
   const {
     messages: assistantMessages,
-    saveMessages,
+    saveMessage,
     clearMessages,
     closeAssistant,
     clearSqlSnippets,
@@ -95,6 +95,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
+
+  // Add a ref to store the last user message
+  const lastUserMessageRef = useRef<MessageType | null>(null)
 
   const [value, setValue] = useState<string>(initialInput)
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
@@ -130,6 +133,21 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     toast.error(errorMessage)
   }, [])
 
+  // Handle completion of the assistant's response
+  const handleChatFinish = useCallback(
+    (message: MessageType) => {
+      // If we have a user message stored in the ref, save both messages
+      if (lastUserMessageRef.current) {
+        saveMessage([lastUserMessageRef.current, message])
+        lastUserMessageRef.current = null
+      } else {
+        // Otherwise just save the assistant message
+        saveMessage(message)
+      }
+    },
+    [saveMessage]
+  )
+
   const {
     messages: chatMessages,
     isLoading: isChatLoading,
@@ -148,12 +166,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       table: currentTable?.name,
     },
     onError: handleError,
+    onFinish: handleChatFinish,
   })
-
-  // Watch messages and save back to global state when changes
-  useEffect(() => {
-    saveMessages(chatMessages)
-  }, [chatMessages, saveMessages])
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
@@ -178,6 +192,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     const payload = { role: 'user', createdAt: new Date(), content } as MessageType
     const headerData = await constructHeaders()
     clearSqlSnippets()
+
+    // Store the user message in the ref before appending
+    lastUserMessageRef.current = payload
+
     append(payload, {
       headers: { Authorization: headerData.get('Authorization') ?? '' },
     })
@@ -224,6 +242,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const handleClearMessages = () => {
     clearMessages()
     setMessages([])
+    lastUserMessageRef.current = null
   }
 
   // Update scroll behavior for new messages
@@ -235,7 +254,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     if (isSticky) {
       setTimeout(scrollToEnd, 0)
     }
-  }, [isChatLoading, isSticky, scrollToEnd, chatMessages])
+  }, [isChatLoading, isSticky, scrollToEnd])
 
   useEffect(() => {
     setValue(initialInput)

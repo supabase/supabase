@@ -113,12 +113,11 @@ export function useAssistant(options?: UseAssistantOptions) {
 
   const handleSelectChat = useCallback(
     (id: string) => {
-      if (projectRef && chats && id in chats) {
-        const chat = projectChatsRecord[id]
-        if (chat) {
-          // Check if this is already the active chat
-          if (id === activeChatId) {
-            // If it's already the active chat, no need to update state
+      if (id !== activeChatId) {
+        if (projectRef && projectChatsRecord) {
+          // Check if the selected chat exists and belongs to the current project
+          const targetChat = projectChatsRecord[id]
+          if (!targetChat) {
             return
           }
 
@@ -128,7 +127,7 @@ export function useAssistant(options?: UseAssistantOptions) {
         }
       }
     },
-    [activeChatId, chats, projectChatsRecord, projectRef, setAiAssistantPanel]
+    [activeChatId, projectRef, setAiAssistantPanel]
   )
 
   const handleDeleteChat = useCallback(
@@ -197,61 +196,32 @@ export function useAssistant(options?: UseAssistantOptions) {
   }, [activeChatId, chats, currentChatBelongsToProject, projectChatsRecord, setAiAssistantPanel])
 
   const handleSaveMessage = useCallback(
-    (message: MessageType) => {
+    (message: MessageType | MessageType[]) => {
       if (projectRef && currentChatBelongsToProject && activeChatId) {
         // Get the existing messages for the active chat
-        const existingMessages = projectChatsRecord[activeChatId]?.messages || []
-        const messageExists = existingMessages.some(
-          (msg: any) =>
-            msg.id === message.id || (msg.content === message.content && msg.role === message.role)
-        )
+        const existingMessages: readonly MessageType[] =
+          projectChatsRecord[activeChatId]?.messages || []
 
-        if (!messageExists) {
-          const newMessages = [...existingMessages, message]
+        // Convert single message to array for consistent handling
+        const messagesToAdd = Array.isArray(message)
+          ? message.filter((msg) => !existingMessages.some((existing) => existing.id === msg.id))
+          : !existingMessages.some((existing) => existing.id === message.id)
+            ? [message]
+            : []
 
-          // Update chat messages
-          setAiAssistantPanel({
+        if (messagesToAdd.length > 0) {
+          const chatUpdate = {
             chats: {
               ...chats,
               [activeChatId]: {
                 ...projectChatsRecord[activeChatId],
-                messages: newMessages,
+                messages: [...existingMessages, ...messagesToAdd],
                 updatedAt: new Date(),
               },
-            } as any,
-          })
-        }
-      }
-    },
-    [
-      chats,
-      activeChatId,
-      currentChatBelongsToProject,
-      projectRef,
-      projectChatsRecord,
-      setAiAssistantPanel,
-    ]
-  )
-
-  const handleSaveMessages = useCallback(
-    (messages: MessageType[]) => {
-      if (projectRef && currentChatBelongsToProject && activeChatId) {
-        // Get the current messages to compare
-        const currentMessages = projectChatsRecord[activeChatId]?.messages || []
-
-        // Check if the messages array is actually different before updating
-        // This prevents circular updates
-        if (JSON.stringify(currentMessages) !== JSON.stringify(messages)) {
-          // Update chat messages
+            },
+          }
           setAiAssistantPanel({
-            chats: {
-              ...chats,
-              [activeChatId]: {
-                ...projectChatsRecord[activeChatId],
-                messages,
-                updatedAt: new Date(),
-              },
-            } as any,
+            chats: chatUpdate.chats as Record<string, ChatSession>,
           })
         }
       }
@@ -336,7 +306,6 @@ export function useAssistant(options?: UseAssistantOptions) {
     renameChat: handleRenameChat,
     clearMessages: handleClearMessages,
     saveMessage: handleSaveMessage,
-    saveMessages: handleSaveMessages,
     openAssistant,
     closeAssistant,
     clearSqlSnippets,

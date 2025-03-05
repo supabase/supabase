@@ -27,7 +27,7 @@ export type ChatSession = {
   id: string
   name: string
   projectRef: string
-  messages: MessageType[]
+  messages: readonly MessageType[]
   createdAt: Date
   updatedAt: Date
 }
