@@ -41,7 +41,6 @@ export const USAGE_APPROACHING_THRESHOLD = 0.75
 
 export const LOCAL_STORAGE_KEYS = {
   AI_ASSISTANT_STATE: 'supabase-ai-assistant-state',
-  AI_ASSISTANT_CHATS: (projectRef: string) => `supabase-ai-assistant-chats-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
   EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
 

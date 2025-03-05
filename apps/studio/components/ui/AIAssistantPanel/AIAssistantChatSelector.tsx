@@ -25,7 +25,7 @@ interface AIAssistantChatSelectorProps {
 export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorProps) => {
   const router = useRouter()
   const projectRef = typeof router.query.ref === 'string' ? router.query.ref : undefined
-  const { projectChats, activeChatId, selectChat, deleteChat, renameChat } = useAssistant({
+  const { chats, activeChatId, selectChat, deleteChat, renameChat, newChat } = useAssistant({
     projectRef,
   })
 
@@ -64,12 +64,24 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
     }
   }
 
-  const handleCancelEditChat = (e?: React.MouseEvent) => {
+  const handleCancelEditChat = (e?: React.MouseEvent | React.FocusEvent) => {
     if (e) {
       e.stopPropagation()
     }
     setEditingChatId(null)
     setEditingChatName('')
+  }
+
+  const handleInputBlur = (e: React.FocusEvent) => {
+    e.stopPropagation()
+    const relatedTarget = e.relatedTarget as HTMLElement | null
+    const isSaveOrCancelButton = relatedTarget?.closest('button')
+
+    if (!isSaveOrCancelButton && editingChatId && editingChatName.trim()) {
+      handleSaveEditChat()
+    } else if (!isSaveOrCancelButton) {
+      handleCancelEditChat(e)
+    }
   }
 
   return (
@@ -88,15 +100,15 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>No chats found.</CommandEmpty_Shadcn_>
             <CommandGroup_Shadcn_>
-              {projectChats.map(([id, chat]) => (
+              {chats.map(([id, chat]) => (
                 <CommandItem_Shadcn_
                   key={id}
                   value={id}
                   onSelect={() => handleSelectChat(id)}
-                  className="flex items-center justify-between gap-2 py-1"
+                  className="flex items-center justify-between gap-2 py-1 w-full overflow-hidden"
                   keywords={[chat.name]}
                 >
-                  <div className="flex items-center w-full">
+                  <div className="flex items-center w-full flex-1 min-w-0">
                     {editingChatId === id ? (
                       <div className="flex items-center gap-2 w-full">
                         <Input_Shadcn_
@@ -106,11 +118,16 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
                           size="tiny"
                           className="flex-1 w-full"
                           onClick={(e) => e.stopPropagation()}
+                          onBlur={handleInputBlur}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                               e.preventDefault()
                               e.stopPropagation()
                               handleSaveEditChat()
+                            } else if (e.key === 'Escape') {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              handleCancelEditChat()
                             }
                           }}
                         />
@@ -135,16 +152,16 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
                       <>
                         <Check
                           className={cn(
-                            'mr-2 h-4 w-4',
+                            'mr-2 h-4 w-4 flex-shrink-0',
                             activeChatId === id ? 'opacity-100' : 'opacity-0'
                           )}
                         />
-                        <span className="truncate max-w-[150px]">{chat.name}</span>
+                        <span className="truncate flex-1 min-w-0 overflow-hidden">{chat.name}</span>
                       </>
                     )}
                   </div>
                   {editingChatId !== id && (
-                    <div className="flex items-center gap-0">
+                    <div className="flex items-center gap-0 shrink-0">
                       <Button
                         type="text"
                         size="tiny"

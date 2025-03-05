@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
 import { ArrowDown, FileText, Info, RefreshCw, X, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { toast } from 'sonner'
 
 import { useParams, useSearchParamsShallow } from 'common/hooks'
@@ -64,12 +64,11 @@ const MemoizedMessage = memo(
 MemoizedMessage.displayName = 'MemoizedMessage'
 
 interface AIAssistantProps {
-  id: string
   initialMessages?: MessageType[] | undefined
   className?: string
 }
 
-export const AIAssistant = ({ id, initialMessages, className }: AIAssistantProps) => {
+export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
@@ -80,13 +79,16 @@ export const AIAssistant = ({ id, initialMessages, className }: AIAssistantProps
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
-  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { aiAssistantPanel } = useAppStateSnapshot()
   const {
     messages: assistantMessages,
-    saveMessage,
+    saveMessages,
     clearMessages,
     closeAssistant,
     newChat,
+    clearSuggestions,
+    setSqlSnippets,
+    activeChatId,
   } = useAssistant({ projectRef: project?.ref })
   const { open, initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
@@ -94,12 +96,7 @@ export const AIAssistant = ({ id, initialMessages, className }: AIAssistantProps
   const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
 
   const [value, setValue] = useState<string>(initialInput)
-  const [assistantError, setAssistantError] = useState<string>()
-  const [lastSentMessage, setLastSentMessage] = useState<MessageType>()
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
-  const [localInitialMessages, setLocalInitialMessages] = useState<MessageType[] | undefined>(
-    initialMessages
-  )
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -127,16 +124,21 @@ export const AIAssistant = ({ id, initialMessages, className }: AIAssistantProps
   const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
+  const handleError = useCallback((error: Error) => {
+    const errorMessage = JSON.parse(error.message).message
+    toast.error(errorMessage)
+  }, [])
+
   const {
     messages: chatMessages,
     isLoading: isChatLoading,
     append,
     setMessages,
   } = useChat({
-    id,
+    id: activeChatId || 'default',
     api: `${BASE_PATH}/api/ai/sql/generate-v3`,
     maxSteps: 5,
-    initialMessages: localInitialMessages,
+    initialMessages: assistantMessages,
     body: {
       includeSchemaMetadata,
       projectRef: project?.ref,
@@ -144,38 +146,32 @@ export const AIAssistant = ({ id, initialMessages, className }: AIAssistantProps
       schema: currentSchema,
       table: currentTable?.name,
     },
-    onFinish: (message) => saveMessage(message),
-    onError: (error) => {
-      const errorMessage = JSON.parse(error.message).message
-      toast.error(errorMessage)
-    },
+    onError: handleError,
   })
+
+  // Watch messages and save back to global state when changes
+  useEffect(() => {
+    saveMessages(chatMessages)
+  }, [chatMessages, saveMessages])
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
-  const messages = useMemo(() => {
-    return [
-      ...chatMessages,
-      ...(assistantError !== undefined && lastSentMessage !== undefined ? [lastSentMessage] : []),
-    ]
-  }, [chatMessages, assistantError, lastSentMessage])
-
   const renderedMessages = useMemo(
     () =>
-      messages.map((message) => {
+      chatMessages.map((message) => {
         return (
           <MemoizedMessage
             key={message.id}
             message={message}
-            isLoading={isChatLoading && message.id === messages[messages.length - 1].id}
+            isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
           />
         )
       }),
-    [messages, isChatLoading]
+    [chatMessages, isChatLoading]
   )
 
-  const hasMessages = messages.length > 0
+  const hasMessages = chatMessages.length > 0
 
   const sendMessageToAssistant = async (content: string) => {
     const payload = { role: 'user', createdAt: new Date(), content } as MessageType
@@ -184,11 +180,7 @@ export const AIAssistant = ({ id, initialMessages, className }: AIAssistantProps
       headers: { Authorization: headerData.get('Authorization') ?? '' },
     })
 
-    setAiAssistantPanel({ sqlSnippets: undefined, messages: [...messages, payload] })
-    saveMessage(payload)
     setValue('')
-    setAssistantError(undefined)
-    setLastSentMessage(payload)
 
     if (content.includes('Help me to debug')) {
       sendEvent({
@@ -229,7 +221,6 @@ export const AIAssistant = ({ id, initialMessages, className }: AIAssistantProps
 
   const handleClearMessages = () => {
     clearMessages()
-    setLocalInitialMessages([])
     setMessages([])
   }
 
@@ -242,7 +233,7 @@ export const AIAssistant = ({ id, initialMessages, className }: AIAssistantProps
     if (isSticky) {
       setTimeout(scrollToEnd, 0)
     }
-  }, [isChatLoading, isSticky, scrollToEnd, messages])
+  }, [isChatLoading, isSticky, scrollToEnd, chatMessages])
 
   useEffect(() => {
     setValue(initialInput)
@@ -255,21 +246,16 @@ export const AIAssistant = ({ id, initialMessages, className }: AIAssistantProps
   // Remove suggestions if sqlSnippets were removed
   useEffect(() => {
     if (!sqlSnippets || sqlSnippets.length === 0) {
-      setAiAssistantPanel({ suggestions: undefined })
+      clearSuggestions()
     }
-  }, [sqlSnippets, suggestions, setAiAssistantPanel])
+  }, [sqlSnippets, suggestions, clearSuggestions])
 
   useEffect(() => {
     if (open && isInSQLEditor && !!snippetContent) {
-      setAiAssistantPanel({ sqlSnippets: [snippetContent] })
+      setSqlSnippets([snippetContent])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, isInSQLEditor, snippetContent])
-
-  // Update initialMessages when they change from props
-  useEffect(() => {
-    setLocalInitialMessages(initialMessages)
-  }, [initialMessages])
 
   return (
     <>
@@ -358,7 +344,8 @@ export const AIAssistant = ({ id, initialMessages, className }: AIAssistantProps
           {hasMessages ? (
             <div className="w-full p-5">
               {renderedMessages}
-              {(last(messages)?.role === 'user' || last(messages)?.content?.length === 0) && (
+              {(last(chatMessages)?.role === 'user' ||
+                last(chatMessages)?.content?.length === 0) && (
                 <div className="flex gap-4 w-auto overflow-hidden">
                   <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
                   <div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
@@ -524,7 +511,7 @@ export const AIAssistant = ({ id, initialMessages, className }: AIAssistantProps
                   onRemove={() => {
                     const newSnippets = [...sqlSnippets]
                     newSnippets.splice(index, 1)
-                    setAiAssistantPanel({ sqlSnippets: newSnippets })
+                    setSqlSnippets(newSnippets)
                   }}
                   className="text-xs"
                 />

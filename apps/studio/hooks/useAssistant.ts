@@ -1,7 +1,24 @@
-import { Message as MessageType } from 'ai/react'
-import { useCallback } from 'react'
+import type { Message, Message as MessageType } from 'ai/react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { ChatSession } from 'state/app-state'
+
+// Define a simpler type for messages to avoid deep instantiation errors
+// Make it compatible with the Message type from ai/react
+type SimpleMessage = {
+  id: string
+  content: string
+  role: 'function' | 'data' | 'system' | 'user' | 'assistant' | 'tool' | string
+  [key: string]: any
+}
+
+// Helper function to convert SimpleMessage[] to MessageType[]
+const convertToMessageType = (messages: SimpleMessage[]): MessageType[] => {
+  return messages.map((msg) => ({
+    ...msg,
+    role: msg.role as 'function' | 'data' | 'system' | 'user' | 'assistant' | 'tool',
+  })) as MessageType[]
+}
 
 export interface UseAssistantOptions {
   projectRef?: string
@@ -11,12 +28,80 @@ export function useAssistant(options?: UseAssistantOptions) {
   const { projectRef } = options || {}
   const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
 
-  const { chats, activeChatId, open, messages } = aiAssistantPanel
+  const { chats, activeChatId, open } = aiAssistantPanel
 
-  // Get chat entries that match the current project
-  const projectChats = Object.entries(chats || {}).filter(
-    ([_, chat]) => chat.projectRef === projectRef
-  )
+  // Use useMemo to compute project-specific chats
+  const { projectChatsRecord, projectChatEntries } = useMemo(() => {
+    const record: Record<string, ChatSession> = {}
+    const entries: Array<[string, ChatSession]> = []
+
+    // Skip if no chats or projectRef
+    if (!chats || !projectRef) {
+      return { projectChatsRecord: record, projectChatEntries: entries }
+    }
+
+    // Filter chats by project reference
+    const chatIds = Object.keys(chats)
+    for (const id of chatIds) {
+      const chat = chats[id]
+      if (chat && chat.projectRef === projectRef) {
+        // @ts-ignore - Suppress deep type instantiation error
+        record[id] = chat
+        // @ts-ignore - Suppress deep type instantiation error
+        entries.push([id, chat])
+      }
+    }
+
+    return { projectChatsRecord: record, projectChatEntries: entries }
+  }, [chats, projectRef])
+
+  // Check if the current active chat belongs to this project
+  const currentChatBelongsToProject = Boolean(activeChatId && projectChatsRecord[activeChatId])
+
+  useEffect(() => {
+    if (projectRef) {
+      if (projectRef && !currentChatBelongsToProject) {
+        const chatIds = Object.keys(projectChatsRecord)
+        if (chatIds.length > 0) {
+          // Set active chat to the first chat of this project
+          const newActiveChatId = chatIds[0]
+          const activeChat = projectChatsRecord[newActiveChatId]
+
+          if (activeChat) {
+            setAiAssistantPanel({
+              activeChatId: newActiveChatId,
+            })
+          }
+        } else {
+          // No chats for this project, create a new one
+          const chatId = crypto.randomUUID()
+          const newChat: ChatSession = {
+            id: chatId,
+            name: 'New Chat',
+            projectRef: projectRef as string,
+            messages: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }
+
+          setAiAssistantPanel({
+            chats: {
+              ...(aiAssistantPanel.chats || {}),
+              [chatId]: newChat,
+            } as any,
+            activeChatId: chatId,
+          })
+        }
+      }
+    }
+  }, [
+    projectRef,
+    currentChatBelongsToProject,
+    activeChatId,
+    projectChatsRecord,
+    setAiAssistantPanel,
+    aiAssistantPanel.chats,
+  ])
 
   const handleNewChat = useCallback(() => {
     if (projectRef) {
@@ -31,7 +116,6 @@ export function useAssistant(options?: UseAssistantOptions) {
       }
 
       setAiAssistantPanel({
-        messages: [],
         chats: {
           ...(aiAssistantPanel.chats || {}),
           [chatId]: newChat,
@@ -42,184 +126,227 @@ export function useAssistant(options?: UseAssistantOptions) {
       return chatId
     }
     return undefined
-  }, [projectRef, aiAssistantPanel.chats, setAiAssistantPanel])
+  }, [projectRef, setAiAssistantPanel])
 
   const handleSelectChat = useCallback(
     (id: string) => {
-      const chat = chats?.[id]
-      if (chat) {
-        // Check if this is already the active chat and messages are the same
-        if (id === activeChatId) {
-          // If it's already the active chat, no need to update state
-          return
-        }
+      if (projectRef && chats && id in chats) {
+        const chat = projectChatsRecord[id]
+        if (chat) {
+          // Check if this is already the active chat
+          if (id === activeChatId) {
+            // If it's already the active chat, no need to update state
+            return
+          }
 
-        // Create a new array from the messages to avoid readonly issues
-        const messagesCopy = chat.messages ? [...chat.messages] : []
-
-        // Check if the messages are different from the current ones
-        const currentMessagesJson = JSON.stringify(aiAssistantPanel.messages || [])
-        const newMessagesJson = JSON.stringify(messagesCopy)
-
-        if (id !== activeChatId || currentMessagesJson !== newMessagesJson) {
           setAiAssistantPanel({
-            messages: messagesCopy as any,
             activeChatId: id,
           })
         }
       }
     },
-    [chats, setAiAssistantPanel, activeChatId, aiAssistantPanel.messages]
+    [activeChatId, chats, projectChatsRecord, projectRef, setAiAssistantPanel]
   )
 
   const handleDeleteChat = useCallback(
     (id: string) => {
-      const { [id]: _, ...remainingChats } = chats || {}
+      // Remove the chat with the given ID
+      const { [id]: _, ...remainingChats } = chats
 
-      // If deleting the active chat, set active to undefined or the first available chat
+      // If the deleted chat was the active one, select a new active chat
       let newActiveChatId = activeChatId
-      if (newActiveChatId === id) {
-        const chatIds = Object.keys(remainingChats)
-        newActiveChatId = chatIds.length > 0 ? chatIds[0] : undefined
+      if (id === activeChatId) {
+        // Get the IDs of the remaining chats for this project
+        const projectChatIds = Object.keys(remainingChats).filter(
+          (chatId) => remainingChats[chatId]?.projectRef === projectRef
+        )
+        newActiveChatId = projectChatIds.length > 0 ? projectChatIds[0] : undefined
       }
 
-      // Create a new array from the messages to avoid readonly issues
-      const messagesCopy =
-        newActiveChatId && remainingChats[newActiveChatId]?.messages
-          ? [...remainingChats[newActiveChatId].messages]
-          : []
-
       setAiAssistantPanel({
-        messages: messagesCopy as any,
         chats: remainingChats as any,
         activeChatId: newActiveChatId,
       })
     },
-    [chats, activeChatId, setAiAssistantPanel]
+    [activeChatId, chats, projectRef, setAiAssistantPanel]
   )
 
   const handleRenameChat = useCallback(
     (id: string, name: string) => {
-      const chat = chats?.[id]
-      if (chat) {
-        setAiAssistantPanel({
-          chats: {
-            ...chats,
-            [id]: {
-              ...chat,
-              name,
-              updatedAt: new Date(),
-            },
-          } as any,
-        })
+      // Only rename if it's a project chat
+      const chat = projectChatsRecord[id]
+      if (chat && chat.name !== name) {
+        // Use the direct state update approach instead of functional update
+        // to avoid TypeScript errors with the state updater function
+        const updatedChats = { ...chats }
+        if (updatedChats[id]) {
+          updatedChats[id] = {
+            ...updatedChats[id],
+            name,
+            updatedAt: new Date(),
+          }
+
+          setAiAssistantPanel({
+            chats: updatedChats as any,
+          })
+        }
       }
     },
-    [chats, setAiAssistantPanel]
+    [chats, projectChatsRecord, setAiAssistantPanel]
   )
 
   const handleClearMessages = useCallback(() => {
-    if (activeChatId && chats && chats[activeChatId]) {
+    // Only clear if the active chat belongs to this project
+    if (currentChatBelongsToProject && activeChatId && projectChatsRecord[activeChatId]) {
       setAiAssistantPanel({
-        messages: [],
+        sqlSnippets: [],
+        initialInput: '',
         chats: {
           ...chats,
           [activeChatId]: {
-            ...chats[activeChatId],
+            ...projectChatsRecord[activeChatId],
             messages: [],
             updatedAt: new Date(),
           },
         } as any,
       })
     }
-  }, [activeChatId, chats, setAiAssistantPanel])
+  }, [activeChatId, chats, currentChatBelongsToProject, projectChatsRecord, setAiAssistantPanel])
 
   const handleSaveMessage = useCallback(
     (message: MessageType) => {
-      // Create a function to safely copy messages and add a new one
-      function safeAddMessage(existingMessages: any, newMessage: MessageType): any {
-        if (!existingMessages || !Array.isArray(existingMessages)) {
-          return [newMessage]
-        }
-
-        // Check if the message already exists to avoid duplicates
+      clearSqlSnippets()
+      if (projectRef && currentChatBelongsToProject && activeChatId) {
+        // Get the existing messages for the active chat
+        const existingMessages = projectChatsRecord[activeChatId]?.messages || []
         const messageExists = existingMessages.some(
-          (msg) =>
-            msg.id === newMessage.id ||
-            (msg.content === newMessage.content && msg.role === newMessage.role)
+          (msg: any) =>
+            msg.id === message.id || (msg.content === message.content && msg.role === message.role)
         )
 
-        if (messageExists) {
-          return existingMessages
-        }
+        if (!messageExists) {
+          const newMessages = [...existingMessages, message]
 
-        return [...existingMessages, newMessage]
-      }
-
-      if (activeChatId && chats && chats[activeChatId]) {
-        // Get existing messages
-        const existingChatMessages = chats[activeChatId].messages
-        const existingAppMessages = aiAssistantPanel.messages
-
-        // Create new message arrays
-        const newChatMessages = safeAddMessage(existingChatMessages, message)
-        const newAppMessages = safeAddMessage(existingAppMessages, message)
-
-        // Only update if messages have changed
-        const chatMessagesChanged = newChatMessages.length !== existingChatMessages.length
-        const appMessagesChanged = newAppMessages.length !== existingAppMessages.length
-
-        if (chatMessagesChanged || appMessagesChanged) {
-          // Update the active chat with the new message
-          const updatedChat = {
-            ...chats[activeChatId],
-            messages: newChatMessages,
-            updatedAt: new Date(),
-          }
-
+          // Update chat messages
           setAiAssistantPanel({
-            messages: newAppMessages,
             chats: {
               ...chats,
-              [activeChatId]: updatedChat,
+              [activeChatId]: {
+                ...projectChatsRecord[activeChatId],
+                messages: newMessages,
+                updatedAt: new Date(),
+              },
             } as any,
           })
         }
-      } else {
-        // Fallback to old behavior if no active chat
-        const newMessages = safeAddMessage(aiAssistantPanel.messages, message)
+      }
+    },
+    [
+      chats,
+      activeChatId,
+      currentChatBelongsToProject,
+      projectRef,
+      projectChatsRecord,
+      setAiAssistantPanel,
+    ]
+  )
 
-        // Only update if messages have changed
-        if (newMessages.length !== aiAssistantPanel.messages.length) {
+  const handleSaveMessages = useCallback(
+    (messages: MessageType[]) => {
+      clearSqlSnippets()
+      if (projectRef && currentChatBelongsToProject && activeChatId) {
+        // Get the current messages to compare
+        const currentMessages = projectChatsRecord[activeChatId]?.messages || []
+
+        // Check if the messages array is actually different before updating
+        // This prevents circular updates
+        if (JSON.stringify(currentMessages) !== JSON.stringify(messages)) {
+          // Update chat messages
           setAiAssistantPanel({
-            messages: newMessages,
+            chats: {
+              ...chats,
+              [activeChatId]: {
+                ...projectChatsRecord[activeChatId],
+                messages,
+                updatedAt: new Date(),
+              },
+            } as any,
           })
         }
       }
     },
-    [activeChatId, chats, aiAssistantPanel.messages, setAiAssistantPanel]
+    [
+      chats,
+      activeChatId,
+      currentChatBelongsToProject,
+      projectRef,
+      projectChatsRecord,
+      setAiAssistantPanel,
+    ]
   )
 
   const openAssistant = useCallback(
-    (
-      options?: Partial<Omit<typeof aiAssistantPanel, 'messages'>> & { messages?: MessageType[] }
-    ) => {
-      setAiAssistantPanel({ open: true, ...options } as any)
+    (options?: Partial<typeof aiAssistantPanel>) => {
+      // If opening the assistant, ensure we have a valid project chat
+      const updatedOptions = { ...options }
+
+      if (projectRef) {
+        // If we're opening with a specific chat ID, make sure it belongs to this project
+        if (updatedOptions.activeChatId && !projectChatsRecord[updatedOptions.activeChatId]) {
+          // If not, find the first available project chat or create a new one
+          const projectChatIds = Object.keys(projectChatsRecord)
+          if (projectChatIds.length > 0) {
+            updatedOptions.activeChatId = projectChatIds[0]
+          } else {
+            // No chats for this project, we'll create one when the assistant opens
+            delete updatedOptions.activeChatId
+          }
+        }
+      }
+
+      setAiAssistantPanel({ open: true, ...updatedOptions } as any)
+
+      // If we opened without a valid project chat, create one
+      if (
+        projectRef &&
+        !updatedOptions.activeChatId &&
+        Object.keys(projectChatsRecord).length === 0
+      ) {
+        handleNewChat()
+      }
     },
-    [setAiAssistantPanel]
+    [projectRef, setAiAssistantPanel, handleNewChat]
   )
 
   const closeAssistant = useCallback(() => {
     setAiAssistantPanel({ open: false })
   }, [setAiAssistantPanel])
 
+  const clearSqlSnippets = useCallback(() => {
+    setAiAssistantPanel({ sqlSnippets: undefined })
+  }, [setAiAssistantPanel])
+
+  const clearSuggestions = useCallback(() => {
+    setAiAssistantPanel({ suggestions: undefined })
+  }, [setAiAssistantPanel])
+
+  const setSqlSnippets = useCallback(
+    (snippets: string[]) => {
+      setAiAssistantPanel({ sqlSnippets: snippets })
+    },
+    [setAiAssistantPanel]
+  )
+
   return {
     // State
-    chats,
-    projectChats,
+    chats: projectChatEntries,
     activeChatId,
-    activeChat: activeChatId ? chats[activeChatId] : undefined,
+    activeChat:
+      currentChatBelongsToProject && activeChatId ? projectChatsRecord[activeChatId] : undefined,
     isOpen: open,
-    messages,
+    messages: (currentChatBelongsToProject && activeChatId
+      ? projectChatsRecord[activeChatId]?.messages || []
+      : chats?.[activeChatId || 'default']?.messages || []) as Message[],
 
     // Actions
     newChat: handleNewChat,
@@ -228,7 +355,11 @@ export function useAssistant(options?: UseAssistantOptions) {
     renameChat: handleRenameChat,
     clearMessages: handleClearMessages,
     saveMessage: handleSaveMessage,
+    saveMessages: handleSaveMessages,
     openAssistant,
     closeAssistant,
+    clearSqlSnippets,
+    clearSuggestions,
+    setSqlSnippets,
   }
 }
