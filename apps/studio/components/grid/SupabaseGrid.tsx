@@ -8,6 +8,7 @@ import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import { EMPTY_ARR } from 'lib/void'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -174,30 +175,12 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
         }
         return 5000
       },
-      onSuccess(data) {
-        dispatch({
-          type: 'SET_ROWS_COUNT',
-          payload: data.rows.length,
-        })
-      },
     }
   )
 
   useEffect(() => {
     if (!mounted) setMounted(true)
   }, [])
-
-  useEffect(() => {
-    if (mounted) {
-      dispatch({ type: 'UPDATE_FILTERS', payload: {} })
-    }
-  }, [JSON.stringify(filters)])
-
-  useEffect(() => {
-    if (mounted) {
-      dispatch({ type: 'UPDATE_SORTS', payload: {} })
-    }
-  }, [JSON.stringify(sorts)])
 
   useEffect(() => {
     if (state.isInitialComplete && projectRef && state.table) {
@@ -266,7 +249,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
           <Grid
             ref={gridRef}
             {...gridProps}
-            rows={data?.rows ?? []}
+            rows={data?.rows ?? EMPTY_ARR}
             error={error}
             isLoading={isLoading}
             isSuccess={isSuccess}
@@ -279,11 +262,11 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
             onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
           />
           <Footer isRefetching={isRefetching} />
-          <Shortcuts gridRef={gridRef} />
+          <Shortcuts gridRef={gridRef} rows={data?.rows ?? EMPTY_ARR} />
         </>
       )}
 
-      {mounted && createPortal(<RowContextMenu rows={data?.rows ?? []} />, document.body)}
+      {mounted && createPortal(<RowContextMenu rows={data?.rows ?? EMPTY_ARR} />, document.body)}
     </div>
   )
 }

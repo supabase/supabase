@@ -40,21 +40,21 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
     (p: ItemParams) => {
       const { props } = p
 
-      if (!state.selectedCellPosition || !props) {
+      if (!snap.selectedCellPosition || !props) {
         return
       }
 
       const { rowIdx } = props
       const row = rows[rowIdx]
 
-      const columnKey = state.gridColumns[state.selectedCellPosition?.idx as number].key
+      const columnKey = state.gridColumns[snap.selectedCellPosition.idx as number].key
 
       const value = row[columnKey]
       const text = formatClipboardValue(value)
 
       copyToClipboard(text)
     },
-    [rows, state.gridColumns, state.selectedCellPosition]
+    [rows, state.gridColumns, snap.selectedCellPosition]
   )
 
   return (

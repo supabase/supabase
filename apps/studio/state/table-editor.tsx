@@ -1,10 +1,12 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
+import { PropsWithChildren, createContext, useContext, useRef } from 'react'
+import { proxy, useSnapshot } from 'valtio'
+import { proxySet } from 'valtio/utils'
+
 import type { SupaRow } from 'components/grid/types'
 import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
-import { PropsWithChildren, createContext, useContext, useRef } from 'react'
 import type { Dictionary } from 'types'
-import { proxy, useSnapshot } from 'valtio'
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
 
@@ -64,6 +66,9 @@ export const createTableEditorState = () => {
     page: 1,
     setPage: (page: number) => {
       state.page = page
+
+      // reset selected row state
+      state.setSelectedRows(new Set())
     },
     rowsPerPage: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,
     setRowsPerPage: (rowsPerPage: number) => {
@@ -139,6 +144,13 @@ export const createTableEditorState = () => {
     },
 
     /* Rows */
+    selectedRows: proxySet<number>(),
+    allRowsSelected: false,
+    setSelectedRows: (rows: Set<number>, selectAll?: boolean) => {
+      state.allRowsSelected = selectAll ?? false
+      state.selectedRows = proxySet(rows)
+    },
+
     onAddRow: () => {
       state.ui = {
         open: 'side-panel',
@@ -164,6 +176,12 @@ export const createTableEditorState = () => {
         open: 'confirmation-dialog',
         confirmationDialog: { type: 'row', rows, numRows, allRowsSelected, callback },
       }
+    },
+
+    /* Cells */
+    selectedCellPosition: null as { idx: number; rowIdx: number } | null,
+    setSelectedCellPosition: (position: { idx: number; rowIdx: number } | null) => {
+      state.selectedCellPosition = position
     },
 
     /* Misc */
@@ -224,3 +242,5 @@ export const useTableEditorStateSnapshot = (options?: Parameters<typeof useSnaps
   const state = useContext(TableEditorStateContext)
   return useSnapshot(state, options)
 }
+
+export type TableEditorStateSnapshot = ReturnType<typeof useTableEditorStateSnapshot>

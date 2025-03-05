@@ -13,7 +13,6 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useDispatch, useTrackedState } from '../../../store/Store'
 import { DropdownControl } from '../../common/DropdownControl'
 import { formatEstimatedCount } from './Pagination.utils'
 
@@ -27,8 +26,6 @@ const Pagination = () => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
 
-  const state = useTrackedState()
-  const dispatch = useDispatch()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
@@ -68,12 +65,6 @@ const Pagination = () => {
     },
     {
       keepPreviousData: true,
-      onSuccess(data) {
-        dispatch({
-          type: 'SET_ROWS_COUNT',
-          payload: data.count,
-        })
-      },
     }
   )
 
@@ -83,7 +74,7 @@ const Pagination = () => {
 
   const onPreviousPage = () => {
     if (page > 1) {
-      if (state.selectedRows.size >= 1) {
+      if (snap.selectedRows.size >= 1) {
         setIsConfirmPreviousModalOpen(true)
       } else {
         goToPreviousPage()
@@ -93,15 +84,11 @@ const Pagination = () => {
 
   const onConfirmPreviousPage = () => {
     goToPreviousPage()
-    dispatch({
-      type: 'SELECTED_ROWS_CHANGE',
-      payload: { selectedRows: new Set() },
-    })
   }
 
   const onNextPage = () => {
     if (page < maxPages) {
-      if (state.selectedRows.size >= 1) {
+      if (snap.selectedRows.size >= 1) {
         setIsConfirmNextModalOpen(true)
       } else {
         goToNextPage()
@@ -111,10 +98,6 @@ const Pagination = () => {
 
   const onConfirmNextPage = () => {
     goToNextPage()
-    dispatch({
-      type: 'SELECTED_ROWS_CHANGE',
-      payload: { selectedRows: new Set() },
-    })
   }
 
   const goToPreviousPage = () => {
