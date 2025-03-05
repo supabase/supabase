@@ -6,7 +6,6 @@ import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { ident, literal } from './pg-format'
 import { pgColumnArrayZod } from './pg-meta-columns'
 
-
 const pgTablePrimaryKeyZod = z.object({
   table_id: z.number(),
   name: z.string(),
@@ -298,4 +297,4 @@ END $$;`
   return { sql }
 }
 
-export default { list, retrieve, remove, create, update }
+export { list, retrieve, remove, create, update }

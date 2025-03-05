@@ -7,10 +7,6 @@ import tablePrivileges from './pg-meta-table-privileges'
 import materializedViews from './pg-meta-materialized-views'
 import foreignTables from './pg-meta-foreign-tables'
 import views from './pg-meta-views'
-import tables from './pg-meta-tables'
-import * as functions from './pg-meta-functions'
-import tablePrivileges from './pg-meta-table-privileges'
-import foreignTables from './pg-meta-foreign-tables'
 import policies from './pg-meta-policies'
 import triggers from './pg-meta-triggers'
 import types from './pg-meta-types'
@@ -28,7 +24,6 @@ export default {
   materializedViews,
   foreignTables,
   views,
-  foreignTables,
   policies,
   triggers,
   types,
