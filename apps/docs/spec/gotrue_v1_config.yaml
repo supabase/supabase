@@ -13,7 +13,7 @@ info:
   bugs: 'https://github.com/supabase/gotrue/issues' # {string} Where developers can file bugs.
   spec: 'https://github.com/supabase/supabase/blob/master/docs/spec/gotrue_v1_config.yaml' # {string} Where developers can find this spec (to link directly in the docs).
   description: |
-    In a self-hosted environment, you do not have access to the Auth configuration such as third party OAuth provider settings through the Supabase dashboard. Instead, you configure them through the `docker-compose.yml` file. You can read more about the configuration in the [Self-hosting guide](/docs/guides/self-hosting/docker#configuring-services).
+    In a self-hosted environment, you do not have access to the Auth configuration such as third party OAuth provider settings through the Supabase dashboard. Instead, you configure them through the `compose.yaml` file. You can read more about the configuration in the [Self-hosting guide](/docs/guides/self-hosting/docker#configuring-services).
 
     You can find the complete list of available configuration parameters on the README of the [Auth repository](https://github.com/supabase/auth?tab=readme-ov-file#configuration).
   tags:
