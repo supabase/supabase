@@ -25,16 +25,19 @@ type DockerRepositoryTagSearch = {
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const fallback = { latest: null }
+  const fallback = { latest: null, last_updated_at: null }
   try {
     const data: DockerRepositoryTagSearch = await fetch(
       'https://hub.docker.com/v2/repositories/supabase/studio/tags?page=1&page_size=5'
     ).then((res) => res.json())
     const latest = data.results.find((x) => x.name === 'latest')
+    // [Joshen] This should return the image of the latest stable release
     const latestImage = data.results.find((x) => x.digest === latest?.digest && x.name !== 'latest')
 
     if (!latestImage) return res.status(200).json(fallback)
-    return res.status(200).json({ latest: latestImage?.name })
+    return res
+      .status(200)
+      .json({ latest: latestImage?.name, last_updated_at: latest?.last_updated })
   } catch {
     return res.status(200).json(fallback)
   }

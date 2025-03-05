@@ -8,7 +8,7 @@ import { miscKeys } from './keys'
 export async function getDockerHubStudioVersions() {
   try {
     const data = await fetch(`${BASE_PATH}/api/get-docker-hub-versions`).then((res) => res.json())
-    return data as { latest: string | null }
+    return data as { latest: string | null, last_updated_at: string | null }
   } catch (error) {
     throw error
   }
