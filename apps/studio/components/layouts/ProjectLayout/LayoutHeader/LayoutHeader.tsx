@@ -120,7 +120,7 @@ const LayoutHeader = ({
             )}
 
             {!IS_PLATFORM && (
-              <p className="mx-2.5 text-xs text-foreground-light">Default project</p>
+              <div className="ml-3 text-xs text-foreground-light">Default project</div>
             )}
 
             {projectRef && IS_PLATFORM && (

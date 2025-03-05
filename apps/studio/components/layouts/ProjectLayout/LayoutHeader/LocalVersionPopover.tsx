@@ -35,7 +35,7 @@ export const LocalVersionPopover = () => {
     : undefined
 
   return (
-    <Popover_Shadcn_ modal={false}>
+    <Popover_Shadcn_>
       <PopoverTrigger_Shadcn_ className="flex items-center">
         <Badge variant={isLatestVersion ? 'default' : 'brand'}>
           {isLatestVersion ? 'Latest' : 'Update available'}
