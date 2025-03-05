@@ -3,23 +3,6 @@ import { useCallback, useEffect, useMemo } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { ChatSession } from 'state/app-state'
 
-// Define a simpler type for messages to avoid deep instantiation errors
-// Make it compatible with the Message type from ai/react
-type SimpleMessage = {
-  id: string
-  content: string
-  role: 'function' | 'data' | 'system' | 'user' | 'assistant' | 'tool' | string
-  [key: string]: any
-}
-
-// Helper function to convert SimpleMessage[] to MessageType[]
-const convertToMessageType = (messages: SimpleMessage[]): MessageType[] => {
-  return messages.map((msg) => ({
-    ...msg,
-    role: msg.role as 'function' | 'data' | 'system' | 'user' | 'assistant' | 'tool',
-  })) as MessageType[]
-}
-
 export interface UseAssistantOptions {
   projectRef?: string
 }
@@ -215,7 +198,6 @@ export function useAssistant(options?: UseAssistantOptions) {
 
   const handleSaveMessage = useCallback(
     (message: MessageType) => {
-      clearSqlSnippets()
       if (projectRef && currentChatBelongsToProject && activeChatId) {
         // Get the existing messages for the active chat
         const existingMessages = projectChatsRecord[activeChatId]?.messages || []
@@ -253,7 +235,6 @@ export function useAssistant(options?: UseAssistantOptions) {
 
   const handleSaveMessages = useCallback(
     (messages: MessageType[]) => {
-      clearSqlSnippets()
       if (projectRef && currentChatBelongsToProject && activeChatId) {
         // Get the current messages to compare
         const currentMessages = projectChatsRecord[activeChatId]?.messages || []

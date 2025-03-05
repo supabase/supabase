@@ -122,9 +122,6 @@ const getInitialState = () => {
   const urlParams = new URLSearchParams(window.location.search)
   const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
 
-  // Get project ref from URL if available
-  const projectRef = urlParams.get('ref') || ''
-
   let parsedAiAssistant = INITIAL_AI_ASSISTANT
   let parsedEditorPanel = INITIAL_EDITOR_PANEL
 
@@ -283,9 +280,6 @@ export const appState = proxy({
   setMobileMenuOpen: (value: boolean) => {
     appState.mobileMenuOpen = value
   },
-
-  // The assistant-related functions have been moved to the useAssistant hook
-  // Only keeping the setAiAssistantPanel function for state updates
 })
 
 // Set up localStorage subscriptions
@@ -294,23 +288,21 @@ if (typeof window !== 'undefined') {
     // Save AI assistant state with limited message history
     const aiAssistantState = {
       ...appState.aiAssistantPanel,
-      // Process chats to limit message history in each chat
       chats: appState.aiAssistantPanel.chats
         ? Object.entries(appState.aiAssistantPanel.chats).reduce((acc, [chatId, chat]) => {
             return {
               ...acc,
               [chatId]: {
                 ...chat,
+                messages: chat.messages?.slice(-20) || [], // Only keep last 20 messages
               },
             }
           }, {})
         : {},
     }
 
-    // Save to global storage
     localStorage.setItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE, JSON.stringify(aiAssistantState))
 
-    // Save editor panel state
     localStorage.setItem(
       LOCAL_STORAGE_KEYS.EDITOR_PANEL_STATE,
       JSON.stringify(appState.editorPanel)

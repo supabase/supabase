@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Check, ChevronsUpDown, Edit, MessageSquare, Plus, Trash, X } from 'lucide-react'
+import { Check, Edit, MessageSquare, Trash, X } from 'lucide-react'
 import { useAssistant } from 'hooks/useAssistant'
 import { useRouter } from 'next/router'
 import {
@@ -11,7 +11,6 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Input,
   Input_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
@@ -25,7 +24,7 @@ interface AIAssistantChatSelectorProps {
 export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorProps) => {
   const router = useRouter()
   const projectRef = typeof router.query.ref === 'string' ? router.query.ref : undefined
-  const { chats, activeChatId, selectChat, deleteChat, renameChat, newChat } = useAssistant({
+  const { chats, activeChatId, selectChat, deleteChat, renameChat } = useAssistant({
     projectRef,
   })
 
@@ -105,7 +104,7 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
                   key={id}
                   value={id}
                   onSelect={() => handleSelectChat(id)}
-                  className="flex items-center justify-between gap-2 py-1 w-full overflow-hidden"
+                  className="flex items-center justify-between gap-2 py-1 w-full overflow-hidden group"
                   keywords={[chat.name]}
                 >
                   <div className="flex items-center w-full flex-1 min-w-0">
@@ -161,7 +160,7 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
                     )}
                   </div>
                   {editingChatId !== id && (
-                    <div className="flex items-center gap-0 shrink-0">
+                    <div className="flex items-center gap-0 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Button
                         type="text"
                         size="tiny"

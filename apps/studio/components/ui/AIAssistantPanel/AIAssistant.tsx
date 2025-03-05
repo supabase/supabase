@@ -85,6 +85,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     saveMessages,
     clearMessages,
     closeAssistant,
+    clearSqlSnippets,
     newChat,
     clearSuggestions,
     setSqlSnippets,
@@ -176,6 +177,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const sendMessageToAssistant = async (content: string) => {
     const payload = { role: 'user', createdAt: new Date(), content } as MessageType
     const headerData = await constructHeaders()
+    clearSqlSnippets()
     append(payload, {
       headers: { Authorization: headerData.get('Authorization') ?? '' },
     })

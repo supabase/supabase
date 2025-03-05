@@ -228,9 +228,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                       )}
                     >
                       {aiAssistantPanel.open && (
-                        <div className="w-full h-[100dvh] md:h-full max-h-[100dvh]">
-                          <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
-                        </div>
+                        <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
                       )}
                       {editorPanel.open && <EditorPanel />}
                     </ResizablePanel>
