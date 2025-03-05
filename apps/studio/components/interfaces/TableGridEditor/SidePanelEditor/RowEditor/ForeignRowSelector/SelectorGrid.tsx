@@ -1,3 +1,4 @@
+import { NullValue } from 'components/grid/components/common/NullValue'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import type { SupaRow, SupaTable } from 'components/grid/types'
 import {
@@ -8,7 +9,6 @@ import { Key } from 'lucide-react'
 import DataGrid, { Column } from 'react-data-grid'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { convertByteaToHex } from '../RowEditor.utils'
-import { NullValue } from 'components/grid/components/common/NullValue'
 
 export interface SelectorGridProps {
   table: SupaTable
