@@ -84,7 +84,7 @@ export const RefSubLayout = {
 }
 
 interface StickyHeaderProps {
-  title?: string
+  title?: React.ReactNode | string
   monoFont?: boolean
   className?: string
 }

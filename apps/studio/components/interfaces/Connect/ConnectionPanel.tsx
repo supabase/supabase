@@ -3,9 +3,10 @@ import Link from 'next/link'
 
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
+  Badge,
   Button,
   cn,
   CodeBlock,
@@ -21,6 +22,7 @@ import { DirectConnectionIcon, TransactionIcon } from './PoolerIcons'
 
 interface ConnectionPanelProps {
   type?: 'direct' | 'transaction' | 'session'
+  badge?: string
   title: string
   description: string
   connectionString: string
@@ -28,7 +30,7 @@ interface ConnectionPanelProps {
     type: 'error' | 'success'
     title: string
     description?: string
-    link?: { text: string; url: string }
+    links?: { text: string; url: string }[]
   }
   notice?: string[]
   parameters?: Array<{
@@ -100,6 +102,7 @@ export const CodeBlockFileHeader = ({ title }: { title: string }) => {
 
 export const ConnectionPanel = ({
   type = 'direct',
+  badge,
   title,
   description,
   connectionString,
@@ -113,14 +116,19 @@ export const ConnectionPanel = ({
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
-  const { data: poolingInfo } = usePoolingConfigurationQuery({ projectRef })
+  const { data: poolingInfo } = useSupavisorConfigurationQuery({ projectRef })
   const poolingConfiguration = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
   const isSessionMode = poolingConfiguration?.pool_mode === 'session'
+
+  const links = ipv4Status.links ?? []
 
   return (
     <div className="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:gap-20 w-full">
       <div className="flex flex-col">
-        <h1 className="text-sm mb-2">{title}</h1>
+        <div className="flex items-center gap-x-2 mb-2">
+          <h1 className="text-sm">{title}</h1>
+          {!!badge && <Badge>{badge}</Badge>}
+        </div>
         <p className="text-sm text-foreground-light mb-4">{description}</p>
         <div className="flex flex-col -space-y-px">
           {fileTitle && <CodeBlockFileHeader title={fileTitle} />}
@@ -216,21 +224,15 @@ export const ConnectionPanel = ({
               {ipv4Status.description && (
                 <span className="text-xs text-foreground-lighter">{ipv4Status.description}</span>
               )}
-              {ipv4Status.type === 'error' && (
-                <span className="text-xs text-foreground-lighter">
-                  Use Session Pooler if on a IPv4 network or purchase IPv4 addon
-                </span>
-              )}
-              {ipv4Status.link && (
-                <div className="mt-2">
-                  <Button asChild type="default" size="tiny">
-                    <Link
-                      href={ipv4Status.link.url}
-                      className="text-xs text-light hover:text-foreground"
-                    >
-                      {ipv4Status.link.text}
-                    </Link>
-                  </Button>
+              {links.length > 0 && (
+                <div className="flex items-center gap-x-2 mt-2">
+                  {links.map((link) => (
+                    <Button key={link.text} asChild type="default" size="tiny">
+                      <Link href={link.url} className="text-xs text-light hover:text-foreground">
+                        {link.text}
+                      </Link>
+                    </Button>
+                  ))}
                 </div>
               )}
             </div>
@@ -285,7 +287,7 @@ export const ConnectionPanel = ({
                   <p className="text-xs text-foreground-lighter max-w-xs">
                     If you wish to use a Direct Connection with these, please purchase{' '}
                     <Link
-                      href={ipv4Status.link?.url ?? '/'}
+                      href={`/project/${projectRef}/settings/addons?panel=ipv4`}
                       className="text-xs text-light hover:text-foreground"
                     >
                       IPv4 support

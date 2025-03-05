@@ -41,6 +41,7 @@ export const USAGE_APPROACHING_THRESHOLD = 0.75
 
 export const LOCAL_STORAGE_KEYS = {
   AI_ASSISTANT_STATE: 'supabase-ai-assistant-state',
+  SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
   EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
 
   UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
@@ -93,6 +94,9 @@ export const LOCAL_STORAGE_KEYS = {
 
   // api keys view switcher for new and legacy api keys
   API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
+
+  // last visited logs page
+  LAST_VISITED_LOGS_PAGE: 'supabase-last-visited-logs-page',
 }
 
 export const OPT_IN_TAGS = {

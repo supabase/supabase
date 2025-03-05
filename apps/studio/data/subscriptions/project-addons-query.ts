@@ -9,6 +9,9 @@ export type ProjectAddonsVariables = {
   projectRef?: string
 }
 
+// [Joshen] For any customer facing text - let's use "Add-on" hyphenated
+// Will need to address consistency across the dashboard
+
 export async function getProjectAddons(
   { projectRef }: ProjectAddonsVariables,
   signal?: AbortSignal
@@ -36,6 +39,7 @@ export const useProjectAddonsQuery = <TData = ProjectAddonsData>(
     ({ signal }) => getProjectAddons({ projectRef }, signal),
     {
       enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+      staleTime: 60 * 60 * 1000, // 60 minutes
       ...options,
     }
   )
