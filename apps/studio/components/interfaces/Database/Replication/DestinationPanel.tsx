@@ -44,6 +44,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useReplicationSinkByIdQuery } from 'data/replication/sink-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import { max } from 'lodash'
 
 interface DestinationPanelProps {
   visible: boolean
@@ -104,6 +105,7 @@ const DestinationPanel = ({
     publicationName: z.string().min(1, 'Publication is required'),
     maxSize: z.number().min(1, 'Max Size must be greater than 0').int(),
     maxFillSecs: z.number().min(1, 'Max Fill seconds should be greater than 0').int(),
+    maxStalenessMins: z.number().nonnegative(),
     enabled: z.boolean(),
   })
   const defaultValues = useMemo(
@@ -116,6 +118,7 @@ const DestinationPanel = ({
       publicationName: pipelineData?.publication_name ?? '',
       maxSize: pipelineData?.config?.config?.max_size ?? 1000,
       maxFillSecs: pipelineData?.config?.config?.max_fill_secs ?? 10,
+      maxStalenessMins: sinkData?.config?.big_query?.max_staleness_mins ?? 5,
       enabled: existingDestination?.enabled ?? true,
     }),
     [sinkData, pipelineData, existingDestination]
@@ -146,6 +149,7 @@ const DestinationPanel = ({
           projectId: data.projectId,
           datasetId: data.datasetId,
           serviceAccountKey: data.serviceAccountKey,
+          maxStalenessMins: data.maxStalenessMins,
         })
 
         if (existingDestination.pipelineId) {
@@ -177,6 +181,7 @@ const DestinationPanel = ({
           projectId: data.projectId,
           datasetId: data.datasetId,
           serviceAccountKey: data.serviceAccountKey,
+          maxStalenessMins: data.maxStalenessMins,
         })
         const { id: pipelineId } = await createPipeline({
           projectRef,
@@ -377,6 +382,26 @@ const DestinationPanel = ({
                                       valueAsNumber: true, // Ensure the value is handled as a number
                                     })}
                                     placeholder="Max fill seconds"
+                                  />
+                                </FormControl_Shadcn_>
+                                <FormMessage_Shadcn_ />
+                              </FormItem_Shadcn_>
+                            )}
+                          />
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="maxStalenessMins"
+                            render={({ field }) => (
+                              <FormItem_Shadcn_ className="flex flex-col gap-y-2">
+                                <FormLabel_Shadcn_>Max Staleness</FormLabel_Shadcn_>
+                                <FormControl_Shadcn_>
+                                  <Input_Shadcn_
+                                    {...field}
+                                    type="number"
+                                    {...form.register('maxStalenessMins', {
+                                      valueAsNumber: true, // Ensure the value is handled as a number
+                                    })}
+                                    placeholder="Max staleness in minutes"
                                   />
                                 </FormControl_Shadcn_>
                                 <FormMessage_Shadcn_ />
