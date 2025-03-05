@@ -10,6 +10,8 @@ interface DocMeta {
   path: string
 }
 
+console.log('🤖 Building llms.txt')
+
 // Function to extract frontmatter from MDX files
 function extractFrontmatter(content: string): { title?: string; description?: string } {
   const frontmatterRegex = /---\n([\s\S]*?)\n---/
@@ -101,4 +103,4 @@ if (!fs.existsSync(publicDir)) {
 }
 
 fs.writeFileSync(path.join(publicDir, 'llms.txt'), content)
-console.log('Generated llms.txt in public directory')
+console.log('✅ Generated llms.txt in public directory')
