@@ -8,6 +8,13 @@
       <lastBuildDate>Fri, 28 Feb 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
+  <guid>https://supabase.com/customers/resend</guid>
+  <title>Resend&apos;s Journey with Supabase: Scaling Email Infrastructure with Ease</title>
+  <link>https://supabase.com/customers/resend</link>
+  <description>Scaling seamlessly to 5,000+ paying customers &amp; millions of emails sent daily with Supabase</description>
+  <pubDate>Fri, 28 Feb 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/meshy</guid>
   <title>Scaling Innovation with Supabase: Meshy’s Migration to Cost-Effective Authentication</title>
   <link>https://supabase.com/customers/meshy</link>
