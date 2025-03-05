@@ -3,7 +3,7 @@ import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
-import { ArrowDown, FileText, Info, X } from 'lucide-react'
+import { ArrowDown, FileText, Info, RefreshCw, X, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -44,6 +44,8 @@ import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
+import { AIAssistantChatSelector } from './AIAssistantChatSelector'
+import { useAssistant } from 'hooks/useAssistant'
 
 const MemoizedMessage = memo(
   ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
@@ -65,15 +67,9 @@ interface AIAssistantProps {
   id: string
   initialMessages?: MessageType[] | undefined
   className?: string
-  onResetConversation: () => void
 }
 
-export const AIAssistant = ({
-  id,
-  initialMessages,
-  className,
-  onResetConversation,
-}: AIAssistantProps) => {
+export const AIAssistant = ({ id, initialMessages, className }: AIAssistantProps) => {
   const router = useRouter()
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
@@ -84,7 +80,14 @@ export const AIAssistant = ({
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
-  const { aiAssistantPanel, setAiAssistantPanel, saveLatestMessage } = useAppStateSnapshot()
+  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const {
+    messages: assistantMessages,
+    saveMessage,
+    clearMessages,
+    closeAssistant,
+    newChat,
+  } = useAssistant({ projectRef: project?.ref })
   const { open, initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -94,6 +97,9 @@ export const AIAssistant = ({
   const [assistantError, setAssistantError] = useState<string>()
   const [lastSentMessage, setLastSentMessage] = useState<MessageType>()
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
+  const [localInitialMessages, setLocalInitialMessages] = useState<MessageType[] | undefined>(
+    initialMessages
+  )
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -130,7 +136,7 @@ export const AIAssistant = ({
     id,
     api: `${BASE_PATH}/api/ai/sql/generate-v3`,
     maxSteps: 5,
-    initialMessages,
+    initialMessages: localInitialMessages,
     body: {
       includeSchemaMetadata,
       projectRef: project?.ref,
@@ -138,7 +144,7 @@ export const AIAssistant = ({
       schema: currentSchema,
       table: currentTable?.name,
     },
-    onFinish: (message) => saveLatestMessage(message),
+    onFinish: (message) => saveMessage(message),
     onError: (error) => {
       const errorMessage = JSON.parse(error.message).message
       toast.error(errorMessage)
@@ -179,6 +185,7 @@ export const AIAssistant = ({
     })
 
     setAiAssistantPanel({ sqlSnippets: undefined, messages: [...messages, payload] })
+    saveMessage(payload)
     setValue('')
     setAssistantError(undefined)
     setLastSentMessage(payload)
@@ -194,10 +201,6 @@ export const AIAssistant = ({
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     }
-  }
-
-  const closeAssistant = () => {
-    setAiAssistantPanel({ open: false })
   }
 
   const confirmOptInToShareSchemaData = async () => {
@@ -222,6 +225,12 @@ export const AIAssistant = ({
         },
       }
     )
+  }
+
+  const handleClearMessages = () => {
+    clearMessages()
+    setLocalInitialMessages([])
+    setMessages([])
   }
 
   // Update scroll behavior for new messages
@@ -257,6 +266,11 @@ export const AIAssistant = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, isInSQLEditor, snippetContent])
 
+  // Update initialMessages when they change from props
+  useEffect(() => {
+    setLocalInitialMessages(initialMessages)
+  }, [initialMessages])
+
   return (
     <>
       <div className={cn('flex flex-col h-full', className)}>
@@ -265,8 +279,8 @@ export const AIAssistant = ({
             <div className="border-b flex items-center bg gap-x-3 px-5 h-[46px]">
               <AiIconAnimation allowHoverEffect />
 
-              <div className="text-sm flex-1">Assistant</div>
-              <div className="flex gap-4 items-center">
+              <div className="text-sm flex-1 flex items-center gap-x-2">
+                Assistant
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Info size={14} className="text-foreground-light" />
@@ -278,14 +292,39 @@ export const AIAssistant = ({
                       : 'Project metadata is not being shared. Opt in to improve Assistant responses.'}
                   </TooltipContent>
                 </Tooltip>
-                <div className="flex gap-2">
-                  {(hasMessages || suggestions || sqlSnippets) && (
-                    <Button type="default" disabled={isChatLoading} onClick={onResetConversation}>
-                      Reset
-                    </Button>
-                  )}
-                  <Button type="default" className="w-7" onClick={closeAssistant} icon={<X />} />
-                </div>
+              </div>
+              <div className="flex gap-2">
+                <AIAssistantChatSelector />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="default"
+                      size="tiny"
+                      icon={<Plus size={14} />}
+                      onClick={() => {
+                        if (project?.ref) {
+                          newChat()
+                        }
+                      }}
+                      className="h-7 w-7 p-0"
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>New chat</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="default"
+                      size="tiny"
+                      icon={<RefreshCw size={14} />}
+                      onClick={handleClearMessages}
+                      className="h-7 w-7 p-0"
+                      disabled={isChatLoading}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>Clear chat messages</TooltipContent>
+                </Tooltip>
+                <Button type="default" className="w-7 h-7" onClick={closeAssistant} icon={<X />} />
               </div>
             </div>
             {!includeSchemaMetadata && selectedOrganization && (

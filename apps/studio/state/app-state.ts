@@ -23,6 +23,15 @@ export type Template = {
   content: string
 }
 
+export type ChatSession = {
+  id: string
+  name: string
+  projectRef: string
+  messages: MessageType[]
+  createdAt: Date
+  updatedAt: Date
+}
+
 type AiAssistantPanelType = {
   open: boolean
   messages: MessageType[]
@@ -35,6 +44,10 @@ type AiAssistantPanelType = {
   // Mainly used for editing a database entity (e.g editing a function, RLS policy etc)
   entity?: CommonDatabaseEntity
   tables: { schema: string; name: string }[]
+  // Store multiple chat sessions
+  chats: Record<string, ChatSession>
+  // Currently active chat ID
+  activeChatId?: string
 }
 
 type EditorPanelType = {
@@ -63,6 +76,8 @@ const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
   content: '',
   entity: undefined,
   tables: [],
+  chats: {},
+  activeChatId: undefined,
 }
 
 const INITIAL_EDITOR_PANEL: EditorPanelType = {
@@ -109,18 +124,54 @@ const getInitialState = () => {
   const urlParams = new URLSearchParams(window.location.search)
   const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
 
+  // Get project ref from URL if available
+  const projectRef = urlParams.get('ref') || ''
+
   let parsedAiAssistant = INITIAL_AI_ASSISTANT
   let parsedEditorPanel = INITIAL_EDITOR_PANEL
 
   try {
     if (stored) {
       parsedAiAssistant = JSON.parse(stored, (key, value) => {
-        if (key === 'createdAt' && value) {
+        if ((key === 'createdAt' || key === 'updatedAt') && value) {
           return new Date(value)
         }
         return value
       })
     }
+
+    // Load project-specific chats if project ref is available
+    if (projectRef) {
+      const storedChats = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_CHATS(projectRef))
+      if (storedChats) {
+        const parsedChats = JSON.parse(storedChats, (key, value) => {
+          if ((key === 'createdAt' || key === 'updatedAt') && value) {
+            return new Date(value)
+          }
+          return value
+        })
+
+        // Merge with existing chats
+        parsedAiAssistant.chats = {
+          ...parsedAiAssistant.chats,
+          ...parsedChats,
+        }
+
+        // Set active chat to the first chat if not already set
+        if (!parsedAiAssistant.activeChatId) {
+          const chatIds = Object.keys(parsedAiAssistant.chats)
+          if (chatIds.length > 0) {
+            parsedAiAssistant.activeChatId = chatIds[0]
+            // Set messages to the active chat's messages
+            const activeChat = parsedAiAssistant.chats[chatIds[0]]
+            if (activeChat) {
+              parsedAiAssistant.messages = activeChat.messages
+            }
+          }
+        }
+      }
+    }
+
     if (storedEditor) {
       parsedEditorPanel = JSON.parse(storedEditor)
     }
@@ -215,6 +266,9 @@ export const appState = proxy({
     appState.aiAssistantPanel = {
       ...INITIAL_AI_ASSISTANT,
       open: appState.aiAssistantPanel.open,
+      // Preserve chats when resetting the panel
+      chats: appState.aiAssistantPanel.chats,
+      activeChatId: appState.aiAssistantPanel.activeChatId,
     }
   },
 
@@ -225,6 +279,34 @@ export const appState = proxy({
     }
 
     const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
+
+    // If opening the panel and there's a projectRef in the value, ensure the active chat belongs to this project
+    if (value.open && value.entity?.projectRef && appState.aiAssistantPanel.chats) {
+      const projectRef = value.entity.projectRef
+      const currentActiveChatId = appState.aiAssistantPanel.activeChatId
+      const chats = appState.aiAssistantPanel.chats
+
+      // Check if current active chat belongs to this project
+      const currentChatBelongsToProject =
+        currentActiveChatId &&
+        chats[currentActiveChatId] &&
+        chats[currentActiveChatId].projectRef === projectRef
+
+      // If not, find a chat that belongs to this project or leave as is
+      if (!currentChatBelongsToProject) {
+        const projectChats = Object.entries(chats).filter(
+          ([_, chat]) => chat.projectRef === projectRef
+        )
+
+        if (projectChats.length > 0) {
+          // Set the first chat of this project as active
+          value.activeChatId = projectChats[0][0]
+          // Also set the messages to match this chat
+          value.messages = chats[value.activeChatId].messages
+        }
+      }
+    }
+
     appState.aiAssistantPanel = {
       ...appState.aiAssistantPanel,
       content: hasEntityChanged ? '' : appState.aiAssistantPanel.content,
@@ -233,9 +315,30 @@ export const appState = proxy({
   },
 
   saveLatestMessage: (message: any) => {
-    appState.aiAssistantPanel = {
-      ...appState.aiAssistantPanel,
-      messages: [...appState.aiAssistantPanel.messages, message],
+    const { activeChatId, chats } = appState.aiAssistantPanel
+
+    if (activeChatId && chats && chats[activeChatId]) {
+      // Update the active chat with the new message
+      const updatedChat = {
+        ...chats[activeChatId],
+        messages: [...chats[activeChatId].messages, message],
+        updatedAt: new Date(),
+      }
+
+      appState.aiAssistantPanel = {
+        ...appState.aiAssistantPanel,
+        messages: [...appState.aiAssistantPanel.messages, message],
+        chats: {
+          ...chats,
+          [activeChatId]: updatedChat,
+        },
+      }
+    } else {
+      // Fallback to old behavior if no active chat
+      appState.aiAssistantPanel = {
+        ...appState.aiAssistantPanel,
+        messages: [...appState.aiAssistantPanel.messages, message],
+      }
     }
   },
 
@@ -269,6 +372,9 @@ export const appState = proxy({
   setMobileMenuOpen: (value: boolean) => {
     appState.mobileMenuOpen = value
   },
+
+  // The assistant-related functions have been moved to the useAssistant hook
+  // Only keeping the setAiAssistantPanel function for state updates
 })
 
 // Set up localStorage subscriptions
@@ -279,7 +385,42 @@ if (typeof window !== 'undefined') {
       ...appState.aiAssistantPanel,
       // limit to 20 messages so as to not overflow the context window
       messages: appState.aiAssistantPanel.messages?.slice(-20),
+      // Process chats to limit message history in each chat
+      chats: appState.aiAssistantPanel.chats
+        ? Object.entries(appState.aiAssistantPanel.chats).reduce((acc, [chatId, chat]) => {
+            return {
+              ...acc,
+              [chatId]: {
+                ...chat,
+                messages: chat.messages.slice(-20),
+              },
+            }
+          }, {})
+        : {},
     }
+
+    // Store chats by project reference, limiting to 20 messages per chat
+    if (appState.aiAssistantPanel.activeChatId && appState.aiAssistantPanel.chats) {
+      const activeChat = appState.aiAssistantPanel.chats[appState.aiAssistantPanel.activeChatId]
+      if (activeChat?.projectRef) {
+        const limitedChats = Object.entries(appState.aiAssistantPanel.chats).reduce(
+          (acc, [chatId, chat]) => ({
+            ...acc,
+            [chatId]: {
+              ...chat,
+              messages: chat.messages.slice(-20),
+            },
+          }),
+          {}
+        )
+        localStorage.setItem(
+          LOCAL_STORAGE_KEYS.AI_ASSISTANT_CHATS(activeChat.projectRef),
+          JSON.stringify(limitedChats)
+        )
+      }
+    }
+
+    // Keep the old storage for backward compatibility
     localStorage.setItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE, JSON.stringify(aiAssistantState))
 
     // Save editor panel state
