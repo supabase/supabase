@@ -1622,37 +1622,6 @@ export interface components {
       /** @enum {string} */
       status?: 'in_use' | 'standby'
     }
-    CreateSinkResponse: {
-      id: number
-    }
-    CreateSourceResponse: {
-      id: number
-    }
-    CreateStorageBucketBody: {
-      allowed_mime_types: string[]
-      file_size_limit: number
-      id: string
-      public: boolean
-    }
-    CreateStorageCredentialBody: {
-      description: string
-    }
-    CreateStorageCredentialResponse: {
-      access_key: string
-      description: string
-      id: string
-      secret_key: string
-    }
-    CreateTableBody: {
-      comment?: string
-      name: string
-      schema?: string
-    }
-    CreateTaxIdBody: {
-      country?: string
-      type: string
-      value: string
-    }
     CreateThirdPartyAuthBody: {
       custom_jwks?: Record<string, never>
       jwks_url?: string
@@ -2482,64 +2451,6 @@ export interface components {
     UpdateSigningKeyBody: {
       /** @enum {string} */
       status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
-    }
-    UpdatePublicationBody: {
-      id?: number
-      name?: string
-      owner?: string
-      publish_delete?: boolean
-      publish_insert?: boolean
-      publish_truncate?: boolean
-      publish_update?: boolean
-      tables?: string[] | null
-    }
-    UpdateRealtimeConfigBodyDto: {
-      /** @description Sets connection pool size for Realtime Authorization */
-      connection_pool?: number
-      /** @description Sets maximum number of bytes per second rate per channel limit */
-      max_bytes_per_second?: number
-      /** @description Sets maximum number of channels per client rate limit */
-      max_channels_per_client?: number
-      /** @description Sets maximum number of concurrent users rate limit */
-      max_concurrent_users?: number
-      /** @description Sets maximum number of events per second rate per channel limit */
-      max_events_per_second?: number
-      /** @description Sets maximum number of joins per second rate limit */
-      max_joins_per_second?: number
-      /** @description Whether to only allow private channels */
-      private_only?: boolean
-    }
-    UpdateRestrictionsBody: {
-      no_notification?: boolean
-      restriction_data?: components['schemas']['RestrictionData']
-      /** @enum {string} */
-      restriction_status: 'grace_period' | 'grace_period_over' | 'null' | 'restricted'
-    }
-    UpdateRestrictionsRequestBody: {
-      restricted_to_quota: string
-    }
-    UpdateRestrictionsResponse: {
-      message?: string
-      restriction_data?: components['schemas']['RestrictionData']
-      /** @enum {string} */
-      restriction_status?: 'grace_period' | 'grace_period_over' | 'null' | 'restricted'
-      slug: string
-    }
-    UpdateSchemaBody: {
-      name?: string
-      owner?: string
-    }
-    UpdateSecretsConfigBody: {
-      change_tracking_id: string
-      jwt_secret: string
-    }
-    UpdateSecretsResponse: {
-      message: string
-    }
-    UpdateStorageBucketBody: {
-      allowed_mime_types: string[]
-      file_size_limit: number
-      public: boolean
     }
     UpdateStorageConfigBody: {
       features?: components['schemas']['StorageFeatures']
