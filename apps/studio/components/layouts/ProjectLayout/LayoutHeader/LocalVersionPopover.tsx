@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 
+import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useDockerHubStudioVersionsQuery } from 'data/misc/docker-hub-versions-query'
 import { STUDIO_VERSION } from 'lib/constants'
@@ -14,6 +15,7 @@ import {
   DialogTrigger,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
+  PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
   SimpleCodeBlock,
   Tabs_Shadcn_,
@@ -39,23 +41,11 @@ export const LocalVersionPopover = () => {
           {isLatestVersion ? 'Latest' : 'Update available'}
         </Badge>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ align="end" className="w-80">
-        <p className="text-xs text-foreground-lighter">Studio version:</p>
-        <div className="flex items-center gap-x-2">
-          <p className="text-sm font-mono">{STUDIO_VERSION}</p>
-          {hasLatestVersionCheck ? (
-            isLatestVersion ? (
-              <Badge variant="outline">Latest</Badge>
-            ) : (
-              <Badge variant="brand">Update available</Badge>
-            )
-          ) : null}
-        </div>
-
+      <PopoverContent_Shadcn_ align="end" className="w-80 px-0">
         {hasLatestVersionCheck ? (
           !isLatestVersion ? (
-            <div>
-              <p className="text-xs my-2">
+            <div className="px-4 mb-3">
+              <p className="text-sm mb-2">
                 A new version of Supabase Studio is available and can be updated via the CLI:
               </p>
               <Tabs_Shadcn_ defaultValue="macos">
@@ -95,10 +85,14 @@ export const LocalVersionPopover = () => {
                 </TabsContent_Shadcn_>
               </Tabs_Shadcn_>
             </div>
-          ) : null
+          ) : (
+            <div className="px-4 mb-3">
+              <p className="text-sm">You're on the latest version of Studio</p>
+            </div>
+          )
         ) : null}
 
-        <div className="flex flex-col gap-y-2 mt-3">
+        <div className="flex flex-col gap-y-2 px-4">
           <p className="text-xs text-foreground-lighter">
             All available image versions of Supabase Studio can be found on our{' '}
             <InlineLink href="https://hub.docker.com/r/supabase/studio/tags">Docker Hub</InlineLink>
@@ -106,7 +100,7 @@ export const LocalVersionPopover = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-x-2 mt-3">
+        <div className="flex items-center gap-x-2 mt-3 px-4">
           <Dialog>
             <DialogTrigger asChild>
               <Button type="default">Release schedule</Button>
@@ -132,11 +126,15 @@ export const LocalVersionPopover = () => {
                   title="Beta Releases"
                   description="Beta releases are also available in between stable releases via the Beta version of the CLI if you might be waiting on a fix. If you'd like to try, we recommend doing so via npm:"
                 >
-                  <div className="flex items-center bg-surface-200 py-1 px-2 rounded mt-3">
+                  <div className="flex items-center bg-surface-200 py-1 px-2 rounded mt-2">
                     <SimpleCodeBlock parentClassName="bg-surface-200">
                       npm i supabase@beta --save-dev
                     </SimpleCodeBlock>
                   </div>
+                  <DocsButton
+                    href="https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=linux#using-beta-version"
+                    className="!no-underline mt-2"
+                  />
                 </Admonition>
               </DialogSection>
             </DialogContent>
@@ -150,6 +148,19 @@ export const LocalVersionPopover = () => {
               CLI Docs
             </a>
           </Button>
+        </div>
+        <PopoverSeparator_Shadcn_ className="my-4" />
+        <div className="flex items-center gap-x-4 px-4">
+          <div className="flex flex-col gap-y-1">
+            <p className="text-xs">Current version:</p>
+            <p className="text-sm font-mono">{STUDIO_VERSION}</p>
+          </div>
+          {hasLatestVersionCheck && !isLatestVersion && (
+            <div className="flex flex-col gap-y-1">
+              <p className="text-xs">Available version:</p>
+              <p className="text-sm font-mono">{data.latest}</p>
+            </div>
+          )}
         </div>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
