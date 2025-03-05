@@ -249,7 +249,7 @@ const { error } = await supabase
 const { data, error } = await supabase
   .auth
   .signInWithOtp({ phone })
-  
+
 // After receiving a SMS with a OTP.
 const { data, error } = await supabase
   .auth
@@ -304,7 +304,7 @@ const { data, error } = await supabase
 
 #### Get the user's current session
 
-<GetSessionWarning />
+<$Partial path="get_session_warning.mdx" />
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
