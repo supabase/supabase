@@ -26,6 +26,8 @@ RUN apt-get update -qq && \
 RUN npm install -g pnpm@9.15.5
 
 WORKDIR /app
+ARG BUILD_VERSION
+ENV STUDIO_VERSION="$BUILD_VERSION"
 
 # Prune unneeded dependencies with turbo (from apps/ for example)
 FROM base AS turbo

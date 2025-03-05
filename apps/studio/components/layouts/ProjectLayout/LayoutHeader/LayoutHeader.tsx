@@ -16,12 +16,13 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, STUDIO_VERSION } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
+import { LocalVersionPopover } from './LocalVersionPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
 
 const LayoutHeaderDivider = () => (
@@ -119,7 +120,7 @@ const LayoutHeader = ({
             )}
 
             {!IS_PLATFORM && (
-              <div className="ml-3 text-xs text-foreground-light">Default project</div>
+              <p className="mx-2.5 text-xs text-foreground-light">Default project</p>
             )}
 
             {projectRef && IS_PLATFORM && (
@@ -154,13 +155,15 @@ const LayoutHeader = ({
           </div>
           <div className="flex items-center gap-x-2">
             {customHeaderComponents && customHeaderComponents}
-            {IS_PLATFORM && (
+            {IS_PLATFORM ? (
               <>
                 <FeedbackDropdown />
                 <NotificationsPopoverV2 />
                 <HelpPopover />
               </>
-            )}
+            ) : !!STUDIO_VERSION ? (
+              <LocalVersionPopover />
+            ) : null}
           </div>
         </div>
         <div className="absolute md:hidden left-0 h-full w-3 bg-gradient-to-r from-background-dash-sidebar to-transparent pointer-events-none" />
