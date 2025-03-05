@@ -51,7 +51,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
     if (totalSize < defaultTotalSize) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Disk size cannot be reduced in size. Must be at least ${formatNumber(defaultTotalSize)} GB.`,
+        message: `Disk size cannot be reduced in size. Reduce your database size and then head to the Infrastructure settings and go through a Postgres version upgrade to right-size your disk.`,
         path: ['totalSize'],
       })
     }

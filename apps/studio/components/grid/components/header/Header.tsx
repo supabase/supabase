@@ -7,7 +7,6 @@ import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useDispatch, useTrackedState } from 'components/grid/store/Store'
 import type { Filter, Sort, SupaTable } from 'components/grid/types'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
@@ -207,7 +206,7 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHe
                             onClick={() => {
                               onImportData()
                               sendEvent({
-                                action: TelemetryActions.IMPORT_DATA_BUTTON_CLICKED,
+                                action: 'import_data_button_clicked',
                                 properties: { tableType: 'Existing Table' },
                                 groups: {
                                   project: ref ?? 'Unknown',

@@ -28,6 +28,7 @@ import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
 import { ParametersPopover } from './ParametersPopover'
 import { getCumulativeResults } from './QueryBlock.utils'
+import SqlWarningAdmonition from '../SqlWarningAdmonition'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
@@ -282,51 +283,25 @@ export const QueryBlock = ({
       }
     >
       {!!showWarning && (
-        <Admonition
-          type="warning"
-          className="mb-0 rounded-none border-0 shrink-0 bg-background-100"
-        >
-          <p>
-            {showWarning === 'hasWriteOperation'
-              ? 'This query contains write operations.'
-              : 'This query involves running a function.'}{' '}
-            Are you sure you want to execute it?
-          </p>
-          <p className="text-foreground-light">
-            Make sure you are not accidentally removing something important.
-          </p>
-          <div className="flex justify-stretch mt-2 gap-2">
-            <Button
-              type="outline"
-              size="tiny"
-              className="w-full flex-1"
-              onClick={() => setShowWarning(undefined)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="danger"
-              size="tiny"
-              disabled={!sql}
-              className="w-full flex-1"
-              onClick={() => {
-                // [Joshen] This is for when we introduced the concept of parameters into our reports
-                // const processedSql = processParameterizedSql(sql!, combinedParameterValues)
-                if (sql) {
-                  setShowWarning(undefined)
-                  execute({
-                    projectRef: ref,
-                    connectionString: project?.connectionString,
-                    sql,
-                  })
-                  onRunQuery?.('mutation')
-                }
-              }}
-            >
-              Run
-            </Button>
-          </div>
-        </Admonition>
+        <SqlWarningAdmonition
+          warningType={showWarning}
+          className="border-b"
+          onCancel={() => setShowWarning(undefined)}
+          onConfirm={() => {
+            // [Joshen] This is for when we introduced the concept of parameters into our reports
+            // const processedSql = processParameterizedSql(sql!, combinedParameterValues)
+            if (sql) {
+              setShowWarning(undefined)
+              execute({
+                projectRef: ref,
+                connectionString: project?.connectionString,
+                sql,
+              })
+              onRunQuery?.('mutation')
+            }
+          }}
+          disabled={!sql}
+        />
       )}
 
       {isExecuting && queryResult === undefined && (
