@@ -12,10 +12,19 @@ export type UpdateSinkParams = {
   projectId: string
   datasetId: string
   serviceAccountKey: string
+  maxStalenessMins: number
 }
 
 async function updateSink(
-  { sinkId, projectRef, sinkName, projectId, datasetId, serviceAccountKey }: UpdateSinkParams,
+  {
+    sinkId,
+    projectRef,
+    sinkName,
+    projectId,
+    datasetId,
+    serviceAccountKey,
+    maxStalenessMins,
+  }: UpdateSinkParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -27,6 +36,7 @@ async function updateSink(
       dataset_id: datasetId,
       service_account_key: serviceAccountKey,
       sink_name: sinkName,
+      max_staleness_mins: maxStalenessMins,
     },
     signal,
   })
