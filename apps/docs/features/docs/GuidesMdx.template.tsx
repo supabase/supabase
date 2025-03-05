@@ -115,7 +115,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
         <GuidesTableOfContents
           video={meta?.tocVideo}
           className={cn(
-            'hidden md:block',
+            'hidden md:flex',
             'col-span-3 self-start',
             'sticky',
             /**

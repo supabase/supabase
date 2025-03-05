@@ -12,7 +12,6 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { Route } from 'components/ui/ui.types'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
 
 interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   route: Route
@@ -21,8 +20,6 @@ interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorEleme
 
 const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonProps>(
   ({ route, isActive = false, onClick = noop, ...props }, ref) => {
-    const snap = useAppStateSnapshot()
-
     const [storedAllowNavPanel] = useLocalStorageQuery(
       LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
       true
@@ -78,7 +75,6 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
           {route.icon}
         </span>
         <span
-          aria-hidden={snap.navigationPanelOpen || undefined}
           className={cn(
             'min-w-[128px] text-sm text-foreground-light',
             'group-hover/item:text-foreground',

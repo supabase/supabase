@@ -366,12 +366,16 @@ export const gettingstarted: NavMenuConstant = {
       ],
     },
     {
-      name: 'AI Prompts',
+      name: 'AI Tools',
       url: undefined,
       items: [
         {
-          name: 'Overview',
+          name: 'Prompts',
           url: '/guides/getting-started/ai-prompts',
+        },
+        {
+          name: 'Model context protocol (MCP)',
+          url: '/guides/getting-started/mcp',
         },
       ],
     },
@@ -1088,6 +1092,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/bigquery',
         },
         {
+          name: 'Connecting to Clerk',
+          url: '/guides/database/extensions/wrappers/clerk',
+        },
+        {
           name: 'Connecting to ClickHouse',
           url: '/guides/database/extensions/wrappers/clickhouse',
         },
@@ -1102,6 +1110,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to MSSQL',
           url: '/guides/database/extensions/wrappers/mssql',
+        },
+        {
+          name: 'Connecting to Notion',
+          url: '/guides/database/extensions/wrappers/notion',
         },
         {
           name: 'Connecting to Paddle',
@@ -1945,6 +1957,13 @@ export const local_development: NavMenuConstant = {
   ],
 }
 
+export const contributing: NavMenuConstant = {
+  icon: 'contributing',
+  title: 'Contributing',
+  url: '/contributing',
+  items: [{ name: 'Overview', url: '/contributing' }],
+}
+
 export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof IconPanel>>[] = [
   {
     name: 'Auth0',
@@ -2010,6 +2029,27 @@ export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof Ico
     url: '/guides/platform/migrating-to-supabase/mssql',
   },
 ]
+
+export const security: NavMenuConstant = {
+  icon: 'platform',
+  title: 'Security',
+  url: '/guides/security',
+  items: [
+    { name: 'Overview', url: '/guides/security' },
+    {
+      name: 'Product security',
+      url: '/guides/security/product-security',
+    },
+    {
+      name: 'Compliance',
+      url: undefined,
+      items: [
+        { name: 'SOC 2', url: '/guides/security/soc-2-compliance' },
+        { name: 'HIPAA', url: '/guides/security/hipaa-compliance' },
+      ],
+    },
+  ],
+}
 
 export const platform: NavMenuConstant = {
   icon: 'platform',
@@ -2358,6 +2398,7 @@ export const deployment: NavMenuConstant = {
         },
         { name: 'Maturity model', url: '/guides/deployment/maturity-model' },
         { name: 'Production checklist', url: '/guides/deployment/going-into-prod' },
+        { name: 'SOC 2 compliance', url: '/guides/security/soc-2-compliance' },
       ],
     },
     {

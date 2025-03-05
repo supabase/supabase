@@ -98,7 +98,9 @@ The compute size of your project sets the upper limit for disk throughput and IO
 | 12XL             | 14,250 MiB/s    | 50,000 IOPS |
 | 16XL             | 19,000 MiB/s    | 80,000 IOPS |
 
-Smaller compute instances like Nano, Micro, and Small have baseline performance levels that can occasionally be exceeded. Larger compute-instances (4XL and above) are designed for sustained, high performance with specific IOPS and throughput limits. If you hit your IOPS or throughput limit, throttling will occur.
+Smaller compute instances like Nano, Micro, Small, and Medium have baseline performance levels that can occasionally be exceeded for short periods of time. If it does exceed the baseline, you should consider upgrading your instance size for a more reliable performance.
+
+Larger compute instances (4XL and above) are designed for sustained, high performance with specific IOPS and throughput limits which you can [configure](/docs/guides/platform/manage-your-usage/disk-throughput). If you hit your IOPS or throughput limit, throttling will occur.
 
 ### Choosing the right compute instance for consistent disk performance
 
@@ -106,7 +108,7 @@ If you need consistent disk performance, choose the 4XL or larger compute instan
 
 ### Provisioned disk throughput and IOPS
 
-The default disk type is gp3, which comes with a baseline throughput of 125 MiB/s and a default IOPS of 3,000. You can provision additional IOPS and throughput from the [Database Settings](/dashboard/project/_/settings/database) page, but keep in mind that the effective IOPS and throughput will be limited by the compute instance size.
+The default disk type is gp3, which comes with a baseline throughput of 125 MiB/s and a default IOPS of 3,000. You can provision additional IOPS and throughput from the [Database Settings](https://supabase.com/dashboard/project/_/settings/compute-and-disk) page, but keep in mind that the effective IOPS and throughput will be limited by the compute instance size. This requires Large compute size or above.
 
 <Admonition type="caution">
 
