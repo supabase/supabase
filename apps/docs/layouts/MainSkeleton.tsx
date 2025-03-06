@@ -6,11 +6,11 @@ import { memo, useEffect, type PropsWithChildren, type ReactNode } from 'react'
 
 import { cn } from 'ui'
 
+import { type NavMenuSection } from '~/components/Navigation/Navigation.types'
 import DefaultNavigationMenu, {
   MenuId,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
-import { type NavMenuSection } from '~/components/Navigation/Navigation.types'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
@@ -77,6 +77,10 @@ const levelsData = {
   local_development: {
     icon: 'reference-cli',
     name: 'Local Development',
+  },
+  security: {
+    icon: 'platform',
+    name: 'Security',
   },
   platform: {
     icon: 'platform',
@@ -381,8 +385,6 @@ function SidebarSkeleton({
 
   const mobileMenuOpen = useMenuMobileOpen()
 
-  console.log('menuName', menuName, menuId)
-
   return (
     <div className={cn('flex flex-row h-full relative', className)}>
       {!hideSideNav && (
@@ -425,4 +427,4 @@ function SidebarSkeleton({
   )
 }
 
-export { TopNavSkeleton, SidebarSkeleton }
+export { SidebarSkeleton, TopNavSkeleton }

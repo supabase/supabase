@@ -135,6 +135,7 @@ allow_list = [
     "Drizzle",
     "EnterpriseDB",
     "Entra",
+    "ePHI",
     "Erlang",
     "Figma",
     "Firestore",
@@ -206,6 +207,7 @@ allow_list = [
     "PGAudit",
     "PGroonga",
     "PgBouncer",
+    "PHI",
     "PingIdentity",
     # For historical purposes
     "POSTGRES",
@@ -309,6 +311,7 @@ allow_list = [
     "supabase-community",
     "supabase-flutter",
     "supabase-gdscript",
+    "supabase-grafana",
     "supabase-go",
     "supabase-js",
     "supabase-kt",
