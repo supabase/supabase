@@ -4,6 +4,7 @@ import schemas from './pg-meta-schemas'
 import * as tables from './pg-meta-tables'
 import * as functions from './pg-meta-functions'
 import tablePrivileges from './pg-meta-table-privileges'
+import publications from './pg-meta-publications'
 import extensions from './pg-meta-extensions'
 import config from './pg-meta-config'
 import materializedViews from './pg-meta-materialized-views'
@@ -23,6 +24,7 @@ export default {
   tables,
   functions,
   tablePrivileges,
+  publications,
   extensions,
   config,
   materializedViews,
