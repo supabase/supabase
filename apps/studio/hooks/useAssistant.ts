@@ -109,7 +109,7 @@ export function useAssistant(options?: UseAssistantOptions) {
       return chatId
     }
     return undefined
-  }, [projectRef, setAiAssistantPanel])
+  }, [projectRef, setAiAssistantPanel, aiAssistantPanel.chats])
 
   const handleSelectChat = useCallback(
     (id: string) => {
@@ -127,7 +127,7 @@ export function useAssistant(options?: UseAssistantOptions) {
         }
       }
     },
-    [activeChatId, projectRef, setAiAssistantPanel]
+    [activeChatId, projectRef, projectChatsRecord, setAiAssistantPanel]
   )
 
   const handleDeleteChat = useCallback(
@@ -158,23 +158,22 @@ export function useAssistant(options?: UseAssistantOptions) {
       // Only rename if it's a project chat
       const chat = projectChatsRecord[id]
       if (chat && chat.name !== name) {
-        // Use the direct state update approach instead of functional update
-        // to avoid TypeScript errors with the state updater function
-        const updatedChats = { ...chats }
-        if (updatedChats[id]) {
-          updatedChats[id] = {
-            ...updatedChats[id],
+        // Create new chats object with the updated chat
+        const updatedChats = {
+          ...chats,
+          [id]: {
+            ...chat,
             name,
             updatedAt: new Date(),
-          }
+          },
+        } as Record<string, ChatSession>
 
-          setAiAssistantPanel({
-            chats: updatedChats as any,
-          })
-        }
+        setAiAssistantPanel({
+          chats: updatedChats,
+        })
       }
     },
-    [chats, projectChatsRecord, setAiAssistantPanel]
+    [projectChatsRecord, chats, setAiAssistantPanel]
   )
 
   const handleClearMessages = useCallback(() => {
@@ -193,7 +192,7 @@ export function useAssistant(options?: UseAssistantOptions) {
         } as any,
       })
     }
-  }, [activeChatId, chats, currentChatBelongsToProject, projectChatsRecord, setAiAssistantPanel])
+  }, [activeChatId, projectChatsRecord])
 
   const handleSaveMessage = useCallback(
     (message: MessageType | MessageType[]) => {
