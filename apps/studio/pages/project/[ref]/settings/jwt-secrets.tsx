@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import JWTSecretKeysTable from 'components/interfaces/JwtSecrets/JWTSecretKeysTable'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,
@@ -40,5 +41,10 @@ const AuthSettings: NextPageWithLayout = () => {
   )
 }
 
-AuthSettings.getLayout = (page) => <SettingsLayout>{page}</SettingsLayout>
+AuthSettings.getLayout = (page) => (
+  <DefaultLayout>
+    <SettingsLayout>{page}</SettingsLayout>
+  </DefaultLayout>
+)
+
 export default AuthSettings
