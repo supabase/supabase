@@ -77,14 +77,7 @@ export function useAssistant(options?: UseAssistantOptions) {
         }
       }
     }
-  }, [
-    projectRef,
-    currentChatBelongsToProject,
-    activeChatId,
-    projectChatsRecord,
-    setAiAssistantPanel,
-    aiAssistantPanel.chats,
-  ])
+  }, [projectRef])
 
   const handleNewChat = useCallback(() => {
     if (projectRef) {
