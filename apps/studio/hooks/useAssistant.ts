@@ -166,7 +166,7 @@ export function useAssistant(options?: UseAssistantOptions) {
         })
       }
     },
-    [projectChatsRecord, chats, setAiAssistantPanel]
+    [projectChatsRecord]
   )
 
   const handleClearMessages = useCallback(() => {
