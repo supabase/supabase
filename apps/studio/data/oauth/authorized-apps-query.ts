@@ -13,6 +13,7 @@ export type AuthorizedApp = {
   icon: string | null
   name: string
   website: string
+  created_by: string
   authorized_at: string
 }
 
