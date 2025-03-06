@@ -63,7 +63,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
           >
             {cellValue === null
               ? 'NULL'
-              : typeof cellValue === 'number' || typeof cellValue === 'string'
+              : typeof cellValue === 'string'
                 ? cellValue
                 : JSON.stringify(cellValue)}
           </div>
