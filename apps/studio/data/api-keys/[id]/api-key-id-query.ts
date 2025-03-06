@@ -16,7 +16,6 @@ export async function getAPIKeysById(
   if (typeof projectRef === 'undefined') throw new Error('projectRef is required')
   if (typeof id === 'undefined') throw new Error('Content ID is required')
 
-  // @ts-ignore Just a sample here, TS lint will validate if the endpoint is valid
   const { data, error } = await get('/v1/projects/{ref}/api-keys/{id}', {
     params: {
       path: { ref: projectRef, id },

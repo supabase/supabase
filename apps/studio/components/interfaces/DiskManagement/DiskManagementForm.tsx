@@ -292,10 +292,10 @@ export function DiskManagementForm() {
 
   useEffect(() => {
     // Initialize field values properly when data has been loaded, preserving any user changes
-    if (isSuccess) {
+    if (isDiskAttributesSuccess || isSuccess) {
       form.reset(defaultValues, {})
     }
-  }, [isSuccess])
+  }, [isSuccess, isDiskAttributesSuccess])
 
   // Redirect logic incase disk and compute feature is not live yet
   useEffect(() => {
@@ -314,7 +314,11 @@ export function DiskManagementForm() {
             title="Compute and Disk configuration is not available on the Free Plan"
             actions={
               <Button type="default" asChild>
-                <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
+                <Link
+                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=diskManagementConfigure`}
+                >
+                  Upgrade plan
+                </Link>
               </Button>
             }
             description="You will need to upgrade to at least the Pro Plan to configure compute and disk"

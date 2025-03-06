@@ -1,16 +1,19 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
+
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common/hooks'
 import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DropdownMenuItem } from 'ui'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
-const APIKeyDeleteDialog = ({
-  apiKey,
-}: {
+interface APIKeyDeleteDialogProps {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
-}) => {
+}
+
+export const APIKeyDeleteDialog = ({ apiKey }: APIKeyDeleteDialogProps) => {
   const { ref: projectRef } = useParams()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -26,7 +29,7 @@ const APIKeyDeleteDialog = ({
     deleteAPIKey({ projectRef, id: apiKey.id })
   }
 
-  const canDeleteAPIKeys = true // todo
+  const canDeleteAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
 
   return (
     <>
@@ -60,5 +63,3 @@ const APIKeyDeleteDialog = ({
     </>
   )
 }
-
-export default APIKeyDeleteDialog

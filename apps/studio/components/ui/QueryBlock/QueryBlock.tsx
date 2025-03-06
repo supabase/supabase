@@ -28,6 +28,7 @@ import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
 import { ParametersPopover } from './ParametersPopover'
 import { getCumulativeResults } from './QueryBlock.utils'
+import SqlWarningAdmonition from '../SqlWarningAdmonition'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
@@ -82,6 +83,8 @@ interface QueryBlockProps {
   disableRunIfMutation?: boolean
   /** UI to render if there's no query results (Used in Reports) */
   noResultPlaceholder?: ReactNode
+  /** To trigger a refresh of the query */
+  isRefreshing?: boolean
   /** Optional callback whenever a chart configuration is updated (Used in Reports) */
   onUpdateChartConfig?: ({
     chart,
@@ -109,6 +112,7 @@ export const QueryBlock = ({
   runQuery = false,
   lockColumns = false,
   draggable = false,
+  isRefreshing = false,
   disableRunIfMutation = false,
   noResultPlaceholder = null,
   tooltip,
@@ -181,20 +185,25 @@ export const QueryBlock = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sql, isLoading, runQuery, project])
 
+  useEffect(() => {
+    if (isRefreshing) handleExecute()
+  }, [isRefreshing])
+
   return (
     <ReportBlockContainer
       draggable={draggable}
       showDragHandle={draggable}
       tooltip={tooltip}
+      loading={isExecuting}
       onDragStart={(e: DragEvent<Element>) => onDragStart?.(e)}
       icon={
         <SQL_ICON
+          size={18}
+          strokeWidth={1.5}
           className={cn(
             'transition-colors fill-foreground-muted group-aria-selected:fill-foreground',
             'w-5 h-5 shrink-0 grow-0 -ml-0.5'
           )}
-          size={16}
-          strokeWidth={1.5}
         />
       }
       label={label}
@@ -274,51 +283,25 @@ export const QueryBlock = ({
       }
     >
       {!!showWarning && (
-        <Admonition
-          type="warning"
-          className="mb-0 rounded-none border-0 shrink-0 bg-background-100"
-        >
-          <p>
-            {showWarning === 'hasWriteOperation'
-              ? 'This query contains write operations.'
-              : 'This query involves running a function.'}{' '}
-            Are you sure you want to execute it?
-          </p>
-          <p className="text-foreground-light">
-            Make sure you are not accidentally removing something important.
-          </p>
-          <div className="flex justify-stretch mt-2 gap-2">
-            <Button
-              type="outline"
-              size="tiny"
-              className="w-full flex-1"
-              onClick={() => setShowWarning(undefined)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="danger"
-              size="tiny"
-              disabled={!sql}
-              className="w-full flex-1"
-              onClick={() => {
-                // [Joshen] This is for when we introduced the concept of parameters into our reports
-                // const processedSql = processParameterizedSql(sql!, combinedParameterValues)
-                if (sql) {
-                  setShowWarning(undefined)
-                  execute({
-                    projectRef: ref,
-                    connectionString: project?.connectionString,
-                    sql,
-                  })
-                  onRunQuery?.('mutation')
-                }
-              }}
-            >
-              Run
-            </Button>
-          </div>
-        </Admonition>
+        <SqlWarningAdmonition
+          warningType={showWarning}
+          className="border-b"
+          onCancel={() => setShowWarning(undefined)}
+          onConfirm={() => {
+            // [Joshen] This is for when we introduced the concept of parameters into our reports
+            // const processedSql = processParameterizedSql(sql!, combinedParameterValues)
+            if (sql) {
+              setShowWarning(undefined)
+              execute({
+                projectRef: ref,
+                connectionString: project?.connectionString,
+                sql,
+              })
+              onRunQuery?.('mutation')
+            }
+          }}
+          disabled={!sql}
+        />
       )}
 
       {isExecuting && queryResult === undefined && (
@@ -329,7 +312,9 @@ export const QueryBlock = ({
 
       {showSql && (
         <div
-          className="shrink-0 w-full max-h-96 overflow-y-auto"
+          className={cn('shrink-0 w-full max-h-96 overflow-y-auto', {
+            'border-b': queryResult !== undefined,
+          })}
           style={{ height: !!queryHeight ? `${queryHeight}px` : undefined }}
         >
           <CodeBlock

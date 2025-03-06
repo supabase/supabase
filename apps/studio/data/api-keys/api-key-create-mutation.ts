@@ -26,8 +26,9 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
   const { data, error } = await post('/v1/projects/{ref}/api-keys', {
     params: {
       path: { ref: payload.projectRef },
-      // WRONG QUERY PARAMETER
-      query: { reveal: true },
+      query: {
+        reveal: false,
+      },
     },
     body:
       payload.type === 'secret'

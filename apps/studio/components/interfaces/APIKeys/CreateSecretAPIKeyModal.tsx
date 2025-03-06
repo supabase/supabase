@@ -1,7 +1,11 @@
-import { useState } from 'react'
-import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Plus } from 'lucide-react'
+import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import * as z from 'zod'
+
+import { useParams } from 'common'
+import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import {
   Button,
   Dialog,
@@ -17,20 +21,11 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
-import { Plus } from 'lucide-react'
-import { useParams } from 'common'
-
 const FORM_ID = 'create-secret-api-key'
 const SCHEMA = z.object({
-  // role: z.string(),
   description: z.string(),
 })
 
@@ -45,7 +40,6 @@ const CreateSecretAPIKeyModal = () => {
   const form = useForm<z.infer<typeof SCHEMA>>({
     resolver: zodResolver(SCHEMA),
     defaultValues: {
-      // role: 'service_role',
       description: '',
     },
   })
@@ -53,17 +47,11 @@ const CreateSecretAPIKeyModal = () => {
   const { mutate: createAPIKey, isLoading: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
-    console.log('got to onSubmit')
     createAPIKey(
       {
         projectRef,
         type: 'secret',
         description: values.description.trim(),
-        // secret_jwt_template: values.role.trim()
-        //   ? {
-        //       role: values.role,
-        //     }
-        //   : undefined,
       },
       {
         onSuccess: () => {
@@ -97,33 +85,6 @@ const CreateSecretAPIKeyModal = () => {
               id={FORM_ID}
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              {/* <FormField_Shadcn_
-                key="role"
-                name="role"
-                control={form.control}
-                render={({ field }) => (
-                  <>
-                    <FormItemLayout
-                      label="Postgres Role for RLS"
-                      description="API calls to your project will use this Postgres role to authorize requests."
-                    >
-                      <FormControl_Shadcn_>
-                        <Input_Shadcn_ {...field} />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                    {field.value.trim() === 'service_role' && (
-                      <Alert_Shadcn_ variant="warning">
-                        <WarningIcon className="h-4 w-4" strokeWidth={2} />
-                        <AlertTitle_Shadcn_>Row-Level Security Bypass</AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
-                          Using <code>service_role</code> will bypass all RLS policies on your
-                          project. Use with care!
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    )}
-                  </>
-                )}
-              /> */}
               <FormField_Shadcn_
                 key="description"
                 name="description"

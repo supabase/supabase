@@ -13,6 +13,7 @@ export const COLOR_MAP = {
   'dark-yellow': { bar: 'fill-yellow-1000', marker: 'bg-yellow-1000' },
   orange: { bar: 'fill-orange-800', marker: 'bg-orange-800' },
   'dark-orange': { bar: 'fill-orange-1000', marker: 'bg-orange-1100' },
+  teal: { bar: 'fill-teal-600', marker: 'bg-teal-700' },
   red: { bar: 'fill-red-800', marker: 'bg-red-800' },
   'dark-red': { bar: 'fill-red-1000', marker: 'bg-red-1000' },
   purple: { bar: 'fill-purple-900', marker: 'bg-purple-900' },
@@ -36,6 +37,7 @@ export type AttributeColor =
   | 'dark-orange'
   | 'dark-yellow'
   | 'dark-green'
+  | 'teal'
 
 export interface Attribute {
   key: string
@@ -86,6 +88,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           { key: EgressType.REALTIME, name: 'Realtime Egress', color: 'orange' },
           { key: EgressType.FUNCTIONS, name: 'Functions Egress', color: 'purple' },
           { key: EgressType.SUPAVISOR, name: 'Supavisor Egress', color: 'red' },
+          { key: EgressType.LOGDRAIN, name: 'Logdrain Egress', color: 'teal' },
         ],
         name: 'Total Egress',
         unit: 'bytes',
@@ -169,7 +172,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
             links: [
               {
                 name: 'Documentation',
-                url: 'https://supabase.com/docs/guides/platform/org-based-billing#disk-size',
+                url: 'https://supabase.com/docs/guides/platform/manage-your-usage/disk-size',
               },
               {
                 name: 'Disk Management',
@@ -299,7 +302,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
         attributes: [
           { key: PricingMetric.REALTIME_PEAK_CONNECTIONS.toLowerCase(), color: 'white' },
         ],
-        name: 'Realtime Peak Connections',
+        name: 'Realtime Concurrent Peak Connections',
         chartPrefix: 'Max',
         unit: 'absolute',
         description:

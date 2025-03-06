@@ -200,7 +200,7 @@ using (true)
 
 ### Enable the hook
 
-In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate PostgreSQL function from the dropdown menu.
+In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate Postgres function from the dropdown menu.
 
 When developing locally, follow the [local development](/docs/guides/auth/auth-hooks#local-development) instructions.
 
@@ -267,7 +267,7 @@ const { subscription: authListener } = supabase.auth.onAuthStateChange(async (ev
 })
 ```
 
-For server-side logic you can use packages like [express-jwt](https://github.com/auth0/express-jwt), [koa-jwt](https://github.com/stiang/koa-jwt), [PyJWT](https://github.com/jpadilla/pyjwt), [dart_jsonwebtoken](https://pub.dev/packages/dart_jsonwebtoken), [Microsoft.AspNetCore.Authentication.JwtBearer](https://www.nuget.org/packages/Microsoft.AspNetCore.Authentication.JwtBearer), etc.
+For server-side logic you can use packages like [`express-jwt`](https://github.com/auth0/express-jwt), [`koa-jwt`](https://github.com/stiang/koa-jwt), [`PyJWT`](https://github.com/jpadilla/pyjwt), [dart_jsonwebtoken](https://pub.dev/packages/dart_jsonwebtoken), [Microsoft.AspNetCore.Authentication.JwtBearer](https://www.nuget.org/packages/Microsoft.AspNetCore.Authentication.JwtBearer), etc.
 
 ## Conclusion
 

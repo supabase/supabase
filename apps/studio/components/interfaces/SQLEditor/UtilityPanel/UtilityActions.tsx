@@ -1,13 +1,4 @@
-import {
-  AlignLeft,
-  Check,
-  Command,
-  CornerDownLeft,
-  Heart,
-  Keyboard,
-  Loader2,
-  MoreVertical,
-} from 'lucide-react'
+import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -29,6 +20,7 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
+import { SqlRunButton } from './RunButton'
 import SavingIndicator from './SavingIndicator'
 
 export type UtilityActionsProps = {
@@ -190,29 +182,12 @@ const UtilityActions = ({
             onSelectId={onSelectDatabase}
           />
           <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
-          <Button
-            onClick={() => executeQuery()}
-            disabled={isDisabled || isExecuting}
-            type="primary"
-            size="tiny"
-            iconRight={
-              isExecuting ? (
-                <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-              ) : (
-                <div className="flex items-center space-x-1">
-                  {os === 'macos' ? (
-                    <Command size={10} strokeWidth={1.5} />
-                  ) : (
-                    <p className="text-xs text-foreground-light">CTRL</p>
-                  )}
-                  <CornerDownLeft size={10} strokeWidth={1.5} />
-                </div>
-              )
-            }
+          <SqlRunButton
+            isDisabled={isDisabled || isExecuting}
+            isExecuting={isExecuting}
             className="rounded-l-none min-w-[82px]"
-          >
-            {hasSelection ? 'Run selected' : 'Run'}
-          </Button>
+            onClick={executeQuery}
+          />
         </div>
       </div>
     </div>

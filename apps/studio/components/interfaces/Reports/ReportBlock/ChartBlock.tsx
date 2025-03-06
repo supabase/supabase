@@ -66,7 +66,11 @@ export const ChartBlock = ({
 
   const databaseIdentifier = state.selectedDatabaseId
 
-  const { data: dailyStatsData, isLoading: isFetchingDailyStats } = useProjectDailyStatsQuery(
+  const {
+    data: dailyStatsData,
+    isFetching: isFetchingDailyStats,
+    isLoading: isLoadingDailyStats,
+  } = useProjectDailyStatsQuery(
     {
       projectRef: ref as string,
       attribute: attribute as ProjectDailyStatsAttribute,
@@ -78,18 +82,21 @@ export const ChartBlock = ({
     { enabled: provider === 'daily-stats' }
   )
 
-  const { data: infraMonitoringData, isLoading: isFetchingInfraMonitoring } =
-    useInfraMonitoringQuery(
-      {
-        projectRef: ref as string,
-        attribute: attribute as InfraMonitoringAttribute,
-        startDate,
-        endDate,
-        interval: interval as AnalyticsInterval,
-        databaseIdentifier,
-      },
-      { enabled: provider === 'infra-monitoring' }
-    )
+  const {
+    data: infraMonitoringData,
+    isFetching: isFetchingInfraMonitoring,
+    isLoading: isLoadingInfraMonitoring,
+  } = useInfraMonitoringQuery(
+    {
+      projectRef: ref as string,
+      attribute: attribute as InfraMonitoringAttribute,
+      startDate,
+      endDate,
+      interval: interval as AnalyticsInterval,
+      databaseIdentifier,
+    },
+    { enabled: provider === 'infra-monitoring' }
+  )
 
   const chartData =
     provider === 'infra-monitoring'
@@ -98,13 +105,20 @@ export const ChartBlock = ({
         ? dailyStatsData
         : undefined
 
+  const isFetching =
+    provider === 'infra-monitoring'
+      ? isFetchingInfraMonitoring
+      : provider === 'daily-stats'
+        ? isFetchingDailyStats
+        : false
+
   const loading =
     isLoading ||
     attribute.startsWith('new_snippet_') ||
     (provider === 'infra-monitoring'
-      ? isFetchingInfraMonitoring
+      ? isLoadingInfraMonitoring
       : provider === 'daily-stats'
-        ? isFetchingDailyStats
+        ? isLoadingDailyStats
         : isLoading)
 
   const metric = METRICS.find((x) => x.key === attribute)
@@ -165,6 +179,7 @@ export const ChartBlock = ({
     <ReportBlockContainer
       draggable
       showDragHandle
+      loading={isFetching}
       icon={metric?.category?.icon('text-foreground-muted')}
       label={label}
       actions={

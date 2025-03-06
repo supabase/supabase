@@ -86,6 +86,7 @@ const LogsQueryPanel = ({
       if (key === 'AUTH') return authEnabled
       if (key === 'STORAGE') return storageEnabled
       if (key === 'FN_EDGE') return edgeFunctionsEnabled
+      if (key === 'PG_CRON') return false
       if (key === 'WAREHOUSE') return false
       return true
     })

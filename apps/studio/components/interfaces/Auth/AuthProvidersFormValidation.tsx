@@ -1,6 +1,6 @@
-import { boolean, number, object, string } from 'yup'
-import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
+import { NO_REQUIRED_CHARACTERS, urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { ProjectAuthConfigData } from 'data/auth/auth-config-query'
+import { boolean, number, object, string } from 'yup'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
@@ -36,6 +36,44 @@ const PROVIDER_EMAIL = {
       If disabled, a user can change their password at any time.`,
       type: 'boolean',
     },
+    PASSWORD_HIBP_ENABLED: {
+      title: 'Prevent use of leaked passwords',
+      description:
+        'Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API.',
+      type: 'boolean',
+    },
+    PASSWORD_MIN_LENGTH: {
+      title: 'Minimum password length',
+      type: 'number',
+      description:
+        'Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.',
+      units: 'characters',
+    },
+    PASSWORD_REQUIRED_CHARACTERS: {
+      type: 'select',
+      title: 'Password Requirements',
+      description: 'Passwords that do not have at least one of each will be rejected as weak.',
+      enum: [
+        {
+          label: 'No required characters (default)',
+          value: NO_REQUIRED_CHARACTERS,
+        },
+        {
+          label: 'Letters and digits',
+          value: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789',
+        },
+        {
+          label: 'Lowercase, uppercase letters and digits',
+          value: 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789',
+        },
+        {
+          label: 'Lowercase, uppercase letters, digits and symbols (recommended)',
+          value:
+            'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~',
+        },
+      ],
+    },
+
     MAILER_OTP_EXP: {
       title: 'Email OTP Expiration',
       type: 'number',
@@ -55,6 +93,9 @@ const PROVIDER_EMAIL = {
       .max(86400, 'Must be no more than 86400')
       .required('This is required'),
     MAILER_OTP_LENGTH: number().min(6, 'Must be at least 6').max(10, 'Must be no more than 10'),
+    PASSWORD_MIN_LENGTH: number()
+      .min(6, 'Must be greater or equal to 6.')
+      .required('This is required'),
   }),
   misc: {
     iconKey: 'email-icon2',

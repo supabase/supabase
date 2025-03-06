@@ -4,7 +4,6 @@ import 'react-resizable/css/styles.css'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
@@ -29,6 +28,7 @@ interface GridResizeProps {
   interval: AnalyticsInterval
   editableReport: Dashboards.Content
   disableUpdate: boolean
+  isRefreshing: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
   onUpdateChart: (
     id: string,
@@ -46,6 +46,7 @@ export const GridResize = ({
   interval,
   editableReport,
   disableUpdate,
+  isRefreshing,
   onRemoveChart,
   onUpdateChart,
   setEditableReport,
@@ -133,7 +134,7 @@ export const GridResize = ({
         },
       }
     )
-    sendEvent({ action: TelemetryActions.CUSTOM_REPORT_ASSISTANT_SQL_BLOCK_ADDED })
+    sendEvent({ action: 'custom_report_assistant_sql_block_added' })
   }
 
   if (!editableReport) return null
@@ -167,6 +168,7 @@ export const GridResize = ({
               endDate={endDate}
               interval={interval}
               disableUpdate={disableUpdate}
+              isRefreshing={isRefreshing}
               onRemoveChart={onRemoveChart}
               onUpdateChart={(config) => onUpdateChart(item.id, config)}
             />

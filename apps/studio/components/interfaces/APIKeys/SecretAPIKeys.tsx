@@ -1,7 +1,10 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useMemo } from 'react'
+
 import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { APIKeysData, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useMemo } from 'react'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { Card, CardContent, EyeOffIcon, Skeleton, WarningIcon, cn } from 'ui'
 import {
   Table,
@@ -11,12 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
-import APIKeyRow from './APIKeyRow'
+import { APIKeyRow } from './APIKeyRow'
 import CreateSecretAPIKeyModal from './CreateSecretAPIKeyModal'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-const SecretAPIKeys = () => {
+export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
   const {
     data: apiKeysData,
@@ -143,5 +144,3 @@ const SecretAPIKeys = () => {
     </TableContainer>
   )
 }
-
-export default SecretAPIKeys

@@ -1,7 +1,12 @@
 import { ChevronRight, FileCode, X } from 'lucide-react'
 import Link from 'next/link'
 
+import { useParams } from 'common'
+import Panel from 'components/ui/Panel'
+import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
+  Badge,
   Button,
   cn,
   CodeBlock,
@@ -11,11 +16,13 @@ import {
   CollapsibleTrigger_Shadcn_,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { ConnectionParameters } from './ConnectionParameters'
 import { DirectConnectionIcon, TransactionIcon } from './PoolerIcons'
 
 interface ConnectionPanelProps {
   type?: 'direct' | 'transaction' | 'session'
+  badge?: string
   title: string
   description: string
   connectionString: string
@@ -23,7 +30,7 @@ interface ConnectionPanelProps {
     type: 'error' | 'success'
     title: string
     description?: string
-    link?: { text: string; url: string }
+    links?: { text: string; url: string }[]
   }
   notice?: string[]
   parameters?: Array<{
@@ -95,6 +102,7 @@ export const CodeBlockFileHeader = ({ title }: { title: string }) => {
 
 export const ConnectionPanel = ({
   type = 'direct',
+  badge,
   title,
   description,
   connectionString,
@@ -105,34 +113,78 @@ export const ConnectionPanel = ({
   fileTitle,
   onCopyCallback,
 }: ConnectionPanelProps) => {
+  const { ref: projectRef } = useParams()
+  const state = useDatabaseSelectorStateSnapshot()
+
+  const { data: poolingInfo } = useSupavisorConfigurationQuery({ projectRef })
+  const poolingConfiguration = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+  const isSessionMode = poolingConfiguration?.pool_mode === 'session'
+
+  const links = ipv4Status.links ?? []
+
   return (
     <div className="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:gap-20 w-full">
       <div className="flex flex-col">
-        <h1 className="text-sm mb-2">{title}</h1>
+        <div className="flex items-center gap-x-2 mb-2">
+          <h1 className="text-sm">{title}</h1>
+          {!!badge && <Badge>{badge}</Badge>}
+        </div>
         <p className="text-sm text-foreground-light mb-4">{description}</p>
         <div className="flex flex-col -space-y-px">
           {fileTitle && <CodeBlockFileHeader title={fileTitle} />}
-          <CodeBlock
-            wrapperClassName={cn(
-              '[&_pre]:rounded-b-none [&_pre]:px-4 [&_pre]:py-3',
-              fileTitle && '[&_pre]:rounded-t-none'
-            )}
-            language={lang}
-            value={connectionString}
-            className="[&_code]:text-[12px] [&_code]:text-foreground"
-            hideLineNumbers
-            onCopyCallback={onCopyCallback}
-          />
-          {notice && (
-            <div className="border px-4 py-1 w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-light">
-              {notice?.map((text: string) => (
-                <p key={text} className="text-xs text-foreground-lighter">
-                  {text}
-                </p>
-              ))}
-            </div>
+          {type === 'transaction' && isSessionMode ? (
+            <Admonition
+              showIcon={false}
+              type="default"
+              className="[&>h5]:text-xs [&>div]:text-xs"
+              title="Transaction pooler is unavailable as pool mode is set to Session"
+              description="If you'd like to use transaction mode, update your pool mode to Transaction for the connection pooler in your project's Database Settings."
+            >
+              <Button asChild type="default" className="mt-2">
+                <Link
+                  href={`/project/${projectRef}/settings/database#connection-pooler`}
+                  className="text-xs text-light hover:text-foreground"
+                >
+                  Database Settings
+                </Link>
+              </Button>
+            </Admonition>
+          ) : (
+            <>
+              {/* [Joshen] Can probably remove this after Feb 28 */}
+              {type === 'session' && isSessionMode && (
+                <Panel.Notice
+                  layout="vertical"
+                  className="border rounded mb-2"
+                  title="Deprecating Session Mode on Port 6543"
+                  description="Please use port 5432 for Session Mode as Supavisor will be deprecating Session Mode on port 6543 on February 28, 2025."
+                  href="https://github.com/orgs/supabase/discussions/32755"
+                  buttonText="Read the announcement"
+                />
+              )}
+              <CodeBlock
+                wrapperClassName={cn(
+                  '[&_pre]:rounded-b-none [&_pre]:px-4 [&_pre]:py-3',
+                  fileTitle && '[&_pre]:rounded-t-none'
+                )}
+                language={lang}
+                value={connectionString}
+                className="[&_code]:text-[12px] [&_code]:text-foreground"
+                hideLineNumbers
+                onCopyCallback={onCopyCallback}
+              />
+              {notice && (
+                <div className="border px-4 py-1 w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-light">
+                  {notice?.map((text: string) => (
+                    <p key={text} className="text-xs text-foreground-lighter">
+                      {text}
+                    </p>
+                  ))}
+                </div>
+              )}
+              {parameters.length > 0 && <ConnectionParameters parameters={parameters} />}
+            </>
           )}
-          {parameters.length > 0 && <ConnectionParameters parameters={parameters} />}
         </div>
       </div>
       <div className="flex flex-col items-end">
@@ -172,21 +224,15 @@ export const ConnectionPanel = ({
               {ipv4Status.description && (
                 <span className="text-xs text-foreground-lighter">{ipv4Status.description}</span>
               )}
-              {ipv4Status.type === 'error' && (
-                <span className="text-xs text-foreground-lighter">
-                  Use Session Pooler if on a IPv4 network or purchase IPv4 addon
-                </span>
-              )}
-              {ipv4Status.link && (
-                <div className="mt-2">
-                  <Button asChild type="default" size="tiny">
-                    <Link
-                      href={ipv4Status.link.url}
-                      className="text-xs text-light hover:text-foreground"
-                    >
-                      {ipv4Status.link.text}
-                    </Link>
-                  </Button>
+              {links.length > 0 && (
+                <div className="flex items-center gap-x-2 mt-2">
+                  {links.map((link) => (
+                    <Button key={link.text} asChild type="default" size="tiny">
+                      <Link href={link.url} className="text-xs text-light hover:text-foreground">
+                        {link.text}
+                      </Link>
+                    </Button>
+                  ))}
                 </div>
               )}
             </div>
@@ -241,7 +287,7 @@ export const ConnectionPanel = ({
                   <p className="text-xs text-foreground-lighter max-w-xs">
                     If you wish to use a Direct Connection with these, please purchase{' '}
                     <Link
-                      href={ipv4Status.link?.url ?? '/'}
+                      href={`/project/${projectRef}/settings/addons?panel=ipv4`}
                       className="text-xs text-light hover:text-foreground"
                     >
                       IPv4 support

@@ -671,7 +671,7 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
 
 <Admonition type="caution">
 
-This feature is currently in Private Alpha. The API and implementation may change. To request access, submit a Support Ticket.
+This feature is currently in Public Alpha. If you have any issues [submit a support ticket](https://supabase.help).
 
 </Admonition>
 
@@ -679,7 +679,7 @@ This feature is currently in Private Alpha. The API and implementation may chang
 
 Broadcast Changes allows you to trigger messages from your database. To achieve it Realtime is directly reading your WAL (Write Append Log) file using a publication against the `realtime.messages` table so whenever a new insert happens a message is sent to connected users.
 
-It uses partitioned tables per day which allows the deletion your previous images in a performant way by dropping the physical tables of this partitioned table. Tables older than 3 days old are deleted.
+It uses partitioned tables per day which allows the deletion your previous messages in a performant way by dropping the physical tables of this partitioned table. Tables older than 3 days old are deleted.
 
 Broadcasting from the database works like a client-side broadcast, using WebSockets to send JSON packages. [Realtime Authorization](/docs/guides/realtime/authorization) is required and enabled by default to protect your data.
 

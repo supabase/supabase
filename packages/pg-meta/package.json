@@ -11,15 +11,19 @@
     "test": "run-s db:clean db:run test:run db:clean",
     "db:clean": "cd test/db && docker compose down",
     "db:run": "cd test/db && docker compose up --detach --wait",
-    "test:run": "vitest run"
+    "test:run": "vitest run --coverage",
+    "test:update": "vitest run --update"
   },
   "dependencies": {
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/pg": "^8.11.11",
+    "@vitest/coverage-v8": "2.1.8",
     "npm-run-all": "^4.1.5",
-    "postgres": "^3.4.5",
+    "pg": "^8.13.1",
+    "postgres-array": "^3.0.2",
     "typescript": "~5.5.0",
-    "vitest": "^2.1.8"
+    "vitest": "^3.0.0"
   }
 }

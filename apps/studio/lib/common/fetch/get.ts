@@ -1,9 +1,9 @@
-import { handleError, handleResponse, handleResponseError, constructHeaders } from './base'
-import { uuidv4 } from '../../helpers'
 import type { SupaResponse } from 'types/base'
+import { uuidv4 } from '../../helpers'
+import { constructHeaders, handleError, handleResponse, handleResponseError } from './base'
 
 /**
- * @deprecated please use get method from data/fetchers instead
+ * @deprecated Please use get method from data/fetchers instead, unless making requests to an external URL
  */
 export async function get<T = any>(
   url: string,

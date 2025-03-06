@@ -1,9 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
-
 import { apiKeysKeys } from './keys'
-import { components } from 'api-types'
 
 export interface APIKeysVariables {
   projectRef?: string

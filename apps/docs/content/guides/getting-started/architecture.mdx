@@ -1,7 +1,7 @@
 ---
-id: 'architecture'
 title: 'Architecture'
 description: 'Supabase design and architecture'
+tocVideo: 'T-qAtAKjqwc'
 ---
 
 Supabase is open source. We choose open source tools which are scalable and make them simple to use.
@@ -27,14 +27,14 @@ Each Supabase project consists of several tools:
   }}
 />
 
-### PostgreSQL (database)
+### Postgres (database)
 
-PostgreSQL is the core of Supabase. We do not abstract the PostgreSQL database—you can access it and use it with full privileges. We simply provide tools which makes PostgreSQL as easy to use as Firebase.
+Postgres is the core of Supabase. We do not abstract the Postgres database—you can access it and use it with full privileges. We provide tools which makes Postgres as easy to use as Firebase.
 
 - Official Docs: [postgresql.org/docs](https://www.postgresql.org/docs/current/index.html)
 - Source code: [github.com/postgres/postgres](https://github.com/postgres/postgres) (mirror)
-- License: [PostgreSQL License](https://www.postgresql.org/about/licence/)
-- Language: C
+  {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
+- License: [PostgreSQL License](https://www.postgresql.org/about/licence/)- Language: C
 
 ### Studio (dashboard)
 
@@ -56,7 +56,7 @@ A JWT-based API for managing users and issuing access tokens. This integrates wi
 
 ### PostgREST (API)
 
-A standalone web server that turns your PostgreSQL database directly into a RESTful API.
+A standalone web server that turns your Postgres database directly into a RESTful API.
 We use this with our [`pg_graphql`](https://github.com/supabase/pg_graphql) extension to provide a GraphQL API.
 
 - Official Docs: [postgrest.org](https://postgrest.org/)
@@ -66,7 +66,7 @@ We use this with our [`pg_graphql`](https://github.com/supabase/pg_graphql) exte
 
 ### Realtime (API & multiplayer)
 
-A scalable websocket engine for managing user Presence, broadcasting messages, and streaming database changes.
+A scalable WebSocket engine for managing user Presence, broadcasting messages, and streaming database changes.
 
 - Official Docs: [Supabase Realtime docs](/docs/guides/realtime)
 - Source code: [github.com/supabase/realtime](https://github.com/supabase/realtime)
@@ -80,7 +80,7 @@ An S3-compatible object storage service that stores metadata in Postgres.
 - Official Docs: [Supabase Storage reference docs](/docs/reference/storage)
 - Source code: [github.com/supabase/storage-api](https://github.com/supabase/storage-api)
 - License: [Apache 2.0](https://github.com/supabase/storage-api/blob/master/LICENSE)
-- Language: NodeJS / TypeScript
+- Language: Node.js / TypeScript
 
 ### Deno (Edge Functions)
 
@@ -98,7 +98,7 @@ A RESTful API for managing your Postgres. Fetch tables, add roles, and run queri
 - Official Docs: [supabase.github.io/postgres-meta](https://supabase.github.io/postgres-meta/)
 - Source code: [github.com/supabase/postgres-meta](https://github.com/supabase/postgres-meta)
 - License: [Apache 2.0](https://github.com/supabase/postgres-meta/blob/master/LICENSE)
-- Language: NodeJS / TypeScript
+- Language: Node.js / TypeScript
 
 ### Supavisor
 

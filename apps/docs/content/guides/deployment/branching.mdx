@@ -4,7 +4,7 @@ description: 'Use Supabase Branches to test and preview changes.'
 subtitle: 'Use Supabase Branches to test and preview changes'
 ---
 
-Use branching to safely and easily experiment with changes to your Supabase project.
+Use branching to safely experiment with changes to your Supabase project.
 
 Supabase branches work like Git branches. They let you create and test changes like new configurations, database schemas, or features in a separate, temporary instance without affecting your production setup.
 
@@ -50,7 +50,7 @@ Preview Branch instances contain no data by default. You must include a seed fil
 
 ## Git providers
 
-To manage code changes, your Supabase project must be connected to a Git repository. At this stage, we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](https://github.com/orgs/supabase/discussions/18936) for GitLab, BitBucket, and non-Git based Branching.
+To manage code changes, your Supabase project must be connected to a Git repository. At this stage, we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](https://github.com/orgs/supabase/discussions/18936) for GitLab, Bitbucket, and non-Git based Branching.
 
 ### Branching with GitHub
 
@@ -73,7 +73,7 @@ Supabase Branching follows the [Trunk Based Development](https://trunkbaseddevel
   }}
 />
 
-When you merge your Git branch into the production branch, all new migrations will be applied to your Production environment based on the changes made to your [`config.toml`](/docs/guides/local-development/cli/config).
+When you merge your Git branch into the production branch, all new migrations will be applied to your Production environment. If you have declared Storage buckets or Edge Functions in `config.toml`, they will also be deployed automatically. All other configurations, including API, Auth, and seed files, will be ignored by default.
 
 <Admonition type="note" label="Data changes are not merged into production." />
 
@@ -337,7 +337,7 @@ The Supabase CLI provides two options: [manual migrations](https://supabase.com/
     <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Make schema changes locally" fullWidth>
 
-            Start supabase locally:
+            Start Supabase locally:
 
             <CH.Code lineNumbers={false}>
 
@@ -505,7 +505,7 @@ When Branching is enabled, your `config.toml` settings automatically sync to all
 
 ### Basic configuration
 
-To update configuration for a Supabase branch, simply modify `config.toml` and push to git. The Supabase integration will detect the changes and apply them to the corresponding branch.
+To update configuration for a Supabase branch, modify `config.toml` and push to git. The Supabase integration will detect the changes and apply them to the corresponding branch.
 
 ### Remote-specific configuration
 

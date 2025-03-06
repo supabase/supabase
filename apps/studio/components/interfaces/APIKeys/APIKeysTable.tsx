@@ -1,7 +1,7 @@
 import { AnimatePresence } from 'framer-motion'
-import APIKeyRow from './APIKeyRow'
+
 import { APIKeysData } from 'data/api-keys/api-keys-query'
-// ... other imports
+import { APIKeyRow } from './APIKeyRow'
 
 const APIKeysTable = ({
   apiKeys,
@@ -10,7 +10,7 @@ const APIKeysTable = ({
 }) => {
   return (
     <table>
-      <thead>{/* ... table header */}</thead>
+      <thead />
       <tbody>
         <AnimatePresence initial={false}>
           {apiKeys.map((apiKey) => (
