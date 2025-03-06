@@ -218,14 +218,7 @@ export function useAssistant(options?: UseAssistantOptions) {
         }
       }
     },
-    [
-      chats,
-      activeChatId,
-      currentChatBelongsToProject,
-      projectRef,
-      projectChatsRecord,
-      setAiAssistantPanel,
-    ]
+    [activeChatId, projectChatsRecord]
   )
 
   const openAssistant = useCallback(
@@ -258,7 +251,7 @@ export function useAssistant(options?: UseAssistantOptions) {
         handleNewChat()
       }
     },
-    [projectRef, setAiAssistantPanel, handleNewChat]
+    [projectRef]
   )
 
   const closeAssistant = useCallback(() => {
@@ -287,9 +280,7 @@ export function useAssistant(options?: UseAssistantOptions) {
     activeChat:
       currentChatBelongsToProject && activeChatId ? projectChatsRecord[activeChatId] : undefined,
     isOpen: open,
-    messages: (currentChatBelongsToProject && activeChatId
-      ? projectChatsRecord[activeChatId]?.messages || []
-      : chats?.[activeChatId || 'default']?.messages || []) as Message[],
+    messages: projectChatsRecord[activeChatId || 'default']?.messages as Message[],
 
     // Actions
     newChat: handleNewChat,
