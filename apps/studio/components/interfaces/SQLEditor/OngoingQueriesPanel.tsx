@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { RefreshCw, StopCircle } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
@@ -27,16 +27,15 @@ import {
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useAppStateSnapshot } from 'state/app-state'
+import { useParams } from 'common'
 
-interface OngoingQueriesPanel {
-  visible: boolean
-  onClose: () => void
-}
-
-export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) => {
+export const OngoingQueriesPanel = () => {
   const [_, setParams] = useUrlState({ replace: true })
+  const { viewOngoingQueries } = useParams()
   const project = useSelectedProject()
   const state = useDatabaseSelectorStateSnapshot()
+  const appState = useAppStateSnapshot()
   const [selectedId, setSelectedId] = useState<number>()
 
   const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
@@ -61,6 +60,13 @@ export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) =
   )
   const queries = data ?? []
 
+  useEffect(() => {
+    if (viewOngoingQueries) {
+      appState.setOnGoingQueriesPanelOpen(true)
+      setParams({ viewOngoingQueries: undefined })
+    }
+  }, [viewOngoingQueries])
+
   const { mutate: abortQuery, isLoading } = useQueryAbortMutation({
     onSuccess: () => {
       toast.success(`Successfully aborted query (ID: ${selectedId})`)
@@ -70,12 +76,12 @@ export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) =
 
   const closePanel = () => {
     setParams({ viewOngoingQueries: undefined })
-    onClose()
+    appState.setOnGoingQueriesPanelOpen(false)
   }
 
   return (
     <>
-      <Sheet open={visible} onOpenChange={() => closePanel()}>
+      <Sheet open={appState.ongoingQueriesPanelOpen} onOpenChange={() => closePanel()}>
         <SheetContent size="lg">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-x-2">

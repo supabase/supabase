@@ -8,13 +8,7 @@ const OrganizationDeletePanel = () => {
   const selectedOrganization = useSelectedOrganization()
 
   return (
-    <Panel
-      title={
-        <p key="panel-title" className="uppercase">
-          Danger Zone
-        </p>
-      }
-    >
+    <Panel title={<p key="panel-title">DANGER ZONE</p>}>
       <Panel.Content className="!p-0">
         {selectedOrganization?.managed_by !== 'vercel-marketplace' ? (
           <Admonition

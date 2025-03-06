@@ -5,14 +5,15 @@ import dayjs from 'dayjs'
 import { CronJobType } from './CreateCronJobSheet'
 import { HTTPHeader } from './CronJobs.constants'
 
-export const buildCronQuery = (name: string, schedule: string, command: string) => {
-  return `select cron.schedule('${name}','${schedule}',${command});`
+export function buildCronQuery(name: string, schedule: string, command: string) {
+  const escapedName = name.replace(/'/g, "''")
+  return `select cron.schedule('${escapedName}', '${schedule}', ${command});`
 }
 
 export const buildHttpRequestCommand = (
   method: 'GET' | 'POST',
   url: string,
-  headers: HTTPHeader[],
+  headers: HTTPHeader[] = [],
   body: string | undefined,
   timeout: number
 ) => {

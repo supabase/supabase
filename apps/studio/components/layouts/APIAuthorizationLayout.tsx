@@ -37,7 +37,7 @@ const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorization
           </div>
         </div>
         <Separator />
-        <div className="flex flex-col justify-center flex-grow mx-auto w-[90vw] max-w-[600px] h-full space-y-4">
+        <div className="flex flex-col justify-center flex-grow mx-auto w-[90vw] max-w-[600px] space-y-4">
           {children}
         </div>
       </main>

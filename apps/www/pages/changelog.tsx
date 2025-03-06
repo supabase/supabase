@@ -1,5 +1,6 @@
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
 import { createAppAuth } from '@octokit/auth-app'
+import { Octokit } from '@octokit/core'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { Octokit as OctokitRest } from '@octokit/rest'
 import dayjs from 'dayjs'
@@ -80,7 +81,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
 
   // Process as of Feb. 2024:
   // create a Release each month and create a corresponding changelog discussion
-  // — we don't want to pull in both the changelog entry and the release entry
+  // — we don't want to pull in both the changelog entry and the release entry
   // — we want to ignore new releases and only show the old ones that don't have a corresponding changelog discussion
   // — so we have this list of old releases that we want to show
   const oldReleases = [
@@ -94,7 +95,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
 
   // uses the graphql api
   async function fetchDiscussions(owner: string, repo: string, categoryId: string, cursor: string) {
-    const { Octokit } = await import('@octokit/core')
     const ExtendedOctokit = Octokit.plugin(paginateGraphql)
     type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
 

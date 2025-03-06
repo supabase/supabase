@@ -1651,6 +1651,128 @@
         "security": [{ "bearer": [] }]
       }
     },
+    "/v1/projects/{ref}/config/auth/signing-keys": {
+      "post": {
+        "operationId": "createSigningKeyForProject",
+        "summary": "[Alpha] Create a new signing key for the project in standby status",
+        "parameters": [
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateSigningKeyBody" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "[Alpha] Create a new signing key for the project in standby status",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CreateSigningKeyBody" }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Auth"],
+        "security": [{ "bearer": [] }]
+      },
+      "get": {
+        "operationId": "listSigningKeysForProject",
+        "summary": "[Alpha] List all signing keys for the project",
+        "parameters": [
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SigningKeysResponse" }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Auth"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/config/auth/signing-keys/{id}": {
+      "get": {
+        "operationId": "getSigningKeyForProject",
+        "summary": "[Alpha] Get information about a signing key",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } },
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+              }
+            }
+          }
+        },
+        "tags": ["Auth"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "deleteSigningKey",
+        "summary": "[Alpha] Remove a signing key from a project, where the status is previously_used",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } },
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Auth"],
+        "security": [{ "bearer": [] }]
+      },
+      "patch": {
+        "operationId": "patchSigningKey",
+        "summary": "[Alpha] Update a signing key, mainly its status",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } },
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateSigningKeyBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Auth"],
+        "security": [{ "bearer": [] }]
+      }
+    },
     "/v1/projects/{ref}/config/storage": {
       "get": {
         "operationId": "v1-get-storage-config",
@@ -2203,6 +2325,30 @@
         "security": [{ "bearer": [] }]
       }
     },
+    "/v1/projects/{ref}/database/context": {
+      "get": {
+        "operationId": "getDatabaseMetadata",
+        "summary": "Gets database metadata for the given project.",
+        "description": "This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.",
+        "deprecated": true,
+        "parameters": [
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetProjectDbMetadataResponseDto" }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Database"],
+        "security": [{ "bearer": [] }]
+      }
+    },
     "/v1/projects/{ref}/functions": {
       "get": {
         "operationId": "v1-list-all-functions",
@@ -2238,7 +2384,8 @@
       "post": {
         "operationId": "v1-create-a-function",
         "summary": "Create a function",
-        "description": "Creates a function and adds it to the specified project.",
+        "description": "This endpoint is deprecated - use the deploy endpoint. Creates a function and adds it to the specified project.",
+        "deprecated": true,
         "parameters": [
           {
             "name": "ref",
@@ -2277,12 +2424,6 @@
             "required": false,
             "in": "query",
             "schema": { "type": "string" }
-          },
-          {
-            "name": "compute_multiplier",
-            "required": false,
-            "in": "query",
-            "schema": { "minimum": 1, "maximum": 4, "type": "number" }
           }
         ],
         "requestBody": {
@@ -2305,6 +2446,95 @@
           },
           "403": { "description": "" },
           "500": { "description": "Failed to create project's function" }
+        },
+        "tags": ["Edge Functions"],
+        "security": [{ "bearer": [] }]
+      },
+      "put": {
+        "operationId": "v1-bulk-update-functions",
+        "summary": "Bulk update functions",
+        "description": "Bulk update functions. It will create a new function or replace existing. The operation is idempotent. NOTE: You will need to manually bump the version.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/BulkUpdateFunctionBody" }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BulkUpdateFunctionResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to update functions" }
+        },
+        "tags": ["Edge Functions"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/functions/deploy": {
+      "post": {
+        "operationId": "v1-deploy-a-function",
+        "summary": "Deploy a function",
+        "description": "A new endpoint to deploy functions. It will create if function does not exist.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": { "pattern": "/^[A-Za-z0-9_-]+$/", "type": "string" }
+          },
+          {
+            "name": "bundleOnly",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "boolean" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": { "$ref": "#/components/schemas/FunctionDeployBody" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DeployFunctionResponse" }
+              }
+            }
+          },
+          "403": { "description": "" },
+          "500": { "description": "Failed to deploy function" }
         },
         "tags": ["Edge Functions"],
         "security": [{ "bearer": [] }]
@@ -2395,12 +2625,6 @@
             "required": false,
             "in": "query",
             "schema": { "type": "string" }
-          },
-          {
-            "name": "compute_multiplier",
-            "required": false,
-            "in": "query",
-            "schema": { "minimum": 1, "maximum": 4, "type": "number" }
           }
         ],
         "requestBody": {
@@ -3027,20 +3251,11 @@
             "format": "uri",
             "description": "Template URL used to create the project from the CLI.",
             "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
-          },
-          "release_channel": {
-            "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
-            "description": "Release channel. If not provided, GA will be used."
-          },
-          "postgres_engine": {
-            "type": "string",
-            "enum": ["15", "17-oriole"],
-            "description": "Postgres engine version. If not provided, the latest version will be used."
           }
         },
         "required": ["db_pass", "name", "organization_id", "region"],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "hideDefinitions": ["release_channel", "postgres_engine"]
       },
       "V1ProjectResponse": {
         "type": "object",
@@ -3476,7 +3691,11 @@
       },
       "SecretResponse": {
         "type": "object",
-        "properties": { "name": { "type": "string" }, "value": { "type": "string" } },
+        "properties": {
+          "name": { "type": "string" },
+          "value": { "type": "string" },
+          "updated_at": { "type": "string" }
+        },
         "required": ["name", "value"]
       },
       "CreateSecretBody": {
@@ -3713,6 +3932,68 @@
         },
         "required": ["name", "healthy", "status"]
       },
+      "CreateSigningKeyBody": {
+        "type": "object",
+        "properties": {
+          "algorithm": { "type": "string", "enum": ["EdDSA", "ES256", "RS256", "HS256"] },
+          "status": { "type": "string", "enum": ["in_use", "standby"] }
+        },
+        "required": ["algorithm"],
+        "additionalProperties": false
+      },
+      "SigningKeysResponse": {
+        "type": "object",
+        "properties": {
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string", "format": "uuid" },
+                "algorithm": { "type": "string", "enum": ["EdDSA", "ES256", "RS256", "HS256"] },
+                "status": {
+                  "type": "string",
+                  "enum": ["in_use", "previously_used", "revoked", "standby"]
+                },
+                "public_jwk": { "nullable": true },
+                "created_at": { "type": "string", "format": "date-time" },
+                "updated_at": { "type": "string", "format": "date-time" }
+              },
+              "required": ["id", "algorithm", "status", "created_at", "updated_at"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["keys"],
+        "additionalProperties": false
+      },
+      "SigningKeyResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "algorithm": { "type": "string", "enum": ["EdDSA", "ES256", "RS256", "HS256"] },
+          "status": {
+            "type": "string",
+            "enum": ["in_use", "previously_used", "revoked", "standby"]
+          },
+          "public_jwk": { "nullable": true },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "algorithm", "status", "created_at", "updated_at"],
+        "additionalProperties": false
+      },
+      "UpdateSigningKeyBody": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["in_use", "previously_used", "revoked", "standby"]
+          }
+        },
+        "required": ["status"],
+        "additionalProperties": false
+      },
       "StorageFeatureImageTransformation": {
         "type": "object",
         "properties": { "enabled": { "type": "boolean" } },
@@ -3759,6 +4040,7 @@
           "effective_cache_size": { "type": "string" },
           "logical_decoding_work_mem": { "type": "string" },
           "maintenance_work_mem": { "type": "string" },
+          "track_activity_query_size": { "type": "string" },
           "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
           "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
           "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
@@ -3786,6 +4068,7 @@
           "effective_cache_size": { "type": "string" },
           "logical_decoding_work_mem": { "type": "string" },
           "maintenance_work_mem": { "type": "string" },
+          "track_activity_query_size": { "type": "string" },
           "max_connections": { "type": "integer", "minimum": 1, "maximum": 262143 },
           "max_locks_per_transaction": { "type": "integer", "minimum": 10, "maximum": 2147483640 },
           "max_parallel_maintenance_workers": { "type": "integer", "minimum": 0, "maximum": 1024 },
@@ -4442,7 +4725,7 @@
             "type": "string",
             "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           },
-          "postgres_engine": { "type": "string", "enum": ["13", "14", "15", "17-oriole"] }
+          "postgres_engine": { "type": "string", "enum": ["13", "14", "15", "17", "17-oriole"] }
         },
         "required": ["version", "release_channel", "postgres_engine"]
       },
@@ -4458,18 +4741,8 @@
       },
       "RestoreProjectBodyDto": {
         "type": "object",
-        "properties": {
-          "release_channel": {
-            "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
-            "description": "Release channel version. If not provided, GeneralAvailability will be used."
-          },
-          "postgres_engine": {
-            "type": "string",
-            "enum": ["15", "17-oriole"],
-            "description": "Postgres engine version. If not provided, the latest version from the given release channel will be used."
-          }
-        }
+        "properties": {},
+        "hideDefinitions": ["release_channel", "postgres_engine"]
       },
       "V1AnalyticsResponse": {
         "type": "object",
@@ -4506,6 +4779,32 @@
         "properties": { "query": { "type": "string" } },
         "required": ["query"]
       },
+      "GetProjectDbMetadataResponseDto": {
+        "type": "object",
+        "properties": {
+          "databases": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "schemas": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": { "name": { "type": "string" } },
+                    "required": ["name"],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": ["name", "schemas"],
+              "additionalProperties": true
+            }
+          }
+        },
+        "required": ["databases"]
+      },
       "FunctionResponse": {
         "type": "object",
         "properties": {
@@ -4519,8 +4818,7 @@
           "verify_jwt": { "type": "boolean" },
           "import_map": { "type": "boolean" },
           "entrypoint_path": { "type": "string" },
-          "import_map_path": { "type": "string" },
-          "compute_multiplier": { "type": "number" }
+          "import_map_path": { "type": "string" }
         },
         "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
       },
@@ -4530,10 +4828,71 @@
           "slug": { "type": "string", "pattern": "/^[A-Za-z0-9_-]+$/" },
           "name": { "type": "string" },
           "body": { "type": "string" },
-          "verify_jwt": { "type": "boolean" },
-          "compute_multiplier": { "type": "number", "minimum": 1, "maximum": 4 }
+          "verify_jwt": { "type": "boolean" }
         },
         "required": ["slug", "name", "body"]
+      },
+      "BulkUpdateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "version": { "type": "integer" },
+          "created_at": { "type": "integer", "format": "int64" },
+          "id": { "type": "string" },
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "status": { "enum": ["ACTIVE", "REMOVED", "THROTTLED"], "type": "string" },
+          "verify_jwt": { "type": "boolean" },
+          "import_map": { "type": "boolean" },
+          "entrypoint_path": { "type": "string" },
+          "import_map_path": { "type": "string" }
+        },
+        "required": ["version", "id", "slug", "name", "status"]
+      },
+      "BulkUpdateFunctionResponse": {
+        "type": "object",
+        "properties": {
+          "functions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/FunctionResponse" }
+          }
+        },
+        "required": ["functions"]
+      },
+      "FunctionDeployMetadata": {
+        "type": "object",
+        "properties": {
+          "entrypoint_path": { "type": "string" },
+          "import_map_path": { "type": "string" },
+          "static_patterns": { "type": "array", "items": { "type": "string" } },
+          "verify_jwt": { "type": "boolean" },
+          "name": { "type": "string" }
+        },
+        "required": ["entrypoint_path"]
+      },
+      "FunctionDeployBody": {
+        "type": "object",
+        "properties": {
+          "file": { "type": "array", "items": { "type": "string", "format": "binary" } },
+          "metadata": { "$ref": "#/components/schemas/FunctionDeployMetadata" }
+        },
+        "required": ["file", "metadata"]
+      },
+      "DeployFunctionResponse": {
+        "type": "object",
+        "properties": {
+          "version": { "type": "integer" },
+          "created_at": { "type": "integer", "format": "int64" },
+          "updated_at": { "type": "integer", "format": "int64" },
+          "id": { "type": "string" },
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "status": { "enum": ["ACTIVE", "REMOVED", "THROTTLED"], "type": "string" },
+          "verify_jwt": { "type": "boolean" },
+          "import_map": { "type": "boolean" },
+          "entrypoint_path": { "type": "string" },
+          "import_map_path": { "type": "string" }
+        },
+        "required": ["version", "id", "slug", "name", "status"]
       },
       "FunctionSlugResponse": {
         "type": "object",
@@ -4548,8 +4907,7 @@
           "verify_jwt": { "type": "boolean" },
           "import_map": { "type": "boolean" },
           "entrypoint_path": { "type": "string" },
-          "import_map_path": { "type": "string" },
-          "compute_multiplier": { "type": "number" }
+          "import_map_path": { "type": "string" }
         },
         "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
       },
@@ -4558,8 +4916,7 @@
         "properties": {
           "name": { "type": "string" },
           "body": { "type": "string" },
-          "verify_jwt": { "type": "boolean" },
-          "compute_multiplier": { "type": "number", "minimum": 1, "maximum": 4 }
+          "verify_jwt": { "type": "boolean" }
         }
       },
       "V1StorageBucketResponse": {

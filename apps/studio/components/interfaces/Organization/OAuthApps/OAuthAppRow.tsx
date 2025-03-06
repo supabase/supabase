@@ -7,6 +7,7 @@ import Table from 'components/to-be-cleaned/Table'
 import type { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { copyToClipboard } from 'lib/helpers'
+import { toast } from 'sonner'
 import {
   Button,
   DropdownMenu,
@@ -56,11 +57,15 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
             icon={isCopied ? <Check className="text-brand" strokeWidth={3} /> : <Clipboard />}
             className="ml-2 px-1"
             onClick={() => {
-              copyToClipboard(app.client_id)
-              setIsCopied(true)
-              setTimeout(() => {
-                setIsCopied(false)
-              }, 3000)
+              if (app.client_id) {
+                copyToClipboard(app.client_id)
+                setIsCopied(true)
+                setTimeout(() => {
+                  setIsCopied(false)
+                }, 3000)
+              } else {
+                toast('Unable to retrieve app client ID')
+              }
             }}
           />
         </div>

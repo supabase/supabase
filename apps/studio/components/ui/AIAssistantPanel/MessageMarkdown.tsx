@@ -2,7 +2,6 @@ import { useRouter } from 'next/router'
 import { DragEvent, memo, ReactNode, useContext, useEffect, useMemo, useRef } from 'react'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -16,6 +15,7 @@ import { AssistantSnippetProps } from './AIAssistant.types'
 import { identifyQueryType } from './AIAssistant.utils'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { MessageContext } from './Message'
+import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 
 export const OrderedList = memo(({ children }: { children: ReactNode }) => (
   <ol className="flex flex-col gap-y-4">{children}</ol>
@@ -149,19 +149,22 @@ export const MarkdownPre = ({ children }: { children: any }) => {
   })
 
   const language = children[0].props.className?.replace('language-', '') || 'sql'
-  const rawSql = language === 'sql' ? children[0].props.children : undefined
-  const formatted = (rawSql || [''])[0]
-  const propsMatch = formatted.match(/--\s*props:\s*(\{[^}]+\})/)
+  const rawContent = children[0].props.children[0]
+  const propsMatch = rawContent.match(/(?:--|\/\/)\s*props:\s*(\{[^}]+\})/)
 
   const snippetProps: AssistantSnippetProps = useMemo(
     () => (propsMatch ? JSON.parse(propsMatch[1]) : {}),
     [propsMatch]
   )
+
   const { xAxis, yAxis } = snippetProps
-  const title = snippetProps.title || 'SQL Query'
+  const title = snippetProps.title || (language === 'edge' ? 'Edge Function' : 'SQL Query')
   const isChart = snippetProps.isChart === 'true'
   const runQuery = snippetProps.runQuery === 'true'
-  const sql = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
+
+  // Strip props from the content for both SQL and edge functions
+  const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
+
   const isDraggableToReports =
     supportSQLBlocks && canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
 
@@ -177,26 +180,31 @@ export const MarkdownPre = ({ children }: { children: any }) => {
 
   const onRunQuery = async (queryType: 'select' | 'mutation') => {
     sendEvent({
-      action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED,
+      action: 'assistant_suggestion_run_query_clicked',
       properties: {
         queryType,
-        ...(queryType === 'mutation' ? { category: identifyQueryType(sql) ?? 'unknown' } : {}),
+        ...(queryType === 'mutation'
+          ? { category: identifyQueryType(cleanContent) ?? 'unknown' }
+          : {}),
       },
     })
   }
 
   return (
     <div className="w-auto -ml-[36px] overflow-x-hidden">
-      {language === 'sql' ? (
+      {language === 'edge' ? (
+        <EdgeFunctionBlock
+          label={title}
+          code={cleanContent}
+          functionName={snippetProps.name || 'my-function'}
+          showCode={!readOnly}
+        />
+      ) : language === 'sql' ? (
         readOnly ? (
-          <CollapsibleCodeBlock
-            value={children[0].props.children[0]}
-            language="sql"
-            hideLineNumbers
-          />
+          <CollapsibleCodeBlock value={cleanContent} language="sql" hideLineNumbers />
         ) : (
           <MemoizedQueryBlock
-            sql={sql}
+            sql={cleanContent}
             title={title}
             xAxis={xAxis}
             yAxis={yAxis}
@@ -211,7 +219,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
             onDragStart={(e: DragEvent<Element>) => {
               e.dataTransfer.setData(
                 'application/json',
-                JSON.stringify({ label: title, sql, config: chartConfig.current })
+                JSON.stringify({ label: title, sql: cleanContent, config: chartConfig.current })
               )
             }}
           />
@@ -219,7 +227,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
       ) : (
         <CodeBlock
           hideLineNumbers
-          value={children[0].props.children[0]}
+          value={cleanContent}
           language={language as CodeBlockLang}
           className={cn(
             'max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',

@@ -67,7 +67,7 @@ const PaymentMethodSelection = ({
           <div className="flex items-center justify-between px-4 py-2 border border-dashed rounded-md bg-alternative">
             <div className="flex items-center space-x-4 text-foreground-light">
               <AlertCircle size={16} strokeWidth={1.5} />
-              <p className="text-sm">No saved payment methods</p>
+              <p className="text-sm">No payment methods</p>
             </div>
 
             <ButtonTooltip
@@ -139,7 +139,7 @@ const PaymentMethodSelection = ({
 
       <AddNewPaymentMethodModal
         visible={showAddNewPaymentMethodModal}
-        returnUrl={`${getURL()}/org/${selectedOrganization?.slug}/billing?panel=subscriptionPlan`}
+        returnUrl={`${getURL()}/org/${selectedOrganization?.slug}/billing?panel=subscriptionPlan&source=paymentMethod`}
         onCancel={() => setShowAddNewPaymentMethodModal(false)}
         autoMarkAsDefaultPaymentMethod={true}
         onConfirm={async () => {

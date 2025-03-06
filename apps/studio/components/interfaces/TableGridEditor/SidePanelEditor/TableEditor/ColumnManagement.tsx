@@ -9,8 +9,11 @@ import {
   DroppableProvided,
 } from 'react-beautiful-dnd'
 
+import { useParams } from 'common'
 import InformationBox from 'components/ui/InformationBox'
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -54,9 +57,14 @@ const ColumnManagement = ({
   onClearImportContent = noop,
   onUpdateFkRelations,
 }: ColumnManagementProps) => {
+  const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
+
   const [open, setOpen] = useState(false)
   const [selectedColumn, setSelectedColumn] = useState<ColumnField>()
   const [selectedFk, setSelectedFk] = useState<ForeignKey>()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const hasImportContent = !isEmpty(importContent)
   const [primaryKeyColumns, otherColumns] = partition(
@@ -156,8 +164,21 @@ const ColumnManagement = ({
                     </Button>
                   </div>
                 ) : (
-                  <Button type="default" onClick={onSelectImportData}>
-                    Import data via spreadsheet
+                  <Button
+                    type="default"
+                    onClick={() => {
+                      onSelectImportData()
+                      sendEvent({
+                        action: 'import_data_button_clicked',
+                        properties: { tableType: 'New Table' },
+                        groups: {
+                          project: projectRef ?? 'Unknown',
+                          organization: org?.slug ?? 'Unknown',
+                        },
+                      })
+                    }}
+                  >
+                    Import data from CSV
                   </Button>
                 )}
               </>

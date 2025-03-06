@@ -11,6 +11,8 @@ import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/S
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { copyToClipboard } from 'lib/helpers'
 import { Button, cn } from 'ui'
@@ -133,6 +135,8 @@ export const Grid = memo(
 
       const table = state.table
 
+      const { mutate: sendEvent } = useSendEventMutation()
+      const org = useSelectedOrganization()
       const { project } = useProjectContext()
       const { data } = useForeignKeyConstraintsQuery({
         projectRef: project?.ref,
@@ -214,8 +218,21 @@ export const Grid = memo(
                               </p>
                               <div className="flex items-center space-x-2 mt-4">
                                 {onAddRow !== undefined && onImportData !== undefined && (
-                                  <Button type="default" onClick={onImportData}>
-                                    Import data via CSV
+                                  <Button
+                                    type="default"
+                                    onClick={() => {
+                                      onImportData()
+                                      sendEvent({
+                                        action: 'import_data_button_clicked',
+                                        properties: { tableType: 'Existing Table' },
+                                        groups: {
+                                          project: project?.ref ?? 'Unknown',
+                                          organization: org?.slug ?? 'Unknown',
+                                        },
+                                      })
+                                    }}
+                                  >
+                                    Import data from CSV
                                   </Button>
                                 )}
                               </div>

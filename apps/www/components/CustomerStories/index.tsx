@@ -13,7 +13,6 @@ import Panel from '~/components/Panel'
 import customerStories from '~/data/CustomerStories'
 import type { CustomerStoryType } from '~/data/CustomerStories'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 const CustomersSliderMobile = dynamic(() => import('./CustomersSliderMobile'))
 const CutomsersSliderDesktop = dynamic(() => import('./CutomsersSliderDesktop'))
@@ -112,7 +111,7 @@ export const CompositionCol: React.FC<CompositionColProps> = ({ column, classNam
             className="col-span-12 md:col-span-4 w-full md:w-[450px] h-full"
             onClick={() =>
               sendTelemetryEvent({
-                action: TelemetryActions.HOMEPAGE_CUSTOMER_STORY_CARD_CLICKED,
+                action: 'homepage_customer_story_card_clicked',
                 properties: { customer: customer.organization, cardType: 'expanded' },
               })
             }
@@ -126,7 +125,7 @@ export const CompositionCol: React.FC<CompositionColProps> = ({ column, classNam
             className="col-span-12 md:col-span-4 w-full h-full flex-grow"
             onClick={() =>
               sendTelemetryEvent({
-                action: TelemetryActions.HOMEPAGE_CUSTOMER_STORY_CARD_CLICKED,
+                action: 'homepage_customer_story_card_clicked',
                 properties: { customer: customer.organization, cardType: 'narrow' },
               })
             }

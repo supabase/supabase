@@ -2,7 +2,6 @@ import Link from 'next/link'
 
 import { Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 const Hero = () => {
@@ -34,7 +33,8 @@ const Hero = () => {
                       as="https://supabase.com/dashboard"
                       onClick={() =>
                         sendTelemetryEvent({
-                          action: TelemetryActions.HOMEPAGE_HERO_START_PROJECT_CLICKED,
+                          action: 'start_project_button_clicked',
+                          properties: { buttonLocation: 'Homepage Hero' },
                         })
                       }
                     >
@@ -47,7 +47,8 @@ const Hero = () => {
                       as="/contact/sales"
                       onClick={() =>
                         sendTelemetryEvent({
-                          action: TelemetryActions.HOMEPAGE_HERO_REQUEST_DEMO_CLICKED,
+                          action: 'request_demo_button_clicked',
+                          properties: { buttonLocation: 'Homepage Hero' },
                         })
                       }
                     >

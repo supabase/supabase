@@ -354,6 +354,12 @@
             "type": "cli-command"
           }
         ]
+      },
+      {
+        "id": "supabase-inspect-report",
+        "title": "Inspect all database statistics and save output",
+        "slug": "supabase-inspect-report",
+        "type": "cli-command"
       }
     ]
   },
@@ -839,6 +845,12 @@
         "id": "supabase-postgres-config-update",
         "title": "Update Postgres configurations",
         "slug": "supabase-postgres-config-update",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-postgres-config-delete",
+        "title": "Delete Postgres configurations",
+        "slug": "supabase-postgres-config-delete",
         "type": "cli-command"
       }
     ]

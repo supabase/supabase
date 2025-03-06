@@ -1,16 +1,24 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { AlertCircle, BookOpen, Loader2 } from 'lucide-react'
-
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, Input } from 'ui'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useFlag } from 'hooks/ui/useFlag'
+import { AlertCircle, Loader2 } from 'lucide-react'
+import { Input } from 'ui'
 
-const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
+const DisplayApiSettings = ({
+  legacy,
+  showNotice = true,
+}: {
+  legacy?: boolean
+  showNotice?: boolean
+}) => {
   const { ref: projectRef } = useParams()
+
+  const newApiKeysFlag = useFlag('newApiKeys')
 
   const {
     data: settings,
@@ -24,8 +32,10 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
-
+  const { isLoading, can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
+    PermissionAction.READ,
+    'service_api_keys'
+  )
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
   const apiKeys = settings?.service_api_keys ?? []
@@ -45,21 +55,25 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
                 <br />
                 You can use the keys below in the Supabase client libraries.
                 <br />
-                <a
-                  href="https://supabase.com/docs#client-libraries"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <Button icon={<BookOpen />} type="default" className="mt-4">
-                    Client Docs
-                  </Button>
-                </a>
               </p>
             </div>
           )
         }
       >
-        {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8 space-x-2">
+            <Loader2 className="animate-spin" size={16} strokeWidth={1.5} />
+            <p className="text-sm text-foreground-light">Retrieving API keys</p>
+          </div>
+        ) : !canReadAPIKeys ? (
+          <div className="flex items-center py-8 px-8 space-x-2">
+            <AlertCircle size={16} strokeWidth={1.5} />
+            <p className="text-sm text-foreground-light">
+              You don't have permission to view API keys. These keys restricted to users with higher
+              access levels.
+            </p>
+          </div>
+        ) : isProjectSettingsError || isJwtSecretUpdateStatusError ? (
           <div className="flex items-center justify-center py-8 space-x-2">
             <AlertCircle size={16} strokeWidth={1.5} />
             <p className="text-sm text-foreground-light">
@@ -101,7 +115,9 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
                     ))}
                     {x.tags === 'service_role' && (
                       <>
-                        <code className="bg-red-900 text-xs text-white">secret</code>
+                        <code className="text-xs text-code !bg-destructive !text-white !border-destructive">
+                          secret
+                        </code>
                       </>
                     )}
                     {x.tags === 'anon' && <code className="text-xs text-code">public</code>}
@@ -130,15 +146,30 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
             </Panel.Content>
           ))
         )}
-        <Panel.Notice
-          className="border-t"
-          title="New API keys coming 2025"
-          description={`
-\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.    
+        {showNotice ? (
+          newApiKeysFlag ? (
+            <Panel.Notice
+              className="border-t"
+              title="API keys have moved"
+              badgeLabel={'Changelog'}
+              description={`
+  \`anon\` and \`service_role\` API keys can now be replaced with \`publishable\` and \`secret\` API keys.
+  `}
+              href="https://github.com/orgs/supabase/discussions/29260"
+              buttonText="Read the announcement"
+            />
+          ) : (
+            <Panel.Notice
+              className="border-t"
+              title="New API keys coming Q4 2024"
+              description={`
+\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.
 `}
-          href="https://github.com/orgs/supabase/discussions/29260"
-          buttonText="Read the announcement"
-        />
+              href="https://github.com/orgs/supabase/discussions/29260"
+              buttonText="Read the announcement"
+            />
+          )
+        ) : null}
       </Panel>
     </>
   )

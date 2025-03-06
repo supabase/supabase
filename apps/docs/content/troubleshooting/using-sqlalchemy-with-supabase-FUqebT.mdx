@@ -22,7 +22,7 @@ It is recommended that you connect with the pooler in transaction mode (port 654
 postgres://[db-user].[project-ref]:[db-password]@aws-0-[aws-region].pooler.supabase.com:6543
 ```
 
-When using transaction mode, you should use the[ NullPool setting:](https://docs.sqlalchemy.org/en/20/core/pooling.html#switching-pool-implementations)
+When using transaction mode, you should use the[ `NullPool` setting:](https://docs.sqlalchemy.org/en/20/core/pooling.html#switching-pool-implementations)
 
 ```py
 from sqlalchemy.pool import NullPool
