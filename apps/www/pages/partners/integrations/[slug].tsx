@@ -231,7 +231,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
           <div className="mb-6">
             <ExpandableVideo
               videoId={partner.video}
-              imgUrl={videoThumbnail}
+              // imgUrl={videoThumbnail}
               imgOverlayText="Watch an introductory video"
               triggerContainerClassName="w-full"
             />
