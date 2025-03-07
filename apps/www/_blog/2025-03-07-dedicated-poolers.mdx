@@ -29,33 +29,41 @@ The Dedicated Pooler is a [PgBouncer](https://www.pgbouncer.org/) instance that'
 
 The dedicated pooler is isolated to your own project and grants you fine-grained control over the configuration.
 
-### A problem of IP addresses
+### Connecting to your database
 
-A year ago AWS [started charging for IPv4 addresses](/blog/ipv6). Only ~45% of the world have adopted IPv6, so this left us in a bit of a pickle: charge our customers more to cover the costs, or offer a proxy service that's compatible with IPv4.
+This gives you now 3 options for connecting to your database:
 
-![IPv6 adoption](/images/blog/dedicated-poolers/ipv6-adoption.png)
+<Img
+  alt="3 different connection options"
+  src={{
+    dark: '/images/blog/dedicated-poolers/connection-options.png',
+    light: '/images/blog/dedicated-poolers/connection-options.png',
+  }}
+  caption="3 different connection options"
+/>
 
-<small>Source: https://www.google.com/intl/en/ipv6/statistics.html</small>
+1. **Direct connections (free):** recommended for when you are connecting using servers.
+2. **Shared Pooler (free):** recommended for when you are connecting using serverless functions (like Next.js or AWS Lambda)
+3. **Dedicated Pooler (Pro Plan and above):** recommended for when you are connecting using serverless functions and you start to scale up. It is available on the Pro Plan and above.
 
-We opted to release a free proxy service, [Supavisor](/blog/supavisor-postgres-connection-pooler), to keep our pricing as low as possible.
+## Choosing between Supavisor and PgBouncer
 
-### A problem of growth
+A year ago AWS [started charging for IPv4 addresses](/blog/ipv6). We introduced [Supavisor](/blog/supavisor-postgres-connection-pooler) to ensure that you didn't need to pay to connect to your database if your network didn't support IPv6. Only ~45% of the world have adopted IPv6, so this was a great solution for many.
+
+<Img
+  alt="IPv6 adoption"
+  src={{
+    dark: '/images/blog/dedicated-poolers/ipv6-adoption.png',
+    light: '/images/blog/dedicated-poolers/ipv6-adoption.png',
+  }}
+  caption="Source: https://www.google.com/intl/en/ipv6/statistics.html"
+/>
 
 In the recent months, we've seen unprecedented growth. We have tens of thousands of new developers pouring into Supabase every week, doing weird and wonderful things with their databases.
 
 ![Recent Supabase Signups](/images/blog/dedicated-poolers/signups.png)
 
-This has added a lot of strain to the infrastructure in ways that are atypical of the past 4 years' usage.
-
-### An alternative solution
-
-Later this year we were planning to release dedicated connection poolers. We're pulling this timeline forward give you more options when managing your database. This gives you now 3 options for connecting to your database
-
-![Pooling options](/images/blog/dedicated-poolers/connection-options.png)
-
-1. **Direct connections (free):** recommended for when you are connecting using servers.
-2. **Shared Pooler (free):** recommended for when you are connecting using serverless functions (like Next.js or AWS Lambda)
-3. **Dedicated Pooler (Pro Plan and above):** recommended for when you are connecting using serverless functions and you start to scale up. It is available on the Pro Plan and above.
+Introducing Dedicated Poolers is a step towards a more flexible pricing model, allowing you to choose the right connection type for your use case. If you need dedicated hardware, you can now opt for a Dedicated Pooler. This gives you lower latency, better performance, and higher reliability.
 
 ### Getting started
 
