@@ -38,6 +38,8 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
         
 export type UpdateDateRange = (from: string, to: string) => void
+import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
+import { Admonition } from 'ui-patterns'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -238,6 +240,33 @@ const DatabaseUsage = () => {
     },
   })
 
+  const { data: pgBouncerConfig } = usePgbouncerConfigQuery({
+    projectRef: ref ?? 'default',
+  })
+  const isPgBouncerEnabled = pgBouncerConfig?.pgbouncer_enabled
+
+  const REPORT_ATTRIBUTES = [
+    { id: 'ram_usage', label: 'Memory usage', hide: false },
+    { id: 'avg_cpu_usage', label: 'Average CPU usage', hide: false },
+    { id: 'max_cpu_usage', label: 'Max CPU usage', hide: false },
+    { id: 'disk_io_consumption', label: 'Disk IO consumed', hide: false },
+    {
+      id: 'pg_stat_database_num_backends',
+      label: 'Pooler to database connections',
+      hide: false,
+    },
+    {
+      id: 'supavisor_connections_active',
+      label: 'Client to Supavisor connections',
+      hide: false,
+    },
+    {
+      id: 'pgbouncer_pools_client_active_connections',
+      label: 'Client to dedicated pooler connections',
+      hide: !isPgBouncerEnabled,
+    },
+  ] as const
+
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
@@ -256,7 +285,7 @@ const DatabaseUsage = () => {
     REPORT_ATTRIBUTES.forEach((attr) => {
       queryClient.invalidateQueries(
         analyticsKeys.infraMonitoring(ref, {
-          attribute: attr.id,
+          attribute: attr?.id,
           startDate: period_start.date,
           endDate: period_start.end,
           interval,
@@ -415,6 +444,59 @@ const DatabaseUsage = () => {
                 tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
                 onClick={onRefreshReport}
               />
+              <div className="flex items-center gap-x-3">
+                <DateRangePicker
+                  loading={false}
+                  value={'7d'}
+                  options={TIME_PERIODS_INFRA}
+                  currentBillingPeriodStart={undefined}
+                  onChange={(values) => {
+                    if (values.interval === '1d') {
+                      setDateRange({ ...values, interval: '1h' })
+                    } else {
+                      setDateRange(values)
+                    }
+                  }}
+                />
+                {dateRange && (
+                  <div className="flex items-center gap-x-2">
+                    <p className="text-foreground-light">
+                      {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
+                    </p>
+                    <p className="text-foreground-light">
+                      <ArrowRight size={12} />
+                    </p>
+                    <p className="text-foreground-light">
+                      {dayjs(dateRange.period_end.date).format('MMMM D, hh:mma')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="space-y-6">
+              {dateRange &&
+                REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr) => (
+                  <>
+                    <ChartHandler
+                      key={attr.id}
+                      provider="infra-monitoring"
+                      attribute={attr.id}
+                      label={attr.label}
+                      interval={dateRange.interval}
+                      startDate={dateRange?.period_start?.date}
+                      endDate={dateRange?.period_end?.date}
+                    />
+                    {attr.id === 'pgbouncer_pools_client_active_connections' && (
+                      <Admonition type="note" title="Dedicated Pooler is enabled" className="p-2">
+                        <p>
+                          Your project is currently using the Dedicated Pooler instead of Supavisor.
+                          You can update this in{' '}
+                          <Link href={`/project/${ref}/settings/database`}>Database settings</Link>.
+                        </p>
+                      </Admonition>
+                    )}
+                  </>
+                ))}
             </div>
           </div>
         </div>
