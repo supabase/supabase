@@ -37,8 +37,19 @@ export const getIdentity = (gotrueUser: User) => {
  * Transfers the search params from the current location path to a newly built path
  */
 export const buildPathWithParams = (pathname: string) => {
-  const searchParams = new URLSearchParams(location.search)
-  return `${pathname}?${searchParams.toString()}`
+  const [basePath, existingParams] = pathname.split('?', 2)
+
+  const pathnameSearchParams = new URLSearchParams(existingParams || '')
+
+  // Merge the parameters, with pathname parameters taking precedence
+  // over the current location's search parameters
+  const mergedParams = new URLSearchParams(location.search)
+  for (const [key, value] of pathnameSearchParams.entries()) {
+    mergedParams.set(key, value)
+  }
+
+  const queryString = mergedParams.toString()
+  return queryString ? `${basePath}?${queryString}` : basePath
 }
 
 export const getReturnToPath = (fallback = '/projects') => {

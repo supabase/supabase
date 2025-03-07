@@ -1,6 +1,7 @@
-import { post } from 'lib/common/fetch'
-import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from 'lib/constants'
+import { post as post_ } from 'data/fetchers'
+import { DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from 'lib/constants'
 import { toast } from 'sonner'
+import { ResponseError } from 'types'
 
 export default async function passwordStrength(value: string) {
   let message: string = ''
@@ -12,10 +13,11 @@ export default async function passwordStrength(value: string) {
       message = `${PASSWORD_STRENGTH[0]} Maximum length of password exceeded`
       warning = `Password should be less than 100 characters`
     } else {
-      // [Joshen] Unable to use RQ atm due to our Jest tests being in JS
-      const response = await post(`${API_URL}/profile/password-check`, { password: value })
-      if (!response.error) {
-        const { result } = response
+      const { data, error } = await post_('/platform/profile/password-check', {
+        body: { password: value },
+      })
+      if (!error) {
+        const { result } = data
         const resultScore = result?.score ?? 0
 
         const score = (PASSWORD_STRENGTH as any)[resultScore]
@@ -33,7 +35,7 @@ export default async function passwordStrength(value: string) {
           } You need a stronger password.`
         }
       } else {
-        toast.error(`Failed to check password strength: ${response.error.message}`)
+        toast.error(`Failed to check password strength: ${(error as ResponseError).message}`)
       }
     }
   }

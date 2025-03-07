@@ -2836,11 +2836,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/monitoring-troubleshooting/:path*',
-    destination: '/docs/guides/telemetry/:path*',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/troubleshooting',
     destination: '/docs/guides/troubleshooting/http-api-issues',
   },
@@ -2871,6 +2866,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/:path*',
+    destination: '/docs/guides/telemetry/:path*',
+  },
+  {
+    permanent: true,
     source: '/partners/experts',
     destination: '/partners',
   },
@@ -2878,6 +2878,101 @@ module.exports = [
     permanent: true,
     source: '/partners/experts/:path*',
     destination: '/partners',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#how-billing-is-organized',
+    destination: '/docs/guides/platform/billing-on-supabase#organization-based-billing',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#quotas-and-features',
+    destination: '/docs/guides/platform/billing-on-supabase#variable-usage-fees-and-quotas',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#usage-items',
+    destination: '/docs/guides/platform/billing-on-supabase#variable-usage-fees-and-quotas',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours',
+    destination: '/docs/guides/platform/manage-your-usage/compute',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#compute-pricing',
+    destination: '/docs/guides/platform/manage-your-usage/compute#pricing',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#compute-credits',
+    destination: '/docs/guides/platform/manage-your-usage/compute#compute-credits',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#read-replicas',
+    destination: '/docs/guides/platform/manage-your-usage/read-replicas',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#project-add-ons',
+    destination: '/docs/guides/platform/manage-your-usage',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#unified-egress',
+    destination: '/docs/guides/platform/manage-your-usage/egress',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#included-egress-quota',
+    destination: '/docs/guides/platform/manage-your-usage/egress#pricing',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#egress-dashboards',
+    destination: '/docs/guides/platform/manage-your-usage/egress#usage-page',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#disk-size',
+    destination: '/docs/guides/platform/manage-your-usage/disk-size',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#free-plan',
+    destination: '/docs/guides/platform/billing-on-supabase#free-plan',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#billing-examples',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#multiple-projects-in-a-free-plan-organization',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#multiple-projects-in-a-pro-plan-organization',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/spend-cap',
+    destination: '/docs/guides/platform/cost-control#spend-cap',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/project-management/api',
+    destination: '/docs/reference/api/introduction',
   },
 
   // marketing

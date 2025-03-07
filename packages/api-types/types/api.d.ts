@@ -4,904 +4,35 @@
  */
 
 export interface paths {
-  '/partners/flyio/callback': {
+  '/v1/branches/{branch_id}': {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    /** Redirects to Supabase dashboard after completing Fly sso */
-    get: operations['CallbackController_redirectToDashboardFlyioExtensionScreen']
+    /**
+     * Get database branch config
+     * @description Fetches configurations of the specified database branch
+     */
+    get: operations['v1-get-a-branch-config']
     put?: never
     post?: never
-    delete?: never
+    /**
+     * Delete a database branch
+     * @description Deletes the specified database branch
+     */
+    delete: operations['v1-delete-a-branch']
     options?: never
     head?: never
-    patch?: never
+    /**
+     * Update database branch config
+     * @description Updates the configuration of the specified database branch
+     */
+    patch: operations['v1-update-a-branch-config']
     trace?: never
   }
-  '/partners/flyio/extensions': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Creates a database */
-    post: operations['FlyExtensionsController_provisionResource']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/partners/flyio/extensions/{extension_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets database status */
-    get: operations['ExtensionController_getResourceStatus']
-    put?: never
-    post?: never
-    /** Deletes a database */
-    delete: operations['ExtensionController_deleteResource']
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/partners/flyio/extensions/{extension_id}/sso': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Starts Fly single sign on */
-    get: operations['ExtensionController_startFlyioSSO']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/partners/flyio/extensions/eligibility': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Checks database provisioning eligibility */
-    post: operations['FlyExtensionsController_checkEligibility']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/partners/flyio/organizations/{organization_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets details of the organization linked to the provided Fly organization id */
-    get: operations['FlyOrganizationsController_getOrganization']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/partners/flyio/organizations/{organization_id}/extensions': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets all databases that belong to the given Fly organization id */
-    get: operations['FlyOrganizationsController_getOrgExtensions']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/partners/flyio/organizations/{organization_id}/sso': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Starts Fly single sign on */
-    get: operations['FlyOrganizationsController_startFlyioSSO']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/partners/flyio/organizations/{organization_id}/subscription': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /** Updates organization subscription linked to the provided Fly organization id */
-    put: operations['FlyOrganizationsController_updateOrganization']
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/partners/vercel/callback': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Redirects to Supabase dashboard after completing Vercel sso flow */
-    get: operations['CallbackController_redirectToDashboardVercelExtensionScreen']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/partners/vercel/v1/installations/{installation_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets the set of billing plans available to a specific Installation */
-    get: operations['InstallationsController_getInstallation']
-    /** Upserts an installation for the account with installation_id */
-    put: operations['InstallationsController_createInstallation']
-    post?: never
-    /** Deletes the installation with provided installation_id */
-    delete: operations['InstallationsController_deleteInstallation']
-    options?: never
-    head?: never
-    /** Updates an installation for the account with installation_id */
-    patch: operations['InstallationsController_updateInstallation']
-    trace?: never
-  }
-  '/partners/vercel/v1/installations/{installation_id}/plans': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets the set of billing plans available to a specific Installation */
-    get: operations['InstallationsController_getInstallationBillingPlans']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/partners/vercel/v1/installations/{installation_id}/resources': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Lists all resources */
-    get: operations['ResourcesController_listResources']
-    put?: never
-    /** Provisions a resource */
-    post: operations['ResourcesController_createResource']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/partners/vercel/v1/installations/{installation_id}/resources/{resource_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Fetches a resource by resource_id */
-    get: operations['ResourcesController_getResource']
-    put?: never
-    post?: never
-    /** Uninstalls and de-provisions a resource */
-    delete: operations['ResourcesController_deleteResource']
-    options?: never
-    head?: never
-    /** Updates a resource */
-    patch: operations['ResourcesController_updateResource']
-    trace?: never
-  }
-  '/partners/vercel/v1/installations/{installation_id}/resources/{resource_id}/plans': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Returns the set of billing plans available to a specific resource */
-    get: operations['ResourcesController_getResourcePlans']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/partners/vercel/v1/products/{product_id}/plans': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Return quotes for different billing plans for a specific product */
-    get: operations['ProductsController_listResources']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/auth/{ref}/config': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets GoTrue config */
-    get: operations['GoTrueConfigController_getGoTrueConfig']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    /** Updates GoTrue config */
-    patch: operations['GoTrueConfigController_updateGoTrueConfig']
-    trace?: never
-  }
-  '/platform/auth/{ref}/config/hooks': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    /** Updates GoTrue config hooks */
-    patch: operations['GoTrueConfigController_updateGoTrueConfigHooks']
-    trace?: never
-  }
-  '/platform/auth/{ref}/invite': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Sends an invite to the given email */
-    post: operations['AuthInviteController_sendInvite']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/auth/{ref}/magiclink': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Sends a magic link to the given email */
-    post: operations['MagicLinkController_sendMagicLink']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/auth/{ref}/otp': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Sends an OTP to the given phone number */
-    post: operations['OtpController_sendOtp']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/auth/{ref}/recover': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Sends a recovery email to the given email */
-    post: operations['RecoverController_sendRecover']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/auth/{ref}/templates/{template}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets GoTrue template */
-    get: operations['TemplateController_getTemplate']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/auth/{ref}/users': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Creates user */
-    post: operations['UsersController_createUser']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/auth/{ref}/users/{id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    /** Delete user with given ID */
-    delete: operations['UsersController_deleteUserById']
-    options?: never
-    head?: never
-    /** Updates user with given ID */
-    patch: operations['UsersController_updateUserById']
-    trace?: never
-  }
-  '/platform/auth/{ref}/users/{id}/factors': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    /** Delete all factors associated to a user */
-    delete: operations['FactorsController_deleteFactors']
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/auth/{ref}/validate/spam': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Validate spam based on the given email content */
-    post: operations['ValidateController_validateSpam']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/cli/login': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Create CLI login session */
-    post: operations['CliLoginController_createCliLoginSession']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/cli/login/{session_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Retrieve CLI login session */
-    get: operations['CliLoginController_getCliLoginSession']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/database/{ref}/backups': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets project backups */
-    get: operations['BackupsController_getBackups']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/database/{ref}/backups/download': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Download project backup */
-    post: operations['BackupsController_downloadBackup']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/database/{ref}/backups/downloadable-backups': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets backups that might be downloadable, but potentially not restorable. */
-    get: operations['BackupsController_getDownloadableBackups']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/database/{ref}/backups/enable-physical-backups': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Enable usage of physical backups */
-    post: operations['BackupsController_enablePhysicalBackup']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/database/{ref}/backups/pitr': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Restore project to a previous point in time */
-    post: operations['BackupsController_restorePointInTimeBackup']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/database/{ref}/backups/restore': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Restore project backup */
-    post: operations['BackupsController_restoreBackup']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/database/{ref}/backups/restore-physical': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Restore project with a physical backup */
-    post: operations['BackupsController_restorePhysicalBackup']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/database/{ref}/clone': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List valid backups to clone from */
-    get: operations['CloneController_getValidBackups']
-    put?: never
-    /** Clone the current project from a backup */
-    post: operations['CloneController_cloneCurrentProject']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/database/{ref}/clone/status': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Retrieve the current status of an existing cloning process */
-    get: operations['CloneController_cloneProjectStatus']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/database/{ref}/hook-enable': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Enables Database Webhooks on the project */
-    post: operations['HooksController_enableHooks']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/database/{ref}/hook-logs': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets hook logs with the given ID */
-    get: operations['HooksController_getHookLogs']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/feedback/docs': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Send feedback on docs */
-    post: operations['SendFeedbackController_sendDocsFeedback']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/feedback/downgrade': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Send exit survey to HubSpot */
-    post: operations['SendFeedbackController_sendExitSurvey']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/feedback/send': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Send feedback */
-    post: operations['SendFeedbackController_sendFeedback']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/feedback/upgrade': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Send upgrade survey to survey_responses table */
-    post: operations['SendFeedbackController_sendUpgradeSurvey']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/integrations': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets user's integrations */
-    get: operations['IntegrationsController_getUserInstallations']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/integrations/{slug}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets integration with the given organization slug */
-    get: operations['IntegrationsController_getUserInstallationForOrg']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/integrations/github/authorization': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get GitHub authorization */
-    get: operations['GitHubAuthorizationsController_getGitHubAuthorization']
-    put?: never
-    /** Create GitHub authorization */
-    post: operations['GitHubAuthorizationsController_createGitHubAuthorization']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/integrations/github/branches/{connectionId}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List GitHub connection branches */
-    get: operations['GitHubBranchesController_listConnectionBranches']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/integrations/github/branches/{connectionId}/{branchName}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get GitHub connection branch */
-    get: operations['GitHubBranchesController_getConnectionBranch']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/integrations/github/connections': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List organization GitHub connections */
-    get: operations['GitHubConnectionsController_listOrganizationGitHubConnections']
-    put?: never
-    /** Connects a GitHub project to a supabase project */
-    post: operations['GitHubConnectionsController_createGitHubConnection']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/integrations/github/connections/{connection_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    /** Deletes github project connection */
-    delete: operations['GitHubConnectionsController_deleteGitHubConnection']
-    options?: never
-    head?: never
-    /** Updates a GitHub connection for a supabase project */
-    patch: operations['GitHubConnectionsController_updateGitHubConnection']
-    trace?: never
-  }
-  '/platform/integrations/github/repositories': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets GitHub repositories for user */
-    get: operations['GitHubRepositoriesController_listRepositories']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/integrations/vercel': {
+  '/v1/branches/{branch_id}/push': {
     parameters: {
       query?: never
       header?: never
@@ -911,17 +42,735 @@ export interface paths {
     get?: never
     put?: never
     /**
-     * Create vercel integration
-     * @description Exchanges a vercel code for an access token and saves the access token to the new integration record
+     * Pushes a database branch
+     * @description Pushes the specified database branch
      */
-    post: operations['VercelIntegrationController_createVercelIntegration']
+    post: operations['v1-push-a-branch']
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  '/platform/integrations/vercel/{organization_integration_id}': {
+  '/v1/branches/{branch_id}/reset': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Resets a database branch
+     * @description Resets the specified database branch
+     */
+    post: operations['v1-reset-a-branch']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/oauth/authorize': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Beta] Authorize user through oauth */
+    get: operations['v1-authorize-user']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/oauth/revoke': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** [Beta] Revoke oauth app authorization and it's corresponding tokens */
+    post: operations['v1-revoke-token']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/oauth/token': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** [Beta] Exchange auth code for user's access and refresh token */
+    post: operations['v1-exchange-oauth-token']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/organizations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all organizations
+     * @description Returns a list of organizations that you currently belong to.
+     */
+    get: operations['v1-list-all-organizations']
+    put?: never
+    /** Create an organization */
+    post: operations['v1-create-an-organization']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/organizations/{slug}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets information about the organization */
+    get: operations['v1-get-an-organization']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/organizations/{slug}/members': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List members of an organization */
+    get: operations['v1-list-organization-members']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all projects
+     * @description Returns a list of all projects you've previously created.
+     */
+    get: operations['v1-list-all-projects']
+    put?: never
+    /** Create a project */
+    post: operations['v1-create-a-project']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets a specific project that belongs to the authenticated user */
+    get: operations['v1-get-project']
+    put?: never
+    post?: never
+    /** Deletes the given project */
+    delete: operations['v1-delete-a-project']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/analytics/endpoints/logs.all': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project's logs */
+    get: operations['getLogs']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/api-keys': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get project api keys */
+    get: operations['v1-get-project-api-keys']
+    put?: never
+    /** [Alpha] Creates a new API key for the project */
+    post: operations['createApiKey']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/api-keys/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Alpha] Get API key */
+    get: operations['getApiKey']
+    put?: never
+    post?: never
+    /** [Alpha] Deletes an API key for the project */
+    delete: operations['deleteApiKey']
+    options?: never
+    head?: never
+    /** [Alpha] Updates an API key for the project */
+    patch: operations['updateApiKey']
+    trace?: never
+  }
+  '/v1/projects/{ref}/branches': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all database branches
+     * @description Returns all database branches of the specified project.
+     */
+    get: operations['v1-list-all-branches']
+    put?: never
+    /**
+     * Create a database branch
+     * @description Creates a database branch from the specified project.
+     */
+    post: operations['v1-create-a-branch']
+    /**
+     * Disables preview branching
+     * @description Disables preview branching for the specified project
+     */
+    delete: operations['v1-disable-preview-branching']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/auth': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project's auth config */
+    get: operations['v1-get-auth-service-config']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Updates a project's auth config */
+    patch: operations['v1-update-auth-service-config']
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/auth/signing-keys': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Alpha] List all signing keys for the project */
+    get: operations['listSigningKeysForProject']
+    put?: never
+    /** [Alpha] Create a new signing key for the project in standby status */
+    post: operations['createSigningKeyForProject']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/auth/signing-keys/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Alpha] Get information about a signing key */
+    get: operations['getSigningKeyForProject']
+    put?: never
+    post?: never
+    /** [Alpha] Remove a signing key from a project, where the status is previously_used */
+    delete: operations['deleteSigningKey']
+    options?: never
+    head?: never
+    /** [Alpha] Update a signing key, mainly its status */
+    patch: operations['patchSigningKey']
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/auth/sso/providers': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists all SSO providers */
+    get: operations['v1-list-all-sso-provider']
+    put?: never
+    /** Creates a new SSO provider */
+    post: operations['v1-create-a-sso-provider']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/auth/sso/providers/{provider_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets a SSO provider by its UUID */
+    get: operations['v1-get-a-sso-provider']
+    /** Updates a SSO provider by its UUID */
+    put: operations['v1-update-a-sso-provider']
+    post?: never
+    /** Removes a SSO provider by its UUID */
+    delete: operations['v1-delete-a-sso-provider']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/auth/third-party-auth': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Alpha] Lists all third-party auth integrations */
+    get: operations['listTPAForProject']
+    put?: never
+    /** Creates a new third-party auth integration */
+    post: operations['createTPAForProject']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Alpha] Get a third-party integration */
+    get: operations['getTPAForProject']
+    put?: never
+    post?: never
+    /** [Alpha] Removes a third-party auth integration */
+    delete: operations['deleteTPAForProject']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/database/pgbouncer': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get project's pgbouncer config */
+    get: operations['v1-get-project-pgbouncer-config']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/database/pooler': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project's supavisor config */
+    get: operations['v1-get-supavisor-config']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Updates project's supavisor config */
+    patch: operations['v1-update-supavisor-config']
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/database/postgres': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project's Postgres config */
+    get: operations['v1-get-postgres-config']
+    /** Updates project's Postgres config */
+    put: operations['v1-update-postgres-config']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/storage': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project's storage config */
+    get: operations['v1-get-storage-config']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Updates project's storage config */
+    patch: operations['v1-update-storage-config']
+    trace?: never
+  }
+  '/v1/projects/{ref}/custom-hostname': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Beta] Gets project's custom hostname config */
+    get: operations['v1-get-hostname-config']
+    put?: never
+    post?: never
+    /** [Beta] Deletes a project's custom hostname configuration */
+    delete: operations['v1-Delete hostname config']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/custom-hostname/activate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** [Beta] Activates a custom hostname for a project. */
+    post: operations['v1-activate-custom-hostname']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/custom-hostname/initialize': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** [Beta] Updates project's custom hostname configuration */
+    post: operations['v1-update-hostname-config']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/custom-hostname/reverify': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** [Beta] Attempts to verify the DNS configuration for project's custom hostname configuration */
+    post: operations['v1-verify-dns-config']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/backups': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists all backups */
+    get: operations['v1-list-all-backups']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/backups/restore-pitr': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Restores a PITR backup for a database */
+    post: operations['v1-restore-pitr-backup']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/context': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Gets database metadata for the given project.
+     * @deprecated
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     */
+    get: operations['getDatabaseMetadata']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/query': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** [Beta] Run sql query */
+    post: operations['v1-run-a-query']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/webhooks/enable': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** [Beta] Enables Database Webhooks on the project */
+    post: operations['v1-enable-database-webhook']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/functions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all functions
+     * @description Returns all functions you've previously added to the specified project.
+     */
+    get: operations['v1-list-all-functions']
+    /**
+     * Bulk update functions
+     * @description Bulk update functions. It will create a new function or replace existing. The operation is idempotent. NOTE: You will need to manually bump the version.
+     */
+    put: operations['v1-bulk-update-functions']
+    /**
+     * Create a function
+     * @deprecated
+     * @description This endpoint is deprecated - use the deploy endpoint. Creates a function and adds it to the specified project.
+     */
+    post: operations['v1-create-a-function']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/functions/{function_slug}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Retrieve a function
+     * @description Retrieves a function with the specified slug and project.
+     */
+    get: operations['v1-get-a-function']
+    put?: never
+    post?: never
+    /**
+     * Delete a function
+     * @description Deletes a function with the specified slug from the specified project.
+     */
+    delete: operations['v1-delete-a-function']
+    options?: never
+    head?: never
+    /**
+     * Update a function
+     * @description Updates a function with the specified slug and project.
+     */
+    patch: operations['v1-update-a-function']
+    trace?: never
+  }
+  '/v1/projects/{ref}/functions/{function_slug}/body': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Retrieve a function body
+     * @description Retrieves a function body for the specified slug and project.
+     */
+    get: operations['v1-get-a-function-body']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/functions/deploy': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Deploy a function
+     * @description A new endpoint to deploy functions. It will create if function does not exist.
+     */
+    post: operations['v1-deploy-a-function']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/health': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project's service health status */
+    get: operations['v1-get-services-health']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/network-bans': {
     parameters: {
       query?: never
       header?: never
@@ -931,14 +780,14 @@ export interface paths {
     get?: never
     put?: never
     post?: never
-    /** Removes Vercel organization integration with the given id */
-    delete: operations['VercelIntegrationController_removeVercelIntegration']
+    /** [Beta] Remove network bans. */
+    delete: operations['v1-delete-network-bans']
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  '/platform/integrations/vercel/connections': {
+  '/v1/projects/{ref}/network-bans/retrieve': {
     parameters: {
       query?: never
       header?: never
@@ -947,15 +796,32 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Connects a Vercel project to a supabase project */
-    post: operations['VercelConnectionsController_createVercelConnection']
+    /** [Beta] Gets project's network bans */
+    post: operations['v1-list-all-network-bans']
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  '/platform/integrations/vercel/connections/{connection_id}': {
+  '/v1/projects/{ref}/network-restrictions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Beta] Gets project's network restrictions */
+    get: operations['v1-get-network-restrictions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/network-restrictions/apply': {
     parameters: {
       query?: never
       header?: never
@@ -964,16 +830,15 @@ export interface paths {
     }
     get?: never
     put?: never
-    post?: never
-    /** Deletes vercel project connection */
-    delete: operations['VercelConnectionsController_deleteVercelConnection']
+    /** [Beta] Updates project's network restrictions */
+    post: operations['v1-update-network-restrictions']
+    delete?: never
     options?: never
     head?: never
-    /** Updates a Vercel connection for a supabase project */
-    patch: operations['VercelConnectionsController_updateVercelConnection']
+    patch?: never
     trace?: never
   }
-  '/platform/integrations/vercel/connections/{connection_id}/sync-envs': {
+  '/v1/projects/{ref}/pause': {
     parameters: {
       query?: never
       header?: never
@@ -982,24 +847,25 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Syncs supabase project envs with given connection id */
-    post: operations['VercelConnectionsController_syncVercelConnectionEnvironments']
+    /** Pauses the given project */
+    post: operations['v1-pause-a-project']
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  '/platform/integrations/vercel/connections/{organization_integration_id}': {
+  '/v1/projects/{ref}/pgsodium': {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    /** Gets installed vercel project connections for the given organization integration */
-    get: operations['VercelConnectionsController_getVercelConnections']
-    put?: never
+    /** [Beta] Gets project's pgsodium config */
+    get: operations['v1-get-pgsodium-config']
+    /** [Beta] Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible. */
+    put: operations['v1-update-pgsodium-config']
     post?: never
     delete?: never
     options?: never
@@ -1007,43 +873,25 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/integrations/vercel/projects/{organization_integration_id}': {
+  '/v1/projects/{ref}/postgrest': {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    /** Gets vercel projects with the given organization integration id */
-    get: operations['VercelProjectController_getVercelProjects']
+    /** Gets project's postgrest config */
+    get: operations['v1-get-postgrest-service-config']
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
-    patch?: never
+    /** Updates project's postgrest config */
+    patch: operations['v1-update-postgrest-service-config']
     trace?: never
   }
-  '/platform/notifications': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get notifications */
-    get: operations['NotificationsController_getNotificationsV2']
-    put?: never
-    post?: never
-    /** Delete notifications */
-    delete: operations['NotificationsController_deleteNotifications']
-    options?: never
-    head?: never
-    /** Update notifications */
-    patch: operations['NotificationsController_updateNotificationsV2']
-    trace?: never
-  }
-  '/platform/notifications/archive-all': {
+  '/v1/projects/{ref}/read-replicas/remove': {
     parameters: {
       query?: never
       header?: never
@@ -1052,103 +900,15 @@ export interface paths {
     }
     get?: never
     put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    /** Archives all notifications */
-    patch: operations['NotificationsController_archiveAllNotifications']
-    trace?: never
-  }
-  '/platform/notifications/summary': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get an aggregated data of interest across all notifications for the user */
-    get: operations['NotificationsController_getNotificationsSummary']
-    put?: never
-    post?: never
+    /** [Beta] Remove a read replica */
+    post: operations['v1-remove-a-read-replica']
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  '/platform/oauth/authorizations/{id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** [Beta] Get oauth app authorization request */
-    get: operations['OAuthAuthorizationsController_getAuthorizationRequest']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/organizations': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets user's organizations */
-    get: operations['OrganizationsController_getOrganizations']
-    put?: never
-    /** Creates an organization */
-    post: operations['OrganizationsController_createOrganizationWithTier']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/organizations/{slug}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets a specific organization that belongs to the authenticated user */
-    get: operations['OrganizationSlugController_getOrganization']
-    put?: never
-    post?: never
-    /** Deletes organization */
-    delete: operations['OrganizationSlugController_deleteOrganization']
-    options?: never
-    head?: never
-    /** Updates organization */
-    patch: operations['OrganizationSlugController_updateOrganization']
-    trace?: never
-  }
-  '/platform/organizations/{slug}/audit': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets an organization's audit logs */
-    get: operations['OrgAuditLogsController_getAuditLogs']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/organizations/{slug}/available-versions': {
+  '/v1/projects/{ref}/read-replicas/setup': {
     parameters: {
       query?: never
       header?: never
@@ -1157,15 +917,32 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Retrieves a list of available Postgres versions available to the organization */
-    post: operations['OrganizationSlugController_getAvailableImageVersions']
+    /** [Beta] Set up a read replica */
+    post: operations['v1-setup-a-read-replica']
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  '/platform/organizations/{slug}/billing/credits/top-up': {
+  '/v1/projects/{ref}/readonly': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Returns project's readonly mode status */
+    get: operations['v1-get-readonly-mode-status']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/readonly/temporary-disable': {
     parameters: {
       query?: never
       header?: never
@@ -1174,41 +951,104 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Tops up the credit balance */
-    post: operations['OrgCreditsController_createTopUp']
+    /** Disables project's readonly mode for the next 15 minutes */
+    post: operations['v1-disable-readonly-mode-temporarily']
     delete?: never
     options?: never
     head?: never
     patch?: never
     trace?: never
   }
-  '/platform/organizations/{slug}/billing/invoices': {
+  '/v1/projects/{ref}/restore': {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    /** Gets invoices for the given organization */
-    get: operations['OrgInvoicesController_getInvoices']
+    /** Lists available restore versions for the given project */
+    get: operations['v1-list-available-restore-versions']
     put?: never
-    post?: never
+    /** Restores the given project */
+    post: operations['v1-restore-a-project']
     delete?: never
     options?: never
-    /** Gets the total count of invoices for the given organization */
-    head: operations['OrgInvoicesController_countInvoices']
+    head?: never
     patch?: never
     trace?: never
   }
-  '/platform/organizations/{slug}/billing/invoices/{invoiceId}': {
+  '/v1/projects/{ref}/restore/cancel': {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    /** Gets invoice with the given invoice ID */
-    get: operations['OrgInvoicesController_getInvoice']
+    get?: never
+    put?: never
+    /** Cancels the given project restoration */
+    post: operations['v1-cancel-a-project-restoration']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/secrets': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all secrets
+     * @description Returns all secrets you've previously added to the specified project.
+     */
+    get: operations['v1-list-all-secrets']
+    put?: never
+    /**
+     * Bulk create secrets
+     * @description Creates multiple secrets and adds them to the specified project.
+     */
+    post: operations['v1-bulk-create-secrets']
+    /**
+     * Bulk delete secrets
+     * @description Deletes all secrets with the given names from the specified project
+     */
+    delete: operations['v1-bulk-delete-secrets']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/ssl-enforcement': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Beta] Get project's SSL enforcement configuration. */
+    get: operations['v1-get-ssl-enforcement-config']
+    /** [Beta] Update project's SSL enforcement configuration. */
+    put: operations['v1-update-ssl-enforcement-config']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/storage/buckets': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists all buckets */
+    get: operations['v1-list-all-buckets']
     put?: never
     post?: never
     delete?: never
@@ -1217,15 +1057,18 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/organizations/{slug}/billing/invoices/{invoiceId}/payment-link': {
+  '/v1/projects/{ref}/types/typescript': {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    /** Gets the payment link to manually pay the given invoice */
-    get: operations['OrgInvoicesController_getInvoicePaymentLink']
+    /**
+     * Generate TypeScript types
+     * @description Returns the TypeScript types of your schema for use with supabase-js.
+     */
+    get: operations['v1-generate-typescript-types']
     put?: never
     post?: never
     delete?: never
@@ -1234,15 +1077,32 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/organizations/{slug}/billing/invoices/upcoming': {
+  '/v1/projects/{ref}/upgrade': {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    /** Gets the upcoming invoice */
-    get: operations['OrgInvoicesController_getUpcomingInvoice']
+    get?: never
+    put?: never
+    /** [Beta] Upgrades the project's Postgres version */
+    post: operations['v1-upgrade-postgres-version']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/upgrade/eligibility': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Beta] Returns the project's eligibility for upgrades */
+    get: operations['v1-get-postgres-upgrade-eligibility']
     put?: never
     post?: never
     delete?: never
@@ -1251,12 +1111,128 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/organizations/{slug}/billing/plans': {
+  '/v1/projects/{ref}/upgrade/status': {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
+    }
+    /** [Beta] Gets the latest status of the project's upgrade */
+    get: operations['v1-get-postgres-upgrade-status']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/vanity-subdomain': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Beta] Gets current vanity subdomain config */
+    get: operations['v1-get-vanity-subdomain-config']
+    put?: never
+    post?: never
+    /** [Beta] Deletes a project's vanity subdomain configuration */
+    delete: operations['v1-deactivate-vanity-subdomain-config']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/vanity-subdomain/activate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** [Beta] Activates a vanity subdomain for a project. */
+    post: operations['v1-activate-vanity-subdomain-config']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/vanity-subdomain/check-availability': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** [Beta] Checks vanity subdomain availability */
+    post: operations['v1-check-vanity-subdomain-availability']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/snippets': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists SQL snippets for the logged in user */
+    get: operations['v1-list-all-snippets']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/snippets/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets a specific SQL snippet */
+    get: operations['v1-get-a-snippet']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+}
+export type webhooks = Record<string, never>
+export interface components {
+  schemas: {
+    ActivateVanitySubdomainResponse: {
+      custom_domain: string
+    }
+    ApiKeyResponse: {
+      api_key: string
+      description?: string | null
+      hash?: string | null
+      id?: string | null
+      inserted_at?: string | null
+      name: string
+      prefix?: string | null
+      secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
+      /** @enum {string|null} */
+      type?: 'publishable' | 'secret' | 'legacy' | null
+      updated_at?: string | null
     }
     /** Gets subscription Plans */
     get: operations['OrgPlansController_getAvailablePlans']
@@ -29320,176 +29296,281 @@ export interface operations {
         ref: string
       }
       cookie?: never
+    ApiKeySecretJWTTemplate: {
+      role: string
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['DiskResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get database disk attributes */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
+    AttributeMapping: {
+      keys: {
+        [key: string]: components['schemas']['AttributeValue']
       }
     }
-  }
-  DiskController_modifyDisk: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    AttributeValue: {
+      array?: boolean
+      default?: Record<string, never> | number | string | boolean
+      name?: string
+      names?: string[]
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['DiskRequestBody']
-      }
+    AuthConfigResponse: {
+      api_max_request_duration: number | null
+      db_max_pool_size: number | null
+      disable_signup: boolean | null
+      external_anonymous_users_enabled: boolean | null
+      external_apple_additional_client_ids: string | null
+      external_apple_client_id: string | null
+      external_apple_enabled: boolean | null
+      external_apple_secret: string | null
+      external_azure_client_id: string | null
+      external_azure_enabled: boolean | null
+      external_azure_secret: string | null
+      external_azure_url: string | null
+      external_bitbucket_client_id: string | null
+      external_bitbucket_enabled: boolean | null
+      external_bitbucket_secret: string | null
+      external_discord_client_id: string | null
+      external_discord_enabled: boolean | null
+      external_discord_secret: string | null
+      external_email_enabled: boolean | null
+      external_facebook_client_id: string | null
+      external_facebook_enabled: boolean | null
+      external_facebook_secret: string | null
+      external_figma_client_id: string | null
+      external_figma_enabled: boolean | null
+      external_figma_secret: string | null
+      external_github_client_id: string | null
+      external_github_enabled: boolean | null
+      external_github_secret: string | null
+      external_gitlab_client_id: string | null
+      external_gitlab_enabled: boolean | null
+      external_gitlab_secret: string | null
+      external_gitlab_url: string | null
+      external_google_additional_client_ids: string | null
+      external_google_client_id: string | null
+      external_google_enabled: boolean | null
+      external_google_secret: string | null
+      external_google_skip_nonce_check: boolean | null
+      external_kakao_client_id: string | null
+      external_kakao_enabled: boolean | null
+      external_kakao_secret: string | null
+      external_keycloak_client_id: string | null
+      external_keycloak_enabled: boolean | null
+      external_keycloak_secret: string | null
+      external_keycloak_url: string | null
+      external_linkedin_oidc_client_id: string | null
+      external_linkedin_oidc_enabled: boolean | null
+      external_linkedin_oidc_secret: string | null
+      external_notion_client_id: string | null
+      external_notion_enabled: boolean | null
+      external_notion_secret: string | null
+      external_phone_enabled: boolean | null
+      external_slack_client_id: string | null
+      external_slack_enabled: boolean | null
+      external_slack_oidc_client_id: string | null
+      external_slack_oidc_enabled: boolean | null
+      external_slack_oidc_secret: string | null
+      external_slack_secret: string | null
+      external_spotify_client_id: string | null
+      external_spotify_enabled: boolean | null
+      external_spotify_secret: string | null
+      external_twitch_client_id: string | null
+      external_twitch_enabled: boolean | null
+      external_twitch_secret: string | null
+      external_twitter_client_id: string | null
+      external_twitter_enabled: boolean | null
+      external_twitter_secret: string | null
+      external_workos_client_id: string | null
+      external_workos_enabled: boolean | null
+      external_workos_secret: string | null
+      external_workos_url: string | null
+      external_zoom_client_id: string | null
+      external_zoom_enabled: boolean | null
+      external_zoom_secret: string | null
+      hook_custom_access_token_enabled: boolean | null
+      hook_custom_access_token_secrets: string | null
+      hook_custom_access_token_uri: string | null
+      hook_mfa_verification_attempt_enabled: boolean | null
+      hook_mfa_verification_attempt_secrets: string | null
+      hook_mfa_verification_attempt_uri: string | null
+      hook_password_verification_attempt_enabled: boolean | null
+      hook_password_verification_attempt_secrets: string | null
+      hook_password_verification_attempt_uri: string | null
+      hook_send_email_enabled: boolean | null
+      hook_send_email_secrets: string | null
+      hook_send_email_uri: string | null
+      hook_send_sms_enabled: boolean | null
+      hook_send_sms_secrets: string | null
+      hook_send_sms_uri: string | null
+      jwt_exp: number | null
+      mailer_allow_unverified_email_sign_ins: boolean | null
+      mailer_autoconfirm: boolean | null
+      mailer_otp_exp: number
+      mailer_otp_length: number | null
+      mailer_secure_email_change_enabled: boolean | null
+      mailer_subjects_confirmation: string | null
+      mailer_subjects_email_change: string | null
+      mailer_subjects_invite: string | null
+      mailer_subjects_magic_link: string | null
+      mailer_subjects_reauthentication: string | null
+      mailer_subjects_recovery: string | null
+      mailer_templates_confirmation_content: string | null
+      mailer_templates_email_change_content: string | null
+      mailer_templates_invite_content: string | null
+      mailer_templates_magic_link_content: string | null
+      mailer_templates_reauthentication_content: string | null
+      mailer_templates_recovery_content: string | null
+      mfa_max_enrolled_factors: number | null
+      mfa_phone_enroll_enabled: boolean | null
+      mfa_phone_max_frequency: number | null
+      mfa_phone_otp_length: number
+      mfa_phone_template: string | null
+      mfa_phone_verify_enabled: boolean | null
+      mfa_totp_enroll_enabled: boolean | null
+      mfa_totp_verify_enabled: boolean | null
+      mfa_web_authn_enroll_enabled: boolean | null
+      mfa_web_authn_verify_enabled: boolean | null
+      password_hibp_enabled: boolean | null
+      password_min_length: number | null
+      password_required_characters: string | null
+      rate_limit_anonymous_users: number | null
+      rate_limit_email_sent: number | null
+      rate_limit_otp: number | null
+      rate_limit_sms_sent: number | null
+      rate_limit_token_refresh: number | null
+      rate_limit_verify: number | null
+      refresh_token_rotation_enabled: boolean | null
+      saml_allow_encrypted_assertions: boolean | null
+      saml_enabled: boolean | null
+      saml_external_url: string | null
+      security_captcha_enabled: boolean | null
+      security_captcha_provider: string | null
+      security_captcha_secret: string | null
+      security_manual_linking_enabled: boolean | null
+      security_refresh_token_reuse_interval: number | null
+      security_update_password_require_reauthentication: boolean | null
+      sessions_inactivity_timeout: number | null
+      sessions_single_per_user: boolean | null
+      sessions_tags: string | null
+      sessions_timebox: number | null
+      site_url: string | null
+      sms_autoconfirm: boolean | null
+      sms_max_frequency: number | null
+      sms_messagebird_access_key: string | null
+      sms_messagebird_originator: string | null
+      sms_otp_exp: number | null
+      sms_otp_length: number
+      sms_provider: string | null
+      sms_template: string | null
+      sms_test_otp: string | null
+      sms_test_otp_valid_until: string | null
+      sms_textlocal_api_key: string | null
+      sms_textlocal_sender: string | null
+      sms_twilio_account_sid: string | null
+      sms_twilio_auth_token: string | null
+      sms_twilio_content_sid: string | null
+      sms_twilio_message_service_sid: string | null
+      sms_twilio_verify_account_sid: string | null
+      sms_twilio_verify_auth_token: string | null
+      sms_twilio_verify_message_service_sid: string | null
+      sms_vonage_api_key: string | null
+      sms_vonage_api_secret: string | null
+      sms_vonage_from: string | null
+      smtp_admin_email: string | null
+      smtp_host: string | null
+      smtp_max_frequency: number | null
+      smtp_pass: string | null
+      smtp_port: string | null
+      smtp_sender_name: string | null
+      smtp_user: string | null
+      uri_allow_list: string | null
     }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to modify database disk */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    AuthHealthResponse: {
+      /** @enum {string} */
+      name: 'GoTrue'
     }
-  }
-  DiskController_getDiskAutoscaleConfig: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    /** @enum {string} */
+    BillingPlanId: 'free' | 'pro' | 'team' | 'enterprise'
+    BranchDeleteResponse: {
+      message: string
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['DiskAutoscaleConfig']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get project disk autoscale config */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    BranchDetailResponse: {
+      db_host: string
+      db_pass?: string
+      db_port: number
+      db_user?: string
+      jwt_secret?: string
+      postgres_engine: string
+      postgres_version: string
+      ref: string
+      release_channel: string
+      /** @enum {string} */
+      status:
+        | 'INACTIVE'
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'UNKNOWN'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UPGRADING'
+        | 'PAUSING'
+        | 'RESTORE_FAILED'
+        | 'RESTARTING'
+        | 'PAUSE_FAILED'
+        | 'RESIZING'
     }
-  }
-  DiskController_updateDiskAutoscaleConfig: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    BranchResponse: {
+      created_at: string
+      git_branch?: string
+      id: string
+      is_default: boolean
+      /**
+       * @deprecated
+       * @description This field is deprecated and will not be populated.
+       */
+      latest_check_run_id?: number
+      name: string
+      parent_project_ref: string
+      persistent: boolean
+      /** Format: int32 */
+      pr_number?: number
+      project_ref: string
+      /** @enum {string} */
+      status:
+        | 'CREATING_PROJECT'
+        | 'RUNNING_MIGRATIONS'
+        | 'MIGRATIONS_PASSED'
+        | 'MIGRATIONS_FAILED'
+        | 'FUNCTIONS_DEPLOYED'
+        | 'FUNCTIONS_FAILED'
+      updated_at: string
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateDiskAutoscaleConfig']
-      }
+    BranchUpdateResponse: {
+      message: string
+      workflow_run_id: string
     }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['DiskAutoscaleConfig']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update project disk autoscale config */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    BulkUpdateFunctionBody: {
+      /** Format: int64 */
+      created_at?: number
+      entrypoint_path?: string
+      id: string
+      import_map?: boolean
+      import_map_path?: string
+      name: string
+      slug: string
+      /** @enum {string} */
+      status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+      verify_jwt?: boolean
+      version: number
     }
-  }
-  DiskController_getDiskUtilization: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    BulkUpdateFunctionResponse: {
+      functions: components['schemas']['FunctionResponse'][]
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['DiskUtilMetricsResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get disk utilization */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    CfResponse: {
+      errors: Record<string, never>[]
+      messages: Record<string, never>[]
+      result: components['schemas']['CustomHostnameDetails']
+      success: boolean
     }
   }
   InfraMonitoringController_getUsageMetrics: {
@@ -29543,1211 +29624,1090 @@ export interface operations {
         ref: string
       }
       cookie?: never
+    CreateApiKeyBody: {
+      description?: string | null
+      secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
+      /** @enum {string} */
+      type: 'publishable' | 'secret'
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      /** @description Failed to get project's usage metrics */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    CreateBranchBody: {
+      branch_name: string
+      desired_instance_size?: components['schemas']['DesiredInstanceSize']
+      git_branch?: string
+      persistent?: boolean
+      postgres_engine?: components['schemas']['PostgresEngine']
+      region?: string
+      release_channel?: components['schemas']['ReleaseChannel']
     }
-  }
-  HealthCheckController_projectHealthCheck: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    CreateOrganizationV1Dto: {
+      name: string
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get project health check */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    CreateProviderBody: {
+      attribute_mapping?: components['schemas']['AttributeMapping']
+      domains?: string[]
+      metadata_url?: string
+      metadata_xml?: string
+      /**
+       * @description What type of provider will be created
+       * @enum {string}
+       */
+      type: 'saml'
     }
-  }
-  LoadBalancersController_getLoadBalancers: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    CreateProviderResponse: {
+      created_at?: string
+      domains?: components['schemas']['Domain'][]
+      id: string
+      saml?: components['schemas']['SamlDescriptor']
+      updated_at?: string
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['LoadBalancerDetailResponse'][]
-        }
-      }
+    CreateSecretBody: {
+      /**
+       * @description Secret name must not start with the SUPABASE_ prefix.
+       * @example string
+       */
+      name: string
+      value: string
     }
-  }
-  PauseController_pauseProject: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    CreateSigningKeyBody: {
+      /** @enum {string} */
+      algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
+      /** @enum {string} */
+      status?: 'in_use' | 'standby'
     }
-    requestBody?: never
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to pause the project */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    CreateThirdPartyAuthBody: {
+      custom_jwks?: Record<string, never>
+      jwks_url?: string
+      oidc_issuer_url?: string
     }
-  }
-  PauseController_getProject: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    CustomHostnameDetails: {
+      custom_origin_server: string
+      hostname: string
+      id: string
+      ownership_verification: components['schemas']['OwnershipVerification']
+      ssl: components['schemas']['SslValidation']
+      status: string
+      verification_errors?: string[]
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PauseStatusResponse']
-        }
-      }
+    DatabaseUpgradeStatus: {
+      /** @enum {string} */
+      error?:
+        | '1_upgraded_instance_launch_failed'
+        | '2_volume_detachchment_from_upgraded_instance_failed'
+        | '3_volume_attachment_to_original_instance_failed'
+        | '4_data_upgrade_initiation_failed'
+        | '5_data_upgrade_completion_failed'
+        | '6_volume_detachchment_from_original_instance_failed'
+        | '7_volume_attachment_to_upgraded_instance_failed'
+        | '8_upgrade_completion_failed'
+        | '9_post_physical_backup_failed'
+      initiated_at: string
+      latest_status_at: string
+      /** @enum {string} */
+      progress?:
+        | '0_requested'
+        | '1_started'
+        | '2_launched_upgraded_instance'
+        | '3_detached_volume_from_upgraded_instance'
+        | '4_attached_volume_to_original_instance'
+        | '5_initiated_data_upgrade'
+        | '6_completed_data_upgrade'
+        | '7_detached_volume_from_original_instance'
+        | '8_attached_volume_to_upgraded_instance'
+        | '9_completed_upgrade'
+        | '10_completed_post_physical_backup'
+      /** @enum {integer} */
+      status: 0 | 1 | 2
+      target_version: number
     }
-  }
-  ResizeController_resizeDatabase: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    DatabaseUpgradeStatusResponse: {
+      databaseUpgradeStatus: components['schemas']['DatabaseUpgradeStatus'] | null
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ResizeBody']
-      }
+    DeleteProviderResponse: {
+      created_at?: string
+      domains?: components['schemas']['Domain'][]
+      id: string
+      saml?: components['schemas']['SamlDescriptor']
+      updated_at?: string
     }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to resize database disk */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    DeployFunctionResponse: {
+      /** Format: int64 */
+      created_at?: number
+      entrypoint_path?: string
+      id: string
+      import_map?: boolean
+      import_map_path?: string
+      name: string
+      slug: string
+      /** @enum {string} */
+      status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+      /** Format: int64 */
+      updated_at?: number
+      verify_jwt?: boolean
+      version: number
     }
-  }
-  RestartController_restartProject: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    /** @enum {string} */
+    DesiredInstanceSize:
+      | 'micro'
+      | 'small'
+      | 'medium'
+      | 'large'
+      | 'xlarge'
+      | '2xlarge'
+      | '4xlarge'
+      | '8xlarge'
+      | '12xlarge'
+      | '16xlarge'
+    Domain: {
+      created_at?: string
+      domain?: string
+      id: string
+      updated_at?: string
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RestartProjectInfo']
-      }
+    FunctionDeployBody: {
+      file: string[]
+      metadata: components['schemas']['FunctionDeployMetadata']
     }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to restart project */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    FunctionDeployMetadata: {
+      entrypoint_path: string
+      import_map_path?: string
+      name?: string
+      static_patterns?: string[]
+      verify_jwt?: boolean
     }
-  }
-  RestartServicesController_restartServices: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    FunctionResponse: {
+      /** Format: int64 */
+      created_at: number
+      entrypoint_path?: string
+      id: string
+      import_map?: boolean
+      import_map_path?: string
+      name: string
+      slug: string
+      /** @enum {string} */
+      status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+      /** Format: int64 */
+      updated_at: number
+      verify_jwt?: boolean
+      version: number
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RestartServicesBody']
-      }
+    FunctionSlugResponse: {
+      /** Format: int64 */
+      created_at: number
+      entrypoint_path?: string
+      id: string
+      import_map?: boolean
+      import_map_path?: string
+      name: string
+      slug: string
+      /** @enum {string} */
+      status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+      /** Format: int64 */
+      updated_at: number
+      verify_jwt?: boolean
+      version: number
     }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to restart given services */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    GetProjectAvailableRestoreVersionsResponse: {
+      available_versions: components['schemas']['ProjectAvailableRestoreVersion'][]
     }
-  }
-  UnpauseController_unpauseProject: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        ref: string
-      }
-      cookie?: never
+    GetProjectDbMetadataResponseDto: {
+      databases: ({
+        name: string
+        schemas: ({
+          name: string
+        } & {
+          [key: string]: unknown
+        })[]
+      } & {
+        [key: string]: unknown
+      })[]
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UnpauseProjectBodyDto']
-      }
+    GetProviderResponse: {
+      created_at?: string
+      domains?: components['schemas']['Domain'][]
+      id: string
+      saml?: components['schemas']['SamlDescriptor']
+      updated_at?: string
     }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['UnpauseProjectResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to unpause project */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    ListProvidersResponse: {
+      items: components['schemas']['Provider'][]
     }
-  }
-  UnpauseController_cancelProjectRestoration: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        ref: string
-      }
-      cookie?: never
+    NetworkBanResponse: {
+      banned_ipv4_addresses: string[]
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['RestoreCancellation']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to cancel project restoration */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    NetworkRestrictionsRequest: {
+      dbAllowedCidrs?: string[]
+      dbAllowedCidrsV6?: string[]
     }
-  }
-  UnpauseController_getAvailableImageVersions: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        ref: string
-      }
-      cookie?: never
+    NetworkRestrictionsResponse: {
+      config: components['schemas']['NetworkRestrictionsRequest']
+      /** @enum {string} */
+      entitlement: 'disallowed' | 'allowed'
+      old_config?: components['schemas']['NetworkRestrictionsRequest']
+      /** @enum {string} */
+      status: 'stored' | 'applied'
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['UnpauseProjectAvailableVersionsResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to retrieve available versions */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    OAuthRevokeTokenBodyDto: {
+      /** Format: uuid */
+      client_id: string
+      client_secret: string
+      refresh_token: string
     }
-  }
-  SettingsController_getProjectApi: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    OAuthTokenBody: {
+      client_id: string
+      client_secret: string
+      code?: string
+      code_verifier?: string
+      /** @enum {string} */
+      grant_type: 'authorization_code' | 'refresh_token'
+      redirect_uri?: string
+      refresh_token?: string
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ProjectSettingsResponse']
-        }
-      }
-      /** @description Failed to retrieve project's settings */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    OAuthTokenResponse: {
+      access_token: string
+      /** Format: int64 */
+      expires_in: number
+      refresh_token: string
+      /** @enum {string} */
+      token_type: 'Bearer'
     }
-  }
-  SensitivityController_updateProjectSensitivity: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    OrganizationResponseV1: {
+      id: string
+      name: string
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['MarkSensitiveBody']
-      }
+    OwnershipVerification: {
+      name: string
+      type: string
+      value: string
     }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ProjectSensitivityResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update project */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    PgsodiumConfigResponse: {
+      root_key: string
     }
-  }
-  ProjectStatusController_getStatus: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    PostgresConfigResponse: {
+      effective_cache_size?: string
+      logical_decoding_work_mem?: string
+      maintenance_work_mem?: string
+      max_connections?: number
+      max_locks_per_transaction?: number
+      max_parallel_maintenance_workers?: number
+      max_parallel_workers?: number
+      max_parallel_workers_per_gather?: number
+      max_replication_slots?: number
+      max_slot_wal_keep_size?: string
+      max_standby_archive_delay?: string
+      max_standby_streaming_delay?: string
+      max_wal_senders?: number
+      max_wal_size?: string
+      max_worker_processes?: number
+      /** @enum {string} */
+      session_replication_role?: 'origin' | 'replica' | 'local'
+      shared_buffers?: string
+      statement_timeout?: string
+      track_activity_query_size?: string
+      track_commit_timestamp?: boolean
+      wal_keep_size?: string
+      wal_sender_timeout?: string
+      work_mem?: string
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get project's status */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    /**
+     * @description Postgres engine version. If not provided, the latest version will be used.
+     * @enum {string}
+     */
+    PostgresEngine: '15' | '17-oriole'
+    PostgrestConfigWithJWTSecretResponse: {
+      db_extra_search_path: string
+      /** @description If `null`, the value is automatically configured based on compute size. */
+      db_pool: number | null
+      db_schema: string
+      jwt_secret?: string
+      max_rows: number
     }
-  }
-  ProjectsController_getProjectByFlyExtensionId: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        fly_extension_id: string
-      }
-      cookie?: never
+    ProjectAvailableRestoreVersion: {
+      /** @enum {string} */
+      postgres_engine: '13' | '14' | '15' | '17' | '17-oriole'
+      /** @enum {string} */
+      release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+      version: string
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GetProjectByFlyExtensionIdResponse']
-        }
-      }
+    ProjectUpgradeEligibilityResponse: {
+      current_app_version: string
+      current_app_version_release_channel: components['schemas']['ReleaseChannel']
+      duration_estimate_hours: number
+      eligible: boolean
+      extension_dependent_objects: string[]
+      latest_app_version: string
+      legacy_auth_custom_roles: string[]
+      potential_breaking_changes: string[]
+      target_upgrade_versions: components['schemas']['ProjectVersion'][]
     }
-  }
-  V0ProjectsMetricsController_getProjectsMetrics: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
+    ProjectUpgradeInitiateResponse: {
+      tracking_id: string
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GetMetricsBody']
-      }
+    ProjectVersion: {
+      app_version: string
+      postgres_version: components['schemas']['PostgresEngine']
+      release_channel: components['schemas']['ReleaseChannel']
     }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GetMetricsResponse']
-        }
-      }
+    Provider: {
+      created_at?: string
+      domains?: components['schemas']['Domain'][]
+      id: string
+      saml?: components['schemas']['SamlDescriptor']
+      updated_at?: string
     }
-  }
-  StatusController_getStatus: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
+    ReadOnlyStatusResponse: {
+      enabled: boolean
+      override_active_until: string
+      override_enabled: boolean
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to retrieve infrastructure status */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    RealtimeHealthResponse: {
+      connected_cluster: number
     }
-  }
-  StorageArchiveController_getArchive: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    /** @enum {string} */
+    ReleaseChannel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+    RemoveNetworkBanRequest: {
+      ipv4_addresses: string[]
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GetArchiveResponse']
-        }
-      }
-      /** @description Failed to get project storage archive */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    RemoveReadReplicaBody: {
+      database_identifier: string
     }
-  }
-  StorageArchiveController_createArchive: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    RestoreProjectBodyDto: Record<string, never>
+    SamlDescriptor: {
+      attribute_mapping?: components['schemas']['AttributeMapping']
+      entity_id: string
+      id: string
+      metadata_url?: string
+      metadata_xml?: string
     }
-    requestBody?: never
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create project storage archive */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    SecretResponse: {
+      name: string
+      updated_at?: string
+      value: string
     }
-  }
-  StorageBucketsController_getBuckets: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+    SetUpReadReplicaBody: {
+      /**
+       * @description Region you want your read replica to reside in
+       * @example us-east-1
+       * @enum {string}
+       */
+      read_replica_region:
+        | 'us-east-1'
+        | 'us-east-2'
+        | 'us-west-1'
+        | 'us-west-2'
+        | 'ap-east-1'
+        | 'ap-southeast-1'
+        | 'ap-northeast-1'
+        | 'ap-northeast-2'
+        | 'ap-southeast-2'
+        | 'eu-west-1'
+        | 'eu-west-2'
+        | 'eu-west-3'
+        | 'eu-north-1'
+        | 'eu-central-1'
+        | 'eu-central-2'
+        | 'ca-central-1'
+        | 'ap-south-1'
+        | 'sa-east-1'
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['StorageBucket'][]
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get list of buckets */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    SigningKeyResponse: {
+      /** @enum {string} */
+      algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
+      /** Format: date-time */
+      created_at: string
+      /** Format: uuid */
+      id: string
+      public_jwk?: unknown
+      /** @enum {string} */
+      status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
+      /** Format: date-time */
+      updated_at: string
     }
-  }
-  StorageBucketsController_createBucket: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateStorageBucketBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': string
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create bucket */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageBucketIdController_getBucket: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
+    SigningKeysResponse: {
+      keys: {
+        /** @enum {string} */
+        algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
+        /** Format: date-time */
+        created_at: string
+        /** Format: uuid */
         id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
+        public_jwk?: unknown
+        /** @enum {string} */
+        status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
+        /** Format: date-time */
+        updated_at: string
+      }[]
     }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['StorageBucket']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get bucket */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
+    SnippetContent: {
+      favorite: boolean
+      schema_version: string
+      sql: string
+    }
+    SnippetList: {
+      cursor?: string
+      data: components['schemas']['SnippetMeta'][]
+    }
+    SnippetMeta: {
+      description: string | null
+      id: string
+      inserted_at: string
+      name: string
+      owner: components['schemas']['SnippetUser']
+      project: components['schemas']['SnippetProject']
+      /** @enum {string} */
+      type: 'sql'
+      updated_at: string
+      updated_by: components['schemas']['SnippetUser']
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
+    }
+    SnippetProject: {
+      /** Format: int64 */
+      id: number
+      name: string
+    }
+    SnippetResponse: {
+      content: components['schemas']['SnippetContent']
+      description: string | null
+      id: string
+      inserted_at: string
+      name: string
+      owner: components['schemas']['SnippetUser']
+      project: components['schemas']['SnippetProject']
+      /** @enum {string} */
+      type: 'sql'
+      updated_at: string
+      updated_by: components['schemas']['SnippetUser']
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
+    }
+    SnippetUser: {
+      /** Format: int64 */
+      id: number
+      username: string
+    }
+    SslEnforcementRequest: {
+      requestedConfig: components['schemas']['SslEnforcements']
+    }
+    SslEnforcementResponse: {
+      appliedSuccessfully: boolean
+      currentConfig: components['schemas']['SslEnforcements']
+    }
+    SslEnforcements: {
+      database: boolean
+    }
+    SslValidation: {
+      status: string
+      validation_errors?: components['schemas']['ValidationError'][]
+      validation_records: components['schemas']['ValidationRecord'][]
+    }
+    StorageConfigResponse: {
+      features: components['schemas']['StorageFeatures']
+      /** Format: int64 */
+      fileSizeLimit: number
+    }
+    StorageFeatureImageTransformation: {
+      enabled: boolean
+    }
+    StorageFeatures: {
+      imageTransformation: components['schemas']['StorageFeatureImageTransformation']
+      s3Protocol: components['schemas']['StorageFeatureS3Protocol']
+    }
+    StorageFeatureS3Protocol: {
+      enabled: boolean
+    }
+    SubdomainAvailabilityResponse: {
+      available: boolean
+    }
+    SupavisorConfigResponse: {
+      connectionString: string
+      /** @enum {string} */
+      database_type: 'PRIMARY' | 'READ_REPLICA'
+      db_host: string
+      db_name: string
+      db_port: number
+      db_user: string
+      default_pool_size: number | null
+      identifier: string
+      is_using_scram_auth: boolean
+      max_client_conn: number | null
+      /** @enum {string} */
+      pool_mode: 'transaction' | 'session'
+    }
+    ThirdPartyAuth: {
+      custom_jwks?: Record<string, never> | null
+      id: string
+      inserted_at: string
+      jwks_url?: string | null
+      oidc_issuer_url?: string | null
+      resolved_at?: string | null
+      resolved_jwks?: Record<string, never> | null
+      type: string
+      updated_at: string
+    }
+    TypescriptResponse: {
+      types: string
+    }
+    UpdateApiKeyBody: {
+      description?: string | null
+      secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
+    }
+    UpdateAuthConfigBody: {
+      api_max_request_duration?: number
+      db_max_pool_size?: number
+      disable_signup?: boolean
+      external_anonymous_users_enabled?: boolean
+      external_apple_additional_client_ids?: string
+      external_apple_client_id?: string
+      external_apple_enabled?: boolean
+      external_apple_secret?: string
+      external_azure_client_id?: string
+      external_azure_enabled?: boolean
+      external_azure_secret?: string
+      external_azure_url?: string
+      external_bitbucket_client_id?: string
+      external_bitbucket_enabled?: boolean
+      external_bitbucket_secret?: string
+      external_discord_client_id?: string
+      external_discord_enabled?: boolean
+      external_discord_secret?: string
+      external_email_enabled?: boolean
+      external_facebook_client_id?: string
+      external_facebook_enabled?: boolean
+      external_facebook_secret?: string
+      external_figma_client_id?: string
+      external_figma_enabled?: boolean
+      external_figma_secret?: string
+      external_github_client_id?: string
+      external_github_enabled?: boolean
+      external_github_secret?: string
+      external_gitlab_client_id?: string
+      external_gitlab_enabled?: boolean
+      external_gitlab_secret?: string
+      external_gitlab_url?: string
+      external_google_additional_client_ids?: string
+      external_google_client_id?: string
+      external_google_enabled?: boolean
+      external_google_secret?: string
+      external_google_skip_nonce_check?: boolean
+      external_kakao_client_id?: string
+      external_kakao_enabled?: boolean
+      external_kakao_secret?: string
+      external_keycloak_client_id?: string
+      external_keycloak_enabled?: boolean
+      external_keycloak_secret?: string
+      external_keycloak_url?: string
+      external_linkedin_oidc_client_id?: string
+      external_linkedin_oidc_enabled?: boolean
+      external_linkedin_oidc_secret?: string
+      external_notion_client_id?: string
+      external_notion_enabled?: boolean
+      external_notion_secret?: string
+      external_phone_enabled?: boolean
+      external_slack_client_id?: string
+      external_slack_enabled?: boolean
+      external_slack_oidc_client_id?: string
+      external_slack_oidc_enabled?: boolean
+      external_slack_oidc_secret?: string
+      external_slack_secret?: string
+      external_spotify_client_id?: string
+      external_spotify_enabled?: boolean
+      external_spotify_secret?: string
+      external_twitch_client_id?: string
+      external_twitch_enabled?: boolean
+      external_twitch_secret?: string
+      external_twitter_client_id?: string
+      external_twitter_enabled?: boolean
+      external_twitter_secret?: string
+      external_workos_client_id?: string
+      external_workos_enabled?: boolean
+      external_workos_secret?: string
+      external_workos_url?: string
+      external_zoom_client_id?: string
+      external_zoom_enabled?: boolean
+      external_zoom_secret?: string
+      hook_custom_access_token_enabled?: boolean
+      hook_custom_access_token_secrets?: string
+      hook_custom_access_token_uri?: string
+      hook_mfa_verification_attempt_enabled?: boolean
+      hook_mfa_verification_attempt_secrets?: string
+      hook_mfa_verification_attempt_uri?: string
+      hook_password_verification_attempt_enabled?: boolean
+      hook_password_verification_attempt_secrets?: string
+      hook_password_verification_attempt_uri?: string
+      hook_send_email_enabled?: boolean
+      hook_send_email_secrets?: string
+      hook_send_email_uri?: string
+      hook_send_sms_enabled?: boolean
+      hook_send_sms_secrets?: string
+      hook_send_sms_uri?: string
+      jwt_exp?: number
+      mailer_allow_unverified_email_sign_ins?: boolean
+      mailer_autoconfirm?: boolean
+      mailer_otp_exp?: number
+      mailer_otp_length?: number
+      mailer_secure_email_change_enabled?: boolean
+      mailer_subjects_confirmation?: string
+      mailer_subjects_email_change?: string
+      mailer_subjects_invite?: string
+      mailer_subjects_magic_link?: string
+      mailer_subjects_reauthentication?: string
+      mailer_subjects_recovery?: string
+      mailer_templates_confirmation_content?: string
+      mailer_templates_email_change_content?: string
+      mailer_templates_invite_content?: string
+      mailer_templates_magic_link_content?: string
+      mailer_templates_reauthentication_content?: string
+      mailer_templates_recovery_content?: string
+      mfa_max_enrolled_factors?: number
+      mfa_phone_enroll_enabled?: boolean
+      mfa_phone_max_frequency?: number
+      mfa_phone_otp_length?: number
+      mfa_phone_template?: string
+      mfa_phone_verify_enabled?: boolean
+      mfa_totp_enroll_enabled?: boolean
+      mfa_totp_verify_enabled?: boolean
+      mfa_web_authn_enroll_enabled?: boolean
+      mfa_web_authn_verify_enabled?: boolean
+      password_hibp_enabled?: boolean
+      password_min_length?: number
+      /** @enum {string} */
+      password_required_characters?:
+        | 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~'
+        | ''
+      rate_limit_anonymous_users?: number
+      rate_limit_email_sent?: number
+      rate_limit_otp?: number
+      rate_limit_sms_sent?: number
+      rate_limit_token_refresh?: number
+      rate_limit_verify?: number
+      refresh_token_rotation_enabled?: boolean
+      saml_enabled?: boolean
+      saml_external_url?: string
+      security_captcha_enabled?: boolean
+      security_captcha_provider?: string
+      security_captcha_secret?: string
+      security_manual_linking_enabled?: boolean
+      security_refresh_token_reuse_interval?: number
+      security_update_password_require_reauthentication?: boolean
+      sessions_inactivity_timeout?: number
+      sessions_single_per_user?: boolean
+      sessions_tags?: string
+      sessions_timebox?: number
+      site_url?: string
+      sms_autoconfirm?: boolean
+      sms_max_frequency?: number
+      sms_messagebird_access_key?: string
+      sms_messagebird_originator?: string
+      sms_otp_exp?: number
+      sms_otp_length?: number
+      sms_provider?: string
+      sms_template?: string
+      sms_test_otp?: string
+      sms_test_otp_valid_until?: string
+      sms_textlocal_api_key?: string
+      sms_textlocal_sender?: string
+      sms_twilio_account_sid?: string
+      sms_twilio_auth_token?: string
+      sms_twilio_content_sid?: string
+      sms_twilio_message_service_sid?: string
+      sms_twilio_verify_account_sid?: string
+      sms_twilio_verify_auth_token?: string
+      sms_twilio_verify_message_service_sid?: string
+      sms_vonage_api_key?: string
+      sms_vonage_api_secret?: string
+      sms_vonage_from?: string
+      smtp_admin_email?: string
+      smtp_host?: string
+      smtp_max_frequency?: number
+      smtp_pass?: string
+      smtp_port?: string
+      smtp_sender_name?: string
+      smtp_user?: string
+      uri_allow_list?: string
+    }
+    UpdateBranchBody: {
+      branch_name?: string
+      git_branch?: string
+      persistent?: boolean
+      /**
+       * @deprecated
+       * @description This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead.
+       */
+      reset_on_push?: boolean
+      /** @enum {string} */
+      status?:
+        | 'CREATING_PROJECT'
+        | 'RUNNING_MIGRATIONS'
+        | 'MIGRATIONS_PASSED'
+        | 'MIGRATIONS_FAILED'
+        | 'FUNCTIONS_DEPLOYED'
+        | 'FUNCTIONS_FAILED'
+    }
+    UpdateCustomHostnameBody: {
+      custom_hostname: string
+    }
+    UpdateCustomHostnameResponse: {
+      custom_hostname: string
+      data: components['schemas']['CfResponse']
+      /** @enum {string} */
+      status:
+        | '1_not_started'
+        | '2_initiated'
+        | '3_challenge_verified'
+        | '4_origin_setup_completed'
+        | '5_services_reconfigured'
+    }
+    UpdatePgsodiumConfigBody: {
+      root_key: string
+    }
+    UpdatePostgresConfigBody: {
+      effective_cache_size?: string
+      logical_decoding_work_mem?: string
+      maintenance_work_mem?: string
+      max_connections?: number
+      max_locks_per_transaction?: number
+      max_parallel_maintenance_workers?: number
+      max_parallel_workers?: number
+      max_parallel_workers_per_gather?: number
+      max_replication_slots?: number
+      max_slot_wal_keep_size?: string
+      max_standby_archive_delay?: string
+      max_standby_streaming_delay?: string
+      max_wal_senders?: number
+      max_wal_size?: string
+      max_worker_processes?: number
+      restart_database?: boolean
+      /** @enum {string} */
+      session_replication_role?: 'origin' | 'replica' | 'local'
+      shared_buffers?: string
+      statement_timeout?: string
+      track_activity_query_size?: string
+      track_commit_timestamp?: boolean
+      wal_keep_size?: string
+      wal_sender_timeout?: string
+      work_mem?: string
+    }
+    UpdatePostgrestConfigBody: {
+      db_extra_search_path?: string
+      db_pool?: number
+      db_schema?: string
+      max_rows?: number
+    }
+    UpdateProviderBody: {
+      attribute_mapping?: components['schemas']['AttributeMapping']
+      domains?: string[]
+      metadata_url?: string
+      metadata_xml?: string
+    }
+    UpdateProviderResponse: {
+      created_at?: string
+      domains?: components['schemas']['Domain'][]
+      id: string
+      saml?: components['schemas']['SamlDescriptor']
+      updated_at?: string
+    }
+    UpdateSigningKeyBody: {
+      /** @enum {string} */
+      status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
+    }
+    UpdateStorageConfigBody: {
+      features?: components['schemas']['StorageFeatures']
+      /** Format: int64 */
+      fileSizeLimit?: number
+    }
+    UpdateSupavisorConfigBody: {
+      default_pool_size?: number | null
+      /**
+       * @deprecated
+       * @description This field is deprecated and is ignored in this request
+       * @enum {string}
+       */
+      pool_mode?: 'transaction' | 'session'
+    }
+    UpdateSupavisorConfigResponse: {
+      default_pool_size: number | null
+      /** @enum {string} */
+      pool_mode: 'transaction' | 'session'
+    }
+    UpgradeDatabaseBody: {
+      release_channel: components['schemas']['ReleaseChannel']
+      target_version: string
+    }
+    V1AnalyticsResponse: {
+      error?:
+        | {
+            code?: number
+            errors?: {
+              domain?: string
+              location?: string
+              locationType?: string
+              message?: string
+              reason?: string
+            }[]
+            message?: string
+            status?: string
+          }
+        | string
+      result?: Record<string, never>[]
+    }
+    V1Backup: {
+      inserted_at: string
+      is_physical_backup: boolean
+      /** @enum {string} */
+      status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED' | 'CANCELLED'
+    }
+    V1BackupsResponse: {
+      backups: components['schemas']['V1Backup'][]
+      physical_backup_data: components['schemas']['V1PhysicalBackup']
+      pitr_enabled: boolean
+      region: string
+      walg_enabled: boolean
+    }
+    V1CreateFunctionBody: {
+      body: string
+      name: string
+      slug: string
+      verify_jwt?: boolean
+    }
+    V1CreateProjectBodyDto: {
+      /** @description Database password */
+      db_pass: string
+      /** @enum {string} */
+      desired_instance_size?:
+        | 'micro'
+        | 'small'
+        | 'medium'
+        | 'large'
+        | 'xlarge'
+        | '2xlarge'
+        | '4xlarge'
+        | '8xlarge'
+        | '12xlarge'
+        | '16xlarge'
+      /**
+       * @deprecated
+       * @description This field is deprecated and is ignored in this request
+       */
+      kps_enabled?: boolean
+      /** @description Name of your project */
+      name: string
+      /** @description Slug of your organization */
+      organization_id: string
+      /**
+       * @deprecated
+       * @description Subscription Plan is now set on organization level and is ignored in this request
+       * @enum {string}
+       */
+      plan?: 'free' | 'pro'
+      /**
+       * @description Region you want your server to reside in
+       * @enum {string}
+       */
+      region:
+        | 'us-east-1'
+        | 'us-east-2'
+        | 'us-west-1'
+        | 'us-west-2'
+        | 'ap-east-1'
+        | 'ap-southeast-1'
+        | 'ap-northeast-1'
+        | 'ap-northeast-2'
+        | 'ap-southeast-2'
+        | 'eu-west-1'
+        | 'eu-west-2'
+        | 'eu-west-3'
+        | 'eu-north-1'
+        | 'eu-central-1'
+        | 'eu-central-2'
+        | 'ca-central-1'
+        | 'ap-south-1'
+        | 'sa-east-1'
+      /**
+       * Format: uri
+       * @description Template URL used to create the project from the CLI.
+       * @example https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
+       */
+      template_url?: string
+    }
+    V1DatabaseResponse: {
+      /** @description Database host */
+      host: string
+      /** @description Database engine */
+      postgres_engine: string
+      /** @description Release channel */
+      release_channel: string
+      /** @description Database version */
+      version: string
+    }
+    V1OrganizationMemberResponse: {
+      email?: string
+      mfa_enabled: boolean
+      role_name: string
+      user_id: string
+      user_name: string
+    }
+    V1OrganizationSlugResponse: {
+      allowed_release_channels: components['schemas']['ReleaseChannel'][]
+      id: string
+      name: string
+      opt_in_tags: 'AI_SQL_GENERATOR_OPT_IN'[]
+      plan?: components['schemas']['BillingPlanId']
+    }
+    V1PgbouncerConfigResponse: {
+      connection_string?: string
+      default_pool_size?: number
+      ignore_startup_parameters?: string
+      max_client_conn?: number
+      /** @enum {string} */
+      pool_mode?: 'transaction' | 'session' | 'statement'
+    }
+    V1PhysicalBackup: {
+      /** Format: int64 */
+      earliest_physical_backup_date_unix?: number
+      /** Format: int64 */
+      latest_physical_backup_date_unix?: number
+    }
+    V1PostgrestConfigResponse: {
+      db_extra_search_path: string
+      /** @description If `null`, the value is automatically configured based on compute size. */
+      db_pool: number | null
+      db_schema: string
+      max_rows: number
+    }
+    V1ProjectRefResponse: {
+      /** Format: int64 */
+      id: number
+      name: string
+      ref: string
+    }
+    V1ProjectResponse: {
+      /**
+       * @description Creation timestamp
+       * @example 2023-03-29T16:32:59Z
+       */
+      created_at: string
+      /** @description Id of your project */
+      id: string
+      /** @description Name of your project */
+      name: string
+      /** @description Slug of your organization */
+      organization_id: string
+      /**
+       * @description Region of your project
+       * @example us-east-1
+       */
+      region: string
+      /** @enum {string} */
+      status:
+        | 'INACTIVE'
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'UNKNOWN'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UPGRADING'
+        | 'PAUSING'
+        | 'RESTORE_FAILED'
+        | 'RESTARTING'
+        | 'PAUSE_FAILED'
+        | 'RESIZING'
+    }
+    V1ProjectWithDatabaseResponse: {
+      /**
+       * @description Creation timestamp
+       * @example 2023-03-29T16:32:59Z
+       */
+      created_at: string
+      database: components['schemas']['V1DatabaseResponse']
+      /** @description Id of your project */
+      id: string
+      /** @description Name of your project */
+      name: string
+      /** @description Slug of your organization */
+      organization_id: string
+      /**
+       * @description Region of your project
+       * @example us-east-1
+       */
+      region: string
+      /** @enum {string} */
+      status:
+        | 'INACTIVE'
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'UNKNOWN'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UPGRADING'
+        | 'PAUSING'
+        | 'RESTORE_FAILED'
+        | 'RESTARTING'
+        | 'PAUSE_FAILED'
+        | 'RESIZING'
+    }
+    V1RestorePitrBody: {
+      /** Format: int64 */
+      recovery_time_target_unix: number
+    }
+    V1RunQueryBody: {
+      query: string
+    }
+    V1ServiceHealthResponse: {
+      error?: string
+      healthy: boolean
+      info?:
+        | components['schemas']['AuthHealthResponse']
+        | components['schemas']['RealtimeHealthResponse']
+      /** @enum {string} */
+      name: 'auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage'
+      /** @enum {string} */
+      status: 'COMING_UP' | 'ACTIVE_HEALTHY' | 'UNHEALTHY'
+    }
+    V1StorageBucketResponse: {
+      created_at: string
+      id: string
+      name: string
+      owner: string
+      public: boolean
+      updated_at: string
+    }
+    V1UpdateFunctionBody: {
+      body?: string
+      name?: string
+      verify_jwt?: boolean
+    }
+    ValidationError: {
+      message: string
+    }
+    ValidationRecord: {
+      txt_name: string
+      txt_value: string
+    }
+    VanitySubdomainBody: {
+      vanity_subdomain: string
+    }
+    VanitySubdomainConfigResponse: {
+      custom_domain?: string
+      /** @enum {string} */
+      status: 'not-used' | 'custom-domain-used' | 'active'
     }
   }
-  StorageBucketIdController_deleteBucket: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete bucket */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageBucketIdController_updateBucket: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateStorageBucketBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update bucket */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageBucketIdController_emptyBucket: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to empty bucket */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageObjectsController_deleteObjects: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['DeleteObjectsBody']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete objects */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageObjectsController_copyObject: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CopyObjectBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['CopyObjectResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to copy object */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageObjectsController_download: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['DownloadObjectBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to download the file */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageObjectsController_getObjects: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GetObjectsBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['StorageObject'][]
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get list of objects with the given bucket */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageObjectsController_moveObject: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['MoveObjectBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to move object */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageObjectsController_createPublicUrl: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GetPublicUrlBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PublicUrlResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create public URL */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageObjectsController_createSignedUrl: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GetSignedUrlBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['SignedUrlResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create a signed URL */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageObjectsController_createSignedUrls: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage bucket id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GetSignedUrlsBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['SignedUrlsResponse'][]
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get multiple signed URLs */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageS3CredentialsController_getAllCredentials: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GetStorageCredentialsResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get project storage credentials */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageS3CredentialsController_createCredential: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateStorageCredentialBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['CreateStorageCredentialResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create project storage credential */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StorageS3CredentialsController_deleteCredential: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Storage credential id */
-        id: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete project storage credential */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
+  responses: never
+  parameters: never
+  requestBodies: never
+  headers: never
+  pathItems: never
+}
+export type $defs = Record<string, never>
+export interface operations {
   'v1-get-a-branch-config': {
     parameters: {
       query?: never
@@ -31164,7 +31124,7 @@ export interface operations {
       }
     }
   }
-  V1ProjectLogsController_getLogs: {
+  getLogs: {
     parameters: {
       query?: {
         iso_timestamp_end?: string
@@ -31219,7 +31179,7 @@ export interface operations {
       }
     }
   }
-  ApiKeysController_createApiKey: {
+  createApiKey: {
     parameters: {
       query: {
         reveal: boolean
@@ -31247,7 +31207,7 @@ export interface operations {
       }
     }
   }
-  ApiKeysController_getApiKey: {
+  getApiKey: {
     parameters: {
       query: {
         reveal: boolean
@@ -31272,7 +31232,7 @@ export interface operations {
       }
     }
   }
-  ApiKeysController_deleteApiKey: {
+  deleteApiKey: {
     parameters: {
       query: {
         reveal: boolean
@@ -31303,7 +31263,7 @@ export interface operations {
       }
     }
   }
-  ApiKeysController_updateApiKey: {
+  updateApiKey: {
     parameters: {
       query: {
         reveal: boolean
@@ -31488,6 +31448,147 @@ export interface operations {
       }
       /** @description Failed to update project's auth config */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  listSigningKeysForProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SigningKeysResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  createSigningKeyForProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateSigningKeyBody']
+      }
+    }
+    responses: {
+      /** @description [Alpha] Create a new signing key for the project in standby status */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateSigningKeyBody']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  getSigningKeyForProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SigningKeyResponse']
+        }
+      }
+    }
+  }
+  deleteSigningKey: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SigningKeyResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  patchSigningKey: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateSigningKeyBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SigningKeyResponse']
+        }
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -31681,7 +31782,7 @@ export interface operations {
       }
     }
   }
-  ThirdPartyAuthController_listTPAForProject: {
+  listTPAForProject: {
     parameters: {
       query?: never
       header?: never
@@ -31709,7 +31810,7 @@ export interface operations {
       }
     }
   }
-  ThirdPartyAuthController_createTPAForProject: {
+  createTPAForProject: {
     parameters: {
       query?: never
       header?: never
@@ -31741,7 +31842,7 @@ export interface operations {
       }
     }
   }
-  ThirdPartyAuthController_getTPAForProject: {
+  getTPAForProject: {
     parameters: {
       query?: never
       header?: never
@@ -31770,7 +31871,7 @@ export interface operations {
       }
     }
   }
-  ThirdPartyAuthController_deleteTPAForProject: {
+  deleteTPAForProject: {
     parameters: {
       query?: never
       header?: never
@@ -32266,7 +32367,7 @@ export interface operations {
       }
     }
   }
-  V1DatabaseContextController_getDatabaseMetadata: {
+  getDatabaseMetadata: {
     parameters: {
       query?: never
       header?: never
@@ -32400,10 +32501,48 @@ export interface operations {
       }
     }
   }
+  'v1-bulk-update-functions': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BulkUpdateFunctionBody'][]
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BulkUpdateFunctionResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update functions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-create-a-function': {
     parameters: {
       query?: {
-        compute_multiplier?: number
         entrypoint_path?: string
         import_map?: boolean
         import_map_path?: string
@@ -32523,7 +32662,6 @@ export interface operations {
   'v1-update-a-function': {
     parameters: {
       query?: {
-        compute_multiplier?: number
         entrypoint_path?: string
         import_map?: boolean
         import_map_path?: string
@@ -32597,6 +32735,48 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve function body with given slug */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-deploy-a-function': {
+    parameters: {
+      query?: {
+        bundleOnly?: boolean
+        slug?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'multipart/form-data': components['schemas']['FunctionDeployBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DeployFunctionResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to deploy function */
       500: {
         headers: {
           [name: string]: unknown

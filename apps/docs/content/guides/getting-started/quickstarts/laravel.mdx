@@ -73,9 +73,11 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Change the default schema">
 
-    By default Laravel uses the `public` schema. We recommend changing this as supabase exposes the `public` schema as a [data API](/docs/guides/api).
+    By default Laravel uses the `public` schema. We recommend changing this as Supabase exposes the `public` schema as a [data API](/docs/guides/api).
 
     You can change the schema of your Laravel application by modifying the `search_path` variable `app/config/database.php`.
+
+    The schema you specify in `search_path` has to exist on Supabase. You can create a new schema from the [Table Editor](/dashboard/project/_/editor).
 
     </StepHikeCompact.Details>
 

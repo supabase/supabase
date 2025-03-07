@@ -1,3 +1,4 @@
+import { NullValue } from 'components/grid/components/common/NullValue'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import type { SupaRow, SupaTable } from 'components/grid/types'
 import {
@@ -7,6 +8,7 @@ import {
 import { Key } from 'lucide-react'
 import DataGrid, { Column } from 'react-data-grid'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { convertByteaToHex } from '../RowEditor.utils'
 
 export interface SelectorGridProps {
   table: SupaTable
@@ -33,11 +35,24 @@ const columnRender = (name: string, isPrimaryKey = false) => {
   )
 }
 
-const formatter = (column: string, row: SupaRow) => {
-  const formattedValue = typeof row[column] === 'object' ? JSON.stringify(row[column]) : row[column]
+// TODO: move this formatter out to a common component
+const formatter = ({ column, format, row }: { column: string; format: string; row: SupaRow }) => {
+  const formattedValue =
+    format === 'bytea'
+      ? convertByteaToHex(row[column])
+      : row[column] === null
+        ? null
+        : typeof row[column] === 'object'
+          ? JSON.stringify(row[column])
+          : row[column]
+
   return (
     <div className="group sb-grid-select-cell__formatter overflow-hidden">
-      <span className="text-sm truncate">{formattedValue}</span>
+      {formattedValue === null ? (
+        <NullValue />
+      ) : (
+        <span className="text-sm truncate">{formattedValue}</span>
+      )}
     </div>
   )
 }
@@ -53,7 +68,8 @@ const SelectorGrid = ({ table, rows, onRowSelect }: SelectorGridProps) => {
     const result: Column<SupaRow> = {
       key: column.name,
       name: column.name,
-      renderCell: (props) => formatter(column.name, props.row),
+      renderCell: (props) =>
+        formatter({ column: column.name, format: column.format, row: props.row }),
       renderHeaderCell: () => columnRender(column.name, column.isPrimaryKey),
       resizable: true,
       width: columnWidth,

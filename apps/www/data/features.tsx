@@ -1550,7 +1550,7 @@ By utilizing the Supabase Management API, you can create more efficient, scalabl
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '/images/features/management-api.png',
     heroImageLight: '/images/features/management-api-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/project-management/api',
+    docsUrl: 'https://supabase.com/docs/reference/api/introduction',
     slug: 'management-api',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1663,7 +1663,7 @@ By building on Supabase's SOC 2 compliant platform, you gain a significant advan
     icon: ShieldCheck,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/security/compliance',
+    docsUrl: 'https://supabase.com/docs/guides/security/soc-2-compliance',
     slug: 'soc-2-compliance',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -1856,6 +1856,38 @@ This feature is particularly valuable for teams looking to implement robust secu
     slug: 'postgres-roles',
     status: {
       stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'User Impersonation',
+    subtitle: 'Experience your application as any user.',
+    description: `
+User Impersonation in Supabase allows developers to simulate the experience of any user within their application. This feature is particularly useful for testing and debugging, as it enables you to view and interact with your application exactly as a specific user would.
+
+## Key benefits
+1. Realistic Testing: Validate user-specific features and permissions by impersonating users directly in Supabase Studio.
+2. RLS Policy Verification: Test Row Level Security (RLS) policies with real data to ensure they function as intended.
+3. Enhanced Debugging: Quickly identify and resolve user-specific issues by experiencing the application from their perspective.
+4. Seamless Integration: Use the Table Editor, SQL Editor, and GraphiQL to impersonate users and test queries and mutations.
+5. Efficient Development: Accelerate the process of writing and testing RLS policies, reducing development time and effort.
+
+## User Impersonation is particularly valuable for:
+- Developers testing user-specific features and permissions
+- Teams implementing complex RLS policies
+- Applications requiring detailed user experience validation
+- Debugging user-reported issues with precision
+
+By leveraging User Impersonation, you can ensure that your application delivers the intended experience for every user, enhancing both functionality and security. This feature empowers developers to create more robust and user-friendly applications by providing a comprehensive toolset for testing and validation.
+`,
+    icon: Users,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION, ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '/images/blog/launch-week-x/day-1/3.png',
+    heroImageLight: '/images/blog/launch-week-x/day-1/3.png',
+    docsUrl: '/blog/studio-introducing-assistant#user-impersonation',
+    slug: 'user-impersonation',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
     },
   },

@@ -12,7 +12,6 @@ import { z } from 'zod'
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
@@ -201,7 +200,7 @@ const Wizard: NextPageWithLayout = () => {
   } = useProjectCreateMutation({
     onSuccess: (res) => {
       sendEvent({
-        action: TelemetryActions.PROJECT_CREATION_SIMPLE_VERSION_SUBMITTED,
+        action: 'project_creation_simple_version_submitted',
       })
       router.push(`/project/${res.ref}/building`)
     },
@@ -568,7 +567,7 @@ const Wizard: NextPageWithLayout = () => {
                                     <Link
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                                      href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                                     >
                                       <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
                                         <p className="text-sm m-0">Compute Billing</p>

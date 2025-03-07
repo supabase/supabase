@@ -5,13 +5,13 @@ description: 'Migrate your Firebase Firestore database to a Supabase Postgres da
 subtitle: 'Migrate your Firebase Firestore database to a Supabase Postgres database.'
 ---
 
-Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/firestore) to convert data from a Firebase Firestore database to a Supabase PostgreSQL database. The process copies the entire contents of a single Firestore `collection` to a single PostgreSQL `table`.
+Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/firestore) to convert data from a Firebase Firestore database to a Supabase Postgres database. The process copies the entire contents of a single Firestore `collection` to a single Postgres `table`.
 
 The Firestore `collection` is "flattened" and converted to a table with basic columns of one of the following types: `text`, `numeric`, `boolean`, or `jsonb`. If your structure is more complex, you can write a program to split the newly-created `json` file into multiple, related tables before you import your `json` file(s) to Supabase.
 
 ## Set up the migration tool [#set-up-migration-tool]
 
-1. Clone the [firebase-to-supabase](https://github.com/supabase-community/firebase-to-supabase) repository:
+1. Clone the [`firebase-to-supabase`](https://github.com/supabase-community/firebase-to-supabase) repository:
 
    ```bash
    git clone https://github.com/supabase-community/firebase-to-supabase.git
@@ -77,7 +77,7 @@ And split it into two files (one table for users and one table for items):
 ]
 ```
 
-### Import JSON file to Supabase (PostgreSQL) [#import-to-supabase]
+### Import JSON file to Supabase (Postgres) [#import-to-supabase]
 
 `node json2supabase.js <path_to_json_file> [<primary_key_strategy>] [<primary_key_name>]`
 
@@ -101,11 +101,11 @@ Hooks are used to customize the process of exporting a collection of Firestore d
 
 ### Write a custom hook
 
-#### Create a .js file for your collection
+#### Create a `.js` file for your collection
 
 If your Firestore collection is called `users`, create a file called `users.js` in the current folder.
 
-#### Construct your .js file
+#### Construct your `.js` file
 
 The basic format of a hook file looks like this:
 

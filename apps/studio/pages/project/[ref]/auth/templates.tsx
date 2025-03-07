@@ -1,29 +1,26 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { EmailTemplates } from 'components/interfaces/Auth'
-import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import { FormsContainer } from 'components/ui/Forms/FormsContainer'
+import { AuthEmailsLayout } from 'components/layouts/AuthLayout/AuthEmailsLayout'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
-const PageLayout: NextPageWithLayout = () => {
+const TemplatesPage: NextPageWithLayout = () => {
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const isPermissionsLoaded = usePermissionsLoaded()
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
     return <NoPermission isFullPage resourceText="access your project's email settings" />
-  } else {
-    return (
-      <FormsContainer>
-        <EmailTemplates />
-      </FormsContainer>
-    )
   }
+
+  return (
+    <ScaffoldContainer>
+      <EmailTemplates />
+    </ScaffoldContainer>
+  )
 }
 
-PageLayout.getLayout = (page) => {
-  return <AuthLayout>{page}</AuthLayout>
-}
+TemplatesPage.getLayout = (page) => <AuthEmailsLayout>{page}</AuthEmailsLayout>
 
-export default PageLayout
+export default TemplatesPage

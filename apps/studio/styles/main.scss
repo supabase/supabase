@@ -15,6 +15,14 @@
   --chart-5: 27 87% 67%;
   --chart-warning: hsl(var(--warning-default));
   --chart-destructive: hsl(var(--destructive-default));
+  --sidebar-background: var(--background-dash-sidebar);
+  --sidebar-foreground: var(--foreground-default);
+  --sidebar-primary: var(--foreground-default);
+  --sidebar-primary-foreground: var(--warning-default);
+  --sidebar-accent: var(--background-selection);
+  --sidebar-accent-foreground: var(--foreground-default);
+  --sidebar-border: var(--border-default);
+  --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
 .dark {
@@ -25,6 +33,14 @@
   --chart-5: 340 75% 55%;
   --chart-warning: hsl(var(--warning-default));
   --chart-destructive: hsl(var(--destructive-default));
+  --sidebar-background: var(--background-dash-sidebar);
+  --sidebar-foreground: var(--foreground-default);
+  --sidebar-primary: var(--foreground-default);
+  --sidebar-primary-foreground: var(--warning-default);
+  --sidebar-accent: var(--background-selection);
+  --sidebar-accent-foreground: var(--foreground-default);
+  --sidebar-border: var(--border-default);
+  --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
 @layer utilities {
@@ -48,9 +64,7 @@ body,
 .main {
   @apply bg-studio relative;
   @apply text-foreground;
-  height: 100%;
-  padding: 0;
-  margin: 0;
+  @apply overflow-x-clip;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 }
@@ -279,7 +293,7 @@ div[data-radix-portal]:not(.portal--toast) {
 }
 
 .react-grid-item > .react-resizable-handle::after {
-  content: "";
+  content: '';
   position: absolute;
   right: 3px !important;
   bottom: 3px !important;
