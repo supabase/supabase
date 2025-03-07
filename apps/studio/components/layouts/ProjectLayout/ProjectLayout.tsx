@@ -371,5 +371,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <BuildingState />
   }
 
+  // REMOVE ME
+  // if (router.asPath === `/project/${ref}`) {
+  //   return <BuildingState />
+  // }
+
   return <Fragment key={selectedProject?.ref}>{children}</Fragment>
 }
