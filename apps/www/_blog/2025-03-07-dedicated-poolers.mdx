@@ -1,0 +1,60 @@
+---
+title: 'Dedicated Poolers'
+description:
+author: paul_copplestone
+image: dedicated-poolers/dedicated-poolers-og.png
+thumb: dedicated-poolers/dedicated-poolers-thumb.png
+categories:
+  - product
+  - postgres
+tags:
+  - postgres
+date: '2025-03-07'
+toc_depth: 3
+---
+
+Today we're adding Dedicated Poolers - a Postgres connection pooler that's co-located with your database for maximum performance and reliability.
+
+<Admonition type="info">
+
+Don't know what a Pooler is? Check out our [docs](/docs/guides/database/connecting-to-postgres#serverside-poolers).
+
+</Admonition>
+
+### Supabase Dedicated Pooler
+
+The Dedicated Pooler is a [PgBouncer](https://www.pgbouncer.org/) instance that's co-located with your Postgres database. This will require you to connect with IPv6 or, if that's not an option, you can use the [IPv4 add-on](/guides/platform/ipv4-address).
+
+The dedicated pooler is isolated to your own project and grants you fine-grained control over the configuration.
+
+### A problem of IP addresses
+
+A year ago AWS [started charging for IPv4 addresses](/blog/ipv6). Only ~45% of the world have adopted IPv6, so this left us in a bit of a pickle: charge our customers more to cover the costs, or offer a proxy service that's compatible with IPv4.
+
+![IPv6 adoption](/images/blog/dedicated-poolers/ipv6-adoption.png)
+
+<small>Source: https://www.google.com/intl/en/ipv6/statistics.html</small>
+
+We opted to release a free proxy service, [Supavisor](/blog/supavisor-postgres-connection-pooler), to keep our pricing as low as possible.
+
+### A problem of growth
+
+In the recent months, we've seen unprecedented growth. We have tens of thousands of new developers pouring into Supabase every week, doing weird and wonderful things with their databases.
+
+![Recent Supabase Signups](/images/blog/dedicated-poolers/signups.png)
+
+This has added a lot of strain to the infrastructure in ways that are atypical of the past 4 years' usage.
+
+### An alternative solution
+
+Later this year we were planning to release dedicated connection poolers. We're pulling this timeline forward give you more options when managing your database. This gives you now 3 options for connecting to your database
+
+![Pooling options](/images/blog/dedicated-poolers/connection-options.png)
+
+1. **Direct connections (free):** recommended for when you are connecting using servers.
+2. **Shared Pooler (free):** recommended for when you are connecting using serverless functions (like Next.js or AWS Lambda)
+3. **Dedicated Pooler (Pro Plan and above):** recommended for when you are connecting using serverless functions and you start to scale up. It is available on the Pro Plan and above.
+
+### Getting started
+
+- [ ] Some details on release date, usage etc
