@@ -107,6 +107,7 @@ const DatabaseUsage = () => {
     {
       id: 'ram-usage',
       label: 'Memory usage',
+      hide: false,
       showTooltip: true,
       showLegend: true,
       hideChartType: true,
@@ -146,6 +147,7 @@ const DatabaseUsage = () => {
       label: 'CPU usage',
       format: '%',
       valuePrecision: 2,
+      hide: false,
       showTooltip: true,
       showLegend: true,
       showMaxValue: false,
@@ -188,6 +190,7 @@ const DatabaseUsage = () => {
       id: 'client-connections',
       label: 'Client connections',
       valuePrecision: 0,
+      hide: false,
       showTooltip: true,
       showLegend: true,
       hideChartType: true,
@@ -219,6 +222,7 @@ const DatabaseUsage = () => {
     {
       id: 'disk-iops',
       label: 'Disk IOps',
+      hide: false,
       showTooltip: true,
       showLegend: true,
       hideChartType: true,
