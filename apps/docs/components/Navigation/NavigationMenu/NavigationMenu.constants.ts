@@ -1529,6 +1529,14 @@ export const functions: NavMenuConstant = {
           name: 'Type-Safe SQL with Kysely',
           url: '/guides/functions/kysely-postgres',
         },
+        {
+          name: 'Text To Speech with ElevenLabs',
+          url: '/guides/functions/examples/elevenlabs-generate-speech-stream',
+        },
+        {
+          name: 'Speech Transcription with ElevenLabs',
+          url: '/guides/functions/examples/elevenlabs-transcribe-speech',
+        },
       ],
     },
   ],
