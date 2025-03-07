@@ -36,10 +36,12 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import ComposedChartHandler, { MultiAttribute } from 'components/ui/Charts/ComposedChartHandler'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-        
+
 export type UpdateDateRange = (from: string, to: string) => void
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { Admonition } from 'ui-patterns'
+import DateRangePicker from '../../../../components/ui/DateRangePicker'
+import { TIME_PERIODS_INFRA } from '../../../../lib/constants/metrics'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -56,150 +58,6 @@ DatabaseReport.getLayout = (page) => (
 )
 
 export default DatabaseReport
-
-const REPORT_ATTRIBUTES = [
-  {
-    id: 'ram-usage',
-    label: 'Memory usage',
-    showTooltip: true,
-    showLegend: true,
-    hideChartType: true,
-    defaultChartStyle: 'line',
-    // showTotal: false,
-    attributes: [
-      {
-        attribute: 'ram_usage_max_available',
-        provider: 'infra-monitoring',
-        label: 'Max RAM Available',
-        isMaxValue: true,
-      },
-      {
-        attribute: 'ram_usage_used',
-        provider: 'infra-monitoring',
-        label: 'Used',
-      },
-      {
-        attribute: 'ram_usage_cache_and_buffers',
-        provider: 'infra-monitoring',
-        label: 'Cache + buffers',
-      },
-      {
-        attribute: 'ram_usage_free',
-        provider: 'infra-monitoring',
-        label: 'Free',
-      },
-      {
-        attribute: 'ram_usage_swap',
-        provider: 'infra-monitoring',
-        label: 'Swap',
-      },
-    ],
-  },
-  {
-    id: 'cpu-usage',
-    label: 'CPU usage',
-    format: '%',
-    valuePrecision: 2,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: true,
-    defaultChartStyle: 'line',
-    attributes: [
-      {
-        attribute: 'cpu_usage_busy_system',
-        provider: 'infra-monitoring',
-        label: 'System',
-        format: '%',
-      },
-      {
-        attribute: 'cpu_usage_busy_user',
-        provider: 'infra-monitoring',
-        label: 'User',
-        format: '%',
-      },
-      {
-        attribute: 'cpu_usage_busy_iowait',
-        provider: 'infra-monitoring',
-        label: 'IOwait',
-        format: '%',
-      },
-      {
-        attribute: 'cpu_usage_busy_irqs',
-        provider: 'infra-monitoring',
-        label: 'IRQs',
-        format: '%',
-      },
-      {
-        attribute: 'cpu_usage_busy_other',
-        provider: 'infra-monitoring',
-        label: 'other',
-        format: '%',
-      },
-    ],
-  },
-  {
-    id: 'client-connections',
-    label: 'Client connections',
-    valuePrecision: 0,
-    showTooltip: true,
-    showLegend: true,
-    hideChartType: true,
-    defaultChartStyle: 'line',
-    attributes: [
-      {
-        attribute: 'client_connections_postgres',
-        provider: 'infra-monitoring',
-        label: 'postgres',
-      },
-      {
-        attribute: 'supavisor_connections_active',
-        provider: 'infra-monitoring',
-        label: 'supavisor',
-      },
-      {
-        attribute: 'client_connections_realtime',
-        provider: 'infra-monitoring',
-        label: 'realtime',
-      },
-      {
-        attribute: 'client_connections_max_limit',
-        provider: 'infra-monitoring',
-        label: 'max limit',
-        isMaxValue: true,
-      },
-    ],
-  },
-  {
-    id: 'disk-iops',
-    label: 'Disk IOps',
-    showTooltip: true,
-    showLegend: true,
-    hideChartType: true,
-    defaultChartStyle: 'line',
-    attributes: [
-      {
-        attribute: 'disk_iops_write',
-        provider: 'infra-monitoring',
-        label: 'IOps write',
-      },
-      { attribute: 'disk_iops_read', provider: 'infra-monitoring', label: 'IOps read' },
-      // {
-      //   attribute: 'disk_iops_max',
-      //   provider: 'infra-monitoring',
-      //   label: 'IOps Max',
-      //   isMaxValue: true,
-      // },
-      // {
-      //   attribute: 'disk_iops_usage',
-      //   provider: 'infra-monitoring',
-      //   label: 'IOps Max',
-      //   format: '%',
-      //   isMaxValue: true,
-      // },
-    ],
-  },
-]
 
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
@@ -246,26 +104,169 @@ const DatabaseUsage = () => {
   const isPgBouncerEnabled = pgBouncerConfig?.pgbouncer_enabled
 
   const REPORT_ATTRIBUTES = [
-    { id: 'ram_usage', label: 'Memory usage', hide: false },
-    { id: 'avg_cpu_usage', label: 'Average CPU usage', hide: false },
-    { id: 'max_cpu_usage', label: 'Max CPU usage', hide: false },
-    { id: 'disk_io_consumption', label: 'Disk IO consumed', hide: false },
     {
-      id: 'pg_stat_database_num_backends',
-      label: 'Pooler to database connections',
-      hide: false,
+      id: 'ram-usage',
+      label: 'Memory usage',
+      showTooltip: true,
+      showLegend: true,
+      hideChartType: true,
+      defaultChartStyle: 'line',
+      // showTotal: false,
+      attributes: [
+        {
+          attribute: 'ram_usage_max_available',
+          provider: 'infra-monitoring',
+          label: 'Max RAM Available',
+          isMaxValue: true,
+        },
+        {
+          attribute: 'ram_usage_used',
+          provider: 'infra-monitoring',
+          label: 'Used',
+        },
+        {
+          attribute: 'ram_usage_cache_and_buffers',
+          provider: 'infra-monitoring',
+          label: 'Cache + buffers',
+        },
+        {
+          attribute: 'ram_usage_free',
+          provider: 'infra-monitoring',
+          label: 'Free',
+        },
+        {
+          attribute: 'ram_usage_swap',
+          provider: 'infra-monitoring',
+          label: 'Swap',
+        },
+      ],
     },
     {
-      id: 'supavisor_connections_active',
-      label: 'Client to Supavisor connections',
-      hide: false,
+      id: 'cpu-usage',
+      label: 'CPU usage',
+      format: '%',
+      valuePrecision: 2,
+      showTooltip: true,
+      showLegend: true,
+      showMaxValue: false,
+      hideChartType: true,
+      defaultChartStyle: 'line',
+      attributes: [
+        {
+          attribute: 'cpu_usage_busy_system',
+          provider: 'infra-monitoring',
+          label: 'System',
+          format: '%',
+        },
+        {
+          attribute: 'cpu_usage_busy_user',
+          provider: 'infra-monitoring',
+          label: 'User',
+          format: '%',
+        },
+        {
+          attribute: 'cpu_usage_busy_iowait',
+          provider: 'infra-monitoring',
+          label: 'IOwait',
+          format: '%',
+        },
+        {
+          attribute: 'cpu_usage_busy_irqs',
+          provider: 'infra-monitoring',
+          label: 'IRQs',
+          format: '%',
+        },
+        {
+          attribute: 'cpu_usage_busy_other',
+          provider: 'infra-monitoring',
+          label: 'other',
+          format: '%',
+        },
+      ],
     },
     {
-      id: 'pgbouncer_pools_client_active_connections',
-      label: 'Client to dedicated pooler connections',
-      hide: !isPgBouncerEnabled,
+      id: 'client-connections',
+      label: 'Client connections',
+      valuePrecision: 0,
+      showTooltip: true,
+      showLegend: true,
+      hideChartType: true,
+      defaultChartStyle: 'line',
+      attributes: [
+        {
+          attribute: 'client_connections_postgres',
+          provider: 'infra-monitoring',
+          label: 'postgres',
+        },
+        {
+          attribute: 'supavisor_connections_active',
+          provider: 'infra-monitoring',
+          label: 'supavisor',
+        },
+        {
+          attribute: 'client_connections_realtime',
+          provider: 'infra-monitoring',
+          label: 'realtime',
+        },
+        {
+          attribute: 'client_connections_max_limit',
+          provider: 'infra-monitoring',
+          label: 'max limit',
+          isMaxValue: true,
+        },
+      ],
     },
-  ] as const
+    {
+      id: 'disk-iops',
+      label: 'Disk IOps',
+      showTooltip: true,
+      showLegend: true,
+      hideChartType: true,
+      defaultChartStyle: 'line',
+      attributes: [
+        {
+          attribute: 'disk_iops_write',
+          provider: 'infra-monitoring',
+          label: 'IOps write',
+        },
+        { attribute: 'disk_iops_read', provider: 'infra-monitoring', label: 'IOps read' },
+        // {
+        //   attribute: 'disk_iops_max',
+        //   provider: 'infra-monitoring',
+        //   label: 'IOps Max',
+        //   isMaxValue: true,
+        // },
+        // {
+        //   attribute: 'disk_iops_usage',
+        //   provider: 'infra-monitoring',
+        //   label: 'IOps Max',
+        //   format: '%',
+        //   isMaxValue: true,
+        // },
+      ],
+    },
+  ]
+  // const REPORT_ATTRIBUTES = [
+  //   { id: 'ram_usage', label: 'Memory usage', hide: false },
+  //   { id: 'avg_cpu_usage', label: 'Average CPU usage', hide: false },
+  //   { id: 'max_cpu_usage', label: 'Max CPU usage', hide: false },
+  //   { id: 'disk_io_consumption', label: 'Disk IO consumed', hide: false },
+  //   {
+  //     id: 'pg_stat_database_num_backends',
+  //     label: 'Pooler to database connections',
+  //     hide: false,
+  //   },
+  //   {
+  //     id: 'supavisor_connections_active',
+  //     label: 'Client to Supavisor connections',
+  //     hide: false,
+  //   },
+  //   {
+  //     id: 'pgbouncer_pools_client_active_connections',
+  //     label: 'Client to dedicated pooler connections',
+  //     hide: !isPgBouncerEnabled,
+  //   },
+  // ] as const
 
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
     onSuccess: (_, variables) => {
