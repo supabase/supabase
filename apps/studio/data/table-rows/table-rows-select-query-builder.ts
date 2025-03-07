@@ -9,6 +9,7 @@ import { ImpersonationRole } from 'lib/role-impersonation'
 import { getPagination } from '../utils/pagination'
 import { formatFilterValue } from './utils'
 import { THRESHOLD_COUNT } from './table-rows-count-query'
+import { ident } from '@supabase/pg-meta/src/pg-format'
 
 // Maximum number of characters to display for text/json fields
 export const MAX_CHARACTERS = 10 * KB
@@ -78,15 +79,6 @@ export const getDefaultOrderByColumns = (table: SupaTable) => {
 }
 
 /**
- * Helper function to properly escape PostgreSQL identifiers (column/table names)
- * Double quotes within identifiers need to be escaped by doubling them
- */
-export const escapeIdentifier = (identifier: string): string => {
-  // If the identifier contains double quotes, escape them by doubling
-  return `"${identifier.replace(/"/g, '""')}"`
-}
-
-/**
  * Determines if a column type should be truncated based on its format and dataType
  */
 export const shouldTruncateColumn = (column: any): boolean => {
@@ -148,7 +140,7 @@ export const buildTableRowsQuery = ({
 
   // Create select expressions for each column, applying truncation only to needed columns
   const selectExpressions = allColumnNames.map((columnName) => {
-    const escapedColumnName = escapeIdentifier(columnName)
+    const escapedColumnName = ident(columnName)
 
     if (columnsToTruncate.includes(columnName)) {
       return `CASE
@@ -172,7 +164,7 @@ export const buildTableRowsQuery = ({
   arrayBasedColumnNames.forEach((columnName) => {
     // Find this column in our select expressions
     const index = selectExpressions.findIndex(
-      (expr) => expr === escapeIdentifier(columnName) || expr.startsWith(`CASE WHEN`)
+      (expr) => expr === ident(columnName) || expr.startsWith(`CASE WHEN`)
     )
     if (index >= 0) {
       // If it's a column that needs truncation, we need to keep the truncation
@@ -180,7 +172,7 @@ export const buildTableRowsQuery = ({
         // We won't modify it, as we need to keep the truncation logic
       } else {
         // Otherwise just add the text[] cast
-        selectExpressions[index] = `${escapeIdentifier(columnName)}::text[]`
+        selectExpressions[index] = `${ident(columnName)}::text[]`
       }
     }
   })
