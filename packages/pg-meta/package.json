@@ -12,7 +12,8 @@
     "db:clean": "cd test/db && docker compose down",
     "db:run": "cd test/db && docker compose up --detach --wait",
     "test:run": "vitest run --coverage",
-    "test:update": "vitest run --update"
+    "test:update": "vitest run --update",
+    "lint": "tsc --noEmit"
   },
   "dependencies": {
     "zod": "^3.22.4"
