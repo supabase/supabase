@@ -28,17 +28,17 @@ export const METRIC_CATEGORIES = {
     key: 'api_database',
   },
   API_AUTH: {
-    label: 'Auth API',
+    label: 'Authentication',
     icon: (className?: string) => <Auth size={16} className={className} />,
     key: 'api_auth',
   },
   API_STORAGE: {
-    label: 'Storage API',
+    label: 'Storage',
     icon: (className?: string) => <Storage size={16} className={className} />,
     key: 'api_storage',
   },
   API_REALTIME: {
-    label: 'Realtime API',
+    label: 'Realtime',
     icon: (className?: string) => <Realtime size={16} className={className} />,
     key: 'api_realtime',
   },
@@ -54,6 +54,7 @@ export const METRIC_CATEGORIES = {
   },
 }
 
+// [Joshen] Eventually we can remove some charts here from DEPRECATED_REPORTS from Reports.constants.ts
 export const METRICS: Metric[] = [
   {
     key: 'avg_cpu_usage',

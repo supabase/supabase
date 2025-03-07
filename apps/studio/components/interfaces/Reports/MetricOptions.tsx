@@ -24,6 +24,7 @@ import {
   SQL_ICON,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { DEPRECATED_REPORTS } from './Reports.constants'
 
 interface MetricOptionsProps {
   config?: Dashboards.Content
@@ -73,7 +74,10 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent>
-                {METRICS.filter((metric) => metric?.category?.key === cat.key).map((metric) => {
+                {METRICS.filter(
+                  (metric) =>
+                    !DEPRECATED_REPORTS.includes(metric.key) && metric?.category?.key === cat.key
+                ).map((metric) => {
                   return (
                     <DropdownMenuCheckboxItem
                       key={metric.key}
