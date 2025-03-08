@@ -80,6 +80,20 @@ type DeletePayload = {
 
 Logging history of webhook calls is available under the `net` schema of your database. For more info, see the [GitHub Repo](https://github.com/supabase/pg_net).
 
+## Local Development
+
+When using Database Webhooks on your local Supabase instance, you need to be aware that the Postgres database runs inside a Docker container. This means that `localhost` or `127.0.0.1` in your webhook URL will refer to the container itself, not your host machine where your application is running.
+
+To target services running on your host machine, use `host.docker.internal`. If that doesn't work, you may need to use your machine's local IP address instead.
+
+For example, if you want to trigger an edge function when a webhook fires, your webhook URL would be:
+
+```
+http://host.docker.internal:54321/functions/v1/my-function-name
+```
+
+If you're experiencing connection issues with webhooks locally, verify you're using the correct hostname instead of `localhost`.
+
 ## Resources
 
 - [pg_net](/docs/guides/database/extensions/pgnet): an async networking extension for Postgres
