@@ -1,5 +1,4 @@
-import type { Dictionary } from 'types'
-import type { Filter, FilterOperator, QueryTable, Sort } from '../types'
+import type { Filter, FilterOperator, QueryTable, Sort, Dictionary } from './types'
 import { IQueryModifier, QueryModifier } from './QueryModifier'
 
 export interface IQueryFilter {

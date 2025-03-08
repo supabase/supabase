@@ -1,4 +1,4 @@
-import { Query } from 'components/grid/query/Query'
+import { Query } from '@supabase/pg-meta/src/query'
 import { Filter, Sort, SupaTable } from 'components/grid/types'
 import {
   JSON_TYPES,

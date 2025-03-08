@@ -17,6 +17,7 @@ import version from './pg-meta-version'
 import indexes from './pg-meta-indexes'
 import columnPrivileges from './pg-meta-column-privileges'
 import tableRowsQuery from './pg-meta-table-rows-query'
+import * as query from './query/index'
 
 export default {
   roles,
@@ -38,4 +39,5 @@ export default {
   indexes,
   columnPrivileges,
   tableRowsQuery,
+  query,
 }

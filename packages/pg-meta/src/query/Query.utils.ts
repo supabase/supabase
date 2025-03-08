@@ -1,6 +1,5 @@
-import { format, ident, literal } from '@supabase/pg-meta/src/pg-format'
-import type { Dictionary } from 'types'
-import type { Filter, QueryPagination, QueryTable, Sort } from '../types'
+import { ident, literal, format } from '../pg-format'
+import type { Filter, QueryPagination, QueryTable, Sort, Dictionary } from './types'
 
 export function countQuery(
   table: QueryTable,
