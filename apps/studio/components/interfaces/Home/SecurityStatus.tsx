@@ -1,9 +1,10 @@
-import { CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
+import { CheckCircle2, ChevronRight, InfoIcon, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, useState } from 'react'
 
 import { useParams } from 'common'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { useServiceRoleKeyLeakQuery } from 'data/lint/service-role-key-leak-query'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -26,6 +27,10 @@ export const SecurityStatus = () => {
 
   const totalLints = errorLints.length + warnLints.length + infoLints.length
   const noIssuesFound = totalLints === 0
+
+  const { data: hasServiceRoleKeyLeak } = useServiceRoleKeyLeakQuery({
+    projectRef: ref,
+  })
 
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
@@ -72,6 +77,33 @@ export const SecurityStatus = () => {
               <p className="text-xs text-foreground-lighter px-3 pb-1.5">
                 {totalLints} issue{totalLints > 1 ? 's' : ''} have been identified
               </p>
+              <PopoverSeparator_Shadcn_ />
+              {hasServiceRoleKeyLeak && (
+                <div key={1}>
+                  <Link href={`/project/${ref}/settings/api`}>
+                    <div className="group flex items-center justify-between w-full px-3 py-3 transition hover:bg-surface-300">
+                      <div className="flex gap-x-3">
+                        <div>
+                          <InfoIcon size={14} className="text-destructive-600" />
+                        </div>
+                        <div>
+                          <p className="text-xs">Service Role Key Leak</p>
+                          <p className="text-xs text-foreground-light">
+                            Your service role key grants full read and write access to your database
+                            and Auth admin APIs. Do not use it within a browser and rotate the JWT
+                            secret immediately.
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight
+                        size={14}
+                        className="transition opacity-0 group-hover:opacity-100 shrink-0"
+                      />
+                    </div>
+                  </Link>
+                  <PopoverSeparator_Shadcn_ />
+                </div>
+              )}
               <PopoverSeparator_Shadcn_ />
               {[
                 { lints: errorLints, level: LINTER_LEVELS.ERROR },
