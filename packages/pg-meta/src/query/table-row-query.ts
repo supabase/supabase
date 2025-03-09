@@ -1,6 +1,7 @@
 import { z } from 'zod'
-import { ident } from './pg-format'
-import { PGTable } from './pg-meta-tables'
+import { ident } from '../pg-format'
+import { PGTable } from '../pg-meta-tables'
+import { Query } from './Query'
 
 // Constants
 export const MAX_CHARACTERS = 10 * 1024 // 10KB
@@ -15,7 +16,7 @@ export const sortZod = z.object({
 
 export const filterZod = z.object({
   column: z.string(),
-  operator: z.string(),
+  operator: z.enum(['=', '<>', '>', '<', '>=', '<=', '~~', '~~*', '!~~', '!~~*', 'in', 'is']),
   value: z.string().optional(),
 })
 
@@ -127,77 +128,6 @@ export const shouldTruncateColumn = (column: any): boolean => {
   }
 
   return false
-}
-
-/**
- * Helper class for building SQL queries
- */
-class Query {
-  private _select: string = ''
-  private _from: string = ''
-  private _where: string[] = []
-  private _orderBy: string[] = []
-  private _limit: number | null = null
-  private _offset: number | null = null
-
-  from(tableName: string, schema?: string): Query {
-    const escapedTableName = ident(tableName)
-    this._from = schema ? `${ident(schema)}.${escapedTableName}` : escapedTableName
-    return this
-  }
-
-  select(columns: string): Query {
-    this._select = columns
-    return this
-  }
-
-  filter(column: string, operator: string, value: any): Query {
-    const escapedColumn = ident(column)
-    this._where.push(`${escapedColumn} ${operator} ${value}`)
-    return this
-  }
-
-  order(
-    tableName: string,
-    column: string,
-    ascending: boolean = true,
-    nullsFirst: boolean = true
-  ): Query {
-    const direction = ascending ? 'asc' : 'desc'
-    const nullsOrder = nullsFirst ? 'nulls first' : 'nulls last'
-    const escapedTableName = ident(tableName)
-    const escapedColumn = ident(column)
-    this._orderBy.push(`${escapedTableName}.${escapedColumn} ${direction} ${nullsOrder}`)
-    return this
-  }
-
-  range(from: number, to: number): Query {
-    this._limit = to - from + 1
-    this._offset = from
-    return this
-  }
-
-  toSql(): string {
-    let sql = `select ${this._select} from ${this._from}`
-
-    if (this._where.length > 0) {
-      sql += ` where ${this._where.join(' and ')}`
-    }
-
-    if (this._orderBy.length > 0) {
-      sql += ` order by ${this._orderBy.join(', ')}`
-    }
-
-    if (this._limit !== null) {
-      sql += ` limit ${this._limit}`
-    }
-
-    if (this._offset !== null) {
-      sql += ` offset ${this._offset}`
-    }
-
-    return `${sql};`
-  }
 }
 
 /**
