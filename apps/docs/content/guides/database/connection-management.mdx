@@ -19,6 +19,8 @@ The general rule is that if you are heavily using the PostgREST database API, yo
 
 These numbers are generalizations and depends on other Supabase products that you use and the extent of their usage. The actual values depend on your concurrent peak connection usage. For instance, if you were only using 80 connections in a week period and your database max connections is set to 500, then realistically you could allocate the difference of 420 (minus a reasonable buffer) to service more demand.
 
+Note that, in addition to your own direct database connections, the pool size also needs to serve internal Supabase services and connections made using Supavisor session mode.
+
 ## Monitoring connections
 
 ### Capturing historical usage
