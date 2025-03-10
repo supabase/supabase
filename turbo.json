@@ -72,8 +72,7 @@
         "ASSET_CDN_S3_ENDPOINT",
         "SITE_NAME",
         "VERCEL_URL",
-        // This one's just for Docker
-        "STUDIO_VERSION"
+        "CURRENT_CLI_VERSION"
       ],
       "outputs": [".next/**", "!.next/cache/**"]
     },

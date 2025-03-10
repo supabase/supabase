@@ -3,7 +3,6 @@ import dayjs from 'dayjs'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useCLIReleaseVersionQuery } from 'data/misc/cli-release-version-query'
-import { STUDIO_VERSION } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -28,16 +27,16 @@ import { Admonition } from 'ui-patterns'
 /**
  * TODO: Chat with Qiao how we can pass the CLI version into the env var for STUDIO_VERSION
  * Ideally we can also mark the beta version via STUDIO_VERSION too
- *
  */
 
 export const LocalVersionPopover = () => {
   const { data, isSuccess } = useCLIReleaseVersionQuery()
   const hasLatestCLIVersion = isSuccess && !!data?.latest
-  const isLatestVersion = data?.latest === STUDIO_VERSION
+  const isLatestVersion = data?.current === data?.latest
 
-  // [Joshen] This is just scaffolding
-  const isBeta = true ///(data?.latest ?? '').includes('beta')
+  // [Joshen] This is just scaffolding - will need to figure out how to identify beta versions
+  // We can do this separately
+  const isBeta = false ///(data?.latest ?? '').includes('beta')
 
   const approximateNextRelease = !!data?.published_at
     ? dayjs(data?.published_at).utc().add(14, 'day').format('DD MMM YYYY')
@@ -168,7 +167,7 @@ export const LocalVersionPopover = () => {
         <div className="flex items-center gap-x-4 px-4">
           <div className="flex flex-col gap-y-1">
             <p className="text-xs">Current version:</p>
-            <p className="text-sm font-mono">{STUDIO_VERSION}</p>
+            <p className="text-sm font-mono">{data.current}</p>
           </div>
           {hasLatestCLIVersion && !isLatestVersion && !isBeta && (
             <div className="flex flex-col gap-y-1">

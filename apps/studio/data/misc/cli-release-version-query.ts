@@ -7,7 +7,7 @@ import { miscKeys } from './keys'
 export async function getCLIReleaseVersion() {
   try {
     const data = await fetch(`${BASE_PATH}/api/cli-release-version`).then((res) => res.json())
-    return data as { latest: string | null; published_at: string | null }
+    return data as { current: string | null; latest: string | null; published_at: string | null }
   } catch (error) {
     throw error
   }
