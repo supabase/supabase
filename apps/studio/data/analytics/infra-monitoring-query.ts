@@ -12,7 +12,6 @@ export type InfraMonitoringAttribute =
   | 'ram_usage'
   | 'disk_io_consumption'
   | 'pg_stat_database_num_backends'
-  | 'client_connections'
   | 'supavisor_connections_active'
 
 export type InfraMonitoringVariables = {
