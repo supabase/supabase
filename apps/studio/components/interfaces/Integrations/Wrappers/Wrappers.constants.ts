@@ -18,6 +18,7 @@ export const WRAPPER_HANDLERS = {
   CAL: 'wasm_fdw_handler',
   CALENDLY: 'wasm_fdw_handler',
   CLERK: 'wasm_fdw_handler',
+  NOTION: 'wasm_fdw_handler',
 }
 
 export const WRAPPERS: WrapperMeta[] = [
@@ -2537,8 +2538,8 @@ export const WRAPPERS: WrapperMeta[] = [
     handlerName: WRAPPER_HANDLERS.CLERK,
     validatorName: 'wasm_fdw_validator',
     icon: `${BASE_PATH}/img/icons/clerk-icon.svg`,
-    label: 'Clerk',
     extensionName: 'clerkFdw',
+    label: 'Clerk',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/clerk',
     minimumExtensionVersion: '0.4.0',
     server: {
@@ -2863,6 +2864,159 @@ export const WRAPPERS: WrapperMeta[] = [
           {
             name: 'object',
             defaultValue: 'users',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'notion_wrapper',
+    description: 'Notion provides a versatile, ready-to-use solution for managing your data.',
+    handlerName: WRAPPER_HANDLERS.NOTION,
+    validatorName: 'wasm_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/notion-icon.svg`,
+    extensionName: 'NotionFdw',
+    label: 'Notion',
+    docsUrl: 'https://fdw.dev/catalog/notion/',
+    minimumExtensionVersion: '0.4.0',
+    server: {
+      options: [
+        {
+          name: 'fdw_package_url',
+          label: 'FDW Package URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://github.com/supabase/wrappers/releases/download/wasm_notion_fdw_v0.1.1/notion_fdw.wasm',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_name',
+          label: 'FDW Package Name',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'supabase:notion-fdw',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_version',
+          label: 'FDW Package Version',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '0.1.1',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_checksum',
+          label: 'FDW Package Checksum',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '6dea3014f462aafd0c051c37d163fe326e7650c26a7eb5d8017a30634b5a46de',
+          hidden: true,
+        },
+        {
+          name: 'api_url',
+          label: 'API URL',
+          required: false,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'https://api.notion.com/v1',
+        },
+        {
+          name: 'api_key_id',
+          label: 'Notion API Key',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Blocks',
+        description: 'Notion Block content',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'page_id', type: 'text' },
+          { name: 'type', type: 'text' },
+          { name: 'created_time', type: 'timestamp' },
+          { name: 'last_edited_time', type: 'timestamp' },
+          { name: 'archived', type: 'boolean' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'block',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Pages',
+        description: 'Notion Pages',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'url', type: 'text' },
+          { name: 'created_time', type: 'timestamp' },
+          { name: 'last_edited_time', type: 'timestamp' },
+          { name: 'archived', type: 'boolean' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'page',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Databases',
+        description: 'Notion Databases',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'url', type: 'text' },
+          { name: 'created_time', type: 'timestamp' },
+          { name: 'last_edited_time', type: 'timestamp' },
+          { name: 'archived', type: 'boolean' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'database',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Users',
+        description: 'Notion Users',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'name', type: 'text' },
+          { name: 'type', type: 'text' },
+          { name: 'avatar_url', type: 'text' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'user',
             editable: false,
             required: true,
             type: 'text',

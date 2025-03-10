@@ -97,7 +97,7 @@ const UtilityTabResults = ({
               ) : (
                 <p className="font-mono text-sm tracking-tight">Error: {result.error?.message}</p>
               )}
-              {result.autoLimit && (
+              {!isTimeout && result.autoLimit && (
                 <p className="text-sm text-foreground-light">
                   Note: A limit of {result.autoLimit} was applied to your query. If this was the
                   cause of a syntax error, try selecting "No limit" instead and re-run the query.

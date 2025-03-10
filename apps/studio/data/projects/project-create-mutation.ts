@@ -15,6 +15,7 @@ const WHITELIST_ERRORS = [
   'name should not contain a . string',
   'Project creation in the Supabase dashboard is disabled for this Vercel-managed organization.',
   'Your account, which is handled by the Fly Supabase extension, cannot access this endpoint.',
+  'already exists in your organization.',
 ]
 
 export type DbInstanceSize = components['schemas']['DesiredInstanceSize']
