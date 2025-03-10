@@ -116,7 +116,7 @@ export const ConnectionPooling = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
 
   const disablePoolModeSelection = useMemo(() => {
-    return true // subscription?.plan?.id === 'free'
+    return subscription?.plan?.id === 'free'
   }, [subscription])
 
   console.log({ pgbouncerConfig })
