@@ -69,7 +69,7 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
   const { mutate: updateEmail, isLoading } = useEmailUpdateMutation({
     onSuccess: (_, vars) => {
       toast.success(
-        `An email address has been sent to ${vars.email} to confirm the email address change`
+        `A confirmation email has been sent to ${vars.email}. Please confirm the change within 10 minutes.`
       )
       onClose()
     },
