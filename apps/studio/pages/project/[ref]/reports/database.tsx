@@ -449,59 +449,6 @@ const DatabaseUsage = () => {
                 tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
                 onClick={onRefreshReport}
               />
-              <div className="flex items-center gap-x-3">
-                <DateRangePicker
-                  loading={false}
-                  value={'7d'}
-                  options={TIME_PERIODS_INFRA}
-                  currentBillingPeriodStart={undefined}
-                  onChange={(values) => {
-                    if (values.interval === '1d') {
-                      setDateRange({ ...values, interval: '1h' })
-                    } else {
-                      setDateRange(values)
-                    }
-                  }}
-                />
-                {dateRange && (
-                  <div className="flex items-center gap-x-2">
-                    <p className="text-foreground-light">
-                      {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
-                    </p>
-                    <p className="text-foreground-light">
-                      <ArrowRight size={12} />
-                    </p>
-                    <p className="text-foreground-light">
-                      {dayjs(dateRange.period_end.date).format('MMMM D, hh:mma')}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="space-y-6">
-              {dateRange &&
-                REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr) => (
-                  <>
-                    <ChartHandler
-                      key={attr.id}
-                      provider="infra-monitoring"
-                      attribute={attr.id}
-                      label={attr.label}
-                      interval={dateRange.interval}
-                      startDate={dateRange?.period_start?.date}
-                      endDate={dateRange?.period_end?.date}
-                    />
-                    {attr.id === 'pgbouncer_pools_client_active_connections' && (
-                      <Admonition type="note" title="Dedicated Pooler is enabled" className="p-2">
-                        <p>
-                          Your project is currently using the Dedicated Pooler instead of Supavisor.
-                          You can update this in{' '}
-                          <Link href={`/project/${ref}/settings/database`}>Database settings</Link>.
-                        </p>
-                      </Admonition>
-                    )}
-                  </>
-                ))}
             </div>
           </div>
         </div>
@@ -520,7 +467,6 @@ const DatabaseUsage = () => {
               />
             ))}
         </div>
-
         {dateRange && isReplicaSelected && (
           <Panel title="Replica Information">
             <Panel.Content>
