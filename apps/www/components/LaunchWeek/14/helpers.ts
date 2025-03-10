@@ -6,7 +6,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { GlitchPass } from './glitch'
-import { CRTShader } from './crt-shader'
+import { CRTShader, CRTShader2 } from './crt-shader'
 
 // // CRT Shader implementation
 // const CRTShader = {
@@ -181,14 +181,14 @@ export const createThreeSetup = (
   let glitchPass: GlitchPass | null = null
   if (options.postprocessing?.glitch?.enabled) {
     glitchPass = new GlitchPass(options.postprocessing.glitch.dtSize || 64)
-    glitchPass.setIntensity(options.postprocessing.glitch.colS || 0)
+    glitchPass.uniforms.col_s.value = options.postprocessing.glitch.colS || 0
     composer.addPass(glitchPass)
   }
 
   // Add CRT pass if enabled
   let crtPass: ShaderPass | null = null
   if (options.postprocessing?.crt?.enabled) {
-    crtPass = new ShaderPass(CRTShader)
+    crtPass = new ShaderPass(CRTShader2)
     crtPass.uniforms.resolution.value.set(container.clientWidth, container.clientHeight)
     composer.addPass(crtPass)
   }
