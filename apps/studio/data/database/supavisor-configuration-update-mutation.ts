@@ -13,6 +13,7 @@ type SupavisorConfigurationUpdateVariables = {
 export async function updateSupavisorConfiguration({
   ref,
   default_pool_size,
+  pool_mode,
 }: SupavisorConfigurationUpdateVariables) {
   if (!ref) return console.error('Project ref is required')
 
@@ -22,7 +23,7 @@ export async function updateSupavisorConfiguration({
     // whereby updating pool_mode on pgbouncer affects the pool_mode that gets returned on
     // GET config/supavisor. Which means if I'm on PgBouncer Session, and I swap to Supavisor
     // then Supavisor's pool_mode will be "session" (when it's meant to persist as transaction permanently)
-    body: { default_pool_size, pool_mode: 'transaction' },
+    body: { default_pool_size, pool_mode },
   })
 
   if (error) handleError(error)

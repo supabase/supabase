@@ -119,8 +119,6 @@ export const ConnectionPooling = () => {
     return subscription?.plan?.id === 'free'
   }, [subscription])
 
-  console.log({ pgbouncerConfig })
-
   const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -199,7 +197,7 @@ export const ConnectionPooling = () => {
     supavisorConfig?.pool_mode === null && pgbouncerConfig?.pool_mode === null
 
   const onSubmit: SubmitHandler<z.infer<typeof PoolingConfigurationFormSchema>> = async (data) => {
-    const { pool_mode, default_pool_size, max_client_conn } = data
+    const { pool_mode, default_pool_size } = data
 
     if (!projectRef) return console.error('Project ref is required')
 
@@ -207,6 +205,7 @@ export const ConnectionPooling = () => {
       {
         ref: projectRef,
         default_pool_size,
+        pool_mode: pool_mode === 'transaction' ? 'transaction' : 'session',
       },
       {
         onSuccess: (data) => {
@@ -221,7 +220,6 @@ export const ConnectionPooling = () => {
     form.reset({
       pool_mode: pgbouncerConfig?.pool_mode || 'transaction',
       default_pool_size: (supavisorConfig || pgbouncerConfig)?.default_pool_size,
-      max_client_conn: (supavisorConfig || pgbouncerConfig)?.max_client_conn,
     })
   }
 
@@ -456,7 +454,7 @@ export const ConnectionPooling = () => {
                         {...field}
                         type="number"
                         className="w-full"
-                        value={field.value || ''}
+                        value={(supavisorConfig || pgbouncerConfig)?.max_client_conn || ''}
                         disabled={true}
                         placeholder={!field.value ? `${defaultMaxClientConn}` : ''}
                         {...form.register('max_client_conn', {
