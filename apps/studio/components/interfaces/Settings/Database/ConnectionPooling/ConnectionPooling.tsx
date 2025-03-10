@@ -52,6 +52,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
+import Link from 'next/link'
 
 const formId = 'pooling-configuration-form'
 
@@ -218,7 +219,7 @@ export const ConnectionPooling = () => {
 
   const resetForm = () => {
     form.reset({
-      pool_mode: pgbouncerConfig?.pool_mode || 'session',
+      pool_mode: pgbouncerConfig?.pool_mode || 'transaction',
       default_pool_size: (supavisorConfig || pgbouncerConfig)?.default_pool_size,
       max_client_conn: (supavisorConfig || pgbouncerConfig)?.max_client_conn,
     })
@@ -304,7 +305,19 @@ export const ConnectionPooling = () => {
                         <Admonition
                           type="note"
                           title="Dedicated Pooler is only available for Pro Plan and above"
-                          description="Free Plan users can only access our shared connection pooler. To use a dedicated pooler instance for your project, upgrade to Pro Plan."
+                          description={
+                            <span className="prose text-sm">
+                              Free Plan users can only access our shared connection pooler. To use a
+                              dedicated pooler instance for your project,{' '}
+                              <Link
+                                href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=connectionPooling`}
+                                target="_blank"
+                              >
+                                upgrade to Pro Plan
+                              </Link>
+                              .
+                            </span>
+                          }
                         />
                       ) : (
                         <>
