@@ -2,9 +2,13 @@
 
 import { TrendingUp } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
-
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 'ui'
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
   ChartConfig,
   ChartContainer,
   ChartLegend,
@@ -24,16 +28,10 @@ const chartData = [
   { month: 'June', desktop: 214, mobile: 140 },
 ]
 
-const chartConfig = {
-  desktop: {
-    label: 'Desktop',
-    color: 'hsl(var(--chart-1))',
-  },
-  mobile: {
-    label: 'Mobile',
-    color: 'hsl(var(--chart-2))',
-  },
-} satisfies ChartConfig
+const chartConfig: ChartConfig = {
+  desktop: { label: 'Desktop', color: 'hsl(var(--chart-1))' },
+  mobile: { label: 'Mobile', color: 'hsl(var(--chart-2))' },
+}
 
 export default function Component() {
   return (
@@ -71,3 +69,4 @@ export default function Component() {
     </Card>
   )
 }
+
