@@ -1,9 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-
 import LegacyAPIKeys from 'components/interfaces/APIKeys/LegacyAPIKeys'
 import { PublishableAPIKeys } from 'components/interfaces/APIKeys/PublishableAPIKeys'
 import { SecretAPIKeys } from 'components/interfaces/APIKeys/SecretAPIKeys'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import ApiKeysLayout from 'components/layouts/project/[ref]/settings/APIKeysLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -39,9 +39,11 @@ const ApiKeysSettings: NextPageWithLayout = () => {
 }
 
 ApiKeysSettings.getLayout = (page) => (
-  <SettingsLayout>
-    <ApiKeysLayout>{page}</ApiKeysLayout>
-  </SettingsLayout>
+  <DefaultLayout>
+    <SettingsLayout>
+      <ApiKeysLayout>{page}</ApiKeysLayout>
+    </SettingsLayout>
+  </DefaultLayout>
 )
 
 export default ApiKeysSettings

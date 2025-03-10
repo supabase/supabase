@@ -670,6 +670,9 @@ importers:
       ip-num:
         specifier: ^1.5.1
         version: 1.5.1
+      jotai:
+        specifier: ^2.8.0
+        version: 2.8.1(@types/react@18.3.3)(react@18.2.0)
       json-logic-js:
         specifier: ^2.0.2
         version: 2.0.2

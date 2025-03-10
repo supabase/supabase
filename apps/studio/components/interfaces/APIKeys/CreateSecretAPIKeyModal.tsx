@@ -1,6 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import * as z from 'zod'
+
+import { useParams } from 'common'
+import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import {
   Button,
   Dialog,
@@ -18,11 +23,6 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
-import { Plus } from 'lucide-react'
 
 const FORM_ID = 'create-secret-api-key'
 const SCHEMA = z.object({

@@ -1,6 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { InputVariants } from '@ui/components/shadcn/ui/input'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Eye, MoreVertical } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -10,13 +10,10 @@ import CopyButton from 'components/ui/CopyButton'
 import { useAPIKeyIdQuery } from 'data/api-keys/[id]/api-key-id-query'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
 import { apiKeysKeys } from 'data/api-keys/keys'
-import { AnimatePresence, motion } from 'framer-motion'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
   TableCell,
   TableRow,
@@ -29,6 +26,8 @@ export const APIKeyRow = ({
 }: {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
 }) => {
+  // const isSecret = apiKey.type === 'secret'
+
   const MotionTableRow = motion(TableRow)
 
   return (
