@@ -108,7 +108,10 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
             name="email"
             control={form.control}
             render={({ field }) => (
-              <FormItemLayout label="Provide a new email address">
+              <FormItemLayout
+                label="Provide a new email address"
+                description="A confirmation email will be sent to the provided email address"
+              >
                 <FormControl_Shadcn_>
                   <Input_Shadcn_ {...field} placeholder="example@email.com" />
                 </FormControl_Shadcn_>
@@ -122,7 +125,7 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
             Cancel
           </Button>
           <Button htmlType="submit" loading={isLoading} disabled={isLoading}>
-            Confirm update
+            Confirm
           </Button>
         </DialogFooter>
       </form>
