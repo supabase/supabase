@@ -338,7 +338,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
           <RowAction
             title="Remove MFA factors"
-            description="This will log the user out of all active sessions"
+            description="Removes all MFA factors associated with the user. Use this option with caution as the user's authentication assurance level (AAL) will drop to AAL1. User is not signed out when using this option."
             button={{
               icon: <ShieldOff />,
               text: 'Remove MFA factors',
