@@ -81,6 +81,8 @@ export const DatabaseConnectionString = () => {
     ? pgbouncerConfig
     : supavisorConfig?.find((x) => x.identifier === state.selectedDatabaseId)
 
+    console.log({ pgbouncerConfig, supavisorConfig })
+
   const {
     data: databases,
     error: readReplicasError,

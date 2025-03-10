@@ -31,6 +31,8 @@ const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
     const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
     const { data: supavisorConfig } = useSupavisorConfigurationQuery({ projectRef })
 
+    console.log({ pgbouncerConfig, supavisorConfig })
+
     const isPgBouncerEnabled = allowPgBouncerSelection && !!pgbouncerConfig?.pgbouncer_enabled
     const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
     const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
