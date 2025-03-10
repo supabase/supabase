@@ -12,7 +12,6 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  Separator,
   cn,
 } from 'ui'
 
@@ -268,7 +267,13 @@ const Column = ({
         <Checkbox
           label=""
           checked={column.isPrimaryKey}
-          onChange={() => onUpdateColumn({ isPrimaryKey: !column.isPrimaryKey })}
+          onChange={() => {
+            const updatedValue = !column.isPrimaryKey
+            onUpdateColumn({
+              isPrimaryKey: updatedValue,
+              isNullable: updatedValue ? false : column.isNullable,
+            })
+          }}
         />
       </div>
       <div className={`${hasImportContent ? 'w-[10%]' : 'w-[0%]'}`} />
@@ -295,16 +300,13 @@ const Column = ({
 
               <div className="flex flex-col space-y-1" key={`${column.id}_configuration`}>
                 {!column.isPrimaryKey && (
-                  <>
-                    <Checkbox
-                      label="Is Nullable"
-                      description="Specify if the column can assume a NULL value if no value is provided"
-                      checked={column.isNullable}
-                      className="p-4"
-                      onChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
-                    />
-                    <Separator />
-                  </>
+                  <Checkbox
+                    label="Is Nullable"
+                    description="Specify if the column can assume a NULL value if no value is provided"
+                    checked={column.isNullable}
+                    className="p-4"
+                    onChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
+                  />
                 )}
                 <Checkbox
                   label="Is Unique"
@@ -313,7 +315,6 @@ const Column = ({
                   className="p-4"
                   onChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
                 />
-                <Separator />
                 {column.format.includes('int') && (
                   <Checkbox
                     label="Is Identity"
