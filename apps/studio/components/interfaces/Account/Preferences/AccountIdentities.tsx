@@ -25,6 +25,8 @@ export const AccountIdentities = () => {
   const { data, isLoading, isSuccess } = useProfileIdentitiesQuery()
   const identities = data?.identities ?? []
 
+  console.log(identities)
+
   const [selectedProviderUnlink, setSelectedProviderUnlink] = useState<string>()
   const [selectedProviderUpdateEmail, setSelectedProviderUpdateEmail] = useState<string>()
 
