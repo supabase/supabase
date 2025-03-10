@@ -12,11 +12,12 @@ import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
 import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
+import { useCLIReleaseVersionQuery } from 'data/misc/cli-release-version-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM, STUDIO_VERSION } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
@@ -63,6 +64,9 @@ const LayoutHeader = ({
   const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
+
+  const { data } = useCLIReleaseVersionQuery()
+  const currentCliVersion = data?.current
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganization?.slug,
@@ -161,7 +165,7 @@ const LayoutHeader = ({
                 <NotificationsPopoverV2 />
                 <HelpPopover />
               </>
-            ) : !!STUDIO_VERSION ? (
+            ) : !!currentCliVersion ? (
               <LocalVersionPopover />
             ) : null}
           </div>
