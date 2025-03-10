@@ -606,6 +606,7 @@ class StorageExplorerStore {
       }
 
       let startingBytes = 0
+      const bucketName = this.selectedBucket.name
 
       return () => {
         return new Promise<void>(async (resolve, reject) => {
@@ -642,7 +643,7 @@ class StorageExplorerStore {
             uploadDataDuringCreation: uploadDataDuringCreation,
             removeFingerprintOnSuccess: true,
             metadata: {
-              bucketName: this.selectedBucket.name,
+              bucketName,
               objectName: formattedPathToFile,
               ...fileOptions,
             },
