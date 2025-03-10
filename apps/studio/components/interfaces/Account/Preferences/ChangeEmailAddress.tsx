@@ -1,12 +1,12 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { InlineLink } from 'components/ui/InlineLink'
 import { useEmailUpdateMutation } from 'data/profile/profile-update-email-mutation'
-import { useRef, useState } from 'react'
 import {
   Button,
   DialogFooter,
@@ -31,7 +31,7 @@ export const GitHubChangeEmailAddress = () => {
           <InlineLink href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/changing-your-primary-email-address">
             GitHub
           </InlineLink>{' '}
-          (your public, not primary email)
+          (your primary email)
         </li>
         <li>Log out of GitHub</li>
         <li>Log back into GitHub (with the new, desired email set as primary)</li>
@@ -48,9 +48,7 @@ export const SSOChangeEmailAddress = () => {
         Email addresses for SSO should be updated through your identity provider
       </p>
       <ol className="flex flex-col gap-y-0.5 text-sm ml-4 pl-2 list-decimal text-foreground-light">
-        <li>Log out of Supabase</li>
-        <li>Change your Primary Email in your identity provider</li>
-        <li>Log back into Supabase via SSO with the new, desired email</li>
+        <li>Contact the owner / admin for your team to change your email</li>
       </ol>
     </DialogSection>
   )
@@ -71,7 +69,7 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
   const { mutate: updateEmail, isLoading } = useEmailUpdateMutation({
     onSuccess: (_, vars) => {
       toast.success(
-        `An email address has been sent to ${vars.email}, please to confirm the email address change`
+        `An email address has been sent to ${vars.email} to confirm the email address change`
       )
       onClose()
     },

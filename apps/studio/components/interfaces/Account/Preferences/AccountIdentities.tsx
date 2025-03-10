@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useSession } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
@@ -22,7 +21,6 @@ import {
 
 export const AccountIdentities = () => {
   const router = useRouter()
-  const session = useSession()
 
   const { data, isLoading, isSuccess } = useProfileIdentitiesQuery()
   const identities = data?.identities ?? []
@@ -42,7 +40,7 @@ export const AccountIdentities = () => {
   const [_, message] = router.asPath.split('#message=')
 
   const getProviderName = (provider: string) =>
-    provider === 'github' ? 'GitHub' : provider === 'sso' ? 'SSO' : provider
+    provider === 'github' ? 'GitHub' : provider.startsWith('sso') ? 'SSO' : provider
 
   const onConfirmUnlinkIdentity = async () => {
     const identity = identities.find((i) => i.provider === selectedProviderUnlink)
@@ -142,7 +140,7 @@ export const AccountIdentities = () => {
           </DialogHeader>
           {selectedProviderUpdateEmail === 'github' ? (
             <GitHubChangeEmailAddress />
-          ) : selectedProviderUpdateEmail === 'sso' ? (
+          ) : selectedProviderUpdateEmail?.startsWith('sso') ? (
             <SSOChangeEmailAddress />
           ) : (
             <ChangeEmailAddressForm onClose={() => setSelectedProviderUpdateEmail(undefined)} />
@@ -152,6 +150,7 @@ export const AccountIdentities = () => {
 
       <ConfirmationModal
         variant="warning"
+        size="small"
         loading={isUnlinking}
         visible={!!selectedProviderUnlink}
         title={`Unlink ${getProviderName(selectedProviderUnlink ?? '')} identity`}
@@ -161,8 +160,8 @@ export const AccountIdentities = () => {
         confirmLabelLoading="Unlinking identity"
         alert={{
           base: { variant: 'warning' },
-          title: `Confirm to unlink ${getProviderName(selectedProviderUnlink ?? '')} identity from account`,
-          description: 'This action cannot be undone',
+          title: `Confirm to disconnect your ${getProviderName(selectedProviderUnlink ?? '')} identity`,
+          description: `After disconnecting, you will only be able to sign in via ${selectedProviderUnlink === 'github' ? 'email and password' : 'your GitHub identity'}`,
         }}
       />
     </>
