@@ -13,7 +13,7 @@ interface IntroductionProps {
 const Introduction = ({ selectedLang }: IntroductionProps) => {
   const { ref: projectRef } = useParams()
 
-  const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
+  const { data: config, isSuccess } = useProjectPostgrestConfigQuery({ projectRef })
 
   const isPublicSchemaEnabled = config?.db_schema
     .split(',')
@@ -24,13 +24,14 @@ const Introduction = ({ selectedLang }: IntroductionProps) => {
     <>
       <h2 className="doc-heading">Introduction</h2>
       <div className="doc-section">
-        <article className="code-column text-foreground">
+        <article className="code-column text-foreground flex flex-col gap-y-2">
           <p>
             All views and tables in the <code>public</code> schema and accessible by the active
             database role for a request are available for querying.
           </p>
-
-          {!isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert />}
+        </article>
+        <article className="code">
+          {isSuccess && !isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert />}
         </article>
       </div>
 

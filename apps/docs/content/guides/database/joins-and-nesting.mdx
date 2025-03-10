@@ -8,7 +8,7 @@ The data APIs automatically detect relationships between Postgres tables. Since 
 
 ## One-to-many joins
 
-Let's use an example database that stores `countries` and `cities`:
+Let's use an example database that stores `orchestral_sections` and `instruments`:
 
 <Tabs
   scrollable
@@ -19,50 +19,50 @@ Let's use an example database that stores `countries` and `cities`:
 >
 <TabPanel id="table" label="Tables">
 
-**Countries**
+**Orchestral sections**
 
-| `id` | `name`         |
-| ---- | -------------- |
-| 1    | United Kingdom |
-| 2    | United States  |
+| `id` | `name`    |
+| ---- | --------- |
+| 1    | strings   |
+| 2    | woodwinds |
 
-**Cities**
+**Instruments**
 
-| `id` | `name`      | `country_id` |
-| ---- | ----------- | ------------ |
-| 1    | London      | 1            |
-| 2    | Manchester  | 1            |
-| 3    | Los Angeles | 2            |
-| 4    | New York    | 2            |
+| `id` | `name` | `section_id` |
+| ---- | ------ | ------------ |
+| 1    | violin | 1            |
+| 2    | viola  | 1            |
+| 3    | flute  | 2            |
+| 4    | oboe   | 2            |
 
 </TabPanel>
 <TabPanel id="SQL" label="SQL">
 
 ```sql
-create table countries (
+create table orchestral_sections (
   "id" serial primary key,
   "name" text
 );
 
-insert into countries
+insert into orchestral_sections
   (id, name)
 values
-  (1, 'United Kingdom'),
-  (2, 'United States');
+  (1, 'strings'),
+  (2, 'woodwinds');
 
-create table cities (
+create table instruments (
   "id" serial primary key,
   "name" text,
-  "country_id" int references "countries"
+  "section_id" int references "orchestral_sections"
 );
 
-insert into cities
-  (name, country_id)
+insert into instruments
+  (name, section_id)
 values
-  ('London', 1),
-  ('Manchester', 1),
-  ('Los Angeles', 2),
-  ('New York', 2);
+  ('violin', 1),
+  ('viola', 1),
+  ('flute', 2),
+  ('oboe', 2);
 ```
 
 </TabPanel>
@@ -80,10 +80,10 @@ The APIs will automatically detect relationships based on the foreign keys:
 <TabPanel id="js" label="JavaScript">
 
 ```js
-const { data, error } = await supabase.from('countries').select(`
-  id, 
-  name, 
-  cities ( id, name )
+const { data, error } = await supabase.from('orchestral_sections').select(`
+  id,
+  name,
+  instruments ( id, name )
 `)
 ```
 
@@ -93,66 +93,66 @@ const { data, error } = await supabase.from('countries').select(`
 
 These helper types provide the result types from any query, including nested types for database joins.
 
-Given the following schema with a relation between cities and countries:
+Given the following schema with a relation between orchestral sections and instruments:
 
 ```sql
-create table countries (
+create table orchestral_sections (
   "id" serial primary key,
   "name" text
 );
 
-create table cities (
+create table instruments (
   "id" serial primary key,
   "name" text,
-  "country_id" int references "countries"
+  "section_id" int references "orchestral_sections"
 );
 ```
 
-We can get the nested `CountriesWithCities` type like this:
+We can get the nested `SectionsWithInstruments` type like this:
 
 ```ts
 import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
 
-const countriesWithCitiesQuery = supabase.from('countries').select(`
+const sectionsWithInstrumentsQuery = supabase.from('orchestral_sections').select(`
   id,
   name,
-  cities (
+  instruments (
     id,
     name
   )
 `)
-type CountriesWithCities = QueryData<typeof countriesWithCitiesQuery>
+type SectionsWithInstruments = QueryData<typeof sectionsWithInstrumentsQuery>
 
-const { data, error } = await countriesWithCitiesQuery
+const { data, error } = await sectionsWithInstrumentsQuery
 if (error) throw error
-const countriesWithCities: CountriesWithCities = data
+const sectionsWithInstruments: SectionsWithInstruments = data
 ```
 
 </TabPanel>
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final data = await supabase.from('countries').select('id, name, cities(id, name)');
+final data = await supabase.from('orchestral_sections').select('id, name, instruments(id, name)');
 ```
 
 </TabPanel>
 <TabPanel id="swift" label="Swift">
 
 ```swift
-struct Country: Codable {
+struct OrchestralSection: Codable {
   let id: Int
   let name: String
-  let cities: [City]
+  let instruments: [Instrument]
 
-  struct City: Codable {
+  struct Instrument: Codable {
     let id: Int
     let name: String
   }
 }
 
-let countries: [Country] = try await supabase
-  .from("countries")
-  .select("id, name, cities(id, name)")
+let orchestralSections: [OrchestralSection] = try await supabase
+  .from("orchestral_sections")
+  .select("id, name, instruments(id, name)")
   .execute()
   .value
 ```
@@ -161,14 +161,14 @@ let countries: [Country] = try await supabase
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val data = supabase.from("countries").select(Columns.raw("id, name, cities(id, name)"))
+val data = supabase.from("orchestral_sections").select(Columns.raw("id, name, instruments(id, name)"))
 ```
 
 </TabPanel>
 <TabPanel id="python" label="Python">
 
 ```python
-data = supabase.from_('countries').select('id, name, cities(id, name)').execute()
+data = supabase.from_('orchestral_sections').select('id, name, instruments(id, name)').execute()
 ```
 
 </TabPanel>
@@ -177,13 +177,13 @@ data = supabase.from_('countries').select('id, name, cities(id, name)').execute(
 ```javascript
 const Query = `
   query {
-    countriesCollection {
+    orchestral_sectionsCollection {
       edges {
         node {
           id
-          name 
-          cities {
-            id, 
+          name
+          instruments {
+            id,
             name
           }
         }
@@ -197,7 +197,7 @@ const Query = `
 <TabPanel id="url" label="URL">
 
 ```bash
-GET https://[REF].supabase.co/rest/v1/countries?select=id,name,cities(id,name)
+GET https://[REF].supabase.co/rest/v1/orchestral_sections?select=id,name,instruments(id,name)
 ```
 
 </TabPanel>
@@ -238,8 +238,8 @@ In these cases you don't need to explicitly define the joining table (members). 
 
 ```js
 const { data, error } = await supabase.from('teams').select(`
-  id, 
-  team_name, 
+  id,
+  team_name,
   users ( id, name )
 `)
 ```
@@ -387,7 +387,7 @@ const { data, error } = await supabase.from('shifts').select(
       badge_scan_time
     ),
    end_scan:scans!scan_id_end (
-     id, 
+     id,
      user_id,
      badge_scan_time
     )

@@ -163,12 +163,13 @@ To prevent TypeScript errors, add type definitions for the new `event.locals` pr
 
 ```ts src/app.d.ts
 import type { Session, SupabaseClient, User } from '@supabase/supabase-js'
+import type { Database } from './database.types.ts' // import generated types
 
 declare global {
   namespace App {
     // interface Error {}
     interface Locals {
-      supabase: SupabaseClient
+      supabase: SupabaseClient<Database>
       safeGetSession: () => Promise<{ session: Session | null; user: User | null }>
       session: Session | null
       user: User | null
@@ -308,7 +309,7 @@ Create your first page. This example page calls Supabase from the server to get 
 
 This is an example of a public page that uses publicly readable data.
 
-To populate your database, run the [countries quickstart](/dashboard/project/_/sql/quickstarts) from your dashboard.
+To populate your database, run the [colors quickstart](/dashboard/project/_/sql/quickstarts) from your dashboard.
 
 </StepHikeCompact.Details>
 
@@ -320,21 +321,21 @@ To populate your database, run the [countries quickstart](/dashboard/project/_/s
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ locals: { supabase } }) => {
-  const { data: countries } = await supabase.from('countries').select('name').limit(5).order('name')
-  return { countries: countries ?? [] }
+  const { data: colors } = await supabase.from('colors').select('name').limit(5).order('name')
+  return { colors: colors ?? [] }
 }
 ```
 
 ```svelte src/routes/+page.svelte
 <script>
   let { data } = $props()
-  let { countries } = $derived(data)
+  let { colors } = $derived(data)
 </script>
 
 <h1>Welcome to Supabase!</h1>
 <ul>
-  {#each countries as country}
-    <li>{country.name}</li>
+  {#each colors as color}
+    <li>{color.name}</li>
   {/each}
 </ul>
 ```

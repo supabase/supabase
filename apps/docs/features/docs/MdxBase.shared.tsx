@@ -1,7 +1,7 @@
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Image } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition, type AdmonitionProps } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
@@ -28,6 +28,18 @@ import {
   QuickstartIntro,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
+  PostgresInstallation,
+  PricingMfaPhone,
+  PricingBranching,
+  PricingEdgeFunctions,
+  PricingMau,
+  PricingMauSso,
+  PricingMauThirdParty,
+  PricingPitr,
+  PricingRealtimeMessages,
+  PricingRealtimeConnections,
+  PricingStorageImageTransformations,
+  PricingStorageSize,
 } from '~/components/MDX/partials'
 import { NavData } from '~/components/NavData'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
@@ -40,11 +52,13 @@ import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import * as CH from '~/features/ui/CodeHike'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import InfoTooltip from '~/features/ui/InfoTooltip'
 
 const components = {
   Accordion,
   AccordionItem,
   Admonition,
+  // Admonition: (props: AdmonitionProps) => <Admonition className="[&_a]:underline" {...props} />,
   AuthErrorCodesTable,
   AuthRateLimits,
   AuthSmsProviderConfig,
@@ -83,10 +97,23 @@ const components = {
   ShowUntil,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
+  PostgresInstallation,
   SqlToRest,
   StepHikeCompact,
   Tabs,
   TabPanel,
+  InfoTooltip,
+  PricingMfaPhone,
+  PricingBranching,
+  PricingEdgeFunctions,
+  PricingMau,
+  PricingMauSso,
+  PricingMauThirdParty,
+  PricingPitr,
+  PricingRealtimeMessages,
+  PricingRealtimeConnections,
+  PricingStorageImageTransformations,
+  PricingStorageSize,
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
       {props.children}

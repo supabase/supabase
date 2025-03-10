@@ -77,7 +77,10 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
           <ScaffoldTitle className="pb-3">
             {selectedOrganization?.name ?? 'Organization'} settings
           </ScaffoldTitle>
-          <NavMenu className="border-none" aria-label="Organization menu navigation">
+          <NavMenu
+            className="border-none max-w-full overflow-y-hidden overflow-x-auto"
+            aria-label="Organization menu navigation"
+          >
             {filteredNavMenuItems.map((item) => (
               <NavMenuItem key={item.label} active={currentPath === item.href}>
                 <Link href={item.href}>{item.label}</Link>

@@ -1,11 +1,13 @@
 import { isEqual } from 'lodash'
 import { HelpCircle, Settings } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import {
   TablePrivilegesGrant,
@@ -20,9 +22,6 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
   Button,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -38,15 +37,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
 import { getQueueFunctionsMapping } from './Queue.utils'
-import { Admonition } from 'ui-patterns'
-import Link from 'next/link'
 
 const ACTIONS = ['select', 'insert', 'update', 'delete']
 const ROLES = ['anon', 'authenticated', 'postgres', 'service_role']
@@ -147,8 +144,8 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
                 connectionString: project.connectionString,
                 revokes: revoke.map((x) => ({
                   grantee: x.role,
-                  privilege_type: x.action.toUpperCase(),
-                  relation_id: queueTable.id,
+                  privilegeType: x.action.toUpperCase(),
+                  relationId: queueTable.id,
                 })) as TablePrivilegesRevoke[],
               }),
             ]
@@ -162,13 +159,13 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
                 revokes: [
                   ...rolesNoLongerHavingPerms.map((x) => ({
                     grantee: x,
-                    privilege_type: 'INSERT' as 'INSERT',
-                    relation_id: archiveTable.id,
+                    privilegeType: 'INSERT' as const,
+                    relationId: archiveTable.id,
                   })),
                   ...rolesNoLongerHavingPerms.map((x) => ({
                     grantee: x,
-                    privilege_type: 'SELECT' as 'SELECT',
-                    relation_id: archiveTable.id,
+                    privilegeType: 'SELECT' as const,
+                    relationId: archiveTable.id,
                   })),
                 ],
               }),
@@ -181,8 +178,8 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
                 connectionString: project.connectionString,
                 grants: grant.map((x) => ({
                   grantee: x.role,
-                  privilege_type: x.action.toUpperCase(),
-                  relation_id: queueTable.id,
+                  privilegeType: x.action.toUpperCase(),
+                  relationId: queueTable.id,
                 })) as TablePrivilegesGrant[],
               }),
               // Just grant select + insert on archive table as long as we're granting any perms to the queue table for the role
@@ -192,13 +189,13 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
                 grants: [
                   ...rolesBeingGrantedPerms.map((x) => ({
                     grantee: x,
-                    privilege_type: 'INSERT' as 'INSERT',
-                    relation_id: archiveTable.id,
+                    privilegeType: 'INSERT' as const,
+                    relationId: archiveTable.id,
                   })),
                   ...rolesBeingGrantedPerms.map((x) => ({
                     grantee: x,
-                    privilege_type: 'SELECT' as 'SELECT',
-                    relation_id: archiveTable.id,
+                    privilegeType: 'SELECT' as const,
+                    relationId: archiveTable.id,
                   })),
                 ],
               }),
@@ -286,16 +283,13 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
                   const relatedFunctions = getQueueFunctionsMapping(x)
                   return (
                     <TableHead key={x}>
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ className="mx-auto flex items-center gap-x-1 capitalize text-foreground-light font-normal">
+                      <Tooltip>
+                        <TooltipTrigger className="mx-auto flex items-center gap-x-1 capitalize text-foreground-light font-normal">
                           {x}
                           {isExposed && <HelpCircle size={14} strokeWidth={1.5} />}
-                        </TooltipTrigger_Shadcn_>
+                        </TooltipTrigger>
                         {isExposed && (
-                          <TooltipContent_Shadcn_
-                            side="bottom"
-                            className="w-64 flex flex-col gap-y-1"
-                          >
+                          <TooltipContent side="bottom" className="w-64 flex flex-col gap-y-1">
                             <p>
                               Required for{' '}
                               {relatedFunctions.length === 6
@@ -308,9 +302,9 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
                                 <code key={`${x}_${y}`}>{y}</code>
                               ))}
                             </div>
-                          </TooltipContent_Shadcn_>
+                          </TooltipContent>
                         )}
-                      </Tooltip_Shadcn_>
+                      </Tooltip>
                     </TableHead>
                   )
                 })}

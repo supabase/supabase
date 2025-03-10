@@ -63,7 +63,7 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
               active, it incurs compute costs based on the compute size of your project. Paused
               projects do not incur compute costs.{' '}
               <Link
-                href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                 target="_blank"
                 className="transition text-brand hover:text-brand-600 underline"
               >

@@ -35,6 +35,7 @@ export interface PreviewLogData extends CustomLogData {
   timestamp: number
   event_message: string
   metadata?: Metadata
+  [key: string]: string | number | Metadata | undefined
 }
 export type LogData = CustomLogData & PreviewLogData
 
@@ -51,7 +52,9 @@ export interface CountData {
 }
 
 export interface EventChartData extends Datum {
-  count: number
+  error_count: number
+  warning_count: number
+  ok_count: number
   timestamp: string
 }
 

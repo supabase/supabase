@@ -58,6 +58,8 @@ export * from './src/components/Upload'
 export * from './src/components/Form'
 export * from './src/components/ExpandingTextArea'
 
+export * from './src/components/PrePostTab'
+
 // layout
 export * from './src/components/LoadingLine'
 
@@ -222,10 +224,10 @@ export {
 } from './src/components/shadcn/ui/tabs'
 
 export {
-  TooltipProvider as TooltipProvider_Shadcn_,
-  Tooltip as Tooltip_Shadcn_,
-  TooltipTrigger as TooltipTrigger_Shadcn_,
-  TooltipContent as TooltipContent_Shadcn_,
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
 } from './src/components/shadcn/ui/tooltip'
 
 export {
@@ -238,7 +240,7 @@ export * from './src/components/shadcn/ui/calendar'
 
 export { Toggle as Toggle_Shadcn } from './src/components/shadcn/ui/toggle'
 
-export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
+export { ScrollArea, ScrollBar, ScrollViewport } from './src/components/shadcn/ui/scroll-area'
 
 export { Separator } from './src/components/shadcn/ui/separator'
 
@@ -250,6 +252,7 @@ export * from './src/components/radio-group-card'
 export * from './src/components/TreeView'
 
 export * from './src/components/shadcn/ui/chart'
+export * from './src/components/shadcn/ui/sidebar'
 
 // links
 

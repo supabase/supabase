@@ -1067,6 +1067,16 @@ export const examples: Registry = [
     files: ['example/inner-side-menu-with-search.tsx'],
   },
   {
+    name: 'toc-demo',
+    type: 'components:example',
+    files: ['example/toc-demo.tsx'],
+  },
+  {
+    name: 'toc-single-demo',
+    type: 'components:example',
+    files: ['example/toc-single-demo.tsx'],
+  },
+  {
     name: 'multi-select-demo',
     type: 'components:example',
     files: ['example/multi-select-demo.tsx'],
@@ -1090,6 +1100,11 @@ export const examples: Registry = [
     name: 'multi-select-combobox',
     type: 'components:example',
     files: ['example/multi-select-combobox.tsx'],
+  },
+  {
+    name: 'multi-select-combobox-creatable',
+    type: 'components:example',
+    files: ['example/multi-select-combobox-creatable.tsx'],
   },
   {
     name: 'multi-select-deletable-badge',
@@ -1200,5 +1215,10 @@ export const examples: Registry = [
     name: 'expanding-textarea-demo',
     type: 'docs:example',
     files: ['example/expanding-textarea-demo.tsx'],
+  },
+  {
+    name: 'logs-bar-chart',
+    type: 'components:example',
+    files: ['example/logs-bar-chart.tsx'],
   },
 ]

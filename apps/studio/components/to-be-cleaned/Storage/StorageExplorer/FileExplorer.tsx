@@ -14,7 +14,6 @@ export interface FileExplorerProps {
   columns: StorageColumn[]
   openedFolders: StorageItem[]
   selectedItems: StorageItemWithColumn[]
-  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null
   itemSearchString: string
   onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
@@ -27,7 +26,6 @@ const FileExplorer = ({
   columns = [],
   openedFolders = [],
   selectedItems = [],
-  selectedFilePreview,
   itemSearchString,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
@@ -48,7 +46,7 @@ const FileExplorer = ({
   return (
     <div
       ref={fileExplorerRef}
-      className="file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full"
+      className="file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full relative"
     >
       <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
       <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
@@ -63,7 +61,6 @@ const FileExplorer = ({
               column={column}
               openedFolders={openedFolders}
               selectedItems={selectedItems}
-              selectedFilePreview={selectedFilePreview}
               itemSearchString={itemSearchString}
               onFilesUpload={onFilesUpload}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
@@ -81,7 +78,6 @@ const FileExplorer = ({
               view={view}
               column={columns[columns.length - 1]}
               selectedItems={selectedItems}
-              selectedFilePreview={selectedFilePreview}
               itemSearchString={itemSearchString}
               onFilesUpload={onFilesUpload}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}

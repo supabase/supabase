@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import type * as React from 'react'
 
 export const detectBrowser = () => {
   if (!navigator) return undefined
@@ -32,4 +33,22 @@ export const useReducedMotion = (): boolean => {
     () => prefersReducedMotionMediaQuery.matches,
     () => false
   )
+}
+
+export function ensurePlatformSuffix(apiUrl: string) {
+  return apiUrl.endsWith('/platform') ? apiUrl : `${apiUrl}/platform`
+}
+
+export function mergeRefs<T>(...refs: React.Ref<T>[]): React.RefCallback<T> {
+  return (value) => {
+    refs.forEach((ref) => {
+      if (typeof ref === 'function') {
+        ref(value)
+      } else if (ref !== null) {
+        if (typeof ref === 'object' && ref !== null && 'current' in ref) {
+          ;(ref as any).current = value
+        }
+      }
+    })
+  }
 }

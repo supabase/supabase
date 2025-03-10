@@ -14,7 +14,7 @@ const columns: Column<LogData>[] = [
       }
       return (
         <RowLayout>
-          <TimestampInfo value={props.row.timestamp!} />
+          <TimestampInfo utcTimestamp={props.row.timestamp!} />
           {props.row.event_type === 'uncaughtException' ? (
             <SeverityFormatter value={props.row.event_type} uppercase={false} />
           ) : (

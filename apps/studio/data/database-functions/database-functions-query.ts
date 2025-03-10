@@ -16,8 +16,11 @@ const pgMetaFunctionsList = pgMeta.functions.list()
 
 export async function getDatabaseFunctions(
   { projectRef, connectionString }: DatabaseFunctionsVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ) {
+  let headers = new Headers(headersInit)
+
   const { result } = await executeSql(
     {
       projectRef,
@@ -25,7 +28,8 @@ export async function getDatabaseFunctions(
       sql: pgMetaFunctionsList.sql,
       queryKey: ['database-functions'],
     },
-    signal
+    signal,
+    headers
   )
 
   return result as DatabaseFunction[]

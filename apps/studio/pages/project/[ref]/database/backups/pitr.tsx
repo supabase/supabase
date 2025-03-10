@@ -22,6 +22,7 @@ import { PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   return (
@@ -42,7 +43,9 @@ const DatabasePhysicalBackups: NextPageWithLayout = () => {
 }
 
 DatabasePhysicalBackups.getLayout = (page) => (
-  <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
 )
 
 const PITR = () => {
@@ -86,6 +89,7 @@ const PITR = () => {
           {!isEnabled ? (
             <UpgradeToPro
               addon="pitr"
+              source="pitr"
               primaryText="Point in Time Recovery is a Pro Plan add-on."
               secondaryText={
                 plan === 'free'

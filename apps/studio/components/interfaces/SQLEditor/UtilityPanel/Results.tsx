@@ -50,24 +50,29 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
   )
 
   const formatter = (column: any, row: any) => {
+    const cellValue = row[column]
+
     return (
       <ContextMenu_Shadcn_ modal={false}>
         <ContextMenuTrigger_Shadcn_ asChild>
           <div
             className={cn(
               'flex items-center h-full font-mono text-xs w-full whitespace-pre',
-              row[column] === null && 'text-foreground-lighter'
+              cellValue === null && 'text-foreground-lighter'
             )}
           >
-            {row[column] === null ? 'NULL' : JSON.stringify(row[column])}
+            {cellValue === null
+              ? 'NULL'
+              : typeof cellValue === 'string'
+                ? cellValue
+                : JSON.stringify(cellValue)}
           </div>
         </ContextMenuTrigger_Shadcn_>
         <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
           <ContextMenuItem_Shadcn_
             className="gap-x-2"
             onSelect={() => {
-              const cellValue = row[column] ?? ''
-              const value = formatClipboardValue(cellValue)
+              const value = formatClipboardValue(cellValue ?? '')
               copyToClipboard(value)
             }}
             onFocusCapture={(e) => e.stopPropagation()}
@@ -127,19 +132,29 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
 
   return (
     <>
-      <DataGrid
-        columns={columns}
-        rows={rows}
-        className="h-full flex-grow border-t-0"
-        rowClass={() => '[&>.rdg-cell]:items-center'}
-        onSelectedCellChange={setCellPosition}
-      />
-      <CellDetailPanel
-        column={cellPosition?.column.name ?? ''}
-        value={cellPosition?.row?.[cellPosition.column.name]}
-        visible={expandCell}
-        onClose={() => setExpandCell(false)}
-      />
+      {rows.length === 0 ? (
+        <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+          <p className="m-0 border-0 px-4 py-3 font-mono text-sm text-foreground-light">
+            Success. No rows returned
+          </p>
+        </div>
+      ) : (
+        <>
+          <DataGrid
+            columns={columns}
+            rows={rows}
+            className="h-full flex-grow border-t-0"
+            rowClass={() => '[&>.rdg-cell]:items-center'}
+            onSelectedCellChange={setCellPosition}
+          />
+          <CellDetailPanel
+            column={cellPosition?.column.name ?? ''}
+            value={cellPosition?.row?.[cellPosition.column.name]}
+            visible={expandCell}
+            onClose={() => setExpandCell(false)}
+          />
+        </>
+      )}
     </>
   )
 }

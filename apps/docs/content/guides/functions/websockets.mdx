@@ -1,5 +1,5 @@
 ---
-id: 'function-websockets'
+id: 'function-WebSockets'
 title: 'Handling WebSockets'
 description: 'How to handle WebSocket connections in Edge Functions'
 subtitle: 'How to handle WebSocket connections in Edge Functions'
@@ -25,8 +25,8 @@ Here are some basic examples of setting up WebSocket servers using Deno and Node
   Deno.serve(req => {
     const upgrade = req.headers.get("upgrade") || "";
 
-    if (upgrade.toLowerCase() != "websocket") {
-        return new Response("request isn't trying to upgrade to websocket.", { status: 400 });
+    if (upgrade.toLowerCase() != "WebSocket") {
+        return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 });
     }
 
     const { socket, response } = Deno.upgradeWebSocket(req);
@@ -130,8 +130,8 @@ Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),
 Deno.serve(req => {
 const upgrade = req.headers.get("upgrade") || "";
 
-    if (upgrade.toLowerCase() != "websocket") {
-        return new Response("request isn't trying to upgrade to websocket.", { status: 400 });
+    if (upgrade.toLowerCase() != "WebSocket") {
+        return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 });
     }
 
 // Please be aware query params may be logged in some logging systems.
@@ -179,8 +179,8 @@ const supabase = createClient(
   Deno.serve(req => {
     const upgrade = req.headers.get("upgrade") || "";
 
-    if (upgrade.toLowerCase() != "websocket") {
-        return new Response("request isn't trying to upgrade to websocket.", { status: 400 });
+    if (upgrade.toLowerCase() != "WebSocket") {
+        return new Response("request isn't trying to upgrade to WebSocket.", { status: 400 });
     }
 
   // Sec-WebScoket-Protocol may return multiple protocol values `jwt-TOKEN, value1, value 2`

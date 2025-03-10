@@ -8,6 +8,13 @@ export enum DiskType {
   IO2 = 'io2',
 }
 
+// [Joshen] As per https://github.com/supabase/infrastructure/pull/20478
+export const DISK_AUTOSCALE_CONFIG_DEFAULTS = {
+  growthPercent: 50,
+  minIncrementSize: 4,
+  maxSizeGb: 60000,
+}
+
 export const IOPS_RANGE = {
   [DiskType.GP3]: { min: 3000, max: 16000 },
   [DiskType.IO2]: { min: 100, max: 256000 },
@@ -48,11 +55,6 @@ export const DISK_LIMITS = {
     includedIops: 0,
     includedThroughput: 0,
   },
-}
-
-export const DISK_TYPE_LABELS = {
-  [DiskType.GP3]: 'General Purpose SSD (gp3)',
-  [DiskType.IO2]: 'Provisioned IOPS SSD (io2)',
 }
 
 interface PlanDetails {

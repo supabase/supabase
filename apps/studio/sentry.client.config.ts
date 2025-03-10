@@ -9,12 +9,8 @@ import { match } from 'path-to-regexp'
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
-  tracesSampleRate: 0.01,
-
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
-
   beforeSend(event, hint) {
     const consent =
       typeof window !== 'undefined'
@@ -33,21 +29,6 @@ Sentry.init({
     }
     return null
   },
-
-  integrations: [
-    Sentry.browserTracingIntegration({
-      // TODO: update gotrue + api to support Access-Control-Request-Headers: authorization,baggage,sentry-trace,x-client-info
-      // then remove these options
-      traceFetch: false,
-      traceXHR: false,
-      beforeStartSpan: (context) => {
-        return {
-          ...context,
-          name: standardiseRouterUrl(location.pathname),
-        }
-      },
-    }),
-  ],
   ignoreErrors: [
     // Used exclusively in Monaco Editor.
     'ResizeObserver',

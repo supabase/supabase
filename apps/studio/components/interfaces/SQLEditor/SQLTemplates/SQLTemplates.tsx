@@ -8,6 +8,7 @@ import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -17,6 +18,7 @@ import SQLCard from './SQLCard'
 const SQLTemplates = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { profile } = useProfile()
   const { project } = useProjectContext()
   const [sql] = partition(SQL_TEMPLATES, { type: 'template' })
@@ -56,7 +58,7 @@ const SQLTemplates = () => {
   }
 
   return (
-    <div className="block h-full space-y-8 overflow-y-auto p-6">
+    <div className="block h-full space-y-8 overflow-y-auto p-4 md:p-6">
       <div>
         <div className="mb-4">
           <h1 className="text-foreground mb-3 text-xl">Scripts</h1>
@@ -76,9 +78,9 @@ const SQLTemplates = () => {
               onClick={(sql, title) => {
                 handleNewQuery(sql, title)
                 sendEvent({
-                  category: 'scripts',
-                  action: 'script_clicked',
-                  label: x.title,
+                  action: 'sql_editor_template_clicked',
+                  properties: { templateName: title },
+                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
                 })
               }}
             />

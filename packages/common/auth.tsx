@@ -10,7 +10,9 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { gotrueClient } from './gotrue'
+import { gotrueClient, type User } from './gotrue'
+
+export type { User }
 
 const DEFAULT_SESSION: any = {
   access_token: undefined,
