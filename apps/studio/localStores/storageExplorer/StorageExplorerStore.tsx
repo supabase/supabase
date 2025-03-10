@@ -66,8 +66,6 @@ export function useStorageStore() {
 const CORRUPTED_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes
 const LIMIT = 200
 const OFFSET = 0
-const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 10 years
-const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
 const BATCH_SIZE = 2
 const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
 const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's completed"
