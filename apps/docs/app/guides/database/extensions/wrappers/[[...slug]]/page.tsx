@@ -11,7 +11,7 @@ import {
   removeRedundantH1,
 } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
-import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
+import { REVALIDATION_TAGS } from '~/features/helpers.fetch'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter } from '~/lib/docs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
@@ -196,7 +196,9 @@ const getContent = async (params: Params) => {
     const repoPath = `${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
     editLink = `${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`
 
-    const response = await fetchRevalidatePerDay(`https://raw.githubusercontent.com/${repoPath}`)
+    const response = await fetch(`https://raw.githubusercontent.com/${repoPath}`, {
+      next: { tags: [REVALIDATION_TAGS.WRAPPERS] },
+    })
     const rawContent = await response.text()
 
     const { content: contentWithoutFrontmatter } = matter(rawContent)
