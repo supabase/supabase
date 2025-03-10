@@ -81,5 +81,18 @@ export const getReturnToPath = (fallback = '/projects') => {
     validReturnTo = pattern.test(returnTo) ? fallback : returnTo
   }
 
-  return validReturnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
+  const [path, existingQuery] = validReturnTo.split('?')
+
+  const finalSearchParams = new URLSearchParams(existingQuery || '')
+
+  // Add all remaining search params to the final search params
+  if (remainingSearchParams) {
+    const remainingParams = new URLSearchParams(remainingSearchParams)
+    remainingParams.forEach((value, key) => {
+      finalSearchParams.append(key, value)
+    })
+  }
+
+  const finalQuery = finalSearchParams.toString()
+  return path + (finalQuery ? `?${finalQuery}` : '')
 }
