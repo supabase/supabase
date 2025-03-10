@@ -6,82 +6,83 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { GlitchPass } from './glitch'
+import { CRTShader } from './crt-shader'
 
-// CRT Shader implementation
-const CRTShader = {
-  uniforms: {
-    tDiffuse: { value: null },
-    time: { value: 0 },
-    resolution: { value: new THREE.Vector2(1, 1) },
-    scanlineIntensity: { value: 0.5 },
-    scanlineCount: { value: 320 },
-    vignetteIntensity: { value: 0.8 },
-    noiseIntensity: { value: 0.05 },
-    flickerIntensity: { value: 0.03 },
-    rgbShiftAmount: { value: 0.003 },
-  },
-  vertexShader: `
-    varying vec2 vUv;
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `,
-  fragmentShader: `
-    uniform sampler2D tDiffuse;
-    uniform float time;
-    uniform vec2 resolution;
-    uniform float scanlineIntensity;
-    uniform float scanlineCount;
-    uniform float vignetteIntensity;
-    uniform float noiseIntensity;
-    uniform float flickerIntensity;
-    uniform float rgbShiftAmount;
-    
-    varying vec2 vUv;
-    
-    // Random function
-    float random(vec2 st) {
-      return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
-    }
-    
-    void main() {
-      // RGB shift effect
-      vec2 shiftR = vec2(rgbShiftAmount, 0.0);
-      vec2 shiftG = vec2(0.0, rgbShiftAmount);
-      
-      float r = texture2D(tDiffuse, vUv + shiftR).r;
-      float g = texture2D(tDiffuse, vUv + shiftG).g;
-      float b = texture2D(tDiffuse, vUv).b;
-      
-      vec4 shiftedColor = vec4(r, g, b, 1.0);
-      
-      // Scanline effect
-      float scanline = sin(vUv.y * scanlineCount * 3.14159) * 0.5 + 0.5;
-      scanline = pow(scanline, 1.0) * scanlineIntensity;
-      
-      // Vignette effect
-      vec2 center = vec2(0.5, 0.5);
-      float dist = distance(vUv, center);
-      float vignette = smoothstep(0.5, 0.2, dist) * vignetteIntensity;
-      
-      // Noise
-      float noise = random(vUv + time * 0.001) * noiseIntensity;
-      
-      // Flicker
-      float flicker = random(vec2(time * 0.001, 0.0)) * flickerIntensity;
-      
-      // Combine effects
-      vec4 finalColor = shiftedColor;
-      finalColor.rgb *= (1.0 - scanline);
-      finalColor.rgb *= (1.0 - vignette);
-      finalColor.rgb += noise;
-      finalColor.rgb *= (1.0 - flicker);
-      
-      gl_FragColor = finalColor;
-    }
-  `,
-}
+// // CRT Shader implementation
+// const CRTShader = {
+//   uniforms: {
+//     tDiffuse: { value: null },
+//     time: { value: 0 },
+//     resolution: { value: new THREE.Vector2(1, 1) },
+//     scanlineIntensity: { value: 0.5 },
+//     scanlineCount: { value: 320 },
+//     vignetteIntensity: { value: 0.8 },
+//     noiseIntensity: { value: 0.05 },
+//     flickerIntensity: { value: 0.03 },
+//     rgbShiftAmount: { value: 0.003 },
+//   },
+//   vertexShader: `
+//     varying vec2 vUv;
+//     void main() {
+//       vUv = uv;
+//       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+//     }
+//   `,
+//   fragmentShader: `
+//     uniform sampler2D tDiffuse;
+//     uniform float time;
+//     uniform vec2 resolution;
+//     uniform float scanlineIntensity;
+//     uniform float scanlineCount;
+//     uniform float vignetteIntensity;
+//     uniform float noiseIntensity;
+//     uniform float flickerIntensity;
+//     uniform float rgbShiftAmount;
+//
+//     varying vec2 vUv;
+//
+//     // Random function
+//     float random(vec2 st) {
+//       return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+//     }
+//
+//     void main() {
+//       // RGB shift effect
+//       vec2 shiftR = vec2(rgbShiftAmount, 0.0);
+//       vec2 shiftG = vec2(0.0, rgbShiftAmount);
+//
+//       float r = texture2D(tDiffuse, vUv + shiftR).r;
+//       float g = texture2D(tDiffuse, vUv + shiftG).g;
+//       float b = texture2D(tDiffuse, vUv).b;
+//
+//       vec4 shiftedColor = vec4(r, g, b, 1.0);
+//
+//       // Scanline effect
+//       float scanline = sin(vUv.y * scanlineCount * 3.14159) * 0.5 + 0.5;
+//       scanline = pow(scanline, 1.0) * scanlineIntensity;
+//
+//       // Vignette effect
+//       vec2 center = vec2(0.5, 0.5);
+//       float dist = distance(vUv, center);
+//       float vignette = smoothstep(0.5, 0.2, dist) * vignetteIntensity;
+//
+//       // Noise
+//       float noise = random(vUv + time * 0.001) * noiseIntensity;
+//
+//       // Flicker
+//       float flicker = random(vec2(time * 0.001, 0.0)) * flickerIntensity;
+//
+//       // Combine effects
+//       vec4 finalColor = shiftedColor;
+//       finalColor.rgb *= (1.0 - scanline);
+//       finalColor.rgb *= (1.0 - vignette);
+//       finalColor.rgb += noise;
+//       finalColor.rgb *= (1.0 - flicker);
+//
+//       gl_FragColor = finalColor;
+//     }
+//   `,
+// }
 
 /**
  * Custom hook for managing requestAnimationFrame
@@ -253,21 +254,35 @@ export const loadGLTFModel = (url: string): Promise<THREE.Group> => {
 
 /**
  * Helper function to create a flight ticket mesh
- * @param modelUrl URL of the GLTF model to use for the ticket
- * @param width Width of the ticket
- * @param height Height of the ticket
+ * @param source URL of the GLTF model or texture to use for the ticket
+ * @param options Configuration options for the ticket
  * @returns Promise that resolves with the created model
  */
 export const createTicketMesh = async (
-  modelUrl: string,
-  width: number = 4,
-  height: number = 2
+  source: string,
+  options: {
+    width?: number
+    height?: number
+    forceTextureMode?: boolean
+    materialOptions?: {
+      transparent?: boolean
+      emissiveColor?: THREE.Color | number
+      emissiveIntensity?: number
+      color?: THREE.Color | number
+    }
+  } = {}
 ): Promise<THREE.Object3D> => {
   try {
-    // Check if the URL ends with .glb or .gltf to determine if it's a 3D model
-    if (modelUrl.endsWith('.glb') || modelUrl.endsWith('.gltf')) {
+    const width = options.width || 4
+    const height = options.height || 2
+    
+    // Determine if we should use texture mode
+    const useTextureMode = options.forceTextureMode || 
+      !(source.endsWith('.glb') || source.endsWith('.gltf'))
+    
+    if (!useTextureMode) {
       // Load the GLTF model
-      const model = await loadGLTFModel(modelUrl)
+      const model = await loadGLTFModel(source)
       
       // Calculate scale to fit the model within the specified width and height
       const box = new THREE.Box3().setFromObject(model)
@@ -292,21 +307,25 @@ export const createTicketMesh = async (
           if (Array.isArray(child.material)) {
             child.material.forEach(mat => {
               if (mat instanceof THREE.MeshStandardMaterial) {
-                mat.emissive = new THREE.Color(0xffffff)
-                mat.emissiveIntensity = 0.2
+                mat.emissive = options.materialOptions?.emissiveColor 
+                  ? new THREE.Color(options.materialOptions.emissiveColor) 
+                  : new THREE.Color(0xffffff)
+                mat.emissiveIntensity = options.materialOptions?.emissiveIntensity ?? 0.2
               }
             })
           } else if (child.material instanceof THREE.MeshStandardMaterial) {
-            child.material.emissive = new THREE.Color(0xffffff)
-            child.material.emissiveIntensity = 0.2
+            child.material.emissive = options.materialOptions?.emissiveColor 
+              ? new THREE.Color(options.materialOptions.emissiveColor) 
+              : new THREE.Color(0xffffff)
+            child.material.emissiveIntensity = options.materialOptions?.emissiveIntensity ?? 0.2
           }
         }
       })
       
       return model
     } else {
-      // If it's not a 3D model, load it as a texture
-      const texture = await loadTexture(modelUrl)
+      // Load as a texture
+      const texture = await loadTexture(source)
       
       // Create a plane geometry for the ticket
       const geometry = new THREE.PlaneGeometry(width, height)
@@ -314,10 +333,17 @@ export const createTicketMesh = async (
       // Create a material with the loaded texture
       const material = new THREE.MeshStandardMaterial({
         map: texture,
-        transparent: true,
+        transparent: options.materialOptions?.transparent !== undefined 
+          ? options.materialOptions.transparent 
+          : true,
         side: THREE.DoubleSide,
-        emissive: new THREE.Color(0xffffff),
-        emissiveIntensity: 0.2,
+        emissive: options.materialOptions?.emissiveColor 
+          ? new THREE.Color(options.materialOptions.emissiveColor) 
+          : new THREE.Color(0xffffff),
+        emissiveIntensity: options.materialOptions?.emissiveIntensity ?? 0.2,
+        color: options.materialOptions?.color 
+          ? new THREE.Color(options.materialOptions.color) 
+          : new THREE.Color(0xffffff),
       })
       
       // Create the mesh
@@ -329,7 +355,7 @@ export const createTicketMesh = async (
     console.error('Error loading model/texture:', error)
     
     // Fallback to a simple plane with a default material if loading fails
-    const geometry = new THREE.PlaneGeometry(width, height)
+    const geometry = new THREE.PlaneGeometry(options.width || 4, options.height || 2)
     const material = new THREE.MeshStandardMaterial({
       color: 0x00ff00,
       transparent: true,
@@ -340,6 +366,31 @@ export const createTicketMesh = async (
     
     return new THREE.Mesh(geometry, material)
   }
+}
+
+/**
+ * Helper function to create a ticket mesh specifically from a texture
+ * @param textureUrl URL of the texture to use for the ticket
+ * @param options Configuration options for the ticket
+ * @returns Promise that resolves with the created mesh
+ */
+export const createTextureTicketMesh = async (
+  textureUrl: string,
+  options: {
+    width?: number
+    height?: number
+    materialOptions?: {
+      transparent?: boolean
+      emissiveColor?: THREE.Color | number
+      emissiveIntensity?: number
+      color?: THREE.Color | number
+    }
+  } = {}
+): Promise<THREE.Mesh> => {
+  return createTicketMesh(textureUrl, {
+    ...options,
+    forceTextureMode: true
+  }) as Promise<THREE.Mesh>
 }
 
 /**

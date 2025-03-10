@@ -68,9 +68,12 @@ const LwCanvas = ({ className }: { className?: string }) => {
 
     // Load the ticket texture and create the actual ticket mesh
     // Replace this URL with your actual ticket texture
-    const ticketTextureUrl = '/images/launchweek/14/bilet-supabase.glb'
+    const ticketTextureUrl = '/images/launchweek/14/ticket-test.png'
 
-    createTicketMesh(ticketTextureUrl, ...planeGeometrySize)
+    createTicketMesh(ticketTextureUrl, {
+      width: planeGeometrySize[0],
+      height: planeGeometrySize[1],
+    })
       .then((ticketModel) => {
         // Remove placeholder and add the actual ticket model
         scene.remove(ticket)
@@ -146,22 +149,22 @@ const LwCanvas = ({ className }: { className?: string }) => {
     const animate = (time?: number) => {
       const currentTime = time || 0
 
-      // if (ticket) {
-      //   // Add very subtle floating animation with reduced amplitude
-      //   const floatingX = Math.sin(currentTime * 0.0003) * 0.05
-      //   const floatingY = Math.sin(currentTime * 0.0005) * 0.03
-      //
-      //   // Smoothly interpolate current position toward target (mouse) position
-      //   const lerpFactor = 0.05 // Lower value = smoother/slower follow
-      //
-      //   // Combine floating animation with mouse following
-      //   ticket.rotation.y = floatingX + (targetX * 0.2)
-      //   ticket.rotation.x = floatingY + (targetY * -0.2)
-      //
-      //   // Smoothly move ticket position toward target with easing
-      //   ticket.position.x += (targetX - ticket.position.x) * lerpFactor
-      //   ticket.position.y += (targetY - ticket.position.y) * lerpFactor + (Math.sin(currentTime * 0.0007) * 0.02)
-      // }
+      if (ticket) {
+        // Add very subtle floating animation with reduced amplitude
+        const floatingX = Math.sin(currentTime * 0.0003) * 0.01
+        const floatingY = Math.sin(currentTime * 0.0005) * 0.005
+
+        // Smoothly interpolate current position toward target (mouse) position
+        const lerpFactor = 0.05 // Lower value = smoother/slower follow
+
+        // Combine floating animation with mouse following
+        ticket.rotation.y = floatingX + (targetX * 0.2)
+        ticket.rotation.x = floatingY + (targetY * -0.2)
+
+        // Smoothly move ticket position toward target with easing
+        ticket.position.x += (targetX - ticket.position.x) * lerpFactor
+        ticket.position.y += (targetY - ticket.position.y) * lerpFactor + (Math.sin(currentTime * 0.0007) * 0.02)
+      }
 
       // Update CRT shader time uniform for animation effects
       if (crtPass) {
