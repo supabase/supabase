@@ -76,8 +76,7 @@ services:
     image: supabase/gotrue:v2.169.0
     restart: unless-stopped
     volumes:
-      - ./certs/mailpit-cert.pem:/etc/ssl/certs/mailpit-cert.pem:rw
-      - ./certs/mailpit-cert.key:/etc/ssl/private/mailpit-cert.key:rw
+      - ./certs/cert.pem:/usr/local/share/ca-certificates/mailpit-cert.crt:rw
     healthcheck:
       test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/health" ]
       timeout: 5s
