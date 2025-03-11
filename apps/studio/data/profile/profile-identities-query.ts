@@ -9,8 +9,8 @@ export async function getProfileIdentities() {
 
   if (error) throw error
 
-  const { identities = [], new_email } = data.user
-  return { identities, new_email }
+  const { identities = [], new_email, email_change_sent_at } = data.user
+  return { identities, new_email, email_change_sent_at }
 }
 
 type ProfileIdentitiesData = {
