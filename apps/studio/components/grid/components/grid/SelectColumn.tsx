@@ -9,7 +9,7 @@ import {
 } from 'react-data-grid'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { SELECT_COLUMN_KEY } from '../../constants'
 import { useTrackedState } from '../../store/Store'
 import type { SupaRow } from '../../types'
@@ -171,7 +171,7 @@ function SelectCellHeader({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
 }: SelectCellHeaderProps) {
-  const snap = useTableEditorStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
   const inputRef = useRef<HTMLInputElement>(null)
 
   // indeterminate state === some rows are selected but not all

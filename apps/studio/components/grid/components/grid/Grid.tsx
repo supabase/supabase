@@ -15,7 +15,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { copyToClipboard } from 'lib/helpers'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
 import { useDispatch, useTrackedState } from '../../store/Store'
 import type { Filter, GridProps, SupaRow } from '../../types'
@@ -77,7 +77,7 @@ export const Grid = memo(
       ref: React.Ref<DataGridHandle> | undefined
     ) => {
       const dispatch = useDispatch()
-      const snap = useTableEditorStateSnapshot()
+      const snap = useTableEditorTableStateSnapshot()
       const state = useTrackedState()
 
       function onColumnResize(index: number, width: number) {

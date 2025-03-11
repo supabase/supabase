@@ -26,7 +26,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -76,7 +76,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
 
-  const snap = useTableEditorStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
   const showHeaderActions = snap.selectedRows.size === 0
 
   const projectRef = project?.ref

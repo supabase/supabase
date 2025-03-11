@@ -11,6 +11,7 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { EMPTY_ARR } from 'lib/void'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   cleanupProps,
   formatFilterURLParams,
@@ -134,7 +135,8 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
   const { id: tableId } = useParams()
   const dispatch = useDispatch()
   const state = useTrackedState()
-  const snap = useTableEditorStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
 
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
@@ -156,7 +158,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
       sorts,
       filters,
       page: snap.page,
-      limit: snap.rowsPerPage,
+      limit: tableEditorSnap.rowsPerPage,
       impersonatedRole: roleImpersonationState.role,
     },
     {

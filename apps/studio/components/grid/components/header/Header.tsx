@@ -23,6 +23,7 @@ import {
   useSubscribeToImpersonatedRole,
 } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   cn,
@@ -71,7 +72,7 @@ const Header = ({
   headerActions,
   customHeader,
 }: HeaderProps) => {
-  const snap = useTableEditorStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
 
   return (
     <div>
@@ -256,7 +257,8 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const state = useTrackedState()
 
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const isImpersonatingRole = roleImpersonationState.role !== undefined
@@ -270,7 +272,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     sorts,
     filters,
     page: snap.page,
-    limit: snap.rowsPerPage,
+    limit: tableEditorSnap.rowsPerPage,
     impersonatedRole: roleImpersonationState.role,
   })
 
@@ -295,7 +297,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     const rowIdxs = Array.from(snap.selectedRows) as number[]
     const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
 
-    snap.onDeleteRows(rows, {
+    tableEditorSnap.onDeleteRows(rows, {
       allRowsSelected: snap.allRowsSelected,
       numRows,
       callback: () => {

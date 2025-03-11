@@ -8,6 +8,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
@@ -24,7 +25,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   })
 
   return (
-    <>
+    <TableEditorTableStateContextProvider key={`table-editor-table-${id}`}>
       <TableGridEditor
         isLoadingSelectedTable={isLoading}
         selectedTable={selectedTable}
@@ -41,7 +42,7 @@ const TableEditorPage: NextPageWithLayout = () => {
           }
         }}
       />
-    </>
+    </TableEditorTableStateContextProvider>
   )
 }
 

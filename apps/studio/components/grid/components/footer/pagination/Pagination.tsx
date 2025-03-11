@@ -10,6 +10,7 @@ import { THRESHOLD_COUNT, useTableRowsCountQuery } from 'data/table-rows/table-r
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -27,7 +28,8 @@ const Pagination = () => {
   const id = _id ? Number(_id) : undefined
 
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -69,7 +71,7 @@ const Pagination = () => {
   )
 
   const count = data?.is_estimate ? formatEstimatedCount(data.count) : data?.count.toLocaleString()
-  const maxPages = Math.ceil((data?.count ?? 0) / snap.rowsPerPage)
+  const maxPages = Math.ceil((data?.count ?? 0) / tableEditorSnap.rowsPerPage)
   const totalPages = (data?.count ?? 0) > 0 ? maxPages : 1
 
   const onPreviousPage = () => {
@@ -117,7 +119,7 @@ const Pagination = () => {
 
   const onRowsPerPageChange = (value: string | number) => {
     const rowsPerPage = Number(value)
-    snap.setRowsPerPage(isNaN(rowsPerPage) ? 100 : rowsPerPage)
+    tableEditorSnap.setRowsPerPage(isNaN(rowsPerPage) ? 100 : rowsPerPage)
   }
 
   useEffect(() => {
@@ -184,7 +186,7 @@ const Pagination = () => {
               align="start"
             >
               <Button asChild type="outline" style={{ padding: '3px 10px' }}>
-                <span>{`${snap.rowsPerPage} rows`}</span>
+                <span>{`${tableEditorSnap.rowsPerPage} rows`}</span>
               </Button>
             </DropdownControl>
           </div>

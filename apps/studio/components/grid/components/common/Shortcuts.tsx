@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import type { DataGridHandle } from 'react-data-grid'
 
 import { SupaRow } from 'components/grid/types'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { useTrackedState } from '../../store/Store'
 import { copyToClipboard, formatClipboardValue } from '../../utils/common'
 import { useKeyboardShortcuts } from './Hooks'
@@ -13,7 +13,7 @@ type ShortcutsProps = {
 }
 
 export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
-  const snap = useTableEditorStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
   const state = useTrackedState()
   const { gridColumns } = state
 
