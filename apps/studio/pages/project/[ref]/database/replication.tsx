@@ -4,6 +4,7 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Destinations from 'components/interfaces/Database/Replication/Destinations'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import InstanceConfiguration from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
   return (
@@ -17,6 +18,9 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
             />
           </div>
         </ScaffoldSection>
+      </ScaffoldContainer>
+      <InstanceConfiguration />
+      <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
             <Destinations />
