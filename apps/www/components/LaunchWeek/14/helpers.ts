@@ -9,6 +9,7 @@ import { GlitchPass } from './glitch'
 import { CRTShader } from './crt-shader'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 /**
  * Helper to simplifies controlling requestAnimationFrame
@@ -66,10 +67,16 @@ export const createThreeSetup = (
         enabled: boolean
       }
     }
+    debug?: boolean
   } = {}
 ) => {
   // Create scene
   const scene = new THREE.Scene()
+
+  if (options.debug) {
+    const axesHelper = new THREE.AxesHelper(5)
+    scene.add(axesHelper)
+  }
 
   // Create camera
   const camera = new THREE.PerspectiveCamera(
@@ -85,6 +92,12 @@ export const createThreeSetup = (
   renderer.setSize(container.clientWidth, container.clientHeight)
   renderer.setPixelRatio(window.devicePixelRatio)
   container.appendChild(renderer.domElement)
+
+  // Enable debug info if debug mode is enabled
+  if (options.debug) {
+    renderer.info.autoReset = false
+    console.log('Three.js Debug Mode Enabled')
+  }
 
   // Create composer for post-processing
   const composer = new EffectComposer(renderer)
@@ -132,6 +145,33 @@ export const createThreeSetup = (
     }
   }
 
+  // Add stats display if debug mode is enabled
+  let stats: { instance: Stats | null } = { instance: null }
+  let orbitControls: { instance: OrbitControls | null } = { instance: null }
+  if (options.debug) {
+    import('three/examples/jsm/libs/stats.module.js').then(({ default: Stats }) => {
+      const statsInstance = new Stats()
+      statsInstance.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
+      statsInstance.dom.style.position = 'absolute'
+      statsInstance.dom.style.top = '0px'
+      statsInstance.dom.style.left = '0px'
+      container.appendChild(statsInstance.dom)
+      stats.instance = statsInstance
+    })
+
+    import('three/examples/jsm/controls/OrbitControls.js').then(({ OrbitControls }) => {
+      // Create OrbitControls after the setup
+      const controls = new OrbitControls(camera, renderer.domElement)
+
+      // Configure controls as needed
+      controls.enableDamping = true // Add smooth damping
+      controls.dampingFactor = 0.05
+      controls.enableZoom = true
+      controls.enablePan = true
+      orbitControls.instance = controls
+    })
+  }
+
   return {
     scene,
     camera,
@@ -141,6 +181,9 @@ export const createThreeSetup = (
     bloomPass,
     glitchPass,
     crtPass,
+    stats,
+    orbitControls,
+    debug: options.debug || false,
   }
 }
 
@@ -191,6 +234,7 @@ export const createTicketMesh = async (
     height?: number
     forceTextureMode?: boolean
     enhanceEmissive?: boolean
+    debug?: boolean
     materialOptions?: {
       transparent?: boolean
       emissiveColor?: THREE.Color | number
@@ -200,9 +244,9 @@ export const createTicketMesh = async (
   } = {}
 ): Promise<THREE.Object3D> => {
   try {
-    const width = options.width || 4
-    const height = options.height || 2
-
+    // const width = options.width || 4
+    // const height = options.height || 2
+    //
     // Determine if we should use texture mode
     const useTextureMode =
       options.forceTextureMode || !(source.endsWith('.glb') || source.endsWith('.gltf'))
@@ -210,48 +254,72 @@ export const createTicketMesh = async (
     if (!useTextureMode) {
       // Load the GLTF model
       const model = await loadGLTFModel(source)
+      const objectsNames = ['planet'] as const
+      const namedObjects = getNamedTextObjects(objectsNames, model)
+      const textures = {} as {
+        [key in (typeof objectsNames)[number]]?: ReturnType<typeof createTextureForObject>
+      }
 
-      const namedObject = model.getObjectByName('planetName')
+      for (let i = 0; i < namedObjects.length; i++) {
+        const namedObject = namedObjects[i]
+        const objectName = objectsNames[i]
 
-      const boxHelper = new THREE.BoxHelper(namedObject, 0xff0000) // Red outline
-      model.add(boxHelper) // Add to the model so it moves with it
+        if (!namedObject) {
+          console.error(`Named object ${objectsNames} not found`)
+          continue
+        }
 
-      const fontLoader = new FontLoader()
+        let text = ''
+        switch (objectName) {
+          case 'planet':
+            text = 'Earth'
+            break
+          default:
+            objectName satisfies never
+        }
 
-      fontLoader.load('/images/launchweek/14/Arial_Regular.json', function (font) {
-        const textGeometry = new TextGeometry('Earth', {
-          font: font,
-          size: 96,
-          depth: 0.05,
-        })
-
-        const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff })
-        const textMesh = new THREE.Mesh(textGeometry, textMaterial)
-
-        // Add text as child of your named object
-        if (namedObject) namedObject.add(textMesh)
-        else console.error('Named object not found')
-
-        // Position relative to parent
-        textMesh.position.set(0, 0, 0.01) // Slight offset to avoid z-fighting
-      })
+        const texture = createTextureForObject(namedObject, text)
+        textures[objectName] = texture
+        namedObject.add(texture)
+      }
 
       // Calculate scale to fit the model within the specified width and height
       const box = new THREE.Box3().setFromObject(model)
       const size = box.getSize(new THREE.Vector3())
 
-      // Calculate scale factors to fit the model within the specified dimensions
-      const scaleX = width / size.x
-      const scaleY = height / size.y
-      const scale = Math.min(scaleX, scaleY)
-
-      // Apply the scale
-      model.scale.set(scale, scale, scale)
-
       // Center the model
       box.setFromObject(model)
       const center = box.getCenter(new THREE.Vector3())
       model.position.sub(center)
+
+      // Add debug helpers if debug mode is enabled
+      if (options.debug) {
+        // Add bounding box helper
+        const boxHelper = new THREE.BoxHelper(model, 0xff0000)
+        model.add(boxHelper)
+
+        // Add wireframe helper for each mesh
+        model.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            const wireframe = new THREE.WireframeGeometry(child.geometry)
+            const line = new THREE.LineSegments(wireframe)
+            line.material = new THREE.LineBasicMaterial({ color: 0x00ffff })
+            line.position.copy(child.position)
+            line.rotation.copy(child.rotation)
+            line.scale.copy(child.scale)
+            model.add(line)
+
+            if(!child.name) {
+              console.log('Debug: Mesh has no name', child)
+            }
+
+            console.log('Debug: Added wireframe to mesh', child.name || 'unnamed')
+          }
+        })
+
+        console.log('Debug: Model dimensions', size)
+        console.log('Debug: Center position', center)
+      }
 
       // Only enhance emissive properties if explicitly requested
       // This respects the original GLTF materials by default
@@ -278,35 +346,8 @@ export const createTicketMesh = async (
       }
 
       return model
-    } else {
-      // Load as a texture
-      const texture = await loadTexture(source)
-
-      // Create a plane geometry for the ticket
-      const geometry = new THREE.PlaneGeometry(width, height)
-
-      // Create a material with the loaded texture
-      const material = new THREE.MeshStandardMaterial({
-        map: texture,
-        transparent:
-          options.materialOptions?.transparent !== undefined
-            ? options.materialOptions.transparent
-            : true,
-        side: THREE.DoubleSide,
-        emissive: options.materialOptions?.emissiveColor
-          ? new THREE.Color(options.materialOptions.emissiveColor)
-          : new THREE.Color(0xffffff),
-        emissiveIntensity: options.materialOptions?.emissiveIntensity ?? 0.2,
-        color: options.materialOptions?.color
-          ? new THREE.Color(options.materialOptions.color)
-          : new THREE.Color(0xffffff),
-      })
-
-      // Create the mesh
-      const mesh = new THREE.Mesh(geometry, material)
-
-      return mesh
-    }
+    } 
+    throw new Error(`Failed to load model from: ${source}`)
   } catch (error) {
     console.error('Error loading model/texture:', error)
 
@@ -380,4 +421,98 @@ export const useThreeJS = (
   }, [setupCallback])
 
   return { containerRef }
+}
+
+function getNamedTextObjects<TNamedObjects extends readonly string[]>(
+  names: TNamedObjects,
+  model: THREE.Group<THREE.Object3DEventMap>
+): { [K in keyof TNamedObjects]: THREE.Object3D | null } {
+  let namedObjects = Array(names.length).fill(null) as (THREE.Object3D | null)[]
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i]
+    const obj = model.getObjectByName(name)
+    if (obj) {
+      namedObjects[i] = obj
+    }
+  }
+
+  return namedObjects as { [K in keyof TNamedObjects]: THREE.Object3D | null }
+}
+
+function createTextureForObject(object: THREE.Object3D, text: string) {
+  const box = new THREE.Box3().setFromObject(object)
+  const size = box.getSize(new THREE.Vector3())
+
+  const canvas = document.createElement('canvas')
+  const canvasWidth = 512 // Base canvas width
+  const canvasHeight = Math.floor(canvasWidth * (size.y / size.x)) // Maintain aspect ratio
+
+  canvas.width = canvasWidth
+  canvas.height = canvasHeight
+
+  // Get canvas context and set up text rendering
+  const context = canvas.getContext('2d')
+
+  if (!context) {
+    throw new Error(`Could not get 2D context for text "${text}"`)
+  }
+
+  // Clear canvas
+  context.clearRect(0, 0, canvas.width, canvas.height)
+
+  // Optional: fill background (can be transparent)
+  context.fillStyle = 'rgba(0, 0, 0, 0.5)'
+  context.fillRect(0, 0, canvas.width, canvas.height)
+
+  // Set text properties
+  context.fillStyle = 'white'
+
+  // Calculate font size based on canvas dimensions
+  // Adjust the divisor to control text size relative to canvas
+  const fontSize = Math.floor(canvasWidth / 5)
+  context.font = `bold ${fontSize}px Arial`
+
+  // Center text
+  context.textAlign = 'center'
+  context.textBaseline = 'middle'
+  context.fillText(text, canvas.width / 2, canvas.height / 2)
+
+  // Debug info - draw canvas border
+  context.strokeStyle = 'red'
+  context.lineWidth = 4
+  context.strokeRect(0, 0, canvas.width, canvas.height)
+
+  // Debug info - draw center point
+  context.fillStyle = 'red'
+  context.beginPath()
+  context.arc(canvas.width / 2, canvas.height / 2, 5, 0, Math.PI * 2)
+  context.fill()
+
+  // Create texture from canvas
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.needsUpdate = true
+
+  // Create a plane geometry sized to match the named object
+  const textPlane = new THREE.PlaneGeometry(20, 10)
+  const textMaterial = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    side: THREE.DoubleSide,
+    depthWrite: false, // Prevents z-fighting
+  })
+
+  const textMesh = new THREE.Mesh(textPlane, textMaterial)
+
+  // Position the text slightly in front of the object
+  // Adjust the z-offset as needed to prevent z-fighting
+  textMesh.position.set(0, 0, 0.01)
+  textMesh.rotation.set(0, 0, 0) // Rotate 180 degrees to face the camera
+
+  console.log('canvasWidth', canvasWidth)
+  console.log('canvasHeight', canvasHeight)
+  console.log('size', size)
+  console.log('text', text)
+  console.log('fontSize', fontSize)
+
+  return textMesh
 }
