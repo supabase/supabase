@@ -10,6 +10,7 @@ import { CRTShader } from './crt-shader'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { coloredTextureMaterial } from './colored-texture-shader'
 
 /**
  * Helper to simplifies controlling requestAnimationFrame
@@ -253,15 +254,16 @@ export const createTicketMesh = async (
       const model = await loadGLTFModel(source)
       const ticketTexture = options.ticketTextureSource ? await loadTexture(options.ticketTextureSource) : null
 
+
       if(ticketTexture) {
         const ticket = model.getObjectByName('ticket')
         if (ticket instanceof THREE.Mesh) {
-          ticket.material = new THREE.MeshBasicMaterial({
-            map: ticketTexture,
-            side: THREE.DoubleSide,
-            transparent: true,
-            depthWrite: false,
-          })
+          // Store the original material properties
+          const newMaterial = new THREE.ShaderMaterial(coloredTextureMaterial)
+          newMaterial.uniforms.myTexture.value = ticketTexture
+
+          ticket.material = newMaterial
+
         }
       }
 
