@@ -5,8 +5,8 @@ CERTS_DIR="./certs"
 mkdir -p "$CERTS_DIR"
 
 # Define cert and key file paths
-CERT_FILE="$CERTS_DIR/mailpit-cert.pem"
-KEY_FILE="$CERTS_DIR/mailpit-key.pem"
+CERT_FILE="$CERTS_DIR/cert.pem"
+KEY_FILE="$CERTS_DIR/key.pem"
 
 # Generate the self-signed certificate
 openssl req -x509 -newkey rsa:4096 -keyout "$KEY_FILE" -out "$CERT_FILE" -days 365 -nodes \
