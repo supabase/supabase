@@ -65,6 +65,7 @@
     "typescript": "~5.5.0",
     "unified": "^11.0.5",
     "vfile": "^6.0.3",
+    "vite": "^6.0.0",
     "vitest": "^3.0.0"
   },
   "peerDependencies": {
