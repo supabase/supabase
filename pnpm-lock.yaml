@@ -1853,7 +1853,7 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0
       lodash:
-        specifier: '*'
+        specifier: ^4.17.21
         version: 4.17.21
       lucide-react:
         specifier: '*'
