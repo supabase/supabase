@@ -12,7 +12,7 @@
       - [Shared components](#shared-components)
       - [Installing packages](#installing-packages)
   - [Running Docker for Supabase Studio](#running-docker-for-supabase-studio)
-    - [Prerequsites](#prerequsites)
+    - [Prerequisites](#prerequisites)
     - [Get Started](#get-started)
   - [Create a pull request](#create-a-pull-request)
   - [Issue assignment](#issue-assignment)
@@ -129,7 +129,7 @@ For example:
 
 To run Studio locally, you'll need to setup Docker in addition to your NextJS frontend.
 
-#### Prerequsites
+#### Prerequisites
 
 First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
 

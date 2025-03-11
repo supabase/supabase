@@ -246,7 +246,7 @@ const ActiveDot = (errorArray: any[], warningArray: any[]) => {
   return (
     <div
       className={cn(
-        'absolute flex h-2 w-2 left-[18px] group-data-[state=expanded]:left-[20px] top-2 z-10 rounded-full',
+        'absolute pointer-events-none flex h-2 w-2 left-[18px] group-data-[state=expanded]:left-[20px] top-2 z-10 rounded-full',
         errorArray.length > 0
           ? 'bg-destructive-600'
           : warningArray.length > 0

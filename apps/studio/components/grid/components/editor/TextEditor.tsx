@@ -43,7 +43,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
 
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
   const rawValue = row[column.key as keyof TRow] as unknown
-  const initialValue = rawValue ? String(rawValue) : null
+  const initialValue = rawValue || rawValue === '' ? String(rawValue) : null
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(initialValue)
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
