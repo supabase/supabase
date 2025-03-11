@@ -304,10 +304,15 @@ export const createTicketMesh = async (
             const wireframe = new THREE.WireframeGeometry(child.geometry)
             const line = new THREE.LineSegments(wireframe)
             line.material = new THREE.LineBasicMaterial({ color: 0x00ffff })
-            line.position.copy(child.position)
-            line.rotation.copy(child.rotation)
-            line.scale.copy(child.scale)
-            model.add(line)
+            
+            // Instead of adding to the model, add directly to the child mesh
+            // This prevents double transformation
+            child.add(line)
+            
+            // Reset position, rotation, and scale to match the parent mesh exactly
+            line.position.set(0, 0, 0)
+            line.rotation.set(0, 0, 0)
+            line.scale.set(1, 1, 1)
 
             if(!child.name) {
               console.log('Debug: Mesh has no name', child)
