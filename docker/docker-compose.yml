@@ -82,7 +82,8 @@ services:
     image: supabase/gotrue:v2.169.0
     restart: unless-stopped
     volumes:
-      - ./certs/cert.pem:/tmp/cert.pem:rw
+      - ./certs/cert.pem:/etc/ssl/certs/cert.pem:ro
+      - ./certs/cert.key:/etc/ssl/private/cert.key:ro
     healthcheck:
       test:
         [
@@ -161,12 +162,6 @@ services:
       # GOTRUE_HOOK_SEND_EMAIL_ENABLED: "false"
       # GOTRUE_HOOK_SEND_EMAIL_URI: "http://host.docker.internal:54321/functions/v1/email_sender"
       # GOTRUE_HOOK_SEND_EMAIL_SECRETS: "v1,whsec_VGhpcyBpcyBhbiBleGFtcGxlIG9mIGEgc2hvcnRlciBCYXNlNjQgc3RyaW5n"
-    command: 
-      [
-        "sh",
-        "-c",
-        "mkdir -p /tmp/ssl/certs && cp /tmp/cert.pem /tmp/ssl/certs/cert.pem && cat /tmp/ssl/certs/cert.pem >> /tmp/ca-certificates.crt && exec auth"
-      ]
 
   rest:
     container_name: supabase-rest
