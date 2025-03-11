@@ -232,9 +232,9 @@ export const loadGLTFModel = (url: string): Promise<THREE.Group> => {
 export const createTicketMesh = async (
   source: string,
   options: {
+    ticketTextureSource?: string
     width?: number
     height?: number
-    forceTextureMode?: boolean
     enhanceEmissive?: boolean
     debug?: boolean
     materialOptions?: {
@@ -246,18 +246,26 @@ export const createTicketMesh = async (
   } = {}
 ): Promise<THREE.Object3D> => {
   try {
-    // const width = options.width || 4
-    // const height = options.height || 2
-    //
-    // Determine if we should use texture mode
-    const useTextureMode =
-      options.forceTextureMode || !(source.endsWith('.glb') || source.endsWith('.gltf'))
+    const useTextureMode = !(source.endsWith('.glb') || source.endsWith('.gltf'))
 
     if (!useTextureMode) {
       // Load the GLTF model
       const model = await loadGLTFModel(source)
+      const ticketTexture = options.ticketTextureSource ? await loadTexture(options.ticketTextureSource) : null
 
-      const objectsNames = ['planet', 'name', 'time', 'date'] as const
+      if(ticketTexture) {
+        const ticket = model.getObjectByName('ticket')
+        if (ticket instanceof THREE.Mesh) {
+          ticket.material = new THREE.MeshBasicMaterial({
+            map: ticketTexture,
+            side: THREE.DoubleSide,
+            transparent: true,
+            depthWrite: false,
+          })
+        }
+      }
+
+      const objectsNames = ['planet', 'name', 'time', 'date', 'spicies', 'number'] as const
       const namedObjects = getNamedTextObjects(objectsNames, model)
       const textures = {} as {
         [key in (typeof objectsNames)[number]]?: ReturnType<typeof createTextureForObject>
@@ -287,6 +295,14 @@ export const createTicketMesh = async (
 
           case 'date':
             text = '03/24/2025'
+            break
+
+          case 'spicies':
+            text = 'Modern human'
+            break
+
+          case 'number':
+            text = 'A001'
             break
 
           default:
@@ -382,31 +398,6 @@ export const createTicketMesh = async (
 
     return new THREE.Mesh(geometry, material)
   }
-}
-
-/**
- * Helper function to create a ticket mesh specifically from a texture
- * @param textureUrl URL of the texture to use for the ticket
- * @param options Configuration options for the ticket
- * @returns Promise that resolves with the created mesh
- */
-export const createTextureTicketMesh = async (
-  textureUrl: string,
-  options: {
-    width?: number
-    height?: number
-    materialOptions?: {
-      transparent?: boolean
-      emissiveColor?: THREE.Color | number
-      emissiveIntensity?: number
-      color?: THREE.Color | number
-    }
-  } = {}
-): Promise<THREE.Mesh> => {
-  return createTicketMesh(textureUrl, {
-    ...options,
-    forceTextureMode: true,
-  }) as Promise<THREE.Mesh>
 }
 
 /**

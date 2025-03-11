@@ -79,10 +79,12 @@ const LwCanvas = ({ className }: { className?: string }) => {
     // Load the ticket texture and create the actual ticket mesh
     // Replace this URL with your actual ticket texture
     const ticketScene = '/images/launchweek/14/supabase-ticket.glb'
+    const ticketStaticTexture = '/images/launchweek/14/supabase-static-ticket.png'
 
     createTicketMesh(ticketScene, {
       width: planeGeometrySize[0],
       height: planeGeometrySize[1],
+      ticketTextureSource: ticketStaticTexture,
       debug
     })
       .then((ticketModel) => {
@@ -160,15 +162,6 @@ const LwCanvas = ({ className }: { className?: string }) => {
     const animate = (time?: number) => {
       const currentTime = time || 0
 
-      // if (ticket) {
-      //   // Add very subtle floating animation with reduced amplitude
-      //   // Smoothly interpolate current position toward target (mouse) position
-      //   const lerpFactor = 0.05 // Lower value = smoother/slower follow
-      //
-      //   ticket.position.y +=
-      //     (targetY - ticket.position.y) * lerpFactor + Math.sin(currentTime * 0.0007) * 0.02
-      // }
-      //
       // Update CRT shader time uniform for animation effects
       if (crtPass) {
         crtPass.uniforms.time.value = currentTime
