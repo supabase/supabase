@@ -214,7 +214,9 @@ export const loadGLTFModel = (url: string): Promise<THREE.Group> => {
     const loader = new GLTFLoader()
     loader.load(
       url,
-      (gltf) => resolve(gltf.scene),
+      (gltf) => {
+        resolve(gltf.scene)
+      },
       undefined,
       (error) => reject(error)
     )
@@ -254,7 +256,8 @@ export const createTicketMesh = async (
     if (!useTextureMode) {
       // Load the GLTF model
       const model = await loadGLTFModel(source)
-      const objectsNames = ['planet'] as const
+
+      const objectsNames = ['planet', 'name', 'time', 'date'] as const
       const namedObjects = getNamedTextObjects(objectsNames, model)
       const textures = {} as {
         [key in (typeof objectsNames)[number]]?: ReturnType<typeof createTextureForObject>
@@ -274,13 +277,24 @@ export const createTicketMesh = async (
           case 'planet':
             text = 'Earth'
             break
+          case 'name':
+            text = 'John Doe'
+            break
+
+          case 'time':
+            text = '00:12:00'
+            break
+
+          case 'date':
+            text = '03/24/2025'
+            break
+
           default:
             objectName satisfies never
         }
 
-        const texture = createTextureForObject(namedObject, text)
-        textures[objectName] = texture
-        namedObject.add(texture)
+        const meshWithTexture = createTextureForObject(namedObject, text)
+        textures[objectName] = meshWithTexture
       }
 
       // Calculate scale to fit the model within the specified width and height
@@ -304,17 +318,17 @@ export const createTicketMesh = async (
             const wireframe = new THREE.WireframeGeometry(child.geometry)
             const line = new THREE.LineSegments(wireframe)
             line.material = new THREE.LineBasicMaterial({ color: 0x00ffff })
-            
+
             // Instead of adding to the model, add directly to the child mesh
             // This prevents double transformation
             child.add(line)
-            
+
             // Reset position, rotation, and scale to match the parent mesh exactly
             line.position.set(0, 0, 0)
             line.rotation.set(0, 0, 0)
             line.scale.set(1, 1, 1)
 
-            if(!child.name) {
+            if (!child.name) {
               console.log('Debug: Mesh has no name', child)
             }
 
@@ -351,7 +365,7 @@ export const createTicketMesh = async (
       }
 
       return model
-    } 
+    }
     throw new Error(`Failed to load model from: ${source}`)
   } catch (error) {
     console.error('Error loading model/texture:', error)
@@ -445,12 +459,26 @@ function getNamedTextObjects<TNamedObjects extends readonly string[]>(
 }
 
 function createTextureForObject(object: THREE.Object3D, text: string) {
-  const box = new THREE.Box3().setFromObject(object)
-  const size = box.getSize(new THREE.Vector3())
+  // Update matrix in case object has moved
+  object.updateWorldMatrix(true, true)
+
+  const localBox = new THREE.Box3().setFromObject(object)
+  const localSize = localBox.getSize(new THREE.Vector3())
+
+  // Get world scale
+  const worldScale = new THREE.Vector3()
+  object.matrixWorld.decompose(new THREE.Vector3(), new THREE.Quaternion(), worldScale)
+
+  // Apply world scale to get world size. Spline by default exports models with 0.01 scale
+  const worldSize = new THREE.Vector3(
+    localSize.x / Math.abs(worldScale.x),
+    localSize.y / Math.abs(worldScale.y),
+    localSize.z / Math.abs(worldScale.z)
+  )
 
   const canvas = document.createElement('canvas')
-  const canvasWidth = 512 // Base canvas width
-  const canvasHeight = Math.floor(canvasWidth * (size.y / size.x)) // Maintain aspect ratio
+  const canvasWidth = worldSize.x // Base canvas width
+  const canvasHeight = Math.floor(canvasWidth * (localSize.y / localSize.x)) // Maintain aspect ratio
 
   canvas.width = canvasWidth
   canvas.height = canvasHeight
@@ -465,40 +493,25 @@ function createTextureForObject(object: THREE.Object3D, text: string) {
   // Clear canvas
   context.clearRect(0, 0, canvas.width, canvas.height)
 
-  // Optional: fill background (can be transparent)
-  context.fillStyle = 'rgba(0, 0, 0, 0.5)'
-  context.fillRect(0, 0, canvas.width, canvas.height)
-
   // Set text properties
-  context.fillStyle = 'white'
+  context.fillStyle = 'black'
 
   // Calculate font size based on canvas dimensions
   // Adjust the divisor to control text size relative to canvas
-  const fontSize = Math.floor(canvasWidth / 5)
+  const fontSize = Math.floor(canvasHeight)
   context.font = `bold ${fontSize}px Arial`
 
   // Center text
-  context.textAlign = 'center'
+  context.textAlign = 'left'
   context.textBaseline = 'middle'
-  context.fillText(text, canvas.width / 2, canvas.height / 2)
-
-  // Debug info - draw canvas border
-  context.strokeStyle = 'red'
-  context.lineWidth = 4
-  context.strokeRect(0, 0, canvas.width, canvas.height)
-
-  // Debug info - draw center point
-  context.fillStyle = 'red'
-  context.beginPath()
-  context.arc(canvas.width / 2, canvas.height / 2, 5, 0, Math.PI * 2)
-  context.fill()
+  context.fillText(text, 0, canvas.height / 2)
 
   // Create texture from canvas
   const texture = new THREE.CanvasTexture(canvas)
   texture.needsUpdate = true
 
   // Create a plane geometry sized to match the named object
-  const textPlane = new THREE.PlaneGeometry(20, 10)
+  const textPlane = new THREE.PlaneGeometry(worldSize.x, worldSize.y)
   const textMaterial = new THREE.MeshBasicMaterial({
     map: texture,
     transparent: true,
@@ -508,16 +521,12 @@ function createTextureForObject(object: THREE.Object3D, text: string) {
 
   const textMesh = new THREE.Mesh(textPlane, textMaterial)
 
+  object.add(textMesh)
+
   // Position the text slightly in front of the object
   // Adjust the z-offset as needed to prevent z-fighting
-  textMesh.position.set(0, 0, 0.01)
-  textMesh.rotation.set(0, 0, 0) // Rotate 180 degrees to face the camera
-
-  console.log('canvasWidth', canvasWidth)
-  console.log('canvasHeight', canvasHeight)
-  console.log('size', size)
-  console.log('text', text)
-  console.log('fontSize', fontSize)
+  // Offset position to align top-left corner instead of center
+  textMesh.position.set(worldSize.x / 2, -worldSize.y / 2, 0.01)
 
   return textMesh
 }

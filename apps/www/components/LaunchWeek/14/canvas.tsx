@@ -1,32 +1,42 @@
 import * as THREE from 'three'
 import { cn } from 'ui'
 import { createThreeSetup, useThreeJS, createTicketMesh } from './helpers'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 const LwCanvas = ({ className }: { className?: string }) => {
   const { containerRef } = useThreeJS((container) => {
     // Create scene with postprocessing effects
-    const { scene, camera, renderer, composer, resize, crtPass, glitchPass } = createThreeSetup(
-      container,
-      {
-        cameraPosition: new THREE.Vector3(0, 0, 5),
-        postprocessing: {
-          bloom: {
-            enabled: true,
-            strength: 0.25,
-            radius: 0.7,
-            threshold: 0.2,
-          },
-          glitch: {
-            enabled: true,
-            dtSize: 512, // Increase detail size for less frequent glitches
-            colS: 0,
-          },
-          crt: {
-            enabled: true,
-          },
+    const {
+      scene,
+      camera,
+      renderer,
+      composer,
+      resize,
+      crtPass,
+      glitchPass,
+      stats,
+      debug,
+      orbitControls,
+    } = createThreeSetup(container, {
+      cameraPosition: new THREE.Vector3(0, 0, 5),
+      debug: true,
+      postprocessing: {
+        bloom: {
+          enabled: true,
+          strength: 0.25,
+          radius: 0.7,
+          threshold: 0.2,
         },
-      }
-    )
+        glitch: {
+          enabled: true,
+          dtSize: 512, // Increase detail size for less frequent glitches
+          colS: 0,
+        },
+        crt: {
+          enabled: true,
+        },
+      },
+    })
 
     // Set renderer clear color to make background visible
     renderer.setClearColor(0x000000, 0.1)
@@ -68,11 +78,12 @@ const LwCanvas = ({ className }: { className?: string }) => {
 
     // Load the ticket texture and create the actual ticket mesh
     // Replace this URL with your actual ticket texture
-    const ticketScene = '/images/launchweek/14/ticket-supabase-positioned.gltf'
+    const ticketScene = '/images/launchweek/14/supabase-ticket.glb'
 
     createTicketMesh(ticketScene, {
       width: planeGeometrySize[0],
       height: planeGeometrySize[1],
+      debug
     })
       .then((ticketModel) => {
         // Remove placeholder and add the actual ticket model
@@ -149,14 +160,15 @@ const LwCanvas = ({ className }: { className?: string }) => {
     const animate = (time?: number) => {
       const currentTime = time || 0
 
-      if (ticket) {
-        // Add very subtle floating animation with reduced amplitude
-        // Smoothly interpolate current position toward target (mouse) position
-        const lerpFactor = 0.05 // Lower value = smoother/slower follow
-
-        ticket.position.y += (targetY - ticket.position.y) * lerpFactor + (Math.sin(currentTime * 0.0007) * 0.02)
-      }
-
+      // if (ticket) {
+      //   // Add very subtle floating animation with reduced amplitude
+      //   // Smoothly interpolate current position toward target (mouse) position
+      //   const lerpFactor = 0.05 // Lower value = smoother/slower follow
+      //
+      //   ticket.position.y +=
+      //     (targetY - ticket.position.y) * lerpFactor + Math.sin(currentTime * 0.0007) * 0.02
+      // }
+      //
       // Update CRT shader time uniform for animation effects
       if (crtPass) {
         crtPass.uniforms.time.value = currentTime
@@ -173,13 +185,29 @@ const LwCanvas = ({ className }: { className?: string }) => {
         }
       }
 
+      if (stats.instance) {
+        stats.instance.begin()
+      }
+
+      if (orbitControls.instance) {
+        // Update controls in animation loop
+        orbitControls.instance.update()
+      }
+
       // Render with post-processing
       composer.render()
+
+      if (stats.instance) {
+        stats.instance.end()
+      }
     }
 
     // Cleanup function
     const cleanup = () => {
       window.removeEventListener('resize', resize)
+
+      // Your existing cleanup code...
+      orbitControls.instance?.dispose() // Dispose controls on cleanup
 
       // Dispose of all resources
       scene.traverse((object) => {
