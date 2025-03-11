@@ -151,18 +151,9 @@ const LwCanvas = ({ className }: { className?: string }) => {
 
       if (ticket) {
         // Add very subtle floating animation with reduced amplitude
-        // const floatingX = Math.sin(currentTime * 0.0003) * 0.01
-        const floatingY = Math.sin(currentTime * 0.0005) * 0.005
-
         // Smoothly interpolate current position toward target (mouse) position
         const lerpFactor = 0.05 // Lower value = smoother/slower follow
 
-        // // Combine floating animation with mouse following
-        // ticket.rotation.y = floatingX + (targetX * 0.2)
-        // ticket.rotation.x = floatingY + (targetY * -0.2)
-
-        // Smoothly move ticket position toward target with easing
-        // ticket.position.x += (targetX - ticket.position.x) * lerpFactor
         ticket.position.y += (targetY - ticket.position.y) * lerpFactor + (Math.sin(currentTime * 0.0007) * 0.02)
       }
 
