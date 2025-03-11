@@ -2,9 +2,12 @@ import * as THREE from 'three'
 import { cn } from 'ui'
 import { createThreeSetup, useThreeJS, createTicketMesh } from './helpers'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { useCallback, useRef, useState } from 'react'
 
 const LwCanvas = ({ className }: { className?: string }) => {
-  const { containerRef } = useThreeJS((container) => {
+  const secretRef = useRef(false)
+
+  const setup = useCallback((container: HTMLElement) => {
     // Create scene with postprocessing effects
     const {
       scene,
@@ -14,12 +17,13 @@ const LwCanvas = ({ className }: { className?: string }) => {
       resize,
       crtPass,
       glitchPass,
+      bloomPass,
       stats,
       debug,
       orbitControls,
     } = createThreeSetup(container, {
       cameraPosition: new THREE.Vector3(0, 0, 5),
-      debug: true,
+      debug: false,
       postprocessing: {
         bloom: {
           enabled: true,
@@ -39,10 +43,7 @@ const LwCanvas = ({ className }: { className?: string }) => {
     })
 
     // Set renderer clear color to make background visible
-    renderer.setClearColor(0x000000, 0.1)
-
-    // Set renderer clear color to make background visible
-    renderer.setClearColor(0x000000, 0.1)
+    renderer.setClearColor(0x000000, 0)
 
     // Add ambient light with increased intensity
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.0)
@@ -85,7 +86,7 @@ const LwCanvas = ({ className }: { className?: string }) => {
       width: planeGeometrySize[0],
       height: planeGeometrySize[1],
       ticketTextureSource: ticketStaticTexture,
-      debug
+      debug,
     })
       .then((ticketModel) => {
         // Remove placeholder and add the actual ticket model
@@ -165,6 +166,15 @@ const LwCanvas = ({ className }: { className?: string }) => {
       // Update CRT shader time uniform for animation effects
       if (crtPass) {
         crtPass.uniforms.time.value = currentTime
+        crtPass.enabled = secretRef.current
+      }
+
+      if(glitchPass) {
+        glitchPass.enabled = secretRef.current
+      }
+
+      if(bloomPass) {
+        bloomPass.enabled = secretRef.current
       }
 
       // Gradually decay mouse intensity when not moving
@@ -222,17 +232,29 @@ const LwCanvas = ({ className }: { className?: string }) => {
     }
 
     return { cleanup, animate }
-  })
+  }, [])
+
+  const { containerRef } = useThreeJS(setup)
+
 
   return (
-    <div
-      className={cn(
-        'w-screen absolute inset-0 h-[600px] lg:min-h-full lg:max-h-[1000px] flex justify-center items-center overflow-hidden pointer-events-none',
-        className
-      )}
-    >
-      <div ref={containerRef} className="w-full lg:h-full" />
-    </div>
+    <>
+      <div
+        className={cn(
+          'w-screen absolute inset-0 h-[600px] lg:min-h-full lg:max-h-[1000px] flex justify-center items-center overflow-hidden pointer-events-none',
+          className
+        )}
+      >
+        <div ref={containerRef} className="w-full lg:h-full" />
+      </div>
+
+      <button
+        className="absolute top-4 right-4 bg-white text-black p-2 rounded-md shadow-md z-20 hover:bg-gray-200 cursor-pointer"
+        onClick={() => secretRef.current = !secretRef.current}
+      >
+        Toggle secret
+      </button>
+    </>
   )
 }
 

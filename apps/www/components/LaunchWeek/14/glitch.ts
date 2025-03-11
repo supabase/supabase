@@ -95,6 +95,10 @@ class GlitchPass extends Pass {
     this.intensity = amount
   }
 
+  enable(value: boolean) {
+    this.uniforms['byp'].value = value ? 0 : 1
+  }
+
   dispose() {
     this.material.dispose()
 
