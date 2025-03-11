@@ -47,7 +47,7 @@ export const useThreeAnimation = (callback: (time?: number) => void) => {
 export const createThreeSetup = (
   container: HTMLElement,
   options: {
-    cameraPosition?: THREE.Vector3
+    sceneUrl: string,
     postprocessing?: {
       bloom?: {
         enabled: boolean
@@ -64,7 +64,7 @@ export const createThreeSetup = (
         enabled: boolean
       }
     }
-  } = {}
+  }
 ) => {
   // Create scene
   const scene = new THREE.Scene()
@@ -76,7 +76,7 @@ export const createThreeSetup = (
     0.1,
     1000
   )
-  camera.position.copy(options.cameraPosition || new THREE.Vector3(0, 0, 5))
+  camera.position.copy(new THREE.Vector3(0, 0, 5))
 
   // Create renderer
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
