@@ -47,7 +47,7 @@ export const useThreeAnimation = (callback: (time?: number) => void) => {
 export const createThreeSetup = (
   container: HTMLElement,
   options: {
-    sceneUrl: string,
+    cameraPosition?: THREE.Vector3,
     postprocessing?: {
       bloom?: {
         enabled: boolean
@@ -64,7 +64,7 @@ export const createThreeSetup = (
         enabled: boolean
       }
     }
-  }
+  } = {}
 ) => {
   // Create scene
   const scene = new THREE.Scene()
@@ -76,7 +76,7 @@ export const createThreeSetup = (
     0.1,
     1000
   )
-  camera.position.copy(new THREE.Vector3(0, 0, 5))
+  camera.position.copy(options.cameraPosition || new THREE.Vector3(0, 0, 5))
 
   // Create renderer
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
@@ -188,6 +188,7 @@ export const createTicketMesh = async (
     width?: number
     height?: number
     forceTextureMode?: boolean
+    enhanceEmissive?: boolean
     materialOptions?: {
       transparent?: boolean
       emissiveColor?: THREE.Color | number
@@ -225,26 +226,29 @@ export const createTicketMesh = async (
       const center = box.getCenter(new THREE.Vector3())
       model.position.sub(center)
       
-      // Add emissive material to all meshes in the model for better visibility with CRT effect
-      model.traverse((child) => {
-        if (child instanceof THREE.Mesh && child.material) {
-          if (Array.isArray(child.material)) {
-            child.material.forEach(mat => {
-              if (mat instanceof THREE.MeshStandardMaterial) {
-                mat.emissive = options.materialOptions?.emissiveColor 
-                  ? new THREE.Color(options.materialOptions.emissiveColor) 
-                  : new THREE.Color(0xffffff)
-                mat.emissiveIntensity = options.materialOptions?.emissiveIntensity ?? 0.2
-              }
-            })
-          } else if (child.material instanceof THREE.MeshStandardMaterial) {
-            child.material.emissive = options.materialOptions?.emissiveColor 
-              ? new THREE.Color(options.materialOptions.emissiveColor) 
-              : new THREE.Color(0xffffff)
-            child.material.emissiveIntensity = options.materialOptions?.emissiveIntensity ?? 0.2
+      // Only enhance emissive properties if explicitly requested
+      // This respects the original GLTF materials by default
+      if (options.enhanceEmissive) {
+        model.traverse((child) => {
+          if (child instanceof THREE.Mesh && child.material) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach(mat => {
+                if (mat instanceof THREE.MeshStandardMaterial) {
+                  mat.emissive = options.materialOptions?.emissiveColor 
+                    ? new THREE.Color(options.materialOptions.emissiveColor) 
+                    : new THREE.Color(0xffffff)
+                  mat.emissiveIntensity = options.materialOptions?.emissiveIntensity ?? 0.2
+                }
+              })
+            } else if (child.material instanceof THREE.MeshStandardMaterial) {
+              child.material.emissive = options.materialOptions?.emissiveColor 
+                ? new THREE.Color(options.materialOptions.emissiveColor) 
+                : new THREE.Color(0xffffff)
+              child.material.emissiveIntensity = options.materialOptions?.emissiveIntensity ?? 0.2
+            }
           }
-        }
-      })
+        })
+      }
       
       return model
     } else {
@@ -346,4 +350,3 @@ export const useThreeJS = (
   
   return { containerRef }
 }
-
