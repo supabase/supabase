@@ -7,13 +7,15 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { GlitchPass } from './glitch'
 import { CRTShader } from './crt-shader'
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 
 /**
- * Custom hook for managing requestAnimationFrame
+ * Helper to simplifies controlling requestAnimationFrame
  * @param callback Animation callback function
  * @returns Object with start and stop functions
  */
-export const useThreeAnimation = (callback: (time?: number) => void) => {
+export const createThreeAnimation = (callback: (time?: number) => void) => {
   const requestRef = { current: undefined } as { current: number | undefined }
   const previousTimeRef = { current: undefined } as { current: number | undefined }
 
@@ -47,7 +49,7 @@ export const useThreeAnimation = (callback: (time?: number) => void) => {
 export const createThreeSetup = (
   container: HTMLElement,
   options: {
-    cameraPosition?: THREE.Vector3,
+    cameraPosition?: THREE.Vector3
     postprocessing?: {
       bloom?: {
         enabled: boolean
@@ -200,88 +202,114 @@ export const createTicketMesh = async (
   try {
     const width = options.width || 4
     const height = options.height || 2
-    
+
     // Determine if we should use texture mode
-    const useTextureMode = options.forceTextureMode || 
-      !(source.endsWith('.glb') || source.endsWith('.gltf'))
-    
+    const useTextureMode =
+      options.forceTextureMode || !(source.endsWith('.glb') || source.endsWith('.gltf'))
+
     if (!useTextureMode) {
       // Load the GLTF model
       const model = await loadGLTFModel(source)
-      
+
+      const namedObject = model.getObjectByName('planetName')
+
+      const boxHelper = new THREE.BoxHelper(namedObject, 0xff0000) // Red outline
+      model.add(boxHelper) // Add to the model so it moves with it
+
+      const fontLoader = new FontLoader()
+
+      fontLoader.load('/images/launchweek/13/ticket/SourceCodePro_Regular.json', function (font) {
+        const textGeometry = new TextGeometry('Earth', {
+          font: font,
+          size: 96,
+          depth: 0.05,
+        })
+
+        const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff })
+        const textMesh = new THREE.Mesh(textGeometry, textMaterial)
+
+        // Add text as child of your named object
+        if (namedObject) namedObject.add(textMesh)
+        else console.error('Named object not found')
+
+        // Position relative to parent
+        textMesh.position.set(0, 0, 0.01) // Slight offset to avoid z-fighting
+      })
+
       // Calculate scale to fit the model within the specified width and height
       const box = new THREE.Box3().setFromObject(model)
       const size = box.getSize(new THREE.Vector3())
-      
+
       // Calculate scale factors to fit the model within the specified dimensions
       const scaleX = width / size.x
       const scaleY = height / size.y
       const scale = Math.min(scaleX, scaleY)
-      
+
       // Apply the scale
       model.scale.set(scale, scale, scale)
-      
+
       // Center the model
       box.setFromObject(model)
       const center = box.getCenter(new THREE.Vector3())
       model.position.sub(center)
-      
+
       // Only enhance emissive properties if explicitly requested
       // This respects the original GLTF materials by default
       if (options.enhanceEmissive) {
         model.traverse((child) => {
           if (child instanceof THREE.Mesh && child.material) {
             if (Array.isArray(child.material)) {
-              child.material.forEach(mat => {
+              child.material.forEach((mat) => {
                 if (mat instanceof THREE.MeshStandardMaterial) {
-                  mat.emissive = options.materialOptions?.emissiveColor 
-                    ? new THREE.Color(options.materialOptions.emissiveColor) 
+                  mat.emissive = options.materialOptions?.emissiveColor
+                    ? new THREE.Color(options.materialOptions.emissiveColor)
                     : new THREE.Color(0xffffff)
                   mat.emissiveIntensity = options.materialOptions?.emissiveIntensity ?? 0.2
                 }
               })
             } else if (child.material instanceof THREE.MeshStandardMaterial) {
-              child.material.emissive = options.materialOptions?.emissiveColor 
-                ? new THREE.Color(options.materialOptions.emissiveColor) 
+              child.material.emissive = options.materialOptions?.emissiveColor
+                ? new THREE.Color(options.materialOptions.emissiveColor)
                 : new THREE.Color(0xffffff)
               child.material.emissiveIntensity = options.materialOptions?.emissiveIntensity ?? 0.2
             }
           }
         })
       }
-      
+
       return model
     } else {
       // Load as a texture
       const texture = await loadTexture(source)
-      
+
       // Create a plane geometry for the ticket
       const geometry = new THREE.PlaneGeometry(width, height)
-      
+
       // Create a material with the loaded texture
       const material = new THREE.MeshStandardMaterial({
         map: texture,
-        transparent: options.materialOptions?.transparent !== undefined 
-          ? options.materialOptions.transparent 
-          : true,
+        transparent:
+          options.materialOptions?.transparent !== undefined
+            ? options.materialOptions.transparent
+            : true,
         side: THREE.DoubleSide,
-        emissive: options.materialOptions?.emissiveColor 
-          ? new THREE.Color(options.materialOptions.emissiveColor) 
+        emissive: options.materialOptions?.emissiveColor
+          ? new THREE.Color(options.materialOptions.emissiveColor)
           : new THREE.Color(0xffffff),
         emissiveIntensity: options.materialOptions?.emissiveIntensity ?? 0.2,
-        color: options.materialOptions?.color 
-          ? new THREE.Color(options.materialOptions.color) 
+        color: options.materialOptions?.color
+          ? new THREE.Color(options.materialOptions.color)
           : new THREE.Color(0xffffff),
       })
-      
+
       // Create the mesh
       const mesh = new THREE.Mesh(geometry, material)
-      
+
       return mesh
     }
   } catch (error) {
     console.error('Error loading model/texture:', error)
-    
+
     // Fallback to a simple plane with a default material if loading fails
     const geometry = new THREE.PlaneGeometry(options.width || 4, options.height || 2)
     const material = new THREE.MeshStandardMaterial({
@@ -291,7 +319,7 @@ export const createTicketMesh = async (
       emissive: new THREE.Color(0xffffff),
       emissiveIntensity: 0.2,
     })
-    
+
     return new THREE.Mesh(geometry, material)
   }
 }
@@ -317,7 +345,7 @@ export const createTextureTicketMesh = async (
 ): Promise<THREE.Mesh> => {
   return createTicketMesh(textureUrl, {
     ...options,
-    forceTextureMode: true
+    forceTextureMode: true,
   }) as Promise<THREE.Mesh>
 }
 
@@ -327,26 +355,29 @@ export const createTextureTicketMesh = async (
  * @returns Object with containerRef
  */
 export const useThreeJS = (
-  setupCallback: (container: HTMLElement) => { cleanup: () => void; animate: (time?: number) => void }
+  setupCallback: (container: HTMLElement) => {
+    cleanup: () => void
+    animate: (time?: number) => void
+  }
 ) => {
   const containerRef = useRef<HTMLDivElement>(null)
-  
+
   useEffect(() => {
     if (!containerRef.current) return
-    
+
     const container = containerRef.current
     const { cleanup, animate } = setupCallback(container)
-    
+
     // Set up animation loop
-    const { start, stop } = useThreeAnimation(animate)
+    const { start, stop } = createThreeAnimation(animate)
     start()
-    
+
     // Cleanup on unmount
     return () => {
       stop()
       cleanup()
     }
   }, [setupCallback])
-  
+
   return { containerRef }
 }

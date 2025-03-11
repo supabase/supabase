@@ -68,9 +68,9 @@ const LwCanvas = ({ className }: { className?: string }) => {
 
     // Load the ticket texture and create the actual ticket mesh
     // Replace this URL with your actual ticket texture
-    const ticketTextureUrl = '/images/launchweek/14/ticket-test.png'
+    const ticketScene = '/images/launchweek/14/ticket-supabase-positioned.gltf'
 
-    createTicketMesh(ticketTextureUrl, {
+    createTicketMesh(ticketScene, {
       width: planeGeometrySize[0],
       height: planeGeometrySize[1],
     })
