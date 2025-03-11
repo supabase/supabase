@@ -37,8 +37,19 @@ export const getIdentity = (gotrueUser: User) => {
  * Transfers the search params from the current location path to a newly built path
  */
 export const buildPathWithParams = (pathname: string) => {
-  const searchParams = new URLSearchParams(location.search)
-  return `${pathname}?${searchParams.toString()}`
+  const [basePath, existingParams] = pathname.split('?', 2)
+
+  const pathnameSearchParams = new URLSearchParams(existingParams || '')
+
+  // Merge the parameters, with pathname parameters taking precedence
+  // over the current location's search parameters
+  const mergedParams = new URLSearchParams(location.search)
+  for (const [key, value] of pathnameSearchParams.entries()) {
+    mergedParams.set(key, value)
+  }
+
+  const queryString = mergedParams.toString()
+  return queryString ? `${basePath}?${queryString}` : basePath
 }
 
 export const getReturnToPath = (fallback = '/projects') => {
@@ -70,5 +81,18 @@ export const getReturnToPath = (fallback = '/projects') => {
     validReturnTo = pattern.test(returnTo) ? fallback : returnTo
   }
 
-  return validReturnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
+  const [path, existingQuery] = validReturnTo.split('?')
+
+  const finalSearchParams = new URLSearchParams(existingQuery || '')
+
+  // Add all remaining search params to the final search params
+  if (remainingSearchParams) {
+    const remainingParams = new URLSearchParams(remainingSearchParams)
+    remainingParams.forEach((value, key) => {
+      finalSearchParams.append(key, value)
+    })
+  }
+
+  const finalQuery = finalSearchParams.toString()
+  return path + (finalQuery ? `?${finalQuery}` : '')
 }

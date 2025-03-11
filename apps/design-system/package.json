@@ -6,8 +6,9 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev --port 3003",
-    "build": "pnpm run content:build && pnpm run build:registry && next build",
+    "build": "pnpm run content:build && pnpm run build:registry && pnpm run build:llms && next build",
     "build:registry": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
+    "build:llms": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-llms-txt.ts",
     "start": "next start",
     "lint": "next lint",
     "content:build": "contentlayer2 build",
