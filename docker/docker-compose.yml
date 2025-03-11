@@ -440,7 +440,7 @@ services:
       RLIMIT_NOFILE: "10000"
     command: [ "/bin/sh", "-c", "/app/bin/migrate && /app/bin/supavisor eval \"$$(cat /etc/pooler/pooler.exs)\" && /app/bin/server" ]
 
-  supabase-mail:
+  mail:
     container_name: supabase-mail
     image: axllent/mailpit:v1.23
     restart: unless-stopped
