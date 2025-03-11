@@ -218,7 +218,7 @@ export const createTicketMesh = async (
 
       const fontLoader = new FontLoader()
 
-      fontLoader.load('/images/launchweek/13/ticket/SourceCodePro_Regular.json', function (font) {
+      fontLoader.load('/images/launchweek/14/Arial_Regular.json', function (font) {
         const textGeometry = new TextGeometry('Earth', {
           font: font,
           size: 96,
