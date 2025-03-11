@@ -282,6 +282,11 @@ export const createTicketMesh = async (
           continue
         }
 
+        if(namedObject instanceof THREE.Mesh) {
+          // Spline exports some objects with additional invalid materials. Clean it up here
+          namedObject.material = new THREE.MeshBasicMaterial({})
+        }
+
         let text = ''
         switch (objectName) {
           case 'planet':
