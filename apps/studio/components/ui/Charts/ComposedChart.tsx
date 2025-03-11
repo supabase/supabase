@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, ComponentProps, useMemo } from 'react'
+import { useState, ComponentProps } from 'react'
 import dayjs from 'dayjs'
 import {
   Area,
@@ -113,27 +113,8 @@ export default function ComposedChart({
   }
 
   const resolvedHighlightedLabel = getHeaderLabel()
-  const resolvedHighlightedValue = useMemo(() => {
-    if (focusDataIndex !== null) {
-      // When hovering over a data point, sum all non-maxValue attributes
-      const dataPoint = data[focusDataIndex]
-      if (!dataPoint) return highlightedValue
-
-      return attributes
-        .filter((attr) => !attr.isMaxValue && !attr.omitFromTotal)
-        .reduce((sum, attr) => sum + (Number(dataPoint[attr.attribute]) || 0), 0)
-    }
-
-    // When not hovering, use the provided highlightedValue or calculate from last data point
-    if (highlightedValue !== undefined) return highlightedValue
-
-    const lastDataPoint = Array.isArray(data) ? data[data.length - 1] : undefined
-    if (!lastDataPoint) return undefined
-
-    return attributes
-      .filter((attr) => !attr.isMaxValue && !attr.omitFromTotal)
-      .reduce((sum, attr) => sum + (Number(lastDataPoint[attr.attribute]) || 0), 0)
-  }, [focusDataIndex, data, attributes, highlightedValue])
+  const resolvedHighlightedValue =
+    focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
 
   const showHighlightActions =
     chartHighlight?.coordinates.left &&
@@ -141,24 +122,6 @@ export default function ComposedChart({
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
   const maxAttribute = attributes.find((a) => a.isMaxValue)
-  const percentage = useMemo(() => {
-    // Only calculate percentage if we have a maxAttribute and a valid highlighted value
-    if (!maxAttribute || resolvedHighlightedValue === undefined) return undefined
-
-    // Get the current max value based on focus
-    const maxValue =
-      focusDataIndex !== null
-        ? data[focusDataIndex]?.[maxAttribute.attribute]
-        : data[data.length - 1]?.[maxAttribute.attribute]
-
-    if (!maxValue || maxValue === 0) return undefined
-
-    // Calculate percentage
-    return typeof resolvedHighlightedValue === 'number' && typeof maxValue === 'number'
-      ? (resolvedHighlightedValue / maxValue) * 100
-      : undefined
-  }, [maxAttribute, resolvedHighlightedValue, focusDataIndex, data])
-
   const maxAttributeData = {
     name: maxAttribute?.attribute,
     color: '#3ECF8E',
@@ -177,7 +140,7 @@ export default function ComposedChart({
   const isPercentage = format === '%'
   const isRamChart = chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
 
-  if (Array.isArray(data) && data.length === 0) {
+  if (data.length === 0) {
     return (
       <NoDataPlaceholder
         message={emptyStateMessage}
@@ -210,7 +173,6 @@ export default function ComposedChart({
         onChartStyleChange={onChartStyleChange}
         showMaxValue={showMaxValue}
         setShowMaxValue={maxAttribute ? setShowMaxValue : undefined}
-        percentage={percentage}
       />
       <Container className="relative z-10">
         <RechartComposedChart

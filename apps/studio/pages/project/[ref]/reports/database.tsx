@@ -59,6 +59,143 @@ DatabaseReport.getLayout = (page) => (
 
 export default DatabaseReport
 
+const REPORT_ATTRIBUTES = [
+  {
+    id: 'ram-usage',
+    label: 'Memory usage',
+    showTooltip: true,
+    showLegend: true,
+    hideChartType: true,
+    defaultChartStyle: 'line',
+    showTotal: false,
+    attributes: [
+      {
+        attribute: 'ram_usage_max_available',
+        provider: 'infra-monitoring',
+        label: 'Max RAM Available',
+        isMaxValue: true,
+      },
+      {
+        attribute: 'ram_usage_used',
+        provider: 'infra-monitoring',
+        label: 'Used',
+      },
+      {
+        attribute: 'ram_usage_cache_and_buffers',
+        provider: 'infra-monitoring',
+        label: 'Cache + buffers',
+      },
+      {
+        attribute: 'ram_usage_free',
+        provider: 'infra-monitoring',
+        label: 'Free',
+      },
+      {
+        attribute: 'ram_usage_swap',
+        provider: 'infra-monitoring',
+        label: 'Swap',
+      },
+    ],
+  },
+  {
+    id: 'cpu-usage',
+    label: 'CPU usage',
+    format: '%',
+    valuePrecision: 2,
+    showTooltip: true,
+    showLegend: true,
+    showMaxValue: false,
+    hideChartType: true,
+    defaultChartStyle: 'line',
+    attributes: [
+      {
+        attribute: 'cpu_usage_busy_system',
+        provider: 'infra-monitoring',
+        label: 'System',
+        format: '%',
+      },
+      {
+        attribute: 'cpu_usage_busy_user',
+        provider: 'infra-monitoring',
+        label: 'User',
+        format: '%',
+      },
+      {
+        attribute: 'cpu_usage_busy_iowait',
+        provider: 'infra-monitoring',
+        label: 'IOwait',
+        format: '%',
+      },
+      {
+        attribute: 'cpu_usage_busy_irqs',
+        provider: 'infra-monitoring',
+        label: 'IRQs',
+        format: '%',
+      },
+      {
+        attribute: 'cpu_usage_busy_other',
+        provider: 'infra-monitoring',
+        label: 'other',
+        format: '%',
+      },
+    ],
+  },
+  {
+    id: 'client-connections',
+    label: 'Client connections',
+    valuePrecision: 0,
+    showTooltip: true,
+    showLegend: true,
+    hideChartType: true,
+    defaultChartStyle: 'line',
+    attributes: [
+      {
+        attribute: 'client_connections_postgres',
+        provider: 'infra-monitoring',
+        label: 'postgres',
+      },
+      {
+        attribute: 'client_connections_supavisor',
+        provider: 'infra-monitoring',
+        label: 'supavisor',
+      },
+      {
+        attribute: 'client_connections_realtime',
+        provider: 'infra-monitoring',
+        label: 'realtime',
+      },
+      {
+        attribute: 'client_connections_max_limit',
+        provider: 'infra-monitoring',
+        label: 'max limit',
+        isMaxValue: true,
+      },
+    ],
+  },
+  {
+    id: 'disk-iops',
+    label: 'Disk IOps',
+    showTooltip: true,
+    showLegend: true,
+    hideChartType: true,
+    defaultChartStyle: 'line',
+    attributes: [
+      {
+        attribute: 'disk_iops_write',
+        provider: 'infra-monitoring',
+        label: 'IOps write',
+      },
+      { attribute: 'disk_iops_read', provider: 'infra-monitoring', label: 'IOps read' },
+      {
+        attribute: 'disk_iops_max',
+        provider: 'infra-monitoring',
+        label: 'IOps Max',
+        isMaxValue: true,
+      },
+    ],
+  },
+]
+
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()

@@ -50,7 +50,7 @@ const formatLargeNumber = (num: number, precision: number = 0) => {
   }
 }
 
-export const isMax = (attributes?: MultiAttribute[]) => attributes?.find((a) => a.isMaxValue)
+const isMax = (attributes?: MultiAttribute[]) => attributes?.find((a) => a.isMaxValue)
 
 const CustomTooltip = ({
   active,
@@ -94,14 +94,15 @@ const CustomTooltip = ({
             {attribute?.label || entry.name}
           </span>
           <span className="ml-3.5 flex items-end gap-1">
-            {/* Show percentage if max value is set */}
-            {!!maxValueData && !isMax && (
-              <span className="text-[11px] text-foreground-light">({percentage}%)</span>
-            )}
             {isRamChart
               ? formatBytes(entry.value, valuePrecision)
               : numberFormatter(entry.value, valuePrecision)}
             {isPercentage ? '%' : ''}
+
+            {/* Show percentage if max value is set */}
+            {!!maxValueData && !isMax && (
+              <span className="text-[11px] text-foreground-light mb-0.5">({percentage}%)</span>
+            )}
           </span>
         </div>
       )
@@ -110,14 +111,18 @@ const CustomTooltip = ({
     return (
       <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl">
         <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
-        <div className="grid">
+        <div className="grid gap-0">
           {payload.reverse().map((entry: any) => (
             <LabelItem key={entry.name} entry={entry} />
           ))}
           {active && showTotal && (
-            <div className="flex gap-1 border-t mt-0.5 pt-0.5 text-foreground items-center">
-              <span className="flex-grow text-foreground-lighter text-xs">Total</span>
-              <div className="flex items-end gap-1 font-semibold">
+            <div className="flex md:flex-col gap-1 md:gap-0 text-foreground font-semibold">
+              <span className="flex-grow text-foreground-lighter">Total</span>
+              <div className="flex items-end gap-1">
+                <span className="text-base">
+                  {isRamChart ? formatBytes(total, 1) : numberFormatter(total)}
+                  {isPercentage ? '%' : ''}
+                </span>
                 {maxValueAttribute &&
                   !isNaN(total / maxValueData?.value) &&
                   isFinite(total / maxValueData?.value) && (
@@ -125,10 +130,6 @@ const CustomTooltip = ({
                       ({((total / maxValueData?.value) * 100).toFixed(1)}%)
                     </span>
                   )}
-                <span className="text-base">
-                  {isRamChart ? formatBytes(total, 1) : numberFormatter(total)}
-                  {isPercentage ? '%' : ''}
-                </span>
               </div>
             </div>
           )}
