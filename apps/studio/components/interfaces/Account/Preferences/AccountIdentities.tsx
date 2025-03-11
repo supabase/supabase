@@ -9,8 +9,20 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
 import { useUnlinkIdentityMutation } from 'data/profile/profile-unlink-identity-mutation'
+import dayjs from 'dayjs'
 import { BASE_PATH } from 'lib/constants'
-import { Button, cn, Dialog, DialogContent, DialogHeader, DialogTitle } from 'ui'
+import {
+  Badge,
+  Button,
+  cn,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import {
@@ -24,8 +36,9 @@ export const AccountIdentities = () => {
 
   const { data, isLoading, isSuccess } = useProfileIdentitiesQuery()
   const identities = data?.identities ?? []
-
-  console.log(identities)
+  const isChangeExpired = data?.email_change_sent_at
+    ? dayjs().utc().diff(dayjs(data?.email_change_sent_at).utc(), 'minute') > 10
+    : false
 
   const [selectedProviderUnlink, setSelectedProviderUnlink] = useState<string>()
   const [selectedProviderUpdateEmail, setSelectedProviderUpdateEmail] = useState<string>()
@@ -89,6 +102,14 @@ export const AccountIdentities = () => {
                   <div>
                     <div className="flex items-center gap-x-2">
                       <p className="text-sm capitalize">{providerName}</p>
+                      {provider === 'email' && data.new_email && !isChangeExpired && (
+                        <Tooltip>
+                          <TooltipTrigger className="flex items-center">
+                            <Badge variant="default">Pending change</Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>Changing to {data.new_email}</TooltipContent>
+                        </Tooltip>
+                      )}
                       {/* [Joshen] Below is not supported yet, but ideal UX */}
                       {/* {false && <Badge>Logged in as</Badge>} */}
                     </div>

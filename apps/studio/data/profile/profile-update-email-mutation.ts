@@ -2,6 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { handleError, put } from 'data/fetchers'
+import { auth } from 'lib/gotrue'
 import type { ResponseError } from 'types'
 import { profileKeys } from './keys'
 
@@ -35,7 +36,7 @@ export const useEmailUpdateMutation = ({
     (vars) => updateEmail(vars),
     {
       async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(profileKeys.profile())
+        await Promise.all([auth.getUser(), queryClient.invalidateQueries(profileKeys.profile())])
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

@@ -26,8 +26,7 @@ export const useUnlinkIdentityMutation = ({
   const queryClient = useQueryClient()
   return useMutation((vars) => unlinkIdentity(vars), {
     async onSuccess(data, variables, context) {
-      await auth.getUserIdentities()
-      await queryClient.invalidateQueries(profileKeys.identities())
+      await Promise.all([auth.getUser(), queryClient.invalidateQueries(profileKeys.identities())])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

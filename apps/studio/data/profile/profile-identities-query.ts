@@ -5,12 +5,19 @@ import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'
 
 export async function getProfileIdentities() {
-  const { error, data } = await auth.getUserIdentities()
+  const { error, data } = await auth.getUser()
+
   if (error) throw error
-  return data
+
+  const { identities = [], new_email } = data.user
+  return { identities, new_email }
 }
 
-type ProfileIdentitiesData = { identities: UserIdentity[] }
+type ProfileIdentitiesData = {
+  identities: UserIdentity[]
+  new_email?: string
+  email_change_sent_at?: string
+}
 type ProfileIdentitiesError = any
 
 export const useProfileIdentitiesQuery = <TData = ProfileIdentitiesData>({
