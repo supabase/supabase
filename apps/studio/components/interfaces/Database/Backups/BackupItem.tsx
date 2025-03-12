@@ -58,28 +58,28 @@ const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProp
           >
             Restore
           </ButtonTooltip>
-          {!backup.isPhysicalBackup && (
-            <ButtonTooltip
-              type="default"
-              icon={<Download />}
-              loading={isDownloading}
-              disabled={!canTriggerScheduledBackups || isDownloading}
-              onClick={() => {
-                if (!projectRef) return console.error('Project ref is required')
-                downloadBackup({ ref: projectRef, backup })
-              }}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canTriggerScheduledBackups
+          <ButtonTooltip
+            type="default"
+            icon={<Download />}
+            loading={isDownloading}
+            disabled={!canTriggerScheduledBackups || isDownloading || backup.isPhysicalBackup}
+            onClick={() => {
+              if (!projectRef) return console.error('Project ref is required')
+              downloadBackup({ ref: projectRef, backup })
+            }}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: backup.isPhysicalBackup
+                  ? 'Physical backups cannot be downloaded'
+                  : !canTriggerScheduledBackups
                     ? 'You need additional permissions to download backups'
                     : undefined,
-                },
-              }}
-            >
-              Download
-            </ButtonTooltip>
-          )}
+              },
+            }}
+          >
+            Download
+          </ButtonTooltip>
         </div>
       )
     return <Badge variant="warning">Backup In Progress...</Badge>
@@ -91,12 +91,15 @@ const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProp
         index ? 'border-t border-default' : ''
       }`}
     >
-      <TimestampInfo
-        displayAs="utc"
-        utcTimestamp={backup.inserted_at}
-        labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-        className="text-left !text-sm font-mono tracking-tight"
-      />
+      <div className="flex items-center gap-x-2">
+        <TimestampInfo
+          displayAs="utc"
+          utcTimestamp={backup.inserted_at}
+          labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+          className="text-left !text-sm font-mono tracking-tight"
+        />
+        <Badge variant="default">{backup.isPhysicalBackup ? 'Physical' : 'Logical'}</Badge>
+      </div>
       <div>{generateSideButtons(backup)}</div>
     </div>
   )
