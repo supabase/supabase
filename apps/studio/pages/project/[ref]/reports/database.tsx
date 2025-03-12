@@ -351,6 +351,11 @@ const DatabaseUsage = () => {
           label: 'realtime',
         },
         {
+          attribute: 'client_connections_pgbouncer',
+          provider: 'infra-monitoring',
+          label: 'pgbouncer',
+        },
+        {
           attribute: 'client_connections_max_limit',
           provider: 'infra-monitoring',
           label: 'max limit',

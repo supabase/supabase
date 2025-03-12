@@ -142,6 +142,16 @@ export default function ComposedChart({
   const isPercentage = format === '%'
   const isRamChart = chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
 
+  //*
+  // Set the y-axis domain
+  // to the highest value in the chart data for percentage charts
+  // to vertically zoom in on the data
+  // */
+  const yDomain = [
+    0,
+    Math.max(...chartData.map((att) => (typeof att.value === 'number' ? att.value : 0))),
+  ]
+
   if (data.length === 0) {
     return (
       <NoDataPlaceholder
@@ -208,12 +218,7 @@ export default function ComposedChart({
           }}
         >
           {showGrid && <CartesianGrid stroke={CHART_COLORS.AXIS} />}
-          <YAxis
-            {..._YAxisProps}
-            hide
-            domain={isPercentage ? [0, 100] : undefined}
-            key={yAxisKey}
-          />
+          <YAxis {..._YAxisProps} hide domain={isPercentage ? yDomain : undefined} key={yAxisKey} />
           <XAxis
             {..._XAxisProps}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
