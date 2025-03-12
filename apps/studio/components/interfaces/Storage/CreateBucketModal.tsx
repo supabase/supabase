@@ -50,9 +50,16 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
 
   const validate = (values: any) => {
     const errors = {} as any
+
     if (!values.name) {
       errors.name = 'Please provide a name for your bucket'
     }
+
+    if (values.name && !/^[a-z0-9.-]+$/.test(values.name)) {
+      errors.name =
+        'The name of the bucket must only container lowercase letters, numbers, dots, and hyphens'
+    }
+
     if (values.name && values.name.endsWith(' ')) {
       errors.name = 'The name of the bucket cannot end with a whitespace'
     }
