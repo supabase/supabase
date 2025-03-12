@@ -40,6 +40,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   showGrid?: boolean
   showTooltip?: boolean
   showTotal?: boolean
+  showMaxValue?: boolean
   chartHighlight?: ChartHighlight
   hideChartType?: boolean
   chartStyle?: string
@@ -71,6 +72,7 @@ export default function ComposedChart({
   showGrid = false,
   showTooltip = false,
   showTotal = true,
+  showMaxValue = false,
   chartHighlight,
   hideChartType,
   chartStyle,
@@ -78,7 +80,7 @@ export default function ComposedChart({
   updateDateRange,
 }: BarChartProps) {
   const [_activePayload, setActivePayload] = useState<any>(null)
-  const [showMaxValue, setShowMaxValue] = useState(true)
+  const [_showMaxValue, setShowMaxValue] = useState(showMaxValue)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
   const { Container } = useChartSize(size)
@@ -171,7 +173,7 @@ export default function ComposedChart({
         hideChartType={hideChartType}
         chartStyle={chartStyle}
         onChartStyleChange={onChartStyleChange}
-        showMaxValue={showMaxValue}
+        showMaxValue={_showMaxValue}
         setShowMaxValue={maxAttribute ? setShowMaxValue : undefined}
       />
       <Container className="relative z-10">
@@ -264,7 +266,7 @@ export default function ComposedChart({
                 />
               ))}
           {/* Max value, if available */}
-          {maxAttribute && showMaxValue && (
+          {maxAttribute && _showMaxValue && (
             <Line
               key={maxAttribute.attribute}
               type="stepAfter"
@@ -306,7 +308,7 @@ export default function ComposedChart({
         <CustomLabel
           payload={[maxAttributeData, ...chartData]}
           attributes={attributes}
-          showMaxValue={showMaxValue}
+          showMaxValue={_showMaxValue}
         />
       )}
     </div>

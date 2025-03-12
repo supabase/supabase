@@ -53,6 +53,7 @@ interface ComposedChartHandlerProps {
   showTooltip?: boolean
   showLegend?: boolean
   showTotal?: boolean
+  showMaxValue?: boolean
   updateDateRange: UpdateDateRange
   valuePrecision?: number
 }
@@ -83,6 +84,7 @@ const ComposedChartHandler = ({
   className,
   showTooltip,
   showLegend,
+  showMaxValue,
   showTotal,
   updateDateRange,
   valuePrecision,
@@ -245,6 +247,7 @@ const ComposedChartHandler = ({
           showTooltip={showTooltip}
           showLegend={showLegend}
           showTotal={showTotal}
+          showMaxValue={showMaxValue}
           onChartStyleChange={setChartStyle}
           updateDateRange={updateDateRange}
           valuePrecision={valuePrecision}

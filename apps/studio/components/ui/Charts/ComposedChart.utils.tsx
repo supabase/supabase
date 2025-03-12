@@ -112,8 +112,8 @@ const CustomTooltip = ({
       <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl">
         <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
-          {payload.reverse().map((entry: any) => (
-            <LabelItem key={entry.name} entry={entry} />
+          {payload.reverse().map((entry: any, index: number) => (
+            <LabelItem key={`${entry.name}-${index}`} entry={entry} />
           ))}
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground font-semibold">
@@ -181,7 +181,7 @@ const CustomLabel = ({ payload, attributes, showMaxValue }: CustomLabelProps) =>
   return (
     <div className="relative z-0 mx-auto flex flex-col items-center gap-1 text-xs w-full">
       <div className="flex flex-wrap items-center justify-center gap-2">
-        {items?.map((entry) => <LabelItem key={entry.name} entry={entry} />)}
+        {items?.map((entry, index) => <LabelItem key={`${entry.name}-${index}`} entry={entry} />)}
       </div>
     </div>
   )
