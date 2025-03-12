@@ -1,5 +1,5 @@
 import { NextSeo } from 'next-seo'
-import { LwCanvas } from '~/components/LaunchWeek/14/canvas'
+import { LwCanvas } from '~/components/LaunchWeek/14/TicketCanvas'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LW14_DATE, LW14_TITLE, LW14_URL, SITE_ORIGIN } from '~/lib/constants'

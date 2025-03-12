@@ -5,12 +5,12 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { GlitchPass } from './glitch'
-import { CRTShader } from './crt-shader'
+import { GlitchPass } from './effects/glitch'
+import { CRTShader } from './effects/crt-shader'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { coloredTextureMaterial } from './colored-texture-shader'
+import { coloredTextureMaterial } from './effects/colored-texture-shader'
 
 /**
  * Helper to simplifies controlling requestAnimationFrame
