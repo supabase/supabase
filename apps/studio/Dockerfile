@@ -11,7 +11,6 @@
 FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
 
 # Fixes issues with Sentry CLI and SSL certificates during build
 # TODO: Git is added because it's needed to build libpg, remove it once they publish a binary on the S3 bucket
@@ -23,6 +22,8 @@ RUN apt-get update -qq && \
   build-essential && \ 
   rm -rf /var/lib/apt/lists/* && \
   update-ca-certificates
+
+RUN npm install -g pnpm@9.15.5
 
 WORKDIR /app
 
@@ -50,7 +51,7 @@ CMD ["pnpm", "dev:studio"]
 # Compile Next.js
 FROM dev AS builder
 
-RUN pnpm dlx turbo@2.3.3 run build --filter studio -- --no-lint
+RUN pnpm --filter studio exec next build
 
 # Copy only compiled code and dependencies
 FROM base AS production

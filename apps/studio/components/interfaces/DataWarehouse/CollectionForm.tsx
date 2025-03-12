@@ -127,7 +127,9 @@ export const CollectionForm = ({
                     className="mt-2"
                     type="primary"
                     onClick={() =>
-                      router.push(`/org/${currentOrg?.slug}/billing?panel=subscriptionPlan`)
+                      router.push(
+                        `/org/${currentOrg?.slug}/billing?panel=subscriptionPlan&source=dataWarehouseIncreaseRetention`
+                      )
                     }
                   >
                     Upgrade plan

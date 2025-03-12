@@ -27,6 +27,7 @@
     "@types/lodash": "^4.14.202",
     "json-stringify-safe": "^5.0.1",
     "lodash": "^4.17.21",
+    "tsconfig": "workspace:*",
     "tsx": "^4.7.0"
   }
 }

@@ -1,3 +1,4 @@
+import matter from 'gray-matter'
 import type { Code, Heading, Root } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { toMarkdown } from 'mdast-util-to-markdown'
@@ -11,7 +12,8 @@ import { EXAMPLES_DIRECTORY } from '~/lib/docs'
 const PROMPTS_DIRECTORY = join(EXAMPLES_DIRECTORY, 'prompts')
 
 function parseMarkdown(markdown: string) {
-  const mdast = fromMarkdown(markdown)
+  const { content: withoutFrontmatter } = matter(markdown)
+  const mdast = fromMarkdown(withoutFrontmatter)
 
   let heading = ''
   visit(mdast, 'heading', (node: Heading) => {

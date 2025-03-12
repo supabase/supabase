@@ -36,6 +36,7 @@ const withMDX = nextMdx({
 /** @type {import('next').NextConfig} nextConfig */
 
 const nextConfig = {
+  assetPrefix: getAssetPrefix(),
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   // reactStrictMode: true,
@@ -73,7 +74,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Strict-Transport-Security',
-            value: '',
+            value: process.env.VERCEL === '1' ? 'max-age=31536000; includeSubDomains; preload' : '',
           },
           {
             key: 'X-Robots-Tag',
@@ -96,7 +97,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Strict-Transport-Security',
-            value: '',
+            value: process.env.VERCEL === '1' ? 'max-age=31536000; includeSubDomains; preload' : '',
           },
           {
             key: 'X-Robots-Tag',
@@ -113,6 +114,10 @@ const nextConfig = {
             value: '(?:.+\\.vercel\\.app)',
           },
         ],
+      },
+      {
+        source: '/favicon/:slug*',
+        headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
       },
     ]
   },
@@ -171,3 +176,18 @@ const configExport = () => {
 }
 
 export default configExport
+
+function getAssetPrefix() {
+  // If not force enabled, but not production env, disable CDN
+  if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
+    return undefined
+  }
+
+  // Force disable CDN
+  if (process.env.FORCE_ASSET_CDN === '-1') {
+    return undefined
+  }
+
+  // @ts-ignore
+  return `https://frontend-assets.supabase.com/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
+}

@@ -24,10 +24,12 @@ import {
   PostgresVersionSelector,
   extractPostgresVersionDetails,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { ProjectVisual } from 'components/interfaces/ProjectCreation/ProjectVisual'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SchemaGenerator } from 'components/interfaces/ProjectCreation/SchemaGenerator'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
+import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
 import { FeedbackDropdown } from 'components/layouts/ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from 'components/layouts/ProjectLayout/LayoutHeader/HelpPopover'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
@@ -61,7 +63,6 @@ import {
   PROJECT_STATUS,
   PROVIDERS,
 } from 'lib/constants'
-import { TelemetryActions } from 'common/telemetry-constants'
 import passwordStrength from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import type { CloudProvider } from 'shared-data'
@@ -128,9 +129,7 @@ const FormSchema = z.object({
   }),
   dbPassStrength: z.number(),
   dbPass: z
-    .string({
-      required_error: 'Please enter a database password.',
-    })
+    .string({ required_error: 'Please enter a database password.' })
     .min(1, 'Password is required.'),
   instanceSize: z.string(),
   dataApi: z.boolean(),
@@ -160,7 +159,6 @@ const WizardForm = () => {
   const [showVisual, setShowVisual] = useState(false)
 
   const [step, setStep] = useState(1)
-  const [aiDescription, setAiDescription] = useState('')
   const [formTitle, setFormTitle] = useState('Create a new project')
   const [formDescription, setFormDescription] = useState(
     'Get started by choosing how you want to create your project'
@@ -310,7 +308,7 @@ const WizardForm = () => {
     // too important to cause disruption here, make sure to catch and skip any errors
     try {
       sendEvent({
-        action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_SUBMITTED,
+        action: 'project_creation_second_step_submitted',
       })
     } catch (error) {}
 
@@ -534,13 +532,12 @@ const WizardForm = () => {
                     }
                   }}
                   onSubmit={(value) => {
-                    setAiDescription(value)
                     setFormTitle('Create a project')
                     setFormDescription(
                       'We have generated a starting schema for you based on your description'
                     )
                     sendEvent({
-                      action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
+                      action: 'project_creation_initial_step_submitted',
                       properties: { onboardingPath: 'use_prompt' },
                     })
                     setStep(2)
@@ -549,7 +546,7 @@ const WizardForm = () => {
                     setFormTitle('Start from Scratch')
                     setFormDescription('Configure your new blank project')
                     sendEvent({
-                      action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
+                      action: 'project_creation_initial_step_submitted',
                       properties: { onboardingPath: 'start_blank' },
                     })
                     setStep(2)
@@ -560,7 +557,7 @@ const WizardForm = () => {
                       'First we need to create a new project to migrate your database to'
                     )
                     sendEvent({
-                      action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
+                      action: 'project_creation_initial_step_submitted',
                       properties: { onboardingPath: 'migrate' },
                     })
                     setStep(2)
@@ -716,40 +713,51 @@ const WizardForm = () => {
                                   <FormField_Shadcn_
                                     control={form.control}
                                     name="dbPass"
-                                    render={({ field }) => (
-                                      <FormItemLayout
-                                        label="Database Password"
-                                        description={
-                                          <PasswordStrengthBar
-                                            passwordStrengthScore={form.getValues('dbPassStrength')}
-                                            password={field.value}
-                                            passwordStrengthMessage={passwordStrengthMessage}
-                                            generateStrongPassword={generatePassword}
-                                          />
-                                        }
-                                      >
-                                        <FormControl_Shadcn_>
-                                          <Input
-                                            copy={field.value.length > 0}
-                                            type="password"
-                                            placeholder="Type in a strong password"
-                                            {...field}
-                                            autoComplete="off"
-                                            onChange={async (event) => {
-                                              field.onChange(event)
-                                              form.trigger('dbPassStrength')
-                                              const value = event.target.value
-                                              if (event.target.value === '') {
-                                                await form.setValue('dbPassStrength', 0)
-                                                await form.trigger('dbPass')
-                                              } else {
-                                                await delayedCheckPasswordStrength(value)
-                                              }
-                                            }}
-                                          />
-                                        </FormControl_Shadcn_>
-                                      </FormItemLayout>
-                                    )}
+                                    render={({ field }) => {
+                                      const hasSpecialCharacters =
+                                        field.value.length > 0 &&
+                                        !field.value.match(SPECIAL_CHARS_REGEX)
+
+                                      return (
+                                        <FormItemLayout
+                                          label="Database Password"
+                                          description={
+                                            <>
+                                              {hasSpecialCharacters && <SpecialSymbolsCallout />}
+                                              <PasswordStrengthBar
+                                                passwordStrengthScore={form.getValues(
+                                                  'dbPassStrength'
+                                                )}
+                                                password={field.value}
+                                                passwordStrengthMessage={passwordStrengthMessage}
+                                                generateStrongPassword={generatePassword}
+                                              />
+                                            </>
+                                          }
+                                        >
+                                          <FormControl_Shadcn_>
+                                            <Input
+                                              copy={field.value.length > 0}
+                                              type="password"
+                                              placeholder="Type in a strong password"
+                                              {...field}
+                                              autoComplete="off"
+                                              onChange={async (event) => {
+                                                field.onChange(event)
+                                                form.trigger('dbPassStrength')
+                                                const value = event.target.value
+                                                if (event.target.value === '') {
+                                                  await form.setValue('dbPassStrength', 0)
+                                                  await form.trigger('dbPass')
+                                                } else {
+                                                  await delayedCheckPasswordStrength(value)
+                                                }
+                                              }}
+                                            />
+                                          </FormControl_Shadcn_>
+                                        </FormItemLayout>
+                                      )
+                                    }}
                                   />
                                 </div>
                                 <div className="py-5 border-t border-b">
@@ -805,7 +813,7 @@ const WizardForm = () => {
                                               <Link
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                                                href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                                               >
                                                 <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
                                                   <p className="text-sm m-0">Compute Billing</p>
@@ -1168,9 +1176,13 @@ const WizardForm = () => {
                                   form="project-create-form"
                                   htmlType="submit"
                                   size="large"
-                                  loading={isCreatingNewProject}
-                                  disabled={isCreatingNewProject || projectCreateBlocked}
                                   className="w-full"
+                                  loading={isCreatingNewProject}
+                                  disabled={
+                                    !canCreateProject ||
+                                    isCreatingNewProject ||
+                                    projectCreateBlocked
+                                  }
                                 >
                                   {isCreatingNewProject ? 'Creating project...' : 'Create project'}
                                 </Button>
@@ -1238,13 +1250,9 @@ const instanceLabel = (instance: string | undefined): string => {
 }
 
 const Wizard: NextPageWithLayout = () => {
-  const { slug, projectName } = useParams()
-
-  const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
-  const currentOrg = organizations?.find((o: any) => o.slug === slug)
-
-  const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
-    useFreeProjectLimitCheckQuery({ slug })
+  const { slug } = useParams()
+  const { isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
+  const { isLoading: isLoadingFreeProjectLimitCheck } = useFreeProjectLimitCheckQuery({ slug })
 
   if (!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck) return null
 
