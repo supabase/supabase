@@ -68,6 +68,20 @@ interface AIAssistantProps {
   onResetConversation: () => void
 }
 
+export const useChatInputRef = () => {
+  const ref = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.focus()
+    }
+  }, [])
+
+  return {
+    ref,
+  }
+}
+
 export const AIAssistant = ({
   id,
   initialMessages,
@@ -87,7 +101,7 @@ export const AIAssistant = ({
   const { aiAssistantPanel, setAiAssistantPanel, saveLatestMessage } = useAppStateSnapshot()
   const { open, initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
-  const inputRef = useRef<HTMLTextAreaElement>(null)
+  const { ref: inputRef } = useChatInputRef()
   const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
 
   const [value, setValue] = useState<string>(initialInput)

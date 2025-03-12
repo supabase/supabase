@@ -1,7 +1,13 @@
 import { MousePointerClick, X } from 'lucide-react'
 import {
+  AiIconAnimation,
   Button,
   CodeBlock,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
@@ -11,6 +17,8 @@ import {
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import type { LogData, QueryType } from './Logs.types'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { useAppStateSnapshot } from 'state/app-state'
+import { useChatInputRef } from 'components/ui/AIAssistantPanel/AIAssistant'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -28,8 +36,6 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
     if (!log) return <LogDetailEmptyState />
 
     switch (queryType) {
-      // case 'warehouse':
-      //   return <WarehouseSelectionRenderer log={log} />
       case 'api':
         const status = log?.metadata?.[0]?.response?.[0]?.status_code
         const method = log?.metadata?.[0]?.request?.[0]?.method
@@ -54,25 +60,70 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
         return <DefaultPreviewSelectionRenderer log={log} />
     }
   }
+  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const { ref: inputRef } = useChatInputRef()
+  const focusInput = () => {
+    setTimeout(() => {
+      inputRef.current?.focus()
+    }, 600)
+  }
 
   return (
     <div className="relative flex h-full flex-grow flex-col overflow-y-scroll bg-surface-100 border-t">
       <div className="relative flex-grow flex flex-col h-full">
-        <Tabs_Shadcn_ defaultValue="details" className="flex flex-col h-full">
-          <TabsList_Shadcn_ className="px-2 pt-2">
+        <Tabs_Shadcn_ defaultValue="details" className="flex flex-col h-full relative">
+          <TabsList_Shadcn_ className="px-2 pt-1.5 sticky top-0 bg-surface-100 z-10">
             <TabsTrigger_Shadcn_ className="px-3" value="details">
               Details
             </TabsTrigger_Shadcn_>
             <TabsTrigger_Shadcn_ disabled={!log} className="px-3" value="raw">
               Raw
             </TabsTrigger_Shadcn_>
-            <Button
-              type="text"
-              className="ml-auto absolute top-2 right-2 cursor-pointer transition hover:text-foreground h-6 w-6 px-0 py-0 flex items-center justify-center"
-              onClick={onClose}
-            >
-              <X size={14} strokeWidth={2} className="text-foreground-lighter" />
-            </Button>
+            <div className="flex items-center gap-2 justify-end ml-auto">
+              <DropdownMenu>
+                <DropdownMenuTrigger className="size-6 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity data-[state=open]:opacity-100">
+                  <AiIconAnimation allowHoverEffect size={16} />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="max-w-[120px]" align="end" alignOffset={-10}>
+                  <DropdownMenuLabel className="text-xs text-foreground-lighter">
+                    AI Assistant
+                  </DropdownMenuLabel>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setAiAssistantPanel({
+                        open: true,
+                        initialInput: `Provide a concise explanation of the following log from the Supabase ${queryType} logs. \n\`\`\`json
+${JSON.stringify(log)}\n\`\`\``,
+                      })
+                      focusInput()
+                    }}
+                  >
+                    Explain
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setAiAssistantPanel({
+                        open: true,
+                        initialInput: `Troubleshoot the following log from the Supabase ${queryType} logs and provide a concise step by step guide on how to fix it.\n\`\`\`json
+${JSON.stringify(log)}
+\n\`\`\``,
+                      })
+
+                      focusInput()
+                    }}
+                  >
+                    Troubleshoot
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button
+                type="text"
+                className="cursor-pointer transition hover:text-foreground h-6 w-6 px-0 py-0 flex items-center justify-center"
+                onClick={onClose}
+              >
+                <X size={14} strokeWidth={2} className="text-foreground-lighter" />
+              </Button>
+            </div>
           </TabsList_Shadcn_>
           <div className="flex-1 h-full">
             {isLoading ? (
