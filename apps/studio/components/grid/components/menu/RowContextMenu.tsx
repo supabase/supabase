@@ -6,7 +6,6 @@ import type { SupaRow } from 'components/grid/types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { ROW_CONTEXT_MENU_ID } from '.'
-import { useTrackedState } from '../../store/Store'
 import { copyToClipboard, formatClipboardValue } from '../../utils/common'
 
 export type RowContextMenuProps = {
@@ -14,7 +13,6 @@ export type RowContextMenuProps = {
 }
 
 const RowContextMenu = ({ rows }: RowContextMenuProps) => {
-  const state = useTrackedState()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
@@ -29,12 +27,12 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
     const { props } = p
     const { rowIdx } = props
     const row = rows[rowIdx]
-    if (state.onEditRow) state.onEditRow(row)
+    if (tableEditorSnap.onEditRow) tableEditorSnap.onEditRow(row)
   }
 
   function isItemHidden({ data }: PredicateParams) {
-    if (data === 'edit') return state.onEditRow == undefined
-    if (data === 'delete') return !state.editable
+    if (data === 'edit') return tableEditorSnap.onEditRow == undefined
+    if (data === 'delete') return !snap.editable
     return false
   }
 
@@ -49,14 +47,14 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
       const { rowIdx } = props
       const row = rows[rowIdx]
 
-      const columnKey = state.gridColumns[snap.selectedCellPosition.idx as number].key
+      const columnKey = snap.gridColumns[snap.selectedCellPosition.idx as number].key
 
       const value = row[columnKey]
       const text = formatClipboardValue(value)
 
       copyToClipboard(text)
     },
-    [rows, state.gridColumns, snap.selectedCellPosition]
+    [rows, snap.gridColumns, snap.selectedCellPosition]
   )
 
   return (
@@ -70,7 +68,7 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
           <Edit size={14} />
           <span className="ml-2 text-xs">Edit row</span>
         </Item>
-        {state.editable && <Separator />}
+        {snap.editable && <Separator />}
         <Item onClick={onDeleteRow} hidden={isItemHidden} data="delete">
           <Trash size={14} stroke="red" />
           <span className="ml-2 text-xs">Delete row</span>

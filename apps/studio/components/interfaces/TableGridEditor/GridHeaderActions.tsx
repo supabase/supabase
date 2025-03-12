@@ -44,7 +44,6 @@ import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 
 export interface GridHeaderActionsProps {
   table: Entity
-  canEditViaTableEditor: boolean
 }
 
 const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {

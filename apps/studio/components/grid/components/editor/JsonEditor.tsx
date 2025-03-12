@@ -4,13 +4,13 @@ import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useTrackedState } from 'components/grid/store/Store'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Popover, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { BlockKeys } from '../common/BlockKeys'
 import { MonacoEditor } from '../common/MonacoEditor'
@@ -52,7 +52,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   onRowChange,
   onExpandEditor,
 }: JsonEditorProps<TRow, TSummaryRow>) => {
-  const state = useTrackedState()
+  const snap = useTableEditorTableStateSnapshot()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const project = useSelectedProject()
@@ -63,7 +63,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
     id,
   })
 
-  const gridColumn = state.gridColumns.find((x) => x.name == column.key)
+  const gridColumn = snap.gridColumns.find((x) => x.name == column.key)
 
   const rawInitialValue = row[column.key as keyof TRow] as unknown
   const initialValue =
@@ -151,8 +151,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
       onRowChange({ ...row, [column.key]: jsonValue }, true)
       setIsPopoverOpen(false)
     } else {
-      const { onError } = state
-      if (onError) onError(Error('Please enter a valid JSON'))
+      toast.error('Please enter a valid JSON')
     }
   }
 

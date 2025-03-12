@@ -2,10 +2,10 @@ import { QueryClient, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useCallback } from 'react'
 
-import { loadTableEditorSortsAndFiltersFromLocalStorage } from 'components/grid/SupabaseGrid'
 import {
   formatFilterURLParams,
   formatSortURLParams,
+  loadTableEditorStateFromLocalStorage,
   parseSupaTable,
 } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort } from 'components/grid/types'
@@ -45,7 +45,7 @@ export function prefetchEditorTablePage({
       const supaTable = parseSupaTable(entity)
 
       const { sorts: localSorts = [], filters: localFilters = [] } =
-        loadTableEditorSortsAndFiltersFromLocalStorage(projectRef, entity.name, entity.schema) ?? {}
+        loadTableEditorStateFromLocalStorage(projectRef, entity.name, entity.schema) ?? {}
 
       prefetchTableRows(queryClient, {
         projectRef,

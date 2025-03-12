@@ -38,7 +38,7 @@ export function getGridColumns(
   table: SupaTable,
   options?: {
     projectRef?: string
-    tableId?: string
+    tableId?: number
     editable?: boolean
     defaultWidth?: string | number
     onAddColumn?: () => void
@@ -189,7 +189,7 @@ function getCellEditor(
 function getCellRenderer(
   columnDef: SupaColumn,
   columnType: ColumnType,
-  metadata: { projectRef?: string; tableId?: string }
+  metadata: { projectRef?: string; tableId?: number }
 ) {
   switch (columnType) {
     case 'boolean': {

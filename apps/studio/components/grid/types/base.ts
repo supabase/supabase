@@ -28,8 +28,8 @@ export interface Filter {
 }
 
 export interface SavedState {
-  filters: Filter[]
-  sorts: Sort[]
+  filters?: string[]
+  sorts?: string[]
   gridColumns: CalculatedColumn<any, any>[]
 }
 
