@@ -161,7 +161,7 @@ const DisplayApiSettings = ({
           ) : (
             <Panel.Notice
               className="border-t"
-              title="New API keys coming Q4 2024"
+              title="New API keys coming Q2 2025"
               description={`
 \`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.
 `}
