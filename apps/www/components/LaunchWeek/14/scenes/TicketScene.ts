@@ -55,8 +55,9 @@ class TicketScene implements BaseScene {
 
   private _sceneConfig = {
     camera: {
-      position: new Vector3(0, 3, 0),
+      position: new Vector3(0, 10, 0),
       rotation: new Euler(MathUtils.degToRad(-90), 0, 0),
+      fov: 30,
     },
   }
 
@@ -113,8 +114,11 @@ class TicketScene implements BaseScene {
   }
 
   update(context: SceneRenderer, dt?: number): void {
-    const ticket = context.composer.passes[0] as RenderPass
-    this._updateTicketToFollowMouse(ticket, dt)
+    const ticket = context.composer.passes[0]
+    if (ticket instanceof RenderPass) {
+      this._updateTicketToFollowMouse(ticket.scene, dt)
+      this._updateTicketFaceRotation(ticket.scene, dt)
+    }
   }
 
   cleanup(): void {
@@ -130,57 +134,46 @@ class TicketScene implements BaseScene {
     return
   }
 
-  showSecondFace(context: SceneRenderer) {
-    const ticket = context?.composer.passes[0] as RenderPass
-    if (ticket && ticket.scene) {
-      // Toggle frontside state
-      this.state.frontside = !this.state.frontside
+  showSecondFace() {
+    this.state.frontside = !this.state.frontside
+  }
 
-      // Rotate to show back side (180 degrees around Y axis) or front side (0 degrees)
-      const targetRotationY = this.state.frontside ? 0 : Math.PI
+  private _updateTicketToFollowMouse(scene: THREE.Scene, dt?: number) {
+    // Calculate rotation based on mouse position
+    // Limit rotation to reasonable angles
+    if (this._internalState.mousePosition?.isWithinContainer) {
+      const mouseX = this._internalState.mousePosition.containerX
+      const mouseY = this._internalState.mousePosition.containerY
+      // Limit the rotation angles to a reasonable range
+      const targetRotationX = MathUtils.clamp(mouseY * -0.2, -0.3, 0.3)
+      const targetRotationZ = MathUtils.clamp(mouseX * -0.3, -0.4, 0.4)
 
-      // Animate the rotation
-
-      // Smoothly interpolate current rotation to target rotation
-      ticket.scene.rotation.y = MathUtils.lerp(ticket.scene.rotation.y, targetRotationY, 0.1)
+      // Apply smooth rotation with a smaller lerp factor
+      const lerpFactor = Math.min(dt ?? 0.05, 0.05)
+      scene.rotation.x = MathUtils.lerp(scene.rotation.x, targetRotationX, lerpFactor)
+      scene.rotation.z = MathUtils.lerp(scene.rotation.z, targetRotationZ, lerpFactor)
+    } else {
+      // Return to neutral position more slowly
+      const lerpFactor = Math.min(dt ?? 0.03, 0.03)
+      scene.rotation.x = MathUtils.lerp(scene.rotation.x, 0, lerpFactor)
+      scene.rotation.z = MathUtils.lerp(scene.rotation.z, 0, lerpFactor)
     }
   }
 
-  private _updateTicketToFollowMouse(ticket?: RenderPass, dt?: number) {
-    if (ticket && ticket.scene) {
-      // Calculate rotation based on mouse position
-      // Limit rotation to reasonable angles
-      if (this._internalState.mousePosition?.isWithinContainer) {
-        const mouseX = this._internalState.mousePosition.containerX
-        const mouseY = this._internalState.mousePosition.containerY
-        // Limit the rotation angles to a reasonable range
-        const targetRotationX = MathUtils.clamp(mouseY * -0.2, -0.3, 0.3)
-        const targetRotationZ = MathUtils.clamp(mouseX * -0.3, -0.4, 0.4)
-
-        // Apply smooth rotation with a smaller lerp factor
-        const lerpFactor = Math.min(dt ?? 0.05, 0.05)
-        ticket.scene.rotation.x = MathUtils.lerp(
-          ticket.scene.rotation.x,
-          targetRotationX,
-          lerpFactor
-        )
-        ticket.scene.rotation.z = MathUtils.lerp(
-          ticket.scene.rotation.z,
-          targetRotationZ,
-          lerpFactor
-        )
-      } else {
-        // Return to neutral position more slowly
-        const lerpFactor = Math.min(dt ?? 0.03, 0.03)
-        ticket.scene.rotation.x = MathUtils.lerp(ticket.scene.rotation.x, 0, lerpFactor)
-        ticket.scene.rotation.z = MathUtils.lerp(ticket.scene.rotation.z, 0, lerpFactor)
-      }
-    }
+  private _updateTicketFaceRotation(scene: THREE.Scene, dt?: number) {
+    const targetRotationY = this.state.frontside ? 0 : 2 * Math.PI
+    const lerpFactor = Math.min(dt ?? 0.05, 0.05)
+    scene.rotation.z = MathUtils.lerp(scene.rotation.z, targetRotationY, lerpFactor)
   }
 
   private _setCamera(camera: Camera) {
     camera.position.copy(this._sceneConfig.camera.position)
     camera.rotation.copy(this._sceneConfig.camera.rotation)
+
+    if(camera instanceof THREE.PerspectiveCamera) {
+      camera.fov = this._sceneConfig.camera.fov
+      camera.updateProjectionMatrix()
+    }
   }
 
   private _registerMousePositionTracking(context: SceneRenderer) {

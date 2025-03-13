@@ -1,6 +1,6 @@
 import { cn } from 'ui'
 import { useThreeJS } from './helpers'
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import SceneRenderer, { BaseScene } from './utils/SceneRenderer'
 import TicketScene from './scenes/TicketScene'
 
@@ -26,32 +26,44 @@ const TicketCanvas = ({
   className,
   onUpgrade,
 }: TicketCanvasProps) => {
-  const setup = useCallback((container: HTMLElement) => {
-    let scene: BaseScene | null = null
+  const sceneRef = useRef<TicketScene | null>(null)
+  const setup = useCallback(
+    (container: HTMLElement) => {
+      let scene: BaseScene | null = null
 
-    const sceneRenderer = new SceneRenderer(container)
+      const sceneRenderer = new SceneRenderer(container)
 
-    sceneRenderer.activateScene(new TicketScene({
-      defaultSecret: secret,
-      defaultPlatinum: platinum,
-      user,
-      startDate
-    }))
+      sceneRef.current = new TicketScene({
+        defaultSecret: secret,
+        defaultPlatinum: platinum,
+        user,
+        startDate,
+      })
 
-    sceneRenderer.init()
+      sceneRenderer.activateScene(sceneRef.current)
 
-    return sceneRenderer
-  }, [platinum, secret, startDate, user])
+      sceneRenderer.init()
+
+      return sceneRenderer
+    },
+    [platinum, secret, startDate, user]
+  )
 
   const { containerRef } = useThreeJS(setup)
   return (
     <div
       className={cn(
-        'w-screen absolute inset-0 h-[600px] lg:min-h-full lg:max-h-[1000px] flex justify-center items-center overflow-hidden pointer-events-none',
+        'w-screen absolute inset-0 h-[600px] lg:min-h-full lg:max-h-[1000px] flex justify-center items-center overflow-hidden',
         className
       )}
     >
-      <div ref={containerRef} className="w-full lg:h-full" />
+      <div
+        ref={containerRef}
+        className="w-full lg:h-full"
+        onClick={() => {
+          sceneRef.current?.showSecondFace()
+        }}
+      />
     </div>
   )
 }

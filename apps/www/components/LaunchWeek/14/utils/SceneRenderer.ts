@@ -11,7 +11,7 @@ export interface BaseScene {
   /**
    * Update the scene for each animation frame
    */
-  update(context: SceneRenderer, dt: number): void
+  update(context: SceneRenderer, dt?: number): void
 
   /**
    * Clean up resources when the scene is destroyed
