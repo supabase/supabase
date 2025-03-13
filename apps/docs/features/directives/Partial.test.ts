@@ -68,6 +68,8 @@ Some more text.
 
 First level of nesting:
 
+{/* prettier-ignore */}
+
 Second level of nesting.
 
 Some more text.
