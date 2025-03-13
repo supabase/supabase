@@ -694,10 +694,10 @@ The `realtime.send` function provides the most flexibility by allowing you to br
 
 ```sql
 SELECT realtime.send (
-	to_jsonb ('{}'::text), -- JSONB Payload
-	'event', -- Event name
-	'topic', -- Topic
-	FALSE -- Public / Private flag
+  jsonb_build_object('hello', 'world'), -- JSONB Payload
+  'event', -- Event name
+  'topic', -- Topic
+  false -- Public / Private flag.
 );
 ```
 
@@ -772,7 +772,9 @@ Finally, client side will requires to be set up to listen to the topic `topic:<r
 const gameId = 'id'
 await supabase.realtime.setAuth() // Needed for Realtime Authorization
 const changes = supabase
-  .channel(`topic:${gameId}`)
+  .channel(`topic:${gameId}`, {
+    config: { private: true },
+  })
   .on('broadcast', { event: 'INSERT' }, (payload) => console.log(payload))
   .on('broadcast', { event: 'UPDATE' }, (payload) => console.log(payload))
   .on('broadcast', { event: 'DELETE' }, (payload) => console.log(payload))
