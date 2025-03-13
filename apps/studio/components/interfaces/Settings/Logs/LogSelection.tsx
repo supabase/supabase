@@ -19,6 +19,7 @@ import type { LogData, QueryType } from './Logs.types'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useChatInputRef } from 'components/ui/AIAssistantPanel/AIAssistant'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -31,6 +32,7 @@ export interface LogSelectionProps {
 }
 
 const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectionProps) => {
+  const logsAIShortcutEnabled = useFlag('logsaishortcut')
   const LogDetails = () => {
     if (error) return <LogErrorState error={error} />
     if (!log) return <LogDetailEmptyState />
@@ -80,42 +82,44 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
               Raw
             </TabsTrigger_Shadcn_>
             <div className="flex items-center gap-2 justify-end ml-auto">
-              <DropdownMenu>
-                <DropdownMenuTrigger className="size-6 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity data-[state=open]:opacity-100">
-                  <AiIconAnimation allowHoverEffect size={16} />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="max-w-[120px]" align="end" alignOffset={-10}>
-                  <DropdownMenuLabel className="text-xs text-foreground-lighter">
-                    AI Assistant
-                  </DropdownMenuLabel>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setAiAssistantPanel({
-                        open: true,
-                        initialInput: `Provide a concise explanation of the following log from the Supabase ${queryType} logs. \n\`\`\`json
+              {logsAIShortcutEnabled && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="size-6 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity data-[state=open]:opacity-100">
+                    <AiIconAnimation allowHoverEffect size={16} />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="max-w-[120px]" align="end" alignOffset={-10}>
+                    <DropdownMenuLabel className="text-xs text-foreground-lighter">
+                      AI Assistant
+                    </DropdownMenuLabel>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setAiAssistantPanel({
+                          open: true,
+                          initialInput: `Provide a concise explanation of the following log from the Supabase ${queryType} logs. \n\`\`\`json
 ${JSON.stringify(log)}\n\`\`\``,
-                      })
-                      focusInput()
-                    }}
-                  >
-                    Explain
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setAiAssistantPanel({
-                        open: true,
-                        initialInput: `Troubleshoot the following log from the Supabase ${queryType} logs and provide a concise step by step guide on how to fix it.\n\`\`\`json
+                        })
+                        focusInput()
+                      }}
+                    >
+                      Explain
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setAiAssistantPanel({
+                          open: true,
+                          initialInput: `Troubleshoot the following log from the Supabase ${queryType} logs and provide a concise step by step guide on how to fix it.\n\`\`\`json
 ${JSON.stringify(log)}
 \n\`\`\``,
-                      })
+                        })
 
-                      focusInput()
-                    }}
-                  >
-                    Troubleshoot
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                        focusInput()
+                      }}
+                    >
+                      Troubleshoot
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
               <Button
                 type="text"
                 className="cursor-pointer transition hover:text-foreground h-6 w-6 px-0 py-0 flex items-center justify-center"
