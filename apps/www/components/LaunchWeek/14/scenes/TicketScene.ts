@@ -68,21 +68,7 @@ class TicketScene implements BaseScene {
     const gltf = await loadGLTFModel(this.sceneUrl)
 
     const ticket = gltf.scene as unknown as Scene
-    const frontFace = gltf.scene.getObjectByName('FrontFace')
-    if (frontFace instanceof THREE.Mesh) {
-      frontFace.material = new THREE.MeshPhongMaterial({
-        opacity: 0,
-        transparent: true,
-      })
-    }
 
-    const backFace = gltf.scene.getObjectByName('BackFace')
-    if (backFace instanceof THREE.Mesh) {
-      backFace.material = new THREE.MeshPhongMaterial({
-        opacity: 0,
-        transparent: true,
-      })
-    }
     this.setCamera(context.camera)
     const modelRenderPass = new RenderPass(ticket, context.camera)
     context.composer.addPass(modelRenderPass)
@@ -103,6 +89,10 @@ class TicketScene implements BaseScene {
     const pointLight = new THREE.PointLight(0xffffff, 1.0)
     pointLight.position.set(0, 0, 5)
     ticket.add(pointLight)
+
+    window.addEventListener('mousemove', () => {
+
+    })
   }
 
   update(context: SceneRenderer): void {
