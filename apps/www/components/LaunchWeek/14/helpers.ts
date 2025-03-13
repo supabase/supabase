@@ -4,7 +4,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { GlitchPass } from './effects/glitch'
 import { CRTShader } from './effects/crt-shader'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
@@ -210,13 +210,13 @@ export const loadTexture = (url: string): Promise<THREE.Texture> => {
  * @param url URL of the GLTF model to load
  * @returns Promise that resolves with the loaded model
  */
-export const loadGLTFModel = (url: string): Promise<THREE.Group> => {
-  return new Promise((resolve, reject) => {
+export const loadGLTFModel = (url: string) => {
+  return new Promise<GLTF>((resolve, reject) => {
     const loader = new GLTFLoader()
     loader.load(
       url,
       (gltf) => {
-        resolve(gltf.scene)
+        resolve(gltf)
       },
       undefined,
       (error) => reject(error)
@@ -251,11 +251,12 @@ export const createTicketMesh = async (
 
     if (!useTextureMode) {
       // Load the GLTF model
-      const model = await loadGLTFModel(source)
-      const ticketTexture = options.ticketTextureSource ? await loadTexture(options.ticketTextureSource) : null
+      const model = (await loadGLTFModel(source)).scene
+      const ticketTexture = options.ticketTextureSource
+        ? await loadTexture(options.ticketTextureSource)
+        : null
 
-
-      if(ticketTexture) {
+      if (ticketTexture) {
         const ticket = model.getObjectByName('ticket')
         if (ticket instanceof THREE.Mesh) {
           // Store the original material properties
@@ -263,7 +264,6 @@ export const createTicketMesh = async (
           newMaterial.uniforms.myTexture.value = ticketTexture
 
           ticket.material = newMaterial
-
         }
       }
 
@@ -282,7 +282,7 @@ export const createTicketMesh = async (
           continue
         }
 
-        if(namedObject instanceof THREE.Mesh) {
+        if (namedObject instanceof THREE.Mesh) {
           // Spline exports some objects with additional invalid materials. Clean it up here
           namedObject.material = new THREE.MeshBasicMaterial({})
         }
@@ -424,16 +424,16 @@ export const useThreeJS = (
     if (!containerRef.current) return
 
     const container = containerRef.current
-    const { cleanup, animate } = setupCallback(container)
+    const renderer = setupCallback(container)
 
     // Set up animation loop
-    const { start, stop } = createThreeAnimation(animate)
+    const { start, stop } = createThreeAnimation(renderer.animate.bind(renderer))
     start()
 
     // Cleanup on unmount
     return () => {
       stop()
-      cleanup()
+      renderer.cleanup()
     }
   }, [setupCallback])
 
