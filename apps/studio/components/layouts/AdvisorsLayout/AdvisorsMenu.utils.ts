@@ -1,9 +1,11 @@
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import type { Project } from 'data/projects/project-detail-query'
+import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 
 export const generateAdvisorsMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
+  const advisorRules = useFlag('advisorRules')
 
   return [
     {
@@ -29,7 +31,7 @@ export const generateAdvisorsMenu = (project?: Project): ProductMenuGroup[] => {
         },
       ],
     },
-    ...(IS_PLATFORM
+    ...(IS_PLATFORM && advisorRules
       ? [
           {
             title: 'Configuration',
