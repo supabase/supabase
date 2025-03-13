@@ -11,7 +11,7 @@ export interface BaseScene {
   /**
    * Update the scene for each animation frame
    */
-  update(context: SceneRenderer): void
+  update(context: SceneRenderer, dt: number): void
 
   /**
    * Clean up resources when the scene is destroyed
@@ -33,7 +33,7 @@ class SceneRenderer {
   activeScene: BaseScene | null
   private _resizeHandler: ((ev: UIEvent) => void) | null = null
 
-  constructor(private container: HTMLElement) {
+  constructor(public container: HTMLElement) {
     this.renderer = new WebGLRenderer({ antialias: true, alpha: true })
     this.composer = new EffectComposer(this.renderer)
     this.activeScene = null
@@ -62,6 +62,7 @@ class SceneRenderer {
   }
 
   animate(dTime?: number) {
+    this.activeScene?.update(this, dTime)
     this.composer.render(dTime)
   }
 
