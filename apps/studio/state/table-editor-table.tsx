@@ -1,6 +1,6 @@
 import { PropsWithChildren, createContext, useContext, useEffect, useRef } from 'react'
 import { CalculatedColumn } from 'react-data-grid'
-import { proxy, subscribe, useSnapshot } from 'valtio'
+import { proxy, ref, subscribe, useSnapshot } from 'valtio'
 import { proxySet } from 'valtio/utils'
 
 import {
@@ -48,6 +48,33 @@ export const createTableEditorTableState = ({
     /* Table */
     table,
     originalTable,
+
+    /**
+     * Used for tracking changes to the table
+     * Do not use outside of table-editor-table.tsx
+     */
+    _originalTableRef: ref(originalTable),
+
+    updateTable: (table: Entity) => {
+      const supaTable = parseSupaTable(table)
+
+      const gridColumns = getInitialGridColumns(
+        getGridColumns(supaTable, {
+          projectRef,
+          tableId: table.id,
+          editable,
+          onAddColumn: editable ? onAddColumn : undefined,
+          onExpandJSONEditor,
+          onExpandTextEditor,
+        }),
+        { gridColumns: state.gridColumns }
+      )
+
+      state.table = supaTable
+      state.gridColumns = gridColumns
+      state.originalTable = table
+      state._originalTableRef = ref(table)
+    },
 
     /* Rows */
     selectedRows: proxySet<number>(),
@@ -149,17 +176,25 @@ export const TableEditorTableStateContextProvider = ({
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      return subscribe(state.gridColumns, () => {
+      return subscribe(state, () => {
         saveTableEditorStateToLocalStorageDebounced({
           gridColumns: state.gridColumns,
           projectRef,
-          tableName: table.name,
-          schema: table.schema,
+          tableName: state.table.name,
+          schema: state.table.schema,
         })
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    // We can use a === check here because react-query is good
+    // about returning objects with the same ref / different ref
+    if (state._originalTableRef !== table) {
+      state.updateTable(table)
+    }
+  }, [table])
 
   return (
     <TableEditorTableStateContext.Provider value={state}>
