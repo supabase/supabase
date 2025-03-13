@@ -184,17 +184,9 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         connectionString: project?.connectionString,
         table: supaTable,
       })
-      const formattedRows = rows.map((row) => {
-        const formattedRow = row
-        Object.keys(row).map((column) => {
-          if (typeof row[column] === 'object' && row[column] !== null)
-            formattedRow[column] = JSON.stringify(formattedRow[column])
-        })
-        return formattedRow
-      })
 
-      if (formattedRows.length > 0) {
-        const sqlStatements = formatTableRowsToSQL(supaTable, formattedRows)
+      if (rows.length > 0) {
+        const sqlStatements = formatTableRowsToSQL(supaTable, rows)
         const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
         saveAs(sqlData, `${entity!.name}_rows.sql`)
       }
