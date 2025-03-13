@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader'
 import { loadGLTFModel } from '../helpers'
 import SceneRenderer, { BaseScene } from '../utils/SceneRenderer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
@@ -49,14 +48,35 @@ class TicketScene implements BaseScene {
     basic: {
       back: '/images/launchweek/14/back-basic-ticket-textrue.png',
       front: '/images/launchweek/14/front-basic-ticket-texture.png',
+
+      bgColor: 0x202020,
+      textColor: 0xffffff,
+      textDimmedColor: 0x515151,
+      textNeonColor: 0xffffff,
+      textNeonDimmedColor: 0x515151,
+      transparentBg: 0x00000000,
     },
     secret: {
       back: '/images/launchweek/14/back-secret-ticket-textrue.png',
       front: '/images/launchweek/14/front-secret-ticket-texture.png',
+
+      bgColor: 0x050505ff,
+      textColor: 0xffffffff,
+      textDimmedColor: 0x515151ff,
+      textNeonColor: 0x2cf494ff,
+      textNeonDimmedColor: 0x12623bff,
+      transparentBg: 0x2cf49466,
     },
     platinum: {
       back: '/images/launchweek/14/back-platinum-ticket-textrue.png',
       front: '/images/launchweek/14/front-platinum-ticket-texture.png',
+
+      bgColor: 0x050505ff,
+      textColor: 0xffc73aff,
+      textDimmedColor: 0xffc73aff,
+      textNeonColor: 0xffc73aff,
+      textNeonDimmedColor: 0xffc73aff,
+      transparentBg: 0xffc73a66,
     },
   }
 
@@ -93,6 +113,7 @@ class TicketScene implements BaseScene {
     'TicketBackGoBackButton',
     'TicketBackWebsiteButton',
   ] as const
+  private static TEXTURE_PIXEL_DENSITY_FACTOR = 100
 
   private _textureCanvases: {
     [key in AvailableTextures]?: { canvas: HTMLCanvasElement; context: CanvasRenderingContext2D }
@@ -290,7 +311,7 @@ class TicketScene implements BaseScene {
       )
 
       const canvas = document.createElement('canvas')
-      const canvasWidth = worldSize.x // Base canvas width
+      const canvasWidth = worldSize.x * TicketScene.TEXTURE_PIXEL_DENSITY_FACTOR
       const canvasHeight = Math.floor(canvasWidth * (localSize.y / localSize.x)) // Maintain aspect ratio
 
       canvas.width = canvasWidth
@@ -335,7 +356,13 @@ class TicketScene implements BaseScene {
   }
 
   private _setSecretTextures() {
-    this._textureCanvases
+    if (!this._textureCanvases.TicketFront) {
+      throw new Error('TicketFront texture canvas is not set')
+    }
+
+    const { context, canvas } = this._textureCanvases.TicketFront
+
+    context.clearRect(0, 0, canvas.width, canvas.height)
   }
 
   private executeWithObject(
