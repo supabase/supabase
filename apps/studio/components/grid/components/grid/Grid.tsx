@@ -9,7 +9,6 @@ import AlertError from 'components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useUrlState } from 'hooks/ui/useUrlState'
 import { copyToClipboard } from 'lib/helpers'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
@@ -30,7 +29,7 @@ interface IGrid extends GridProps {
   isSuccess: boolean
   isError: boolean
   filters: Filter[]
-  setParams: ReturnType<typeof useUrlState>[1]
+  onApplyFilters: (appliedFilters: Filter[]) => void
 }
 
 // [Joshen] Just for visibility this is causing some hook errors in the browser
@@ -49,7 +48,7 @@ export const Grid = memo(
         isSuccess,
         isError,
         filters,
-        setParams,
+        onApplyFilters,
       },
       ref: React.Ref<DataGridHandle> | undefined
     ) => {
@@ -132,9 +131,7 @@ export const Grid = memo(
       }
 
       const removeAllFilters = () => {
-        setParams((prevParams) => {
-          return { ...prevParams, filter: [] }
-        })
+        onApplyFilters([])
       }
 
       return (

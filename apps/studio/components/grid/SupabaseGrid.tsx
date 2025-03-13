@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react'
 import { DataGridHandle } from 'react-data-grid'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -12,13 +12,18 @@ import { EMPTY_ARR } from 'lib/void'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { formatFilterURLParams, formatSortURLParams } from './SupabaseGrid.utils'
+import {
+  filtersToUrlParams,
+  formatFilterURLParams,
+  formatSortURLParams,
+  saveTableEditorStateToLocalStorage,
+} from './SupabaseGrid.utils'
 import { Shortcuts } from './components/common/Shortcuts'
 import Footer from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
 import Header, { HeaderProps } from './components/header/Header'
 import { RowContextMenu } from './components/menu'
-import { GridProps } from './types'
+import { Filter, GridProps } from './types'
 
 export const SupabaseGrid = ({
   customHeader,
@@ -32,6 +37,7 @@ export const SupabaseGrid = ({
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
+  const { project } = useProjectContext()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
@@ -44,9 +50,35 @@ export const SupabaseGrid = ({
   const sorts = formatSortURLParams(snap.table.name, sort as string[] | undefined)
   const filters = formatFilterURLParams(filter as string[])
 
+  const onApplyFilters = useCallback(
+    (appliedFilters: Filter[]) => {
+      snap.setEnforceExactCount(false)
+      // Reset page to 1 when filters change
+      snap.setPage(1)
+
+      const filters = filtersToUrlParams(appliedFilters)
+
+      setParams((prevParams) => {
+        return {
+          ...prevParams,
+          filter: filters,
+        }
+      })
+
+      if (project?.ref) {
+        saveTableEditorStateToLocalStorage({
+          projectRef: project.ref,
+          tableName: snap.table.name,
+          schema: snap.table.schema,
+          filters: filters,
+        })
+      }
+    },
+    [project?.ref, snap.table.name, snap.table.schema]
+  )
+
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
-  const { project } = useProjectContext()
   const { data, error, isSuccess, isError, isLoading, isRefetching } = useTableRowsQuery(
     {
       projectRef: project?.ref,
@@ -99,7 +131,7 @@ export const SupabaseGrid = ({
               isSuccess={isSuccess}
               isError={isError}
               filters={filters}
-              setParams={setParams}
+              onApplyFilters={onApplyFilters}
             />
             <Footer isRefetching={isRefetching} />
             <Shortcuts gridRef={gridRef} rows={rows} />
