@@ -39,12 +39,27 @@ interface MousePositionState {
   containerY: number
 }
 
+type AvailableTextures = (typeof TicketScene)['TEXTURE_NAMES'][number]
+
 class TicketScene implements BaseScene {
   raycaster = new THREE.Raycaster()
   sceneUrl = '/images/launchweek/14/ticket-model.glb'
-  staticBasicTexture = '/images/launchweek/14/basic-static-ticket.png'
-  staticSecretTexture = '/images/launchweek/14/secret-static-ticket.png'
-  staticPlatinumTexture = '/images/launchweek/14/platinum-static-ticket.png'
+
+  textureImages = {
+    basic: {
+      back: '/images/launchweek/14/back-basic-ticket-textrue.png',
+      front: '/images/launchweek/14/front-basic-ticket-texture.png',
+    },
+    secret: {
+      back: '/images/launchweek/14/back-secret-ticket-textrue.png',
+      front: '/images/launchweek/14/front-secret-ticket-texture.png',
+    },
+    platinum: {
+      back: '/images/launchweek/14/back-platinum-ticket-textrue.png',
+      front: '/images/launchweek/14/front-platinum-ticket-texture.png',
+    },
+  }
+
   fontUrl = ''
 
   state: TicketSceneState
@@ -67,6 +82,24 @@ class TicketScene implements BaseScene {
 
   private _sceneRenderer: SceneRenderer | null = null
 
+  private _ticket: THREE.Scene | null = null
+  private _modelRenderPass: RenderPass | null = null
+  private static TEXTURE_NAMES = [
+    'TicketFront',
+    'TicketBack',
+    'TicketEdge',
+    'TicketFrontWebsiteButton',
+    'TicketFrontSeatChartButton',
+    'TicketBackGoBackButton',
+    'TicketBackWebsiteButton',
+  ] as const
+
+  private _textureCanvases: {
+    [key in AvailableTextures]?: { canvas: HTMLCanvasElement; context: CanvasRenderingContext2D }
+  } = {}
+
+  private _namedMeshes: { [key in AvailableTextures]?: THREE.Mesh } = {}
+
   constructor(private options: TicketSceneOptions) {
     this.state = {
       secret: options.defaultSecret || false,
@@ -78,7 +111,7 @@ class TicketScene implements BaseScene {
         username: options.user.name || '',
         species: '',
         earth: '',
-        // Start asigning seats from A001
+        // Start assigning seats from A001
         seatCode: (466561 + (options.user.ticketNumber || 0)).toString(36),
       },
     }
@@ -90,29 +123,32 @@ class TicketScene implements BaseScene {
 
     const gltf = await loadGLTFModel(this.sceneUrl)
 
-    const ticket = gltf.scene as unknown as Scene
+    this._ticket = gltf.scene as unknown as Scene
 
     this._setCamera(context.camera)
-    const modelRenderPass = new RenderPass(ticket, context.camera)
-    context.composer.addPass(modelRenderPass)
+    this._modelRenderPass = new RenderPass(this._ticket, context.camera)
+    context.composer.addPass(this._modelRenderPass)
 
     // Set renderer clear color to make background visible
     context.renderer.setClearColor(0x000000, 0)
 
     // Add ambient light with increased intensity
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.0)
-    ticket.add(ambientLight)
+    this._ticket.add(ambientLight)
 
     // Add directional light
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5)
     directionalLight.position.set(5, 5, 5)
-    ticket.add(directionalLight)
+    this._ticket.add(directionalLight)
 
     // Add a point light to better illuminate the placeholder
     const pointLight = new THREE.PointLight(0xffffff, 1.0)
     pointLight.position.set(0, 0, 5)
-    ticket.add(pointLight)
+    this._ticket.add(pointLight)
     this._registerMousePositionTracking(context)
+
+    this._setupNamedObjects()
+    this._setupTextureCanvases()
   }
 
   update(context: SceneRenderer, dt?: number): void {
@@ -236,6 +272,132 @@ class TicketScene implements BaseScene {
   }
 
   private createMaterial() {}
+
+  private _setupTextureCanvases() {
+    for (const [name, mesh] of Object.entries(this._namedMeshes)) {
+      const localBox = new THREE.Box3().setFromObject(mesh)
+      const localSize = localBox.getSize(new THREE.Vector3())
+
+      // Get world scale
+      const worldScale = new THREE.Vector3()
+      mesh.matrixWorld.decompose(new THREE.Vector3(), new THREE.Quaternion(), worldScale)
+
+      // Apply world scale to get world size
+      const worldSize = new THREE.Vector3(
+        localSize.x / Math.abs(worldScale.x),
+        localSize.y / Math.abs(worldScale.y),
+        localSize.z / Math.abs(worldScale.z)
+      )
+
+      const canvas = document.createElement('canvas')
+      const canvasWidth = worldSize.x // Base canvas width
+      const canvasHeight = Math.floor(canvasWidth * (localSize.y / localSize.x)) // Maintain aspect ratio
+
+      canvas.width = canvasWidth
+      canvas.height = canvasHeight
+
+      // Get canvas context and set up text rendering
+      const context = canvas.getContext('2d')
+
+      if (!context) {
+        throw new Error(`Could not get 2D context for text "${name}"`)
+      }
+
+      this._textureCanvases[name as AvailableTextures] = {
+        canvas,
+        context,
+      }
+    }
+  }
+
+  private _setupNamedObjects() {
+    const mainMeshName = 'Plane'
+    const mesh = this._ticket?.getObjectByName(mainMeshName)
+
+    if (!mesh) {
+      throw new Error(`Could not find mesh named ${mainMeshName}`)
+    }
+
+    for (const part of mesh.children) {
+      if (!(part instanceof THREE.Mesh)) {
+        continue
+      }
+
+      if (!(part.material instanceof THREE.Material)) {
+        console.log(`Material is not an instance of THREE.Material. Got:`, part.material)
+        continue
+      }
+
+      if ((TicketScene.TEXTURE_NAMES as readonly string[]).includes(part.material.name)) {
+        this._namedMeshes[part.material.name as AvailableTextures] = part
+      }
+    }
+  }
+
+  private _setSecretTextures() {
+    this._textureCanvases
+  }
+
+  private executeWithObject(
+    execFunctions: [(typeof TicketScene)['TEXTURE_NAMES'][number], (mesh: THREE.Mesh) => void][]
+  ) {
+    const mainMeshName = 'Plane'
+    const mesh = this._ticket?.getObjectByName(mainMeshName)
+
+    if (!mesh) {
+      throw new Error(`Could not find mesh named ${mainMeshName}`)
+    }
+
+    for (const part of mesh.children) {
+      if (!(part instanceof THREE.Mesh)) {
+        continue
+      }
+      if (!(part.material instanceof THREE.Material)) {
+        console.log(`Material is not an instance of THREE.Material. Got:`, part.material)
+        continue
+      }
+
+      switch (part.material.name) {
+        case 'TicketFront': {
+          console.log(part.material.name, part.material)
+          break
+        }
+        case 'TicketBack': {
+          console.log(part.material.name, part.material)
+          break
+        }
+
+        case 'TicketEdge': {
+          console.log(part.material.name, part.material)
+          break
+        }
+
+        case 'TicketFrontWebsiteButton': {
+          console.log(part.material.name, part.material)
+          break
+        }
+
+        case 'TicketFrontSeatChartButton': {
+          console.log(part.material.name, part.material)
+          break
+        }
+
+        case 'TicketBackGoBackButton': {
+          console.log(part.material.name, part.material)
+          break
+        }
+
+        case 'TicketBackWebsiteButton': {
+          console.log(part.material.name, part.material)
+          break
+        }
+
+        default: {
+          console.log('Unexpected material name', part.material.name, part.material)
+        }
+      }
+    }
+  }
 }
 
 export default TicketScene
