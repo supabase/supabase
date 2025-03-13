@@ -1,7 +1,3 @@
-import UserManagementSQLTemplate from './user_management_quickstart_sql_template.mdx'
-import { Tabs } from 'ui'
-export const TabPanel = Tabs.Panel
-
 ## Project setup
 
 Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase and then creating a "schema" inside the database.
@@ -31,7 +27,7 @@ Now we are going to set up the database schema. We can use the "User Management 
 
 <Admonition type="note">
 
-You can easily pull the database schema down to your local project by running the `db pull` command. Read the [local development docs](/docs/guides/cli/local-development#link-your-project) for detailed instructions.
+You can pull the database schema down to your local project by running the `db pull` command. Read the [local development docs](/docs/guides/cli/local-development#link-your-project) for detailed instructions.
 
 </Admonition>
 
@@ -54,12 +50,12 @@ When working locally you can run the following command to create a new migration
 supabase migration new user_management_starter
 ```
 
-<UserManagementSQLTemplate />
+<$Partial path="user_management_quickstart_sql_template.mdx" />
 
 </TabPanel>
 </Tabs>
 
-### Get the API Keys
+### Get the API keys
 
 Now that you've created some database tables, you are ready to insert data using the auto-generated API.
 We just need to get the Project URL and `anon` key from the API settings.

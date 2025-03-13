@@ -3,7 +3,6 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { ContributingToc } from '~/app/contributing/ContributingToC'
-import { MDXProviderGuides } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
@@ -22,9 +21,7 @@ export default async function ContributingPage() {
             id="contributing"
             className="prose max-w-none relative transition-all ease-out duration-100"
           >
-            <MDXProviderGuides>
-              <MDXRemoteBase source={content} />
-            </MDXProviderGuides>
+            <MDXRemoteBase source={content} />
           </article>
         </div>
         <ContributingToc />

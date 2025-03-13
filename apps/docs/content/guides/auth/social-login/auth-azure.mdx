@@ -125,7 +125,7 @@ Supabase Auth requires that Azure returns a valid email address. Therefore you m
 >
 <TabPanel id="js" label="JavaScript">
 
-<CreateClientSnippet />
+<$Partial path="create_client_snippet.mdx" />
 
 When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `azure` as the `provider`:
 
@@ -172,7 +172,7 @@ suspend fun signInWithAzure() {
 </TabPanel>
 </Tabs>
 
-<OAuthPkceFlow />
+<$Partial path="oauth_pkce_flow.mdx" />
 
 <Tabs
   scrollable

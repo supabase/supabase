@@ -57,7 +57,7 @@ jobs:
           git diff --name-only origin/$BASE_REF HEAD \
             | { grep -E "^apps/docs/content/" || test $? = 1; } \
             | xargs -r supa-mdx-lint --format rdf \
-            | reviewdog -f=rdjsonl -reporter=github-pr-review
+            | reviewdog -f=rdjsonl -reporter=github-pr-review -tee
       - name: run linter (external)
         if: steps.filter.outputs.docs == 'true' && github.event.pull_request.head.repo.full_name != github.repository
         env:

@@ -7,7 +7,7 @@ import { cn } from 'ui'
 
 import Breadcrumbs from '~/components/Breadcrumbs'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
-import { MDXProviderGuides, TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
+import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
 import { type GuideFrontmatter } from '~/lib/docs'
@@ -64,77 +64,73 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
   const hideToc = meta?.hideToc || meta?.hide_table_of_contents
 
   return (
-    <MDXProviderGuides>
-      <TocAnchorsProvider>
-        <div className={'grid grid-cols-12 relative gap-4'}>
-          <div
-            className={cn(
-              'relative',
-              'transition-all ease-out',
-              'duration-100',
-              hideToc ? 'col-span-12' : 'col-span-12 md:col-span-9'
-            )}
-          >
-            <Breadcrumbs className="mb-2" />
-            <article
-              // Used to get headings for the table of contents
-              id="sb-docs-guide-main-article"
-              className="prose max-w-none"
-            >
-              <h1 className="mb-0 [&>p]:m-0">
-                <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
-              </h1>
-              {meta?.subtitle && (
-                <h2 className="mt-3 text-xl text-foreground-light">
-                  <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
-                </h2>
-              )}
-              <hr className="not-prose border-t-0 border-b my-8" />
-
-              {content && <MDXRemoteBase source={content} options={mdxOptions} />}
-              {children}
-              <footer className="mt-16 not-prose">
-                <a
-                  href={
-                    editLink.includesProtocol
-                      ? editLink.link
-                      : `https://github.com/${editLink.link}`
-                  }
-                  className={cn(
-                    'w-fit',
-                    'flex items-center gap-1',
-                    'text-sm text-scale-1000 hover:text-scale-1200',
-                    'transition-colors'
-                  )}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
-                </a>
-              </footer>
-            </article>
-          </div>
-          {!hideToc && (
-            <GuidesTableOfContents
-              video={meta?.tocVideo}
-              className={cn(
-                'hidden md:flex',
-                'col-span-3 self-start',
-                'sticky',
-                /**
-                 * --header-height: height of nav
-                 * 1px: height of nav border
-                 * 2rem: content padding
-                 */
-                'top-[calc(var(--header-height)+1px+2rem)]',
-                // 3rem accounts for 2rem of top padding + 1rem of extra breathing room
-                'max-h-[calc(100vh-var(--header-height)-3rem)]'
-              )}
-            />
+    <TocAnchorsProvider>
+      <div className={'grid grid-cols-12 relative gap-4'}>
+        <div
+          className={cn(
+            'relative',
+            'transition-all ease-out',
+            'duration-100',
+            hideToc ? 'col-span-12' : 'col-span-12 md:col-span-9'
           )}
+        >
+          <Breadcrumbs className="mb-2" />
+          <article
+            // Used to get headings for the table of contents
+            id="sb-docs-guide-main-article"
+            className="prose max-w-none"
+          >
+            <h1 className="mb-0 [&>p]:m-0">
+              <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
+            </h1>
+            {meta?.subtitle && (
+              <h2 className="mt-3 text-xl text-foreground-light">
+                <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
+              </h2>
+            )}
+            <hr className="not-prose border-t-0 border-b my-8" />
+
+            {content && <MDXRemoteBase source={content} options={mdxOptions} />}
+            {children}
+            <footer className="mt-16 not-prose">
+              <a
+                href={
+                  editLink.includesProtocol ? editLink.link : `https://github.com/${editLink.link}`
+                }
+                className={cn(
+                  'w-fit',
+                  'flex items-center gap-1',
+                  'text-sm text-scale-1000 hover:text-scale-1200',
+                  'transition-colors'
+                )}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
+              </a>
+            </footer>
+          </article>
         </div>
-      </TocAnchorsProvider>
-    </MDXProviderGuides>
+        {!hideToc && (
+          <GuidesTableOfContents
+            video={meta?.tocVideo}
+            className={cn(
+              'hidden md:flex',
+              'col-span-3 self-start',
+              'sticky',
+              /**
+               * --header-height: height of nav
+               * 1px: height of nav border
+               * 2rem: content padding
+               */
+              'top-[calc(var(--header-height)+1px+2rem)]',
+              // 3rem accounts for 2rem of top padding + 1rem of extra breathing room
+              'max-h-[calc(100vh-var(--header-height)-3rem)]'
+            )}
+          />
+        )}
+      </div>
+    </TocAnchorsProvider>
   )
 }
 
