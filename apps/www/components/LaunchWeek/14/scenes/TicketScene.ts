@@ -40,6 +40,7 @@ interface MousePositionState {
 }
 
 class TicketScene implements BaseScene {
+  raycaster = new THREE.Raycaster()
   sceneUrl = '/images/launchweek/14/ticket-model.glb'
   staticBasicTexture = '/images/launchweek/14/basic-static-ticket.png'
   staticSecretTexture = '/images/launchweek/14/secret-static-ticket.png'
@@ -137,6 +138,10 @@ class TicketScene implements BaseScene {
 
   showSecondFace() {
     this.state.frontside = !this.state.frontside
+  }
+
+  click(e: MouseEvent) {
+    this._updateMousePosition(e)
   }
 
   private _updateTicketToFollowMouse(scene: THREE.Scene, dt?: number) {
