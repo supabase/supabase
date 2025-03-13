@@ -111,7 +111,7 @@ const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProp
           <TooltipTrigger>
             <Badge variant="default">{backup.isPhysicalBackup ? 'Physical' : 'Logical'}</Badge>
           </TooltipTrigger>
-          <TooltipContent>
+          <TooltipContent side="bottom">
             Learn more about backup types{' '}
             <InlineLink href="https://supabase.com/blog/postgresql-physical-logical-backups">
               here
