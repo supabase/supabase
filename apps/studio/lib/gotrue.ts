@@ -77,7 +77,7 @@ export const getReturnToPath = (fallback = '/projects') => {
     // check returnTo doesn't try trick the browser to redirect
     // don't try sanitize, it is a losing battle. Go to fallback
     // disallow anything that starts with /non-word-char+/ or non-char+/
-    const pattern = /^\/?[\W]+\//
+    const pattern = /^\/?[\W]+.*\//
     validReturnTo = pattern.test(returnTo) ? fallback : returnTo
   }
 
