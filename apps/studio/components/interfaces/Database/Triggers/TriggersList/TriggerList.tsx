@@ -86,7 +86,13 @@ const TriggerList = ({
           <Table.td className="space-x-2">
             <Tooltip>
               <TooltipTrigger className="cursor-default truncate max-w-48 inline-block">
-                {x.name}
+                <Button
+                  type="text"
+                  className="text-foreground p-0 hover:bg-transparent"
+                  onClick={() => editTrigger(x)}
+                >
+                  {x.name}
+                </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom" align="center">
                 {x.name}

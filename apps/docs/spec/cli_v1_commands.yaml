@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.19.5
+  version: 2.19.6
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -51,7 +51,7 @@ flags:
     description: use the specified docker network instead of a generated one
     default_value: ''
   - id: output
-    name: --output <[ env | pretty | json | toml | yaml ]>
+    name: -o, --output <[ env | pretty | json | toml | yaml ]>
     description: output format of status variables
     default_value: pretty
     accepted_values:
