@@ -51,6 +51,7 @@ class TicketScene implements BaseScene {
   private _internalState = {
     mousePosition: undefined as MousePositionState | undefined,
     containerBBox: undefined as DOMRect | undefined,
+    naturalPosition: new Vector3(0, 0, 0),
   }
 
   private _sceneConfig = {
@@ -116,8 +117,8 @@ class TicketScene implements BaseScene {
   update(context: SceneRenderer, dt?: number): void {
     const ticket = context.composer.passes[0]
     if (ticket instanceof RenderPass) {
+      this._updateNaturalPosition()
       this._updateTicketToFollowMouse(ticket.scene, dt)
-      this._updateTicketFaceRotation(ticket.scene, dt)
     }
   }
 
@@ -150,27 +151,45 @@ class TicketScene implements BaseScene {
 
       // Apply smooth rotation with a smaller lerp factor
       const lerpFactor = Math.min(dt ?? 0.05, 0.05)
-      scene.rotation.x = MathUtils.lerp(scene.rotation.x, targetRotationX, lerpFactor)
-      scene.rotation.z = MathUtils.lerp(scene.rotation.z, targetRotationZ, lerpFactor)
+      scene.rotation.x = MathUtils.lerp(
+        scene.rotation.x,
+        this._internalState.naturalPosition.x + targetRotationX,
+        lerpFactor
+      )
+      scene.rotation.z = MathUtils.lerp(
+        scene.rotation.z,
+        this._internalState.naturalPosition.z + targetRotationZ,
+        lerpFactor
+      )
     } else {
       // Return to neutral position more slowly
       const lerpFactor = Math.min(dt ?? 0.03, 0.03)
-      scene.rotation.x = MathUtils.lerp(scene.rotation.x, 0, lerpFactor)
-      scene.rotation.z = MathUtils.lerp(scene.rotation.z, 0, lerpFactor)
+      scene.rotation.x = MathUtils.lerp(
+        scene.rotation.x,
+        this._internalState.naturalPosition.x,
+        lerpFactor
+      )
+      scene.rotation.z = MathUtils.lerp(
+        scene.rotation.z,
+        this._internalState.naturalPosition.z,
+        lerpFactor
+      )
     }
   }
 
-  private _updateTicketFaceRotation(scene: THREE.Scene, dt?: number) {
-    const targetRotationY = this.state.frontside ? 0 : 2 * Math.PI
-    const lerpFactor = Math.min(dt ?? 0.05, 0.05)
-    scene.rotation.z = MathUtils.lerp(scene.rotation.z, targetRotationY, lerpFactor)
+  private _updateNaturalPosition() {
+    if (this.state.frontside) {
+      this._internalState.naturalPosition.set(0, 0, 0)
+    } else {
+      this._internalState.naturalPosition.set(0, 0, Math.PI)
+    }
   }
 
   private _setCamera(camera: Camera) {
     camera.position.copy(this._sceneConfig.camera.position)
     camera.rotation.copy(this._sceneConfig.camera.rotation)
 
-    if(camera instanceof THREE.PerspectiveCamera) {
+    if (camera instanceof THREE.PerspectiveCamera) {
       camera.fov = this._sceneConfig.camera.fov
       camera.updateProjectionMatrix()
     }
