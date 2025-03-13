@@ -111,7 +111,11 @@ export const useCustomDomainsQuery = <TData = CustomDomainsData>(
     ({ signal }) => getCustomDomains({ projectRef }, signal),
     {
       enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
-      refetchInterval: false,
+
+      refetchInterval: (data: any) => {
+        if (data.status === '0_not_allowed') return false
+        return 1000 * 5 * 60 // 5 minutes
+      },
       ...options,
     }
   )
