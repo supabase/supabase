@@ -252,9 +252,10 @@ const { data, error } = await supabase
 
 // After receiving a SMS with a OTP.
 const { data, error } = await supabase
-  .auth
-  .verifyOtp({ phone, token })
-```
+.auth
+.verifyOtp({ phone, token })
+
+````
 
 </TabPanel>
 </Tabs>
