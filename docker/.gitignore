@@ -3,3 +3,5 @@ volumes/storage
 .env
 test.http
 docker-compose.override.yml
+volumes/mail
+certs/
