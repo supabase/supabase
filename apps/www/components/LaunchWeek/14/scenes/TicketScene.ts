@@ -109,37 +109,14 @@ class TicketScene implements BaseScene {
     const pointLight = new THREE.PointLight(0xffffff, 1.0)
     pointLight.position.set(0, 0, 5)
     ticket.add(pointLight)
-    this._applyMouseFollowEffect(context)
+    this._registerMousePositionTracking(context)
   }
 
   update(context: SceneRenderer, dt?: number): void {
     const ticket = context.composer.passes[0] as RenderPass
-    if (ticket && ticket.scene) {
-      // Calculate rotation based on mouse position
-      // Limit rotation to reasonable angles
-      if (this._internalState.mousePosition?.isWithinContainer) {
-        const mouseX = this._internalState.mousePosition.containerX
-        const mouseY = this._internalState.mousePosition.containerY
-        const targetRotationX = mouseY * -0.2
-        const targetRotationZ = mouseX * -0.3
-
-        // Apply smooth rotation
-        ticket.scene.rotation.x = MathUtils.lerp(
-          ticket.scene.rotation.x,
-          targetRotationX,
-          dt ?? 0.1
-        )
-        ticket.scene.rotation.z = MathUtils.lerp(
-          ticket.scene.rotation.z,
-          targetRotationZ,
-          dt ?? 0.1
-        )
-      } else {
-        ticket.scene.rotation.x = MathUtils.lerp(ticket.scene.rotation.x, 0, dt ?? 0.1)
-        ticket.scene.rotation.z = MathUtils.lerp(ticket.scene.rotation.z, 0, dt ?? 0.1)
-      }
-    }
+    this._updateTicketToFollowMouse(ticket, dt)
   }
+
   cleanup(): void {
     if (this.mouseMoveHandler) window.removeEventListener('mousemove', this.mouseMoveHandler)
   }
@@ -169,12 +146,44 @@ class TicketScene implements BaseScene {
     }
   }
 
+  private _updateTicketToFollowMouse(ticket?: RenderPass, dt?: number) {
+    if (ticket && ticket.scene) {
+      // Calculate rotation based on mouse position
+      // Limit rotation to reasonable angles
+      if (this._internalState.mousePosition?.isWithinContainer) {
+        const mouseX = this._internalState.mousePosition.containerX
+        const mouseY = this._internalState.mousePosition.containerY
+        // Limit the rotation angles to a reasonable range
+        const targetRotationX = MathUtils.clamp(mouseY * -0.2, -0.3, 0.3)
+        const targetRotationZ = MathUtils.clamp(mouseX * -0.3, -0.4, 0.4)
+
+        // Apply smooth rotation with a smaller lerp factor
+        const lerpFactor = Math.min(dt ?? 0.05, 0.05)
+        ticket.scene.rotation.x = MathUtils.lerp(
+          ticket.scene.rotation.x,
+          targetRotationX,
+          lerpFactor
+        )
+        ticket.scene.rotation.z = MathUtils.lerp(
+          ticket.scene.rotation.z,
+          targetRotationZ,
+          lerpFactor
+        )
+      } else {
+        // Return to neutral position more slowly
+        const lerpFactor = Math.min(dt ?? 0.03, 0.03)
+        ticket.scene.rotation.x = MathUtils.lerp(ticket.scene.rotation.x, 0, lerpFactor)
+        ticket.scene.rotation.z = MathUtils.lerp(ticket.scene.rotation.z, 0, lerpFactor)
+      }
+    }
+  }
+
   private _setCamera(camera: Camera) {
     camera.position.copy(this._sceneConfig.camera.position)
     camera.rotation.copy(this._sceneConfig.camera.rotation)
   }
 
-  private _applyMouseFollowEffect(context: SceneRenderer) {
+  private _registerMousePositionTracking(context: SceneRenderer) {
     this.mouseMoveHandler = this._updateMousePosition.bind(this)
     window.addEventListener('mousemove', this.mouseMoveHandler)
   }
