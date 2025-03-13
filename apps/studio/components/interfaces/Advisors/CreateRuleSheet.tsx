@@ -1,5 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
@@ -7,8 +9,6 @@ import { useLintRuleCreateMutation } from 'data/lint/create-lint-rule-mutation'
 import { LintCategory, LintName } from 'data/lint/lint-rules-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useEffect } from 'react'
-import { toast } from 'sonner'
 import {
   Button,
   Form_Shadcn_,
@@ -28,11 +28,16 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { lintInfoMap } from '../Linter/Linter.utils'
+import { generateRuleDescription } from './AdvisorRules.utils'
 
-interface EditRulesSheetProps {
+interface CreateRuleSheetProps {
   open: boolean
   onOpenChange: (value: boolean) => void
 }
@@ -76,12 +81,18 @@ const defaultValues = {
 }
 
 // [Joshen] Spoken with Hieu - we'll eventually support granularity of Entity/Items as well, just not atm
-export const EditRulesSheet = ({ open, onOpenChange }: EditRulesSheetProps) => {
+// Exceptions are meant to be client side filtering, as this is fully separate from the lint-runner
+// TODO:
+// - Fill up lintInfoMap with categories
+// - Update description of the disable switch with the right report
+// - Filter lints from UI in each advisors page
+// - Support deleting rules
+export const CreateRuleSheet = ({ open, onOpenChange }: CreateRuleSheetProps) => {
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
   const { data: members = [] } = useOrganizationMembersQuery({ slug: organization?.slug })
 
-  const { mutate: createRule } = useLintRuleCreateMutation({
+  const { mutate: createRule, isLoading: isCreating } = useLintRuleCreateMutation({
     onSuccess: () => {
       toast.success('Successfully created new rule!')
       onOpenChange(false)
@@ -96,7 +107,7 @@ export const EditRulesSheet = ({ open, onOpenChange }: EditRulesSheetProps) => {
     defaultValues,
   })
 
-  const { type, lint_category, assigned_to } = form.watch()
+  const { type, lint_category, lint_name, assigned_to, is_disabled } = form.watch()
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -106,8 +117,9 @@ export const EditRulesSheet = ({ open, onOpenChange }: EditRulesSheetProps) => {
       projectRef,
       exception: {
         ...payload,
+        lint_category: type === 'category' ? values.lint_category : undefined,
+        lint_name: type === 'name' ? (values.lint_name as LintName) : undefined,
         assigned_to: values.assigned_to === 'all' ? undefined : values.assigned_to,
-        lint_name: values.lint_name as LintName,
       },
     })
   }
@@ -162,8 +174,10 @@ export const EditRulesSheet = ({ open, onOpenChange }: EditRulesSheetProps) => {
                         </SelectTrigger_Shadcn_>
                         <SelectContent_Shadcn_>
                           <SelectItem_Shadcn_ value="ALL">All</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="PERFORMANCE">Performance</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="SECURITY">Security</SelectItem_Shadcn_>
+                          <SelectItem_Shadcn_ value="PERFORMANCE">
+                            Performance Advisor
+                          </SelectItem_Shadcn_>
+                          <SelectItem_Shadcn_ value="SECURITY">Security Advisor</SelectItem_Shadcn_>
                         </SelectContent_Shadcn_>
                       </Select_Shadcn_>
                     </FormItemLayout>
@@ -231,19 +245,40 @@ export const EditRulesSheet = ({ open, onOpenChange }: EditRulesSheetProps) => {
                     layout="flex"
                     className="px-5"
                     label={`Disable ${type === 'category' ? 'category' : 'this lint'} for ${assigned_to === 'all' ? 'project' : 'the assigned member'}`}
-                    // [Joshen TODO] UI won't show, email won't send
-                    description={`Ignore ${type === 'category' ? `all ${lint_category !== 'ALL' ? `${lint_category?.toLowerCase()} ` : ''}lints` : 'this lint'} in the Advisors report, and from email notifications`}
                   >
-                    <FormControl_Shadcn_>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={field.disabled || assigned_to === 'all'}
-                      />
-                    </FormControl_Shadcn_>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <FormControl_Shadcn_>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={field.disabled || assigned_to === 'all'}
+                          />
+                        </FormControl_Shadcn_>
+                      </TooltipTrigger>
+                      {assigned_to === 'all' && (
+                        <TooltipContent side="bottom">
+                          You may assign the rule to a specific user
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
                   </FormItemLayout>
                 )}
               />
+
+              {((type === 'category' && !!lint_category) || (type === 'name' && !!lint_name)) && (
+                <div className="px-5">
+                  <Admonition showIcon={false} type="default">
+                    {generateRuleDescription({
+                      type,
+                      category: lint_category,
+                      name: lint_name,
+                      disabled: is_disabled,
+                      member: members.find((x) => x.gotrue_id === assigned_to),
+                    })}
+                  </Admonition>
+                </div>
+              )}
 
               <Separator />
 
@@ -271,10 +306,10 @@ export const EditRulesSheet = ({ open, onOpenChange }: EditRulesSheetProps) => {
           </Form_Shadcn_>
         </SheetSection>
         <SheetFooter>
-          <Button disabled={false} type="default" onClick={() => onOpenChange(false)}>
+          <Button disabled={isCreating} type="default" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" disabled={false} loading={false}>
+          <Button form={formId} htmlType="submit" loading={isCreating}>
             Create rule
           </Button>
         </SheetFooter>
