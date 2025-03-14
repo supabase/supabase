@@ -148,7 +148,7 @@ const ChartHandler = ({
 
   return (
     <div className="h-full w-full">
-      <div className="absolute right-6 z-50 flex justify-between">
+      <div className="absolute right-6 z-10 flex justify-between">
         {!hideChartType && (
           <Tooltip>
             <TooltipTrigger asChild>
