@@ -111,6 +111,7 @@ allow_list = [
     "BigQuery",
     "Bitbucket",
     "Bitwarden",
+    "BotFather",
     "Brevo",
     "CAPTCHA",
     "Cartes Bancaires",
@@ -133,6 +134,7 @@ allow_list = [
     "Django",
     "Docker",
     "Drizzle",
+    "ElevenLabs",
     "EnterpriseDB",
     "Entra",
     "ePHI",
@@ -207,6 +209,7 @@ allow_list = [
     "PGAudit",
     "PGroonga",
     "PgBouncer",
+    "PHI",
     "PingIdentity",
     # For historical purposes
     "POSTGRES",
