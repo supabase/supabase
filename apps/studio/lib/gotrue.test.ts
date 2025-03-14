@@ -40,5 +40,10 @@ describe('validateReturnTo', () => {
         '%2F%5B%5Bx%5D%5Djavascript%3Aalert(%22H4CK3D%22)%2F%5By%5D%2F%5B%5Bx%5D%5D%2F%5By%5D%3Fx%26y'
       )
     ).toBe(fallback)
+    expect(
+      validateReturnTo(
+        '/%2F%5B%5Bx%5D%5Djavascript%3Aalert(%22H4CK3D%22)%2F%5By%5D%2F%5B%5Bx%5D%5D%2F%5By%5D%3Fx%26y'
+      )
+    ).toBe(fallback)
   })
 })
