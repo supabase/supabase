@@ -7,6 +7,8 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { GlitchPass } from '../effects/glitch'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { CRTShader } from '../effects/crt-shader'
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass'
+import { TransparentBloomPass } from '../effects/transparent-bloom'
 
 interface TicketSceneState {
   secret: boolean
@@ -255,8 +257,15 @@ class TicketScene implements BaseScene {
     this._setCamera(context.camera)
     this._modelRenderPass = new RenderPass(this._ticket, context.camera)
 
-    // Set renderer clear color to make background visible
+    // Important: Don't set clear values for the render pass
+    // Let the renderer handle clearing
+
+    // Set renderer clear color to make background transparent
     context.renderer.setClearColor(0x000000, 0)
+
+    // Keep everything in linear space until the end of the pipeline
+    // Don't set outputColorSpace here
+    context.renderer.autoClear = false
 
     // Add ambient light with increased intensity
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.0)
@@ -279,36 +288,30 @@ class TicketScene implements BaseScene {
 
     context.composer.addPass(this._modelRenderPass)
 
-    context.renderer.outputColorSpace = THREE.SRGBColorSpace
     // Add the effects passes but with zero intensity
-    if (this._bloomPass) context.composer.addPass(this._bloomPass)
     if (this._glitchPass) context.composer.addPass(this._glitchPass)
     if (this._crtPass) context.composer.addPass(this._crtPass)
+    if (this._bloomPass) context.composer.addPass(this._bloomPass)
+    context.composer.addPass(new OutputPass())
   }
 
   update(context: SceneRenderer, time?: number): void {
+    // Clear the renderer with transparent background before rendering
+    context.renderer.clear(true, true, true)
+
     const ticket = context.composer.passes[0]
     if (ticket instanceof RenderPass) {
       this._updateNaturalPosition()
       this._updateTicketToFollowMouse(ticket.scene, time)
-
       this._updatePasses(time)
-      // Update effects intensity if needed
-      if (this.state.secret) {
-        this._updateEffectsIntensity(time || 0.016)
-      }
     }
   }
+
   private _updatePasses(time?: number) {
     // Update time-based uniforms for shader passes
     if (this._crtPass && this._crtPass.uniforms['time']) {
       this._crtPass.uniforms['time'].value = time
     }
-
-    // // Update glitch pass timing if needed
-    // if (this._glitchPass && this._effectsEnabled) {
-    //     this._glitchPass.curF += dt || 0.016;
-    // }
   }
 
   cleanup(): void {
@@ -348,38 +351,6 @@ class TicketScene implements BaseScene {
 
     // Enable all passes
     if (this._glitchPass) this._glitchPass.enabled = true
-  }
-
-  private _updateEffectsIntensity(dt: number) {
-    console.log('Updating effects intensity')
-    // Gradually increase intensity over time
-    const targetIntensity = 1.0
-    const transitionSpeed = 0.5 // Adjust for faster/slower transition
-
-    if (this._internalState.effectsIntensity < targetIntensity) {
-      // Increase intensity gradually
-      this._internalState.effectsIntensity = Math.min(
-        this._internalState.effectsIntensity + transitionSpeed * dt,
-        targetIntensity
-      )
-
-      // Update bloom intensity
-      if (this._bloomPass) {
-        this._bloomPass.strength = this._internalState.effectsIntensity * 0.7 // Max bloom strength of 0.7
-      }
-
-      // Update RGB shift intensity
-      if (this._crtPass) {
-        this._crtPass.uniforms['intensity'].value = this._internalState.effectsIntensity * 0.01 // Max shift of 0.01
-      }
-
-      // Update glitch intensity - glitch has no intensity parameter,
-      // but we can adjust its frequency based on intensity
-      if (this._glitchPass && this._internalState.effectsIntensity > 0.7) {
-        // Only enable wild mode when intensity is high enough
-        this._glitchPass.goWild = this._internalState.effectsIntensity > 0.9
-      }
-    }
   }
 
   // In your click method
@@ -423,25 +394,30 @@ class TicketScene implements BaseScene {
   }
 
   private _setupPostProcessingEffects(context: SceneRenderer) {
-    // Create bloom pass with initial zero intensity
-    const bloomPass = new UnrealBloomPass(
-      new THREE.Vector2(context.container.clientWidth, context.container.clientHeight),
-      0, // Initial strength
-      0.4, // Radius
-      0 // Threshold
-    )
-    bloomPass.enabled = true
-    this._bloomPass = bloomPass
-
     // Create glitch pass and disable it
-    const glitchPass = new GlitchPass()
-    glitchPass.enabled = false
+    const glitchPass = new GlitchPass(521)
+    glitchPass.enabled = true
+    glitchPass.uniforms.col_s.value = 0
+    glitchPass.setIntensity(0)
+
     this._glitchPass = glitchPass
 
     // Create RGB shift pass with initial zero intensity
     const crtPass = new ShaderPass(CRTShader)
     crtPass.enabled = true
+    crtPass.uniforms.intensity.value = 0
     this._crtPass = crtPass
+
+    // Create bloom pass with initial zero intensity
+    const bloomPass = new TransparentBloomPass(
+      new THREE.Vector2(context.container.clientWidth, context.container.clientHeight),
+      0, // Initial strength
+      0, // Radius
+      0 // Threshold
+    )
+    bloomPass.enabled = true
+    // Don't modify the clear color/alpha here - let the pass handle it internally
+    this._bloomPass = bloomPass
   }
 
   private _updateTicketToFollowMouse(scene: THREE.Scene, dt?: number) {
@@ -711,7 +687,7 @@ class TicketScene implements BaseScene {
 
       const texture = new THREE.CanvasTexture(canvas)
       texture.flipY = false
-      // Fix: Set the correct color space for the canvas texture
+      // Set the correct color space for the texture
       texture.colorSpace = THREE.SRGBColorSpace
       texture.needsUpdate = true
 

@@ -1,4 +1,4 @@
-import { PerspectiveCamera, WebGLRenderer } from 'three'
+import { ColorManagement, LinearSRGBColorSpace, PerspectiveCamera, SRGBColorSpace, WebGLRenderer } from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 
@@ -49,6 +49,10 @@ class SceneRenderer {
   init() {
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight)
     this.renderer.setPixelRatio(window.devicePixelRatio)
+    this.renderer.setClearColor(0x000000, 0) // Set transparent background
+    this.renderer.autoClear = false // Prevent automatic clearing
+    this.renderer.outputColorSpace = SRGBColorSpace
+    ColorManagement.enabled = true
 
     // Initialize composer with correct size and pixel ratio
     this.composer.setSize(this.container.clientWidth, this.container.clientHeight)
@@ -66,6 +70,9 @@ class SceneRenderer {
   }
 
   animate(time?: number) {
+    // Clear the renderer before rendering
+    this.renderer.clear()
+
     this.activeScene?.update(this, time)
     this.composer.render(time)
   }

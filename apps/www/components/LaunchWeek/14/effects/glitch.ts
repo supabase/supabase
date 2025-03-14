@@ -12,7 +12,7 @@ import { Pass, FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass'
 import { DigitalGlitch } from 'three/examples/jsm/shaders/DigitalGlitch'
 
 class GlitchPass extends Pass {
-  uniforms: any
+  uniforms: typeof DigitalGlitch.uniforms
   heightMap: DataTexture
   material: ShaderMaterial
   fsQuad: FullScreenQuad
