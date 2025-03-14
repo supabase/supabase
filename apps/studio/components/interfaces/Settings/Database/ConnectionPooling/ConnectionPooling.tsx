@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { capitalize } from 'lodash'
+import Link from 'next/link'
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -23,7 +24,6 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
   AlertDescription_Shadcn_,
@@ -41,7 +41,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
-import Link from 'next/link'
 
 const formId = 'pooling-configuration-form'
 
@@ -75,7 +74,6 @@ export const ConnectionPooling = () => {
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
   const snap = useDatabaseSettingsStateSnapshot()
-  const allowPgBouncerSelection = useFlag('dualPoolerSupport')
 
   const toastIdRef = useRef<string | number>()
   const [refetchPgBouncerStatus, setRefetchPgBouncerStatus] = useState<boolean>(false)
@@ -168,6 +166,10 @@ export const ConnectionPooling = () => {
     () => isErrorPgbouncerConfig || isErrorSupavisorConfig,
     [isErrorPgbouncerConfig, isErrorSupavisorConfig]
   )
+  const isSuccess = useMemo(
+    () => isSuccessPgbouncerConfig && isSuccessSupavisorConfig,
+    [isSuccessPgbouncerConfig, isSuccessSupavisorConfig]
+  )
   const isSaving = isUpdatingSupavisor
 
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
@@ -199,7 +201,12 @@ export const ConnectionPooling = () => {
       {
         onSuccess: (data) => {
           toast.success(`Successfully updated Pooler configuration`)
-          form.reset({ ...data })
+          if (data) {
+            form.reset({
+              pool_mode: data.pool_mode as 'transaction' | 'session',
+              default_pool_size: data.default_pool_size,
+            })
+          }
         },
       }
     )
@@ -274,188 +281,190 @@ export const ConnectionPooling = () => {
               description="Please start a new project to enable this feature"
             />
           )}
-          <Form_Shadcn_ {...form}>
-            <form
-              id={formId}
-              className="flex flex-col gap-y-6 w-full"
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
-              <FormField_Shadcn_
-                control={form.control}
-                name="pool_mode"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="horizontal"
-                    label="Dedicated Pooler Mode"
-                    description={
-                      disablePoolModeSelection ? (
-                        <Admonition
-                          type="note"
-                          title="Dedicated Pooler is only available for Pro Plan and above"
-                          description={
-                            <span className="prose text-sm">
-                              Free Plan users can only access our shared connection pooler. To use a
-                              dedicated pooler instance for your project,{' '}
-                              <Link
-                                href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=connectionPooling`}
-                                target="_blank"
-                              >
-                                upgrade to Pro Plan
-                              </Link>
-                              .
-                            </span>
-                          }
-                        />
-                      ) : (
-                        <>
-                          {field.value === 'transaction' ? (
-                            <Admonition
-                              type="warning"
-                              title="Pool mode will be set to transaction permanently on port 6543"
-                              description="This will take into effect once saved. If you are using Session mode with port 6543 in your applications, please update to use port 5432 instead before saving."
-                            />
-                          ) : (
-                            <>
+          {isSuccess && (
+            <Form_Shadcn_ {...form}>
+              <form
+                id={formId}
+                className="flex flex-col gap-y-6 w-full"
+                onSubmit={form.handleSubmit(onSubmit)}
+              >
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="pool_mode"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="horizontal"
+                      label="Dedicated Pooler Mode"
+                      description={
+                        disablePoolModeSelection ? (
+                          <Admonition
+                            type="note"
+                            title="Dedicated Pooler is only available for Pro Plan and above"
+                            description={
+                              <span className="prose text-sm">
+                                Free Plan users can only access our shared connection pooler. To use
+                                a dedicated pooler instance for your project,{' '}
+                                <Link
+                                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=connectionPooling`}
+                                  target="_blank"
+                                >
+                                  upgrade to Pro Plan
+                                </Link>
+                                .
+                              </span>
+                            }
+                          />
+                        ) : (
+                          <>
+                            {field.value === 'transaction' ? (
                               <Admonition
-                                className="mt-2"
-                                showIcon={false}
-                                type="default"
-                                title="Set to transaction mode to use both pooling modes concurrently"
-                                description="Session mode can be used concurrently with transaction mode by
+                                type="warning"
+                                title="Pool mode will be set to transaction permanently on port 6543"
+                                description="This will take into effect once saved. If you are using Session mode with port 6543 in your applications, please update to use port 5432 instead before saving."
+                              />
+                            ) : (
+                              <>
+                                <Admonition
+                                  className="mt-2"
+                                  showIcon={false}
+                                  type="default"
+                                  title="Set to transaction mode to use both pooling modes concurrently"
+                                  description="Session mode can be used concurrently with transaction mode by
                                                     using 5432 for session and 6543 for transaction. However, by
                                                     configuring the pooler mode to session here, you will not be able
                                                     to use transaction mode at the same time."
-                              />
-                            </>
-                          )}
-                          <p className="mt-2">
-                            Specify when a connection can be returned to the pool.{' '}
-                            <span
-                              tabIndex={0}
-                              onClick={() => snap.setShowPoolingModeHelper(true)}
-                              className="transition cursor-pointer underline underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-foreground"
-                            >
-                              Learn more about pool modes
-                            </span>
-                            .
+                                />
+                              </>
+                            )}
+                            <p className="mt-2">
+                              Specify when a connection can be returned to the pool.{' '}
+                              <span
+                                tabIndex={0}
+                                onClick={() => snap.setShowPoolingModeHelper(true)}
+                                className="transition cursor-pointer underline underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-foreground"
+                              >
+                                Learn more about pool modes
+                              </span>
+                              .
+                            </p>
+                          </>
+                        )
+                      }
+                    >
+                      <FormControl_Shadcn_>
+                        <Listbox
+                          disabled={disablePoolModeSelection}
+                          value={field.value}
+                          className="w-full"
+                          onChange={(value) => field.onChange(value)}
+                        >
+                          <Listbox.Option key="transaction" label="Transaction" value="transaction">
+                            <p>Transaction mode</p>
+                            <p className="text-xs text-foreground-lighter">
+                              {TRANSACTION_MODE_DESCRIPTION}
+                            </p>
+                          </Listbox.Option>
+                          <Listbox.Option key="session" label="Session" value="session">
+                            <p>Session mode</p>
+                            <p className="text-xs text-foreground-lighter">
+                              {SESSION_MODE_DESCRIPTION}
+                            </p>
+                          </Listbox.Option>
+                        </Listbox>
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="default_pool_size"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="horizontal"
+                      label="Pool Size"
+                      description={
+                        <>
+                          <p>
+                            The maximum number of connections made to the underlying Postgres
+                            cluster, per user+db combination. Pool size has a default of{' '}
+                            {defaultPoolSize} based on your compute size of {computeSize}.
                           </p>
                         </>
-                      )
-                    }
-                  >
-                    <FormControl_Shadcn_>
-                      <Listbox
-                        disabled={disablePoolModeSelection}
-                        value={field.value}
-                        className="w-full"
-                        onChange={(value) => field.onChange(value)}
-                      >
-                        <Listbox.Option key="transaction" label="Transaction" value="transaction">
-                          <p>Transaction mode</p>
-                          <p className="text-xs text-foreground-lighter">
-                            {TRANSACTION_MODE_DESCRIPTION}
-                          </p>
-                        </Listbox.Option>
-                        <Listbox.Option key="session" label="Session" value="session">
-                          <p>Session mode</p>
-                          <p className="text-xs text-foreground-lighter">
-                            {SESSION_MODE_DESCRIPTION}
-                          </p>
-                        </Listbox.Option>
-                      </Listbox>
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
+                      }
+                    >
+                      <FormControl_Shadcn_>
+                        <Input_Shadcn_
+                          {...field}
+                          type="number"
+                          className="w-full"
+                          value={field.value || undefined}
+                          placeholder={!field.value ? `${defaultPoolSize}` : ''}
+                          {...form.register('default_pool_size', {
+                            setValueAs: setValueAsNullableNumber,
+                          })}
+                        />
+                      </FormControl_Shadcn_>
+                      {!!maxConnData &&
+                        (default_pool_size ?? 15) > maxConnData.maxConnections * 0.8 && (
+                          <Alert_Shadcn_ variant="warning" className="mt-2">
+                            <AlertTitle_Shadcn_ className="text-foreground">
+                              Pool size is greater than 80% of the max connections (
+                              {maxConnData.maxConnections}) on your database
+                            </AlertTitle_Shadcn_>
+                            <AlertDescription_Shadcn_>
+                              This may result in instability and unreliability with your database
+                              connections.
+                            </AlertDescription_Shadcn_>
+                          </Alert_Shadcn_>
+                        )}
+                    </FormItemLayout>
+                  )}
+                />
 
-              <FormField_Shadcn_
-                control={form.control}
-                name="default_pool_size"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="horizontal"
-                    label="Pool Size"
-                    description={
-                      <>
-                        <p>
-                          The maximum number of connections made to the underlying Postgres cluster,
-                          per user+db combination. Pool size has a default of {defaultPoolSize}{' '}
-                          based on your compute size of {computeSize}.
-                        </p>
-                      </>
-                    }
-                  >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
-                        {...field}
-                        type="number"
-                        className="w-full"
-                        value={field.value || undefined}
-                        placeholder={!field.value ? `${defaultPoolSize}` : ''}
-                        {...form.register('default_pool_size', {
-                          setValueAs: setValueAsNullableNumber,
-                        })}
-                      />
-                    </FormControl_Shadcn_>
-                    {!!maxConnData &&
-                      (default_pool_size ?? 15) > maxConnData.maxConnections * 0.8 && (
-                        <Alert_Shadcn_ variant="warning" className="mt-2">
-                          <AlertTitle_Shadcn_ className="text-foreground">
-                            Pool size is greater than 80% of the max connections (
-                            {maxConnData.maxConnections}) on your database
-                          </AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
-                            This may result in instability and unreliability with your database
-                            connections.
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
-                      )}
-                  </FormItemLayout>
-                )}
-              />
-
-              <FormField_Shadcn_
-                control={form.control}
-                name="max_client_conn"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="horizontal"
-                    label="Max Client Connections"
-                    description={
-                      <>
-                        <p>
-                          The maximum number of concurrent client connections allowed. This value is
-                          fixed at {defaultMaxClientConn} based on your compute size of{' '}
-                          {computeSize} and cannot be changed.
-                        </p>
-                        <p className="mt-2">
-                          Please refer to our{' '}
-                          <InlineLink href="https://supabase.com/docs/guides/database/connection-management#configuring-supavisors-pool-size">
-                            documentation
-                          </InlineLink>{' '}
-                          to find out more.
-                        </p>
-                      </>
-                    }
-                  >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
-                        {...field}
-                        type="number"
-                        className="w-full"
-                        value={(supavisorConfig || pgbouncerConfig)?.max_client_conn || ''}
-                        disabled={true}
-                        placeholder={!field.value ? `${defaultMaxClientConn}` : ''}
-                        {...form.register('max_client_conn', {
-                          setValueAs: setValueAsNullableNumber,
-                        })}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            </form>
-          </Form_Shadcn_>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="max_client_conn"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="horizontal"
+                      label="Max Client Connections"
+                      description={
+                        <>
+                          <p>
+                            The maximum number of concurrent client connections allowed. This value
+                            is fixed at {defaultMaxClientConn} based on your compute size of{' '}
+                            {computeSize} and cannot be changed.
+                          </p>
+                          <p className="mt-2">
+                            Please refer to our{' '}
+                            <InlineLink href="https://supabase.com/docs/guides/database/connection-management#configuring-supavisors-pool-size">
+                              documentation
+                            </InlineLink>{' '}
+                            to find out more.
+                          </p>
+                        </>
+                      }
+                    >
+                      <FormControl_Shadcn_>
+                        <Input_Shadcn_
+                          {...field}
+                          type="number"
+                          className="w-full"
+                          value={(supavisorConfig || pgbouncerConfig)?.max_client_conn || ''}
+                          disabled={true}
+                          placeholder={!field.value ? `${defaultMaxClientConn}` : ''}
+                          {...form.register('max_client_conn', {
+                            setValueAs: setValueAsNullableNumber,
+                          })}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </form>
+            </Form_Shadcn_>
+          )}
         </Panel.Content>
       </Panel>
     </section>
