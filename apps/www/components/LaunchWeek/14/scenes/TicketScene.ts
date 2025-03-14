@@ -182,7 +182,7 @@ class TicketScene implements BaseScene {
     loadedTextureType: null as 'basic' | 'secret' | 'platinum' | null,
     effectsIntensity: 0,
     mouseIntensityDecay: 0.98, // How quickly the intensity decays
-    mouseIntensityGainRate: 0.005,
+    mouseIntensityGainRate: 0.003,
   }
 
   private _sceneConfig = {
@@ -343,7 +343,7 @@ class TicketScene implements BaseScene {
       // Update glitch pass intensity
       if (this._glitchPass) {
         const glitchIntensity = this._internalState.mousePosition?.mouseIntensity ?? 1
-        this._glitchPass.setIntensity(glitchIntensity * this._internalState.effectsIntensity * 6)
+        this._glitchPass.setIntensity(glitchIntensity * this._internalState.effectsIntensity * 4)
       }
 
       // Update CRT shader intensity

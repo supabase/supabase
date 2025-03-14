@@ -1,261 +1,80 @@
-import * as THREE from 'three'
 import { cn } from 'ui'
-import { createThreeSetup, useThreeJS, createTicketMesh } from './helpers'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { useCallback, useRef, useState } from 'react'
+import { useThreeJS } from './helpers'
+import { useCallback, useRef } from 'react'
+import SceneRenderer, { BaseScene } from './utils/SceneRenderer'
+import TicketScene from './scenes/TicketScene'
 
-const LwCanvas = ({ className }: { className?: string }) => {
-  const secretRef = useRef(false)
+interface TicketCanvasProps {
+  secret?: boolean
+  platinum?: boolean
+  user: {
+    id?: string
+    name?: string
+    ticketNumber?: number
+  }
+  startDate: Date
+  playmodeRTChannel: unknown
+  className?: string
+  onUpgrade?: () => void
+}
 
-  const setup = useCallback((container: HTMLElement) => {
-    // Create scene with postprocessing effects
-    const {
-      scene,
-      camera,
-      renderer,
-      composer,
-      resize,
-      crtPass,
-      glitchPass,
-      bloomPass,
-      stats,
-      debug,
-      orbitControls,
-    } = createThreeSetup(container, {
-      cameraPosition: new THREE.Vector3(0, 0, 5),
-      debug: false,
-      postprocessing: {
-        bloom: {
-          enabled: true,
-          strength: 0.25,
-          radius: 0.7,
-          threshold: 0.2,
+const TicketCanvas = ({
+  secret,
+  platinum,
+  user,
+  startDate,
+  playmodeRTChannel,
+  className,
+  onUpgrade,
+}: TicketCanvasProps) => {
+  const sceneRef = useRef<TicketScene | null>(null)
+  const setup = useCallback(
+    (container: HTMLElement) => {
+      let scene: BaseScene | null = null
+
+      const sceneRenderer = new SceneRenderer(container)
+
+
+      sceneRef.current = new TicketScene({
+        defaultSecret: secret,
+        defaultPlatinum: platinum,
+        user,
+        startDate,
+        onSeatChartButtonClicked: () => {
+          sceneRef.current?.showBackSide()
+          sceneRef.current?.upgradeToSecret()
         },
-        glitch: {
-          enabled: true,
-          dtSize: 512, // Increase detail size for less frequent glitches
-          colS: 0,
+        onGoBackButtonClicked: () => {
+          sceneRef.current?.showFrontSide()
         },
-        crt: {
-          enabled: true,
-        },
-      },
-    })
-
-    // Set renderer clear color to make background visible
-    renderer.setClearColor(0x000000, 0)
-
-    // Add ambient light with increased intensity
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0)
-    scene.add(ambientLight)
-
-    // Add directional light
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5)
-    directionalLight.position.set(5, 5, 5)
-    scene.add(directionalLight)
-
-    // Add a point light to better illuminate the placeholder
-    const pointLight = new THREE.PointLight(0xffffff, 1.0)
-    pointLight.position.set(0, 0, 5)
-    scene.add(pointLight)
-
-    // Create ticket mesh placeholder (will be replaced when texture loads)
-
-    const planeGeometrySize = [12, 6]
-    const placeholderGeometry = new THREE.PlaneGeometry(...planeGeometrySize)
-    const placeholderMaterial = new THREE.MeshBasicMaterial({
-      color: 0x000000,
-      transparent: true,
-      opacity: 1,
-      side: THREE.DoubleSide,
-    })
-    // Use a more generic type for ticket to allow reassignment to either Mesh or Group
-    let ticket: THREE.Object3D = new THREE.Mesh(placeholderGeometry, placeholderMaterial)
-
-    scene.add(ticket)
-
-    // Ensure the ticket is visible in the camera's view
-    ticket.position.z = 0
-
-    // Load the ticket texture and create the actual ticket mesh
-    // Replace this URL with your actual ticket texture
-    const ticketScene = '/images/launchweek/14/supabase-ticket.glb'
-    const ticketStaticTexture = '/images/launchweek/14/supabase-static-ticket.png'
-
-    createTicketMesh(ticketScene, {
-      width: planeGeometrySize[0],
-      height: planeGeometrySize[1],
-      ticketTextureSource: ticketStaticTexture,
-      debug,
-    })
-      .then((ticketModel) => {
-        // Remove placeholder and add the actual ticket model
-        scene.remove(ticket)
-        scene.add(ticketModel)
-
-        // Store reference to the new ticket for animation
-        if (ticket instanceof THREE.Mesh) {
-          ticket.geometry.dispose()
-          if (Array.isArray(ticket.material))
-            ticket.material.forEach((material) => material.dispose())
-          else ticket.material.dispose()
-        }
-
-        // Update the ticket reference
-        ticket = ticketModel
-      })
-      .catch((error) => {
-        console.error('Failed to load ticket texture:', error)
       })
 
-    // Add window resize listener
-    window.addEventListener('resize', resize)
+      sceneRenderer.activateScene(sceneRef.current)
 
-    // Mouse movement tracking for glitch effect and ticket following
-    let lastMouseX = 0
-    let lastMouseY = 0
-    let mouseIntensity = 0
-    let mouseIntensityDecay = 0.95 // How quickly the intensity decays
+      sceneRenderer.init()
 
-    // For mouse tracking of ticket
-    let mouseX = 0
-    let mouseY = 0
-    let targetX = 0
-    let targetY = 0
-
-    const handleMouseMove = (event: MouseEvent) => {
-      // Calculate mouse movement distance for glitch effect
-      const dx = event.clientX - lastMouseX
-      const dy = event.clientY - lastMouseY
-      const distance = Math.sqrt(dx * dx + dy * dy)
-
-      // Update intensity based on movement (clamped between 0 and 1)
-      mouseIntensity = Math.max(0, mouseIntensity + distance * 0.005)
-
-      // Update last position
-      lastMouseX = event.clientX
-      lastMouseY = event.clientY
-
-      // Update glitch intensity
-      if (glitchPass) {
-        glitchPass.setIntensity(mouseIntensity)
-      }
-
-      // Calculate normalized mouse position for ticket following
-      // Convert from screen coordinates to normalized device coordinates (-1 to +1)
-      const rect = container.getBoundingClientRect()
-      mouseX = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1
-      mouseY = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1
-
-      // Scale down the effect for subtle movement
-      targetX = mouseX * 0.5
-      targetY = mouseY * 0.3
-    }
-
-    // Make the container element respond to pointer events
-    container.style.pointerEvents = 'auto'
-
-    // Add mouse event listeners
-    container.addEventListener('mousemove', handleMouseMove)
-
-    // Animation function
-
-    const animate = (time?: number) => {
-      const currentTime = time || 0
-
-      // Update CRT shader time uniform for animation effects
-      if (crtPass) {
-        crtPass.uniforms.time.value = currentTime
-        crtPass.enabled = secretRef.current
-      }
-
-      if(glitchPass) {
-        glitchPass.enabled = secretRef.current
-      }
-
-      if(bloomPass) {
-        bloomPass.enabled = secretRef.current
-      }
-
-      // Gradually decay mouse intensity when not moving
-      if (mouseIntensity > 0) {
-        mouseIntensity *= mouseIntensityDecay
-        if (mouseIntensity < 0.0000001) {
-          mouseIntensity = 0
-        }
-        if (glitchPass) {
-          glitchPass.setIntensity(mouseIntensity)
-        }
-      }
-
-      if (stats.instance) {
-        stats.instance.begin()
-      }
-
-      if (orbitControls.instance) {
-        // Update controls in animation loop
-        orbitControls.instance.update()
-      }
-
-      // Render with post-processing
-      composer.render()
-
-      if (stats.instance) {
-        stats.instance.end()
-      }
-    }
-
-    // Cleanup function
-    const cleanup = () => {
-      window.removeEventListener('resize', resize)
-
-      // Your existing cleanup code...
-      orbitControls.instance?.dispose() // Dispose controls on cleanup
-
-      // Dispose of all resources
-      scene.traverse((object) => {
-        if (object instanceof THREE.Mesh) {
-          if (object.geometry) object.geometry.dispose()
-
-          if (object.material) {
-            if (Array.isArray(object.material)) {
-              object.material.forEach((material) => material.dispose())
-            } else {
-              object.material.dispose()
-            }
-          }
-        }
-      })
-
-      renderer.dispose()
-      container.removeChild(renderer.domElement)
-    }
-
-    return { cleanup, animate }
-  }, [])
+      return sceneRenderer
+    },
+    [platinum, secret, startDate, user]
+  )
 
   const { containerRef } = useThreeJS(setup)
-
-
   return (
-    <>
+    <div
+      className={cn(
+        'w-screen absolute inset-0 h-[600px] lg:min-h-full lg:max-h-[1000px] flex justify-center items-center overflow-hidden',
+        className
+      )}
+    >
       <div
-        className={cn(
-          'w-screen absolute inset-0 h-[600px] lg:min-h-full lg:max-h-[1000px] flex justify-center items-center overflow-hidden pointer-events-none',
-          className
-        )}
-      >
-        <div ref={containerRef} className="w-full lg:h-full" />
-      </div>
-
-      <button
-        className="absolute top-4 right-4 bg-white text-black p-2 rounded-md shadow-md z-20 hover:bg-gray-200 cursor-pointer"
-        onClick={() => secretRef.current = !secretRef.current}
-      >
-        Toggle secret
-      </button>
-    </>
+        ref={containerRef}
+        className="w-full lg:h-full"
+        onClick={(e) => {
+          sceneRef.current?.click(e.nativeEvent)
+        }}
+      />
+    </div>
   )
 }
 
-export { LwCanvas }
+export default TicketCanvas
