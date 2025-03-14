@@ -263,6 +263,7 @@ class TicketScene implements BaseScene {
     await this._loadTextures()
 
     context.composer.addPass(this._modelRenderPass)
+    context.renderer.outputColorSpace = THREE.SRGBColorSpace
   }
 
   update(context: SceneRenderer, dt?: number): void {
@@ -506,107 +507,6 @@ class TicketScene implements BaseScene {
     }
   }
 
-  private _setSecretTextures() {
-    if (this.state.secret) {
-      return
-    }
-
-    if (!this._textureCanvases.TicketFront) {
-      throw new Error('TicketFront texture canvas is not set')
-    }
-
-    const { context, canvas } = this._textureCanvases.TicketFront
-
-    context.clearRect(0, 0, canvas.width, canvas.height)
-    console.log(canvas.width, canvas.height)
-
-    // context.fillStyle = colorObjToRgb(this.textureImages.secret.textNeonColor)
-    context.fillStyle = 'white'
-    const fontSize = this.typography.main.relativeSize * canvas.height
-    console.log({ fontSize })
-    context.font = `400 ${fontSize}px ${this.typography.main.family}`
-    context.textAlign = 'left'
-    context.textBaseline = 'top'
-    context.fillText(
-      'Pampalini',
-      this.texts.user.x * canvas.width,
-      this.texts.user.y * canvas.height
-    )
-    if (
-      this._namedMeshes.TicketFront &&
-      !Array.isArray(this._namedMeshes.TicketFront.material) &&
-      this._namedMeshes.TicketFront.material instanceof THREE.MeshStandardMaterial
-    ) {
-      const texture = new THREE.CanvasTexture(canvas)
-      texture.flipY = false
-      texture.needsUpdate = true
-
-      // Get the existing material
-      this._namedMeshes.TicketFront.material.map = texture
-    }
-  }
-
-  private executeWithObject(
-    execFunctions: [(typeof TicketScene)['TEXTURE_NAMES'][number], (mesh: THREE.Mesh) => void][]
-  ) {
-    const mainMeshName = 'Plane'
-    const mesh = this._ticket?.getObjectByName(mainMeshName)
-
-    if (!mesh) {
-      throw new Error(`Could not find mesh named ${mainMeshName}`)
-    }
-
-    for (const part of mesh.children) {
-      if (!(part instanceof THREE.Mesh)) {
-        continue
-      }
-      if (!(part.material instanceof THREE.Material)) {
-        console.log(`Material is not an instance of THREE.Material. Got:`, part.material)
-        continue
-      }
-
-      switch (part.material.name) {
-        case 'TicketFront': {
-          console.log(part.material.name, part.material)
-          break
-        }
-        case 'TicketBack': {
-          console.log(part.material.name, part.material)
-          break
-        }
-
-        case 'TicketEdge': {
-          console.log(part.material.name, part.material)
-          break
-        }
-
-        case 'TicketFrontWebsiteButton': {
-          console.log(part.material.name, part.material)
-          break
-        }
-
-        case 'TicketFrontSeatChartButton': {
-          console.log(part.material.name, part.material)
-          break
-        }
-
-        case 'TicketBackGoBackButton': {
-          console.log(part.material.name, part.material)
-          break
-        }
-
-        case 'TicketBackWebsiteButton': {
-          console.log(part.material.name, part.material)
-          break
-        }
-
-        default: {
-          console.log('Unexpected material name', part.material.name, part.material)
-        }
-      }
-    }
-  }
-
   private async _loadTextures() {
     // Load textures for each named mesh
     // Create a texture loader
@@ -666,6 +566,9 @@ class TicketScene implements BaseScene {
               // Create an image from the loaded texture
               textureDescriptor.cachedData = loadedTexture
 
+              // Fix: Set the correct color space to match the original model
+              loadedTexture.colorSpace = THREE.SRGBColorSpace
+
               resolve()
             },
             undefined, // onProgress callback
@@ -690,9 +593,22 @@ class TicketScene implements BaseScene {
 
       const texture = new THREE.CanvasTexture(canvas)
       texture.flipY = false
+      // Fix: Set the correct color space for the canvas texture
+      texture.colorSpace = THREE.SRGBColorSpace
       texture.needsUpdate = true
 
+      // Fix: Preserve the original material properties
+      const originalMaterial = mesh.material
+      const originalColor = mesh.material.color.clone()
+      const originalEmissive = mesh.material.emissive ? mesh.material.emissive.clone() : null
+      const originalEmissiveIntensity = mesh.material.emissiveIntensity
+
       mesh.material.map = texture
+      mesh.material.color = originalColor
+      if (originalEmissive) mesh.material.emissive = originalEmissive
+      if (originalEmissiveIntensity) mesh.material.emissiveIntensity = originalEmissiveIntensity
+
+      // Ensure material properties are preserved
       mesh.material.needsUpdate = true
     }
 
