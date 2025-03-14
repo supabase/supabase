@@ -5,8 +5,8 @@ import DocumentPicker, { isCancel, isInProgress, types } from 'react-native-docu
 
 interface Props {
   size: number
-	url: string | null
-	onUpload: (filePath: string) => void
+  url: string | null
+  onUpload: (filePath: string) => void
 }
 
 export default function Avatar({ url, size = 150, onUpload }: Props) {
@@ -20,10 +20,8 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
 
   async function downloadImage(path: string) {
     try {
-      const { data, error } = await supabase.storage
-        .from('avatars')
-        .download(path)
-      
+      const { data, error } = await supabase.storage.from('avatars').download(path)
+
       if (error) {
         throw error
       }
@@ -48,24 +46,22 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
         presentationStyle: 'fullScreen',
         copyTo: 'cachesDirectory',
         type: types.images,
-        mode: 'open'
+        mode: 'open',
       })
 
       const photo = {
         uri: file.fileCopyUri,
         type: file.type,
-        name: file.name
+        name: file.name,
       }
 
       const formData = new FormData()
-      formData.append("file", photo)
+      formData.append('file', photo)
 
       const fileExt = file.name.split('.').pop()
       const filePath = `${Math.random()}.${fileExt}`
 
-      let { error } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, formData)
+      let { error } = await supabase.storage.from('avatars').upload(filePath, formData)
 
       if (error) {
         throw error
@@ -89,14 +85,22 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       {avatarUrl ? (
-        <Image source={{ uri: avatarUrl }} accessibilityLabel="Avatar" style={[avatarSize, styles.avatar, styles.image]} />
+        <Image
+          source={{ uri: avatarUrl }}
+          accessibilityLabel="Avatar"
+          style={[avatarSize, styles.avatar, styles.image]}
+        />
       ) : (
         <View style={[avatarSize, styles.avatar, styles.noImage]} />
       )}
       <View>
-        <Button title={uploading ? 'Uploading ...' : 'Upload'} onPress={uploadAvatar} disabled={uploading} />
+        <Button
+          title={uploading ? 'Uploading ...' : 'Upload'}
+          onPress={uploadAvatar}
+          disabled={uploading}
+        />
       </View>
     </View>
   )
@@ -106,15 +110,20 @@ const styles = StyleSheet.create({
   avatar: {
     borderRadius: 5,
     overflow: 'hidden',
-    maxWidth: '100%'
+    maxWidth: '100%',
   },
   image: {
     objectFit: 'cover',
     paddingTop: 0,
+    marginBottom: 10,
   },
   noImage: {
     backgroundColor: '#333',
-    border: '1px solid rgb(200, 200, 200)',
-    borderRadius: 5
+    borderWidth: 1,
+    borderColor: 'rgb(200, 200, 200)',
+    borderRadius: 5,
+  },
+  container: {
+    alignItems: 'center',
   },
 })
