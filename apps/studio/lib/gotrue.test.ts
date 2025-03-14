@@ -33,4 +33,12 @@ describe('validateReturnTo', () => {
       '/dashboard?param1=value1&param2=value2'
     )
   })
+
+  it('should handle nextjs dynamic path js', () => {
+    expect(
+      validateReturnTo(
+        '%2F%5B%5Bx%5D%5Djavascript%3Aalert(%22H4CK3D%22)%2F%5By%5D%2F%5B%5Bx%5D%5D%2F%5By%5D%3Fx%26y'
+      )
+    ).toBe(fallback)
+  })
 })
