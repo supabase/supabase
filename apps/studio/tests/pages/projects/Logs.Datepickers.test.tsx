@@ -95,14 +95,17 @@ test('datepicker onSubmit will return ISO string of selected dates', async () =>
   // open the datepicker
   userEvent.click(screen.getByText(/13:00/i))
 
-  // screen.logTestingPlaygroundURL()
+  // Get today's date and tomorrow's date
+  const today = dayjs()
+  const tomorrow = today.add(1, 'day')
 
-  // Find and click on the date elements
-  const day20 = screen.getByText('23')
-  userEvent.click(day20)
+  // Find and click on today's date
+  const todayElement = screen.getByText(today.format('D'))
+  userEvent.click(todayElement)
 
-  const day21 = screen.getByText('24')
-  userEvent.click(day21)
+  // Find and click on tomorrow's date
+  const tomorrowElement = screen.getByText(tomorrow.format('D'))
+  userEvent.click(tomorrowElement)
 
   userEvent.click(await screen.findByText('Apply'))
   expect(mockFn).toBeCalled()
@@ -110,8 +113,8 @@ test('datepicker onSubmit will return ISO string of selected dates', async () =>
   const call = mockFn.mock.calls[0][0]
 
   expect(call).toMatchObject({
-    from: dayjs().date(23).hour(13).minute(0).second(0).millisecond(0).toISOString(),
-    to: dayjs().date(24).hour(23).minute(59).second(59).millisecond(0).toISOString(),
+    from: dayjs().date(today.date()).hour(13).minute(0).second(0).millisecond(0).toISOString(),
+    to: dayjs().date(tomorrow.date()).hour(23).minute(59).second(59).millisecond(0).toISOString(),
   })
 })
 
