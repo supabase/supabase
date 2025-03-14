@@ -232,6 +232,7 @@ class TicketScene implements BaseScene {
 
     // Load fonts before loading the model
     await this._loadFonts()
+    await this._preloadAllTextureSets()
 
     const gltf = await loadGLTFModel(this.sceneUrl)
 
@@ -600,7 +601,6 @@ class TicketScene implements BaseScene {
         throw new Error(`Failed to load texture ${textureDescriptor.url}`)
       }
 
-
       context.drawImage(textureDescriptor.cachedData.image, 0, 0, canvas.width, canvas.height)
 
       // For meshes without base images, just draw custom content
@@ -727,6 +727,47 @@ class TicketScene implements BaseScene {
       // Still continue to not block rendering, but with a warning
       this._internalState.fontsLoaded = false
     }
+  }
+
+  private async _preloadAllTextureSets() {
+    const textureLoader = new THREE.TextureLoader()
+    const allSets = ['basic', 'secret', 'platinum'] as const
+
+    let promises: Promise<void>[] = []
+    for (const set of allSets) {
+      const textureSet = this.textureImages[set]
+      if (textureSet.front.cachedData === null) {
+        const promise = new Promise<void>((resolve, reject) => {
+          textureLoader.load(
+            textureSet.front.url,
+            (texture) => {
+              textureSet.front.cachedData = texture
+              resolve()
+            },
+            undefined,
+            reject
+          )
+        })
+        promises.push(promise)
+      }
+      if (textureSet.back.cachedData === null) {
+        const promise = new Promise<void>((resolve, reject) => {
+          textureLoader.load(
+            textureSet.back.url,
+            (texture) => {
+              textureSet.back.cachedData = texture
+              resolve()
+            },
+            undefined,
+            reject
+          )
+        })
+
+        promises.push(promise)
+      }
+    }
+
+    await Promise.all(promises)
   }
 }
 
