@@ -295,8 +295,9 @@ class TicketScene implements BaseScene {
     this.state.frontside = false
   }
 
-  upgradeToSecret() {
+  async upgradeToSecret() {
     this.state.secret = true
+    await this._loadTextures()
   }
 
   // In your click method
@@ -493,6 +494,7 @@ class TicketScene implements BaseScene {
 
     for (const part of mesh.children) {
       if (!(part instanceof THREE.Mesh)) {
+        console.warn(`Part is not a THREE.Mesh. Got:`, part)
         continue
       }
 
@@ -502,7 +504,10 @@ class TicketScene implements BaseScene {
       }
 
       if ((TicketScene.TEXTURE_NAMES as readonly string[]).includes(part.material.name)) {
+        console.log(`Found named mesh:`, part.material.name)
         this._namedMeshes[part.material.name as AvailableTextures] = part
+      } else {
+        console.warn(`Mesh ${part.material.name} is not a named texture`)
       }
     }
   }
@@ -539,22 +544,33 @@ class TicketScene implements BaseScene {
       // Or they can reuse the front/back textures with different UV coordinates
     }
 
+    const allMeshes = Object.entries(this._namedMeshes)
     // Preload all textures and prepare canvases
-    for (const [name, mesh] of Object.entries(this._namedMeshes)) {
-      if (!mesh || !(mesh instanceof THREE.Mesh)) continue
-      if (!mesh.material || !(mesh.material instanceof THREE.MeshStandardMaterial)) continue
+    for (const [name, mesh] of allMeshes) {
+      console.log('Drawind texture', name)
+      if (!mesh || !(mesh instanceof THREE.Mesh)) {
+        console.warn(`Mesh ${name} is not a THREE.Mesh`)
+        continue
+      }
+      if (!mesh.material || !(mesh.material instanceof THREE.MeshStandardMaterial)) {
+        console.warn(`Mesh ${name} has no material or is not a MeshStandardMaterial`)
+        continue
+      }
 
       const textureKey = name as AvailableTextures
       const textureCanvas = this._textureCanvases[textureKey]
 
-      if (!textureCanvas) continue
+      if (!textureCanvas) {
+        console.warn(`No texture canvas found for texture ${textureKey}`)
+        continue
+      }
       const { canvas, context } = textureCanvas
 
       // If we have an image for this texture
       const textureDescriptor = textureImageMap[textureKey]
       if (!textureDescriptor) {
         console.warn(`No texture descriptor found for texture ${textureKey}`)
-        return
+        continue
       }
 
       if (textureDescriptor.cachedData === null) {
@@ -584,7 +600,6 @@ class TicketScene implements BaseScene {
         throw new Error(`Failed to load texture ${textureDescriptor.url}`)
       }
 
-      console.log("Drawind texture", textureKey)
 
       context.drawImage(textureDescriptor.cachedData.image, 0, 0, canvas.width, canvas.height)
 
