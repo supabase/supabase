@@ -292,7 +292,14 @@ export const ConnectionPooling = () => {
               toast.success(`Successfully updated Supavisor configuration`)
             }
             setShowConfirmation(false)
-            form.reset({ type: 'Supavisor', ...data })
+
+            if (data) {
+              form.reset({
+                type: 'Supavisor',
+                pool_mode: data.pool_mode as 'transaction' | 'session' | 'statement',
+                default_pool_size: data.default_pool_size,
+              })
+            }
           },
         }
       )

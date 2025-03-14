@@ -14,6 +14,7 @@ import {
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD, getDefaultHelper } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
 import { Clock } from 'lucide-react'
+import { DateTimeFormats } from '../../../ui/Charts/Charts.constants'
 
 interface Props {
   to: string
@@ -24,12 +25,14 @@ interface Props {
 const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
   const defaultHelper = getDefaultHelper(helpers)
   const [helperValue, setHelperValue] = useState<string>(to || from ? '' : defaultHelper.text)
+  const [selectedHelperItem, setSelectedHelperItem] = useState<DatetimeHelper | null>(null)
 
   const handleHelperChange = (newValue: string) => {
     const selectedHelper = helpers.find((h) => h.text === newValue)
 
     if (onChange && selectedHelper) {
       onChange({ to: selectedHelper.calcTo(), from: selectedHelper.calcFrom() })
+      setSelectedHelperItem(selectedHelper)
     }
   }
 
@@ -58,13 +61,13 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
             icon={<Clock size={12} />}
             className="rounded-r-none"
           >
-            <span>{selectedHelper?.text || defaultHelper.text}</span>
+            <span>{selectedHelperItem?.text || defaultHelper.text}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="start">
           <DropdownMenuRadioGroup
             onValueChange={handleHelperChange}
-            value={selectedHelper?.text || ''}
+            value={selectedHelperItem?.text || ''}
           >
             {helpers.map((helper) => (
               <DropdownMenuRadioItem

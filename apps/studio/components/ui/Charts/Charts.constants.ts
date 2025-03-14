@@ -11,6 +11,17 @@ export const CHART_COLORS = {
   RED_2: 'hsl(var(--destructive-500))',
 }
 
+export const STACKED_CHART_COLORS = [
+  '#3ECF8E',
+  '#A3FFC2',
+  '#DA760B',
+  '#EDD35E',
+  '#65BCD9',
+  '#0063E8',
+  '#DB8DF9',
+  '#B616A6',
+]
+
 // refer to packages/ui/radix-colors.js for full list of colors
 export type ValidStackColor =
   | 'brand'
@@ -50,5 +61,6 @@ export const DEFAULT_STACK_COLORS: ValidStackColor[] = [
 
 export enum DateTimeFormats {
   FULL = 'MMM D, YYYY, hh:mma',
+  FULL_SECONDS = 'MMM D, YYYY, hh:mm:ssa',
   DATE_ONLY = 'MMM D, YYYY',
 }

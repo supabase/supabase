@@ -83,10 +83,15 @@ export const useChartSize = (
   }
 ) => {
   const minHeight = sizeMap[size]
-  const Container: FC<PropsWithChildren> = useMemo(
+  const Container: FC<PropsWithChildren & { className?: string }> = useMemo(
     () =>
-      ({ children }) => (
-        <ResponsiveContainer height={minHeight} minHeight={minHeight} width="100%">
+      ({ className, children }) => (
+        <ResponsiveContainer
+          className={className}
+          height={minHeight}
+          minHeight={minHeight}
+          width="100%"
+        >
           {children as JSX.Element}
         </ResponsiveContainer>
       ),

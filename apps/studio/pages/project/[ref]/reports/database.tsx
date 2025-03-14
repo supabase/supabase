@@ -16,24 +16,32 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
-import { DateRangePicker } from 'components/ui/DateRangePicker'
 import Panel from 'components/ui/Panel'
+import { REPORTS_DATEPICKER_HELPERS } from 'components/interfaces/Reports/Reports.constants'
 import { analyticsKeys } from 'data/analytics/keys'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { BASE_PATH } from 'lib/constants'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
+import ShimmerLine from 'components/ui/ShimmerLine'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
+import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import ComposedChartHandler, { MultiAttribute } from 'components/ui/Charts/ComposedChartHandler'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+
+export type UpdateDateRange = (from: string, to: string) => void
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { Admonition } from 'ui-patterns'
+import DateRangePicker from '../../../../components/ui/DateRangePicker'
+import { TIME_PERIODS_INFRA } from '../../../../lib/constants/metrics'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -51,14 +59,162 @@ DatabaseReport.getLayout = (page) => (
 
 export default DatabaseReport
 
+// const REPORT_ATTRIBUTES = [
+//   {
+//     id: 'ram-usage',
+//     label: 'Memory usage',
+//     showTooltip: true,
+//     showLegend: true,
+//     hideChartType: true,
+//     defaultChartStyle: 'line',
+//     showTotal: false,
+//     attributes: [
+//       {
+//         attribute: 'ram_usage_max_available',
+//         provider: 'infra-monitoring',
+//         label: 'Max RAM Available',
+//         isMaxValue: true,
+//       },
+//       {
+//         attribute: 'ram_usage_used',
+//         provider: 'infra-monitoring',
+//         label: 'Used',
+//       },
+//       {
+//         attribute: 'ram_usage_cache_and_buffers',
+//         provider: 'infra-monitoring',
+//         label: 'Cache + buffers',
+//       },
+//       {
+//         attribute: 'ram_usage_free',
+//         provider: 'infra-monitoring',
+//         label: 'Free',
+//       },
+//       {
+//         attribute: 'ram_usage_swap',
+//         provider: 'infra-monitoring',
+//         label: 'Swap',
+//       },
+//     ],
+//   },
+//   {
+//     id: 'cpu-usage',
+//     label: 'CPU usage',
+//     format: '%',
+//     valuePrecision: 2,
+//     showTooltip: true,
+//     showLegend: true,
+//     showMaxValue: false,
+//     hideChartType: true,
+//     defaultChartStyle: 'line',
+//     attributes: [
+//       {
+//         attribute: 'cpu_usage_busy_system',
+//         provider: 'infra-monitoring',
+//         label: 'System',
+//         format: '%',
+//       },
+//       {
+//         attribute: 'cpu_usage_busy_user',
+//         provider: 'infra-monitoring',
+//         label: 'User',
+//         format: '%',
+//       },
+//       {
+//         attribute: 'cpu_usage_busy_iowait',
+//         provider: 'infra-monitoring',
+//         label: 'IOwait',
+//         format: '%',
+//       },
+//       {
+//         attribute: 'cpu_usage_busy_irqs',
+//         provider: 'infra-monitoring',
+//         label: 'IRQs',
+//         format: '%',
+//       },
+//       {
+//         attribute: 'cpu_usage_busy_other',
+//         provider: 'infra-monitoring',
+//         label: 'other',
+//         format: '%',
+//       },
+//     ],
+//   },
+//   {
+//     id: 'client-connections',
+//     label: 'Client connections',
+//     valuePrecision: 0,
+//     showTooltip: true,
+//     showLegend: true,
+//     hideChartType: true,
+//     defaultChartStyle: 'line',
+//     attributes: [
+//       {
+//         attribute: 'client_connections_postgres',
+//         provider: 'infra-monitoring',
+//         label: 'postgres',
+//       },
+//       {
+//         attribute: 'client_connections_supavisor',
+//         provider: 'infra-monitoring',
+//         label: 'supavisor',
+//       },
+//       {
+//         attribute: 'client_connections_realtime',
+//         provider: 'infra-monitoring',
+//         label: 'realtime',
+//       },
+//       {
+//         attribute: 'client_connections_max_limit',
+//         provider: 'infra-monitoring',
+//         label: 'max limit',
+//         isMaxValue: true,
+//       },
+//     ],
+//   },
+//   {
+//     id: 'disk-iops',
+//     label: 'Disk IOps',
+//     showTooltip: true,
+//     showLegend: true,
+//     hideChartType: true,
+//     defaultChartStyle: 'line',
+//     attributes: [
+//       {
+//         attribute: 'disk_iops_write',
+//         provider: 'infra-monitoring',
+//         label: 'IOps write',
+//       },
+//       { attribute: 'disk_iops_read', provider: 'infra-monitoring', label: 'IOps read' },
+//       {
+//         attribute: 'disk_iops_max',
+//         provider: 'infra-monitoring',
+//         label: 'IOps Max',
+//         isMaxValue: true,
+//       },
+//     ],
+//   },
+// ]
+
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
-  const queryClient = useQueryClient()
+  const organization = useSelectedOrganization()
 
   const state = useDatabaseSelectorStateSnapshot()
+  const defaultStart = dayjs().subtract(7, 'day').toISOString()
+  const defaultEnd = dayjs().toISOString()
+  const [dateRange, setDateRange] = useState<any>({
+    period_start: { date: defaultStart, time_period: '7d' },
+    period_end: { date: defaultEnd, time_period: 'today' },
+    interval: '1h',
+  })
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const plan = subscription?.plan
+  const queryClient = useQueryClient()
+
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const [dateRange, setDateRange] = useState<any>(undefined)
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
@@ -85,26 +241,173 @@ const DatabaseUsage = () => {
   const isPgBouncerEnabled = pgBouncerConfig?.pgbouncer_enabled
 
   const REPORT_ATTRIBUTES = [
-    { id: 'ram_usage', label: 'Memory usage', hide: false },
-    { id: 'avg_cpu_usage', label: 'Average CPU usage', hide: false },
-    { id: 'max_cpu_usage', label: 'Max CPU usage', hide: false },
-    { id: 'disk_io_consumption', label: 'Disk IO consumed', hide: false },
     {
-      id: 'pg_stat_database_num_backends',
-      label: 'Pooler to database connections',
+      id: 'ram-usage',
+      label: 'Memory usage',
       hide: false,
+      showTooltip: true,
+      showLegend: true,
+      hideChartType: true,
+      defaultChartStyle: 'line',
+      // showTotal: false,
+      showMaxValue: false,
+      attributes: [
+        // {
+        //   attribute: 'ram_usage_max_available',
+        //   provider: 'infra-monitoring',
+        //   label: 'Max RAM Available',
+        //   isMaxValue: true,
+        // },
+        {
+          attribute: 'ram_usage_used',
+          provider: 'infra-monitoring',
+          label: 'Used',
+        },
+        {
+          attribute: 'ram_usage_cache_and_buffers',
+          provider: 'infra-monitoring',
+          label: 'Cache + buffers',
+        },
+        {
+          attribute: 'ram_usage_free',
+          provider: 'infra-monitoring',
+          label: 'Free',
+        },
+        {
+          attribute: 'ram_usage_swap',
+          provider: 'infra-monitoring',
+          label: 'Swap',
+        },
+      ],
     },
     {
-      id: 'supavisor_connections_active',
-      label: 'Client to Supavisor connections',
+      id: 'cpu-usage',
+      label: 'CPU usage',
+      format: '%',
+      valuePrecision: 2,
       hide: false,
+      showTooltip: true,
+      showLegend: true,
+      showMaxValue: false,
+      hideChartType: true,
+      defaultChartStyle: 'line',
+      attributes: [
+        {
+          attribute: 'cpu_usage_busy_system',
+          provider: 'infra-monitoring',
+          label: 'System',
+          format: '%',
+        },
+        {
+          attribute: 'cpu_usage_busy_user',
+          provider: 'infra-monitoring',
+          label: 'User',
+          format: '%',
+        },
+        {
+          attribute: 'cpu_usage_busy_iowait',
+          provider: 'infra-monitoring',
+          label: 'IOwait',
+          format: '%',
+        },
+        {
+          attribute: 'cpu_usage_busy_irqs',
+          provider: 'infra-monitoring',
+          label: 'IRQs',
+          format: '%',
+        },
+        {
+          attribute: 'cpu_usage_busy_other',
+          provider: 'infra-monitoring',
+          label: 'other',
+          format: '%',
+        },
+      ],
     },
     {
-      id: 'pgbouncer_pools_client_active_connections',
-      label: 'Client to dedicated pooler connections',
-      hide: !isPgBouncerEnabled,
+      id: 'client-connections',
+      label: 'Client connections',
+      valuePrecision: 0,
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      showMaxValue: true,
+      hideChartType: true,
+      defaultChartStyle: 'line',
+      attributes: [
+        {
+          attribute: 'client_connections_postgres',
+          provider: 'infra-monitoring',
+          label: 'postgres',
+        },
+        {
+          attribute: 'supavisor_connections_active',
+          provider: 'infra-monitoring',
+          label: 'supavisor',
+        },
+        {
+          attribute: 'client_connections_realtime',
+          provider: 'infra-monitoring',
+          label: 'realtime',
+        },
+        {
+          attribute: 'client_connections_pgbouncer',
+          provider: 'infra-monitoring',
+          label: 'pgbouncer',
+        },
+        {
+          attribute: 'client_connections_max_limit',
+          provider: 'infra-monitoring',
+          label: 'max limit',
+          isMaxValue: true,
+        },
+      ],
     },
-  ] as const
+    {
+      id: 'disk-iops',
+      label: 'Disk IOps',
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      hideChartType: true,
+      defaultChartStyle: 'line',
+      attributes: [
+        {
+          attribute: 'disk_iops_write',
+          provider: 'infra-monitoring',
+          label: 'IOps write',
+        },
+        { attribute: 'disk_iops_read', provider: 'infra-monitoring', label: 'IOps read' },
+        // {
+        //   attribute: 'disk_iops_max',
+        //   provider: 'infra-monitoring',
+        //   label: 'IOps Max',
+        //   isMaxValue: true,
+        // },
+      ],
+    },
+  ]
+  // const REPORT_ATTRIBUTES = [
+  //   { id: 'ram_usage', label: 'Memory usage', hide: false },
+  //   { id: 'avg_cpu_usage', label: 'Average CPU usage', hide: false },
+  //   { id: 'max_cpu_usage', label: 'Max CPU usage', hide: false },
+  //   { id: 'disk_io_consumption', label: 'Disk IO consumed', hide: false },
+  //   {
+  //     id: 'pg_stat_database_num_backends',
+  //     label: 'Pooler to database connections',
+  //     hide: false,
+  //   },
+  //   {
+  //     id: 'supavisor_connections_active',
+  //     label: 'Client to Supavisor connections',
+  //     hide: false,
+  //   },
+  //   {
+  //     id: 'pgbouncer_pools_client_active_connections',
+  //     label: 'Client to dedicated pooler connections',
+  //     hide: !isPgBouncerEnabled,
+  //   },
+  // ] as const
 
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
     onSuccess: (_, variables) => {
@@ -164,9 +467,51 @@ const DatabaseUsage = () => {
     }
   }, [db, chart])
 
+  const handleIntervalGranularity = (from: string, to: string) => {
+    const conditions = {
+      '15s': dayjs(to).diff(from, 'hour') < 1, // less than 1 hour
+      '1m': dayjs(to).diff(from, 'hour') < 3, // less than 3 hours
+      '10m': dayjs(to).diff(from, 'hour') < 6, // less than 6 hours
+      '30m': dayjs(to).diff(from, 'hour') < 18, // less than 18 hours
+      '1h': dayjs(to).diff(from, 'day') < 10, // less than 10 days
+      '1d': dayjs(to).diff(from, 'day') >= 10, // more than 10 days
+    }
+
+    switch (true) {
+      case conditions['15s']:
+        return '15s'
+      case conditions['1m']:
+        return '1m'
+      case conditions['10m']:
+        return '10m'
+      case conditions['30m']:
+        return '30m'
+      default:
+        return '1h'
+    }
+  }
+
+  const handleCustomDateFormat =
+    handleIntervalGranularity(dateRange?.period_start?.date, dateRange?.period_end?.date) === '15s'
+      ? DateTimeFormats.FULL_SECONDS
+      : undefined
+
+  const updateDateRange: UpdateDateRange = (from: string, to: string) => {
+    setDateRange({
+      period_start: { date: from, time_period: '7d' },
+      period_end: { date: to, time_period: 'today' },
+      interval: handleIntervalGranularity(from, to),
+    })
+  }
+
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
+      <div className="w-full flex flex-col gap-1">
+        <div className="h-2 w-full">
+          <ShimmerLine active={report.isLoading} />
+        </div>
+      </div>
       <Alert_Shadcn_ className="relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
@@ -207,10 +552,32 @@ const DatabaseUsage = () => {
           <GrafanaBannerActions className="xl:hidden" />
         </AlertDescription_Shadcn_>
       </Alert_Shadcn_>
-      <section>
-        <Panel title={<h2>Database health</h2>}>
-          <Panel.Content>
-            <div className="mb-4 flex items-center gap-x-2">
+      <section className="relative pt-16 -mt-4">
+        <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
+          <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center justify-between space-x-3 pointer-events-auto">
+            <DatePickers
+              onChange={(values: any) => updateDateRange(values.from, values.to)}
+              from={dateRange?.period_start?.date || ''}
+              to={dateRange?.period_end?.date || ''}
+              helpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
+                ...helper,
+                disabled: (index > 4 && plan?.id === 'free') || (index > 5 && plan?.id !== 'pro'),
+              }))}
+            />
+            <div className="flex items-center gap-4">
+              {dateRange && (
+                <div className="flex items-center gap-x-2 text-xs">
+                  <p className="text-foreground-light">
+                    {dayjs(dateRange.period_start.date).format('MMM D, h:mma')}
+                  </p>
+                  <p className="text-foreground-light">
+                    <ArrowRight size={12} />
+                  </p>
+                  <p className="text-foreground-light">
+                    {dayjs(dateRange.period_end.date).format('MMM D, h:mma')}
+                  </p>
+                </div>
+              )}
               <ButtonTooltip
                 type="default"
                 disabled={isRefreshing}
@@ -219,63 +586,24 @@ const DatabaseUsage = () => {
                 tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
                 onClick={onRefreshReport}
               />
-              <div className="flex items-center gap-x-3">
-                <DateRangePicker
-                  loading={false}
-                  value={'7d'}
-                  options={TIME_PERIODS_INFRA}
-                  currentBillingPeriodStart={undefined}
-                  onChange={(values) => {
-                    if (values.interval === '1d') {
-                      setDateRange({ ...values, interval: '1h' })
-                    } else {
-                      setDateRange(values)
-                    }
-                  }}
-                />
-                {dateRange && (
-                  <div className="flex items-center gap-x-2">
-                    <p className="text-foreground-light">
-                      {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
-                    </p>
-                    <p className="text-foreground-light">
-                      <ArrowRight size={12} />
-                    </p>
-                    <p className="text-foreground-light">
-                      {dayjs(dateRange.period_end.date).format('MMMM D, hh:mma')}
-                    </p>
-                  </div>
-                )}
-              </div>
             </div>
-            <div className="space-y-6">
-              {dateRange &&
-                REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr) => (
-                  <>
-                    <ChartHandler
-                      key={attr.id}
-                      provider="infra-monitoring"
-                      attribute={attr.id}
-                      label={attr.label}
-                      interval={dateRange.interval}
-                      startDate={dateRange?.period_start?.date}
-                      endDate={dateRange?.period_end?.date}
-                    />
-                    {attr.id === 'pgbouncer_pools_client_active_connections' && (
-                      <Admonition type="note" title="Dedicated Pooler is enabled" className="p-2">
-                        <p>
-                          Your project is currently using the Dedicated Pooler instead of Supavisor.
-                          You can update this in{' '}
-                          <Link href={`/project/${ref}/settings/database`}>Database settings</Link>.
-                        </p>
-                      </Admonition>
-                    )}
-                  </>
-                ))}
-            </div>
-          </Panel.Content>
-        </Panel>
-
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-4">
+          {dateRange &&
+            REPORT_ATTRIBUTES.map((attr) => (
+              <ComposedChartHandler
+                key={attr.id}
+                {...attr}
+                attributes={attr.attributes as MultiAttribute[]}
+                interval={dateRange.interval}
+                startDate={dateRange?.period_start?.date}
+                endDate={dateRange?.period_end?.date}
+                updateDateRange={updateDateRange}
+                defaultChartStyle={attr.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+              />
+            ))}
+        </div>
         {dateRange && isReplicaSelected && (
           <Panel title="Replica Information">
             <Panel.Content>
