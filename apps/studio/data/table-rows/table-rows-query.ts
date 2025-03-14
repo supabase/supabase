@@ -152,8 +152,9 @@ export const fetchAllTableRows = async ({
 
       await sleep(THROTTLE_DELAY)
     } catch (error) {
-      console.error('Error fetching table rows:', error)
-      return []
+      throw new Error(
+        `Error fetching table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
     }
   }
 
