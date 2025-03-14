@@ -5,12 +5,12 @@ export const CRTShader = {
   uniforms: {
     tDiffuse: { value: null },
     time: { value: 0 },
-    scanlineIntensity: { value: 0.7 },
+    scanlineIntensity: { value: 1 },
     scanlineCount: { value: 320 },
-    vignetteIntensity: { value: 0.5 },
-    noiseIntensity: { value: 0.1 },
-    flickerIntensity: { value: 0.02 },
-    rgbShiftAmount: { value: 0.0015 },
+    vignetteIntensity: { value: 0.9 },
+    noiseIntensity: { value: 0.01 },
+    flickerIntensity: { value: 0.01 },
+    rgbShiftAmount: { value: 0.003 },
     // Add intensity control
     intensity: { value: 1.0 },
   },

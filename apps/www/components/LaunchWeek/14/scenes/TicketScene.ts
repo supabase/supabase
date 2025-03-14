@@ -247,15 +247,16 @@ class TicketScene implements BaseScene {
     await this._loadFonts()
     await this._preloadAllTextureSets()
 
-    // Set up post-processing effects but keep them disabled initially
-    this._setupPostProcessingEffects(context)
-
     const gltf = await loadGLTFModel(this.sceneUrl)
 
     this._ticket = gltf.scene as unknown as Scene
 
+
     this._setCamera(context.camera)
     this._modelRenderPass = new RenderPass(this._ticket, context.camera)
+
+    // Set up post-processing effects but keep them disabled initially
+    this._setupPostProcessingEffects(context)
 
     // Important: Don't set clear values for the render pass
     // Let the renderer handle clearing
@@ -312,6 +313,58 @@ class TicketScene implements BaseScene {
     if (this._crtPass && this._crtPass.uniforms['time']) {
       this._crtPass.uniforms['time'].value = time
     }
+
+    // Update effect intensities if effects are enabled
+    if (this._effectsEnabled) {
+      // Gradually increase effect intensity over time
+      this._internalState.effectsIntensity = Math.min(
+        this._internalState.effectsIntensity + 0.01,
+        1.0
+      )
+
+      // Update glitch pass intensity
+      if (this._glitchPass) {
+        this._glitchPass.setIntensity(this._internalState.effectsIntensity * 0.5) // Scale to desired max (0.5)
+      }
+
+      // Update CRT shader intensity
+      if (this._crtPass && this._crtPass.uniforms['intensity']) {
+        this._crtPass.uniforms['intensity'].value = this._internalState.effectsIntensity * 1 // Scale to desired max (0.3)
+      }
+
+      // Update bloom pass parameters based on secret version state
+      if (this._bloomPass) {
+        if (this.state.secret) {
+          // Gradually increase bloom strength from 0 to 3 without affecting transparency
+          const targetStrength = 3.0
+          const currentStrength = this._bloomPass.strength || 0
+          const newStrength = currentStrength + (targetStrength - currentStrength) * 0.05
+          this._bloomPass.strength = newStrength
+
+          // Gradually decrease threshold for more bloom
+          const targetThreshold = 0.2
+          const currentThreshold = this._bloomPass.threshold || 1.0
+          const newThreshold = currentThreshold - (currentThreshold - targetThreshold) * 0.05
+          this._bloomPass.threshold = newThreshold
+        } else {
+          // Gradually reset bloom to initial values
+          this._bloomPass.strength = Math.max(0, (this._bloomPass.strength || 0) - 0.05)
+          this._bloomPass.threshold = Math.min(1.0, (this._bloomPass.threshold || 0.2) + 0.05)
+        }
+      }
+    } else {
+      // If effects are disabled, ensure all intensities are zero
+      this._internalState.effectsIntensity = 0
+
+      if (this._glitchPass) this._glitchPass.setIntensity(0)
+      if (this._crtPass && this._crtPass.uniforms['intensity'])
+        this._crtPass.uniforms['intensity'].value = 0
+      if (this._bloomPass) {
+        this._bloomPass.strength = 0
+        this._bloomPass.threshold = 1.0
+        this._bloomPass.radius = 0.5
+      }
+    }
   }
 
   cleanup(): void {
@@ -351,6 +404,8 @@ class TicketScene implements BaseScene {
 
     // Enable all passes
     if (this._glitchPass) this._glitchPass.enabled = true
+    if (this._crtPass) this._crtPass.enabled = true
+    if (this._bloomPass) this._bloomPass.enabled = true
   }
 
   // In your click method
@@ -394,29 +449,32 @@ class TicketScene implements BaseScene {
   }
 
   private _setupPostProcessingEffects(context: SceneRenderer) {
-    // Create glitch pass and disable it
+    // Create glitch pass and disable it initially
     const glitchPass = new GlitchPass(521)
-    glitchPass.enabled = true
+    glitchPass.enabled = false // Start disabled
     glitchPass.uniforms.col_s.value = 0
-    glitchPass.setIntensity(0)
-
+    glitchPass.setIntensity(0) // Start with zero intensity
     this._glitchPass = glitchPass
 
-    // Create RGB shift pass with initial zero intensity
+    // Create CRT pass with initial zero intensity
     const crtPass = new ShaderPass(CRTShader)
-    crtPass.enabled = true
-    crtPass.uniforms.intensity.value = 0
+    crtPass.enabled = false // Start disabled
+    crtPass.uniforms.intensity.value = 0 // Start with zero intensity
     this._crtPass = crtPass
+
+    if(!this._ticket) throw new Error('Ticket not loaded')
+    if(!this._sceneRenderer) throw new Error('SceneRenderer not loaded')
 
     // Create bloom pass with initial zero intensity
     const bloomPass = new TransparentBloomPass(
       new THREE.Vector2(context.container.clientWidth, context.container.clientHeight),
-      0, // Initial strength
-      0, // Radius
-      0 // Threshold
+      0, // Initial strength (0-3)
+      0.5, // Initial radius
+      1.0, // Initial threshold (higher = less bloom)
+      this._ticket,
+      this._sceneRenderer.camera
     )
-    bloomPass.enabled = true
-    // Don't modify the clear color/alpha here - let the pass handle it internally
+    bloomPass.enabled = false // Start disabled
     this._bloomPass = bloomPass
   }
 
