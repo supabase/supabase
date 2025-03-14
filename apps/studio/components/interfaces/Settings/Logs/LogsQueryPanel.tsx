@@ -28,7 +28,7 @@ import {
   LOGS_SOURCE_DESCRIPTION,
   LogsTableName,
 } from './Logs.constants'
-import DatePickers from './Logs.DatePickers'
+import { LogsDatePicker, DatePickerValue } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate, WarehouseCollection } from './Logs.types'
 import { WarehouseQueryTemplate } from './Warehouse.utils'
 
@@ -44,7 +44,7 @@ export interface LogsQueryPanelProps {
   onSelectTemplate: (template: LogTemplate) => void
   onSelectWarehouseTemplate: (template: WarehouseQueryTemplate) => void
   onSelectSource: (source: string) => void
-  onDateChange: React.ComponentProps<typeof DatePickers>['onChange']
+  onDateChange: (value: DatePickerValue) => void
   onDataSourceChange: (sourceType: SourceType) => void
 }
 
@@ -203,10 +203,12 @@ const LogsQueryPanel = ({
             )}
 
             {dataSource === 'logs' && (
-              <DatePickers
-                to={defaultTo}
-                from={defaultFrom}
-                onChange={onDateChange}
+              <LogsDatePicker
+                value={{
+                  from: defaultFrom,
+                  to: defaultTo,
+                }}
+                onSubmit={onDateChange}
                 helpers={EXPLORER_DATEPICKER_HELPERS}
               />
             )}
