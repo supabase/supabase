@@ -89,7 +89,13 @@ const FunctionList = ({
         return (
           <Table.tr key={x.id}>
             <Table.td className="truncate">
-              <p title={x.name}>{x.name}</p>
+              <Button
+                type="text"
+                className="text-foreground p-0 hover:bg-transparent"
+                onClick={() => editFunction(x)}
+              >
+                {x.name}
+              </Button>
             </Table.td>
             <Table.td className="table-cell overflow-auto">
               <p title={x.argument_types} className="truncate">

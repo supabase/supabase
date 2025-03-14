@@ -3,7 +3,6 @@ import { Home } from 'lucide-react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useContentQuery } from 'data/content/content-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -25,6 +24,7 @@ import {
   SQL_ICON,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { DEPRECATED_REPORTS } from './Reports.constants'
 
 interface MetricOptionsProps {
   config?: Dashboards.Content
@@ -74,7 +74,10 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent>
-                {METRICS.filter((metric) => metric?.category?.key === cat.key).map((metric) => {
+                {METRICS.filter(
+                  (metric) =>
+                    !DEPRECATED_REPORTS.includes(metric.key) && metric?.category?.key === cat.key
+                ).map((metric) => {
                   return (
                     <DropdownMenuCheckboxItem
                       key={metric.key}
@@ -138,7 +141,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                               isAddingChart: true,
                             })
                             sendEvent({
-                              action: TelemetryActions.CUSTOM_REPORT_ADD_SQL_BLOCK_CLICKED,
+                              action: 'custom_report_add_sql_block_clicked',
                             })
                           }
                         }}

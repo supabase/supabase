@@ -1,3 +1,5 @@
+import { ChevronLeft } from 'lucide-react'
+import Link from 'next/link'
 import { Fragment, ReactNode } from 'react'
 
 import { useParams } from 'common'
@@ -17,8 +19,9 @@ interface PageHeaderProps {
   subtitle?: string
   icon?: ReactNode
   breadcrumbs?: Array<{
-    label: string
+    label?: string
     href?: string
+    element?: ReactNode
   }>
   primaryActions?: ReactNode
   secondaryActions?: ReactNode
@@ -45,28 +48,50 @@ export const PageHeader = ({
       {(displayBreadcrumbs.length > 0 ||
         (isCompact && (title || primaryActions || secondaryActions))) && (
         <div className={cn('flex items-center gap-4', isCompact ? 'justify-between' : 'mb-4')}>
-          {displayBreadcrumbs.length > 0 ? (
-            <Breadcrumb className={cn('text-foreground-muted', isCompact && 'text-base')}>
-              <BreadcrumbList className={isCompact ? 'text-base' : 'text-xs'}>
-                {displayBreadcrumbs.map((item, index) => (
-                  <Fragment key={item.label}>
-                    <BreadcrumbItem>
-                      {item.href ? (
-                        <BreadcrumbLink href={!!ref ? item.href.replace('[ref]', ref) : item.href}>
-                          {item.label}
-                        </BreadcrumbLink>
-                      ) : (
-                        <BreadcrumbPageItem>{item.label}</BreadcrumbPageItem>
-                      )}
-                    </BreadcrumbItem>
-                    {index < displayBreadcrumbs.length - 1 && <BreadcrumbSeparator />}
-                  </Fragment>
-                ))}
-              </BreadcrumbList>
-            </Breadcrumb>
-          ) : isCompact ? (
-            title
-          ) : null}
+          <div className="flex items-center gap-4">
+            {breadcrumbs.length > 0 ? (
+              <Breadcrumb className={cn('text-foreground-muted', isCompact && 'text-base')}>
+                <BreadcrumbList className={isCompact ? 'text-base' : 'text-xs'}>
+                  {breadcrumbs.map((item, index) => (
+                    <Fragment key={item.label || `breadcrumb-${index}`}>
+                      <BreadcrumbItem>
+                        {item.element ? (
+                          item.element
+                        ) : item.href ? (
+                          <BreadcrumbLink asChild className="flex items-center gap-2">
+                            <Link href={!!ref ? item.href.replace('[ref]', ref) : item.href}>
+                              {breadcrumbs.length === 1 && !isCompact && (
+                                <ChevronLeft size={16} strokeWidth={1.5} />
+                              )}
+                              {item.label}
+                            </Link>
+                          </BreadcrumbLink>
+                        ) : (
+                          <BreadcrumbPageItem className="flex items-center gap-2">
+                            {breadcrumbs.length === 1 && (
+                              <ChevronLeft size={16} strokeWidth={1.5} />
+                            )}
+                            {item.label}
+                          </BreadcrumbPageItem>
+                        )}
+                      </BreadcrumbItem>
+                      {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+                    </Fragment>
+                  ))}
+                  {isCompact && title && (
+                    <>
+                      <BreadcrumbSeparator />
+                      <BreadcrumbItem>
+                        <BreadcrumbPageItem>{title}</BreadcrumbPageItem>
+                      </BreadcrumbItem>
+                    </>
+                  )}
+                </BreadcrumbList>
+              </Breadcrumb>
+            ) : isCompact ? (
+              title
+            ) : null}
+          </div>
           {isCompact && (
             <div className="flex items-center gap-2">
               {secondaryActions && (

@@ -218,6 +218,20 @@ const AIEditor = ({
   }, [value, defaultValue])
 
   useEffect(() => {
+    if (initialPrompt) {
+      setPromptInput(initialPrompt)
+      setPromptState({
+        isOpen: Boolean(initialPrompt),
+        selection: '',
+        beforeSelection: '',
+        afterSelection: '',
+        startLineNumber: 0,
+        endLineNumber: 0,
+      })
+    }
+  }, [initialPrompt])
+
+  useEffect(() => {
     if (!isDiffMode) {
       setIsDiffEditorMounted(false)
     }
@@ -299,7 +313,7 @@ const AIEditor = ({
       ) : (
         <div className="w-full h-full relative">
           <Editor
-            theme="vs-dark"
+            theme="supabase"
             language={language}
             value={currentValue}
             options={defaultOptions}

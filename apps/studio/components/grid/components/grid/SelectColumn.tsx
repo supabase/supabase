@@ -9,6 +9,7 @@ import {
 } from 'react-data-grid'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { SELECT_COLUMN_KEY } from '../../constants'
 import { useTrackedState } from '../../store/Store'
 import type { SupaRow } from '../../types'
@@ -170,12 +171,11 @@ function SelectCellHeader({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
 }: SelectCellHeaderProps) {
-  const state = useTrackedState()
-  const { selectedRows, allRowsSelected } = state
+  const snap = useTableEditorTableStateSnapshot()
   const inputRef = useRef<HTMLInputElement>(null)
 
   // indeterminate state === some rows are selected but not all
-  const isIndeterminate = selectedRows.size > 0 && !allRowsSelected
+  const isIndeterminate = snap.selectedRows.size > 0 && !snap.allRowsSelected
 
   useEffect(() => {
     if (inputRef.current) {
