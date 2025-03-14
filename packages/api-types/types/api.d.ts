@@ -2005,6 +2005,7 @@ export interface components {
       available: boolean
     }
     SupavisorConfigResponse: {
+      connection_string: string
       connectionString: string
       /** @enum {string} */
       database_type: 'PRIMARY' | 'READ_REPLICA'
@@ -2314,8 +2315,8 @@ export interface components {
     }
     UpdateSupavisorConfigResponse: {
       default_pool_size: number | null
-      /** @enum {string} */
-      pool_mode: 'transaction' | 'session'
+      /** @enum {number} */
+      pool_mode: never
     }
     UpgradeDatabaseBody: {
       release_channel: components['schemas']['ReleaseChannel']
