@@ -27,7 +27,9 @@ interface TicketSceneOptions {
     name?: string
     ticketNumber?: number
   }
-  onUpgradeToSecret?: () => {}
+  onSeatChartButtonClicked?: () => void
+  onWebsiteButtonClicked?: () => void
+  onGoBackButtonClicked?: () => void
 }
 
 interface MousePositionState {
@@ -46,7 +48,7 @@ class TicketScene implements BaseScene {
 
   textureImages = {
     basic: {
-      back: '/images/launchweek/14/back-basic-ticket-textrue.png',
+      back: '/images/launchweek/14/back-basic-ticket-texture.png',
       front: '/images/launchweek/14/front-basic-ticket-texture.png',
 
       bgColor: { rgb: 0x202020, alpha: 1 },
@@ -57,7 +59,7 @@ class TicketScene implements BaseScene {
       transparentBg: { rgb: 0x000000, alpha: 0 },
     },
     secret: {
-      back: '/images/launchweek/14/back-secret-ticket-textrue.png',
+      back: '/images/launchweek/14/back-secret-ticket-texture.png',
       front: '/images/launchweek/14/front-secret-ticket-texture.png',
 
       bgColor: { rgb: 0x050505, alpha: 1 },
@@ -68,7 +70,7 @@ class TicketScene implements BaseScene {
       transparentBg: { rgb: 0x2cf494, alpha: 0.4 },
     },
     platinum: {
-      back: '/images/launchweek/14/back-platinum-ticket-textrue.png',
+      back: '/images/launchweek/14/back-platinum-ticket-texture.png',
       front: '/images/launchweek/14/front-platinum-ticket-texture.png',
 
       bgColor: { rgb: 0x050505, alpha: 1 },
@@ -83,12 +85,12 @@ class TicketScene implements BaseScene {
   typography = {
     main: {
       family: 'Departure Mono',
-      relativeSize: 73 / 1400,
+      relativeSize: 100 / 1400,
     },
     ticketNumber: {
       family: 'Nippo-Variable',
       weight: 400,
-      relativeSize: 85.26 / 1400,
+      relativeSize: 125 / 1400,
     },
   }
 
@@ -115,7 +117,24 @@ class TicketScene implements BaseScene {
     },
   }
 
-  fontUrl = ''
+  fonts: ConstructorParameters<typeof FontFace>[] = [
+    [
+      'Departure Mono',
+      'url("/fonts/launchweek/14/DepartureMono-Regular.woff2") format("woff2")',
+      {
+        weight: '400',
+        style: 'normal',
+      },
+    ],
+    [
+      'Nippo-Variable',
+      'url("/fonts/launchweek/14/Nippo-Variable.woff2") format("woff2")',
+      {
+        weight: '400 700',
+        style: 'normal',
+      },
+    ],
+  ]
 
   state: TicketSceneState
 
@@ -123,6 +142,7 @@ class TicketScene implements BaseScene {
     mousePosition: undefined as MousePositionState | undefined,
     containerBBox: undefined as DOMRect | undefined,
     naturalPosition: new Vector3(0, 0, 0),
+    fontsLoaded: false,
   }
 
   private _sceneConfig = {
@@ -149,6 +169,15 @@ class TicketScene implements BaseScene {
     'TicketBackWebsiteButton',
   ] as const
   private static TEXTURE_PIXEL_DENSITY_FACTOR = 400
+  private texturePlaneMapping: { [key in AvailableTextures]?: 'back' | 'front' | 'edge' } = {
+    TicketFront: 'front',
+    TicketBack: 'back',
+    TicketEdge: 'edge',
+    TicketFrontWebsiteButton: 'front',
+    TicketFrontSeatChartButton: 'front',
+    TicketBackGoBackButton: 'back',
+    TicketBackWebsiteButton: 'back',
+  }
 
   private _textureCanvases: {
     [key in AvailableTextures]?: { canvas: HTMLCanvasElement; context: CanvasRenderingContext2D }
@@ -164,9 +193,9 @@ class TicketScene implements BaseScene {
       startDate: options.startDate,
       ticketNumber: options.user.ticketNumber || 0,
       texts: {
-        username: options.user.name || '',
-        species: '',
-        earth: '',
+        username: "Goszczu" ?? options.user.name ?? '',
+        species: 'Modern Human',
+        earth: 'Earth',
         // Start assigning seats from A001
         seatCode: (466561 + (options.user.ticketNumber || 0)).toString(36),
       },
@@ -177,13 +206,15 @@ class TicketScene implements BaseScene {
     this._sceneRenderer = context
     this._internalState.containerBBox = context.container.getBoundingClientRect()
 
+    // Load fonts before loading the model
+    await this._loadFonts()
+
     const gltf = await loadGLTFModel(this.sceneUrl)
 
     this._ticket = gltf.scene as unknown as Scene
 
     this._setCamera(context.camera)
     this._modelRenderPass = new RenderPass(this._ticket, context.camera)
-    context.composer.addPass(this._modelRenderPass)
 
     // Set renderer clear color to make background visible
     context.renderer.setClearColor(0x000000, 0)
@@ -205,6 +236,9 @@ class TicketScene implements BaseScene {
 
     this._setupNamedObjects()
     this._setupTextureCanvases()
+    await this._loadTextures()
+
+    context.composer.addPass(this._modelRenderPass)
   }
 
   update(context: SceneRenderer, dt?: number): void {
@@ -228,13 +262,57 @@ class TicketScene implements BaseScene {
     return
   }
 
-  showSecondFace() {
-    this.state.frontside = !this.state.frontside
-    this._setSecretTextures()
+  showFrontSide() {
+    this.state.frontside = true
   }
 
+  showBackSide() {
+    this.state.frontside = false
+  }
+
+  upgradeToSecret() {
+    this._setSecretTextures()
+    this.state.secret = true
+  }
+
+  // In your click method
   click(e: MouseEvent) {
     this._updateMousePosition(e)
+
+    if (!this._internalState.mousePosition?.isWithinContainer || !this._sceneRenderer) return
+
+    // Set up raycaster
+    this.raycaster.setFromCamera(
+      new THREE.Vector2(
+        this._internalState.mousePosition.containerX,
+        this._internalState.mousePosition.containerY
+      ),
+      this._sceneRenderer.camera
+    )
+
+    // Get all meshes to check for intersection
+    const meshes = Object.values(this._namedMeshes).filter(Boolean) as THREE.Mesh[]
+
+    // Check for intersections
+    const intersects = this.raycaster.intersectObjects(meshes)
+
+    if (intersects.length > 0) {
+      const clickedMesh = intersects[0].object as THREE.Mesh
+
+      // Handle click based on which mesh was clicked
+      if (clickedMesh === this._namedMeshes.TicketFrontWebsiteButton) {
+        this.options.onWebsiteButtonClicked?.()
+        // Add your action here
+      } else if (clickedMesh === this._namedMeshes.TicketFrontSeatChartButton) {
+        this.options.onSeatChartButtonClicked?.()
+        // Add your action here
+      } else if (clickedMesh === this._namedMeshes.TicketBackGoBackButton) {
+        this.options.onGoBackButtonClicked?.()
+      } else if (clickedMesh === this._namedMeshes.TicketBackWebsiteButton) {
+        this.options.onWebsiteButtonClicked?.()
+        // Add your action here
+      }
+    }
   }
 
   private _updateTicketToFollowMouse(scene: THREE.Scene, dt?: number) {
@@ -332,7 +410,21 @@ class TicketScene implements BaseScene {
 
   private _setupTextureCanvases() {
     for (const [name, mesh] of Object.entries(this._namedMeshes)) {
-      const localBox = new THREE.Box3().setFromObject(mesh)
+      const planeType = this.texturePlaneMapping[name as AvailableTextures]
+      let referenceMesh: THREE.Mesh | undefined
+      if (planeType === 'front') {
+        referenceMesh = this._namedMeshes.TicketFront
+      } else if (planeType === 'back') {
+        referenceMesh = this._namedMeshes.TicketBack
+      } else if (planeType === 'edge') {
+        referenceMesh = this._namedMeshes.TicketEdge
+      }
+
+      if (!referenceMesh) {
+        throw new Error(`Could not find reference mesh for texture ${name}`)
+      }
+
+      const localBox = new THREE.Box3().setFromObject(referenceMesh)
       const localSize = localBox.getSize(new THREE.Vector3())
 
       // Get world scale
@@ -392,6 +484,10 @@ class TicketScene implements BaseScene {
   }
 
   private _setSecretTextures() {
+    if (this.state.secret) {
+      return
+    }
+
     if (!this._textureCanvases.TicketFront) {
       throw new Error('TicketFront texture canvas is not set')
     }
@@ -404,6 +500,7 @@ class TicketScene implements BaseScene {
     // context.fillStyle = colorObjToRgb(this.textureImages.secret.textNeonColor)
     context.fillStyle = 'white'
     const fontSize = this.typography.main.relativeSize * canvas.height
+    console.log({ fontSize })
     context.font = `400 ${fontSize}px ${this.typography.main.family}`
     context.textAlign = 'left'
     context.textBaseline = 'top'
@@ -417,7 +514,8 @@ class TicketScene implements BaseScene {
       !Array.isArray(this._namedMeshes.TicketFront.material) &&
       this._namedMeshes.TicketFront.material instanceof THREE.MeshStandardMaterial
     ) {
-      const texture = new THREE.CanvasTexture(canvas, this._namedMeshes.TicketFront.material.map?.mapping)
+      const texture = new THREE.CanvasTexture(canvas)
+      texture.flipY = false
       texture.needsUpdate = true
 
       // Get the existing material
@@ -483,6 +581,202 @@ class TicketScene implements BaseScene {
           console.log('Unexpected material name', part.material.name, part.material)
         }
       }
+    }
+  }
+
+  private _loadTextures() {
+    // Load textures for each named mesh
+    // Create a texture loader
+    const textureLoader = new THREE.TextureLoader()
+    const loadingPromises: Promise<void>[] = []
+
+    // Determine which texture set to use based on ticket type
+    const textureSet = this.state.secret
+      ? this.textureImages.secret
+      : this.state.platinum
+        ? this.textureImages.platinum
+        : this.textureImages.basic
+
+    // Map of which image to use for each mesh
+    const textureImageMap: Partial<Record<AvailableTextures, string>> = {
+      TicketFront: textureSet.front,
+      TicketBack: textureSet.back,
+      TicketFrontWebsiteButton: textureSet.front,
+      TicketBackGoBackButton: textureSet.back,
+      TicketFrontSeatChartButton: textureSet.front,
+      TicketBackWebsiteButton: textureSet.back,
+      // Add mappings for buttons if they have separate textures
+      // Or they can reuse the front/back textures with different UV coordinates
+    }
+
+    // Preload all textures and prepare canvases
+    for (const [name, mesh] of Object.entries(this._namedMeshes)) {
+      if (!mesh || !(mesh instanceof THREE.Mesh)) continue
+      if (!mesh.material || !(mesh.material instanceof THREE.MeshStandardMaterial)) continue
+
+      const textureKey = name as AvailableTextures
+      const textureCanvas = this._textureCanvases[textureKey]
+
+      if (!textureCanvas) continue
+      const { canvas, context } = textureCanvas
+
+      // If we have an image for this texture
+      const imageUrl = textureImageMap[textureKey]
+      if (imageUrl) {
+        // Create a loading promise for this texture
+        const loadPromise = new Promise<void>((resolve) => {
+          textureLoader.load(
+            imageUrl,
+            (loadedTexture) => {
+              // Create an image from the loaded texture
+              const image = loadedTexture.image
+
+              // Draw the loaded image onto the canvas as the base
+              context.clearRect(0, 0, canvas.width, canvas.height)
+              context.drawImage(image, 0, 0, canvas.width, canvas.height)
+
+              // Now we can draw additional content on top
+              this._drawCustomContentOnTexture(textureKey, context, canvas)
+
+              // Create a texture from the combined canvas
+              const combinedTexture = new THREE.CanvasTexture(canvas)
+              combinedTexture.flipY = false
+              combinedTexture.needsUpdate = true
+
+              // Apply the texture to the mesh
+              if (!(mesh.material instanceof THREE.MeshStandardMaterial)) {
+                throw new Error(`Material for mesh ${name} is not a MeshStandardMaterial`)
+              }
+
+              mesh.material.map = combinedTexture
+              mesh.material.needsUpdate = true
+
+              resolve()
+            },
+            undefined, // onProgress callback
+            (error) => {
+              console.error(`Error loading texture ${imageUrl}:`, error)
+              resolve() // Resolve anyway to not block other textures
+            }
+          )
+        })
+
+        loadingPromises.push(loadPromise)
+      } else {
+        // For meshes without base images, just draw custom content
+        context.clearRect(0, 0, canvas.width, canvas.height)
+        this._drawCustomContentOnTexture(textureKey, context, canvas)
+
+        const texture = new THREE.CanvasTexture(canvas)
+        texture.flipY = false
+        texture.needsUpdate = true
+
+        mesh.material.map = texture
+        mesh.material.needsUpdate = true
+      }
+    }
+
+    // Return a promise that resolves when all textures are loaded
+    return Promise.all(loadingPromises)
+  }
+
+  // Method to draw custom content on each texture type
+  private _drawCustomContentOnTexture(
+    textureKey: AvailableTextures,
+    context: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) {
+    // Use fallback fonts if custom fonts failed to load
+    const mainFontFamily = this._internalState.fontsLoaded
+      ? this.typography.main.family
+      : 'monospace'
+
+    const ticketNumberFontFamily = this._internalState.fontsLoaded
+      ? this.typography.ticketNumber.family
+      : 'monospace'
+
+      console.log({ mainFontFamily, ticketNumberFontFamily })
+
+    // Get the appropriate color scheme based on ticket type
+    const colors = this.state.secret
+      ? this.textureImages.secret
+      : this.state.platinum
+        ? this.textureImages.platinum
+        : this.textureImages.basic
+
+    switch (textureKey) {
+      case 'TicketFront':
+        // Draw username
+        context.fillStyle = colorObjToRgb(colors.textColor)
+        const fontSize = this.typography.main.relativeSize * canvas.height
+        context.font = `400 ${fontSize}px ${mainFontFamily}`
+        context.textAlign = 'left'
+        context.textBaseline = 'top'
+        context.fillText(
+          this.state.texts.username,
+          this.texts.user.x * canvas.width,
+          this.texts.user.y * canvas.height
+        )
+
+        // Draw species
+        context.fillText(
+          this.state.texts.species,
+          this.texts.species.x * canvas.width,
+          this.texts.species.y * canvas.height
+        )
+
+        // Draw planet
+        context.fillText(
+          this.state.texts.earth,
+          this.texts.planet.x * canvas.width,
+          this.texts.planet.y * canvas.height
+        )
+
+        // Draw ticket number with different font
+        const ticketNumberFontSize = this.typography.ticketNumber.relativeSize * canvas.height
+        context.font = `${this.typography.ticketNumber.weight} ${ticketNumberFontSize}px ${ticketNumberFontFamily}`
+        context.fillText(
+          this.state.texts.seatCode.toUpperCase(),
+          this.texts.ticketNumber.x * canvas.width,
+          this.texts.ticketNumber.y * canvas.height
+        )
+        break
+
+      case 'TicketBack':
+        // Add any custom content for the back of the ticket
+        break
+
+      // Handle other texture types as needed
+      case 'TicketFrontWebsiteButton':
+      case 'TicketFrontSeatChartButton':
+      case 'TicketBackGoBackButton':
+      case 'TicketBackWebsiteButton':
+        // These might not need custom content if the base image is sufficient
+        break
+    }
+  }
+
+  private async _loadFonts(): Promise<void> {
+    try {
+      // Define the fonts to load
+      const fontFaces = this.fonts.map(f => new FontFace(...f))
+      // Load all fonts
+      await Promise.all(
+        fontFaces.map(async (font) => {
+          const loadedFont = await font.load()
+          // Add the loaded font to the document
+          document.fonts.add(loadedFont)
+          return loadedFont
+        })
+      )
+
+      // All fonts loaded successfully
+      this._internalState.fontsLoaded = true
+    } catch (error) {
+      // Handle font loading errors
+      console.error('Failed to load fonts:', error)
+      // Still continue to not block rendering, but with a warning
+      this._internalState.fontsLoaded = false
     }
   }
 }

@@ -5,7 +5,6 @@
        url('/fonts/launchweek/14/Nippo-Variable.woff') format('woff'),
        url('/fonts/launchweek/14/Nippo-Variable.ttf') format('truetype');
   font-weight: 200 700;
-  font-display: swap;
   font-style: normal;
 }
 
