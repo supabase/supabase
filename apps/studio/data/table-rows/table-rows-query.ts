@@ -82,6 +82,7 @@ export const fetchAllTableRows = async ({
   filters = [],
   sorts = [],
   impersonatedRole,
+  progressCallback,
 }: {
   projectRef: string
   connectionString?: string
@@ -89,6 +90,7 @@ export const fetchAllTableRows = async ({
   filters?: Filter[]
   sorts?: Sort[]
   impersonatedRole?: ImpersonationRole
+  progressCallback?: (value: number) => void
 }) => {
   if (IS_PLATFORM && !connectionString) {
     console.error('Connection string is required')
@@ -147,6 +149,7 @@ export const fetchAllTableRows = async ({
         executeSql({ projectRef, connectionString, sql: query })
       )
       rows.push(...result)
+      progressCallback?.(rows.length)
 
       if (result.length < rowsPerPage) break
 
