@@ -823,10 +823,12 @@ class TicketScene implements BaseScene {
         ? this.textureImages.platinum
         : this.textureImages.basic
 
+    const isNeon = this.state.secret || this.state.platinum
+
     switch (textureKey) {
       case 'TicketFront': {
         // Draw username
-        context.fillStyle = colorObjToRgb(colors.textColor)
+        context.fillStyle = colorObjToRgb(isNeon ? colors.textNeonColor : colors.textColor)
         const fontSize = this.typography.main.relativeSize * canvas.height
         context.font = `400 ${fontSize}px ${mainFontFamily}`
         context.textAlign = 'left'
@@ -837,6 +839,9 @@ class TicketScene implements BaseScene {
           this.texts.user.y * canvas.height
         )
 
+        context.fillStyle = colorObjToRgb(
+          isNeon ? colors.textNeonDimmedColor : colors.textDimmedColor
+        )
         // Draw species
         context.fillText(
           this.state.texts.species,
@@ -851,6 +856,7 @@ class TicketScene implements BaseScene {
           this.texts.planet.y * canvas.height
         )
 
+        context.fillStyle = colorObjToRgb(isNeon ? colors.textNeonColor : colors.textDimmedColor)
         // Draw ticket number with different font
         const ticketNumberFontSize = this.typography.ticketNumber.relativeSize * canvas.height
         context.font = `${this.typography.ticketNumber.weight} ${ticketNumberFontSize}px ${ticketNumberFontFamily}`
@@ -862,7 +868,7 @@ class TicketScene implements BaseScene {
         break
       }
       case 'TicketBack': {
-        context.fillStyle = colorObjToRgb(colors.textColor)
+        context.fillStyle = colorObjToRgb(isNeon ? colors.textNeonColor : colors.textColor)
 
         context.textAlign = 'left'
         context.textBaseline = 'top'
