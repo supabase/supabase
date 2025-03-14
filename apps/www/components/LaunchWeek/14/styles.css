@@ -1,0 +1,18 @@
+
+@font-face {
+  font-family: 'Nippo-Variable';
+  src: url('/fonts/launchweek/14/Nippo-Variable.woff2') format('woff2'),
+       url('/fonts/launchweek/14/Nippo-Variable.woff') format('woff'),
+       url('/fonts/launchweek/14/Nippo-Variable.ttf') format('truetype');
+  font-weight: 200 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Departure Mono";
+  src:
+    url("/fonts/launchweek/14/DepartureMono-Regular.woff2") format("woff2"),
+    url("/fonts/launchweek/14/DepartureMono-Regular.woff") format("woff"),
+    url("/fonts/launchweek/14/DepartureMono-Regular.otf") format("opentype");
+}

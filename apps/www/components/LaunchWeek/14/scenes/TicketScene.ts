@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { loadGLTFModel } from '../helpers'
+import { colorObjToRgb, loadGLTFModel } from '../helpers'
 import SceneRenderer, { BaseScene } from '../utils/SceneRenderer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { Camera, Euler, MathUtils, Scene, Vector3 } from 'three'
@@ -49,34 +49,69 @@ class TicketScene implements BaseScene {
       back: '/images/launchweek/14/back-basic-ticket-textrue.png',
       front: '/images/launchweek/14/front-basic-ticket-texture.png',
 
-      bgColor: 0x202020,
-      textColor: 0xffffff,
-      textDimmedColor: 0x515151,
-      textNeonColor: 0xffffff,
-      textNeonDimmedColor: 0x515151,
-      transparentBg: 0x00000000,
+      bgColor: { rgb: 0x202020, alpha: 1 },
+      textColor: { rgb: 0xffffff, alpha: 1 },
+      textDimmedColor: { rgb: 0x515151, alpha: 1 },
+      textNeonColor: { rgb: 0xffffff, alpha: 1 },
+      textNeonDimmedColor: { rgb: 0x515151, alpha: 1 },
+      transparentBg: { rgb: 0x000000, alpha: 0 },
     },
     secret: {
       back: '/images/launchweek/14/back-secret-ticket-textrue.png',
       front: '/images/launchweek/14/front-secret-ticket-texture.png',
 
-      bgColor: 0x050505ff,
-      textColor: 0xffffffff,
-      textDimmedColor: 0x515151ff,
-      textNeonColor: 0x2cf494ff,
-      textNeonDimmedColor: 0x12623bff,
-      transparentBg: 0x2cf49466,
+      bgColor: { rgb: 0x050505, alpha: 1 },
+      textColor: { rgb: 0xffffff, alpha: 1 },
+      textDimmedColor: { rgb: 0x515151, alpha: 1 },
+      textNeonColor: { rgb: 0x2cf494, alpha: 1 },
+      textNeonDimmedColor: { rgb: 0x12623b, alpha: 1 },
+      transparentBg: { rgb: 0x2cf494, alpha: 0.4 },
     },
     platinum: {
       back: '/images/launchweek/14/back-platinum-ticket-textrue.png',
       front: '/images/launchweek/14/front-platinum-ticket-texture.png',
 
-      bgColor: 0x050505ff,
-      textColor: 0xffc73aff,
-      textDimmedColor: 0xffc73aff,
-      textNeonColor: 0xffc73aff,
-      textNeonDimmedColor: 0xffc73aff,
-      transparentBg: 0xffc73a66,
+      bgColor: { rgb: 0x050505, alpha: 1 },
+      textColor: { rgb: 0xffc73a, alpha: 1 },
+      textDimmedColor: { rgb: 0xffc73a, alpha: 1 },
+      textNeonColor: { rgb: 0xffc73a, alpha: 1 },
+      textNeonDimmedColor: { rgb: 0xffc73a, alpha: 1 },
+      transparentBg: { rgb: 0xffc73a, alpha: 0.4 },
+    },
+  }
+
+  typography = {
+    main: {
+      family: 'Departure Mono',
+      relativeSize: 73 / 1400,
+    },
+    ticketNumber: {
+      family: 'Nippo-Variable',
+      weight: 400,
+      relativeSize: 85.26 / 1400,
+    },
+  }
+
+  texts = {
+    user: {
+      x: 367 / 2000,
+      y: 533 / 1400,
+    },
+    species: {
+      x: 367 / 2000,
+      y: 628 / 1400,
+    },
+    planet: {
+      x: 367 / 2000,
+      y: 721 / 1400,
+    },
+    date: {
+      x: 1249 / 2000,
+      y: 255 / 1400,
+    },
+    ticketNumber: {
+      x: 368 / 2000,
+      y: 1077.69 / 1400,
     },
   }
 
@@ -113,7 +148,7 @@ class TicketScene implements BaseScene {
     'TicketBackGoBackButton',
     'TicketBackWebsiteButton',
   ] as const
-  private static TEXTURE_PIXEL_DENSITY_FACTOR = 100
+  private static TEXTURE_PIXEL_DENSITY_FACTOR = 400
 
   private _textureCanvases: {
     [key in AvailableTextures]?: { canvas: HTMLCanvasElement; context: CanvasRenderingContext2D }
@@ -195,6 +230,7 @@ class TicketScene implements BaseScene {
 
   showSecondFace() {
     this.state.frontside = !this.state.frontside
+    this._setSecretTextures()
   }
 
   click(e: MouseEvent) {
@@ -312,7 +348,7 @@ class TicketScene implements BaseScene {
 
       const canvas = document.createElement('canvas')
       const canvasWidth = worldSize.x * TicketScene.TEXTURE_PIXEL_DENSITY_FACTOR
-      const canvasHeight = Math.floor(canvasWidth * (localSize.y / localSize.x)) // Maintain aspect ratio
+      const canvasHeight = Math.floor(canvasWidth * (localSize.z / localSize.x)) // Maintain aspect ratio
 
       canvas.width = canvasWidth
       canvas.height = canvasHeight
@@ -363,6 +399,30 @@ class TicketScene implements BaseScene {
     const { context, canvas } = this._textureCanvases.TicketFront
 
     context.clearRect(0, 0, canvas.width, canvas.height)
+    console.log(canvas.width, canvas.height)
+
+    // context.fillStyle = colorObjToRgb(this.textureImages.secret.textNeonColor)
+    context.fillStyle = 'white'
+    const fontSize = this.typography.main.relativeSize * canvas.height
+    context.font = `400 ${fontSize}px ${this.typography.main.family}`
+    context.textAlign = 'left'
+    context.textBaseline = 'top'
+    context.fillText(
+      'Pampalini',
+      this.texts.user.x * canvas.width,
+      this.texts.user.y * canvas.height
+    )
+    if (
+      this._namedMeshes.TicketFront &&
+      !Array.isArray(this._namedMeshes.TicketFront.material) &&
+      this._namedMeshes.TicketFront.material instanceof THREE.MeshStandardMaterial
+    ) {
+      const texture = new THREE.CanvasTexture(canvas, this._namedMeshes.TicketFront.material.map?.mapping)
+      texture.needsUpdate = true
+
+      // Get the existing material
+      this._namedMeshes.TicketFront.material.map = texture
+    }
   }
 
   private executeWithObject(

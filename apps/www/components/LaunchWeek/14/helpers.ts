@@ -528,3 +528,7 @@ function createTextureForObject(object: THREE.Object3D, text: string) {
 
   return textMesh
 }
+
+export function colorObjToRgb(color: {rgb:number, alpha:number}) {
+  return `rgba(${(color.rgb >> 16) & 255} /  ${color.alpha})`
+}
