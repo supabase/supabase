@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import {
   Alert,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
@@ -14,7 +15,7 @@ import {
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD, getDefaultHelper } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
 import { Clock } from 'lucide-react'
-import { DateTimeFormats } from '../../../ui/Charts/Charts.constants'
+import { useFlag } from 'hooks/ui/useFlag'
 
 interface Props {
   to: string
@@ -24,6 +25,8 @@ interface Props {
 }
 const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
   const defaultHelper = getDefaultHelper(helpers)
+  const isReportsV2 = useFlag('reportsDatabaseV2')
+  // const isReportsV2 = true
   const [helperValue, setHelperValue] = useState<string>(to || from ? '' : defaultHelper.text)
   const [selectedHelperItem, setSelectedHelperItem] = useState<DatetimeHelper | null>(null)
 
@@ -59,7 +62,7 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
           <Button
             type={helperValue ? 'secondary' : 'default'}
             icon={<Clock size={12} />}
-            className="rounded-r-none"
+            className={cn(isReportsV2 && 'rounded-r-none')}
           >
             <span>{selectedHelperItem?.text || defaultHelper.text}</span>
           </Button>
@@ -88,30 +91,32 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DatePicker
-        triggerButtonClassName="rounded-l-none"
-        triggerButtonType={selectedHelper ? 'default' : 'secondary'}
-        triggerButtonTitle="Custom"
-        onChange={(value) => {
-          setHelperValue('')
-          if (onChange) onChange(value)
-        }}
-        to={!helperValue ? to : undefined}
-        from={!helperValue ? from : undefined}
-        renderFooter={({ to, from }) => {
-          if (
-            to &&
-            from &&
-            Math.abs(dayjs(from).diff(dayjs(to), 'day')) > LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD
-          ) {
-            return (
-              <Alert title={''} variant="warning" className="mx-3 pl-2 pr-2 pt-1 pb-2">
-                Large ranges may result in memory errors for big projects.
-              </Alert>
-            )
-          }
-        }}
-      />
+      {isReportsV2 && (
+        <DatePicker
+          triggerButtonClassName="rounded-l-none"
+          triggerButtonType={selectedHelper ? 'default' : 'secondary'}
+          triggerButtonTitle="Custom"
+          onChange={(value) => {
+            setHelperValue('')
+            if (onChange) onChange(value)
+          }}
+          to={!helperValue ? to : undefined}
+          from={!helperValue ? from : undefined}
+          renderFooter={({ to, from }) => {
+            if (
+              to &&
+              from &&
+              Math.abs(dayjs(from).diff(dayjs(to), 'day')) > LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD
+            ) {
+              return (
+                <Alert title={''} variant="warning" className="mx-3 pl-2 pr-2 pt-1 pb-2">
+                  Large ranges may result in memory errors for big projects.
+                </Alert>
+              )
+            }
+          }}
+        />
+      )}
     </div>
   )
 }
