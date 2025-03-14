@@ -31,6 +31,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Separator,
+  SonnerProgress,
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
@@ -288,6 +289,10 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     { keepPreviousData: true }
   )
 
+  const allRows = data?.rows ?? []
+  const totalRows = countData?.count ?? 0
+  const { selectedRows, editable, allRowsSelected } = state
+
   const onSelectAllRows = () => {
     dispatch({
       type: 'SELECT_ALL_ROWS',
@@ -328,6 +333,15 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       return setIsExporting(false)
     }
 
+    const toastId = allRowsSelected
+      ? toast(<SonnerProgress progress={0} message={`Exporting all rows from ${table.name}`} />, {
+          closeButton: false,
+          duration: Infinity,
+        })
+      : toast.loading(
+          `Exporting ${selectedRows.size} row${selectedRows.size > 1 ? 's' : ''} from ${table.name}`
+        )
+
     const rows = allRowsSelected
       ? await fetchAllTableRows({
           projectRef: project.ref,
@@ -336,6 +350,20 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           filters,
           sorts,
           impersonatedRole: roleImpersonationState.role,
+          progressCallback: (value: number) => {
+            const progress = (value / totalRows) * 100
+            toast(
+              <SonnerProgress
+                progress={progress}
+                message={`Exporting all rows from ${table.name}`}
+              />,
+              {
+                id: toastId,
+                closeButton: false,
+                duration: Infinity,
+              }
+            )
+          },
         })
       : allRows.filter((x) => selectedRows.has(x.idx))
 
@@ -352,6 +380,11 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       columns: state.table!.columns.map((column) => column.name),
     })
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    toast.success(`Downloading ${rows.length} rows to CSV`, {
+      id: toastId,
+      closeButton: true,
+      duration: 4000,
+    })
     saveAs(csvData, `${state.table!.name}_rows.csv`)
     setIsExporting(false)
   }
@@ -371,6 +404,15 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       return setIsExporting(false)
     }
 
+    const toastId = allRowsSelected
+      ? toast(<SonnerProgress progress={0} message={`Exporting all rows from ${table.name}`} />, {
+          closeButton: false,
+          duration: Infinity,
+        })
+      : toast.loading(
+          `Exporting ${selectedRows.size} row${selectedRows.size > 1 ? 's' : ''} from ${table.name}`
+        )
+
     const rows = allRowsSelected
       ? await fetchAllTableRows({
           projectRef: project.ref,
@@ -379,11 +421,30 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           filters,
           sorts,
           impersonatedRole: roleImpersonationState.role,
+          progressCallback: (value: number) => {
+            const progress = (value / totalRows) * 100
+            toast(
+              <SonnerProgress
+                progress={progress}
+                message={`Exporting all rows from ${table.name}`}
+              />,
+              {
+                id: toastId,
+                closeButton: false,
+                duration: Infinity,
+              }
+            )
+          },
         })
       : allRows.filter((x) => selectedRows.has(x.idx))
 
     const sqlStatements = formatTableRowsToSQL(table, rows)
     const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
+    toast.success(`Downloading ${rows.length} rows to SQL`, {
+      id: toastId,
+      closeButton: true,
+      duration: 4000,
+    })
     saveAs(sqlData, `${state.table!.name}_rows.sql`)
     setIsExporting(false)
   }
@@ -393,10 +454,6 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       payload: { selectedRows: new Set() },
     })
   }
-
-  const allRows = data?.rows ?? []
-  const totalRows = countData?.count ?? 0
-  const { selectedRows, editable, allRowsSelected } = state
 
   useSubscribeToImpersonatedRole(() => {
     if (allRowsSelected || selectedRows.size > 0) {
