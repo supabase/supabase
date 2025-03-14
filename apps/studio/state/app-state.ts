@@ -23,9 +23,17 @@ export type Template = {
   content: string
 }
 
+export type ChatSession = {
+  id: string
+  name: string
+  projectRef: string
+  messages: readonly MessageType[]
+  createdAt: Date
+  updatedAt: Date
+}
+
 type AiAssistantPanelType = {
   open: boolean
-  messages: MessageType[]
   initialInput: string
   sqlSnippets?: string[]
   suggestions?: SuggestionsType
@@ -35,6 +43,10 @@ type AiAssistantPanelType = {
   // Mainly used for editing a database entity (e.g editing a function, RLS policy etc)
   entity?: CommonDatabaseEntity
   tables: { schema: string; name: string }[]
+  // Store multiple chat sessions
+  chats: Record<string, ChatSession>
+  // Currently active chat ID
+  activeChatId?: string
 }
 
 type EditorPanelType = {
@@ -55,14 +67,15 @@ type DashboardHistoryType = {
 
 const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
   open: false,
-  messages: [],
-  sqlSnippets: undefined,
   initialInput: '',
+  sqlSnippets: undefined,
   suggestions: undefined,
   editor: null,
   content: '',
   entity: undefined,
   tables: [],
+  chats: {},
+  activeChatId: undefined,
 }
 
 const INITIAL_EDITOR_PANEL: EditorPanelType = {
@@ -115,12 +128,13 @@ const getInitialState = () => {
   try {
     if (stored) {
       parsedAiAssistant = JSON.parse(stored, (key, value) => {
-        if (key === 'createdAt' && value) {
+        if ((key === 'createdAt' || key === 'updatedAt') && value) {
           return new Date(value)
         }
         return value
       })
     }
+
     if (storedEditor) {
       parsedEditorPanel = JSON.parse(storedEditor)
     }
@@ -215,6 +229,9 @@ export const appState = proxy({
     appState.aiAssistantPanel = {
       ...INITIAL_AI_ASSISTANT,
       open: appState.aiAssistantPanel.open,
+      // Preserve chats when resetting the panel
+      chats: appState.aiAssistantPanel.chats,
+      activeChatId: appState.aiAssistantPanel.activeChatId,
     }
   },
 
@@ -225,17 +242,11 @@ export const appState = proxy({
     }
 
     const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
+
     appState.aiAssistantPanel = {
       ...appState.aiAssistantPanel,
       content: hasEntityChanged ? '' : appState.aiAssistantPanel.content,
       ...value,
-    }
-  },
-
-  saveLatestMessage: (message: any) => {
-    appState.aiAssistantPanel = {
-      ...appState.aiAssistantPanel,
-      messages: [...appState.aiAssistantPanel.messages, message],
     }
   },
 
@@ -277,12 +288,21 @@ if (typeof window !== 'undefined') {
     // Save AI assistant state with limited message history
     const aiAssistantState = {
       ...appState.aiAssistantPanel,
-      // limit to 20 messages so as to not overflow the context window
-      messages: appState.aiAssistantPanel.messages?.slice(-20),
+      chats: appState.aiAssistantPanel.chats
+        ? Object.entries(appState.aiAssistantPanel.chats).reduce((acc, [chatId, chat]) => {
+            return {
+              ...acc,
+              [chatId]: {
+                ...chat,
+                messages: chat.messages?.slice(-20) || [], // Only keep last 20 messages
+              },
+            }
+          }, {})
+        : {},
     }
+
     localStorage.setItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE, JSON.stringify(aiAssistantState))
 
-    // Save editor panel state
     localStorage.setItem(
       LOCAL_STORAGE_KEYS.EDITOR_PANEL_STATE,
       JSON.stringify(appState.editorPanel)
