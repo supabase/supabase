@@ -3,7 +3,6 @@ import { colorObjToRgb, loadGLTFModel } from '../helpers'
 import SceneRenderer, { BaseScene } from '../utils/SceneRenderer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { Camera, Euler, MathUtils, Scene, Vector3 } from 'three'
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import { GlitchPass } from '../effects/glitch'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { CRTShader } from '../effects/crt-shader'
@@ -44,6 +43,7 @@ interface MousePositionState {
   isWithinContainer: boolean
   containerX: number
   containerY: number
+  mouseIntensity: number
 }
 
 type AvailableTextures = (typeof TicketScene)['TEXTURE_NAMES'][number]
@@ -84,7 +84,10 @@ class TicketScene implements BaseScene {
         url: '/images/launchweek/14/front-secret-ticket-texture.png',
         cachedData: null,
       } as TextureDescriptor,
-
+      seat: {
+        url: '',
+        cachedData: null,
+      } as TextureDescriptor,
       bgColor: { rgb: 0x050505, alpha: 1 },
       textColor: { rgb: 0xffffff, alpha: 1 },
       textDimmedColor: { rgb: 0x515151, alpha: 1 },
@@ -144,6 +147,10 @@ class TicketScene implements BaseScene {
       x: 368 / 2000,
       y: 1077.69 / 1400,
     },
+    ticketNumberBack: {
+      x: 368 / 2000,
+      y: 1070 / 1400,
+    },
   }
 
   fonts: ConstructorParameters<typeof FontFace>[] = [
@@ -174,6 +181,8 @@ class TicketScene implements BaseScene {
     fontsLoaded: false,
     loadedTextureType: null as 'basic' | 'secret' | 'platinum' | null,
     effectsIntensity: 0,
+    mouseIntensityDecay: 0.98, // How quickly the intensity decays
+    mouseIntensityGainRate: 0.005,
   }
 
   private _sceneConfig = {
@@ -216,7 +225,7 @@ class TicketScene implements BaseScene {
 
   private _namedMeshes: { [key in AvailableTextures]?: THREE.Mesh } = {}
 
-  private _bloomPass: UnrealBloomPass | null = null
+  private _bloomPass: TransparentBloomPass | null = null
   private _glitchPass: GlitchPass | null = null
   private _crtPass: ShaderPass | null = null
   private _effectsEnabled = false
@@ -250,7 +259,6 @@ class TicketScene implements BaseScene {
     const gltf = await loadGLTFModel(this.sceneUrl)
 
     this._ticket = gltf.scene as unknown as Scene
-
 
     this._setCamera(context.camera)
     this._modelRenderPass = new RenderPass(this._ticket, context.camera)
@@ -314,6 +322,16 @@ class TicketScene implements BaseScene {
       this._crtPass.uniforms['time'].value = time
     }
 
+    if (this._internalState.mousePosition) {
+      // Gradually decay mouse intensity when not moving
+      if (this._internalState.mousePosition.mouseIntensity > 0) {
+        this._internalState.mousePosition.mouseIntensity *= this._internalState.mouseIntensityDecay
+        if (this._internalState.mousePosition.mouseIntensity < 0.0000001) {
+          this._internalState.mousePosition.mouseIntensity = 0
+        }
+      }
+    }
+
     // Update effect intensities if effects are enabled
     if (this._effectsEnabled) {
       // Gradually increase effect intensity over time
@@ -324,7 +342,8 @@ class TicketScene implements BaseScene {
 
       // Update glitch pass intensity
       if (this._glitchPass) {
-        this._glitchPass.setIntensity(this._internalState.effectsIntensity * 0.5) // Scale to desired max (0.5)
+        const glitchIntensity = this._internalState.mousePosition?.mouseIntensity ?? 1
+        this._glitchPass.setIntensity(glitchIntensity * this._internalState.effectsIntensity * 6)
       }
 
       // Update CRT shader intensity
@@ -462,18 +481,17 @@ class TicketScene implements BaseScene {
     crtPass.uniforms.intensity.value = 0 // Start with zero intensity
     this._crtPass = crtPass
 
-    if(!this._ticket) throw new Error('Ticket not loaded')
-    if(!this._sceneRenderer) throw new Error('SceneRenderer not loaded')
+    if (!this._ticket) throw new Error('Ticket not loaded')
+    if (!this._sceneRenderer) throw new Error('SceneRenderer not loaded')
 
     // Create bloom pass with initial zero intensity
     const bloomPass = new TransparentBloomPass(
       new THREE.Vector2(context.container.clientWidth, context.container.clientHeight),
       0, // Initial strength (0-3)
       0.5, // Initial radius
-      1.0, // Initial threshold (higher = less bloom)
-      this._ticket,
-      this._sceneRenderer.camera
+      1.0 // Initial threshold (higher = less bloom)
     )
+
     bloomPass.enabled = false // Start disabled
     this._bloomPass = bloomPass
   }
@@ -547,8 +565,25 @@ class TicketScene implements BaseScene {
         isWithinContainer: false,
         containerX: 0,
         containerY: 0,
+        mouseIntensity: 0,
       }
     } else {
+      // Calculate mouse movement distance for glitch effect
+      const dx = ev.clientX - this._internalState.mousePosition.clientX
+      const dy = ev.clientY - this._internalState.mousePosition.clientY
+      const distance = Math.sqrt(dx * dx + dy * dy)
+
+      // Update intensity based on movement (clamped between 0 and 1)
+      this._internalState.mousePosition.mouseIntensity = Math.min(
+        1.0,
+        Math.max(
+          0,
+          this._internalState.mousePosition.mouseIntensity +
+            distance * this._internalState.mouseIntensityGainRate
+        )
+      )
+
+      // Update last position
       this._internalState.mousePosition.clientX = ev.clientX
       this._internalState.mousePosition.clientY = ev.clientY
 
@@ -568,8 +603,6 @@ class TicketScene implements BaseScene {
         -((ev.clientY - rect.top) / rect.height) * 2 + 1
     }
   }
-
-  private createMaterial() {}
 
   private _setupTextureCanvases() {
     for (const [name, mesh] of Object.entries(this._namedMeshes)) {
@@ -791,7 +824,7 @@ class TicketScene implements BaseScene {
         : this.textureImages.basic
 
     switch (textureKey) {
-      case 'TicketFront':
+      case 'TicketFront': {
         // Draw username
         context.fillStyle = colorObjToRgb(colors.textColor)
         const fontSize = this.typography.main.relativeSize * canvas.height
@@ -827,11 +860,23 @@ class TicketScene implements BaseScene {
           this.texts.ticketNumber.y * canvas.height
         )
         break
+      }
+      case 'TicketBack': {
+        context.fillStyle = colorObjToRgb(colors.textColor)
 
-      case 'TicketBack':
-        // Add any custom content for the back of the ticket
+        context.textAlign = 'left'
+        context.textBaseline = 'top'
+
+        // Draw ticket number with different font
+        const ticketNumberFontSize = this.typography.ticketNumber.relativeSize * canvas.height
+        context.font = `${this.typography.ticketNumber.weight} ${ticketNumberFontSize}px ${ticketNumberFontFamily}`
+        context.fillText(
+          this.state.texts.seatCode.toUpperCase(),
+          this.texts.ticketNumberBack.x * canvas.width,
+          this.texts.ticketNumberBack.y * canvas.height
+        )
         break
-
+      }
       // Handle other texture types as needed
       case 'TicketFrontWebsiteButton':
       case 'TicketFrontSeatChartButton':
