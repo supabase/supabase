@@ -25,10 +25,9 @@ interface Props {
 }
 const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
   const defaultHelper = getDefaultHelper(helpers)
-  const isReportsV2 = useFlag('reportsDatabaseV2')
-  // const isReportsV2 = true
   const [helperValue, setHelperValue] = useState<string>(to || from ? '' : defaultHelper.text)
   const [selectedHelperItem, setSelectedHelperItem] = useState<DatetimeHelper | null>(null)
+  const isReportsV2 = useFlag('reportsDatabaseV2')
 
   const handleHelperChange = (newValue: string) => {
     const selectedHelper = helpers.find((h) => h.text === newValue)
