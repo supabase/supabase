@@ -42,14 +42,25 @@ interface MousePositionState {
 
 type AvailableTextures = (typeof TicketScene)['TEXTURE_NAMES'][number]
 
+interface TextureDescriptor {
+  url: string
+  cachedData: THREE.Texture | null
+}
+
 class TicketScene implements BaseScene {
   raycaster = new THREE.Raycaster()
   sceneUrl = '/images/launchweek/14/ticket-model.glb'
 
   textureImages = {
     basic: {
-      back: '/images/launchweek/14/back-basic-ticket-texture.png',
-      front: '/images/launchweek/14/front-basic-ticket-texture.png',
+      back: {
+        url: '/images/launchweek/14/back-basic-ticket-texture.png',
+        cachedData: null,
+      } as TextureDescriptor,
+      front: {
+        url: '/images/launchweek/14/front-basic-ticket-texture.png',
+        cachedData: null,
+      } as TextureDescriptor,
 
       bgColor: { rgb: 0x202020, alpha: 1 },
       textColor: { rgb: 0xffffff, alpha: 1 },
@@ -59,8 +70,14 @@ class TicketScene implements BaseScene {
       transparentBg: { rgb: 0x000000, alpha: 0 },
     },
     secret: {
-      back: '/images/launchweek/14/back-secret-ticket-texture.png',
-      front: '/images/launchweek/14/front-secret-ticket-texture.png',
+      back: {
+        url: '/images/launchweek/14/back-secret-ticket-texture.png',
+        cachedData: null,
+      } as TextureDescriptor,
+      front: {
+        url: '/images/launchweek/14/front-secret-ticket-texture.png',
+        cachedData: null,
+      } as TextureDescriptor,
 
       bgColor: { rgb: 0x050505, alpha: 1 },
       textColor: { rgb: 0xffffff, alpha: 1 },
@@ -70,8 +87,14 @@ class TicketScene implements BaseScene {
       transparentBg: { rgb: 0x2cf494, alpha: 0.4 },
     },
     platinum: {
-      back: '/images/launchweek/14/back-platinum-ticket-texture.png',
-      front: '/images/launchweek/14/front-platinum-ticket-texture.png',
+      back: {
+        url: '/images/launchweek/14/back-platinum-ticket-texture.png',
+        cachedData: null,
+      } as TextureDescriptor,
+      front: {
+        url: '/images/launchweek/14/front-platinum-ticket-texture.png',
+        cachedData: null,
+      } as TextureDescriptor,
 
       bgColor: { rgb: 0x050505, alpha: 1 },
       textColor: { rgb: 0xffc73a, alpha: 1 },
@@ -143,6 +166,7 @@ class TicketScene implements BaseScene {
     containerBBox: undefined as DOMRect | undefined,
     naturalPosition: new Vector3(0, 0, 0),
     fontsLoaded: false,
+    loadedTextureType: null as 'basic' | 'secret' | 'platinum' | null,
   }
 
   private _sceneConfig = {
@@ -193,7 +217,7 @@ class TicketScene implements BaseScene {
       startDate: options.startDate,
       ticketNumber: options.user.ticketNumber || 0,
       texts: {
-        username: "Goszczu" ?? options.user.name ?? '',
+        username: 'Goszczu 123425' ?? options.user.name ?? '',
         species: 'Modern Human',
         earth: 'Earth',
         // Start assigning seats from A001
@@ -271,7 +295,6 @@ class TicketScene implements BaseScene {
   }
 
   upgradeToSecret() {
-    this._setSecretTextures()
     this.state.secret = true
   }
 
@@ -584,21 +607,28 @@ class TicketScene implements BaseScene {
     }
   }
 
-  private _loadTextures() {
+  private async _loadTextures() {
     // Load textures for each named mesh
     // Create a texture loader
     const textureLoader = new THREE.TextureLoader()
     const loadingPromises: Promise<void>[] = []
 
+    const textureSetKey = this.state.secret ? 'secret' : this.state.platinum ? 'platinum' : 'basic'
+
+    if (this._internalState.loadedTextureType === textureSetKey) {
+      console.log('Textures already loaded. Active set:', textureSetKey)
+      return
+    } else {
+      console.log('Loading textures for set:', textureSetKey)
+    }
+
+    this._internalState.loadedTextureType = textureSetKey
+
     // Determine which texture set to use based on ticket type
-    const textureSet = this.state.secret
-      ? this.textureImages.secret
-      : this.state.platinum
-        ? this.textureImages.platinum
-        : this.textureImages.basic
+    const textureSet = this.textureImages[textureSetKey]
 
     // Map of which image to use for each mesh
-    const textureImageMap: Partial<Record<AvailableTextures, string>> = {
+    const textureImageMap: Partial<Record<AvailableTextures, TextureDescriptor>> = {
       TicketFront: textureSet.front,
       TicketBack: textureSet.back,
       TicketFrontWebsiteButton: textureSet.front,
@@ -621,59 +651,49 @@ class TicketScene implements BaseScene {
       const { canvas, context } = textureCanvas
 
       // If we have an image for this texture
-      const imageUrl = textureImageMap[textureKey]
-      if (imageUrl) {
+      const textureDescriptor = textureImageMap[textureKey]
+      if (!textureDescriptor) {
+        console.warn(`No texture descriptor found for texture ${textureKey}`)
+        return
+      }
+
+      if (textureDescriptor.cachedData === null) {
         // Create a loading promise for this texture
-        const loadPromise = new Promise<void>((resolve) => {
+        await new Promise<void>((resolve) => {
           textureLoader.load(
-            imageUrl,
+            textureDescriptor.url,
             (loadedTexture) => {
               // Create an image from the loaded texture
-              const image = loadedTexture.image
-
-              // Draw the loaded image onto the canvas as the base
-              context.clearRect(0, 0, canvas.width, canvas.height)
-              context.drawImage(image, 0, 0, canvas.width, canvas.height)
-
-              // Now we can draw additional content on top
-              this._drawCustomContentOnTexture(textureKey, context, canvas)
-
-              // Create a texture from the combined canvas
-              const combinedTexture = new THREE.CanvasTexture(canvas)
-              combinedTexture.flipY = false
-              combinedTexture.needsUpdate = true
-
-              // Apply the texture to the mesh
-              if (!(mesh.material instanceof THREE.MeshStandardMaterial)) {
-                throw new Error(`Material for mesh ${name} is not a MeshStandardMaterial`)
-              }
-
-              mesh.material.map = combinedTexture
-              mesh.material.needsUpdate = true
+              textureDescriptor.cachedData = loadedTexture
 
               resolve()
             },
             undefined, // onProgress callback
             (error) => {
-              console.error(`Error loading texture ${imageUrl}:`, error)
+              console.error(`Error loading texture ${textureDescriptor.url}:`, error)
               resolve() // Resolve anyway to not block other textures
             }
           )
         })
-
-        loadingPromises.push(loadPromise)
-      } else {
-        // For meshes without base images, just draw custom content
-        context.clearRect(0, 0, canvas.width, canvas.height)
-        this._drawCustomContentOnTexture(textureKey, context, canvas)
-
-        const texture = new THREE.CanvasTexture(canvas)
-        texture.flipY = false
-        texture.needsUpdate = true
-
-        mesh.material.map = texture
-        mesh.material.needsUpdate = true
       }
+
+      if (!textureDescriptor.cachedData) {
+        throw new Error(`Failed to load texture ${textureDescriptor.url}`)
+      }
+
+      console.log("Drawind texture", textureKey)
+
+      context.drawImage(textureDescriptor.cachedData.image, 0, 0, canvas.width, canvas.height)
+
+      // For meshes without base images, just draw custom content
+      this._drawCustomContentOnTexture(textureKey, context, canvas)
+
+      const texture = new THREE.CanvasTexture(canvas)
+      texture.flipY = false
+      texture.needsUpdate = true
+
+      mesh.material.map = texture
+      mesh.material.needsUpdate = true
     }
 
     // Return a promise that resolves when all textures are loaded
@@ -694,8 +714,6 @@ class TicketScene implements BaseScene {
     const ticketNumberFontFamily = this._internalState.fontsLoaded
       ? this.typography.ticketNumber.family
       : 'monospace'
-
-      console.log({ mainFontFamily, ticketNumberFontFamily })
 
     // Get the appropriate color scheme based on ticket type
     const colors = this.state.secret
@@ -759,7 +777,7 @@ class TicketScene implements BaseScene {
   private async _loadFonts(): Promise<void> {
     try {
       // Define the fonts to load
-      const fontFaces = this.fonts.map(f => new FontFace(...f))
+      const fontFaces = this.fonts.map((f) => new FontFace(...f))
       // Load all fonts
       await Promise.all(
         fontFaces.map(async (font) => {
