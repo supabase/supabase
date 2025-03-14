@@ -27,6 +27,7 @@ export default defineConfig({
     include: [
       resolve(dirname, './tests/**/*.test.{ts,tsx}'),
       resolve(dirname, './components/**/*.test.{ts,tsx}'),
+      resolve(dirname, './lib/**/*.test.{ts,tsx}'),
     ],
     restoreMocks: true,
     setupFiles: [
