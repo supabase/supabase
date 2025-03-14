@@ -3,6 +3,10 @@ import { colorObjToRgb, loadGLTFModel } from '../helpers'
 import SceneRenderer, { BaseScene } from '../utils/SceneRenderer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { Camera, Euler, MathUtils, Scene, Vector3 } from 'three'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
+import { GlitchPass } from '../effects/glitch'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
+import { CRTShader } from '../effects/crt-shader'
 
 interface TicketSceneState {
   secret: boolean
@@ -167,6 +171,7 @@ class TicketScene implements BaseScene {
     naturalPosition: new Vector3(0, 0, 0),
     fontsLoaded: false,
     loadedTextureType: null as 'basic' | 'secret' | 'platinum' | null,
+    effectsIntensity: 0,
   }
 
   private _sceneConfig = {
@@ -209,6 +214,11 @@ class TicketScene implements BaseScene {
 
   private _namedMeshes: { [key in AvailableTextures]?: THREE.Mesh } = {}
 
+  private _bloomPass: UnrealBloomPass | null = null
+  private _glitchPass: GlitchPass | null = null
+  private _crtPass: ShaderPass | null = null
+  private _effectsEnabled = false
+
   constructor(private options: TicketSceneOptions) {
     this.state = {
       secret: options.defaultSecret || false,
@@ -229,10 +239,14 @@ class TicketScene implements BaseScene {
   async setup(context: SceneRenderer): Promise<void> {
     this._sceneRenderer = context
     this._internalState.containerBBox = context.container.getBoundingClientRect()
+    console.log('setup', this._internalState.containerBBox)
 
     // Load fonts before loading the model
     await this._loadFonts()
     await this._preloadAllTextureSets()
+
+    // Set up post-processing effects but keep them disabled initially
+    this._setupPostProcessingEffects(context)
 
     const gltf = await loadGLTFModel(this.sceneUrl)
 
@@ -264,15 +278,37 @@ class TicketScene implements BaseScene {
     await this._loadTextures()
 
     context.composer.addPass(this._modelRenderPass)
+
     context.renderer.outputColorSpace = THREE.SRGBColorSpace
+    // Add the effects passes but with zero intensity
+    if (this._bloomPass) context.composer.addPass(this._bloomPass)
+    if (this._glitchPass) context.composer.addPass(this._glitchPass)
+    if (this._crtPass) context.composer.addPass(this._crtPass)
   }
 
-  update(context: SceneRenderer, dt?: number): void {
+  update(context: SceneRenderer, time?: number): void {
     const ticket = context.composer.passes[0]
     if (ticket instanceof RenderPass) {
       this._updateNaturalPosition()
-      this._updateTicketToFollowMouse(ticket.scene, dt)
+      this._updateTicketToFollowMouse(ticket.scene, time)
+
+      this._updatePasses(time)
+      // Update effects intensity if needed
+      if (this.state.secret) {
+        this._updateEffectsIntensity(time || 0.016)
+      }
     }
+  }
+  private _updatePasses(time?: number) {
+    // Update time-based uniforms for shader passes
+    if (this._crtPass && this._crtPass.uniforms['time']) {
+      this._crtPass.uniforms['time'].value = time
+    }
+
+    // // Update glitch pass timing if needed
+    // if (this._glitchPass && this._effectsEnabled) {
+    //     this._glitchPass.curF += dt || 0.016;
+    // }
   }
 
   cleanup(): void {
@@ -285,6 +321,7 @@ class TicketScene implements BaseScene {
 
   resize(_ev: UIEvent): void {
     this._internalState.containerBBox = this._sceneRenderer?.container.getBoundingClientRect()
+    console.log('resize', this._internalState.containerBBox)
     return
   }
 
@@ -299,6 +336,50 @@ class TicketScene implements BaseScene {
   async upgradeToSecret() {
     this.state.secret = true
     await this._loadTextures()
+    // Start enabling effects gradually
+    this._enableSecretEffects()
+  }
+
+  private _enableSecretEffects() {
+    if (this._effectsEnabled) return // Already enabled
+
+    this._effectsEnabled = true
+    this._internalState.effectsIntensity = 0
+
+    // Enable all passes
+    if (this._glitchPass) this._glitchPass.enabled = true
+  }
+
+  private _updateEffectsIntensity(dt: number) {
+    console.log('Updating effects intensity')
+    // Gradually increase intensity over time
+    const targetIntensity = 1.0
+    const transitionSpeed = 0.5 // Adjust for faster/slower transition
+
+    if (this._internalState.effectsIntensity < targetIntensity) {
+      // Increase intensity gradually
+      this._internalState.effectsIntensity = Math.min(
+        this._internalState.effectsIntensity + transitionSpeed * dt,
+        targetIntensity
+      )
+
+      // Update bloom intensity
+      if (this._bloomPass) {
+        this._bloomPass.strength = this._internalState.effectsIntensity * 0.7 // Max bloom strength of 0.7
+      }
+
+      // Update RGB shift intensity
+      if (this._crtPass) {
+        this._crtPass.uniforms['intensity'].value = this._internalState.effectsIntensity * 0.01 // Max shift of 0.01
+      }
+
+      // Update glitch intensity - glitch has no intensity parameter,
+      // but we can adjust its frequency based on intensity
+      if (this._glitchPass && this._internalState.effectsIntensity > 0.7) {
+        // Only enable wild mode when intensity is high enough
+        this._glitchPass.goWild = this._internalState.effectsIntensity > 0.9
+      }
+    }
   }
 
   // In your click method
@@ -339,6 +420,28 @@ class TicketScene implements BaseScene {
         // Add your action here
       }
     }
+  }
+
+  private _setupPostProcessingEffects(context: SceneRenderer) {
+    // Create bloom pass with initial zero intensity
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(context.container.clientWidth, context.container.clientHeight),
+      0, // Initial strength
+      0.4, // Radius
+      0 // Threshold
+    )
+    bloomPass.enabled = true
+    this._bloomPass = bloomPass
+
+    // Create glitch pass and disable it
+    const glitchPass = new GlitchPass()
+    glitchPass.enabled = false
+    this._glitchPass = glitchPass
+
+    // Create RGB shift pass with initial zero intensity
+    const crtPass = new ShaderPass(CRTShader)
+    crtPass.enabled = true
+    this._crtPass = crtPass
   }
 
   private _updateTicketToFollowMouse(scene: THREE.Scene, dt?: number) {

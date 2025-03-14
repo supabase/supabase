@@ -50,6 +50,10 @@ class SceneRenderer {
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight)
     this.renderer.setPixelRatio(window.devicePixelRatio)
 
+    // Initialize composer with correct size and pixel ratio
+    this.composer.setSize(this.container.clientWidth, this.container.clientHeight)
+    this.composer.setPixelRatio(window.devicePixelRatio)
+
     this.container.appendChild(this.renderer.domElement)
 
     this._resizeHandler = this._resize.bind(this)
@@ -61,9 +65,9 @@ class SceneRenderer {
     scene.setup(this)
   }
 
-  animate(dTime?: number) {
-    this.activeScene?.update(this, dTime)
-    this.composer.render(dTime)
+  animate(time?: number) {
+    this.activeScene?.update(this, time)
+    this.composer.render(time)
   }
 
   cleanup() {
