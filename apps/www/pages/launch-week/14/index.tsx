@@ -7,8 +7,15 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import { LW14_DATE, LW14_TITLE, LW14_URL, SITE_ORIGIN } from '~/lib/constants'
+import { TicketLayout, TicketLayoutCanvas } from '~/components/LaunchWeek/14/TicketLayout'
+import {
+  TicketHeader,
+  TicketHeaderClaim,
+  TicketHeaderDate,
+  TicketHeaderRemainingTime,
+} from '~/components/LaunchWeek/14/Header'
 
-const dates = [new Date("2025-03-24T12:00:00Z")]
+const dates = [new Date('2025-03-24T12:00:00Z')]
 
 const Lw14Page = () => {
   const { query } = useRouter()
@@ -48,15 +55,28 @@ const Lw14Page = () => {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className='font-["Departure_Mono"]'>
         <SectionContainer id="ticket" className="relative !max-w-none lw-nav-anchor">
-          <TicketCanvas
-            secret={userData.secret}
-            platinum={userData.platinum}
-            playmodeRTChannel={{}}
-            user={{ id: userData.id, name: userData.name, ticketNumber: userData.ticket_number }}
-            startDate={dates[0]}
-          />
+          <TicketLayout>
+            <TicketHeader>
+              <TicketHeaderRemainingTime targetDate={dates[0]} />
+              <TicketHeaderClaim />
+              <TicketHeaderDate />
+            </TicketHeader>
+            <TicketLayoutCanvas>
+              <TicketCanvas
+                secret={userData.secret}
+                platinum={userData.platinum}
+                playmodeRTChannel={{}}
+                user={{
+                  id: userData.id,
+                  name: userData.name,
+                  ticketNumber: userData.ticket_number,
+                }}
+                startDate={dates[0]}
+              />
+            </TicketLayoutCanvas>
+          </TicketLayout>
         </SectionContainer>
       </DefaultLayout>
     </>

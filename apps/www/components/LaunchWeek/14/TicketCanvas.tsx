@@ -62,13 +62,13 @@ const TicketCanvas = ({
   return (
     <div
       className={cn(
-        'w-screen absolute inset-0 h-[600px] lg:min-h-full lg:max-h-[1000px] flex justify-center items-center overflow-hidden',
+        'absolute inset-0 lg:min-h-full flex justify-center items-center overflow-hidden aspect-[1.5841584158] w-full border border-emerald-500',
         className
       )}
     >
       <div
         ref={containerRef}
-        className="w-full lg:h-full"
+        className="w-full h-full"
         onClick={(e) => {
           sceneRef.current?.click(e.nativeEvent)
         }}
