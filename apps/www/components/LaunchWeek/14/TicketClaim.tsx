@@ -5,7 +5,7 @@ import { ActionButton } from './ActionButton'
 
 export const TicketClaim = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="grid w-full gap-4 absolute z-10 top-0 left-0 h-full justify-center justify-items-center content-center">
+    <div className="grid w-full gap-16 absolute z-10 top-0 left-0 h-full justify-center justify-items-center content-center p-10">
       {children}
     </div>
   )
@@ -13,7 +13,7 @@ export const TicketClaim = ({ children }: { children: ReactNode }) => {
 
 export const TicketClaimLogo = () => {
   return (
-    <div className="grid">
+    <div className="grid content-center">
       <Image src={logo} alt="LW logo" className="size-12" width="48" height="48" />
       <div>LW 14</div>
     </div>
@@ -21,13 +21,13 @@ export const TicketClaimLogo = () => {
 }
 
 export const TicketClaimContent = ({ children }: { children?: ReactNode }) => {
-  return <div className="">{children}</div>
+  return <div className="grid gap-6 content-center">{children}</div>
 }
 
 export const TicketClaimMessage = () => {
   return (
-    <div>
-      <div className="inline-flex flex-col justify-start items-center gap-1 font-mono">
+    <div className="grid justify-center">
+      <div className="inline-flex flex-col justify-center items-center gap-1 font-mono">
         <div className="self-stretch text-center justify-center text-emerald-400 text-xl leading-7 [text-shadow:_0px_0px_12px_rgb(255_255_255_/_0.35)]">
           LAUNCH WEEK 14
         </div>
