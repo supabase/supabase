@@ -1,0 +1,117 @@
+'use client'
+
+import { useState } from 'react'
+import ExampleLayout from '../example-layout'
+
+export default function PresenceExample() {
+  const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
+
+  const appJsCode = `import { useEffect, useState } from 'react';
+import './styles.css';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client
+const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_URL}';
+const supabaseKey = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_ANON_KEY}';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Generate a random user ID and avatar
+const userId = Math.random().toString(36).substring(2, 15);
+const getAvatarUrl = (id) => \`https://api.dicebear.com/7.x/avataaars/svg?seed=\${id}\`;
+
+// Channel name - using a unique ID to ensure both instances connect to the same channel
+const CHANNEL = 'presence-example-${instanceId}';
+
+export default function App() {
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [username, setUsername] = useState('');
+  const [isConnected, setIsConnected] = useState(false);
+
+  useEffect(() => {
+    // Generate a random username
+    const adjectives = ['Happy', 'Clever', 'Brave', 'Bright', 'Kind'];
+    const nouns = ['Panda', 'Tiger', 'Eagle', 'Dolphin', 'Fox'];
+    const randomName = \`\${adjectives[Math.floor(Math.random() * adjectives.length)]}\${
+      nouns[Math.floor(Math.random() * nouns.length)]
+    }\${Math.floor(Math.random() * 100)}\`;
+    setUsername(randomName);
+
+    // Subscribe to presence channel
+    const channel = supabase.channel(CHANNEL);
+
+    // Track presence state
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState();
+        const presenceList = [];
+        
+        // Convert presence state to array
+        Object.keys(state).forEach(key => {
+          const presences = state[key];
+          presenceList.push(...presences);
+        });
+        
+        setOnlineUsers(presenceList);
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          // Send presence state when subscribed
+          await channel.track({
+            user_id: userId,
+            username: randomName,
+            avatar: getAvatarUrl(userId),
+            online_at: new Date().getTime(),
+          });
+          setIsConnected(true);
+        }
+      });
+
+    return () => {
+      // Clean up subscription
+      channel.unsubscribe();
+    };
+  }, []);
+
+  return (
+    <div className="flex flex-col h-screen bg-neutral-800 text-white antialiased">
+      {/* Main content */}
+      <div className="flex-1 overflow-hidden p-4">
+        <div className="h-full max-w-3xl mx-auto flex flex-col gap-4 items-center justify-center">
+          <h2 className="text-lg font-medium text-neutral-300 mb-6">
+            Online Users ({onlineUsers.length})
+          </h2>
+          <div className="flex justify-center sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            {onlineUsers.map((user) => (
+              <div 
+                key={user.user_id} 
+                className="flex flex-col items-center gap-3"
+              >
+                <div className="relative bg-neutral-900 rounded-full w-16 h-16">
+                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-neutral-700"></div>
+                </div>
+                <span className="text-sm text-neutral-400 text-center break-words">
+                  {user.username}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}`
+
+  const presenceFiles = {
+    '/App.js': appJsCode,
+    '/styles.css': `/* No custom CSS needed - using Tailwind */`,
+  }
+
+  return (
+    <ExampleLayout
+      appJsCode={appJsCode}
+      files={presenceFiles}
+      title="Presence"
+      description="A simple demonstration of Supabase Realtime Presence, showing which users are currently online and active. This example tracks user presence with avatars and usernames, allowing you to see who's viewing the same content in real-time. Presence is perfect for collaborative applications, showing user activity status, and building features that respond to user availability."
+    />
+  )
+}
