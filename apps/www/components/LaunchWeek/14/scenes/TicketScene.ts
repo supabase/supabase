@@ -314,7 +314,6 @@ class TicketScene implements BaseScene {
 
     const ticket = context.composer.passes[0]
     if (ticket instanceof RenderPass) {
-
       this._updateNaturalPosition()
       this._updateTicketSize(time)
       this._updateTicketToFollowMouse(ticket.scene, time)
@@ -357,7 +356,6 @@ class TicketScene implements BaseScene {
 
     if (!this._internalState.mousePosition?.isWithinContainer || !this._sceneRenderer) return
 
-    // Set up raycaster
     this.raycaster.setFromCamera(
       new THREE.Vector2(
         this._internalState.mousePosition.containerX,
@@ -370,11 +368,12 @@ class TicketScene implements BaseScene {
     const meshes = Object.values(this._namedMeshes).filter(Boolean) as THREE.Mesh[]
 
     // Check for intersections
-    const intersects = this.raycaster.intersectObjects(meshes)
+    const intersects = this.raycaster.intersectObjects(meshes, false)
+    //
+    for (const intersect of intersects) {
+      const clickedMesh = intersect.object as THREE.Mesh
 
-    if (intersects.length > 0) {
-      const clickedMesh = intersects[0].object as THREE.Mesh
-
+      console.log((clickedMesh.material as THREE.Material).name)
       // Handle click based on which mesh was clicked
       if (clickedMesh === this._namedMeshes.TicketFrontWebsiteButton) {
         this.options.onWebsiteButtonClicked?.()
@@ -575,6 +574,26 @@ class TicketScene implements BaseScene {
     } else {
       // console.log("Setting ticket invisible")
       this._ticket?.scale.lerp(new Vector3(0, 0, 0), 0.01)
+      // this._ticket?.scale.set(0, 0, 0)
+    }
+
+    // Update world matrices after scaling to ensure raycaster works correctly
+    this._ticket?.updateMatrixWorld(true)
+
+    // Update bounding boxes for all meshes after scaling
+    this._updateMeshBoundingBoxes()
+  }
+
+  private _updateMeshBoundingBoxes() {
+    // Update bounding boxes for all named meshes
+    for (const meshName in this._namedMeshes) {
+      const mesh = this._namedMeshes[meshName as AvailableTextures]
+      if (mesh && mesh.geometry) {
+        // Ensure the geometry has a bounding box
+        if (!mesh.geometry.boundingBox) {
+          mesh.geometry.computeBoundingBox()
+        }
+      }
     }
   }
 
@@ -698,6 +717,11 @@ class TicketScene implements BaseScene {
       if ((TicketScene.TEXTURE_NAMES as readonly string[]).includes(part.material.name)) {
         console.log(`Found named mesh:`, part.material.name)
         this._namedMeshes[part.material.name as AvailableTextures] = part
+        //
+        // // Ensure geometry has a bounding box for raycaster to work properly
+        // if (part.geometry && !part.geometry.boundingBox) {
+        //   part.geometry.computeBoundingBox()
+        // }
       } else {
         console.warn(`Mesh ${part.material.name} is not a named texture`)
       }

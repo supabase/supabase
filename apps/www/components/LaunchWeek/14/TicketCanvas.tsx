@@ -60,7 +60,6 @@ const TicketCanvas = ({
   )
 
   useEffect(() => {
-    console.log("Setting ticket visible", visible)
     sceneRef.current?.setVisible(visible)
   }, [visible])
 

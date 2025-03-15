@@ -38,7 +38,7 @@ interface TicketHeaderRemainingTimeProps {
 export const TicketHeaderRemainingTime = ({
   targetDate: extTargetDate,
 }: TicketHeaderRemainingTimeProps) => {
-  const [timeLeft, setTimeLeft] = useState<string>('')
+  const [timeLeft, setTimeLeft] = useState<string>('---------------')
 
   useEffect(() => {
     const calculateTimeLeft = () => {
