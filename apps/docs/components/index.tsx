@@ -43,6 +43,7 @@ import AuthRateLimits from './MDX/auth_rate_limits.mdx'
 import DatabaseSetup from './MDX/database_setup.mdx'
 import GetSessionWarning from './MDX/get_session_warning.mdx'
 import KotlinProjectSetup from './MDX/kotlin_project_setup.mdx'
+import McpConfig from './MDX/mcp_config.mdx'
 import MigrationWarnings from './MDX/migration_warnings.mdx'
 import OAuthPkceFlow from './MDX/oauth_pkce_flow.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
@@ -150,6 +151,7 @@ const components = {
   JwtGenerator,
   KotlinProjectSetup,
   Link,
+  McpConfig,
   MigrationWarnings,
   NavData,
   OAuthPkceFlow,
