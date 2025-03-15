@@ -1,13 +1,13 @@
+import { ChevronDown, X } from 'lucide-react'
 import { KeyboardEvent, memo } from 'react'
-import { Button, Input } from 'ui'
 
 import { DropdownControl } from 'components/grid/components/common/DropdownControl'
-import type { Filter, FilterOperator, SupaTable } from 'components/grid/types'
-import { ChevronDown, X } from 'lucide-react'
+import type { Filter, FilterOperator } from 'components/grid/types'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { Button, Input } from 'ui'
 import { FilterOperatorOptions } from './Filter.constants'
 
 export interface FilterRowProps {
-  table: SupaTable
   filterIdx: number
   filter: Filter
   onChange: (index: number, filter: Filter) => void
@@ -15,10 +15,11 @@ export interface FilterRowProps {
   onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void
 }
 
-const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: FilterRowProps) => {
-  const column = table.columns.find((x) => x.name === filter.column)
+const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterRowProps) => {
+  const snap = useTableEditorTableStateSnapshot()
+  const column = snap.table.columns.find((x) => x.name === filter.column)
   const columnOptions =
-    table.columns?.map((x) => {
+    snap.table.columns?.map((x) => {
       return { value: x.name, label: x.name, postLabel: x.dataType }
     }) || []
 

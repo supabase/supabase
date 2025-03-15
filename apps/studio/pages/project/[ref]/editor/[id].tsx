@@ -1,4 +1,3 @@
-import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common/hooks'
@@ -8,12 +7,11 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
+import { TablesData } from 'data/tables/tables-query'
+import { useCallback } from 'react'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { resolvedTheme } = useTheme()
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
 
@@ -24,25 +22,27 @@ const TableEditorPage: NextPageWithLayout = () => {
     id,
   })
 
+  const router = useRouter()
+  const onAfterDeleteTable = useCallback(
+    (tables: TablesData) => {
+      // For simplicity for now, we just open the first table within the same schema
+      if (tables.length > 0) {
+        router.push(`/project/${projectRef}/editor/${tables[0].id}`)
+      } else {
+        router.push(`/project/${projectRef}/editor`)
+      }
+    },
+    [router, projectRef]
+  )
+
   return (
-    <TableEditorTableStateContextProvider key={`table-editor-table-${id}`}>
-      <TableGridEditor
-        isLoadingSelectedTable={isLoading}
-        selectedTable={selectedTable}
-        theme={resolvedTheme?.includes('dark') ? 'dark' : 'light'}
-      />
+    <>
+      <TableGridEditor isLoadingSelectedTable={isLoading} selectedTable={selectedTable} />
       <DeleteConfirmationDialogs
         selectedTable={selectedTable}
-        onAfterDeleteTable={(tables) => {
-          // For simplicity for now, we just open the first table within the same schema
-          if (tables.length > 0) {
-            router.push(`/project/${projectRef}/editor/${tables[0].id}`)
-          } else {
-            router.push(`/project/${projectRef}/editor`)
-          }
-        }}
+        onAfterDeleteTable={onAfterDeleteTable}
       />
-    </TableEditorTableStateContextProvider>
+    </>
   )
 }
 

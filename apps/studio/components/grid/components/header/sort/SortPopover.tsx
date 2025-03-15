@@ -5,8 +5,8 @@ import { useCallback, useMemo, useState } from 'react'
 
 import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
 import { DropdownControl } from 'components/grid/components/common/DropdownControl'
-import type { Sort, SupaTable } from 'components/grid/types'
-import { useUrlState } from 'hooks/ui/useUrlState'
+import type { Sort } from 'components/grid/types'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -17,27 +17,17 @@ import {
 import SortRow from './SortRow'
 
 export interface SortPopoverProps {
-  table: SupaTable
   sorts: string[]
-  setParams: ReturnType<typeof useUrlState>[1]
+  onApplySorts: (sorts: Sort[]) => void
 }
 
-const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
+const SortPopover = ({ sorts, onApplySorts }: SortPopoverProps) => {
   const [open, setOpen] = useState(false)
 
   const btnText =
     (sorts || []).length > 0
       ? `Sorted by ${sorts.length} rule${sorts.length > 1 ? 's' : ''}`
       : 'Sort'
-
-  const onApplySorts = (appliedSorts: Sort[]) => {
-    setParams((prevParams) => {
-      return {
-        ...prevParams,
-        sort: appliedSorts.map((sort) => `${sort.column}:${sort.ascending ? 'asc' : 'desc'}`),
-      }
-    })
-  }
 
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
@@ -47,7 +37,7 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
-        <SortOverlay table={table} sorts={sorts} onApplySorts={onApplySorts} />
+        <SortOverlay sorts={sorts} onApplySorts={onApplySorts} />
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )
@@ -56,19 +46,20 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
 export default SortPopover
 
 export interface SortOverlayProps {
-  table: SupaTable
   sorts: string[]
   onApplySorts: (sorts: Sort[]) => void
 }
 
-const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayProps) => {
+const SortOverlay = ({ sorts: sortsFromUrl, onApplySorts }: SortOverlayProps) => {
+  const snap = useTableEditorTableStateSnapshot()
+
   const initialSorts = useMemo(
-    () => formatSortURLParams(table.name, sortsFromUrl ?? []),
-    [table.name, sortsFromUrl]
+    () => formatSortURLParams(snap.table.name, sortsFromUrl ?? []),
+    [snap.table.name, sortsFromUrl]
   )
   const [sorts, setSorts] = useState<Sort[]>(initialSorts)
 
-  const columns = table.columns!.filter((x) => {
+  const columns = snap.table.columns.filter((x) => {
     // exclude json/jsonb columns from sorting. Sorting by json fields in PG is only possible if you provide key from
     // the JSON object.
     if (x.dataType === 'json' || x.dataType === 'jsonb') {
@@ -84,7 +75,7 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayPr
     }) || []
 
   function onAddSort(columnName: string | number) {
-    setSorts([...sorts, { table: table.name, column: columnName as string, ascending: true }])
+    setSorts([...sorts, { table: snap.table.name, column: columnName as string, ascending: true }])
   }
 
   const onDeleteSort = useCallback((column: string) => {
@@ -119,7 +110,6 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayPr
       {sorts.map((sort, index) => (
         <SortRow
           key={sort.column}
-          table={table}
           index={index}
           columnName={sort.column}
           sort={sort}

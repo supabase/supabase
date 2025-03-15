@@ -3,7 +3,6 @@ import type { DataGridHandle } from 'react-data-grid'
 
 import { SupaRow } from 'components/grid/types'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { useTrackedState } from '../../store/Store'
 import { copyToClipboard, formatClipboardValue } from '../../utils/common'
 import { useKeyboardShortcuts } from './Hooks'
 
@@ -14,8 +13,6 @@ type ShortcutsProps = {
 
 export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
   const snap = useTableEditorTableStateSnapshot()
-  const state = useTrackedState()
-  const { gridColumns } = state
 
   const metaKey = useMemo(() => {
     function getClientOS() {
@@ -56,7 +53,7 @@ export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
       },
       [`${metaKey}+ArrowLeft`]: (event) => {
         event.stopPropagation()
-        const fronzenColumns = gridColumns.filter((x) => x.frozen)
+        const fronzenColumns = snap.gridColumns.filter((x) => x.frozen)
         const position = {
           idx: fronzenColumns.length,
           rowIdx: snap.selectedCellPosition?.rowIdx ?? 0,
@@ -66,7 +63,7 @@ export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
       [`${metaKey}+ArrowRight`]: (event) => {
         event.stopPropagation()
         gridRef.current?.selectCell({
-          idx: gridColumns.length - 2, // -2 because we don't want to select the end extra col
+          idx: snap.gridColumns.length - 2, // -2 because we don't want to select the end extra col
           rowIdx: snap.selectedCellPosition?.rowIdx ?? 0,
         })
       },
@@ -75,7 +72,7 @@ export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
         if (snap.selectedCellPosition) {
           const { idx, rowIdx } = snap.selectedCellPosition
           if (idx > 0) {
-            const colKey = gridColumns[idx].key
+            const colKey = snap.gridColumns[idx].key
             const cellValue = rows[rowIdx]?.[colKey] ?? ''
             const value = formatClipboardValue(cellValue)
             copyToClipboard(value)
