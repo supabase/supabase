@@ -20,12 +20,13 @@ import { number, object } from 'yup'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { uuidv4 } from 'lib/helpers'
 import {
@@ -38,21 +39,18 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Form,
   Input,
   InputNumber,
   Modal,
   WarningIcon,
-  Form,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
 } from './API.constants'
-import { Admonition } from 'ui-patterns'
-import { FormActions } from 'components/ui/Forms/FormActions'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 
 const schema = object({
   JWT_EXP: number()
@@ -226,6 +224,12 @@ const JWTSettings = () => {
                                 <p className="text-sm opacity-50">
                                   A random secret will be created, or you can create your own.
                                 </p>
+                                <p className="text-sm opacity-50">
+                                  This will invalidate your{' '}
+                                  <code className="text-xs">service_role</code> and{' '}
+                                  <code className="text-xs">anon</code> API keys, and sign out all
+                                  users authenticated through Supabase Auth.
+                                </p>
                               </div>
                               <div className="flex flex-col items-end">
                                 {isUpdatingJwtSecret ? (
@@ -244,7 +248,7 @@ const JWTSettings = () => {
                                       },
                                     }}
                                   >
-                                    Generate a new secret
+                                    Generate a random secret
                                   </ButtonTooltip>
                                 ) : (
                                   <DropdownMenu>
@@ -259,7 +263,7 @@ const JWTSettings = () => {
                                         onClick={() => setIsGeneratingKey(true)}
                                       >
                                         <RefreshCw size={16} />
-                                        <p>Generate a random secret</p>
+                                        <p>Generate a new secret</p>
                                       </DropdownMenuItem>
                                       <DropdownMenuSeparator />
                                       <DropdownMenuItem

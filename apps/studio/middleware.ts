@@ -20,6 +20,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/get-ip-address',
   '/get-utc-time',
   '/edge-functions/test',
+  '/check-service-role-key-leak',
 ]
 
 export function middleware(request: NextRequest) {
