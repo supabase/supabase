@@ -217,10 +217,10 @@ function filterLiteral(value: any) {
 //============================================================
 
 function applySorts(query: string, sorts: Sort[]) {
-  if (sorts.length === 0) return query
-  query += ` order by ${sorts
+  const validSorts = sorts.filter((sort) => sort.column)
+  if (validSorts.length === 0) return query
+  query += ` order by ${validSorts
     .map((x) => {
-      if (!x.column) return null
       const order = x.ascending ? 'asc' : 'desc'
       const nullOrder = x.nullsFirst ? 'nulls first' : 'nulls last'
       return `${ident(x.table)}.${ident(x.column)} ${order} ${nullOrder}`

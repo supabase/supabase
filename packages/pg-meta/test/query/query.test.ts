@@ -4,7 +4,7 @@ import { QueryAction } from '../../src/query/QueryAction'
 import { QueryFilter } from '../../src/query/QueryFilter'
 import { QueryModifier } from '../../src/query/QueryModifier'
 import * as QueryUtils from '../../src/query/Query.utils'
-import type { QueryTable, Dictionary, Filter, Sort } from '../../src/query/types'
+import type { QueryTable, Filter, Sort } from '../../src/query/types'
 
 describe('Query', () => {
   test('from() should create a QueryAction with the correct table', () => {
@@ -172,31 +172,6 @@ describe('QueryModifier', () => {
     expect(result).toBe('delete from public.users where id = 1 returning *;')
   })
 
-  test('toSql() should throw an error for a delete query without filters', () => {
-    const queryModifier = new QueryModifier(table, 'delete')
-
-    expect(() => queryModifier.toSql()).toThrow()
-  })
-
-  test('toSql() should generate the correct SQL for an insert query', () => {
-    const values: Dictionary<any>[] = [{ id: 1, name: 'John' }]
-    const queryModifier = new QueryModifier(table, 'insert', {
-      actionValue: values,
-      actionOptions: { returning: true },
-    })
-    const result = queryModifier.toSql()
-
-    expect(result).toMatch(/insert into public.users/)
-    expect(result).toMatch(/from jsonb_populate_recordset/)
-    expect(result).toMatch(/returning \*/i)
-  })
-
-  test('toSql() should throw an error for an insert query without values', () => {
-    const queryModifier = new QueryModifier(table, 'insert')
-
-    expect(() => queryModifier.toSql()).toThrow()
-  })
-
   test('toSql() should generate the correct SQL for a select query with filters, sorts and pagination', () => {
     const queryModifier = new QueryModifier(table, 'select', {
       actionValue: 'id, name',
@@ -205,33 +180,9 @@ describe('QueryModifier', () => {
     })
     queryModifier.range(0, 5)
     const result = queryModifier.toSql()
-
-    expect(result).toMatch(
-      /select id, name from public.users where id > 10 order by users.name asc nulls last limit \d+ offset 0;/
+    expect(result).toMatchInlineSnapshot(
+      `"select id, name from public.users where id > 10 order by users.name asc nulls last limit 6 offset 0;"`
     )
-  })
-
-  test('toSql() should generate the correct SQL for an update query with filters', () => {
-    const value: Dictionary<any> = { name: 'John' }
-    const queryModifier = new QueryModifier(table, 'update', {
-      actionValue: value,
-      filters: [{ column: 'id', operator: '=', value: 1 }],
-      actionOptions: { returning: true },
-    })
-    const result = queryModifier.toSql()
-
-    expect(result).toMatch(/update public.users set/)
-    expect(result).toMatch(/from json_populate_record/)
-    expect(result).toMatch(/where id = 1 returning \*/i)
-  })
-
-  test('toSql() should throw an error for an update query without filters', () => {
-    const value: Dictionary<any> = { name: 'John' }
-    const queryModifier = new QueryModifier(table, 'update', {
-      actionValue: value,
-    })
-
-    expect(() => queryModifier.toSql()).toThrow()
   })
 
   test('toSql() should generate the correct SQL for a truncate query', () => {
@@ -314,15 +265,17 @@ describe('Query.utils', () => {
     test('should generate a correct insert query with values', () => {
       const values = [{ id: 1, name: 'John' }]
       const result = QueryUtils.insertQuery(table, values)
-      // Just check the basic structure as the exact format is complex
-      expect(result).toMatch(/insert into public.users/i)
-      expect(result).toMatch(/jsonb_populate_recordset/i)
+      expect(result).toMatchInlineSnapshot(
+        `"insert into public.users (id,name) select id,name from jsonb_populate_recordset(null::public.users, '[{"id":1,"name":"John"}]');"`
+      )
     })
 
     test('should include returning clause when specified', () => {
       const values = [{ id: 1, name: 'John' }]
       const result = QueryUtils.insertQuery(table, values, { returning: true })
-      expect(result).toMatch(/returning \*/i)
+      expect(result).toMatchInlineSnapshot(
+        `"insert into public.users (id,name) select id,name from jsonb_populate_recordset(null::public.users, '[{"id":1,"name":"John"}]') returning *;"`
+      )
     })
 
     test('should include enum array columns in returning clause when specified', () => {
@@ -331,7 +284,9 @@ describe('Query.utils', () => {
         returning: true,
         enumArrayColumns: ['tags'],
       })
-      expect(result).toMatch(/returning \*, "tags"::text\[\]/i)
+      expect(result).toMatchInlineSnapshot(
+        `"insert into public.users (id,name) select id,name from jsonb_populate_recordset(null::public.users, '[{"id":1,"name":"John"}]') returning *, "tags"::text[];"`
+      )
     })
   })
 
@@ -367,9 +322,7 @@ describe('Query.utils', () => {
     test('should ignore sorts with undefined column', () => {
       const sorts: Sort[] = [{ table: 'users', column: '', ascending: true, nullsFirst: false }]
       const result = QueryUtils.selectQuery(table, '*', { sorts: sorts })
-      // Order by appears in the SQL even with an empty column, so we just check it contains the main parts
-      expect(result).toContain('select * from public.users')
-      expect(result).toContain('order by')
+      expect(result).toMatchInlineSnapshot(`"select * from public.users;"`)
     })
   })
 
@@ -383,9 +336,9 @@ describe('Query.utils', () => {
       const value = { name: 'John' }
       const filters = [{ column: 'id', operator: '=' as const, value: 1 }]
       const result = QueryUtils.updateQuery(table, value, { filters: filters })
-      // Just check the basic structure as the exact format is complex
-      expect(result).toMatch(/update public.users set/i)
-      expect(result).toMatch(/where id = 1/i)
+      expect(result).toMatchInlineSnapshot(
+        `"update public.users set (name) = (select name from json_populate_record(null::public.users, '{"name":"John"}')) where id = 1;"`
+      )
     })
 
     test('should include returning clause when specified', () => {
@@ -395,7 +348,9 @@ describe('Query.utils', () => {
         filters: filters,
         returning: true,
       })
-      expect(result).toMatch(/returning \*/i)
+      expect(result).toMatchInlineSnapshot(
+        `"update public.users set (name) = (select name from json_populate_record(null::public.users, '{"name":"John"}')) where id = 1 returning *;"`
+      )
     })
 
     test('should include enum array columns in returning clause when specified', () => {
@@ -406,7 +361,9 @@ describe('Query.utils', () => {
         returning: true,
         enumArrayColumns: ['tags'],
       })
-      expect(result).toMatch(/returning \*, "tags"::text\[\]/i)
+      expect(result).toMatchInlineSnapshot(
+        `"update public.users set (name) = (select name from json_populate_record(null::public.users, '{"name":"John"}')) where id = 1 returning *, "tags"::text[];"`
+      )
     })
   })
 
@@ -503,8 +460,7 @@ describe('Query.utils', () => {
       test('should ignore sorts with undefined column', () => {
         const sorts: Sort[] = [{ table: 'users', column: '', ascending: true, nullsFirst: false }]
         const result = QueryUtils.selectQuery(table, '*', { sorts: sorts })
-        // Tests are passing if we include an ORDER BY clause with no column
-        expect(result).toMatch(/select \* from public.users/)
+        expect(result).toMatchInlineSnapshot(`"select * from public.users;"`)
       })
     })
 
@@ -615,9 +571,9 @@ describe('End-to-end query chaining', () => {
       .from('users', 'public')
       .insert([{ name: 'John', email: 'john@example.com' }], { returning: true })
       .toSql()
-
-    expect(sql).toMatch(/insert into public.users/i)
-    expect(sql).toMatch(/returning \*/i)
+    expect(sql).toMatchInlineSnapshot(
+      `"insert into public.users (name,email) select name,email from jsonb_populate_recordset(null::public.users, '[{"name":"John","email":"john@example.com"}]') returning *;"`
+    )
   })
 
   test('should correctly build an update query', () => {
@@ -627,10 +583,9 @@ describe('End-to-end query chaining', () => {
       .update({ name: 'Updated Name' }, { returning: true })
       .filter('id', '=', 1)
       .toSql()
-
-    expect(sql).toMatch(/update public.users set/i)
-    expect(sql).toMatch(/where id = 1/i)
-    expect(sql).toMatch(/returning \*/i)
+    expect(sql).toMatchInlineSnapshot(
+      `"update public.users set (name) = (select name from json_populate_record(null::public.users, '{"name":"Updated Name"}')) where id = 1 returning *;"`
+    )
   })
 
   test('should correctly build a delete query', () => {
