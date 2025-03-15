@@ -16,11 +16,13 @@ import {
 } from '~/components/LaunchWeek/14/Header'
 import {
   TicketClaim,
-  TicketClaimButton,
+  TicketClaimButtons,
   TicketClaimContent,
   TicketClaimLogo,
   TicketClaimMessage,
 } from '~/components/LaunchWeek/14/TicketClaim'
+import { ActionButton } from '~/components/LaunchWeek/14/ActionButton'
+import { usePartymode } from '~/components/LaunchWeek/14/use-partymode'
 
 const dates = [new Date('2025-03-24T12:00:00Z')]
 
@@ -34,6 +36,7 @@ const Lw14Page = () => {
   const ticketNumber = query.ticketNumber?.toString()
   const [session, setSession] = useState<Session | null>(null)
   const [showCustomizationForm, setShowCustomizationForm] = useState<boolean>(false)
+  const partymode = usePartymode()
 
   const defaultUserData = {
     id: query.id?.toString(),
@@ -94,7 +97,24 @@ const Lw14Page = () => {
                   <TicketClaimLogo />
                   <TicketClaimContent>
                     <TicketClaimMessage />
-                    <TicketClaimButton onClick={() => setTicketVisible(true)} />
+                    <TicketClaimButtons>
+                      <ActionButton
+                        variant="primary"
+                        icon="T"
+                        onClick={() => setTicketVisible(true)}
+                      >
+                        CLAIM YOUR TICKET
+                      </ActionButton>
+                      <ActionButton
+                        variant={partymode.state.on ? 'primary' : 'secondary'}
+                        icon="P"
+                        onClick={() => {
+                          partymode.toggle()
+                        }}
+                      >
+                        Party mode: {partymode.state.on ? 'ON' : 'OFF'}
+                      </ActionButton>
+                    </TicketClaimButtons>
                   </TicketClaimContent>
                 </TicketClaim>
               )}

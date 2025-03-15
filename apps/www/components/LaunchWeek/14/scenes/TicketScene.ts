@@ -325,13 +325,8 @@ class TicketScene implements BaseScene {
     if (this.mouseMoveHandler) window.removeEventListener('mousemove', this.mouseMoveHandler)
   }
 
-  handleEvent(event: string, data?: any): void {
-    throw new Error('Method not implemented.')
-  }
-
   resize(_ev: UIEvent): void {
     this._internalState.containerBBox = this._sceneRenderer?.container.getBoundingClientRect()
-    console.log('resize', this._internalState.containerBBox)
     return
   }
 

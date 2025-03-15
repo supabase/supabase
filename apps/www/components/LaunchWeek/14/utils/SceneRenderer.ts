@@ -17,11 +17,6 @@ export interface BaseScene {
    */
   cleanup(): void
 
-  /**
-   * Handle events from the parent component
-   */
-  handleEvent(event: string, data?: any): void
-
   resize(ev: UIEvent): void
 }
 
