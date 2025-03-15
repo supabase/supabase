@@ -1,10 +1,11 @@
 import { cn } from 'ui'
 import { useThreeJS } from './helpers'
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import SceneRenderer, { BaseScene } from './utils/SceneRenderer'
 import TicketScene from './scenes/TicketScene'
 
 interface TicketCanvasProps {
+  visible: boolean
   secret?: boolean
   platinum?: boolean
   user: {
@@ -19,6 +20,7 @@ interface TicketCanvasProps {
 }
 
 const TicketCanvas = ({
+  visible,
   secret,
   platinum,
   user,
@@ -33,7 +35,6 @@ const TicketCanvas = ({
       let scene: BaseScene | null = null
 
       const sceneRenderer = new SceneRenderer(container)
-
 
       sceneRef.current = new TicketScene({
         defaultSecret: secret,
@@ -58,11 +59,16 @@ const TicketCanvas = ({
     [platinum, secret, startDate, user]
   )
 
+  useEffect(() => {
+    console.log("Setting ticket visible", visible)
+    sceneRef.current?.setVisible(visible)
+  }, [visible])
+
   const { containerRef } = useThreeJS(setup)
   return (
     <div
       className={cn(
-        'absolute inset-0 lg:min-h-full flex justify-center items-center overflow-hidden aspect-[1.5841584158] w-full border border-emerald-500',
+        'absolute inset-0 flex justify-center items-center overflow-hidden w-full h-full',
         className
       )}
     >

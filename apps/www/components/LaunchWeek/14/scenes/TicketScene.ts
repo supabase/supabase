@@ -10,6 +10,7 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass'
 import { TransparentBloomPass } from '../effects/transparent-bloom'
 
 interface TicketSceneState {
+  visible: boolean
   secret: boolean
   platinum: boolean
   frontside: boolean
@@ -24,6 +25,7 @@ interface TicketSceneState {
 }
 
 interface TicketSceneOptions {
+  defaultVisible?: boolean
   defaultSecret?: boolean
   defaultPlatinum?: boolean
   startDate: Date
@@ -232,6 +234,7 @@ class TicketScene implements BaseScene {
 
   constructor(private options: TicketSceneOptions) {
     this.state = {
+      visible: options.defaultVisible ?? false,
       secret: options.defaultSecret || false,
       platinum: options.defaultPlatinum || false,
       frontside: true,
@@ -259,6 +262,7 @@ class TicketScene implements BaseScene {
     const gltf = await loadGLTFModel(this.sceneUrl)
 
     this._ticket = gltf.scene as unknown as Scene
+    if (!this.state.visible) this._ticket.scale.set(0, 0, 0)
 
     this._setCamera(context.camera)
     this._modelRenderPass = new RenderPass(this._ticket, context.camera)
@@ -310,10 +314,97 @@ class TicketScene implements BaseScene {
 
     const ticket = context.composer.passes[0]
     if (ticket instanceof RenderPass) {
+
       this._updateNaturalPosition()
+      this._updateTicketSize(time)
       this._updateTicketToFollowMouse(ticket.scene, time)
       this._updatePasses(time)
     }
+  }
+
+  cleanup(): void {
+    if (this.mouseMoveHandler) window.removeEventListener('mousemove', this.mouseMoveHandler)
+  }
+
+  handleEvent(event: string, data?: any): void {
+    throw new Error('Method not implemented.')
+  }
+
+  resize(_ev: UIEvent): void {
+    this._internalState.containerBBox = this._sceneRenderer?.container.getBoundingClientRect()
+    console.log('resize', this._internalState.containerBBox)
+    return
+  }
+
+  showFrontSide() {
+    this.state.frontside = true
+  }
+
+  showBackSide() {
+    this.state.frontside = false
+  }
+
+  async upgradeToSecret() {
+    this.state.secret = true
+    await this._loadTextures()
+    // Start enabling effects gradually
+    this._enableSecretEffects()
+  }
+
+  // In your click method
+  click(e: MouseEvent) {
+    this._updateMousePosition(e)
+
+    if (!this._internalState.mousePosition?.isWithinContainer || !this._sceneRenderer) return
+
+    // Set up raycaster
+    this.raycaster.setFromCamera(
+      new THREE.Vector2(
+        this._internalState.mousePosition.containerX,
+        this._internalState.mousePosition.containerY
+      ),
+      this._sceneRenderer.camera
+    )
+
+    // Get all meshes to check for intersection
+    const meshes = Object.values(this._namedMeshes).filter(Boolean) as THREE.Mesh[]
+
+    // Check for intersections
+    const intersects = this.raycaster.intersectObjects(meshes)
+
+    if (intersects.length > 0) {
+      const clickedMesh = intersects[0].object as THREE.Mesh
+
+      // Handle click based on which mesh was clicked
+      if (clickedMesh === this._namedMeshes.TicketFrontWebsiteButton) {
+        this.options.onWebsiteButtonClicked?.()
+        // Add your action here
+      } else if (clickedMesh === this._namedMeshes.TicketFrontSeatChartButton) {
+        this.options.onSeatChartButtonClicked?.()
+        // Add your action here
+      } else if (clickedMesh === this._namedMeshes.TicketBackGoBackButton) {
+        this.options.onGoBackButtonClicked?.()
+      } else if (clickedMesh === this._namedMeshes.TicketBackWebsiteButton) {
+        this.options.onWebsiteButtonClicked?.()
+        // Add your action here
+      }
+    }
+  }
+
+  setVisible(value: boolean) {
+    this.state.visible = value
+  }
+
+  private _enableSecretEffects() {
+    if (this._effectsEnabled) return // Already enabled
+
+    this._effectsEnabled = true
+    this._internalState.effectsIntensity = 0
+
+    // Enable all passes
+    if (this._glitchPass) this._glitchPass.enabled = true
+    if (this._crtPass) this._crtPass.enabled = true
+    if (this._bloomPass) this._bloomPass.enabled = true
   }
 
   private _updatePasses(time?: number) {
@@ -382,87 +473,6 @@ class TicketScene implements BaseScene {
         this._bloomPass.strength = 0
         this._bloomPass.threshold = 1.0
         this._bloomPass.radius = 0.5
-      }
-    }
-  }
-
-  cleanup(): void {
-    if (this.mouseMoveHandler) window.removeEventListener('mousemove', this.mouseMoveHandler)
-  }
-
-  handleEvent(event: string, data?: any): void {
-    throw new Error('Method not implemented.')
-  }
-
-  resize(_ev: UIEvent): void {
-    this._internalState.containerBBox = this._sceneRenderer?.container.getBoundingClientRect()
-    console.log('resize', this._internalState.containerBBox)
-    return
-  }
-
-  showFrontSide() {
-    this.state.frontside = true
-  }
-
-  showBackSide() {
-    this.state.frontside = false
-  }
-
-  async upgradeToSecret() {
-    this.state.secret = true
-    await this._loadTextures()
-    // Start enabling effects gradually
-    this._enableSecretEffects()
-  }
-
-  private _enableSecretEffects() {
-    if (this._effectsEnabled) return // Already enabled
-
-    this._effectsEnabled = true
-    this._internalState.effectsIntensity = 0
-
-    // Enable all passes
-    if (this._glitchPass) this._glitchPass.enabled = true
-    if (this._crtPass) this._crtPass.enabled = true
-    if (this._bloomPass) this._bloomPass.enabled = true
-  }
-
-  // In your click method
-  click(e: MouseEvent) {
-    this._updateMousePosition(e)
-
-    if (!this._internalState.mousePosition?.isWithinContainer || !this._sceneRenderer) return
-
-    // Set up raycaster
-    this.raycaster.setFromCamera(
-      new THREE.Vector2(
-        this._internalState.mousePosition.containerX,
-        this._internalState.mousePosition.containerY
-      ),
-      this._sceneRenderer.camera
-    )
-
-    // Get all meshes to check for intersection
-    const meshes = Object.values(this._namedMeshes).filter(Boolean) as THREE.Mesh[]
-
-    // Check for intersections
-    const intersects = this.raycaster.intersectObjects(meshes)
-
-    if (intersects.length > 0) {
-      const clickedMesh = intersects[0].object as THREE.Mesh
-
-      // Handle click based on which mesh was clicked
-      if (clickedMesh === this._namedMeshes.TicketFrontWebsiteButton) {
-        this.options.onWebsiteButtonClicked?.()
-        // Add your action here
-      } else if (clickedMesh === this._namedMeshes.TicketFrontSeatChartButton) {
-        this.options.onSeatChartButtonClicked?.()
-        // Add your action here
-      } else if (clickedMesh === this._namedMeshes.TicketBackGoBackButton) {
-        this.options.onGoBackButtonClicked?.()
-      } else if (clickedMesh === this._namedMeshes.TicketBackWebsiteButton) {
-        this.options.onWebsiteButtonClicked?.()
-        // Add your action here
       }
     }
   }
@@ -555,6 +565,17 @@ class TicketScene implements BaseScene {
   private _registerMousePositionTracking(context: SceneRenderer) {
     this.mouseMoveHandler = this._updateMousePosition.bind(this)
     window.addEventListener('mousemove', this.mouseMoveHandler)
+  }
+
+  private _updateTicketSize(time?: number) {
+    if (this.state.visible) {
+      // console.log("Setting ticket visible")
+      // this._ticket?.scale.set(1, 1, 1)
+      this._ticket?.scale.lerp(new Vector3(1, 1, 1), 0.01)
+    } else {
+      // console.log("Setting ticket invisible")
+      this._ticket?.scale.lerp(new Vector3(0, 0, 0), 0.01)
+    }
   }
 
   private _updateMousePosition(ev: MouseEvent) {

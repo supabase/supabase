@@ -1,6 +1,6 @@
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Session } from '@supabase/supabase-js'
 import TicketCanvas from '~/components/LaunchWeek/14/TicketCanvas'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -14,6 +14,13 @@ import {
   TicketHeaderDate,
   TicketHeaderRemainingTime,
 } from '~/components/LaunchWeek/14/Header'
+import {
+  TicketClaim,
+  TicketClaimButton,
+  TicketClaimContent,
+  TicketClaimLogo,
+  TicketClaimMessage,
+} from '~/components/LaunchWeek/14/TicketClaim'
 
 const dates = [new Date('2025-03-24T12:00:00Z')]
 
@@ -38,6 +45,16 @@ const Lw14Page = () => {
 
   const [userData, setUserData] = useState<UserData>(defaultUserData)
   const [ticketState, setTicketState] = useState<TicketState>('loading')
+  const [ticketVisible, setTicketVisible] = useState(false)
+  const user = useMemo(
+    () => ({
+      id: userData.id,
+      name: userData.name,
+      ticketNumber: userData.ticket_number,
+    }),
+    [userData.id, userData.name, userData.ticket_number]
+  )
+  const playmodeRTChannel = useMemo(() => ({}), [])
 
   return (
     <>
@@ -65,16 +82,22 @@ const Lw14Page = () => {
             </TicketHeader>
             <TicketLayoutCanvas>
               <TicketCanvas
+                visible={ticketVisible}
                 secret={userData.secret}
                 platinum={userData.platinum}
-                playmodeRTChannel={{}}
-                user={{
-                  id: userData.id,
-                  name: userData.name,
-                  ticketNumber: userData.ticket_number,
-                }}
+                playmodeRTChannel={playmodeRTChannel}
+                user={user}
                 startDate={dates[0]}
               />
+              {!ticketVisible && (
+                <TicketClaim>
+                  <TicketClaimLogo />
+                  <TicketClaimContent>
+                    <TicketClaimMessage />
+                    <TicketClaimButton onClick={() => setTicketVisible(true)} />
+                  </TicketClaimContent>
+                </TicketClaim>
+              )}
             </TicketLayoutCanvas>
           </TicketLayout>
         </SectionContainer>
