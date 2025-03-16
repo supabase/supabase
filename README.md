@@ -7,18 +7,18 @@
 
 [Supabase](https://supabase.com) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
+- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database).
+- [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth).
 - [x] Auto-generated APIs.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/graphql)
-  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/realtime)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api).
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/graphql).
+  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/realtime).
 - [x] Functions.
-  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
-- [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
-- [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai)
-- [x] Dashboard
+  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions).
+  - [x] Edge Functions. [Docs](https://supabase.com/docs/guides/functions).
+- [x] File Storage. [Docs](https://supabase.com/docs/guides/storage).
+- [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai).
+- [x] Dashboard.
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
@@ -28,9 +28,9 @@ Watch "releases" of this repo to get notified of major updates.
 
 ## Documentation
 
-For full documentation, visit [supabase.com/docs](https://supabase.com/docs)
+For full documentation, visit [supabase.com/docs](https://supabase.com/docs).
 
-To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
+To see how to Contribute, visit [Getting Started](./DEVELOPERS.md).
 
 ## Community & Support
 
@@ -48,12 +48,12 @@ Supabase is a combination of open source tools. We’re building the features of
 Supabase is a [hosted platform](https://supabase.com/dashboard). You can sign up and start using Supabase without installing anything.
 You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and [develop locally](https://supabase.com/docs/guides/local-development).
 
-![Architecture](apps/docs/public/img/supabase-architecture.svg)
+![Architecture](apps/docs/public/img/supabase-architecture.svg).
 
-- [Postgres](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
+- [Postgres](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness and performance.
 - [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
 - [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API.
-- [GoTrue](https://github.com/supabase/gotrue)is a JWT-based authentication API that simplifies user sign-ups, logins, and session management in your applications.
+- [GoTrue](https://github.com/supabase/gotrue)is a JWT-based authentication API that simplifies user sign-ups, logins and session management in your applications.
 - [Storage](https://github.com/supabase/storage-api)a RESTful API for managing files in S3, with Postgres handling permissions.
 - [pg_graphql](http://github.com/supabase/pg_graphql/) a PostgreSQL extension that exposes a GraphQL API.
 - [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
@@ -220,7 +220,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 </a>
 ```
 
-![Made with Supabase (dark)](./apps/www/public/badge-made-with-supabase-dark.svg)
+![Made with Supabase (dark)](./apps/www/public/badge-made-with-supabase-dark.svg).
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
