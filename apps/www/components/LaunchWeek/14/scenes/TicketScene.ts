@@ -88,6 +88,9 @@ class TicketScene implements BaseScene {
       textNeonColor: { rgb: 0x2cf494, alpha: 1 },
       textNeonDimmedColor: { rgb: 0x12623b, alpha: 1 },
       transparentBg: { rgb: 0x2cf494, alpha: 0.4 },
+      seatPath: new Path2D(
+        'M0.824219 0.661133H41.2231C48.5923 0.661133 54.5703 6.63925 54.5703 14.0084V41.06C54.5703 48.4292 48.5923 54.4072 41.2231 54.4072H0.824219V0.661133Z'
+      ),
     },
     platinum: {
       back: {
@@ -145,6 +148,28 @@ class TicketScene implements BaseScene {
       x: 368 / 2000,
       y: 1070 / 1400,
     },
+    seatStart: {
+      x: 561.89 / 2000,
+      y: 739.4 / 1400,
+    },
+    seatPositions: {
+      x: [
+        0 / 2000,
+        99.82 / 2000,
+        199.77 / 2000,
+        389.84 / 2000,
+        488.05 / 2000,
+        588.25 / 2000,
+        688.43 / 2000,
+        788.63 / 2000,
+      ],
+      y: [
+        0 / 1400,
+        71.61 / 1400,
+        163.5 / 1400,
+        235.54 / 1400
+      ],
+    },
   }
 
   fonts: ConstructorParameters<typeof FontFace>[] = [
@@ -170,7 +195,7 @@ class TicketScene implements BaseScene {
 
   private _internalState = {
     naturalRotation: new Vector3(0, 0, Math.PI),
-    naturalPosition: new Vector3(0, 0, 0),
+    naturalPosition: new Vector3(0, 0, -0.5),
 
     fontsLoaded: false,
     loadedTextureType: null as 'basic' | 'secret' | 'platinum' | null,
@@ -229,7 +254,7 @@ class TicketScene implements BaseScene {
       startDate: options.startDate,
       ticketNumber: options.user.ticketNumber || 0,
       texts: {
-        username: 'Goszczu 123425' ?? options.user.name ?? '',
+        username: options.user.name ?? '',
         species: 'Modern Human',
         earth: 'Earth',
         date: '03/31–04/04',
@@ -252,10 +277,15 @@ class TicketScene implements BaseScene {
 
     const gltf = await loadGLTFModel(this.sceneUrl)
 
-    this._ticket = gltf.scene.getObjectByName("Plane") as unknown as Scene
+    this._ticket = gltf.scene.getObjectByName('Plane') as unknown as Scene
 
     if (!this.state.visible) this._ticket.scale.set(0, 0, 0)
     this._ticket.rotation.setFromVector3(this._internalState.naturalRotation)
+    this._ticket.position.set(
+      this._internalState.naturalPosition.x,
+      this._internalState.naturalPosition.y,
+      this._internalState.naturalPosition.z
+    )
 
     this._setCamera(context.camera)
     this._modelRenderPass = new RenderPass(gltf.scene as unknown as Scene, context.camera)
@@ -280,7 +310,7 @@ class TicketScene implements BaseScene {
     // Add directional light
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5)
     directionalLight.position.set(5, 5, 5)
-    this._ticket.add(directionalLight)
+    gltf.scene.add(directionalLight)
 
     // Add a point light to better illuminate the placeholder
     const pointLight = new THREE.PointLight(0xffffff, 1.0)
@@ -310,13 +340,12 @@ class TicketScene implements BaseScene {
     if (mainRenderPass instanceof RenderPass) {
       this._updateNaturalPosition()
       this._updateTicketSize(time)
-      if(this._ticket) this._updateTicketToFollowMouse(this._ticket, time)
+      if (this._ticket) this._updateTicketToFollowMouse(this._ticket, time)
       this._updatePasses(time)
     }
   }
 
-  cleanup(): void {
-  }
+  cleanup(): void {}
 
   resize(_ev: UIEvent): void {
     return
@@ -655,7 +684,7 @@ class TicketScene implements BaseScene {
     }
   }
 
-  private async _loadTextures() {
+  private async _loadTextures(force?: boolean) {
     // Load textures for each named mesh
     // Create a texture loader
     const textureLoader = new THREE.TextureLoader()
@@ -663,11 +692,13 @@ class TicketScene implements BaseScene {
 
     const textureSetKey = this.state.secret ? 'secret' : this.state.platinum ? 'platinum' : 'basic'
 
-    if (this._internalState.loadedTextureType === textureSetKey) {
-      console.log('Textures already loaded. Active set:', textureSetKey)
-      return
-    } else {
-      console.log('Loading textures for set:', textureSetKey)
+    if (!force) {
+      if (this._internalState.loadedTextureType === textureSetKey) {
+        console.log('Textures already loaded. Active set:', textureSetKey)
+        return
+      } else {
+        console.log('Loading textures for set:', textureSetKey)
+      }
     }
 
     this._internalState.loadedTextureType = textureSetKey
@@ -754,7 +785,7 @@ class TicketScene implements BaseScene {
       texture.colorSpace = THREE.SRGBColorSpace
       texture.needsUpdate = true
 
-      console.log("Drawing texture on", textureKey, mesh)
+      console.log('Drawing texture on', textureKey, mesh)
       // Fix: Preserve the original material properties
       const originalMaterial = mesh.material
       const originalColor = mesh.material.color.clone()
@@ -870,6 +901,27 @@ class TicketScene implements BaseScene {
           this.texts.ticketNumberBack.x * canvas.width,
           this.texts.ticketNumberBack.y * canvas.height
         )
+
+        const seatCoord = this.state.ticketNumber % 32
+        const seatCol = seatCoord % 8
+        const seatRow = Math.floor(seatCoord / 8)
+        console.log('Seat coord:', seatCoord, seatCol, seatRow)
+
+        context.fillStyle = colorObjToRgb(colors.textNeonColor)
+
+        // Save the current context state
+        context.save()
+        // Translate the context based on seat coordinates
+        // Adjust these multipliers to control spacing between seats
+        context.translate(
+          this.texts.seatStart.x * canvas.width + (this.texts.seatPositions.x[seatCol] ?? 0) * canvas.width,
+          this.texts.seatStart.y * canvas.height + (this.texts.seatPositions.y[seatRow] ?? 0) * canvas.height
+        )
+        // Fill the path at the new position
+        context.fill(this.textureImages.secret.seatPath)
+        // Restore the context to its original state
+        context.restore()
+
         break
       }
       // Handle other texture types as needed
