@@ -46,7 +46,6 @@ const formId = 'pooling-configuration-form'
 
 const PoolingConfigurationFormSchema = z.object({
   default_pool_size: z.number().nullable(),
-  pool_mode: z.union([z.literal('transaction'), z.literal('session'), z.literal('statement')]),
   max_client_conn: z.number().nullable(),
 })
 
@@ -148,7 +147,6 @@ export const ConnectionPooling = () => {
   const form = useForm<z.infer<typeof PoolingConfigurationFormSchema>>({
     resolver: zodResolver(PoolingConfigurationFormSchema),
     defaultValues: {
-      pool_mode: undefined,
       default_pool_size: undefined,
       max_client_conn: null,
     },
@@ -188,7 +186,7 @@ export const ConnectionPooling = () => {
     supavisorConfig?.pool_mode === null && pgbouncerConfig?.pool_mode === null
 
   const onSubmit: SubmitHandler<z.infer<typeof PoolingConfigurationFormSchema>> = async (data) => {
-    const { pool_mode, default_pool_size } = data
+    const { default_pool_size } = data
 
     if (!projectRef) return console.error('Project ref is required')
 
@@ -196,14 +194,12 @@ export const ConnectionPooling = () => {
       {
         ref: projectRef,
         default_pool_size,
-        pool_mode: pool_mode === 'transaction' ? 'transaction' : 'session',
       },
       {
         onSuccess: (data) => {
           toast.success(`Successfully updated Pooler configuration`)
           if (data) {
             form.reset({
-              pool_mode: data.pool_mode as 'transaction' | 'session',
               default_pool_size: data.default_pool_size,
             })
           }
@@ -214,7 +210,6 @@ export const ConnectionPooling = () => {
 
   const resetForm = () => {
     form.reset({
-      pool_mode: pgbouncerConfig?.pool_mode || 'transaction',
       default_pool_size: (supavisorConfig || pgbouncerConfig)?.default_pool_size,
     })
   }
@@ -288,94 +283,6 @@ export const ConnectionPooling = () => {
                 className="flex flex-col gap-y-6 w-full"
                 onSubmit={form.handleSubmit(onSubmit)}
               >
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="pool_mode"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="horizontal"
-                      label="Dedicated Pooler Mode"
-                      description={
-                        disablePoolModeSelection ? (
-                          <Admonition
-                            type="note"
-                            title="Dedicated Pooler is only available for Pro Plan and above"
-                            description={
-                              <span className="prose text-sm">
-                                Free Plan users can only access our shared connection pooler. To use
-                                a dedicated pooler instance for your project,{' '}
-                                <Link
-                                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=connectionPooling`}
-                                  target="_blank"
-                                >
-                                  upgrade to Pro Plan
-                                </Link>
-                                .
-                              </span>
-                            }
-                          />
-                        ) : (
-                          <>
-                            {field.value === 'transaction' ? (
-                              <Admonition
-                                type="warning"
-                                title="Pool mode will be set to transaction permanently on port 6543"
-                                description="This will take into effect once saved. If you are using Session mode with port 6543 in your applications, please update to use port 5432 instead before saving."
-                              />
-                            ) : (
-                              <>
-                                <Admonition
-                                  className="mt-2"
-                                  showIcon={false}
-                                  type="default"
-                                  title="Set to transaction mode to use both pooling modes concurrently"
-                                  description="Session mode can be used concurrently with transaction mode by
-                                                    using 5432 for session and 6543 for transaction. However, by
-                                                    configuring the pooler mode to session here, you will not be able
-                                                    to use transaction mode at the same time."
-                                />
-                              </>
-                            )}
-                            <p className="mt-2">
-                              Specify when a connection can be returned to the pool.{' '}
-                              <span
-                                tabIndex={0}
-                                onClick={() => snap.setShowPoolingModeHelper(true)}
-                                className="transition cursor-pointer underline underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-foreground"
-                              >
-                                Learn more about pool modes
-                              </span>
-                              .
-                            </p>
-                          </>
-                        )
-                      }
-                    >
-                      <FormControl_Shadcn_>
-                        <Listbox
-                          disabled={disablePoolModeSelection}
-                          value={field.value}
-                          className="w-full"
-                          onChange={(value) => field.onChange(value)}
-                        >
-                          <Listbox.Option key="transaction" label="Transaction" value="transaction">
-                            <p>Transaction mode</p>
-                            <p className="text-xs text-foreground-lighter">
-                              {TRANSACTION_MODE_DESCRIPTION}
-                            </p>
-                          </Listbox.Option>
-                          <Listbox.Option key="session" label="Session" value="session">
-                            <p>Session mode</p>
-                            <p className="text-xs text-foreground-lighter">
-                              {SESSION_MODE_DESCRIPTION}
-                            </p>
-                          </Listbox.Option>
-                        </Listbox>
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-
                 <FormField_Shadcn_
                   control={form.control}
                   name="default_pool_size"
