@@ -86,7 +86,7 @@ describe('Table Row Query', () => {
               end as name,status,
                 case 
                   when octet_length(history::text) > 10240 
-                  then (select array_cat(history[1:500]::text[], array['...']))::text[]
+                  then (select array_cat(history[1:50]::text[], array['...']))::text[]
                   else history::text[]
                 end
                from public.test_enum_array order by test_enum_array.id asc nulls first limit 10 offset 0;"
@@ -151,7 +151,7 @@ describe('Table Row Query', () => {
               end as name,status,
                 case 
                   when octet_length(history::text) > 10240 
-                  then (select array_cat(history[1:500]::text[], array['...']))::text[]
+                  then (select array_cat(history[1:50]::text[], array['...']))::text[]
                   else history::text[]
                 end
                from public.test_enum_array where status = 'active' order by test_enum_array.id asc nulls first limit 10 offset 0;"
@@ -189,7 +189,7 @@ describe('Table Row Query', () => {
               end as name,status,
                 case 
                   when octet_length(history::text) > 10240 
-                  then (select array_cat(history[1:500]::text[], array['...']))::text[]
+                  then (select array_cat(history[1:50]::text[], array['...']))::text[]
                   else history::text[]
                 end
                from public.test_enum_array where history = ARRAY['active']::status_type[] order by test_enum_array.id asc nulls first limit 10 offset 0;"
@@ -234,7 +234,7 @@ describe('Table Row Query', () => {
               end as name,
                 case 
                   when octet_length(tags::text) > 10240 
-                  then (select array_cat(tags[1:500]::text[], array['...']))::text[]
+                  then (select array_cat(tags[1:50]::text[], array['...']))::text[]
                   else tags::text[]
                 end
                from public.test_array_table order by test_array_table.id asc nulls first limit 10 offset 0;"
@@ -552,18 +552,18 @@ describe('Table Row Query', () => {
 
       // Verify the SQL contains the array truncation logic
       expect(sql).toMatchInlineSnapshot(`
-      "select id,case
-              when octet_length(name::text) > 256 
-              then left(name::text, 256) || '...'
-              else name::text
-            end as name,
-              case 
-                when octet_length(large_array::text) > 256 
-                then (select array_cat(large_array[1:500]::text[], array['...']))::text[]
-                else large_array::text[]
-              end
-             from public.test_large_array_table order by test_large_array_table.id asc nulls first limit 10 offset 0;"
-    `)
+        "select id,case
+                when octet_length(name::text) > 256 
+                then left(name::text, 256) || '...'
+                else name::text
+              end as name,
+                case 
+                  when octet_length(large_array::text) > 256 
+                  then (select array_cat(large_array[1:50]::text[], array['...']))::text[]
+                  else large_array::text[]
+                end
+               from public.test_large_array_table order by test_large_array_table.id asc nulls first limit 10 offset 0;"
+      `)
 
       // Execute the SQL and verify results
       const start = performance.now()
@@ -1095,7 +1095,20 @@ describe('Table Row Query', () => {
 
       // E2E Test: Execute the SQL and verify results
       const queryResult = await db.executeQuery(sql)
-      expect(queryResult).toMatchInlineSnapshot(``)
+      expect(queryResult).toMatchInlineSnapshot(`
+        [
+          {
+            "description": "Description 1",
+            "id": 1,
+            "name": "Foreign Item 1",
+          },
+          {
+            "description": "Description 2",
+            "id": 2,
+            "name": "Foreign Item 2",
+          },
+        ]
+      `)
     })
   })
 })

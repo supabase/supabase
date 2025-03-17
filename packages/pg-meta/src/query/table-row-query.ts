@@ -8,6 +8,8 @@ import { PGMaterializedView } from '../pg-meta-materialized-views'
 
 // Constants
 export const MAX_CHARACTERS = 10 * 1024 // 10KB
+// Max array size
+export const MAX_ARRAY_SIZE = 50
 
 // Types for query building
 export const sortZod = z.object({
@@ -82,9 +84,6 @@ const LARGE_COLUMNS_TYPES_SET = new Set(LARGE_COLUMNS_TYPES)
 
 // Threshold count for applying default sort
 export const THRESHOLD_COUNT = 100000
-
-// Max array size
-const MAX_ARRAY_SIZE = 500
 
 // Return the primary key columns if exists, otherwise return the first column to use as a default sort
 export const getDefaultOrderByColumns = (table: Pick<PGTable, 'primary_keys' | 'columns'>) => {
@@ -163,8 +162,10 @@ export const getTableRowsSql = ({
       (expr) => expr === ident(columnName) // if the column is selected without any truncation applied to it
     )
     if (index >= 0) {
-      // We cast to text[] but limit the array size if the size of the array is too large
+      // We cast to text[] but limit the array size if the total size of the array is too large (same logic than for text fields)
       // This returns the first MAX_ARRAY_SIZE elements of the array (adjustable) and adds '...' if truncated
+      // NOTE: this is not optimal, as the first element in the array could still be very large (more than 10Kb) and in such case
+      // the trimming might fail.
       selectExpressions[index] = `
         case 
           when octet_length(${ident(columnName)}::text) > ${maxCharacters} 
