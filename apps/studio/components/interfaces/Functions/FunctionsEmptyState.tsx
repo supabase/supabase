@@ -2,6 +2,8 @@ import { useParams } from 'common'
 import { ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { ResourceItem } from 'components/ui/Resource/ResourceItem'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Code, Terminal } from 'lucide-react'
 import Link from 'next/link'
@@ -27,6 +29,9 @@ export const FunctionsEmptyState = () => {
   const router = useRouter()
   const { setAiAssistantPanel } = useAppStateSnapshot()
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
+
+  const { mutate: sendEvent } = useSendEventMutation()
+  const org = useSelectedOrganization()
 
   return (
     <>
@@ -69,7 +74,7 @@ export const FunctionsEmptyState = () => {
             </p>
             <Button
               type="default"
-              onClick={() =>
+              onClick={() => {
                 setAiAssistantPanel({
                   open: true,
                   initialInput: 'Create a new edge function that ...',
@@ -83,7 +88,12 @@ export const FunctionsEmptyState = () => {
                     ],
                   },
                 })
-              }
+                sendEvent({
+                  action: 'edge_function_ai_assistant_button_clicked',
+                  properties: { origin: 'no_functions_block' },
+                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                })
+              }}
             >
               Open Assistant
             </Button>
@@ -99,7 +109,17 @@ export const FunctionsEmptyState = () => {
               <p className="text-sm text-foreground-light mb-4 mt-1">
                 Create and edit functions directly in the browser. Download to local at any time.
               </p>
-              <Button type="default" onClick={() => router.push(`/project/${ref}/functions/new`)}>
+              <Button
+                type="default"
+                onClick={() => {
+                  router.push(`/project/${ref}/functions/new`)
+                  sendEvent({
+                    action: 'edge_function_via_editor_button_clicked',
+                    properties: { origin: 'no_functions_block' },
+                    groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                  })
+                }}
+              >
                 Open Editor
               </Button>
             </div>
@@ -116,7 +136,13 @@ export const FunctionsEmptyState = () => {
               <ResourceItem
                 key={template.name}
                 media={<Code strokeWidth={1.5} size={16} className="-translate-y-[9px]" />}
-                onClick={() => {}}
+                onClick={() => {
+                  sendEvent({
+                    action: 'edge_function_template_clicked',
+                    properties: { templateName: template.name, origin: 'functions_page' },
+                    groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                  })
+                }}
               >
                 <Link href={`/project/${ref}/functions/new?template=${template.value}`}>
                   <p>{template.name}</p>
