@@ -20,6 +20,18 @@ export type CustomerStoryType = {
 export const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
+    title:
+      'Quilia Empowers Personal Injury Clients with Streamlined Data Management using Supabase',
+    description:
+      'Migrating to Supabase resulted in a 75% reduction in development time, 50% lower costs, and enhanced security for sensitive client data.',
+    organization: 'Quilia',
+    imgUrl: 'images/customers/logos/quilia.png',
+    logo: '/images/customers/logos/quilia.png',
+    logo_inverse: '/images/customers/logos/light/quilia.png',
+    url: '/customers/quilia',
+  },
+  {
+    type: 'Customer Story',
     title: "Resend's Journey with Supabase: Scaling Email Infrastructure with Ease",
     description:
       'Scaling seamlessly to 5,000+ paying customers & millions of emails sent daily with Supabase',

@@ -22,7 +22,7 @@
     "dayjs": "^1.11.13",
     "framer-motion": "^11.1.9",
     "github-slugger": "^2.0.0",
-    "lodash": "*",
+    "lodash": "^4.17.21",
     "lucide-react": "*",
     "mdast": "^3.0.0",
     "monaco-editor": "*",
@@ -65,6 +65,7 @@
     "typescript": "~5.5.0",
     "unified": "^11.0.5",
     "vfile": "^6.0.3",
+    "vite": "^6.0.0",
     "vitest": "^3.0.0"
   },
   "peerDependencies": {

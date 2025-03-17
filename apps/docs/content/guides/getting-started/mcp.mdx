@@ -63,6 +63,16 @@ This assumes you have Node.js and npx installed. If you don't have Node.js or pr
 
 </Admonition>
 
+<Admonition type="note" title="Windows users">
+
+If you run Node.js and npx in WSL instead of directly on your Windows host, you'll need to prefix the command with `wsl`:
+
+```shell
+wsl npx -y @modelcontextprotocol/server-postgres <connection-string>
+```
+
+</Admonition>
+
 Below are some ways to connect to the Postgres MCP server using popular AI tools:
 
 #### Cursor
