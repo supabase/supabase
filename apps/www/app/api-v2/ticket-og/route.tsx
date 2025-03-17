@@ -15,7 +15,7 @@ const corsHeaders = {
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 
-const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw13`
+const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw14`
 
 // Load custom font
 const FONT_URL = `${STORAGE_URL}/assets/font/CircularStd-Book.otf`
@@ -213,7 +213,7 @@ export async function GET(req: Request, res: Response) {
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
-      .upload(`launch-week/lw13/og/${ticketType}/${username}.png`, generatedTicketImage.body!, {
+      .upload(`launch-week/lw14/og/${ticketType}/${username}.png`, generatedTicketImage.body!, {
         contentType: 'image/png',
         // cacheControl: `${60 * 60 * 24 * 7}`,
         cacheControl: `0`,

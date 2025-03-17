@@ -137,7 +137,7 @@ class TicketScene implements BaseScene {
       y: 721 / 1400,
     },
     date: {
-      x: 1249 / 2000,
+      x: 1185 / 2000,
       y: 255 / 1400,
     },
     ticketNumber: {
@@ -252,7 +252,7 @@ class TicketScene implements BaseScene {
         username: options.user.name ?? '',
         species: 'Modern Human',
         earth: 'Earth',
-        date: '03/31–04/04',
+        date: 'MAR 31—APR 4',
         // Start assigning seats from A001
         seatCode: (466561 + (options.user.ticketNumber || 0)).toString(36),
       },
@@ -399,6 +399,19 @@ class TicketScene implements BaseScene {
 
   setVisible(value: boolean) {
     this.state.visible = value
+  }
+
+  setTicketNumber(ticketNumber: number) {
+    this.state.ticketNumber = ticketNumber
+    this.state.texts.seatCode = (466561 + ticketNumber).toString(36)
+  }
+
+  setUserName(name: string) {
+    this.state.texts.username = name
+  }
+
+  reloadTextures() {
+    this._loadTextures(true)
   }
 
   private _enableSecretEffects() {
