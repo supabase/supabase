@@ -2,6 +2,9 @@ import { z } from 'zod'
 import { ident } from '../pg-format'
 import { PGTable } from '../pg-meta-tables'
 import { Query } from './Query'
+import { PGView } from '../pg-meta-views'
+import { PGForeignTable } from '../pg-meta-foreign-tables'
+import { PGMaterializedView } from '../pg-meta-materialized-views'
 
 // Constants
 export const MAX_CHARACTERS = 10 * 1024 // 10KB
@@ -22,14 +25,21 @@ export const filterZod = z.object({
 
 export type Sort = z.infer<typeof sortZod>
 export type Filter = z.infer<typeof filterZod>
+export type TableLikeEntity = PGTable | PGView | PGForeignTable | PGMaterializedView
 
 export interface BuildTableRowsQueryArgs {
-  table: PGTable
+  table: TableLikeEntity
   filters?: Filter[]
   sorts?: Sort[]
   limit?: number
   page?: number
+  maxCharacters?: number
+  maxArraySize?: number
 }
+
+// Text and JSON types that should be truncated
+export const TEXT_TYPES = ['text', 'varchar', 'char', 'character varying', 'character']
+export const JSON_TYPES = ['json', 'jsonb']
 
 // Additional PostgreSQL types that can hold large values and should be truncated
 export const ADDITIONAL_LARGE_TYPES = [
@@ -37,16 +47,7 @@ export const ADDITIONAL_LARGE_TYPES = [
   'bytea', // Binary data
   'xml', // XML data
   'hstore', // Key-value store
-  'oid', // Object identifier for large objects
   'clob', // Character large object
-  '_text', // Array of text
-  '_varchar', // Array of varchar
-  '_json', // Array of json
-  '_jsonb', // Array of jsonb
-  '_xml', // Array of XML
-  'uuid[]', // Array of UUIDs
-  'text[]', // Another way to denote text arrays
-  'varchar[]', // Another way to denote varchar arrays
 
   // Extension-specific types
   // pgvector extension (for AI/ML/RAG applications)
@@ -76,179 +77,63 @@ export const ADDITIONAL_LARGE_TYPES = [
   'citext', // Case-insensitive text
 ]
 
-// Text and JSON types that should be truncated
-export const TEXT_TYPES = ['text', 'varchar', 'char', 'character varying', 'character']
-export const JSON_TYPES = ['json', 'jsonb']
+export const LARGE_COLUMNS_TYPES = [...TEXT_TYPES, ...JSON_TYPES, ...ADDITIONAL_LARGE_TYPES]
+const LARGE_COLUMNS_TYPES_SET = new Set(LARGE_COLUMNS_TYPES)
 
 // Threshold count for applying default sort
 export const THRESHOLD_COUNT = 100000
 
+// Max array size
+const MAX_ARRAY_SIZE = 500
+
 // Return the primary key columns if exists, otherwise return the first column to use as a default sort
-export const getDefaultOrderByColumns = (table: PGTable) => {
-  const primaryKeyColumns = table.primary_keys.map((pk) => pk.name)
-  if (primaryKeyColumns.length === 0 && table.columns && table.columns.length > 0) {
-    return [table.columns[0]?.name]
-  } else {
+export const getDefaultOrderByColumns = (table: Pick<PGTable, 'primary_keys' | 'columns'>) => {
+  const primaryKeyColumns = table.primary_keys?.map((pk) => pk.name)
+  if (primaryKeyColumns && primaryKeyColumns.length > 0) {
     return primaryKeyColumns
   }
+  if (table.columns && table.columns.length > 0) {
+    return [table.columns[0].name]
+  }
+  return []
 }
 
 /**
  * Determines if a column type should be truncated based on its format and dataType
  */
-export const shouldTruncateColumn = (column: any): boolean => {
-  // Check TEXT_TYPES and JSON_TYPES first
-  if (TEXT_TYPES.includes(column.format) || JSON_TYPES.includes(column.format)) {
-    return true
-  }
+export const shouldTruncateColumn = (columnFormat: string): boolean =>
+  LARGE_COLUMNS_TYPES_SET.has(columnFormat.toLowerCase())
 
-  // Check if dataType is in the additional large types list
-  if (ADDITIONAL_LARGE_TYPES.includes(column.dataType?.toLowerCase())) {
-    return true
-  }
+export const DEFAULT_PAGE_SIZE = 100
 
-  // Check if it's an array type that might contain large values
-  if (column.dataType?.toLowerCase() === 'array') {
-    return true
-  }
+export function getPagination(page?: number, size: number = DEFAULT_PAGE_SIZE) {
+  const limit = size
+  const from = page ? page * limit : 0
+  const to = page ? from + size - 1 : size - 1
 
-  // Check for user-defined types or domain types that might be large
-  if (column.format === 'user-defined' || column.format === 'domain') {
-    return true
-  }
-
-  // Check if the dataType contains 'vector' (for embeddings) regardless of exact name
-  if (column.dataType?.toLowerCase().includes('vector')) {
-    return true
-  }
-
-  // Check if the dataType starts with an underscore (PostgreSQL array notation)
-  if (column.dataType?.startsWith('_')) {
-    return true
-  }
-
-  return false
-}
-
-/**
- * Get pagination parameters
- */
-function getPagination(page: number, size?: number): { from: number; to: number } {
-  const limit = size ?? 100
-  const from = page * limit
-  const to = page * limit + limit - 1
   return { from, to }
 }
 
-/**
- * Escape a string value for SQL
- * Note: This is a simple implementation. For production code,
- * consider using parameterized queries instead.
- */
-function escapeSqlString(value: string): string {
-  // Replace single quotes with two single quotes to escape them
-  return `'${value.replace(/'/g, "''")}'`
-}
-
-/**
- * Format filter value for SQL query based on the column data type
- */
-function formatFilterValue(table: PGTable, filter: Filter): string {
-  // If the value is null or undefined, return 'NULL'
-  if (filter.value === undefined || filter.value === null) {
-    return 'NULL'
-  }
-
-  // Find the column definition
-  const column = table.columns?.find((col) => col.name === filter.column)
-
-  // If column not found, default to string escaping
-  if (!column) {
-    return escapeSqlString(filter.value)
-  }
-
-  // Extract data type, removing array indicators and size constraints
-  const baseDataType = column.data_type
-    .toLowerCase()
-    .replace(/\[\]$/, '') // Remove array notation
-    .replace(/\(\d+\)/, '') // Remove size constraints like varchar(255)
-
-  // ILIKE and NOT ILIKE operators can use wildcards, so we adjust the value
-  if (filter.operator.toUpperCase() === 'ILIKE' || filter.operator.toUpperCase() === 'NOT ILIKE') {
-    return escapeSqlString(`%${filter.value}%`)
-  }
-
-  // Format based on data type
-  if (
-    baseDataType.includes('int') ||
-    baseDataType === 'numeric' ||
-    baseDataType === 'decimal' ||
-    baseDataType === 'real' ||
-    baseDataType === 'double precision' ||
-    baseDataType === 'float'
-  ) {
-    // Numeric types
-    const num = parseFloat(filter.value)
-    return isNaN(num) ? 'NULL' : num.toString()
-  } else if (baseDataType === 'boolean') {
-    // Boolean type
-    return filter.value.toLowerCase() === 'true' ? 'true' : 'false'
-  } else if (baseDataType.includes('json')) {
-    // JSON types (json, jsonb)
-    try {
-      // Try to parse as JSON and stringify to ensure valid format
-      const parsedJson = JSON.parse(filter.value)
-      return `'${JSON.stringify(parsedJson).replace(/'/g, "''")}'::jsonb`
-    } catch (e) {
-      // If not valid JSON, treat as text
-      return escapeSqlString(filter.value)
-    }
-  } else if (baseDataType.includes('time') || baseDataType.includes('date')) {
-    // Date and timestamp types
-    if (filter.value.toLowerCase() === 'now()') {
-      return 'NOW()'
-    } else {
-      return escapeSqlString(filter.value)
-    }
-  } else if (baseDataType.includes('uuid')) {
-    // UUID type
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-    if (uuidRegex.test(filter.value)) {
-      return escapeSqlString(filter.value)
-    } else {
-      return 'NULL'
-    }
-  } else {
-    // Default to string for all other types
-    return escapeSqlString(filter.value)
-  }
-}
-
-/**
- * Builds an optimized SQL query for table rows with efficient handling of large text fields
- * by applying truncation in the main query.
- */
-export const buildTableRowsQuery = ({
+export const getTableRowsSql = ({
   table,
   filters = [],
   sorts = [],
   page,
   limit,
-}: BuildTableRowsQueryArgs): string => {
-  if (!table) return ``
+  maxCharacters = MAX_CHARACTERS,
+  maxArraySize = MAX_ARRAY_SIZE,
+}: BuildTableRowsQueryArgs) => {
+  if (!table || !table.columns) return ``
 
   const query = new Query()
 
-  // Get all column names
-  if (!table.columns) {
-    return ``
-  }
-
-  const allColumnNames = table.columns.map((column) => column.name)
+  const allColumnNames = table.columns
+    .sort((a, b) => a.ordinal_position - b.ordinal_position)
+    .map((column) => column.name)
 
   // Identify columns that might need truncation
   const columnsToTruncate = table.columns
-    .filter((column) => shouldTruncateColumn(column))
+    .filter((column) => shouldTruncateColumn(column.format))
     .map((column) => column.name)
 
   // Create select expressions for each column, applying truncation only to needed columns
@@ -256,11 +141,11 @@ export const buildTableRowsQuery = ({
     const escapedColumnName = ident(columnName)
 
     if (columnsToTruncate.includes(columnName)) {
-      return `CASE
-        WHEN octet_length(${escapedColumnName}::text) > ${MAX_CHARACTERS} 
-        THEN left(${escapedColumnName}::text, ${MAX_CHARACTERS}) || '...'
-        ELSE ${escapedColumnName}::text
-      END AS ${escapedColumnName}`
+      return `case
+        when octet_length(${escapedColumnName}::text) > ${maxCharacters} 
+        then left(${escapedColumnName}::text, ${maxCharacters}) || '...'
+        else ${escapedColumnName}::text
+      end as ${escapedColumnName}`
     } else {
       return escapedColumnName
     }
@@ -268,25 +153,25 @@ export const buildTableRowsQuery = ({
 
   // Handle array-based columns
   const arrayBasedColumnNames = table.columns
-    .filter(
-      (column) => (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
-    )
+    .filter((column) => column.data_type.toLowerCase() === 'array')
     .map((column) => column.name)
 
   // Add array casting for array-based enum columns
   arrayBasedColumnNames.forEach((columnName) => {
     // Find this column in our select expressions
     const index = selectExpressions.findIndex(
-      (expr) => expr === ident(columnName) || expr.startsWith(`CASE WHEN`)
+      (expr) => expr === ident(columnName) // if the column is selected without any truncation applied to it
     )
     if (index >= 0) {
-      // If it's a column that needs truncation, we need to keep the truncation
-      if (columnsToTruncate.includes(columnName)) {
-        // We won't modify it, as we need to keep the truncation logic
-      } else {
-        // Otherwise just add the text[] cast
-        selectExpressions[index] = `${ident(columnName)}::text[]`
-      }
+      // We cast to text[] but limit the array size if the size of the array is too large
+      // This returns the first MAX_ARRAY_SIZE elements of the array (adjustable) and adds '...' if truncated
+      selectExpressions[index] = `
+        case 
+          when octet_length(${ident(columnName)}::text) > ${maxCharacters} 
+          then (select array_cat(${ident(columnName)}[1:${maxArraySize}]::text[], array['...']))::text[]
+          else ${ident(columnName)}::text[]
+        end
+      `
     }
   })
 
@@ -295,17 +180,15 @@ export const buildTableRowsQuery = ({
   // Properly escape the table name and schema
   let queryChains = query.from(table.name, table.schema).select(selectClause)
 
-  filters
-    .filter((x) => x.value && x.value != '')
-    .forEach((x) => {
-      const value = formatFilterValue(table, x)
-      queryChains = queryChains.filter(x.column, x.operator, value)
-    })
+  filters.forEach((x) => {
+    queryChains = queryChains.filter(x.column, x.operator, x.value)
+  })
 
   // If sorts is empty and table row count is within threshold, use the primary key as the default sort
-  const liveRowCount = table.live_rows_estimate || 0
+  // Only apply for selections over a Table, not View, MaterializedViews, ...
+  const liveRowCount = (table as PGTable).live_rows_estimate || 0
   if (sorts.length === 0 && liveRowCount <= THRESHOLD_COUNT && table.columns.length > 0) {
-    const defaultOrderByColumns = getDefaultOrderByColumns(table)
+    const defaultOrderByColumns = getDefaultOrderByColumns(table as PGTable)
     if (defaultOrderByColumns.length > 0) {
       defaultOrderByColumns.forEach((col) => {
         queryChains = queryChains.order(table.name, col, true, true)
@@ -324,6 +207,6 @@ export const buildTableRowsQuery = ({
 
 export default {
   shouldTruncateColumn,
-  buildTableRowsQuery,
+  getTableRowsSql,
   getDefaultOrderByColumns,
 }
