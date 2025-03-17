@@ -45,6 +45,7 @@ export async function getGraphDataFromTables(
         id: table.id,
         name: table.name,
         isForeign: false,
+        comment: table.comment,
         columns,
       } as TableNodeData,
       position: { x: 0, y: 0 },
