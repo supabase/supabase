@@ -78,7 +78,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
       initialValue.endsWith('...') &&
       initialValue.length > MAX_CHARACTERS) ||
     // if the value is an array which total representation is > MAX_CHARACTERS
-    // we'll select the first 500 elements and add a "..." last element at the end of it
+    // we'll select the first MAX_ARRAY_SIZE elements and add a "..." last element at the end of it
     (typeof initialValue === 'string' &&
       // If the string represent an array finishing with "..." element
       initialValue.startsWith('["') &&
