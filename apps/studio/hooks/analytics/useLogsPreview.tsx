@@ -186,7 +186,7 @@ function useLogsPreview({
       // refresh each minute only
       refetchInterval: 60000,
       // only enable if no errors are found and data has already been loaded
-      enabled: !error && data && data.pages.length > 0 ? true : false,
+      enabled: !error && data && data?.pages?.length > 0 ? true : false,
     }
   )
 
