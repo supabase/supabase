@@ -433,7 +433,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Alpha] Lists all third-party auth integrations */
+    /** Lists all third-party auth integrations */
     get: operations['listTPAForProject']
     put?: never
     /** Creates a new third-party auth integration */
@@ -451,11 +451,11 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Alpha] Get a third-party integration */
+    /** Get a third-party integration */
     get: operations['getTPAForProject']
     put?: never
     post?: never
-    /** [Alpha] Removes a third-party auth integration */
+    /** Removes a third-party auth integration */
     delete: operations['deleteTPAForProject']
     options?: never
     head?: never
@@ -2159,7 +2159,6 @@ export interface components {
     }
     SupavisorConfigResponse: {
       connection_string: string
-      connectionString: string
       /** @enum {string} */
       database_type: 'PRIMARY' | 'READ_REPLICA'
       db_host: string

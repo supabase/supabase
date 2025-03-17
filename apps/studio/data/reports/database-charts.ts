@@ -122,6 +122,24 @@ export const getReportAttributes = () => [
         label: 'postgres',
         tooltip: 'Postgres connections',
       },
+      // {
+      //   attribute: 'client_connections_postgres_active',
+      //   provider: 'infra-monitoring',
+      //   label: 'pg active',
+      //   tooltip: 'Postgres active connections',
+      // },
+      // {
+      //   attribute: 'client_connections_postgres_idle',
+      //   provider: 'infra-monitoring',
+      //   label: 'pg idle',
+      //   tooltip: 'Postgres idle connections',
+      // },
+      // {
+      //   attribute: 'client_connections_postgres_idle_in_transaction',
+      //   provider: 'infra-monitoring',
+      //   label: 'pg idle in transaction',
+      //   tooltip: 'Postgres idle in transaction connections',
+      // },
       {
         attribute: 'supavisor_connections_active',
         provider: 'infra-monitoring',

@@ -4335,7 +4335,7 @@ export interface components {
         lint_category: string | null
         lint_name: string | null
         note: string | null
-        project_id: number
+        project_ref: string
       }[]
     }
     CreateOAuthAppBody: {
@@ -5480,7 +5480,7 @@ export interface components {
         lint_category: string | null
         lint_name: string | null
         note: string | null
-        project_id: number
+        project_ref: string
       }[]
     }
     LoadBalancerDatabase: {
@@ -5772,23 +5772,19 @@ export interface components {
     }
     PgbouncerConfigResponse: {
       connection_string: string
-      connectionString: string
       db_dns_name: string
       db_host: string
       db_name: string
       db_port: number
       db_user: string
       default_pool_size?: number
-      ignore_startup_parameters?: string
+      ignore_startup_parameters: string
       inserted_at: string
       max_client_conn?: number
       pgbouncer_enabled: boolean
-      /** @enum {string} */
-      pgbouncer_status: 'COMING_DOWN' | 'COMING_UP' | 'DISABLED' | 'ENABLED' | 'RELOADING'
-      /** @enum {string} */
-      pool_mode?: 'transaction' | 'session' | 'statement'
+      pgbouncer_status: Record<string, never>
+      pool_mode: Record<string, never>
       ssl_enforced: boolean
-      supavisor_enabled: boolean
     }
     PgbouncerStatusResponse: {
       active: boolean
@@ -6653,7 +6649,6 @@ export interface components {
     }
     SupavisorConfigResponse: {
       connection_string: string
-      connectionString: string
       /** @enum {string} */
       database_type: 'PRIMARY' | 'READ_REPLICA'
       db_host: string
@@ -7091,7 +7086,7 @@ export interface components {
     UpdatePgbouncerConfigBody: {
       default_pool_size?: number
       ignore_startup_parameters: string
-      max_client_conn?: number | null
+      max_client_conn?: number
       pgbouncer_enabled: boolean
       /** @enum {string} */
       pool_mode: 'transaction' | 'session' | 'statement'
@@ -7106,12 +7101,10 @@ export interface components {
     UpdatePoolingConfigResponse: {
       default_pool_size?: number
       ignore_startup_parameters: string
-      max_client_conn?: number | null
+      max_client_conn?: number
       pgbouncer_enabled: boolean
-      /** @enum {string} */
-      pgbouncer_status: 'COMING_DOWN' | 'COMING_UP' | 'DISABLED' | 'ENABLED' | 'RELOADING'
-      /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
+      pgbouncer_status: Record<string, never>
+      pool_mode: Record<string, never>
     }
     UpdatePostgresConfigBody: {
       effective_cache_size?: string
