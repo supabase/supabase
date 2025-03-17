@@ -46,7 +46,11 @@ class SceneRenderer {
   private _isDisposed = false
   private _isInitialized = false
 
-  constructor(public container: HTMLElement) {
+  constructor(
+    public container: HTMLElement,
+    private waitFor?: { init: Promise<void>; renderer: SceneRenderer }[],
+    private uuid?: string
+  ) {
     this.renderer = new WebGLRenderer({ antialias: true, alpha: true })
     this.composer = new EffectComposer(this.renderer)
 
@@ -70,13 +74,22 @@ class SceneRenderer {
   }
 
   async init(sceneInitializer: () => Promise<void>) {
-    if (this._isDisposed) {
+    console.log('SCENE RENDERER: Init call', this.waitFor?.length, this.uuid)
+    await Promise.allSettled(
+      this.waitFor?.filter((t) => t.renderer !== this).map((t) => t.init) || []
+    )
+
+    if(this._isDisposed) {
+      console.log('SCENE RENDERER: Already disposed before sceneInitializer', this.uuid)
       return
     }
 
+    console.log('SCENE RENDERER: Waited for all pending inits', this.waitFor?.length, this.uuid)
+
     await sceneInitializer()
 
-    if (this._isDisposed) {
+    if(this._isDisposed) {
+      console.log('SCENE RENDERER: Already disposed after sceneInitializer', this.uuid)
       return
     }
 
@@ -101,7 +114,18 @@ class SceneRenderer {
   }
 
   async activateScene(scene: BaseScene, main?: boolean) {
+    if(this._isDisposed) {
+      console.log('SCENE RENDERER: Already disposed before activateScene', this.uuid)
+      return
+    }
+
     const threeScene = await scene.setup(this)
+
+    if(this._isDisposed) {
+      console.log('SCENE RENDERER: Already disposed after activateScene', this.uuid)
+      return
+    }
+
     if (main && threeScene) {
       this.mainThreeJsScene = threeScene
     }
@@ -130,6 +154,8 @@ class SceneRenderer {
   }
 
   cleanup() {
+    console.log('SCENE RENDERER: Cleanup', this.uuid)
+
     this._isDisposed = true
     this.composer.dispose()
     this.renderer.dispose()
@@ -143,6 +169,15 @@ class SceneRenderer {
     if (this._resizeHandler) {
       window.removeEventListener('resize', this._resizeHandler)
       this._resizeHandler = null
+    }
+
+    if (this.waitFor) {
+      // Mutate array in place instead of replacing reference
+      this.waitFor.splice(
+        0,
+        this.waitFor.length,
+        ...this.waitFor.filter((t) => t.renderer === this)
+      )
     }
   }
 

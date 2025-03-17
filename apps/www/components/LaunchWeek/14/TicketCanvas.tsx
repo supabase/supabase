@@ -32,12 +32,16 @@ const TicketCanvas = ({
 }: TicketCanvasProps) => {
   const sceneRef = useRef<TicketScene | null>(null)
   const tunnelRef = useRef<TunnelScene | null>(null)
+  const initQueue = useRef<{ init: Promise<void>; renderer: SceneRenderer }[]>([])
   const setup = useCallback(
     (container: HTMLElement) => {
-      const sceneRenderer = new SceneRenderer(container)
+      const uuid = Math.random().toString(36).substring(7)
 
-      void sceneRenderer.init(async () => {
-        sceneRef.current = new TicketScene({
+      const sceneRenderer = new SceneRenderer(container, initQueue.current, uuid)
+
+      const initPromise = sceneRenderer.init(async () => {
+        const scene = new TicketScene({
+          defaultVisible: sceneRef.current?.state.visible,
           defaultSecret: secret,
           defaultPlatinum: platinum,
           user,
@@ -51,12 +55,16 @@ const TicketCanvas = ({
           },
         })
 
-        tunnelRef.current = new TunnelScene({
+        const tunnel = new TunnelScene({
           defaultVisible: true,
         })
-        await sceneRenderer.activateScene(sceneRef.current, true)
-        await sceneRenderer.activateScene(tunnelRef.current)
+        await sceneRenderer.activateScene(scene, true)
+        await sceneRenderer.activateScene(tunnel)
+        sceneRef.current = scene
+        tunnelRef.current = tunnel
       })
+
+      initQueue.current.push({ init: initPromise, renderer: sceneRenderer })
 
       return sceneRenderer
     },

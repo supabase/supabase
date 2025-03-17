@@ -1,6 +1,6 @@
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Session } from '@supabase/supabase-js'
 import TicketCanvas from '~/components/LaunchWeek/14/TicketCanvas'
 import DefaultLayout from '~/components/Layouts/Default'

@@ -163,12 +163,7 @@ class TicketScene implements BaseScene {
         688.43 / 2000,
         788.63 / 2000,
       ],
-      y: [
-        0 / 1400,
-        71.61 / 1400,
-        163.5 / 1400,
-        235.54 / 1400
-      ],
+      y: [0 / 1400, 71.61 / 1400, 163.5 / 1400, 235.54 / 1400],
     },
   }
 
@@ -386,7 +381,6 @@ class TicketScene implements BaseScene {
     for (const intersect of intersects) {
       const clickedMesh = intersect.object as THREE.Mesh
 
-      console.log((clickedMesh.material as THREE.Material).name)
       // Handle click based on which mesh was clicked
       if (clickedMesh === this._namedMeshes.TicketFrontWebsiteButton) {
         this.options.onWebsiteButtonClicked?.()
@@ -577,13 +571,9 @@ class TicketScene implements BaseScene {
 
   private _updateTicketSize(time?: number) {
     if (this.state.visible) {
-      // console.log("Setting ticket visible")
-      // this._ticket?.scale.set(1, 1, 1)
       this._ticket?.scale.lerp(new Vector3(1, 1, 1), 0.01)
     } else {
-      // console.log("Setting ticket invisible")
       this._ticket?.scale.lerp(new Vector3(0, 0, 0), 0.01)
-      // this._ticket?.scale.set(0, 0, 0)
     }
 
     // Update world matrices after scaling to ensure raycaster works correctly
@@ -666,17 +656,15 @@ class TicketScene implements BaseScene {
 
     for (const part of mesh.children) {
       if (!(part instanceof THREE.Mesh)) {
-        console.warn(`Part is not a THREE.Mesh. Got:`, part)
         continue
       }
 
       if (!(part.material instanceof THREE.Material)) {
-        console.log(`Material is not an instance of THREE.Material. Got:`, part.material)
+        console.warn(`Material is not an instance of THREE.Material. Got:`, part.material)
         continue
       }
 
       if ((TicketScene.TEXTURE_NAMES as readonly string[]).includes(part.material.name)) {
-        console.log(`Found named mesh:`, part.material.name)
         this._namedMeshes[part.material.name as AvailableTextures] = part
       } else {
         console.warn(`Mesh ${part.material.name} is not a named texture`)
@@ -694,10 +682,7 @@ class TicketScene implements BaseScene {
 
     if (!force) {
       if (this._internalState.loadedTextureType === textureSetKey) {
-        console.log('Textures already loaded. Active set:', textureSetKey)
         return
-      } else {
-        console.log('Loading textures for set:', textureSetKey)
       }
     }
 
@@ -721,7 +706,6 @@ class TicketScene implements BaseScene {
     const allMeshes = Object.entries(this._namedMeshes)
     // Preload all textures and prepare canvases
     for (const [name, mesh] of allMeshes) {
-      console.log('Drawind texture', name)
       if (!mesh || !(mesh instanceof THREE.Mesh)) {
         console.warn(`Mesh ${name} is not a THREE.Mesh`)
         continue
@@ -743,7 +727,6 @@ class TicketScene implements BaseScene {
       // If we have an image for this texture
       const textureDescriptor = textureImageMap[textureKey]
       if (!textureDescriptor) {
-        console.warn(`No texture descriptor found for texture ${textureKey}`)
         continue
       }
 
@@ -785,7 +768,6 @@ class TicketScene implements BaseScene {
       texture.colorSpace = THREE.SRGBColorSpace
       texture.needsUpdate = true
 
-      console.log('Drawing texture on', textureKey, mesh)
       // Fix: Preserve the original material properties
       const originalMaterial = mesh.material
       const originalColor = mesh.material.color.clone()
@@ -905,7 +887,6 @@ class TicketScene implements BaseScene {
         const seatCoord = this.state.ticketNumber % 32
         const seatCol = seatCoord % 8
         const seatRow = Math.floor(seatCoord / 8)
-        console.log('Seat coord:', seatCoord, seatCol, seatRow)
 
         context.fillStyle = colorObjToRgb(colors.textNeonColor)
 
@@ -914,8 +895,10 @@ class TicketScene implements BaseScene {
         // Translate the context based on seat coordinates
         // Adjust these multipliers to control spacing between seats
         context.translate(
-          this.texts.seatStart.x * canvas.width + (this.texts.seatPositions.x[seatCol] ?? 0) * canvas.width,
-          this.texts.seatStart.y * canvas.height + (this.texts.seatPositions.y[seatRow] ?? 0) * canvas.height
+          this.texts.seatStart.x * canvas.width +
+            (this.texts.seatPositions.x[seatCol] ?? 0) * canvas.width,
+          this.texts.seatStart.y * canvas.height +
+            (this.texts.seatPositions.y[seatRow] ?? 0) * canvas.height
         )
         // Fill the path at the new position
         context.fill(this.textureImages.secret.seatPath)
