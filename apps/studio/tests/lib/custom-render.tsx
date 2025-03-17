@@ -1,8 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, RenderOptions } from '@testing-library/react'
-import { TestingAdapterProps } from './render-with-nuqs'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
 import { TooltipProvider } from 'ui'
+
+type AdapterProps = Parameters<typeof NuqsTestingAdapter>[0]
 
 const CustomWrapper = ({
   children,
@@ -11,7 +12,7 @@ const CustomWrapper = ({
 }: {
   children: React.ReactNode
   queryClient?: QueryClient
-  nuqs?: TestingAdapterProps
+  nuqs?: AdapterProps
 }) => {
   const _queryClient = queryClient ?? new QueryClient()
 
@@ -26,7 +27,7 @@ const CustomWrapper = ({
 
 type CustomRenderOpts = RenderOptions & {
   queryClient?: QueryClient
-  nuqs?: TestingAdapterProps
+  nuqs?: AdapterProps
 }
 
 export const customRender = (component: React.ReactElement, renderOptions?: CustomRenderOpts) => {
