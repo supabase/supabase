@@ -1,19 +1,23 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 import type { DataGridHandle } from 'react-data-grid'
+
+import { SupaRow } from 'components/grid/types'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { useTrackedState } from '../../store/Store'
 import { copyToClipboard, formatClipboardValue } from '../../utils/common'
 import { useKeyboardShortcuts } from './Hooks'
 
 type ShortcutsProps = {
   gridRef: React.RefObject<DataGridHandle>
+  rows: SupaRow[]
 }
 
-export function Shortcuts({ gridRef }: ShortcutsProps) {
+export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
+  const snap = useTableEditorTableStateSnapshot()
   const state = useTrackedState()
-  const { rows, gridColumns, selectedCellPosition } = state
-  const [metaKey, setMetaKey] = React.useState('Command')
+  const { gridColumns } = state
 
-  React.useEffect(() => {
+  const metaKey = useMemo(() => {
     function getClientOS() {
       return navigator?.appVersion.indexOf('Win') !== -1
         ? 'windows'
@@ -21,17 +25,16 @@ export function Shortcuts({ gridRef }: ShortcutsProps) {
           ? 'macos'
           : 'unknown'
     }
-    const metakey = getClientOS() === 'windows' ? 'Control' : 'Command'
-    setMetaKey(metakey)
+    return getClientOS() === 'windows' ? 'Control' : 'Command'
   }, [])
 
   useKeyboardShortcuts(
     {
       [`${metaKey}+ArrowUp`]: (event) => {
         event.stopPropagation()
-        if (selectedCellPosition) {
+        if (snap.selectedCellPosition) {
           const position = {
-            idx: selectedCellPosition?.idx ?? 0,
+            idx: snap.selectedCellPosition?.idx ?? 0,
             rowIdx: 0,
           }
           gridRef.current!.selectCell(position)
@@ -41,9 +44,9 @@ export function Shortcuts({ gridRef }: ShortcutsProps) {
       },
       [`${metaKey}+ArrowDown`]: (event) => {
         event.stopPropagation()
-        if (selectedCellPosition) {
+        if (snap.selectedCellPosition) {
           const position = {
-            idx: selectedCellPosition?.idx ?? 0,
+            idx: snap.selectedCellPosition?.idx ?? 0,
             rowIdx: rows.length > 1 ? rows.length - 1 : 0,
           }
           gridRef.current!.selectCell(position)
@@ -56,21 +59,21 @@ export function Shortcuts({ gridRef }: ShortcutsProps) {
         const fronzenColumns = gridColumns.filter((x) => x.frozen)
         const position = {
           idx: fronzenColumns.length,
-          rowIdx: selectedCellPosition?.rowIdx ?? 0,
+          rowIdx: snap.selectedCellPosition?.rowIdx ?? 0,
         }
         gridRef.current!.selectCell(position)
       },
       [`${metaKey}+ArrowRight`]: (event) => {
         event.stopPropagation()
         gridRef.current?.selectCell({
-          idx: gridColumns.length - 1,
-          rowIdx: selectedCellPosition?.rowIdx ?? 0,
+          idx: gridColumns.length - 2, // -2 because we don't want to select the end extra col
+          rowIdx: snap.selectedCellPosition?.rowIdx ?? 0,
         })
       },
       [`${metaKey}+c`]: (event) => {
         event.stopPropagation()
-        if (selectedCellPosition) {
-          const { idx, rowIdx } = selectedCellPosition
+        if (snap.selectedCellPosition) {
+          const { idx, rowIdx } = snap.selectedCellPosition
           if (idx > 0) {
             const colKey = gridColumns[idx].key
             const cellValue = rows[rowIdx]?.[colKey] ?? ''
