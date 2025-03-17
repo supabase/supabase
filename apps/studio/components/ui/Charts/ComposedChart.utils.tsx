@@ -4,6 +4,8 @@ import dayjs from 'dayjs'
 import { DateTimeFormats } from './Charts.constants'
 import { numberFormatter } from './Charts.utils'
 import { MultiAttribute } from './ComposedChartHandler'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import ReactMarkdown from 'react-markdown'
 
 interface CustomIconProps {
   color: string
@@ -164,15 +166,32 @@ const CustomLabel = ({ payload, attributes, showMaxValue }: CustomLabelProps) =>
     const attribute = attributes?.find((a) => a.attribute === entry.name)
     const isMax = entry.name === maxValueAttribute?.attribute
 
+    const Label = () => (
+      <span className="text-nowrap text-foreground-lighter pr-2">
+        {attribute?.label || entry.name}
+      </span>
+    )
+
     if (!showMaxValue && isMax) return null
+
+    const TContent = attribute?.tooltip
 
     return (
       <p key={entry.name} className="inline-flex md:flex-col gap-1 md:gap-0 w-fit text-foreground">
         <div className="flex items-center gap-1">
           {getIcon(entry.name, entry.color)}
-          <span className="text-nowrap text-foreground-lighter pr-2">
-            {attribute?.label || entry.name}
-          </span>
+          {!!attribute?.tooltip ? (
+            <Tooltip>
+              <TooltipTrigger>
+                <Label />
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="center" className="max-w-[250px]">
+                {attribute.tooltip}
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <Label />
+          )}
         </div>
       </p>
     )

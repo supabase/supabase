@@ -33,6 +33,7 @@ export type MultiAttribute = {
   isMaxValue?: boolean
   type?: 'line' | 'area-bar'
   omitFromTotal?: boolean
+  tooltip?: string
 }
 
 interface ComposedChartHandlerProps {
