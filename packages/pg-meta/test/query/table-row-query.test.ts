@@ -1,12 +1,8 @@
 import { expect, test, describe, afterAll, beforeAll } from 'vitest'
 import { createTestDatabase, cleanupRoot } from '../db/utils'
 import pgMeta from '../../src/index'
-import {
-  Filter,
-  getDefaultOrderByColumns,
-  getTableRowsSql,
-  Sort,
-} from '../../src/query/table-row-query'
+import { getDefaultOrderByColumns, getTableRowsSql } from '../../src/query/table-row-query'
+import { Sort, Filter } from '../../src/query'
 
 beforeAll(async () => {
   // Any global setup if needed

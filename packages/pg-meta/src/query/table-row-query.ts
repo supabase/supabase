@@ -1,7 +1,7 @@
-import { z } from 'zod'
 import { ident } from '../pg-format'
 import { PGTable } from '../pg-meta-tables'
 import { Query } from './Query'
+import { Sort, Filter } from './types'
 import { PGView } from '../pg-meta-views'
 import { PGForeignTable } from '../pg-meta-foreign-tables'
 import { PGMaterializedView } from '../pg-meta-materialized-views'
@@ -11,22 +11,6 @@ export const MAX_CHARACTERS = 10 * 1024 // 10KB
 // Max array size
 export const MAX_ARRAY_SIZE = 50
 
-// Types for query building
-export const sortZod = z.object({
-  column: z.string(),
-  table: z.string(),
-  ascending: z.boolean(),
-  nullsFirst: z.boolean(),
-})
-
-export const filterZod = z.object({
-  column: z.string(),
-  operator: z.enum(['=', '<>', '>', '<', '>=', '<=', '~~', '~~*', '!~~', '!~~*', 'in', 'is']),
-  value: z.string().optional(),
-})
-
-export type Sort = z.infer<typeof sortZod>
-export type Filter = z.infer<typeof filterZod>
 export type TableLikeEntity = PGTable | PGView | PGForeignTable | PGMaterializedView
 
 export interface BuildTableRowsQueryArgs {
