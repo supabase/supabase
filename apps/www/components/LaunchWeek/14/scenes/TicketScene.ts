@@ -21,6 +21,7 @@ interface TicketSceneState {
     species: string
     earth: string
     seatCode: string
+    date: string
   }
 }
 
@@ -168,7 +169,9 @@ class TicketScene implements BaseScene {
   state: TicketSceneState
 
   private _internalState = {
-    naturalPosition: new Vector3(0, 0, Math.PI),
+    naturalRotation: new Vector3(0, 0, Math.PI),
+    naturalPosition: new Vector3(0, 0, 0),
+
     fontsLoaded: false,
     loadedTextureType: null as 'basic' | 'secret' | 'platinum' | null,
     effectsIntensity: 0,
@@ -229,6 +232,7 @@ class TicketScene implements BaseScene {
         username: 'Goszczu 123425' ?? options.user.name ?? '',
         species: 'Modern Human',
         earth: 'Earth',
+        date: '03/31–04/04',
         // Start assigning seats from A001
         seatCode: (466561 + (options.user.ticketNumber || 0)).toString(36),
       },
@@ -251,7 +255,7 @@ class TicketScene implements BaseScene {
     this._ticket = gltf.scene.getObjectByName("Plane") as unknown as Scene
 
     if (!this.state.visible) this._ticket.scale.set(0, 0, 0)
-    this._ticket.rotation.setFromVector3(this._internalState.naturalPosition)
+    this._ticket.rotation.setFromVector3(this._internalState.naturalRotation)
 
     this._setCamera(context.camera)
     this._modelRenderPass = new RenderPass(gltf.scene as unknown as Scene, context.camera)
@@ -500,12 +504,12 @@ class TicketScene implements BaseScene {
       const lerpFactor = Math.min(dt ?? 0.05, 0.05)
       scene.rotation.x = MathUtils.lerp(
         scene.rotation.x,
-        this._internalState.naturalPosition.x + targetRotationX,
+        this._internalState.naturalRotation.x + targetRotationX,
         lerpFactor
       )
       scene.rotation.z = MathUtils.lerp(
         scene.rotation.z,
-        this._internalState.naturalPosition.z + targetRotationZ,
+        this._internalState.naturalRotation.z + targetRotationZ,
         lerpFactor
       )
     } else {
@@ -513,12 +517,12 @@ class TicketScene implements BaseScene {
       const lerpFactor = Math.min(dt ?? 0.03, 0.03)
       scene.rotation.x = MathUtils.lerp(
         scene.rotation.x,
-        this._internalState.naturalPosition.x,
+        this._internalState.naturalRotation.x,
         lerpFactor
       )
       scene.rotation.z = MathUtils.lerp(
         scene.rotation.z,
-        this._internalState.naturalPosition.z,
+        this._internalState.naturalRotation.z,
         lerpFactor
       )
     }
@@ -526,9 +530,9 @@ class TicketScene implements BaseScene {
 
   private _updateNaturalPosition() {
     if (this.state.frontside) {
-      this._internalState.naturalPosition.set(0, 0, Math.PI)
+      this._internalState.naturalRotation.set(0, 0, Math.PI)
     } else {
-      this._internalState.naturalPosition.set(0, 0, 0)
+      this._internalState.naturalRotation.set(0, 0, 0)
     }
   }
 
@@ -808,6 +812,13 @@ class TicketScene implements BaseScene {
           this.texts.user.y * canvas.height
         )
 
+        context.fillStyle = colorObjToRgb(isNeon ? colors.textDimmedColor : colors.textColor)
+        context.fillText(
+          this.state.texts.date,
+          this.texts.date.x * canvas.width,
+          this.texts.date.y * canvas.height
+        )
+
         context.fillStyle = colorObjToRgb(
           isNeon ? colors.textNeonDimmedColor : colors.textDimmedColor
         )
@@ -837,10 +848,19 @@ class TicketScene implements BaseScene {
         break
       }
       case 'TicketBack': {
-        context.fillStyle = colorObjToRgb(isNeon ? colors.textNeonColor : colors.textColor)
-
         context.textAlign = 'left'
         context.textBaseline = 'top'
+
+        const fontSize = this.typography.main.relativeSize * canvas.height
+        context.font = `400 ${fontSize}px ${mainFontFamily}`
+        context.fillStyle = colorObjToRgb(isNeon ? colors.textDimmedColor : colors.textColor)
+        context.fillText(
+          this.state.texts.date,
+          this.texts.date.x * canvas.width,
+          this.texts.date.y * canvas.height
+        )
+
+        context.fillStyle = colorObjToRgb(isNeon ? colors.textNeonColor : colors.textColor)
 
         // Draw ticket number with different font
         const ticketNumberFontSize = this.typography.ticketNumber.relativeSize * canvas.height

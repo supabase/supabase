@@ -67,7 +67,7 @@ class TunnelScene implements BaseScene {
       throw new Error('Main Three.js scene not initialized')
     }
     // Add fog to scene for depth effect
-    context.mainThreeJsScene.fog = new THREE.Fog(0x000000, 100, 500)
+    context.mainThreeJsScene.fog = new THREE.Fog(0x000000, 0, 20)
 
     // Create tunnel
     this.createTunnel(context.mainThreeJsScene)
