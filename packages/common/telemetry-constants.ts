@@ -1127,6 +1127,21 @@ export interface EdgeFunctionTemplateClickedEvent {
 }
 
 /**
+ * User clicked the button to create an edge function via CLI.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions
+ */
+export interface EdgeFunctionViaCliButtonClickedEvent {
+  action: 'edge_function_via_cli_button_clicked'
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1195,3 +1210,4 @@ export type TelemetryEvent =
   | EdgeFunctionAiAssistantButtonClickedEvent
   | EdgeFunctionViaEditorButtonClickedEvent
   | EdgeFunctionTemplateClickedEvent
+  | EdgeFunctionViaCliButtonClickedEvent

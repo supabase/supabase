@@ -53,7 +53,17 @@ export const FunctionsEmptyState = () => {
 
             <Dialog>
               <DialogTrigger asChild>
-                <Button type="default">View CLI Instructions</Button>
+                <Button
+                  type="default"
+                  onClick={() =>
+                    sendEvent({
+                      action: 'edge_function_via_cli_button_clicked',
+                      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                    })
+                  }
+                >
+                  View CLI Instructions
+                </Button>
               </DialogTrigger>
               <DialogContent size="large">
                 <DialogSection padding="small">
