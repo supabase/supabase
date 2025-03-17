@@ -39,15 +39,6 @@ interface TicketSceneOptions {
   onGoBackButtonClicked?: () => void
 }
 
-interface MousePositionState {
-  clientX: number
-  clientY: number
-  isWithinContainer: boolean
-  containerX: number
-  containerY: number
-  mouseIntensity: number
-}
-
 type AvailableTextures = (typeof TicketScene)['TEXTURE_NAMES'][number]
 
 interface TextureDescriptor {
@@ -177,14 +168,10 @@ class TicketScene implements BaseScene {
   state: TicketSceneState
 
   private _internalState = {
-    mousePosition: undefined as MousePositionState | undefined,
-    containerBBox: undefined as DOMRect | undefined,
-    naturalPosition: new Vector3(0, 0, 0),
+    naturalPosition: new Vector3(0, 0, Math.PI),
     fontsLoaded: false,
     loadedTextureType: null as 'basic' | 'secret' | 'platinum' | null,
     effectsIntensity: 0,
-    mouseIntensityDecay: 0.98, // How quickly the intensity decays
-    mouseIntensityGainRate: 0.003,
   }
 
   private _sceneConfig = {
@@ -194,8 +181,6 @@ class TicketScene implements BaseScene {
       fov: 30,
     },
   }
-
-  private mouseMoveHandler: ((e: MouseEvent) => void) | null = null
 
   private _sceneRenderer: SceneRenderer | null = null
 
@@ -250,10 +235,12 @@ class TicketScene implements BaseScene {
     }
   }
 
-  async setup(context: SceneRenderer): Promise<void> {
+  getId(): string {
+    return 'TicketScene'
+  }
+
+  async setup(context: SceneRenderer): Promise<Scene> {
     this._sceneRenderer = context
-    this._internalState.containerBBox = context.container.getBoundingClientRect()
-    console.log('setup', this._internalState.containerBBox)
 
     // Load fonts before loading the model
     await this._loadFonts()
@@ -261,11 +248,13 @@ class TicketScene implements BaseScene {
 
     const gltf = await loadGLTFModel(this.sceneUrl)
 
-    this._ticket = gltf.scene as unknown as Scene
+    this._ticket = gltf.scene.getObjectByName("Plane") as unknown as Scene
+
     if (!this.state.visible) this._ticket.scale.set(0, 0, 0)
+    this._ticket.rotation.setFromVector3(this._internalState.naturalPosition)
 
     this._setCamera(context.camera)
-    this._modelRenderPass = new RenderPass(this._ticket, context.camera)
+    this._modelRenderPass = new RenderPass(gltf.scene as unknown as Scene, context.camera)
 
     // Set up post-processing effects but keep them disabled initially
     this._setupPostProcessingEffects(context)
@@ -293,7 +282,6 @@ class TicketScene implements BaseScene {
     const pointLight = new THREE.PointLight(0xffffff, 1.0)
     pointLight.position.set(0, 0, 5)
     this._ticket.add(pointLight)
-    this._registerMousePositionTracking(context)
 
     this._setupNamedObjects()
     this._setupTextureCanvases()
@@ -306,27 +294,27 @@ class TicketScene implements BaseScene {
     if (this._crtPass) context.composer.addPass(this._crtPass)
     if (this._bloomPass) context.composer.addPass(this._bloomPass)
     context.composer.addPass(new OutputPass())
+
+    return gltf.scene as unknown as Scene
   }
 
   update(context: SceneRenderer, time?: number): void {
     // Clear the renderer with transparent background before rendering
     context.renderer.clear(true, true, true)
 
-    const ticket = context.composer.passes[0]
-    if (ticket instanceof RenderPass) {
+    const mainRenderPass = context.composer.passes[0]
+    if (mainRenderPass instanceof RenderPass) {
       this._updateNaturalPosition()
       this._updateTicketSize(time)
-      this._updateTicketToFollowMouse(ticket.scene, time)
+      if(this._ticket) this._updateTicketToFollowMouse(this._ticket, time)
       this._updatePasses(time)
     }
   }
 
   cleanup(): void {
-    if (this.mouseMoveHandler) window.removeEventListener('mousemove', this.mouseMoveHandler)
   }
 
   resize(_ev: UIEvent): void {
-    this._internalState.containerBBox = this._sceneRenderer?.container.getBoundingClientRect()
     return
   }
 
@@ -346,16 +334,13 @@ class TicketScene implements BaseScene {
   }
 
   // In your click method
-  click(e: MouseEvent) {
-    this._updateMousePosition(e)
+  click(_e: MouseEvent) {
+    if (!this._sceneRenderer || !this._sceneRenderer.mousePositionState?.isWithinContainer) return
 
-    if (!this._internalState.mousePosition?.isWithinContainer || !this._sceneRenderer) return
+    const mousePosition = this._sceneRenderer.mousePositionState
 
     this.raycaster.setFromCamera(
-      new THREE.Vector2(
-        this._internalState.mousePosition.containerX,
-        this._internalState.mousePosition.containerY
-      ),
+      new THREE.Vector2(mousePosition.containerX, mousePosition.containerY),
       this._sceneRenderer.camera
     )
 
@@ -402,19 +387,15 @@ class TicketScene implements BaseScene {
   }
 
   private _updatePasses(time?: number) {
+    if (!this._sceneRenderer) {
+      throw new Error('SceneRenderer not loaded')
+    }
+
+    const mousePosition = this._sceneRenderer.mousePositionState
+
     // Update time-based uniforms for shader passes
     if (this._crtPass && this._crtPass.uniforms['time']) {
       this._crtPass.uniforms['time'].value = time
-    }
-
-    if (this._internalState.mousePosition) {
-      // Gradually decay mouse intensity when not moving
-      if (this._internalState.mousePosition.mouseIntensity > 0) {
-        this._internalState.mousePosition.mouseIntensity *= this._internalState.mouseIntensityDecay
-        if (this._internalState.mousePosition.mouseIntensity < 0.0000001) {
-          this._internalState.mousePosition.mouseIntensity = 0
-        }
-      }
     }
 
     // Update effect intensities if effects are enabled
@@ -427,7 +408,7 @@ class TicketScene implements BaseScene {
 
       // Update glitch pass intensity
       if (this._glitchPass) {
-        const glitchIntensity = this._internalState.mousePosition?.mouseIntensity ?? 1
+        const glitchIntensity = mousePosition?.mouseIntensity ?? 1
         this._glitchPass.setIntensity(glitchIntensity * this._internalState.effectsIntensity * 4)
       }
 
@@ -501,11 +482,16 @@ class TicketScene implements BaseScene {
   }
 
   private _updateTicketToFollowMouse(scene: THREE.Scene, dt?: number) {
+    if (!this._sceneRenderer) {
+      throw new Error('SceneRenderer not loaded')
+    }
+
+    const mousePosition = this._sceneRenderer.mousePositionState
     // Calculate rotation based on mouse position
     // Limit rotation to reasonable angles
-    if (this._internalState.mousePosition?.isWithinContainer) {
-      const mouseX = this._internalState.mousePosition.containerX
-      const mouseY = this._internalState.mousePosition.containerY
+    if (mousePosition.isWithinContainer) {
+      const mouseX = mousePosition.containerX
+      const mouseY = mousePosition.containerY
       // Limit the rotation angles to a reasonable range
       const targetRotationX = MathUtils.clamp(mouseY * -0.2, -0.3, 0.3)
       const targetRotationZ = MathUtils.clamp(mouseX * -0.3, -0.4, 0.4)
@@ -540,9 +526,9 @@ class TicketScene implements BaseScene {
 
   private _updateNaturalPosition() {
     if (this.state.frontside) {
-      this._internalState.naturalPosition.set(0, 0, 0)
-    } else {
       this._internalState.naturalPosition.set(0, 0, Math.PI)
+    } else {
+      this._internalState.naturalPosition.set(0, 0, 0)
     }
   }
 
@@ -554,11 +540,6 @@ class TicketScene implements BaseScene {
       camera.fov = this._sceneConfig.camera.fov
       camera.updateProjectionMatrix()
     }
-  }
-
-  private _registerMousePositionTracking(context: SceneRenderer) {
-    this.mouseMoveHandler = this._updateMousePosition.bind(this)
-    window.addEventListener('mousemove', this.mouseMoveHandler)
   }
 
   private _updateTicketSize(time?: number) {
@@ -589,53 +570,6 @@ class TicketScene implements BaseScene {
           mesh.geometry.computeBoundingBox()
         }
       }
-    }
-  }
-
-  private _updateMousePosition(ev: MouseEvent) {
-    if (!this._internalState.mousePosition) {
-      this._internalState.mousePosition = {
-        clientX: 0,
-        clientY: 0,
-        isWithinContainer: false,
-        containerX: 0,
-        containerY: 0,
-        mouseIntensity: 0,
-      }
-    } else {
-      // Calculate mouse movement distance for glitch effect
-      const dx = ev.clientX - this._internalState.mousePosition.clientX
-      const dy = ev.clientY - this._internalState.mousePosition.clientY
-      const distance = Math.sqrt(dx * dx + dy * dy)
-
-      // Update intensity based on movement (clamped between 0 and 1)
-      this._internalState.mousePosition.mouseIntensity = Math.min(
-        1.0,
-        Math.max(
-          0,
-          this._internalState.mousePosition.mouseIntensity +
-            distance * this._internalState.mouseIntensityGainRate
-        )
-      )
-
-      // Update last position
-      this._internalState.mousePosition.clientX = ev.clientX
-      this._internalState.mousePosition.clientY = ev.clientY
-
-      const rect = this._internalState.containerBBox
-      if (!rect) {
-        return
-      }
-      const isWithinContainer =
-        ev.clientX >= rect.left &&
-        ev.clientX <= rect.right &&
-        ev.clientY >= rect.top &&
-        ev.clientY <= rect.bottom
-
-      this._internalState.mousePosition.isWithinContainer = isWithinContainer
-      this._internalState.mousePosition.containerX = ((ev.clientX - rect.left) / rect.width) * 2 - 1
-      this._internalState.mousePosition.containerY =
-        -((ev.clientY - rect.top) / rect.height) * 2 + 1
     }
   }
 
@@ -691,11 +625,10 @@ class TicketScene implements BaseScene {
   }
 
   private _setupNamedObjects() {
-    const mainMeshName = 'Plane'
-    const mesh = this._ticket?.getObjectByName(mainMeshName)
+    const mesh = this._ticket
 
     if (!mesh) {
-      throw new Error(`Could not find mesh named ${mainMeshName}`)
+      throw new Error(`Ticket mesh not loaded`)
     }
 
     for (const part of mesh.children) {
@@ -712,11 +645,6 @@ class TicketScene implements BaseScene {
       if ((TicketScene.TEXTURE_NAMES as readonly string[]).includes(part.material.name)) {
         console.log(`Found named mesh:`, part.material.name)
         this._namedMeshes[part.material.name as AvailableTextures] = part
-        //
-        // // Ensure geometry has a bounding box for raycaster to work properly
-        // if (part.geometry && !part.geometry.boundingBox) {
-        //   part.geometry.computeBoundingBox()
-        // }
       } else {
         console.warn(`Mesh ${part.material.name} is not a named texture`)
       }
@@ -822,6 +750,7 @@ class TicketScene implements BaseScene {
       texture.colorSpace = THREE.SRGBColorSpace
       texture.needsUpdate = true
 
+      console.log("Drawing texture on", textureKey, mesh)
       // Fix: Preserve the original material properties
       const originalMaterial = mesh.material
       const originalColor = mesh.material.color.clone()

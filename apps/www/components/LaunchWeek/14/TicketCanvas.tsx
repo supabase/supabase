@@ -3,6 +3,7 @@ import { useThreeJS } from './helpers'
 import { useCallback, useEffect, useRef } from 'react'
 import SceneRenderer, { BaseScene } from './utils/SceneRenderer'
 import TicketScene from './scenes/TicketScene'
+import TunnelScene from './scenes/TunnelScene'
 
 interface TicketCanvasProps {
   visible: boolean
@@ -30,29 +31,32 @@ const TicketCanvas = ({
   onUpgrade,
 }: TicketCanvasProps) => {
   const sceneRef = useRef<TicketScene | null>(null)
+  const tunnelRef = useRef<TunnelScene | null>(null)
   const setup = useCallback(
     (container: HTMLElement) => {
-      let scene: BaseScene | null = null
-
       const sceneRenderer = new SceneRenderer(container)
 
-      sceneRef.current = new TicketScene({
-        defaultSecret: secret,
-        defaultPlatinum: platinum,
-        user,
-        startDate,
-        onSeatChartButtonClicked: () => {
-          sceneRef.current?.showBackSide()
-          sceneRef.current?.upgradeToSecret()
-        },
-        onGoBackButtonClicked: () => {
-          sceneRef.current?.showFrontSide()
-        },
+      void sceneRenderer.init(async () => {
+        sceneRef.current = new TicketScene({
+          defaultSecret: secret,
+          defaultPlatinum: platinum,
+          user,
+          startDate,
+          onSeatChartButtonClicked: () => {
+            sceneRef.current?.showBackSide()
+            sceneRef.current?.upgradeToSecret()
+          },
+          onGoBackButtonClicked: () => {
+            sceneRef.current?.showFrontSide()
+          },
+        })
+
+        tunnelRef.current = new TunnelScene({
+          defaultVisible: true,
+        })
+        await sceneRenderer.activateScene(sceneRef.current, true)
+        await sceneRenderer.activateScene(tunnelRef.current)
       })
-
-      sceneRenderer.activateScene(sceneRef.current)
-
-      sceneRenderer.init()
 
       return sceneRenderer
     },
