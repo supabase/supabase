@@ -9,8 +9,6 @@ export interface IBaseCommand {
   badge?: () => ReactNode
   icon?: () => ReactNode
   defaultHidden?: boolean
-  keywords?: string[]
-  shortcut?: string
 }
 
 export interface IActionCommand extends IBaseCommand {
@@ -27,6 +25,7 @@ export const isActionCommand = (command: ICommand): command is IActionCommand =>
 export const isRouteCommand = (command: ICommand): command is IRouteCommand => 'route' in command
 
 export interface ICommandSection {
+  id: string
   name: string
   commands: ICommand[]
   meta?: any

@@ -2,6 +2,7 @@ import { proxy } from 'valtio'
 import { type ICommandSection, type ICommandsState, type CommandOptions } from '../types'
 
 const section$new = (name: string): ICommandSection => ({
+  id: name,
   name,
   commands: [],
 })
