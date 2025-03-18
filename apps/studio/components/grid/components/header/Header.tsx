@@ -351,11 +351,11 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           sorts,
           impersonatedRole: roleImpersonationState.role,
           progressCallback: (value: number) => {
-            const progress = (value / totalRows) * 100
+            const progress = Math.min((value / totalRows) * 100, 100)
             toast(
               <SonnerProgress
                 progress={progress}
-                message={`Exporting all rows from ${table.name}`}
+                message={`Exporting all rows from ${value} of ${totalRows} ${table.name}`}
               />,
               {
                 id: toastId,
@@ -366,6 +366,13 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           },
         })
       : allRows.filter((x) => selectedRows.has(x.idx))
+
+    if (rows.length === 0) {
+      toast.dismiss(toastId)
+      toast.error('Export failed, please try exporting again')
+      setIsExporting(false)
+      return
+    }
 
     const formattedRows = rows.map((row) => {
       const formattedRow = row
@@ -380,7 +387,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       columns: state.table!.columns.map((column) => column.name),
     })
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    toast.success(`Downloading ${rows.length} rows to CSV`, {
+    toast.success(`Downloaded ${rows.length} rows to CSV`, {
       id: toastId,
       closeButton: true,
       duration: 4000,
@@ -404,6 +411,11 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       return setIsExporting(false)
     }
 
+    if (allRowsSelected && totalRows === 0) {
+      toast.error('Export failed, please try exporting again')
+      return setIsExporting(false)
+    }
+
     const toastId = allRowsSelected
       ? toast(<SonnerProgress progress={0} message={`Exporting all rows from ${table.name}`} />, {
           closeButton: false,
@@ -422,11 +434,11 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           sorts,
           impersonatedRole: roleImpersonationState.role,
           progressCallback: (value: number) => {
-            const progress = (value / totalRows) * 100
+            const progress = Math.min((value / totalRows) * 100, 100)
             toast(
               <SonnerProgress
                 progress={progress}
-                message={`Exporting all rows from ${table.name}`}
+                message={`Exporting all rows from ${value} of ${totalRows} ${table.name}`}
               />,
               {
                 id: toastId,
@@ -437,6 +449,12 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           },
         })
       : allRows.filter((x) => selectedRows.has(x.idx))
+
+    if (rows.length === 0) {
+      toast.error('Export failed, please exporting try again')
+      setIsExporting(false)
+      return
+    }
 
     const sqlStatements = formatTableRowsToSQL(table, rows)
     const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })

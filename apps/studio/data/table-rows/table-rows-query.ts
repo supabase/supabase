@@ -56,7 +56,7 @@ async function sleep(ms: number) {
 async function executeWithRetry(
   fn: () => Promise<any>,
   maxRetries: number = 3,
-  baseDelay: number = 1000
+  baseDelay: number = 500
 ): Promise<any> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
