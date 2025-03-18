@@ -2,7 +2,7 @@
 import { useRouter } from 'next/compat/router'
 import { useEffect } from 'react'
 import { IS_PROD, LOCAL_STORAGE_KEYS } from '../constants'
-import { getSharedTelemetryData } from '../telemetry'
+import { getSharedTelemetryData } from '../telemetry-utils'
 
 interface UseTelemetryCookieProps {
   hasAcceptedConsent: boolean
