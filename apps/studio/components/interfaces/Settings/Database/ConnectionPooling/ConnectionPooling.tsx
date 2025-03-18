@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { capitalize } from 'lodash'
-import Link from 'next/link'
 import { Fragment, useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -27,25 +26,20 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
-  Badge,
-  Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Listbox,
   Separator,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 
 const formId = 'pooling-configuration-form'
 
 const PoolingConfigurationFormSchema = z.object({
-  pool_mode: z.union([z.literal('transaction'), z.literal('session')]),
   default_pool_size: z.number().nullable(),
   max_client_conn: z.number().nullable(),
 })
@@ -111,7 +105,7 @@ export const ConnectionPooling = () => {
   const connectionPoolingUnavailable = pgbouncerConfig?.pool_mode === null
 
   const onSubmit: SubmitHandler<z.infer<typeof PoolingConfigurationFormSchema>> = async (data) => {
-    const { default_pool_size, pool_mode } = data
+    const { default_pool_size } = data
 
     if (!projectRef) return console.error('Project ref is required')
 
@@ -119,11 +113,11 @@ export const ConnectionPooling = () => {
       {
         ref: projectRef,
         default_pool_size: default_pool_size === null ? undefined : default_pool_size,
-        pool_mode: pool_mode === 'transaction' ? 'transaction' : 'session',
+        pool_mode: 'transaction',
       },
       {
         onSuccess: (data) => {
-          toast.success(`Successfully updated Pooler configuration`)
+          toast.success(`Successfully updated pooler configuration`)
           if (data) {
             form.reset({
               default_pool_size: data.default_pool_size,
@@ -135,10 +129,7 @@ export const ConnectionPooling = () => {
   }
 
   const resetForm = () => {
-    form.reset({
-      pool_mode: pgbouncerConfig?.pool_mode || ('transaction' as any),
-      default_pool_size: pgbouncerConfig?.default_pool_size,
-    })
+    form.reset({ default_pool_size: pgbouncerConfig?.default_pool_size })
   }
 
   useEffect(() => {
@@ -176,16 +167,13 @@ export const ConnectionPooling = () => {
             className="border-x-0 border-t-0 rounded-none"
             type="default"
             title="Dedicated Pooler is not IPv4 compatible"
-            description="If your network only supports IPv4, consider purchasing the IPv4 add-on"
           >
-            <Button asChild type="default" className="mt-2">
-              <Link
-                href={`/project/${projectRef}/settings/addons?panel=ipv4`}
-                className="!no-underline"
-              >
+            <p className="!m-0">
+              If your network only supports IPv4, consider purchasing the{' '}
+              <InlineLink href={`/project/${projectRef}/settings/addons?panel=ipv4`}>
                 IPv4 add-on
-              </Link>
-            </Button>
+              </InlineLink>
+            </p>
           </Admonition>
         )}
         <Panel.Content>
@@ -226,98 +214,17 @@ export const ConnectionPooling = () => {
               >
                 <FormField_Shadcn_
                   control={form.control}
-                  name="pool_mode"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="horizontal"
-                      label="Pool Mode"
-                      labelOptional={
-                        <div className="flex items-center gap-x-1">
-                          {disablePoolModeSelection ? (
-                            <Badge>Shared Pooler</Badge>
-                          ) : (
-                            <Badge>Dedicated Pooler</Badge>
-                          )}
-                          {!disablePoolModeSelection && hasIpv4Addon && (
-                            <Badge>Dedicated IPv4</Badge>
-                          )}
-                          {disablePoolModeSelection ? <Badge>IPv4</Badge> : <Badge>IPv6</Badge>}
-                        </div>
-                      }
-                      description={
-                        disablePoolModeSelection ? (
-                          <Admonition
-                            type="note"
-                            title="Free Plan users can only access our shared connection pooler"
-                            description={
-                              <span className="prose text-sm">
-                                To use a dedicated pooler instance for your project and use a
-                                different pool mode, you can{' '}
-                                <Link
-                                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=connectionPooling`}
-                                  target="_blank"
-                                >
-                                  upgrade to Pro Plan
-                                </Link>
-                                .
-                              </span>
-                            }
-                          />
-                        ) : (
-                          <p className="mt-2">
-                            Specify when a connection can be returned to the pool.{' '}
-                            <span
-                              tabIndex={0}
-                              onClick={() => snap.setShowPoolingModeHelper(true)}
-                              className="transition cursor-pointer underline underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-foreground"
-                            >
-                              Learn more about pool modes
-                            </span>
-                            .
-                          </p>
-                        )
-                      }
-                    >
-                      <FormControl_Shadcn_>
-                        <Listbox
-                          disabled={disablePoolModeSelection}
-                          value={field.value}
-                          className="w-full"
-                          onChange={(value) => field.onChange(value)}
-                        >
-                          <Listbox.Option key="transaction" label="Transaction" value="transaction">
-                            <p>Transaction mode</p>
-                            <p className="text-xs text-foreground-lighter">
-                              {TRANSACTION_MODE_DESCRIPTION}
-                            </p>
-                          </Listbox.Option>
-                          <Listbox.Option key="session" label="Session" value="session">
-                            <p>Session mode</p>
-                            <p className="text-xs text-foreground-lighter">
-                              {SESSION_MODE_DESCRIPTION}
-                            </p>
-                          </Listbox.Option>
-                        </Listbox>
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-
-                <FormField_Shadcn_
-                  control={form.control}
                   name="default_pool_size"
                   render={({ field }) => (
                     <FormItemLayout
                       layout="horizontal"
                       label="Pool Size"
                       description={
-                        <>
-                          <p>
-                            The maximum number of connections made to the underlying Postgres
-                            cluster, per user+db combination. Pool size has a default of{' '}
-                            {defaultPoolSize} based on your compute size of {computeSize}.
-                          </p>
-                        </>
+                        <p>
+                          The maximum number of connections made to the underlying Postgres cluster,
+                          per user+db combination. Pool size has a default of {defaultPoolSize}{' '}
+                          based on your compute size of {computeSize}.
+                        </p>
                       }
                     >
                       <FormControl_Shadcn_>

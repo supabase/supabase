@@ -1,8 +1,8 @@
 import { ChevronRight, FileCode, X } from 'lucide-react'
 import Link from 'next/link'
+import { ReactNode } from 'react'
 
 import { useParams } from 'common'
-import Panel from 'components/ui/Panel'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -29,7 +29,7 @@ interface ConnectionPanelProps {
   ipv4Status: {
     type: 'error' | 'success'
     title: string
-    description?: string
+    description?: string | ReactNode
     links?: { text: string; url: string }[]
   }
   notice?: string[]
@@ -151,17 +151,6 @@ export const ConnectionPanel = ({
             </Admonition>
           ) : (
             <>
-              {/* [Joshen] Can probably remove this after Feb 28 */}
-              {type === 'session' && isSessionMode && (
-                <Panel.Notice
-                  layout="vertical"
-                  className="border rounded mb-2"
-                  title="Deprecating Session Mode on Port 6543"
-                  description="Please use port 5432 for Session Mode as Supavisor will be deprecating Session Mode on port 6543 on February 28, 2025."
-                  href="https://github.com/orgs/supabase/discussions/32755"
-                  buttonText="Read the announcement"
-                />
-              )}
               <CodeBlock
                 wrapperClassName={cn(
                   '[&_pre]:rounded-b-none [&_pre]:px-4 [&_pre]:py-3',
@@ -221,9 +210,12 @@ export const ConnectionPanel = ({
             </div>
             <div className="flex flex-col">
               <span className="text-xs text-foreground">{ipv4Status.title}</span>
-              {ipv4Status.description && (
-                <span className="text-xs text-foreground-lighter">{ipv4Status.description}</span>
-              )}
+              {ipv4Status.description &&
+                (typeof ipv4Status.description === 'string' ? (
+                  <span className="text-xs text-foreground-lighter">{ipv4Status.description}</span>
+                ) : (
+                  ipv4Status.description
+                ))}
               {links.length > 0 && (
                 <div className="flex items-center gap-x-2 mt-2">
                   {links.map((link) => (
