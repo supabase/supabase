@@ -5,18 +5,19 @@ import SceneRenderer, { BaseScene } from './utils/SceneRenderer'
 import TicketScene from './scenes/TicketScene'
 import TunnelScene from './scenes/TunnelScene'
 import useConfData from './hooks/use-conf-data'
+import HUDScene from './scenes/HUDScene'
 
 interface TicketCanvasProps {
   className?: string
 }
 
-const TicketCanvas = ({
-  className,
-}: TicketCanvasProps) => {
+const TicketCanvas = ({ className }: TicketCanvasProps) => {
   const sceneRef = useRef<TicketScene | null>(null)
   const tunnelRef = useRef<TunnelScene | null>(null)
+  const hudRef = useRef<HUDScene | null>(null)
   const initQueue = useRef<{ init: Promise<void>; renderer: SceneRenderer }[]>([])
   const [state, dispatch] = useConfData()
+  const userData = state.userTicketData
   const initialSceneDataRef = useRef({
     visible: state.ticketVisibility,
     secret: state.userTicketData.secret,
@@ -37,7 +38,7 @@ const TicketCanvas = ({
       const initPromise = sceneRenderer.init(async () => {
         dispatch({ type: 'TICKET_LOADING_START' })
         const scene = new TicketScene({
-          defaultVisible: initialSceneDataRef.current.visible,
+          defaultVisible: false ?? initialSceneDataRef.current.visible,
           defaultSecret: initialSceneDataRef.current.secret,
           defaultPlatinum: initialSceneDataRef.current.platinum,
           user: initialSceneDataRef.current.user,
@@ -53,10 +54,35 @@ const TicketCanvas = ({
         const tunnel = new TunnelScene({
           defaultVisible: true,
         })
+
+        const hud = new HUDScene({
+          defaultVisible: true,
+        })
+
         await sceneRenderer.activateScene(scene, true)
         await sceneRenderer.activateScene(tunnel)
+        await sceneRenderer.activateScene(hud)
+
         sceneRef.current = scene
         tunnelRef.current = tunnel
+        hudRef.current = hud
+
+        // Example: Update people online count based on ticket number
+        // In a real app, you might fetch this from an API
+        if (userData.ticket_number) {
+          const baseCount = 1000
+          const randomOffset = Math.floor(Math.random() * 500)
+          hudRef.current.setPeopleOnline(baseCount + randomOffset)
+        }
+
+        hudRef.current.setOxygenLevel(0.60)
+        hudRef.current.setShieldIntegrity(0.99)
+
+        // Example: Set fuel level based on user data
+        // This is just a placeholder - you'd use real data in production
+        const fuelLevel = userData.platinum ? 0.95 : 0.75
+        hudRef.current.setFuelLevel(fuelLevel)
+
         dispatch({ type: 'TICKET_LOADING_SUCCESS' })
       })
 
@@ -69,12 +95,29 @@ const TicketCanvas = ({
 
   useEffect(() => {
     if (sceneRef.current) {
-      sceneRef.current.setVisible(state.ticketVisibility)
+      sceneRef.current.setVisible(false ?? state.ticketVisibility)
       sceneRef.current.setTicketNumber(state.userTicketData.ticket_number ?? 0)
       sceneRef.current.setUserName(state.userTicketData.name ?? '')
       sceneRef.current.reloadTextures()
     }
   }, [state.ticketVisibility, state.userTicketData.name, state.userTicketData.ticket_number])
+
+  useEffect(() => {
+    if (!hudRef.current || !userData) return
+
+    // Example: Update people online count based on ticket number
+    // In a real app, you might fetch this from an API
+    if (userData.ticket_number) {
+      const baseCount = 1000
+      const randomOffset = Math.floor(Math.random() * 500)
+      hudRef.current.setPeopleOnline(baseCount + randomOffset)
+    }
+
+    // Example: Set fuel level based on user data
+    // This is just a placeholder - you'd use real data in production
+    const fuelLevel = userData.platinum ? 0.95 : 0.75
+    hudRef.current.setFuelLevel(fuelLevel)
+  }, [userData])
 
   const { containerRef } = useThreeJS(setup)
   return (

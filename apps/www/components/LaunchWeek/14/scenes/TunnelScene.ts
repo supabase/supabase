@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import SceneRenderer, { BaseScene } from '../utils/SceneRenderer'
-import TicketScene from './TicketScene'
 
 interface TunnelSceneState {
   visible: boolean
