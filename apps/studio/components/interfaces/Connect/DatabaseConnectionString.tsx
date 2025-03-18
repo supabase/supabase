@@ -49,7 +49,7 @@ const StepLabel = ({
   ...props
 }: { number: number; children: ReactNode } & HTMLAttributes<HTMLDivElement>) => (
   <div {...props} className={cn('flex items-center gap-2', props.className)}>
-    <div className="flex font-mono text-xs items-center justify-center w-6 h-6 border boqrder-strong rounded-md bg-surface-100">
+    <div className="flex font-mono text-xs items-center justify-center w-6 h-6 border border-strong rounded-md bg-surface-100">
       {number}
     </div>
     <span>{children}</span>

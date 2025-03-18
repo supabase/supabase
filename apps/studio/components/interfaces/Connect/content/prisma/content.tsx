@@ -1,12 +1,12 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
+import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 import {
+  ConnectTabContent,
   ConnectTabs,
   ConnectTabTrigger,
   ConnectTabTriggers,
-  ConnectTabContent,
 } from 'components/interfaces/Connect/ConnectTabs'
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 
 const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
   return (
@@ -19,7 +19,7 @@ const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
       <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
-# Connect to Supabase via connection pooling with Supavisor.
+# Connect to Supabase via connection pooling.
 DATABASE_URL="${connectionStringPooler.transaction}?pgbouncer=true"
 
 # Direct connection to the database. Used for migrations.

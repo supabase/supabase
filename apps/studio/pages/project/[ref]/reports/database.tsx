@@ -12,6 +12,7 @@ import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import Table from 'components/to-be-cleaned/Table'
@@ -22,18 +23,16 @@ import Panel from 'components/ui/Panel'
 import { analyticsKeys } from 'data/analytics/keys'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
+import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
-import { BASE_PATH } from 'lib/constants'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { BASE_PATH } from 'lib/constants'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
-import { Admonition } from 'ui-patterns'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -251,26 +250,15 @@ const DatabaseUsage = () => {
             <div className="space-y-6">
               {dateRange &&
                 REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr) => (
-                  <>
-                    <ChartHandler
-                      key={attr.id}
-                      provider="infra-monitoring"
-                      attribute={attr.id}
-                      label={attr.label}
-                      interval={dateRange.interval}
-                      startDate={dateRange?.period_start?.date}
-                      endDate={dateRange?.period_end?.date}
-                    />
-                    {attr.id === 'pgbouncer_pools_client_active_connections' && (
-                      <Admonition type="note" title="Dedicated Pooler is enabled" className="p-2">
-                        <p>
-                          Your project is currently using the Dedicated Pooler instead of Supavisor.
-                          You can update this in{' '}
-                          <Link href={`/project/${ref}/settings/database`}>Database settings</Link>.
-                        </p>
-                      </Admonition>
-                    )}
-                  </>
+                  <ChartHandler
+                    key={attr.id}
+                    provider="infra-monitoring"
+                    attribute={attr.id}
+                    label={attr.label}
+                    interval={dateRange.interval}
+                    startDate={dateRange?.period_start?.date}
+                    endDate={dateRange?.period_end?.date}
+                  />
                 ))}
             </div>
           </Panel.Content>

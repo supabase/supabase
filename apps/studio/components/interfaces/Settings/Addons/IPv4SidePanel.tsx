@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
-import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
@@ -13,7 +12,6 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { formatCurrency } from 'lib/helpers'
 import { ExternalLink } from 'lucide-react'
 import { useAddonsPagePanel } from 'state/addons-page'
@@ -32,8 +30,6 @@ const IPv4SidePanel = () => {
   const visible = panel === 'ipv4'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
-  console.log({ pgbouncerConfig})
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
@@ -127,12 +123,12 @@ const IPv4SidePanel = () => {
             <Admonition
               type="default"
               title="The Dedicated Pooler does not support IPv4 addresses"
-              description="If you are connecting to your database via the Dedicated Pooler, you may need this add-on if your network does not support communicating via IPv6. Alternatively, you may consider using our shared pooler Supavisor."
+              description="If you are connecting to your database via the Dedicated Pooler, you may need this add-on if your network does not support communicating via IPv6. Alternatively, you may consider using our Shared Pooler."
             />
           ) : (
             <p className="text-sm">
-              If you are connecting via the Supavisor connection pooler, you do not need this add-on
-              as our pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
+              If you are connecting via the Shared connection pooler, you do not need this add-on as
+              our pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
               <InlineLink href={`/project/${projectRef}/settings/database#connection-pooler`}>
                 project database settings
               </InlineLink>
