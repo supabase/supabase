@@ -80,7 +80,7 @@
     "monaco-editor": "0.33.0",
     "next": "catalog:",
     "next-themes": "^0.3.0",
-    "nuqs": "^1.17.8",
+    "nuqs": "^2.4.1",
     "openai": "^4.20.1",
     "openapi-fetch": "0.12.4",
     "papaparse": "^5.3.1",
