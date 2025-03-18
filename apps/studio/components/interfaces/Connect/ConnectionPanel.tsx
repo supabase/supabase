@@ -1,6 +1,6 @@
 import { ChevronRight, FileCode, X } from 'lucide-react'
 import Link from 'next/link'
-import { ReactNode } from 'react'
+import { PropsWithChildren, ReactNode } from 'react'
 
 import { useParams } from 'common'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
@@ -111,8 +111,9 @@ export const ConnectionPanel = ({
   parameters = [],
   lang = 'bash',
   fileTitle,
+  children,
   onCopyCallback,
-}: ConnectionPanelProps) => {
+}: PropsWithChildren<ConnectionPanelProps>) => {
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -174,6 +175,7 @@ export const ConnectionPanel = ({
               {parameters.length > 0 && <ConnectionParameters parameters={parameters} />}
             </>
           )}
+          {children}
         </div>
       </div>
       <div className="flex flex-col items-end">

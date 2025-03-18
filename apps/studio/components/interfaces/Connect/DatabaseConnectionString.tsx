@@ -16,6 +16,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
+  Button,
   CodeBlock,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
@@ -27,9 +28,6 @@ import {
   SelectValue_Shadcn_,
   Select_Shadcn_,
   Separator,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -38,6 +36,7 @@ import {
   DATABASE_CONNECTION_TYPES,
   DatabaseConnectionType,
   IPV4_ADDON_TEXT,
+  PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT,
 } from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings } from './DatabaseSettings.utils'
@@ -331,7 +330,7 @@ export const DatabaseConnectionString = () => {
                   title: !ipv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
                   description:
                     !sharedPoolerPreferred && !ipv4Addon
-                      ? 'Purchase IPv4 add-on or use Shared Pooler if on a IPv4 network'
+                      ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
                       : sharedPoolerPreferred
                         ? 'Use Session Pooler if on a IPv4 network or purchase IPv4 add-on'
                         : IPV4_ADDON_TEXT,
@@ -362,34 +361,11 @@ export const DatabaseConnectionString = () => {
                       ? 'Not IPv4 compatible'
                       : 'IPv4 compatible',
                   description:
-                    !sharedPoolerPreferred && !ipv4Addon ? (
-                      <span className="text-xs text-foreground-lighter">
-                        Purchase IPv4 add-on or use{' '}
-                        <Tooltip>
-                          <TooltipTrigger className="underline hover:text-foreground transition">
-                            Shared Transaction Pooler
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom">
-                            <p className="text-foreground-lighter mb-1">
-                              Shared transaction pooler connection string:
-                            </p>
-                            <CodeBlock
-                              hideLineNumbers
-                              wrapperClassName={cn('[&_pre]:px-2 [&_pre]:py-3 w-80')}
-                              className="[&_code]:text-[12px] [&_code]:text-foreground"
-                              onCopyCallback={() => {}}
-                            >
-                              {sharedPoolerConfig?.connection_string ?? ''}
-                            </CodeBlock>
-                          </TooltipContent>
-                        </Tooltip>{' '}
-                        if on a IPv4 network
-                      </span>
-                    ) : sharedPoolerPreferred ? (
-                      'Transaction pooler connections are IPv4 proxied for free.'
-                    ) : (
-                      IPV4_ADDON_TEXT
-                    ),
+                    !sharedPoolerPreferred && !ipv4Addon
+                      ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
+                      : sharedPoolerPreferred
+                        ? 'Transaction pooler connections are IPv4 proxied for free.'
+                        : IPV4_ADDON_TEXT,
                   links: !sharedPoolerPreferred ? buttonLinks : undefined,
                 }}
                 notice={['Does not support PREPARE statements']}
@@ -407,7 +383,44 @@ export const DatabaseConnectionString = () => {
                   { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction' },
                 ]}
                 onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
-              />
+              >
+                {!sharedPoolerPreferred && !ipv4Addon && (
+                  <Collapsible_Shadcn_ className="group">
+                    <CollapsibleTrigger_Shadcn_
+                      asChild
+                      className="w-full justify-start !last:rounded-b group-data-[state=open]:rounded-b-none border-light mt-4 px-3"
+                    >
+                      <Button
+                        type="default"
+                        size="tiny"
+                        iconRight={
+                          <ChevronDown className="transition group-data-[state=open]:rotate-180" />
+                        }
+                        className="text-foreground !bg-dash-sidebar justify-between"
+                      >
+                        Using the Shared Pooler for transaction pooling
+                      </Button>
+                    </CollapsibleTrigger_Shadcn_>
+                    <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border text-xs">
+                      <p className="px-3 py-2">
+                        You may use the Shared Pooler, which supports IPv4 networks, for transaction
+                        mode via the following connection string
+                      </p>
+                      <CodeBlock
+                        wrapperClassName={cn(
+                          '[&_pre]:border-x-0 [&_pre]:border-b-0 [&_pre]:px-4 [&_pre]:py-3',
+                          '[&_pre]:rounded-t-none'
+                        )}
+                        language={lang}
+                        value={supavisorConnectionStrings['pooler'][selectedTab]}
+                        className="[&_code]:text-[12px] [&_code]:text-foreground"
+                        hideLineNumbers
+                        onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
+                      />
+                    </CollapsibleContent_Shadcn_>
+                  </Collapsible_Shadcn_>
+                )}
+              </ConnectionPanel>
 
               {sharedPoolerPreferred && ipv4Addon && (
                 <Admonition
