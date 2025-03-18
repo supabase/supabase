@@ -348,7 +348,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
             toast(
               <SonnerProgress
                 progress={progress}
-                message={`Exporting all rows from ${value} of ${totalRows} ${table.name}`}
+                message={`Exporting all rows from ${table.name}`}
               />,
               {
                 id: toastId,
@@ -431,7 +431,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
             toast(
               <SonnerProgress
                 progress={progress}
-                message={`Exporting all rows from ${value} of ${totalRows} ${table.name}`}
+                message={`Exporting all rows from ${table.name}`}
               />,
               {
                 id: toastId,
