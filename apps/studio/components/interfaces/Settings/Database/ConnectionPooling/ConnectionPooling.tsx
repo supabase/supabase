@@ -26,6 +26,7 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  Badge,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
@@ -144,6 +145,11 @@ export const ConnectionPooling = () => {
           <div className="w-full flex items-center justify-between">
             <div className="flex items-center gap-x-2">
               <p>Connection pooling configuration</p>
+              {disablePoolModeSelection ? (
+                <Badge>Dedicated Pooler</Badge>
+              ) : (
+                <Badge>Shared Pooler</Badge>
+              )}
             </div>
             <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler" />
           </div>
