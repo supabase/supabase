@@ -165,11 +165,11 @@ export const RealtimeSettings = () => {
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
-                        {!!maxConn && field.value > maxConn.maxConnections * 0.8 && (
+                        {!!maxConn && field.value > maxConn.maxConnections * 0.5 && (
                           <Admonition
                             showIcon={false}
                             type="warning"
-                            title={`Pool size is greater than 80% of the max connections (${maxConn.maxConnections}) on your database`}
+                            title={`Pool size is greater than 50% of the max connections (${maxConn.maxConnections}) on your database`}
                             description="This may result in instability and unreliability with your database connections."
                           />
                         )}
