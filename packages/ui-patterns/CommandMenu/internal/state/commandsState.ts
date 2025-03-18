@@ -1,11 +1,6 @@
 import { proxy } from 'valtio'
 import { type ICommandSection, type ICommandsState, type CommandOptions } from '../types'
-
-const section$new = (name: string): ICommandSection => ({
-  id: name,
-  name,
-  commands: [],
-})
+import { section$new } from '../CommandSection'
 
 const initCommandsState = () => {
   const state: ICommandsState = proxy({
