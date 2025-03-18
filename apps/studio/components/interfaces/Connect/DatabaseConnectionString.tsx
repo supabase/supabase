@@ -1,5 +1,5 @@
 import { ChevronDown } from 'lucide-react'
-import { HTMLAttributes, ReactNode, useState } from 'react'
+import { HTMLAttributes, ReactNode, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
@@ -9,10 +9,10 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -47,20 +47,31 @@ const StepLabel = ({
   ...props
 }: { number: number; children: ReactNode } & HTMLAttributes<HTMLDivElement>) => (
   <div {...props} className={cn('flex items-center gap-2', props.className)}>
-    <div className="flex font-mono text-xs items-center justify-center w-6 h-6 border border-strong rounded-md bg-surface-100">
+    <div className="flex font-mono text-xs items-center justify-center w-6 h-6 border boqrder-strong rounded-md bg-surface-100">
       {number}
     </div>
     <span>{children}</span>
   </div>
 )
 
+/**
+ *
+ * On Paid plan, to show shared and dedicated connection strings
+ * dedicated to take precedence - shared is like a plan B (not so much of an 1:1 alternative)
+ * warning on ipv4. If they have the ipv4 addon, dont even need to show Supavisor
+ */
+
 export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
   const org = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
-  const allowPgBouncerSelection = useFlag('dualPoolerSupport')
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const sharedPoolerPreferred = useMemo(() => {
+    return subscription?.plan?.id === 'free'
+  }, [subscription])
 
   const {
     data: pgbouncerConfig,
@@ -76,12 +87,10 @@ export const DatabaseConnectionString = () => {
     isError: isErrorSupavisorConfig,
     isSuccess: isSuccessSupavisorConfig,
   } = useSupavisorConfigurationQuery({ projectRef })
-  const isPgBouncerEnabled = allowPgBouncerSelection && !!pgbouncerConfig?.pgbouncer_enabled
-  const poolingConfiguration = isPgBouncerEnabled
-    ? pgbouncerConfig
-    : supavisorConfig?.find((x) => x.identifier === state.selectedDatabaseId)
 
-    console.log({ pgbouncerConfig, supavisorConfig })
+  const poolingConfiguration = sharedPoolerPreferred
+    ? supavisorConfig?.find((x) => x.identifier === state.selectedDatabaseId)
+    : pgbouncerConfig
 
   const {
     data: databases,
@@ -91,12 +100,14 @@ export const DatabaseConnectionString = () => {
     isSuccess: isSuccessReadReplicas,
   } = useReadReplicasQuery({ projectRef })
 
-  const poolerError = isPgBouncerEnabled ? pgbouncerError : supavisorConfigError
-  const isLoadingPoolerConfig = isPgBouncerEnabled
+  const poolerError = sharedPoolerPreferred ? pgbouncerError : supavisorConfigError
+  const isLoadingPoolerConfig = sharedPoolerPreferred
     ? isLoadingPgbouncerConfig
     : isLoadingSupavisorConfig
-  const isErrorPoolerConfig = isPgBouncerEnabled ? isErrorPgbouncerConfig : isErrorSupavisorConfig
-  const isSuccessPoolerConfig = isPgBouncerEnabled
+  const isErrorPoolerConfig = sharedPoolerPreferred
+    ? isErrorPgbouncerConfig
+    : isErrorSupavisorConfig
+  const isSuccessPoolerConfig = sharedPoolerPreferred
     ? isSuccessPgBouncerConfig
     : isSuccessSupavisorConfig
 
@@ -218,8 +229,9 @@ export const DatabaseConnectionString = () => {
     url: `/project/${projectRef}/settings/database#connection-pooling`,
   }
   const buttonLinks = !ipv4Addon
-    ? [ipv4AddOnUrl, ...(isPgBouncerEnabled ? [poolerSettingsUrl] : [])]
-    : [ipv4SettingsUrl, ...(isPgBouncerEnabled ? [poolerSettingsUrl] : [])]
+    ? [ipv4AddOnUrl, ...(sharedPoolerPreferred ? [poolerSettingsUrl] : [])]
+    : [ipv4SettingsUrl, ...(sharedPoolerPreferred ? [poolerSettingsUrl] : [])]
+  const poolerBadge = sharedPoolerPreferred ? 'Shared Pooler' : 'Dedicated Pooler'
 
   return (
     <div className="flex flex-col">
@@ -328,9 +340,9 @@ export const DatabaseConnectionString = () => {
                   type: !ipv4Addon ? 'error' : 'success',
                   title: !ipv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
                   description:
-                    isPgBouncerEnabled && !ipv4Addon
+                    !sharedPoolerPreferred && !ipv4Addon
                       ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
-                      : !isPgBouncerEnabled
+                      : sharedPoolerPreferred
                         ? 'Use Session Pooler if on a IPv4 network or purchase IPv4 add-on'
                         : IPV4_ADDON_TEXT,
                   links: buttonLinks,
@@ -343,25 +355,29 @@ export const DatabaseConnectionString = () => {
                 ]}
                 onCopyCallback={() => handleCopy(selectedTab, 'direct')}
               />
+
               <ConnectionPanel
                 contentType={contentType}
                 lang={lang}
                 type="transaction"
                 title="Transaction pooler"
-                badge={isPgBouncerEnabled ? 'Dedicated Pooler' : 'Supavisor'}
+                badge={poolerBadge}
                 fileTitle={fileTitle}
                 description="Ideal for stateless applications like serverless functions where each interaction with Postgres is brief and isolated."
                 connectionString={connectionStrings['pooler'][selectedTab]}
                 ipv4Status={{
-                  type: isPgBouncerEnabled && !ipv4Addon ? 'error' : 'success',
-                  title: isPgBouncerEnabled && !ipv4Addon ? 'IPv4 incompatible' : 'IPv4 compatible',
+                  type: !sharedPoolerPreferred && !ipv4Addon ? 'error' : 'success',
+                  title:
+                    !sharedPoolerPreferred && !ipv4Addon
+                      ? 'Not IPv4 compatible'
+                      : 'IPv4 compatible',
                   description:
-                    isPgBouncerEnabled && !ipv4Addon
+                    !sharedPoolerPreferred && !ipv4Addon
                       ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
-                      : !isPgBouncerEnabled
+                      : sharedPoolerPreferred
                         ? 'Transaction pooler connections are IPv4 proxied for free.'
                         : IPV4_ADDON_TEXT,
-                  links: isPgBouncerEnabled ? buttonLinks : undefined,
+                  links: !sharedPoolerPreferred ? buttonLinks : undefined,
                 }}
                 notice={['Does not support PREPARE statements']}
                 parameters={[
@@ -376,7 +392,7 @@ export const DatabaseConnectionString = () => {
                 ]}
                 onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
               />
-              {ipv4Addon && !isPgBouncerEnabled && (
+              {sharedPoolerPreferred && ipv4Addon && (
                 <Admonition
                   type="warning"
                   title="Highly recommended to not use Session Pooler"
@@ -393,24 +409,28 @@ export const DatabaseConnectionString = () => {
                 lang={lang}
                 type="session"
                 title="Session pooler"
-                badge={isPgBouncerEnabled ? 'Dedicated Pooler' : 'Supavisor'}
+                badge={poolerBadge}
                 fileTitle={fileTitle}
                 description={
-                  isPgBouncerEnabled
-                    ? 'Recommended if you need to use prepared statements, or other features that are only available in Session mode.'
-                    : 'Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network.'
+                  sharedPoolerPreferred
+                    ? 'Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network.'
+                    : 'Recommended if you need to use prepared statements, or other features that are only available in Session mode.'
                 }
+                // [Joshen TODO] Verify if this is correct for PgBouncer, or only applicable for Supavisor
                 connectionString={connectionStrings['pooler'][selectedTab].replace('6543', '5432')}
                 ipv4Status={{
-                  type: isPgBouncerEnabled && !ipv4Addon ? 'error' : 'success',
-                  title: isPgBouncerEnabled && !ipv4Addon ? 'IPv4 incompatible' : 'IPv4 compatible',
+                  type: !sharedPoolerPreferred && !ipv4Addon ? 'error' : 'success',
+                  title:
+                    !sharedPoolerPreferred && !ipv4Addon
+                      ? 'Not IPv4 compatible'
+                      : 'IPv4 compatible',
                   description:
-                    isPgBouncerEnabled && !ipv4Addon
+                    !sharedPoolerPreferred && !ipv4Addon
                       ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
-                      : !isPgBouncerEnabled
+                      : sharedPoolerPreferred
                         ? 'Session pooler connections are IPv4 proxied for free'
                         : IPV4_ADDON_TEXT,
-                  links: isPgBouncerEnabled ? buttonLinks : undefined,
+                  links: !sharedPoolerPreferred ? buttonLinks : undefined,
                 }}
                 parameters={[
                   { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
