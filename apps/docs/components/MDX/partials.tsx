@@ -10,6 +10,7 @@ import KotlinProjectSetup from './kotlin_project_setup.mdx'
 import MigrationWarnings from './migration_warnings.mdx'
 import OAuthPkceFlow from './oauth_pkce_flow.mdx'
 import ProjectSetup from './project_setup.mdx'
+import PublishableKey from './publishable_key.mdx'
 import QuickstartDbSetup from './quickstart_db_setup.mdx'
 import QuickstartIntro from './quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './social_provider_settings_supabase.mdx'
@@ -37,6 +38,7 @@ export {
   KotlinProjectSetup,
   MigrationWarnings,
   ProjectSetup,
+  PublishableKey,
   OAuthPkceFlow,
   QuickstartDbSetup,
   QuickstartIntro,

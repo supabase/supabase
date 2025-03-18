@@ -83,7 +83,7 @@ export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
 })
 ```
 
-And then, we want to save the environment variables in a `.env.local` file. All you need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+And then, we want to save the environment variables in a `.env.local` file. All you need are the API URL and the <LegacyApiKeys keyword='publishable' type='anon'/> key that you copied [earlier](#get-the-api-keys).
 
 ```bash .env.local
 VITE_SUPABASE_URL=YOUR_SUPABASE_URL

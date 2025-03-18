@@ -54,7 +54,7 @@ Every Supabase project has a unique API URL. Your API is secured behind an API g
 
 1. Go to the [Settings](https://supabase.com/dashboard/project/_/settings/general) page in the Dashboard.
 2. Click **API** in the sidebar.
-3. Find your API `URL`, `anon`, and `service_role` keys on this page.
+3. Find your API `URL`, <LegacyApiKeys keyword='publishable' type='anon'/>, and `service_role` keys on this page.
 
 <video width="99%" muted playsInline controls={true}>
   <source
@@ -65,7 +65,7 @@ Every Supabase project has a unique API URL. Your API is secured behind an API g
 
 The REST API is accessible through the URL `https://<project_ref>.supabase.co/rest/v1`
 
-Both of these routes require the `anon` key to be passed through an `apikey` header.
+Both of these routes require the <LegacyApiKeys keyword='publishable' type='anon'/> key to be passed through an `apikey` header.
 
 ## Using the API
 
