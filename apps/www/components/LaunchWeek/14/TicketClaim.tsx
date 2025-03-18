@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import { ReactNode } from 'react'
 import logo from './assets/logo.png'
-import { ActionButton } from './ActionButton'
 
 export const TicketClaim = ({ children }: { children: ReactNode }) => {
   return (

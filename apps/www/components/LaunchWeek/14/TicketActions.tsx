@@ -5,12 +5,14 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button, cn } from 'ui'
-import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
+import useConfData from './hooks/use-conf-data'
 import { LW_URL, LW14_TWEET_TEXT, LW14_TWEET_TEXT_PLATINUM, LW14_TWEET_TEXT_SECRET } from '~/lib/constants'
+import supabase from './supabase'
 
 export default function TicketActions() {
   const { resolvedTheme } = useTheme()
-  const { userData, supabase } = useConfData()
+  const [state] = useConfData()
+  const userData = state.userTicketData
   const { platinum, username, metadata, secret: hasSecretTicket } = userData
   const [_imgReady, setImgReady] = useState(false)
   const [_loading, setLoading] = useState(false)
@@ -44,8 +46,6 @@ export default function TicketActions() {
   }, [downloadUrl])
 
   const handleShare = async (social: 'twitter' | 'linkedin') => {
-    if (!supabase) return
-
     setTimeout(async () => {
       if (social === 'twitter') {
         await supabase

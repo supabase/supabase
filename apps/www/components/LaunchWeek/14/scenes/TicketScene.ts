@@ -14,7 +14,6 @@ interface TicketSceneState {
   secret: boolean
   platinum: boolean
   frontside: boolean
-  startDate: Date
   ticketNumber: number
   texts: {
     username: string
@@ -29,7 +28,6 @@ interface TicketSceneOptions {
   defaultVisible?: boolean
   defaultSecret?: boolean
   defaultPlatinum?: boolean
-  startDate: Date
   user: {
     id?: string
     name?: string
@@ -246,7 +244,6 @@ class TicketScene implements BaseScene {
       secret: options.defaultSecret || false,
       platinum: options.defaultPlatinum || false,
       frontside: true,
-      startDate: options.startDate,
       ticketNumber: options.user.ticketNumber || 0,
       texts: {
         username: options.user.name ?? '',

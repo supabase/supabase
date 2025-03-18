@@ -4,81 +4,77 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import SceneRenderer, { BaseScene } from './utils/SceneRenderer'
 import TicketScene from './scenes/TicketScene'
 import TunnelScene from './scenes/TunnelScene'
+import useConfData from './hooks/use-conf-data'
 
 interface TicketCanvasProps {
-  visible: boolean
-  secret?: boolean
-  platinum?: boolean
-  user: {
-    id?: string
-    name?: string
-    ticketNumber?: number
-  }
-  startDate: Date
-  playmodeRTChannel: unknown
   className?: string
-  onUpgrade?: () => void
 }
 
 const TicketCanvas = ({
-  visible,
-  secret,
-  platinum,
-  user,
-  startDate,
-  playmodeRTChannel,
   className,
-  onUpgrade,
 }: TicketCanvasProps) => {
-  const initialSceneDataRef = useRef({ visible, secret, platinum, user, startDate })
   const sceneRef = useRef<TicketScene | null>(null)
   const tunnelRef = useRef<TunnelScene | null>(null)
   const initQueue = useRef<{ init: Promise<void>; renderer: SceneRenderer }[]>([])
-  const [ticketState, setState] = useState(initialSceneDataRef.current)
+  const [state, dispatch] = useConfData()
+  const initialSceneDataRef = useRef({
+    visible: state.ticketVisibility,
+    secret: state.userTicketData.secret,
+    platinum: state.userTicketData.platinum,
+    user: {
+      id: state.userTicketData.id,
+      name: state.userTicketData.name,
+      ticketNumber: state.userTicketData.ticket_number,
+    },
+  })
 
-  const setup = useCallback((container: HTMLElement) => {
-    const uuid = Math.random().toString(36).substring(7)
+  const setup = useCallback(
+    (container: HTMLElement) => {
+      const uuid = Math.random().toString(36).substring(7)
 
-    const sceneRenderer = new SceneRenderer(container, initQueue.current, uuid)
+      const sceneRenderer = new SceneRenderer(container, initQueue.current, uuid)
 
-    const initPromise = sceneRenderer.init(async () => {
-      const scene = new TicketScene({
-        defaultVisible: initialSceneDataRef.current.visible,
-        defaultSecret: initialSceneDataRef.current.secret,
-        defaultPlatinum: initialSceneDataRef.current.platinum,
-        user: initialSceneDataRef.current.user,
-        startDate: initialSceneDataRef.current.startDate,
-        onSeatChartButtonClicked: () => {
-          scene.showBackSide()
-          scene.upgradeToSecret()
-        },
-        onGoBackButtonClicked: () => {
-          scene.showFrontSide()
-        },
+      const initPromise = sceneRenderer.init(async () => {
+        dispatch({ type: 'TICKET_LOADING_START' })
+        const scene = new TicketScene({
+          defaultVisible: initialSceneDataRef.current.visible,
+          defaultSecret: initialSceneDataRef.current.secret,
+          defaultPlatinum: initialSceneDataRef.current.platinum,
+          user: initialSceneDataRef.current.user,
+          onSeatChartButtonClicked: () => {
+            scene.showBackSide()
+            scene.upgradeToSecret()
+          },
+          onGoBackButtonClicked: () => {
+            scene.showFrontSide()
+          },
+        })
+
+        const tunnel = new TunnelScene({
+          defaultVisible: true,
+        })
+        await sceneRenderer.activateScene(scene, true)
+        await sceneRenderer.activateScene(tunnel)
+        sceneRef.current = scene
+        tunnelRef.current = tunnel
+        dispatch({ type: 'TICKET_LOADING_SUCCESS' })
       })
 
-      const tunnel = new TunnelScene({
-        defaultVisible: true,
-      })
-      await sceneRenderer.activateScene(scene, true)
-      await sceneRenderer.activateScene(tunnel)
-      sceneRef.current = scene
-      tunnelRef.current = tunnel
-    })
+      initQueue.current.push({ init: initPromise, renderer: sceneRenderer })
 
-    initQueue.current.push({ init: initPromise, renderer: sceneRenderer })
-
-    return sceneRenderer
-  }, [])
+      return sceneRenderer
+    },
+    [dispatch]
+  )
 
   useEffect(() => {
     if (sceneRef.current) {
-      sceneRef.current.setVisible(visible)
-      sceneRef.current.setTicketNumber(user.ticketNumber ?? 0)
-      sceneRef.current.setUserName(user.name ?? '')
+      sceneRef.current.setVisible(state.ticketVisibility)
+      sceneRef.current.setTicketNumber(state.userTicketData.ticket_number ?? 0)
+      sceneRef.current.setUserName(state.userTicketData.name ?? '')
       sceneRef.current.reloadTextures()
     }
-  }, [visible, sceneRef, user.name, user.ticketNumber])
+  }, [state.ticketVisibility, state.userTicketData.name, state.userTicketData.ticket_number])
 
   const { containerRef } = useThreeJS(setup)
   return (

@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react'
 import { LW_URL } from '~/lib/constants'
 import { Check, Copy } from 'lucide-react'
-import useConfData from '../hooks/use-conf-data'
+import useConfData from './hooks/use-conf-data'
 
 export default function TicketCopy() {
-  const { userData } = useConfData()
+  const [state] = useConfData()
+  const userData = state.userTicketData
   const { username, platinum, secret } = userData
   const [copied, setCopied] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
