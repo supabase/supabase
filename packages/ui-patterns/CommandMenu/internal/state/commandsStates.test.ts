@@ -45,7 +45,7 @@ describe('commandState', () => {
 
   it('Registers commands in new section', () => {
     const sectionName = 'Section'
-    let commands = [
+    const commands = [
       { id: 'first', name: 'First', action: () => {} },
       { id: 'second', name: 'Second', action: () => {} },
     ]
