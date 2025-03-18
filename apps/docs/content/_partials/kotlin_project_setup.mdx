@@ -1,7 +1,3 @@
-import ProductManagementSQLTemplate from './product_management_sql_template.mdx'
-import { Tabs } from 'ui'
-export const TabPanel = Tabs.Panel
-
 ## Project setup
 
 Before we start building we're going to set up our Database and API. This is as simple as starting a new Project in Supabase and then creating a "schema" inside the database.
@@ -32,12 +28,12 @@ Now we are going to set up the database schema. You can just copy/paste the SQL 
 </TabPanel> */}
 <TabPanel id="sql" label="SQL">
 
-<ProductManagementSQLTemplate />
+<$Partial path="product_management_sql_template.mdx" />
 
 </TabPanel>
 </Tabs>
 
-### Get the API Keys
+### Get the API keys
 
 Now that you've created some database tables, you are ready to insert data using the auto-generated API.
 We just need to get the Project URL and `anon` key from the API settings.
@@ -45,7 +41,7 @@ We just need to get the Project URL and `anon` key from the API settings.
 1. Go to the [API Settings](https://app.supabase.com/project/_/settings/api) page in the Dashboard.
 2. Find your Project `URL`, `anon`, and `service_role` keys on this page.
 
-### Set up Google Authentication
+### Set up Google authentication
 
 From the [Google Console](https://console.developers.google.com/apis/library), create a new project and add OAuth2 credentials.
 
