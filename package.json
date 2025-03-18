@@ -60,6 +60,13 @@
     "pnpm": ">=9",
     "node": ">=20"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
   "packageManager": "pnpm@9.15.5"
 }

@@ -21,6 +21,7 @@ enum MenuId {
   Deployment = 'deployment',
   Telemetry = 'telemetry',
   Resources = 'resources',
+  Security = 'security',
   SelfHosting = 'self_hosting',
   Integrations = 'integrations',
   LocalDevelopment = 'local_development',
@@ -115,6 +116,10 @@ const menus: Menu[] = [
   },
   {
     id: MenuId.Resources,
+    type: 'guide',
+  },
+  {
+    id: MenuId.Security,
     type: 'guide',
   },
   {

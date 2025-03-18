@@ -2746,6 +2746,25 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/projects/{ref}/notifications/advisor/exceptions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List advisor notification exceptions */
+    get: operations['ProjectAdvisorNotificationsController_listNotificationExceptions']
+    put?: never
+    /** Create advisor notification exceptions */
+    post: operations['ProjectAdvisorNotificationsController_createNotificationExceptions']
+    /** Deletes advisor notification exceptions */
+    delete: operations['ProjectAdvisorNotificationsController_deleteNotificationExceptions']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/pause': {
     parameters: {
       query?: never
@@ -2891,6 +2910,40 @@ export interface paths {
     }
     /** Run project lints */
     get: operations['ProjectRunLintsController_runProjectLints']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/run-lints/leaked-service-key': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Run project leaked service key lint */
+    get: operations['ProjectRunLintsController_runLeakedServiceKeyLint']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/run-lints/no-backup-admin': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Run project backup admin lint */
+    get: operations['ProjectRunLintsController_runAuthBackupAdminLint']
     put?: never
     post?: never
     delete?: never
@@ -3100,9 +3153,11 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    /** Gets a pipeline by id */
+    get: operations['ReplicationPipelinesController_getPipeline']
     put?: never
-    post?: never
+    /** Updates a pipeline */
+    post: operations['ReplicationPipelinesController_updatePipeline']
     /** Deletes a pipeline */
     delete: operations['ReplicationPipelinesController_deletePipeline']
     options?: never
@@ -3186,9 +3241,11 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    /** Gets a sink by id */
+    get: operations['ReplicationSinksController_getSink']
     put?: never
-    post?: never
+    /** Updates a sink */
+    post: operations['ReplicationSinksController_updateSink']
     /** Deletes a sink */
     delete: operations['ReplicationSinksController_deleteSink']
     options?: never
@@ -3764,6 +3821,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/update-email': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Updates a user email address */
+    put: operations['UpdateEmailController_updateEmail']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/vercel/projects': {
     parameters: {
       query?: never
@@ -3960,6 +4034,59 @@ export interface components {
     AuditLogsResponse: {
       result: Record<string, never>[]
       retention_period: number
+    }
+    AuthBackupAdminLintResponseDto: {
+      lints: {
+        cache_key: string
+        categories: ('PERFORMANCE' | 'SECURITY')[]
+        description: string
+        detail: string
+        /** @enum {string} */
+        facing: 'EXTERNAL'
+        /** @enum {string} */
+        level: 'ERROR' | 'WARN' | 'INFO'
+        metadata?: {
+          entity?: string
+          fkey_columns?: number[]
+          fkey_name?: string
+          name?: string
+          schema?: string
+          /** @enum {string} */
+          type?: 'table' | 'view' | 'auth' | 'function' | 'extension' | 'compliance'
+        }
+        /** @enum {string} */
+        name:
+          | 'unindexed_foreign_keys'
+          | 'auth_users_exposed'
+          | 'auth_rls_initplan'
+          | 'no_primary_key'
+          | 'unused_index'
+          | 'multiple_permissive_policies'
+          | 'policy_exists_rls_disabled'
+          | 'rls_enabled_no_policy'
+          | 'duplicate_index'
+          | 'security_definer_view'
+          | 'function_search_path_mutable'
+          | 'rls_disabled_in_public'
+          | 'extension_in_public'
+          | 'rls_references_user_metadata'
+          | 'materialized_view_in_api'
+          | 'foreign_table_in_api'
+          | 'unsupported_reg_types'
+          | 'auth_otp_long_expiry'
+          | 'auth_otp_short_length'
+          | 'ssl_not_enforced'
+          | 'network_restrictions_not_set'
+          | 'password_requirements_min_length'
+          | 'pitr_not_enabled'
+          | 'auth_leaked_password_protection'
+          | 'auth_insufficient_mfa_options'
+          | 'auth_password_policy_missing'
+          | 'leaked_service_key'
+          | 'no_backup_admin'
+        remediation: string
+        title: string
+      }[]
     }
     AutoApiService: {
       app: {
@@ -4161,6 +4288,56 @@ export interface components {
       role_id: number
       role_scoped_projects?: string[]
     }
+    CreateNotificationExceptionsDto: {
+      exceptions: {
+        /** Format: uuid */
+        assigned_to?: string
+        is_disabled: boolean
+        /** @enum {string} */
+        lint_category?: 'ALL' | 'PERFORMANCE' | 'SECURITY'
+        /** @enum {string} */
+        lint_name?:
+          | 'ssl_not_enforced'
+          | 'network_restrictions_not_set'
+          | 'pitr_not_enabled'
+          | 'password_requirements_min_length'
+          | 'unindexed_foreign_keys'
+          | 'auth_users_exposed'
+          | 'auth_rls_initplan'
+          | 'no_primary_key'
+          | 'unused_index'
+          | 'multiple_permissive_policies'
+          | 'policy_exists_rls_disabled'
+          | 'rls_enabled_no_policy'
+          | 'duplicate_index'
+          | 'security_definer_view'
+          | 'function_search_path_mutable'
+          | 'rls_disabled_in_public'
+          | 'extension_in_public'
+          | 'rls_references_user_metadata'
+          | 'materialized_view_in_api'
+          | 'foreign_table_in_api'
+          | 'unsupported_reg_types'
+        note?: string
+      }[]
+    }
+    CreateNotificationExceptionsResponseDto: {
+      exceptions: {
+        /** Format: uuid */
+        assigned_to: string | null
+        /** Format: uuid */
+        id: string
+        /** Format: date-time */
+        inserted_at: string
+        is_disabled: boolean
+        /** Format: uuid */
+        last_updated_by: string
+        lint_category: string | null
+        lint_name: string | null
+        note: string | null
+        project_id: number
+      }[]
+    }
     CreateOAuthAppBody: {
       icon?: string
       name: string
@@ -4297,6 +4474,8 @@ export interface components {
     CreateReplicationSinkBody: {
       /** @description BigQuery dataset id */
       dataset_id: string
+      /** @description Max staleness in minutes */
+      max_staleness_mins: number
       /** @description BigQuery project id */
       project_id: string
       /** @description BigQuery service account key */
@@ -4479,7 +4658,7 @@ export interface components {
     database_type: 'PRIMARY' | 'READ_REPLICA'
     DatabaseDetailResponse: {
       /** @enum {string} */
-      cloud_provider: 'AWS' | 'FLY'
+      cloud_provider: 'AWS' | 'AWS_K8S' | 'FLY'
       connectionString: string
       db_host: string
       db_name: string
@@ -4668,6 +4847,59 @@ export interface components {
       private: number
       shared: number
     }
+    GetLeakedServiceKeyLintResponseDto: {
+      lints: {
+        cache_key: string
+        categories: ('PERFORMANCE' | 'SECURITY')[]
+        description: string
+        detail: string
+        /** @enum {string} */
+        facing: 'EXTERNAL'
+        /** @enum {string} */
+        level: 'ERROR' | 'WARN' | 'INFO'
+        metadata?: {
+          entity?: string
+          fkey_columns?: number[]
+          fkey_name?: string
+          name?: string
+          schema?: string
+          /** @enum {string} */
+          type?: 'table' | 'view' | 'auth' | 'function' | 'extension' | 'compliance'
+        }
+        /** @enum {string} */
+        name:
+          | 'unindexed_foreign_keys'
+          | 'auth_users_exposed'
+          | 'auth_rls_initplan'
+          | 'no_primary_key'
+          | 'unused_index'
+          | 'multiple_permissive_policies'
+          | 'policy_exists_rls_disabled'
+          | 'rls_enabled_no_policy'
+          | 'duplicate_index'
+          | 'security_definer_view'
+          | 'function_search_path_mutable'
+          | 'rls_disabled_in_public'
+          | 'extension_in_public'
+          | 'rls_references_user_metadata'
+          | 'materialized_view_in_api'
+          | 'foreign_table_in_api'
+          | 'unsupported_reg_types'
+          | 'auth_otp_long_expiry'
+          | 'auth_otp_short_length'
+          | 'ssl_not_enforced'
+          | 'network_restrictions_not_set'
+          | 'password_requirements_min_length'
+          | 'pitr_not_enabled'
+          | 'auth_leaked_password_protection'
+          | 'auth_insufficient_mfa_options'
+          | 'auth_password_policy_missing'
+          | 'leaked_service_key'
+          | 'no_backup_admin'
+        remediation: string
+        title: string
+      }[]
+    }
     GetOAuthAuthorizationResponse: {
       approved_at?: string
       approved_organization_slug?: string
@@ -4728,6 +4960,57 @@ export interface components {
     GetProjectByFlyExtensionIdResponse: {
       ref: string
     }
+    GetProjectLintsResponseDto: {
+      cache_key: string
+      categories: ('PERFORMANCE' | 'SECURITY')[]
+      description: string
+      detail: string
+      /** @enum {string} */
+      facing: 'EXTERNAL'
+      /** @enum {string} */
+      level: 'ERROR' | 'WARN' | 'INFO'
+      metadata?: {
+        entity?: string
+        fkey_columns?: number[]
+        fkey_name?: string
+        name?: string
+        schema?: string
+        /** @enum {string} */
+        type?: 'table' | 'view' | 'auth' | 'function' | 'extension' | 'compliance'
+      }
+      /** @enum {string} */
+      name:
+        | 'unindexed_foreign_keys'
+        | 'auth_users_exposed'
+        | 'auth_rls_initplan'
+        | 'no_primary_key'
+        | 'unused_index'
+        | 'multiple_permissive_policies'
+        | 'policy_exists_rls_disabled'
+        | 'rls_enabled_no_policy'
+        | 'duplicate_index'
+        | 'security_definer_view'
+        | 'function_search_path_mutable'
+        | 'rls_disabled_in_public'
+        | 'extension_in_public'
+        | 'rls_references_user_metadata'
+        | 'materialized_view_in_api'
+        | 'foreign_table_in_api'
+        | 'unsupported_reg_types'
+        | 'auth_otp_long_expiry'
+        | 'auth_otp_short_length'
+        | 'ssl_not_enforced'
+        | 'network_restrictions_not_set'
+        | 'password_requirements_min_length'
+        | 'pitr_not_enabled'
+        | 'auth_leaked_password_protection'
+        | 'auth_insufficient_mfa_options'
+        | 'auth_password_policy_missing'
+        | 'leaked_service_key'
+        | 'no_backup_admin'
+      remediation: string
+      title: string
+    }[]
     GetPublicUrlBody: {
       options?: components['schemas']['PublicUrlOptions']
       path: string
@@ -5183,6 +5466,23 @@ export interface components {
       primary_email: string | null
       username: string
     }
+    ListNotificationExceptionsResponseDto: {
+      exceptions: {
+        /** Format: uuid */
+        assigned_to: string | null
+        /** Format: uuid */
+        id: string
+        /** Format: date-time */
+        inserted_at: string
+        is_disabled: boolean
+        /** Format: uuid */
+        last_updated_by: string
+        lint_category: string | null
+        lint_name: string | null
+        note: string | null
+        project_id: number
+      }[]
+    }
     LoadBalancerDatabase: {
       identifier: string
       status: string
@@ -5259,10 +5559,12 @@ export interface components {
       unread_count: number
     }
     OAuthAppResponse: {
+      app_id?: string
       authorized_at?: string
       client_id?: string
       client_secret_alias?: string
       created_at?: string
+      created_by?: string
       icon?: string
       id: string
       name: string
@@ -5366,8 +5668,7 @@ export interface components {
       opt_in_tags: string[]
       projects: components['schemas']['OrganizationSlugProject'][]
       restriction_data: Record<string, never> | null
-      /** @enum {string|null} */
-      restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
+      restriction_status: Record<string, never> | null
       slug: string
     }
     OrgDocumentUrlResponse: {
@@ -5470,6 +5771,7 @@ export interface components {
       defaultPaymentMethodId: string | null
     }
     PgbouncerConfigResponse: {
+      connection_string: string
       connectionString: string
       db_dns_name: string
       db_host: string
@@ -5897,52 +6199,6 @@ export interface components {
       supabase_project_ref: string
       updated_at: string
     }
-    ProjectLintMetadata: {
-      entity?: string
-      fkey_columns?: number[]
-      fkey_name?: string
-      name?: string
-      schema?: string
-      /** @enum {string} */
-      type?: 'table' | 'view' | 'auth' | 'function' | 'extension'
-    }
-    ProjectLintResponse: {
-      cache_key: string
-      categories: ('PERFORMANCE' | 'SECURITY')[]
-      description: string
-      detail: string
-      facing: string
-      /** @enum {string} */
-      level: 'ERROR' | 'WARN' | 'INFO'
-      metadata: components['schemas']['ProjectLintMetadata'] | null
-      /** @enum {string} */
-      name:
-        | 'unindexed_foreign_keys'
-        | 'auth_users_exposed'
-        | 'auth_rls_initplan'
-        | 'no_primary_key'
-        | 'unused_index'
-        | 'multiple_permissive_policies'
-        | 'policy_exists_rls_disabled'
-        | 'rls_enabled_no_policy'
-        | 'duplicate_index'
-        | 'security_definer_view'
-        | 'function_search_path_mutable'
-        | 'rls_disabled_in_public'
-        | 'extension_in_public'
-        | 'rls_references_user_metadata'
-        | 'materialized_view_in_api'
-        | 'foreign_table_in_api'
-        | 'unsupported_reg_types'
-        | 'auth_otp_long_expiry'
-        | 'auth_otp_short_length'
-        | 'ssl_not_enforced'
-        | 'network_restrictions_not_set'
-        | 'password_requirements_min_length'
-        | 'pitr_not_enabled'
-      remediation: Record<string, never>
-      title: string
-    }
     ProjectRefResponse: {
       id: number
       name: string
@@ -6076,6 +6332,22 @@ export interface components {
      * @enum {string}
      */
     ReleaseChannel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+    ReplicationPipelineResponse: {
+      config: {
+        config: {
+          max_fill_secs: number
+          max_size: number
+        }
+      }
+      id: number
+      publication_name: string
+      replicator_id: number
+      sink_id: number
+      sink_name: string
+      source_id: number
+      source_name: string
+      tenant_id: string
+    }
     ReplicationPipelinesResponse: {
       pipelines: {
         config: {
@@ -6107,11 +6379,25 @@ export interface components {
         }[]
       }[]
     }
+    ReplicationSinkResponse: {
+      config: {
+        big_query: {
+          dataset_id: string
+          max_staleness_mins: number
+          project_id: string
+          service_account_key: string
+        }
+      }
+      id: number
+      name: string
+      tenant_id: string
+    }
     ReplicationSinksResponse: {
       sinks: {
         config: {
           big_query: {
             dataset_id: string
+            max_staleness_mins: number
             project_id: string
             service_account_key: string
           }
@@ -6366,6 +6652,7 @@ export interface components {
       width?: number
     }
     SupavisorConfigResponse: {
+      connection_string: string
       connectionString: string
       /** @enum {string} */
       database_type: 'PRIMARY' | 'READ_REPLICA'
@@ -6551,6 +6838,9 @@ export interface components {
        * @default 4
        */
       min_increment_gb?: number
+    }
+    UpdateEmailBodyDto: {
+      newEmail: string
     }
     UpdateFunctionBody: {
       args?: string[]
@@ -6889,6 +7179,33 @@ export interface components {
       /** @description Whether to only allow private channels */
       private_only?: boolean
     }
+    UpdateReplicationPipelineBody: {
+      /** @description Pipeline config */
+      config?: {
+        config: {
+          max_fill_secs: number
+          max_size: number
+        }
+      }
+      /** @description Publication name */
+      publication_name?: string
+      /** @description Sink id */
+      sink_id?: number
+      /** @description Source id */
+      source_id?: number
+    }
+    UpdateReplicationSinkBody: {
+      /** @description BigQuery dataset id */
+      dataset_id: string
+      /** @description Max staleness in minutes */
+      max_staleness_mins: number
+      /** @description BigQuery project id */
+      project_id: string
+      /** @description BigQuery service account key */
+      service_account_key: string
+      /** @description Sink name */
+      sink_name: string
+    }
     UpdateSchemaBody: {
       name?: string
       owner?: string
@@ -6918,16 +7235,14 @@ export interface components {
     UpdateSupavisorConfigBody: {
       default_pool_size?: number | null
       /**
-       * @deprecated
-       * @description This field is deprecated and is ignored in this request
+       * @description Dedicated pooler mode for the project
        * @enum {string}
        */
       pool_mode?: 'transaction' | 'session'
     }
     UpdateSupavisorConfigResponse: {
       default_pool_size: number | null
-      /** @enum {string} */
-      pool_mode: 'transaction' | 'session'
+      pool_mode: string
     }
     UpdateTableBody: {
       comment?: string
@@ -14111,7 +14426,9 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        ref: string
+      }
       cookie?: never
     }
     requestBody?: never
@@ -14137,7 +14454,9 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        ref: string
+      }
       cookie?: never
     }
     requestBody: {
@@ -14737,6 +15056,7 @@ export interface operations {
           | 'total_storage_delete_requests'
           | 'total_storage_options_requests'
           | 'total_storage_patch_requests'
+          | 'total_logdrain_egress'
         endDate: string
         interval: string
         startDate: string
@@ -15050,6 +15370,7 @@ export interface operations {
           | 'physical_replication_lag_physical_replica_lag_seconds'
           | 'pg_stat_database_num_backends'
           | 'supavisor_connections_active'
+          | 'pgbouncer_pools_client_active_connections'
         databaseIdentifier?: string
         endDate: string
         interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
@@ -15133,6 +15454,94 @@ export interface operations {
         content: {
           'application/json': components['schemas']['LoadBalancerDetailResponse'][]
         }
+      }
+    }
+  }
+  ProjectAdvisorNotificationsController_listNotificationExceptions: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListNotificationExceptionsResponseDto']
+        }
+      }
+      /** @description Failed to retrieve advisor notification exceptions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectAdvisorNotificationsController_createNotificationExceptions: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateNotificationExceptionsDto']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateNotificationExceptionsResponseDto']
+        }
+      }
+      /** @description Failed to creare advisor notification exceptions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectAdvisorNotificationsController_deleteNotificationExceptions: {
+    parameters: {
+      query: {
+        ids: string[]
+      }
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete advisor notification exceptions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -15412,7 +15821,63 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ProjectLintResponse'][]
+          'application/json': components['schemas']['GetProjectLintsResponseDto']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectRunLintsController_runLeakedServiceKeyLint: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetLeakedServiceKeyLintResponseDto']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectRunLintsController_runAuthBackupAdminLint: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AuthBackupAdminLintResponseDto']
         }
       }
       403: {
@@ -15783,6 +16248,79 @@ export interface operations {
       }
     }
   }
+  ReplicationPipelinesController_getPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        pipeline_id: number
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returns the pipeline. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationPipelineResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get pipeline */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_updatePipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        pipeline_id: number
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateReplicationPipelineBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update pipeline */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ReplicationPipelinesController_deletePipeline: {
     parameters: {
       query?: never
@@ -15982,6 +16520,79 @@ export interface operations {
         content?: never
       }
       /** @description Failed to create sink */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSinksController_getSink: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+        sink_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returns the sink. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationSinkResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get sink */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSinksController_updateSink: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+        sink_id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateReplicationSinkBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update sink */
       500: {
         headers: {
           [name: string]: unknown
@@ -17331,6 +17942,27 @@ export interface operations {
       cookie?: never
     }
     requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  UpdateEmailController_updateEmail: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateEmailBodyDto']
+      }
+    }
     responses: {
       200: {
         headers: {
