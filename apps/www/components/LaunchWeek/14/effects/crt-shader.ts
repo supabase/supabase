@@ -1,6 +1,3 @@
-import { useRef, useEffect } from 'react'
-import * as THREE from 'three'
-
 export const CRTShader = {
   uniforms: {
     tDiffuse: { value: null },

@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import SceneRenderer, { BaseScene } from '../utils/SceneRenderer'
+import { HUDShader } from '../effects/hud-shader'
 
 interface HudSceneState {
   visible: boolean
@@ -27,8 +28,13 @@ class HUDScene implements BaseScene {
   private hudCanvas: HTMLCanvasElement | null = null
   private hudContext: CanvasRenderingContext2D | null = null
   private hudTexture: THREE.CanvasTexture | null = null
-  private hudMaterial: THREE.MeshBasicMaterial | null = null
+  private hudMaterial: THREE.ShaderMaterial | null = null
 
+  // Noise texture for the shader
+  private noiseTexture: THREE.Texture | null = null
+
+  // Shader parameters
+  private shader = HUDShader
   // HUD parameters
   private width = 0
   private height = 0
@@ -36,12 +42,7 @@ class HUDScene implements BaseScene {
   // canvas height will be calculated based on camera aspect ratio
   private referenceCanvasWidth = 1120
   private referenceCanvasHeight = 707
-  private qualityMultiplier = 1.5 
-
-  // Bar elements
-  private fuelBar: THREE.Mesh | null = null
-  private shieldBar: THREE.Mesh | null = null
-  private oxygenBar: THREE.Mesh | null = null
+  private qualityMultiplier = 1.5
 
   private referenceSizes = {
     axis: {
@@ -109,8 +110,6 @@ class HUDScene implements BaseScene {
   private canvasWidth: number
   private canvasHeight: number
 
-
-
   constructor(private options: HudSceneOptions) {
     this.state = {
       visible: options.defaultVisible ?? false,
@@ -147,6 +146,7 @@ class HUDScene implements BaseScene {
 
     this.setHUDDimensionsAndPosition(12)
 
+    // Create canvas for HUD content
     this.hudCanvas = document.createElement('canvas')
     this.hudCanvas.width = this.canvasWidth
     this.hudCanvas.height = this.canvasHeight
@@ -154,14 +154,29 @@ class HUDScene implements BaseScene {
 
     this.draw()
 
-    this.hudPlane = new THREE.PlaneGeometry(this.width, this.height)
+    // Create noise texture with higher resolution for more subtle grain
+    this.noiseTexture = this.createNoiseTexture(512, 512)
+
+    // Create HUD texture from canvas
     this.hudTexture = new THREE.CanvasTexture(this.hudCanvas)
-    this.hudMaterial = new THREE.MeshBasicMaterial({
-      map: this.hudTexture,
-      // color: 0xffffff,
+    // Use linear filtering for better text quality
+    this.hudTexture.minFilter = THREE.LinearFilter
+    this.hudTexture.magFilter = THREE.LinearFilter
+
+    this.shader.uniforms.tDiffuse.value = this.hudTexture
+
+    // Create shader material
+    this.hudMaterial = new THREE.ShaderMaterial({
+      uniforms: this.shader.uniforms,
+      vertexShader: this.shader.vertexShader,
+      fragmentShader: this.shader.fragmentShader,
       transparent: true,
       side: THREE.DoubleSide,
+      depthWrite: false, // Helps with transparency issues
     })
+
+    // Create HUD mesh
+    this.hudPlane = new THREE.PlaneGeometry(this.width, this.height)
     this.hudMesh = new THREE.Mesh(this.hudPlane, this.hudMaterial)
     this.hudMesh.position.set(0, 0, 0)
 
@@ -171,11 +186,70 @@ class HUDScene implements BaseScene {
     this.setVisible(this.state.visible)
   }
 
+  // Create a noise texture for the shader with more subtle grain pattern
+  // Create a noise texture for the shader with more pronounced grain pattern
+  private createNoiseTexture(width: number, height: number): THREE.DataTexture {
+    const size = width * height
+    const data = new Uint8Array(3 * size)
+
+    // Generate noise with more variation around the center point (128)
+    for (let i = 0; i < size; i++) {
+      const stride = i * 3
+
+      // Generate noise values with wider distribution around mid-gray (128)
+      // This creates a more visible grain effect with values that deviate more from center
+      const noise = 128 + (Math.random() - 0.5) * 100
+
+      data[stride] = noise
+      data[stride + 1] = noise
+      data[stride + 2] = noise
+    }
+
+    const texture = new THREE.DataTexture(data, width, height, THREE.RGBFormat)
+    texture.wrapS = THREE.RepeatWrapping
+    texture.wrapT = THREE.RepeatWrapping
+    // Use nearest filtering for more distinct grain
+    texture.minFilter = THREE.NearestFilter
+    texture.magFilter = THREE.NearestFilter
+    texture.needsUpdate = true
+
+    return texture
+  }
+
   update(context: SceneRenderer, time?: number): void {
     // Update HUD elements based on state
+
+    // Update shader uniforms
+    if (this.shader.uniforms && time !== undefined) {
+      // Update time uniform for animation
+      this.shader.uniforms.u_time.value = time
+    }
   }
 
   cleanup(): void {
+    // Dispose of textures
+    if (this.hudTexture) {
+      this.hudTexture.dispose()
+    }
+
+    if (this.noiseTexture) {
+      this.noiseTexture.dispose()
+    }
+
+    // Dispose of materials
+    if (this.hudMaterial) {
+      this.hudMaterial.dispose()
+    }
+
+    // Dispose of geometries
+    if (this.hudPlane) {
+      this.hudPlane.dispose()
+    }
+
+    // Remove from scene
+    if (this.hudGroup && this._sceneRenderer && this._sceneRenderer.mainThreeJsScene) {
+      this._sceneRenderer.mainThreeJsScene.remove(this.hudGroup)
+    }
   }
 
   // Public methods to update state
@@ -183,34 +257,34 @@ class HUDScene implements BaseScene {
     this.state.peopleOnline = count
 
     this.draw()
-    if(this.hudTexture) this.hudTexture.needsUpdate = true
+    if (this.hudTexture) this.hudTexture.needsUpdate = true
   }
 
   setFuelLevel(level: number): void {
     this.state.fuelLevel = Math.max(0, Math.min(1, level))
 
     this.draw()
-    if(this.hudTexture) this.hudTexture.needsUpdate = true
+    if (this.hudTexture) this.hudTexture.needsUpdate = true
   }
 
   setShieldIntegrity(level: number): void {
     this.state.shieldIntegrity = Math.max(0, Math.min(1, level))
 
     this.draw()
-    if(this.hudTexture) this.hudTexture.needsUpdate = true
+    if (this.hudTexture) this.hudTexture.needsUpdate = true
   }
 
   setOxygenLevel(level: number): void {
     this.state.oxygenLevel = Math.max(0, Math.min(1, level))
 
     this.draw()
-    if(this.hudTexture) this.hudTexture.needsUpdate = true
+    if (this.hudTexture) this.hudTexture.needsUpdate = true
   }
 
   setPeopleOnlineActive(active: boolean): void {
     this.state.peopleOnlineActive = active
     this.draw()
-    if(this.hudTexture) this.hudTexture.needsUpdate = true
+    if (this.hudTexture) this.hudTexture.needsUpdate = true
   }
 
   resize(ev: UIEvent): void {
@@ -250,8 +324,6 @@ class HUDScene implements BaseScene {
 
     const ctx = this.hudContext
     const canvas = this.hudCanvas
-
-    console.log('Drawing HUD', canvas.width, canvas.height)
 
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
