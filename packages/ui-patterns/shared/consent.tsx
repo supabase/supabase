@@ -5,8 +5,9 @@ import { proxy, useSnapshot } from 'valtio'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
 import { useFeatureFlags } from 'common'
+import { cn } from 'ui'
+import { ConsentToast } from '../ConsentToast'
 
-// Global state for consent management
 const consentState = proxy({
   consentValue: (isBrowser ? localStorage?.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT) : null) as
     | string
@@ -66,7 +67,23 @@ export const useConsent = () => {
 
   const triggerConsentToast = useCallback(() => {
     if (isBrowser && consentValue === null) {
-      consentToastId.current = toast.dismiss(consentToastId.current)
+      consentToastId.current = toast(
+        <ConsentToast
+          onAccept={() => handleConsent('true')}
+          onOptOut={() => handleConsent('false')}
+        />,
+        {
+          id: 'consent-toast',
+          position: 'bottom-right',
+          duration: Infinity,
+          closeButton: false,
+          dismissible: false,
+          className: cn(
+            '!w-screen !fixed !border-t !h-auto !left-0 !bottom-0 !top-auto !right-0 !rounded-none !max-w-none !bg-overlay !text',
+            'sm:!w-full sm:!max-w-[356px] sm:!left-auto sm:!right-8 sm:!bottom-8 sm:!rounded-lg sm:border'
+          ),
+        }
+      )
     }
   }, [])
 
