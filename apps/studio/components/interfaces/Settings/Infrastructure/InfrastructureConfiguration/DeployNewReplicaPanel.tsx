@@ -169,7 +169,7 @@ const DeployNewReplicaPanel = ({
   const reachedMaxReplicas =
     (data ?? []).filter((db) => db.identifier !== projectRef).length >= maxNumberOfReplicas
   const isFreePlan = subscription?.plan.id === 'free'
-  const isAWSProvider = project?.cloud_provider === 'AWS'
+  const isAWSProvider = project?.cloud_provider !== 'FLY'
   const isWalgEnabled = project?.is_physical_backups_enabled
   const currentComputeAddon = addons?.selected_addons.find(
     (addon) => addon.type === 'compute_instance'
