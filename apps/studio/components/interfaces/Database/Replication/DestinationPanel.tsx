@@ -44,7 +44,6 @@ import { useState, useMemo, useEffect } from 'react'
 import { useReplicationSinkByIdQuery } from 'data/replication/sink-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
-import { max } from 'lodash'
 
 interface DestinationPanelProps {
   visible: boolean
