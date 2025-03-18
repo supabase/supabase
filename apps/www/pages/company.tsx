@@ -299,7 +299,7 @@ const Press = () => {
   return (
     <SectionContainer className="pt-0 lg:pt-0">
       <div>
-        <SectionHeader title={'Press'} />
+        <SectionHeader title="Press" />
       </div>
       <div className="mx-auto mt-5 grid gap-5 lg:max-w-none lg:grid-cols-3">
         {PressData.filter((x) => x.type == 'article').map((x) => (

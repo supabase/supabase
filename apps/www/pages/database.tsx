@@ -76,7 +76,7 @@ function Database() {
           title={MainProducts['database'].name}
           h1={[
             <span key={'database-h1'}>
-              Open Source SQL Database
+              It’s just Postgres
               <br /> (without the hassle)
             </span>,
           ]}
@@ -127,7 +127,7 @@ function Database() {
                 <ProductIcon icon={MainProducts['authentication'].icon} />
               </div>
 
-              <h4 className="h4">Built-in Auth</h4>
+              <h4 className="h4">Secure by default</h4>
               <p className="p">Leveraging PostgreSQL's proven Row Level Security.</p>
               <p className="p text-sm">
                 Integrated with JWT authentication which controls exactly what your users can

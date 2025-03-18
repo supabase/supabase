@@ -5,11 +5,8 @@ const SectionHeader = (props: any) => {
         <span className="text-foreground-lighter block font-mono text-xs uppercase tracking-widest">
           {props.subtitle}
         </span>
-        <h3 className="h2 lg:max-w-md">
-          <span>{props.title}</span>
-          {props.title_alt && (
-            <span className="text-foreground-light inline">{props.title_alt}</span>
-          )}
+        <h3 className="text-2xl lg:text-4xl scroll-mt-20 !leading-[1.2] text-foreground-light lg:max-w-md">
+          {props.title}
         </h3>
       </div>
       {props.paragraph && (
