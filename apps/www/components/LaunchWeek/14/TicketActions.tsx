@@ -4,9 +4,9 @@ import { Check } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { Button, cn } from 'ui'
+import { Button } from 'ui'
 import useConfData from './hooks/use-conf-data'
-import { LW_URL, LW14_TWEET_TEXT, LW14_TWEET_TEXT_PLATINUM, LW14_TWEET_TEXT_SECRET } from '~/lib/constants'
+import { LW14_TWEET_TEXT, LW14_TWEET_TEXT_PLATINUM, LW14_TWEET_TEXT_SECRET, LW14_URL } from '~/lib/constants'
 import supabase from './supabase'
 
 export default function TicketActions() {
@@ -18,7 +18,7 @@ export default function TicketActions() {
   const [_loading, setLoading] = useState(false)
   const isLessThanMd = useBreakpoint()
   const downloadLink = useRef<HTMLAnchorElement>()
-  const link = `${LW_URL}/tickets/${username}?lw=14${
+  const link = `${LW14_URL}/tickets/${username}?lw=14${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
   }&t=${dayjs(new Date()).format('DHHmmss')}`
   const permalink = encodeURIComponent(link)

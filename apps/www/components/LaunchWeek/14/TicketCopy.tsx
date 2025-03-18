@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { LW_URL } from '~/lib/constants'
+import { LW14_URL } from '~/lib/constants'
 import { Check, Copy } from 'lucide-react'
 import useConfData from './hooks/use-conf-data'
 
@@ -13,7 +13,7 @@ export default function TicketCopy() {
   const displayUrl = `.../launch-week/tickets/${username}?lw=14${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
   }`
-  const url = `${LW_URL}/tickets/${username}?lw=13${
+  const url = `${LW14_URL}/tickets/${username}?lw=14${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
   }`
 

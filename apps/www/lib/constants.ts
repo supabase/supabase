@@ -35,7 +35,7 @@ export const SITE_ORIGIN =
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
       : 'http://localhost:3000'
 
-export const LW_URL = `${SITE_ORIGIN}/launch-week`
+export const LW_URL = `${SITE_ORIGIN}/launch-week/13`
 
 export const TWITTER_USER_NAME = 'supabase'
 export const LW7_DATE = 'April 10th 2023'
@@ -67,6 +67,6 @@ export const LW14_TITLE = 'Launch Week 14'
 export const LW14_TWEET_TEXT = 'Launch Week 14 is just around the corner at @supabase. \nClaim your ticket and stay tuned for all the announcements! \n#launchweek'
 export const LW14_TWEET_TEXT_PLATINUM = 'Just conquered a platinum @supabase Launch Week 14 ticket. Share twice to get one! \n#launchweek'
 export const LW14_TWEET_TEXT_SECRET = `Found the secret golden ticket for @supabase's Launch Week 14. \nCan you find it? \n#launchweek`
-export const LW14_URL = `${SITE_ORIGIN}/launch-week/14`
+export const LW14_URL = `${SITE_ORIGIN}/launch-week`
 
 export const SITE_NAME = 'Supabase'

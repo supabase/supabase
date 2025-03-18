@@ -95,7 +95,7 @@ const TicketCanvas = ({ className }: TicketCanvasProps) => {
 
   useEffect(() => {
     if (sceneRef.current) {
-      sceneRef.current.setVisible(false ?? state.ticketVisibility)
+      sceneRef.current.setVisible(state.ticketVisibility)
       sceneRef.current.setTicketNumber(state.userTicketData.ticket_number ?? 0)
       sceneRef.current.setUserName(state.userTicketData.name ?? '')
       sceneRef.current.reloadTextures()
