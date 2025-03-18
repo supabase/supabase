@@ -1,7 +1,6 @@
 import {
   Button,
   cn,
-  CodeBlock,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +14,17 @@ import { TimestampInfo } from 'ui-patterns'
 import { useState, useEffect } from 'react'
 import { ResponseCodeFormatter } from '../LogsFormatters'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
+
+const LogRowCodeBlock = ({ value, className }: { value: string; className?: string }) => (
+  <pre
+    className={cn(
+      'px-1 bg-surface-300 w-full pt-1 max-w-full border-none text-xs prose-sm transition-all overflow-auto rounded-md',
+      className
+    )}
+  >
+    {JSON.stringify(value, null, 2)}
+  </pre>
+)
 
 const LogRowSeparator = () => <Separator className="bg-border my-1" />
 
@@ -72,17 +82,12 @@ const PropertyRow = ({
         <div className="flex flex-col gap-1">
           <h3 className="text-foreground-lighter text-sm pl-3 py-2">{keyName}</h3>
           <div>
-            <CodeBlock
-              hideLineNumbers
-              className={cn(
-                '!bg-surface-300 w-full pt-1 max-w-full border-none text-xs prose-sm transition-all',
-                {
-                  'max-h-[80px]': !isExpanded,
-                  'max-h-[400px]': isExpanded,
-                }
-              )}
-              value={JSON.stringify(value, null, 2)}
-              language="json"
+            <LogRowCodeBlock
+              className={cn('px-2.5', {
+                'max-h-[80px]': !isExpanded,
+                'max-h-[400px]': isExpanded,
+              })}
+              value={value}
             />
             <Button
               className="mt-1 w-full"
@@ -124,7 +129,7 @@ const PropertyRow = ({
               })}
             >
               {isExpanded ? (
-                <CodeBlock value={JSON.stringify(value, null, 2)} />
+                <LogRowCodeBlock value={value} />
               ) : isTimestamp ? (
                 <TimestampInfo className="text-sm" utcTimestamp={value} />
               ) : isStatus ? (

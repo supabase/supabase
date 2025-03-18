@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.15.8
+  version: 2.19.7
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -51,22 +51,25 @@ flags:
     description: use the specified docker network instead of a generated one
     default_value: ''
   - id: output
-    name: --output <[ pretty | json | toml | yaml ]>
+    name: -o, --output <[ env | pretty | json | toml | yaml ]>
     description: output format of status variables
     default_value: pretty
     accepted_values:
+      - id: env
+        name: env
+        type: '[ env | pretty | json | toml | yaml ]'
       - id: pretty
         name: pretty
-        type: '[ pretty | json | toml | yaml ]'
+        type: '[ env | pretty | json | toml | yaml ]'
       - id: json
         name: json
-        type: '[ pretty | json | toml | yaml ]'
+        type: '[ env | pretty | json | toml | yaml ]'
       - id: toml
         name: toml
-        type: '[ pretty | json | toml | yaml ]'
+        type: '[ env | pretty | json | toml | yaml ]'
       - id: yaml
         name: yaml
-        type: '[ pretty | json | toml | yaml ]'
+        type: '[ env | pretty | json | toml | yaml ]'
   - id: workdir
     name: --workdir <string>
     description: path to a Supabase project directory
@@ -468,26 +471,6 @@ commands:
     usage: supabase status [flags]
     subcommands: []
     flags:
-      - id: output
-        name: -o, --output <[ env | pretty | json | toml | yaml ]>
-        description: Output format of status variables.
-        default_value: pretty
-        accepted_values:
-          - id: env
-            name: env
-            type: '[ env | pretty | json | toml | yaml ]'
-          - id: pretty
-            name: pretty
-            type: '[ env | pretty | json | toml | yaml ]'
-          - id: json
-            name: json
-            type: '[ env | pretty | json | toml | yaml ]'
-          - id: toml
-            name: toml
-            type: '[ env | pretty | json | toml | yaml ]'
-          - id: yaml
-            name: yaml
-            type: '[ env | pretty | json | toml | yaml ]'
       - id: override-name
         name: --override-name <strings>
         description: Override specific variable names.
@@ -537,7 +520,7 @@ commands:
       - id: exclude
         name: -x, --exclude <strings>
         description: |
-          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor]
+          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor]
         default_value: '[]'
       - id: ignore-health-check
         name: --ignore-health-check
@@ -2572,23 +2555,6 @@ commands:
     usage: supabase gen keys [flags]
     subcommands: []
     flags:
-      - id: output
-        name: -o, --output <[ env | json | toml | yaml ]>
-        description: Output format of key variables.
-        default_value: env
-        accepted_values:
-          - id: env
-            name: env
-            type: '[ env | json | toml | yaml ]'
-          - id: json
-            name: json
-            type: '[ env | json | toml | yaml ]'
-          - id: toml
-            name: toml
-            type: '[ env | json | toml | yaml ]'
-          - id: yaml
-            name: yaml
-            type: '[ env | json | toml | yaml ]'
       - id: override-name
         name: --override-name <strings>
         description: Override specific variable names.
@@ -3572,7 +3538,7 @@ commands:
   - id: supabase-branches-update
     title: supabase branches update
     summary: Update a preview branch
-    description: Update a preview branch by its ID.
+    description: Update a preview branch by its name or ID.
     tags: []
     links: []
     usage: supabase branches update [branch-id] [flags]
@@ -3643,26 +3609,9 @@ commands:
     description: Retrieve details of the specified preview branch.
     tags: []
     links: []
-    usage: supabase branches get [branch-id] [flags]
+    usage: supabase branches get [branch-id]
     subcommands: []
     flags:
-      - id: output
-        name: -o, --output <[ pretty | json | toml | yaml ]>
-        description: Output format of branch details.
-        default_value: pretty
-        accepted_values:
-          - id: pretty
-            name: pretty
-            type: '[ pretty | json | toml | yaml ]'
-          - id: json
-            name: json
-            type: '[ pretty | json | toml | yaml ]'
-          - id: toml
-            name: toml
-            type: '[ pretty | json | toml | yaml ]'
-          - id: yaml
-            name: yaml
-            type: '[ pretty | json | toml | yaml ]'
       - id: experimental
         name: --experimental
         description: enable experimental features
@@ -3693,7 +3642,7 @@ commands:
   - id: supabase-branches-delete
     title: supabase branches delete
     summary: Delete a preview branch
-    description: Delete a preview branch by its ID.
+    description: Delete a preview branch by its name or ID.
     tags: []
     links: []
     usage: supabase branches delete [branch-id]

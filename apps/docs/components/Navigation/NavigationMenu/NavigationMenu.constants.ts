@@ -1092,6 +1092,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/bigquery',
         },
         {
+          name: 'Connecting to Clerk',
+          url: '/guides/database/extensions/wrappers/clerk',
+        },
+        {
           name: 'Connecting to ClickHouse',
           url: '/guides/database/extensions/wrappers/clickhouse',
         },
@@ -1524,6 +1528,14 @@ export const functions: NavMenuConstant = {
         {
           name: 'Type-Safe SQL with Kysely',
           url: '/guides/functions/kysely-postgres',
+        },
+        {
+          name: 'Text To Speech with ElevenLabs',
+          url: '/guides/functions/examples/elevenlabs-generate-speech-stream',
+        },
+        {
+          name: 'Speech Transcription with ElevenLabs',
+          url: '/guides/functions/examples/elevenlabs-transcribe-speech',
         },
       ],
     },
@@ -2026,6 +2038,27 @@ export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof Ico
   },
 ]
 
+export const security: NavMenuConstant = {
+  icon: 'platform',
+  title: 'Security',
+  url: '/guides/security',
+  items: [
+    { name: 'Overview', url: '/guides/security' },
+    {
+      name: 'Product security',
+      url: '/guides/security/product-security',
+    },
+    {
+      name: 'Compliance',
+      url: undefined,
+      items: [
+        { name: 'SOC 2', url: '/guides/security/soc-2-compliance' },
+        { name: 'HIPAA', url: '/guides/security/hipaa-compliance' },
+      ],
+    },
+  ],
+}
+
 export const platform: NavMenuConstant = {
   icon: 'platform',
   title: 'Platform',
@@ -2373,6 +2406,7 @@ export const deployment: NavMenuConstant = {
         },
         { name: 'Maturity model', url: '/guides/deployment/maturity-model' },
         { name: 'Production checklist', url: '/guides/deployment/going-into-prod' },
+        { name: 'SOC 2 compliance', url: '/guides/security/soc-2-compliance' },
       ],
     },
     {

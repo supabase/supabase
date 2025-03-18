@@ -58,6 +58,8 @@ export * from './src/components/Upload'
 export * from './src/components/Form'
 export * from './src/components/ExpandingTextArea'
 
+export * from './src/components/PrePostTab'
+
 // layout
 export * from './src/components/LoadingLine'
 
@@ -238,7 +240,7 @@ export * from './src/components/shadcn/ui/calendar'
 
 export { Toggle as Toggle_Shadcn } from './src/components/shadcn/ui/toggle'
 
-export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
+export { ScrollArea, ScrollBar, ScrollViewport } from './src/components/shadcn/ui/scroll-area'
 
 export { Separator } from './src/components/shadcn/ui/separator'
 

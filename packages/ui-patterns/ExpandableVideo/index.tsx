@@ -56,6 +56,7 @@ export function ExpandableVideo({
           text-white
           flex flex-col gap-3
           items-center justify-center
+          bg-alternative
           before:content['']
           before:absolute
           before:inset-0

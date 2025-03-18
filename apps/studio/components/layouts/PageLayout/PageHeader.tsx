@@ -1,8 +1,8 @@
-import { useParams } from 'common'
 import { ChevronLeft } from 'lucide-react'
+import Link from 'next/link'
 import { Fragment, ReactNode } from 'react'
 
-import Link from 'next/link'
+import { useParams } from 'common'
 import { cn } from 'ui'
 import {
   Breadcrumb,
@@ -27,7 +27,6 @@ interface PageHeaderProps {
   secondaryActions?: ReactNode
   className?: string
   isCompact?: boolean
-  pageMeta?: ReactNode
 }
 
 export const PageHeader = ({
@@ -39,7 +38,6 @@ export const PageHeader = ({
   secondaryActions,
   className,
   isCompact = false,
-  pageMeta,
 }: PageHeaderProps) => {
   const { ref } = useParams()
 
