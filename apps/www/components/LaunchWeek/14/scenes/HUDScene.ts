@@ -46,7 +46,7 @@ class HUDScene implements BaseScene {
   private referenceCanvasHeight = 707
   private qualityMultiplier = 1.5
 
-  private referenceSizes = {
+  private referenceStyles = {
     axis: {
       width: 67,
       textGap: 16,
@@ -56,14 +56,6 @@ class HUDScene implements BaseScene {
       ticksColor: '#6E6E6E',
       textShadowBlur: 4,
       textShadowColor: 'rgba(0, 0, 0, 0.25)',
-      leftCoords: {
-        x: 92,
-        y: 206,
-      },
-      rightCoords: {
-        x: 985,
-        y: 206,
-      },
     },
     bars: {
       lineHeight: 16,
@@ -76,20 +68,6 @@ class HUDScene implements BaseScene {
       valueColor: '#fff',
       xGap: 8,
       yGap: 2,
-      coords: [
-        {
-          y: 611,
-          x: 190 + 25,
-        },
-        {
-          y: 611,
-          x: 380 + 25,
-        },
-        {
-          y: 611,
-          x: 570 + 25,
-        },
-      ],
     },
     numberControl: {
       lineHeight: 16,
@@ -101,14 +79,80 @@ class HUDScene implements BaseScene {
       activeColor: '#2CF494',
       disabledColor: '#6C6C6C',
       valueColor: '#fff',
-      coords: {
-        y: 611,
-        x: 760 + 25,
+    },
+  }
+
+  resolutions = {
+    0: {
+      numberControl: {
+        coords: { y: 611, x: 0, alignment: 'center' as const },
+      },
+      bars: {
+        coords: [
+          { y: 611 - 50 * 3, x: 0, alignment: 'center' as const },
+          {
+            y: 611 - 50 * 2,
+            x: 0,
+            alignment: 'center' as const,
+          },
+          {
+            y: 611 - 50 * 1,
+            x: 0,
+            alignment: 'center' as const,
+          },
+        ],
+      },
+      axis: {
+        visible: false as const,
+      },
+    },
+    784: {
+      numberControl: {
+        coords: {
+          y: 611,
+          x: 760 + 25,
+          alignment: 'left' as const,
+        },
+      },
+      bars: {
+        coords: [
+          {
+            y: 611,
+            x: 190 + 25,
+            alignment: 'left' as const,
+          },
+          {
+            y: 611,
+            x: 380 + 25,
+            alignment: 'left' as const,
+          },
+          {
+            y: 611,
+            x: 570 + 25,
+            alignment: 'left' as const,
+          },
+        ],
+      },
+      axis: {
+        visible: true as const,
+        leftCoords: {
+          x: 92,
+          y: 206,
+          alignment: 'left' as const,
+        },
+        rightCoords: {
+          x: 985,
+          y: 206,
+          alignment: 'left' as const,
+        },
       },
     },
   }
 
-  private sizes: typeof this.referenceSizes
+  activeResolutionKey: keyof typeof this.resolutions = 0
+  scaledCoords: typeof this.resolutions
+
+  private scaledStyles: typeof this.referenceStyles
   private canvasWidth: number
   private canvasHeight: number
 
@@ -127,9 +171,18 @@ class HUDScene implements BaseScene {
     this.canvasWidth = this.referenceCanvasWidth * this.qualityMultiplier
     this.canvasHeight = this.referenceCanvasHeight * this.qualityMultiplier
 
-    this.sizes = JSON.parse(JSON.stringify(this.referenceSizes), (key, value) => {
+    this.scaledStyles = JSON.parse(JSON.stringify(this.referenceStyles), (key, value) => {
       return typeof value === 'number' ? value * this.qualityMultiplier : value
     })
+
+    this.scaledCoords = Object.fromEntries(
+      Object.entries(this.resolutions).map(([key, resolutions]) => [
+        key,
+        JSON.parse(JSON.stringify(resolutions), (key, value) => {
+          return typeof value === 'number' ? value * this.qualityMultiplier : value
+        }),
+      ])
+    ) as typeof this.resolutions
   }
 
   getId(): string {
@@ -147,6 +200,8 @@ class HUDScene implements BaseScene {
     // Create main HUD group
     this.hudGroup = new THREE.Group()
     scene.add(this.hudGroup)
+
+    this.activeResolutionKey = this.getResolutionKey(window.innerWidth)
 
     this.setHUDDimensionsAndPosition(12)
 
@@ -184,10 +239,10 @@ class HUDScene implements BaseScene {
 
     // Create HUD mesh
     this.hudPlane = new THREE.PlaneGeometry(this.width, this.height)
-    
+
     // Apply object-cover effect to the initial geometry
     this.applyObjectCoverUVs(this.hudPlane)
-    
+
     this.hudMesh = new THREE.Mesh(this.hudPlane, this.hudMaterial)
     this.hudMesh.position.set(0, 0, 0)
 
@@ -236,9 +291,11 @@ class HUDScene implements BaseScene {
       this.shader.uniforms.time.value = time
       this.shader.uniforms.resolution.value[0] = this.canvasWidth
       this.shader.uniforms.resolution.value[1] = this.canvasHeight
-      this.shader.uniforms.vignetteRadius.value = this.shader.uniforms.vignetteRadius.value + 
+      this.shader.uniforms.vignetteRadius.value =
+        this.shader.uniforms.vignetteRadius.value +
         (this.state.vignetteRaduis - this.shader.uniforms.vignetteRadius.value) * 0.1
-      this.shader.uniforms.vignetteSmoothness.value = this.shader.uniforms.vignetteSmoothness.value + 
+      this.shader.uniforms.vignetteSmoothness.value =
+        this.shader.uniforms.vignetteSmoothness.value +
         (this.state.vignetteSmoothness - this.shader.uniforms.vignetteSmoothness.value) * 0.1
     }
   }
@@ -322,6 +379,13 @@ class HUDScene implements BaseScene {
 
       // Reposition HUD elements based on new dimensions
       this.repositionHudElements()
+
+      const newResolutionKey = this.getResolutionKey(window.innerWidth)
+      if (this.activeResolutionKey !== newResolutionKey && this.hudTexture) {
+        this.activeResolutionKey = newResolutionKey
+        this.draw()
+        this.hudTexture.needsUpdate = true
+      }
     }
   }
 
@@ -353,36 +417,43 @@ class HUDScene implements BaseScene {
     const canvas = this.hudCanvas
 
     ctx.clearRect(0, 0, canvas.width, canvas.height)
+    const sizes = this.scaledCoords[this.activeResolutionKey]
 
-    this.drawLeftAlignedAxis(ctx, this.sizes.axis.leftCoords, {
-      header: 'PREV LWS',
-      labels: ['7', '8', '9', '10', '11', '12', '13'],
-    })
+    if (sizes.axis.visible) {
+      this.drawLeftAlignedAxis(ctx, sizes.axis.leftCoords, {
+        header: 'PREV LWS',
+        labels: ['7', '8', '9', '10', '11', '12', '13'],
+      })
 
-    this.drawLeftAlignedAxis(ctx, this.sizes.axis.rightCoords, {
-      header: 'TEMP',
-      labels: ['2005', '2027', '2049', '2071', '2093', '2115', '2137'],
-    })
+      this.drawLeftAlignedAxis(ctx, sizes.axis.rightCoords, {
+        header: 'TEMP',
+        labels: ['2005', '2027', '2049', '2071', '2093', '2115', '2137'],
+      })
+    }
 
-    this.drawLeftAlignedBarControl(ctx, this.sizes.bars.coords[0], {
+    this.drawBarControl(ctx, sizes.bars.coords[0], {
       label: 'FUEL',
       percentage: this.state.fuelLevel,
+      alignment: sizes.bars.coords[0].alignment,
     })
 
-    this.drawLeftAlignedBarControl(ctx, this.sizes.bars.coords[1], {
+    this.drawBarControl(ctx, sizes.bars.coords[1], {
       label: 'SHIELD INTEGRITY',
       percentage: this.state.shieldIntegrity,
+      alignment: sizes.bars.coords[1].alignment,
     })
 
-    this.drawLeftAlignedBarControl(ctx, this.sizes.bars.coords[2], {
+    this.drawBarControl(ctx, sizes.bars.coords[2], {
       label: 'OXYGEN',
       percentage: this.state.oxygenLevel,
+      alignment: sizes.bars.coords[2].alignment,
     })
 
-    this.drawLeftAlignedNumberControl(ctx, this.sizes.numberControl.coords, {
+    this.drawNumberControl(ctx, sizes.numberControl.coords, {
       label: 'PEOPLE ONLINE',
       value: this.state.peopleOnline,
       active: this.state.peopleOnlineActive,
+      alignment: sizes.numberControl.coords.alignment,
     })
   }
 
@@ -391,7 +462,7 @@ class HUDScene implements BaseScene {
     axisCoords: { x: number; y: number },
     data: { header: string; labels: string[] }
   ) {
-    const axis = this.sizes.axis
+    const axis = this.scaledStyles.axis
     ctx.save()
     let yCoord = 0
     ctx.translate(axisCoords.x + axis.width / 2, axisCoords.y)
@@ -408,20 +479,48 @@ class HUDScene implements BaseScene {
     ctx.restore()
   }
 
-  private drawLeftAlignedBarControl(
+  /**
+   * Draws a bar control with customizable alignment
+   * @param ctx Canvas context
+   * @param coords Coordinates for the control
+   * @param data Control data including label, percentage and alignment
+   */
+  private drawBarControl(
     ctx: CanvasRenderingContext2D,
     coords: { x: number; y: number },
-    data: { label: string; percentage: number }
+    data: { label: string; percentage: number; alignment?: 'left' | 'center' }
   ) {
-    const bars = this.sizes.bars
+    const bars = this.scaledStyles.bars
+    const alignment = data.alignment || 'left'
     ctx.save()
+
+    // Calculate x position based on alignment
+    let x = coords.x
+
+    // If center alignment is specified, ignore the provided x coordinate
+    // and center the entire component on the canvas
+    if (alignment === 'center') {
+      x = this.canvasWidth / 2
+    }
+
+    // Calculate positions for all elements
+    let labelX = x
+    let barX = x
+
+    // Adjust for text alignment
+    if (alignment === 'center') {
+      // For center alignment, calculate offsets
+      const labelWidth = ctx.measureText(data.label).width
+      labelX = x - labelWidth / 2
+      barX = x - bars.barWidth / 2
+    }
 
     // Draw label on top
     ctx.font = `${bars.fontSize}px Source Code Pro, Office Code Pro, Menlo, monospace`
     ctx.fillStyle = bars.labelColor
-    ctx.textAlign = 'left'
+    ctx.textAlign = alignment === 'center' ? 'center' : 'left'
     ctx.textBaseline = 'top'
-    ctx.fillText(data.label, coords.x, coords.y)
+    ctx.fillText(data.label, alignment === 'center' ? x : labelX, coords.y)
 
     // Draw bar below the label
     const barY = coords.y + bars.lineHeight + bars.yGap
@@ -429,7 +528,7 @@ class HUDScene implements BaseScene {
     // Bar background
     ctx.strokeStyle = bars.barColor
     ctx.lineWidth = bars.barStroke
-    ctx.strokeRect(coords.x, barY, bars.barWidth, bars.barHeight)
+    ctx.strokeRect(barX, barY, bars.barWidth, bars.barHeight)
 
     // Add vertical gradient inside the bar background
     const gradient = ctx.createLinearGradient(0, barY, 0, barY + bars.barHeight)
@@ -437,12 +536,12 @@ class HUDScene implements BaseScene {
     gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.04)')
     gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
     ctx.fillStyle = gradient
-    ctx.fillRect(coords.x, barY, bars.barWidth, bars.barHeight)
+    ctx.fillRect(barX, barY, bars.barWidth, bars.barHeight)
 
     // Filled portion of the bar
     const fillWidth = Math.max(0, Math.min(1, data.percentage)) * bars.barWidth
     ctx.fillStyle = bars.barColor
-    ctx.fillRect(coords.x, barY, fillWidth, bars.barHeight)
+    ctx.fillRect(barX, barY, fillWidth, bars.barHeight)
 
     // Draw value on the right of the bar
     ctx.fillStyle = bars.valueColor
@@ -451,25 +550,58 @@ class HUDScene implements BaseScene {
     const value = Math.round(data.percentage * 100)
       .toString()
       .padStart(3, '0')
-    ctx.fillText(value, coords.x + bars.barWidth + bars.xGap, barY + bars.barHeight / 2)
+    ctx.fillText(value, barX + bars.barWidth + bars.xGap, barY + bars.barHeight / 2)
 
     ctx.restore()
   }
 
-  private drawLeftAlignedNumberControl(
+  /**
+   * Draws a number control with customizable alignment
+   * @param ctx Canvas context
+   * @param coords Coordinates for the control
+   * @param data Control data including label, value, active state and alignment
+   */
+  private drawNumberControl(
     ctx: CanvasRenderingContext2D,
     coords: { x: number; y: number },
-    data: { label: string; value: number | null; active: boolean }
+    data: { label: string; value: number | null; active: boolean; alignment?: 'left' | 'center' }
   ) {
-    const control = this.sizes.numberControl
+    const control = this.scaledStyles.numberControl
+    const alignment = data.alignment || 'left'
     ctx.save()
+
+    // Calculate x position based on alignment
+    let x = coords.x
+
+    // If center alignment is specified, ignore the provided x coordinate
+    // and center the entire component on the canvas
+    if (alignment === 'center') {
+      x = this.canvasWidth / 2
+    }
+
+    // Calculate positions for all elements
+    let labelX = x
+    let contentX = x
+
+    if (alignment === 'center') {
+      // For center alignment, calculate offsets
+      const labelWidth = ctx.measureText(data.label).width
+      labelX = x - labelWidth / 2
+
+      // For the dot and value, we need to calculate total width
+      const valueText =
+        data.active && data.value !== null ? data.value.toString().padStart(3, '0') : '---'
+      const valueWidth = ctx.measureText(valueText).width
+      const totalWidth = control.dotSize + control.xGap + valueWidth
+      contentX = x - totalWidth / 2
+    }
 
     // Draw label on top
     ctx.font = `${control.fontSize}px Source Code Pro, Office Code Pro, Menlo, monospace`
     ctx.fillStyle = control.labelColor
-    ctx.textAlign = 'left'
+    ctx.textAlign = alignment === 'center' ? 'center' : 'left'
     ctx.textBaseline = 'top'
-    ctx.fillText(data.label, coords.x, coords.y)
+    ctx.fillText(data.label, alignment === 'center' ? x : labelX, coords.y)
 
     // Draw dot below the label
     const dotY =
@@ -479,7 +611,7 @@ class HUDScene implements BaseScene {
     ctx.fillStyle = data.active ? control.activeColor : control.disabledColor
     ctx.beginPath()
     ctx.arc(
-      coords.x + control.dotSize / 2,
+      contentX + control.dotSize / 2,
       dotY + control.dotSize / 2,
       control.dotSize / 2,
       0,
@@ -495,11 +627,11 @@ class HUDScene implements BaseScene {
       // Draw the actual value when active
       ctx.fillStyle = control.valueColor
       const value = data.value.toString().padStart(3, '0')
-      ctx.fillText(value, coords.x + control.dotSize + control.xGap, dotY + control.dotSize / 2)
+      ctx.fillText(value, contentX + control.dotSize + control.xGap, dotY + control.dotSize / 2)
     } else {
       // Draw dashes when inactive
       ctx.fillStyle = control.disabledColor
-      ctx.fillText('---', coords.x + control.dotSize + control.xGap, dotY + control.dotSize / 2)
+      ctx.fillText('---', contentX + control.dotSize + control.xGap, dotY + control.dotSize / 2)
     }
 
     ctx.restore()
@@ -552,71 +684,78 @@ class HUDScene implements BaseScene {
     if (!this.hudGroup || !this.hudMesh) return
 
     // Update the plane geometry with new dimensions
-    this.hudMesh.geometry.dispose(); // Dispose of the old geometry
-    this.hudPlane = new THREE.PlaneGeometry(this.width, this.height);
-    
+    this.hudMesh.geometry.dispose() // Dispose of the old geometry
+    this.hudPlane = new THREE.PlaneGeometry(this.width, this.height)
+
     // Apply object-cover effect by manipulating UV coordinates
-    this.applyObjectCoverUVs(this.hudPlane);
-    
-    this.hudMesh.geometry = this.hudPlane;
+    this.applyObjectCoverUVs(this.hudPlane)
+
+    this.hudMesh.geometry = this.hudPlane
   }
-  
+
   /**
    * Applies object-cover style UV mapping to preserve the original aspect ratio
    * of the texture when the geometry's aspect ratio changes
    */
   private applyObjectCoverUVs(geometry: THREE.PlaneGeometry): void {
-    if (!this.hudCanvas) return;
-    
+    if (!this.hudCanvas) return
+
     // Calculate aspect ratios
-    const textureAspect = this.canvasWidth / this.canvasHeight;
-    const geometryAspect = this.width / this.height;
-    
+    const textureAspect = this.canvasWidth / this.canvasHeight
+    const geometryAspect = this.width / this.height
+
     // Get UV attribute
-    const uvAttribute = geometry.attributes.uv;
-    const uvs = uvAttribute.array as Float32Array;
-    
+    const uvAttribute = geometry.attributes.uv
+    const uvs = uvAttribute.array as Float32Array
+
     // Calculate UV scale and offset for object-cover effect
-    let scaleX = 1;
-    let scaleY = 1;
-    let offsetX = 0;
-    let offsetY = 0;
-    
+    let scaleX = 1
+    let scaleY = 1
+    let offsetX = 0
+    let offsetY = 0
+
     if (geometryAspect > textureAspect) {
       // Geometry is wider than texture - scale Y and center vertically
-      scaleY = textureAspect / geometryAspect;
-      offsetY = (1 - scaleY) / 2;
+      scaleY = textureAspect / geometryAspect
+      offsetY = (1 - scaleY) / 2
     } else {
       // Geometry is taller than texture - scale X and center horizontally
-      scaleX = geometryAspect / textureAspect;
-      offsetX = (1 - scaleX) / 2;
+      scaleX = geometryAspect / textureAspect
+      offsetX = (1 - scaleX) / 2
     }
-    
+
     // Apply the UV transformation to each vertex
     // Standard UV coordinates for a plane are:
     // (0,0), (1,0), (0,1), (1,1)
-    
+
     // In Three.js, texture coordinates are flipped vertically compared to the standard
     // WebGL convention. We need to flip the Y coordinates (1-y) to correct this.
-    
+
     // Bottom left
-    uvs[0] = offsetX;
-    uvs[1] = 1 - offsetY; // Flip Y
-    
+    uvs[0] = offsetX
+    uvs[1] = 1 - offsetY // Flip Y
+
     // Bottom right
-    uvs[2] = offsetX + scaleX;
-    uvs[3] = 1 - offsetY; // Flip Y
-    
+    uvs[2] = offsetX + scaleX
+    uvs[3] = 1 - offsetY // Flip Y
+
     // Top left
-    uvs[4] = offsetX;
-    uvs[5] = 1 - (offsetY + scaleY); // Flip Y
-    
+    uvs[4] = offsetX
+    uvs[5] = 1 - (offsetY + scaleY) // Flip Y
+
     // Top right
-    uvs[6] = offsetX + scaleX;
-    uvs[7] = 1 - (offsetY + scaleY); // Flip Y
-    
+    uvs[6] = offsetX + scaleX
+    uvs[7] = 1 - (offsetY + scaleY) // Flip Y
+
     // Mark the attribute as needing an update
-    uvAttribute.needsUpdate = true;
+    uvAttribute.needsUpdate = true
+  }
+
+  private getResolutionKey(resolution: number) {
+    const resolutions = Object.keys(this.resolutions).map(Number)
+    return resolutions.reduce((prev, curr) =>
+      resolution - curr >= 0 && resolution - curr < resolution - prev ? curr : prev
+    ) as keyof typeof this.resolutions
   }
 }
 

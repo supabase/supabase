@@ -1064,8 +1064,6 @@ class TicketScene implements BaseScene {
       resolution - curr >= 0 && resolution - curr < resolution - prev ? curr : prev
     ) as keyof typeof this.resolutions
 
-    console.log('Closest resolution:', closestResolution)
-
     return this.resolutions[closestResolution]
   }
 }
