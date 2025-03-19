@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, ComponentProps } from 'react'
+import { useState, ComponentProps, useEffect } from 'react'
 import dayjs from 'dayjs'
 import {
   Area,
@@ -15,9 +15,15 @@ import {
 } from 'recharts'
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
+import { useTheme } from 'next-themes'
 import ChartHeader from './ChartHeader'
 import ChartHighlightActions from './ChartHighlightActions'
-import { CHART_COLORS, DateTimeFormats, STACKED_CHART_COLORS } from './Charts.constants'
+import {
+  CHART_COLORS,
+  DateTimeFormats,
+  STACKED_CHART_COLORS,
+  updateStackedChartColors,
+} from './Charts.constants'
 import { Datum, CommonChartProps } from './Charts.types'
 import { useChartSize, numberFormatter } from './Charts.utils'
 import { ChartHighlight } from './useChartHighlight'
@@ -79,10 +85,16 @@ export default function ComposedChart({
   onChartStyleChange,
   updateDateRange,
 }: BarChartProps) {
+  const { resolvedTheme } = useTheme()
   const [_activePayload, setActivePayload] = useState<any>(null)
   const [_showMaxValue, setShowMaxValue] = useState(showMaxValue)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
+
+  // Update chart colors when theme changes
+  useEffect(() => {
+    updateStackedChartColors(resolvedTheme?.includes('dark') ?? false)
+  }, [resolvedTheme])
 
   const { Container } = useChartSize(size)
 

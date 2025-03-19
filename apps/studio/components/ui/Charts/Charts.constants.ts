@@ -11,7 +11,18 @@ export const CHART_COLORS = {
   RED_2: 'hsl(var(--destructive-500))',
 }
 
-export const STACKED_CHART_COLORS = [
+const LIGHT_STACKED_CHART_COLORS = [
+  '#3ECF8E',
+  '#097c4f',
+  '#DA760B',
+  '#EDC35E',
+  '#65BCD9',
+  '#0063E8',
+  '#DB8DF9',
+  '#B616A6',
+]
+
+const DARK_STACKED_CHART_COLORS = [
   '#3ECF8E',
   '#A3FFC2',
   '#DA760B',
@@ -21,6 +32,14 @@ export const STACKED_CHART_COLORS = [
   '#DB8DF9',
   '#B616A6',
 ]
+
+// Default to light mode colors, will be updated based on theme
+export let STACKED_CHART_COLORS = LIGHT_STACKED_CHART_COLORS
+
+// Function to update colors based on theme
+export const updateStackedChartColors = (isDarkMode: boolean) => {
+  STACKED_CHART_COLORS = isDarkMode ? DARK_STACKED_CHART_COLORS : LIGHT_STACKED_CHART_COLORS
+}
 
 // refer to packages/ui/radix-colors.js for full list of colors
 export type ValidStackColor =

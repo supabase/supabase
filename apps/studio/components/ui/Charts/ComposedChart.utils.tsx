@@ -156,10 +156,6 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
     onLabelHover?.(null)
   }
 
-  // useEffect(() => {
-  //   return () => handleMouseLeave()
-  // }, [])
-
   const getIcon = (name: string, color: string) => {
     switch (name === maxValueAttribute?.attribute) {
       case true:
