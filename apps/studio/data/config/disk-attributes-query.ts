@@ -62,7 +62,7 @@ export const useRemainingDurationForDiskAttributeUpdate = ({
     return lastModifiedAtString === undefined || COOLDOWN_DURATION - secondsFromNow < 0
       ? 0
       : COOLDOWN_DURATION - secondsFromNow
-  }, [lastModifiedAtString])
+  }, [lastModifiedAtString, secondsFromNow])
 
   if (data?.last_modified_at === undefined)
     return {
