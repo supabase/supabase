@@ -250,7 +250,7 @@ export const ConnectionPooling = () => {
           pgbouncer_enabled: true,
           ignore_startup_parameters: pgbouncerConfig.ignore_startup_parameters ?? '',
           pool_mode: pool_mode as 'transaction' | 'session' | 'statement',
-          max_client_conn,
+          max_client_conn: max_client_conn ?? undefined,
           default_pool_size: default_pool_size as number | undefined,
         },
         {
@@ -264,6 +264,7 @@ export const ConnectionPooling = () => {
             }
 
             setShowConfirmation(false)
+            // @ts-expect-error [Joshen] There's some issues with API typing, returning some params as Record<string, never>
             form.reset({ type: 'PgBouncer', ...data })
           },
         }
@@ -274,7 +275,10 @@ export const ConnectionPooling = () => {
           ref: projectRef,
           pgbouncer_enabled: false,
           ignore_startup_parameters: pgbouncerConfig.ignore_startup_parameters ?? '',
-          pool_mode: pgbouncerConfig.pool_mode as 'transaction' | 'session' | 'statement',
+          pool_mode: pgbouncerConfig.pool_mode as unknown as
+            | 'transaction'
+            | 'session'
+            | 'statement',
         })
       }
       updateSupavisorConfig(
@@ -292,7 +296,13 @@ export const ConnectionPooling = () => {
               toast.success(`Successfully updated Supavisor configuration`)
             }
             setShowConfirmation(false)
-            form.reset({ type: 'Supavisor', ...data })
+            if (data) {
+              form.reset({
+                type: 'Supavisor',
+                pool_mode: data.pool_mode as 'transaction' | 'session',
+                default_pool_size: data.default_pool_size,
+              })
+            }
           },
         }
       )
@@ -304,6 +314,7 @@ export const ConnectionPooling = () => {
       if (pgbouncerConfig) {
         form.reset({
           type: 'PgBouncer',
+          // @ts-expect-error [Joshen] There's some issues with API typing, returning some params as Record<string, never>
           pool_mode: pgbouncerConfig.pool_mode,
           default_pool_size: pgbouncerConfig.default_pool_size,
           max_client_conn: pgbouncerConfig.max_client_conn,

@@ -271,6 +271,41 @@ export interface paths {
     patch: operations['updateApiKey']
     trace?: never
   }
+  '/v1/projects/{ref}/billing/addons': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists project addons */
+    get: operations['v1-list-project-addons']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Applies project addon */
+    patch: operations['v1-apply-project-addon']
+    trace?: never
+  }
+  '/v1/projects/{ref}/billing/addons/{addon_variant}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Removes project addon */
+    delete: operations['v1-remove-project-addon']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/branches': {
     parameters: {
       query?: never
@@ -398,7 +433,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Alpha] Lists all third-party auth integrations */
+    /** Lists all third-party auth integrations */
     get: operations['listTPAForProject']
     put?: never
     /** Creates a new third-party auth integration */
@@ -416,11 +451,11 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Alpha] Get a third-party integration */
+    /** Get a third-party integration */
     get: operations['getTPAForProject']
     put?: never
     post?: never
-    /** [Alpha] Removes a third-party auth integration */
+    /** Removes a third-party auth integration */
     delete: operations['deleteTPAForProject']
     options?: never
     head?: never
@@ -1237,6 +1272,33 @@ export interface components {
     ApiKeySecretJWTTemplate: {
       role: string
     }
+    ApplyProjectAddonBodyDto: {
+      /** @enum {string} */
+      addon_type:
+        | 'custom_domain'
+        | 'compute_instance'
+        | 'pitr'
+        | 'ipv4'
+        | 'auth_mfa_phone'
+        | 'auth_mfa_web_authn'
+        | 'log_drain'
+      addon_variant:
+        | (
+            | 'ci_micro'
+            | 'ci_small'
+            | 'ci_medium'
+            | 'ci_large'
+            | 'ci_xlarge'
+            | 'ci_2xlarge'
+            | 'ci_4xlarge'
+            | 'ci_8xlarge'
+            | 'ci_12xlarge'
+            | 'ci_16xlarge'
+          )
+        | 'cd_default'
+        | ('pitr_7' | 'pitr_14' | 'pitr_28')
+        | 'ipv4_default'
+    }
     AttributeMapping: {
       keys: {
         [key: string]: components['schemas']['AttributeValue']
@@ -1714,6 +1776,97 @@ export interface components {
       saml?: components['schemas']['SamlDescriptor']
       updated_at?: string
     }
+    ListProjectAddonsResponseDto: {
+      available_addons: {
+        name: string
+        /** @enum {string} */
+        type:
+          | 'custom_domain'
+          | 'compute_instance'
+          | 'pitr'
+          | 'ipv4'
+          | 'auth_mfa_phone'
+          | 'auth_mfa_web_authn'
+          | 'log_drain'
+        variants: {
+          id:
+            | (
+                | 'ci_micro'
+                | 'ci_small'
+                | 'ci_medium'
+                | 'ci_large'
+                | 'ci_xlarge'
+                | 'ci_2xlarge'
+                | 'ci_4xlarge'
+                | 'ci_8xlarge'
+                | 'ci_12xlarge'
+                | 'ci_16xlarge'
+              )
+            | 'cd_default'
+            | ('pitr_7' | 'pitr_14' | 'pitr_28')
+            | 'ipv4_default'
+            | 'auth_mfa_phone_default'
+            | 'auth_mfa_web_authn_default'
+            | 'log_drain_default'
+          meta?: {
+            [key: string]: number | boolean | string | string[]
+          }
+          name: string
+          price: {
+            amount: number
+            description: string
+            /** @enum {string} */
+            interval: 'monthly' | 'hourly'
+            /** @enum {string} */
+            type: 'fixed' | 'usage'
+          }
+        }[]
+      }[]
+      selected_addons: {
+        /** @enum {string} */
+        type:
+          | 'custom_domain'
+          | 'compute_instance'
+          | 'pitr'
+          | 'ipv4'
+          | 'auth_mfa_phone'
+          | 'auth_mfa_web_authn'
+          | 'log_drain'
+        variant: {
+          id:
+            | (
+                | 'ci_micro'
+                | 'ci_small'
+                | 'ci_medium'
+                | 'ci_large'
+                | 'ci_xlarge'
+                | 'ci_2xlarge'
+                | 'ci_4xlarge'
+                | 'ci_8xlarge'
+                | 'ci_12xlarge'
+                | 'ci_16xlarge'
+              )
+            | 'cd_default'
+            | ('pitr_7' | 'pitr_14' | 'pitr_28')
+            | 'ipv4_default'
+            | 'auth_mfa_phone_default'
+            | 'auth_mfa_web_authn_default'
+            | 'log_drain_default'
+          meta?: {
+            [key: string]: number | boolean | string | string[]
+          }
+          name: string
+          price: {
+            amount: number
+            description: string
+            /** @enum {string} */
+            interval: 'monthly' | 'hourly'
+            /** @enum {string} */
+            type: 'fixed' | 'usage'
+          }
+        }
+      }[]
+    }
     ListProvidersResponse: {
       items: components['schemas']['Provider'][]
     }
@@ -1739,8 +1892,9 @@ export interface components {
       refresh_token: string
     }
     OAuthTokenBody: {
-      client_id: string
-      client_secret: string
+      /** Format: uuid */
+      client_id?: string
+      client_secret?: string
       code?: string
       code_verifier?: string
       /** @enum {string} */
@@ -1750,7 +1904,6 @@ export interface components {
     }
     OAuthTokenResponse: {
       access_token: string
-      /** Format: int64 */
       expires_in: number
       refresh_token: string
       /** @enum {string} */
@@ -2006,7 +2159,6 @@ export interface components {
     }
     SupavisorConfigResponse: {
       connection_string: string
-      connectionString: string
       /** @enum {string} */
       database_type: 'PRIMARY' | 'READ_REPLICA'
       db_host: string
@@ -2307,16 +2459,14 @@ export interface components {
     UpdateSupavisorConfigBody: {
       default_pool_size?: number | null
       /**
-       * @deprecated
-       * @description This field is deprecated and is ignored in this request
+       * @description Dedicated pooler mode for the project
        * @enum {string}
        */
       pool_mode?: 'transaction' | 'session'
     }
     UpdateSupavisorConfigResponse: {
       default_pool_size: number | null
-      /** @enum {number} */
-      pool_mode: never
+      pool_mode: string
     }
     UpgradeDatabaseBody: {
       release_channel: components['schemas']['ReleaseChannel']
@@ -2751,9 +2901,7 @@ export interface operations {
         code_challenge?: string
         code_challenge_method?: 'plain' | 'sha256' | 'S256'
         redirect_uri: string
-        response_mode?: string
-        response_type: 'code' | 'token' | 'id_token token'
-        scope?: string
+        response_type: string
         state?: string
       }
       header?: never
@@ -3176,6 +3324,124 @@ export interface operations {
         content: {
           'application/json': components['schemas']['ApiKeyResponse']
         }
+      }
+    }
+  }
+  'v1-list-project-addons': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListProjectAddonsResponseDto']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to list project addons */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-apply-project-addon': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ApplyProjectAddonBodyDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to apply project addon */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-remove-project-addon': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        addon_variant:
+          | 'ci_micro'
+          | 'ci_small'
+          | 'ci_medium'
+          | 'ci_large'
+          | 'ci_xlarge'
+          | 'ci_2xlarge'
+          | 'ci_4xlarge'
+          | 'ci_8xlarge'
+          | 'ci_12xlarge'
+          | 'ci_16xlarge'
+          | 'cd_default'
+          | 'pitr_7'
+          | 'pitr_14'
+          | 'pitr_28'
+          | 'ipv4_default'
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to remove project addon */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
