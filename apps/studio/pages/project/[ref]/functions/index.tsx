@@ -58,24 +58,6 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
-        <Dialog>
-          <DialogTrigger asChild>
-            <DropdownMenuItem className="gap-4" onSelect={(e) => e.preventDefault()}>
-              <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
-              <div>
-                <span className="text-foreground">Via CLI</span>
-                <p>
-                  Create an edge function locally and then deploy your function via the Supabase CLI
-                </p>
-              </div>
-            </DropdownMenuItem>
-          </DialogTrigger>
-          <DialogContent size="large">
-            <DialogSection padding="small">
-              <TerminalInstructions />
-            </DialogSection>
-          </DialogContent>
-        </Dialog>
         {edgeFunctionCreate && (
           <DropdownMenuItem
             onSelect={() => {
@@ -97,6 +79,24 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
             </div>
           </DropdownMenuItem>
         )}
+        <Dialog>
+          <DialogTrigger asChild>
+            <DropdownMenuItem className="gap-4" onSelect={(e) => e.preventDefault()}>
+              <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
+              <div>
+                <span className="text-foreground">Via CLI</span>
+                <p>
+                  Create an edge function locally and then deploy your function via the Supabase CLI
+                </p>
+              </div>
+            </DropdownMenuItem>
+          </DialogTrigger>
+          <DialogContent size="large">
+            <DialogSection padding="small">
+              <TerminalInstructions />
+            </DialogSection>
+          </DialogContent>
+        </Dialog>
       </DropdownMenuContent>
     </DropdownMenu>
   )

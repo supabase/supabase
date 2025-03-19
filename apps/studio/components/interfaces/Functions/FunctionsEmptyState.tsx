@@ -40,38 +40,31 @@ export const FunctionsEmptyState = () => {
           <CardTitle>Create your first edge function</CardTitle>
         </CardHeader>
         <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
-          {/* CLI Option */}
-          <div className="p-8">
-            <div className="flex items-center gap-2">
-              <Terminal strokeWidth={1.5} size={20} />
-              <h4 className="text-base text-foreground">Via CLI</h4>
+          {/* Editor Option */}
+          {edgeFunctionCreate && (
+            <div className="p-8">
+              <div className="flex items-center gap-2">
+                <Code strokeWidth={1.5} size={20} />
+                <h4 className="text-base text-foreground">Via Editor</h4>
+              </div>
+              <p className="text-sm text-foreground-light mb-4 mt-1">
+                Create and edit functions directly in the browser. Download to local at any time.
+              </p>
+              <Button
+                type="default"
+                onClick={() => {
+                  router.push(`/project/${ref}/functions/new`)
+                  sendEvent({
+                    action: 'edge_function_via_editor_button_clicked',
+                    properties: { origin: 'no_functions_block' },
+                    groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                  })
+                }}
+              >
+                Open Editor
+              </Button>
             </div>
-            <p className="text-sm text-foreground-light mb-4 mt-1">
-              Create and deploy functions using the Supabase CLI. Ideal for local development and
-              version control.
-            </p>
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  type="default"
-                  onClick={() =>
-                    sendEvent({
-                      action: 'edge_function_via_cli_button_clicked',
-                      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                    })
-                  }
-                >
-                  View CLI Instructions
-                </Button>
-              </DialogTrigger>
-              <DialogContent size="large">
-                <DialogSection padding="small">
-                  <TerminalInstructions />
-                </DialogSection>
-              </DialogContent>
-            </Dialog>
-          </div>
+          )}
 
           {/* AI Assistant Option */}
           <div className="p-8">
@@ -109,31 +102,38 @@ export const FunctionsEmptyState = () => {
             </Button>
           </div>
 
-          {/* Editor Option */}
-          {edgeFunctionCreate && (
-            <div className="p-8">
-              <div className="flex items-center gap-2">
-                <Code strokeWidth={1.5} size={20} />
-                <h4 className="text-base text-foreground">Via Editor</h4>
-              </div>
-              <p className="text-sm text-foreground-light mb-4 mt-1">
-                Create and edit functions directly in the browser. Download to local at any time.
-              </p>
-              <Button
-                type="default"
-                onClick={() => {
-                  router.push(`/project/${ref}/functions/new`)
-                  sendEvent({
-                    action: 'edge_function_via_editor_button_clicked',
-                    properties: { origin: 'no_functions_block' },
-                    groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                  })
-                }}
-              >
-                Open Editor
-              </Button>
+          {/* CLI Option */}
+          <div className="p-8">
+            <div className="flex items-center gap-2">
+              <Terminal strokeWidth={1.5} size={20} />
+              <h4 className="text-base text-foreground">Via CLI</h4>
             </div>
-          )}
+            <p className="text-sm text-foreground-light mb-4 mt-1">
+              Create and deploy functions using the Supabase CLI. Ideal for local development and
+              version control.
+            </p>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  type="default"
+                  onClick={() =>
+                    sendEvent({
+                      action: 'edge_function_via_cli_button_clicked',
+                      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                    })
+                  }
+                >
+                  View CLI Instructions
+                </Button>
+              </DialogTrigger>
+              <DialogContent size="large">
+                <DialogSection padding="small">
+                  <TerminalInstructions />
+                </DialogSection>
+              </DialogContent>
+            </Dialog>
+          </div>
         </CardContent>
       </Card>
       {edgeFunctionCreate && (
