@@ -1,7 +1,7 @@
 import { cn } from 'ui'
 import { useThreeJS } from './helpers'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import SceneRenderer, { BaseScene } from './utils/SceneRenderer'
+import { useCallback, useEffect, useRef } from 'react'
+import SceneRenderer from './utils/SceneRenderer'
 import TicketScene from './scenes/TicketScene'
 import TunnelScene from './scenes/TunnelScene'
 import useConfData from './hooks/use-conf-data'
@@ -9,13 +9,15 @@ import HUDScene from './scenes/HUDScene'
 
 interface TicketCanvasProps {
   className?: string
+  onUpgradeToSecret?: () => void
 }
 
-const TicketCanvas = ({ className }: TicketCanvasProps) => {
+const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
   const sceneRef = useRef<TicketScene | null>(null)
   const tunnelRef = useRef<TunnelScene | null>(null)
   const hudRef = useRef<HUDScene | null>(null)
   const initQueue = useRef<{ init: Promise<void>; renderer: SceneRenderer }[]>([])
+  const onUpgradeToSecretRef = useRef(onUpgradeToSecret)
   const [state, dispatch] = useConfData()
   const userData = state.userTicketData
   const initialSceneDataRef = useRef({
@@ -45,6 +47,7 @@ const TicketCanvas = ({ className }: TicketCanvasProps) => {
           onSeatChartButtonClicked: () => {
             scene.showBackSide()
             scene.upgradeToSecret()
+            onUpgradeToSecretRef.current?.()
           },
           onGoBackButtonClicked: () => {
             scene.showFrontSide()
@@ -75,7 +78,7 @@ const TicketCanvas = ({ className }: TicketCanvasProps) => {
           hudRef.current.setPeopleOnline(baseCount + randomOffset)
         }
 
-        hudRef.current.setOxygenLevel(0.60)
+        hudRef.current.setOxygenLevel(0.6)
         hudRef.current.setShieldIntegrity(0.99)
 
         // Example: Set fuel level based on user data
@@ -98,12 +101,18 @@ const TicketCanvas = ({ className }: TicketCanvasProps) => {
       sceneRef.current.setVisible(state.ticketVisibility)
       sceneRef.current.setTicketNumber(state.userTicketData.ticket_number ?? 0)
       sceneRef.current.setUserName(state.userTicketData.name ?? '')
+      if (state.userTicketData.secret) sceneRef.current.upgradeToSecret()
       sceneRef.current.reloadTextures()
-      if(state.ticketVisibility) {
+      if (state.ticketVisibility) {
         hudRef.current?.dimmHud()
       }
     }
-  }, [state.ticketVisibility, state.userTicketData.name, state.userTicketData.ticket_number])
+  }, [
+    state.ticketVisibility,
+    state.userTicketData.name,
+    state.userTicketData.secret,
+    state.userTicketData.ticket_number,
+  ])
 
   useEffect(() => {
     if (!hudRef.current || !userData) return
@@ -121,6 +130,10 @@ const TicketCanvas = ({ className }: TicketCanvasProps) => {
     const fuelLevel = userData.platinum ? 0.95 : 0.75
     hudRef.current.setFuelLevel(fuelLevel)
   }, [userData])
+
+  useEffect(() => {
+    onUpgradeToSecretRef.current = onUpgradeToSecret
+  }, [onUpgradeToSecret])
 
   const { containerRef } = useThreeJS(setup)
   return (

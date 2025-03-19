@@ -167,10 +167,36 @@ export const useRegistration = (props?: RegistrationProps) => {
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [dispatch])
+
+  const upgradeTicket = async () => {
+    if (userData.id) {
+      if(userData.secret) {
+        console.log('User already has a secret ticket')
+        return 
+      }
+
+      const { error } = await supabase
+        .from('tickets')
+        .update({ game_won_at: new Date() })
+        .eq('launch_week', 'lw14')
+        .eq('username', userData.username)
+
+      if (error) {
+        return console.error('Failed to upgrade user ticket', error)
+      }
+
+      // Trigger og-image ticket generation
+      await fetch(`/api-v2/ticket-og?username=${userData.username}&secret=true`)
+
+    } else {
+      console.warn('Cannot upgrade ticket without user data')
+    }
+  }
 
   return {
     realtimeChannel,
     signIn: handleGithubSignIn,
+    upgradeTicket,
   }
 }

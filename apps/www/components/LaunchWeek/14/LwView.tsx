@@ -29,8 +29,8 @@ export const LwView = () => {
   const partymode = usePartymode()
 
   const [state] = useConfData()
-
   const register = useRegistration()
+
 
   return (
     <DefaultLayout className='font-["Departure_Mono"]'>
@@ -42,7 +42,7 @@ export const LwView = () => {
             <TicketHeaderDate />
           </TicketHeader>
           <TicketLayoutCanvas>
-            <TicketCanvas />
+            <TicketCanvas onUpgradeToSecret={register.upgradeTicket}/>
             {state.claimFormState === 'visible' && (
               <TicketClaim>
                 <TicketClaimLogo />
