@@ -184,6 +184,10 @@ class HUDScene implements BaseScene {
 
     // Create HUD mesh
     this.hudPlane = new THREE.PlaneGeometry(this.width, this.height)
+    
+    // Apply object-cover effect to the initial geometry
+    this.applyObjectCoverUVs(this.hudPlane)
+    
     this.hudMesh = new THREE.Mesh(this.hudPlane, this.hudMaterial)
     this.hudMesh.position.set(0, 0, 0)
 
@@ -550,12 +554,69 @@ class HUDScene implements BaseScene {
     // Update the plane geometry with new dimensions
     this.hudMesh.geometry.dispose(); // Dispose of the old geometry
     this.hudPlane = new THREE.PlaneGeometry(this.width, this.height);
+    
+    // Apply object-cover effect by manipulating UV coordinates
+    this.applyObjectCoverUVs(this.hudPlane);
+    
     this.hudMesh.geometry = this.hudPlane;
   }
-
-  private getSize(num: number, axis: 'y' | 'x') {
-    const aspect = this.width / this.height
-    return axis === 'y' ? (num / this.canvasWidth) * aspect : num / this.canvasWidth
+  
+  /**
+   * Applies object-cover style UV mapping to preserve the original aspect ratio
+   * of the texture when the geometry's aspect ratio changes
+   */
+  private applyObjectCoverUVs(geometry: THREE.PlaneGeometry): void {
+    if (!this.hudCanvas) return;
+    
+    // Calculate aspect ratios
+    const textureAspect = this.canvasWidth / this.canvasHeight;
+    const geometryAspect = this.width / this.height;
+    
+    // Get UV attribute
+    const uvAttribute = geometry.attributes.uv;
+    const uvs = uvAttribute.array as Float32Array;
+    
+    // Calculate UV scale and offset for object-cover effect
+    let scaleX = 1;
+    let scaleY = 1;
+    let offsetX = 0;
+    let offsetY = 0;
+    
+    if (geometryAspect > textureAspect) {
+      // Geometry is wider than texture - scale Y and center vertically
+      scaleY = textureAspect / geometryAspect;
+      offsetY = (1 - scaleY) / 2;
+    } else {
+      // Geometry is taller than texture - scale X and center horizontally
+      scaleX = geometryAspect / textureAspect;
+      offsetX = (1 - scaleX) / 2;
+    }
+    
+    // Apply the UV transformation to each vertex
+    // Standard UV coordinates for a plane are:
+    // (0,0), (1,0), (0,1), (1,1)
+    
+    // In Three.js, texture coordinates are flipped vertically compared to the standard
+    // WebGL convention. We need to flip the Y coordinates (1-y) to correct this.
+    
+    // Bottom left
+    uvs[0] = offsetX;
+    uvs[1] = 1 - offsetY; // Flip Y
+    
+    // Bottom right
+    uvs[2] = offsetX + scaleX;
+    uvs[3] = 1 - offsetY; // Flip Y
+    
+    // Top left
+    uvs[4] = offsetX;
+    uvs[5] = 1 - (offsetY + scaleY); // Flip Y
+    
+    // Top right
+    uvs[6] = offsetX + scaleX;
+    uvs[7] = 1 - (offsetY + scaleY); // Flip Y
+    
+    // Mark the attribute as needing an update
+    uvAttribute.needsUpdate = true;
   }
 }
 
