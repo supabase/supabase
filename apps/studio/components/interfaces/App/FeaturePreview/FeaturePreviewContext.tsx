@@ -11,6 +11,13 @@ import { TableEditorTabsPreview } from './TableEditorTabs'
 
 export const FEATURE_PREVIEWS = [
   {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
+    name: 'Inline SQL Editor',
+    content: <InlineEditorPreview />,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
+    isNew: true,
+  },
+  {
     key: LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS,
     name: 'Table Editor Tabs',
     content: <TableEditorTabsPreview />,
@@ -35,13 +42,6 @@ export const FEATURE_PREVIEWS = [
     content: <CLSPreview />,
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
     isNew: false,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
-    name: 'Inline SQL Editor',
-    content: <InlineEditorPreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
-    isNew: true,
   },
 ]
 
