@@ -207,10 +207,12 @@ export const makeActiveTabPermanent = (ref?: string) => {
 // handle navigation to a specific tab
 export const handleTabNavigation = (ref: string | undefined, id: string, router: NextRouter) => {
   if (!ref) return
+
   const store = getTabsStore(ref)
   const tab = store.tabsMap[id]
   if (!tab) return
 
+  console.log('handleTabNavigation')
   store.activeTab = id
 
   // Add to recent items when navigating to a non-preview, non-new tab
@@ -261,8 +263,8 @@ export const handleTabClose = (
     : currentTabs.filter((tab) => {
         return editorEntityTypes[editor]?.includes(tab.type)
       })[0]?.id
-
   delete store.tabsMap[id]
+
   if (currentTab) {
     // Update store
     // If the tab being removed is logged in the store, update the open tabs
@@ -277,24 +279,27 @@ export const handleTabClose = (
     }
   }
 
-  if (nextTabId) {
-    store.activeTab = nextTabId
-    handleTabNavigation(ref, nextTabId, router)
-  } else {
-    // If no tabs of same type, go to the home of the current section
-    switch (currentTab?.type) {
-      case 'sql':
-        router.push(`/project/${router.query.ref}/sql`)
-        break
-      case 'r':
-      case 'v':
-      case 'm':
-      case 'f':
-      case 'p':
-        router.push(`/project/${router.query.ref}/editor`)
-        break
-      default:
-        router.push(`/project/${router.query.ref}/${editor}`)
+  // [Joshen] Only navigate away if we're closing the tab that's currently in focus
+  if (store.activeTab === id) {
+    if (nextTabId) {
+      store.activeTab = nextTabId
+      handleTabNavigation(ref, nextTabId, router)
+    } else {
+      // If no tabs of same type, go to the home of the current section
+      switch (currentTab?.type) {
+        case 'sql':
+          router.push(`/project/${router.query.ref}/sql`)
+          break
+        case 'r':
+        case 'v':
+        case 'm':
+        case 'f':
+        case 'p':
+          router.push(`/project/${router.query.ref}/editor`)
+          break
+        default:
+          router.push(`/project/${router.query.ref}/${editor}`)
+      }
     }
   }
 
