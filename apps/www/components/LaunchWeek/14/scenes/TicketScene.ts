@@ -584,11 +584,14 @@ class TicketScene implements BaseScene {
     }
   }
 
+  _visibleScaleVector = new Vector3(1, 1, 1)
+  _invisibleScaleVector = new Vector3(0, 0, 0)
+
   private _updateTicketSize(time?: number) {
     if (this.state.visible) {
-      this._ticket?.scale.lerp(new Vector3(1, 1, 1), 0.01)
+      this._ticket?.scale.lerp(this._visibleScaleVector, 0.01)
     } else {
-      this._ticket?.scale.lerp(new Vector3(0, 0, 0), 0.01)
+      this._ticket?.scale.lerp(this._invisibleScaleVector, 0.01)
     }
 
     // Update world matrices after scaling to ensure raycaster works correctly

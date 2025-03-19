@@ -230,7 +230,8 @@ class HUDScene implements BaseScene {
     if (this.shader.uniforms && time !== undefined) {
       // Update time uniform for animation
       this.shader.uniforms.time.value = time
-      this.shader.uniforms.resolution.value = [this.canvasWidth, this.canvasHeight]
+      this.shader.uniforms.resolution.value[0] = this.canvasWidth
+      this.shader.uniforms.resolution.value[1] = this.canvasHeight
       this.shader.uniforms.vignetteRadius.value = this.shader.uniforms.vignetteRadius.value + 
         (this.state.vignetteRaduis - this.shader.uniforms.vignetteRadius.value) * 0.1
       this.shader.uniforms.vignetteSmoothness.value = this.shader.uniforms.vignetteSmoothness.value + 
