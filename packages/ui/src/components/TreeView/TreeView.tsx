@@ -1,11 +1,11 @@
 'use client'
 
+import { cva, VariantProps } from 'class-variance-authority'
 import { ChevronRight, FolderClosed, FolderOpen, Loader2 } from 'lucide-react'
-import { ComponentPropsWithoutRef, ReactNode, forwardRef, useEffect, useRef, useState } from 'react'
+import { ComponentPropsWithoutRef, forwardRef, ReactNode, useEffect, useRef, useState } from 'react'
 import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
 import { cn } from '../../lib/utils'
 import { Input } from '../shadcn/ui/input'
-import { cva, VariantProps } from 'class-variance-authority'
 
 const TreeView = TreeViewPrimitive
 
@@ -116,13 +116,24 @@ const TreeViewItem = forwardRef<
       onEditSubmit?.(localValueState)
     }
 
+    // [Joshen] These properties were causing console errors as they were getting passed as props to the parent div
+    const {
+      isDisabled,
+      isHalfSelected,
+      handleSelect,
+      handleExpand,
+      treeState,
+      dispatch,
+      ...divProps
+    } = props as any
+
     return (
       <div
         ref={ref}
+        {...divProps}
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
-        {...props}
-        className={cn(TreeViewItemVariant({ isSelected, isOpened, isPreview }))}
+        className={cn(props.className, TreeViewItemVariant({ isSelected, isOpened, isPreview }))}
         style={{
           paddingLeft:
             level === 1 && !isBranch
@@ -254,4 +265,4 @@ const TreeViewFolderIcon = forwardRef<SVGSVGElement, LucideSVGProps & { isOpen?:
   }
 )
 
-export { TreeView, TreeViewFolderIcon, TreeViewItem, flattenTree, SQL_ICON }
+export { flattenTree, SQL_ICON, TreeView, TreeViewFolderIcon, TreeViewItem }
