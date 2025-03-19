@@ -2,12 +2,14 @@ import { DragEvent, ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 import { Button, CodeBlock, cn, CodeBlockLang } from 'ui'
 import { Code } from 'lucide-react'
 import Link from 'next/link'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Admonition } from 'ui-patterns'
 
 interface EdgeFunctionBlockProps {
@@ -43,6 +45,9 @@ export const EdgeFunctionBlock = ({
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
   const { data: existingFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionName })
 
+  const { mutate: sendEvent } = useSendEventMutation()
+  const org = useSelectedOrganization()
+
   const { mutateAsync: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
       setIsDeployed(true)
@@ -66,6 +71,11 @@ export const EdgeFunctionBlock = ({
           verify_jwt: true,
         },
         files: [{ name: 'index.ts', content: code }],
+      })
+      sendEvent({
+        action: 'edge_function_deploy_button_clicked',
+        properties: { origin: 'functions_ai_assistant' },
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     } catch (error) {
       toast.error(
