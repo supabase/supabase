@@ -1,31 +1,40 @@
 import { ReactNode, useEffect, useState } from 'react'
+import { cn } from 'ui'
 
 export const TicketHeader = ({ children }: { children: ReactNode }) => {
-  return <div className="flex w-full justify-between gap-4">{children}</div>
+  return (
+    <div className="grid lg:grid-cols-[min-content_1fr_min-content] grid-cols-[1fr_1fr] w-full justify-between gap-8">
+      {children}
+    </div>
+  )
 }
+
+const SingleTick = ({ className }: { className?: string }) => {
+  return (
+    <div
+      className={cn(
+        'w-px h-2.5 bg-neutral-500 shadow-[0px_0px_4px_0px_rgba(255,255,255,0.25)]',
+        className
+      )}
+    />
+  )
+}
+
 export const TicketHeaderClaim = () => {
   return (
-    <div className="inline-flex justify-start items-center gap-8">
-      <div className="flex justify-start items-center gap-4">
-        <div className="w-px h-2.5 bg-neutral-500 shadow-[0px_0px_4px_0px_rgba(255,255,255,0.25)]" />
-        <div className="w-px h-2.5 bg-neutral-500" />
-        <div className="w-px h-2.5 bg-neutral-500" />
-        <div className="w-px h-2.5 bg-neutral-500" />
-        <div className="w-px h-2.5 bg-neutral-500" />
-        <div className="w-px h-2.5 bg-neutral-500" />
-        <div className="w-px h-2.5 bg-neutral-500" />
+    <div className="inline-flex justify-center items-center gap-8 w-full order-1 col-span-2 lg:col-auto lg:order-2">
+      <div className="flex gap-4 flex-wrap w-full h-2.5 overflow-hidden justify-end flex-shrink flex-1">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <SingleTick key={i} />
+        ))}
       </div>
-      <div className="text-center justify-center text-neutral-500 text-sm font-normal uppercase [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)]">
+      <div className="text-center justify-center text-neutral-500 text-sm font-normal uppercase [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)] lg:text-nowrap flex-grow text-balance">
         Launch Week is coming. Stay tuned!
       </div>
-      <div className="flex justify-start items-center gap-4">
-        <div className="w-px h-2.5 bg-neutral-500" />
-        <div className="w-px h-2.5 bg-neutral-500" />
-        <div className="w-px h-2.5 bg-neutral-500" />
-        <div className="w-px h-2.5 bg-neutral-500" />
-        <div className="w-px h-2.5 bg-neutral-500" />
-        <div className="w-px h-2.5 bg-neutral-500" />
-        <div className="w-px h-2.5 bg-neutral-500" />
+      <div className="flex gap-4 flex-wrap w-full h-2.5 overflow-hidden flex-shrink flex-1">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <SingleTick key={i} />
+        ))}
       </div>
     </div>
   )
@@ -73,7 +82,7 @@ export const TicketHeaderRemainingTime = ({
   }, [extTargetDate])
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 order-2 lg:order-1">
       <div className="text-justify justify-center text-emerald-400 text-sm font-normal uppercase">
         {timeLeft}
       </div>
@@ -103,12 +112,12 @@ export const TicketHeaderDate = () => {
   }, [])
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 order-3 lg:order-3">
       <div className="text-end text-neutral-500 text-sm font-normal uppercase [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)]">
         {time}
       </div>
 
-      <div className="text-end text-neutral-500 text-xs font-normal uppercase [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)]">
+      <div className="text-end text-neutral-500 text-xs font-normal uppercase [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)] text-nowrap">
         LOCAL TIME
       </div>
     </div>
