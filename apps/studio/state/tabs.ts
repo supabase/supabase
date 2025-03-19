@@ -245,6 +245,7 @@ export const handleTabClose = (
   onClose?: (id: string) => void
 ) => {
   if (!ref) return
+
   const store = getTabsStore(ref)
   // tabs without the one we're closing
   const currentTab = store.tabsMap[id]

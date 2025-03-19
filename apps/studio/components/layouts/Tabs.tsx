@@ -190,6 +190,8 @@ export function Tabs() {
     sql: ['sql'],
   }
 
+  const hasNewTab = router.asPath.includes('/new')
+
   // Separate new tab from regular tabs
   const regularTabs = !editor
     ? []
@@ -218,15 +220,12 @@ export function Tabs() {
     handleTabNavigation(ref, id, router)
   }
 
-  const hasNewTab = router.asPath.includes('/new')
-  const isOnNewPage = router.pathname.endsWith('/explorer/new')
-
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <Tabs_Shadcn_
+        className="w-full flex"
         value={hasNewTab ? 'new' : tabs.activeTab ?? undefined}
         onValueChange={handleTabChange}
-        className="w-full flex"
       >
         <CollapseButton hideTabs={false} />
         <TabsList_Shadcn_ className="bg-surface-200 dark:bg-alternative rounded-b-none gap-0 h-10 flex items-center w-full z-[1] border-none overflow-clip overflow-x-auto ">
@@ -250,7 +249,7 @@ export function Tabs() {
           {hasNewTab && (
             <>
               <TabsTrigger_Shadcn_
-                value={'new'}
+                value="new"
                 className={cn(
                   'flex items-center gap-2 px-3 text-xs',
                   'bg-dash-sidebar/50 dark:bg-surface-100/50',
@@ -282,12 +281,12 @@ export function Tabs() {
           )}
 
           <AnimatePresence initial={false}>
-            {!isOnNewPage && !hasNewTab && (
+            {!hasNewTab && (
               <motion.button
                 className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-b"
                 onClick={() =>
                   router.push(
-                    `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new`
+                    `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
                   )
                 }
                 initial={{ opacity: 0, scale: 0.8, x: -10 }}

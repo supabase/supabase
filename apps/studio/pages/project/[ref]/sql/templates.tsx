@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 
 import { useIsSQLEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import SQLTemplates from 'components/interfaces/SQLEditor/SQLTemplates/SQLTemplates'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
@@ -38,9 +39,11 @@ const SqlTemplates: NextPageWithLayout = () => {
 }
 
 SqlTemplates.getLayout = (page) => (
-  <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
-    <SQLEditorLayout>{page}</SQLEditorLayout>
-  </EditorBaseLayout>
+  <DefaultLayout>
+    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
+      <SQLEditorLayout>{page}</SQLEditorLayout>
+    </EditorBaseLayout>
+  </DefaultLayout>
 )
 
 export default SqlTemplates
