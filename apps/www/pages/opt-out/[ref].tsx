@@ -82,7 +82,17 @@ export default function OptOutPage() {
         setFormMessage('Error: Invalid project reference.')
         setSubmissionType('error')
       } else if (response.ok) {
-        setFormMessage(message)
+        try {
+          const parsedMessage = JSON.parse(message)
+          if (!parsedMessage.message) {
+            throw new Error()
+          }
+
+          setFormMessage(parsedMessage.message)
+        } catch {
+          setFormMessage(message)
+        }
+
         setSubmissionType('success')
       } else {
         console.error('Form submission failed:', message)
@@ -205,6 +215,7 @@ export default function OptOutPage() {
                 onVerify={handleCaptchaVerify}
                 ref={captchaRef}
                 theme={resolvedTheme}
+                size="invisible"
               />
               {form.formState.errors.captchaToken && (
                 <p className="text-sm text-destructive mt-1">
