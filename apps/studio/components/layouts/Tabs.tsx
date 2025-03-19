@@ -8,12 +8,14 @@ import {
 } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { useParams } from 'common'
-
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
+import { useSnapshot } from 'valtio'
+
+import { useParams } from 'common'
+import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import {
   getTabsStore,
   handleTabClose,
@@ -23,10 +25,8 @@ import {
   type Tab,
 } from 'state/tabs'
 import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
-import { useSnapshot } from 'valtio'
 import { useEditorType } from './editors/EditorsLayout.hooks'
 import { CollapseButton } from './Tabs/CollapseButton'
-import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 
 /**
  * Individual draggable tab component that handles:
@@ -168,8 +168,9 @@ const TabPreview = ({ tab }: { tab: string }) => {
 
 export function Tabs() {
   const { ref } = useParams()
-  const editor = useEditorType()
   const router = useRouter()
+
+  const editor = useEditorType()
   const store = getTabsStore(ref)
   const tabs = useSnapshot(store)
   const sensors = useSensors(
@@ -190,10 +191,12 @@ export function Tabs() {
   }
 
   // Separate new tab from regular tabs
-  const regularTabs = openTabs.filter((tab) => {
-    // Filter by editor type - only show SQL tabs for SQL editor and table tabs for table editor
-    return entityTypes[editor]?.includes(tab.type)
-  })
+  const regularTabs = !editor
+    ? []
+    : openTabs.filter((tab) => {
+        // Filter by editor type - only show SQL tabs for SQL editor and table tabs for table editor
+        return entityTypes[editor]?.includes(tab.type)
+      })
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event

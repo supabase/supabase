@@ -1,36 +1,31 @@
-import { useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useFlag } from 'hooks/ui/useFlag'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+
+import { useParams } from 'common'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { removeTabsByEditor } from 'state/tabs'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
 
 const FeaturePreviewModal = () => {
-  const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
-  const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewTabsSqlEditor')
-
-  const snap = useAppStateSnapshot()
   const { ref } = useParams()
+  const snap = useAppStateSnapshot()
+  const org = useSelectedOrganization()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
-  const { ref: projectRef } = useParams()
-  const org = useSelectedOrganization()
-  const enableFunctionsAssistant = useFlag('functionsAssistantV2')
+
+  const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
+  const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewSqlEditorTabs')
 
   const selectedFeaturePreview =
     snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
 
   const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
-
-  const isNotReleased =
-    selectedFeatureKey === 'supabase-ui-functions-assistant' && !enableFunctionsAssistant
 
   const { flags, onUpdateFlag } = featurePreviewContext
   const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
@@ -39,11 +34,9 @@ const FeaturePreviewModal = () => {
   const toggleFeature = () => {
     onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
     sendEvent({
-      action: isSelectedFeatureEnabled
-        ? TelemetryActions.FEATURE_PREVIEW_DISABLED
-        : TelemetryActions.FEATURE_PREVIEW_ENABLED,
+      action: isSelectedFeatureEnabled ? 'feature_preview_disabled' : 'feature_preview_enabled',
       properties: { feature: selectedFeatureKey },
-      groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
 
     if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS) {
@@ -81,8 +74,8 @@ const FeaturePreviewModal = () => {
   useEffect(() => {
     if (snap.showFeaturePreviewModal) {
       sendEvent({
-        action: TelemetryActions.FEATURE_PREVIEWS_CLICKED,
-        groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        action: 'feature_previews_clicked',
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     }
   }, [snap.showFeaturePreviewModal])
@@ -92,7 +85,7 @@ const FeaturePreviewModal = () => {
       hideFooter
       showCloseButton
       size="xlarge"
-      className="max-w-4xl"
+      className="!max-w-4xl"
       header="Dashboard feature previews"
       visible={snap.showFeaturePreviewModal}
       onCancel={handleCloseFeaturePreviewModal}
@@ -143,15 +136,9 @@ const FeaturePreviewModal = () => {
                     </Link>
                   </Button>
                 )}
-                {isNotReleased ? (
-                  <Button disabled type="default">
-                    Coming soon
-                  </Button>
-                ) : (
-                  <Button type="default" onClick={() => toggleFeature()}>
-                    {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
-                  </Button>
-                )}
+                <Button type="default" onClick={() => toggleFeature()}>
+                  {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
+                </Button>
               </div>
             </div>
             {selectedFeature?.content}

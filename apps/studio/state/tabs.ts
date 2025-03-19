@@ -241,7 +241,7 @@ export const handleTabClose = (
   ref: string | undefined,
   id: string,
   router: NextRouter,
-  editor: 'sql' | 'table',
+  editor?: 'sql' | 'table',
   onClose?: (id: string) => void
 ) => {
   if (!ref) return
@@ -250,9 +250,11 @@ export const handleTabClose = (
   const currentTab = store.tabsMap[id]
   const currentTabs = Object.values(store.tabsMap).filter((tab) => tab.id !== id)
 
-  const nextTabId = currentTabs.filter((tab) => {
-    return editorEntityTypes[editor]?.includes(tab.type)
-  })[0]?.id
+  const nextTabId = !editor
+    ? undefined
+    : currentTabs.filter((tab) => {
+        return editorEntityTypes[editor]?.includes(tab.type)
+      })[0]?.id
 
   delete store.tabsMap[id]
   if (currentTab) {

@@ -1,6 +1,6 @@
-import { boolean, number, object, string } from 'yup'
-import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
+import { NO_REQUIRED_CHARACTERS, urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { ProjectAuthConfigData } from 'data/auth/auth-config-query'
+import { boolean, number, object, string } from 'yup'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
@@ -32,7 +32,7 @@ const PROVIDER_EMAIL = {
     },
     SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: {
       title: 'Secure password change',
-      description: `Users will need to be recently logged in to change their password without requiring reauthentication.
+      description: `Users will need to be recently logged in to change their password without requiring reauthentication. (A user is considered recently logged in if the session was created within the last 24 hours.)
       If disabled, a user can change their password at any time.`,
       type: 'boolean',
     },
@@ -56,7 +56,7 @@ const PROVIDER_EMAIL = {
       enum: [
         {
           label: 'No required characters (default)',
-          value: 'NO_REQUIRED_CHARS',
+          value: NO_REQUIRED_CHARACTERS,
         },
         {
           label: 'Letters and digits',

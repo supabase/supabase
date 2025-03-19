@@ -4,8 +4,8 @@ import { useEffect } from 'react'
 import { useParams } from 'common/hooks/useParams'
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
-
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { useContentIdQuery } from 'data/content/content-id-query'
@@ -14,7 +14,6 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { addTab, createTabId } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -59,13 +58,14 @@ const SqlEditor: NextPageWithLayout = () => {
 
   const { flags } = useFeaturePreviewContext()
   const isSqlEditorTabsEnabled = flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+
   // Watch for route changes
   useEffect(() => {
     if (isSqlEditorTabsEnabled) {
       if (!router.isReady || !id || id === 'new') return
 
       const tabId = createTabId('sql', { id })
-      const snippet = data
+      const snippet = allSnippets.find((x) => x.id === id)
 
       addTab(ref, {
         id: tabId,
@@ -77,7 +77,7 @@ const SqlEditor: NextPageWithLayout = () => {
         },
       })
     }
-  }, [router.isReady, id, data, isSqlEditorTabsEnabled])
+  }, [router.isReady, id, isSqlEditorTabsEnabled])
 
   return <SQLEditor />
 }

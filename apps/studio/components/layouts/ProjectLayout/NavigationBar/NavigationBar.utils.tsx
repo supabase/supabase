@@ -1,3 +1,6 @@
+import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
+
+import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
 import type { Route } from 'components/ui/ui.types'
 import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import type { Project } from 'data/projects/project-detail-query'
@@ -12,15 +15,13 @@ import {
   TableEditor,
 } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
-import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export const generateToolRoutes = (
   ref?: string,
   project?: Project,
   features?: { sqlEditorTabs: boolean }
 ): Route[] => {
+  const { sqlEditorTabs } = features ?? {}
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
@@ -39,9 +40,7 @@ export const generateToolRoutes = (
       link: !IS_PLATFORM
         ? `/project/${ref}/sql/1`
         : ref &&
-          (isProjectBuilding
-            ? buildingUrl
-            : `/project/${ref}/sql${features?.sqlEditorTabs ? '' : '/new'}`),
+          (isProjectBuilding ? buildingUrl : `/project/${ref}/sql${!!sqlEditorTabs ? '' : '/new'}`),
     },
   ]
 }
@@ -140,7 +139,7 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
       key: 'logs',
       label: 'Logs',
       icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs/explorer`),
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs`),
     },
     {
       key: 'api',

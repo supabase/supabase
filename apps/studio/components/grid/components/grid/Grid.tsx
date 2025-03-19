@@ -4,7 +4,6 @@ import { forwardRef, useRef } from 'react'
 import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
 import { memo } from 'react-tracked'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { formatClipboardValue } from 'components/grid/utils/common'
 import { TableGridInnerLoadingState } from 'components/interfaces/TableGridEditor/LoadingState'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
@@ -16,6 +15,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { copyToClipboard } from 'lib/helpers'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
 import { useDispatch, useTrackedState } from '../../store/Store'
 import type { Filter, GridProps, SupaRow } from '../../types'
@@ -77,6 +77,7 @@ export const Grid = memo(
       ref: React.Ref<DataGridHandle> | undefined
     ) => {
       const dispatch = useDispatch()
+      const snap = useTableEditorTableStateSnapshot()
       const state = useTrackedState()
 
       function onColumnResize(index: number, width: number) {
@@ -95,11 +96,8 @@ export const Grid = memo(
         }
       }
 
-      function onSelectedRowsChange(selectedRows: ReadonlySet<number>) {
-        dispatch({
-          type: 'SELECTED_ROWS_CHANGE',
-          payload: { selectedRows },
-        })
+      function onSelectedRowsChange(selectedRows: Set<number>) {
+        snap.setSelectedRows(selectedRows)
       }
 
       const selectedCellRef = useRef<{ rowIdx: number; row: any; column: any } | null>(null)
@@ -128,10 +126,7 @@ export const Grid = memo(
 
       function onSelectedCellChange(args: { rowIdx: number; row: any; column: any }) {
         selectedCellRef.current = args
-        dispatch({
-          type: 'SELECTED_CELL_CHANGE',
-          payload: { position: { idx: args.column.idx, rowIdx: args.rowIdx } },
-        })
+        snap.setSelectedCellPosition({ idx: args.column.idx, rowIdx: args.rowIdx })
       }
 
       const table = state.table
@@ -224,7 +219,7 @@ export const Grid = memo(
                                     onClick={() => {
                                       onImportData()
                                       sendEvent({
-                                        action: TelemetryActions.IMPORT_DATA_BUTTON_CLICKED,
+                                        action: 'import_data_button_clicked',
                                         properties: { tableType: 'Existing Table' },
                                         groups: {
                                           project: project?.ref ?? 'Unknown',
@@ -261,7 +256,7 @@ export const Grid = memo(
               ),
             }}
             rowKeyGetter={rowKeyGetter}
-            selectedRows={state.selectedRows}
+            selectedRows={snap.selectedRows}
             onColumnResize={onColumnResize}
             onRowsChange={onRowsChange}
             onSelectedCellChange={onSelectedCellChange}

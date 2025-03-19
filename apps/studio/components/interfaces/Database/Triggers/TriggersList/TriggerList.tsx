@@ -86,7 +86,13 @@ const TriggerList = ({
           <Table.td className="space-x-2">
             <Tooltip>
               <TooltipTrigger className="cursor-default truncate max-w-48 inline-block">
-                {x.name}
+                <Button
+                  type="text"
+                  className="text-foreground p-0 hover:bg-transparent"
+                  onClick={() => editTrigger(x)}
+                >
+                  {x.name}
+                </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom" align="center">
                 {x.name}
@@ -139,7 +145,13 @@ const TriggerList = ({
                       <Button type="default" className="px-1" icon={<MoreVertical />} />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="bottom" align="end" className="w-52">
-                      <DropdownMenuItem className="space-x-2" onClick={() => editTrigger(x)}>
+                      <DropdownMenuItem
+                        className="space-x-2"
+                        onClick={() => {
+                          const sql = generateTriggerCreateSQL(x)
+                          editTrigger(x)
+                        }}
+                      >
                         <Edit2 size={14} />
                         <p>Edit trigger</p>
                       </DropdownMenuItem>

@@ -63,3 +63,7 @@ export function openInstallGitHubIntegrationWindow(type: 'install' | 'authorize'
     newWindow.focus()
   }
 }
+
+export const getGitHubProfileImgUrl = (username: string) => {
+  return `https://github.com/${username}.png?size=80`
+}

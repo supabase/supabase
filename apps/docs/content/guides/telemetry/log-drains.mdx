@@ -16,6 +16,7 @@ The following table lists the supported destinations and the required setup conf
 | --------------------- | ---------------- | ------------------------------------------------- |
 | Generic HTTP endpoint | HTTP             | URL <br /> HTTP Version <br/> Gzip <br /> Headers |
 | DataDog               | HTTP             | API Key <br /> Region                             |
+| Loki                  | HTTP             | URL <br /> Headers                                |
 
 HTTP requests are batched with a max of 250 logs or 1 second intervals, whichever happens first. Logs are compressed via Gzip if the destination supports it.
 
@@ -180,3 +181,19 @@ To setup DataDog log drain, generate a DataDog API key [here](https://app.datado
 </Accordion>
 
 If you are interested in other log drains, upvote them [here](https://github.com/orgs/supabase/discussions/28324)
+
+## Loki
+
+Logs sent to the Loki HTTP API are specifically formatted according to the HTTP API requirements. See the official Loki HTTP API documentation for [more details](https://grafana.com/docs/loki/latest/reference/loki-http-api/#ingest-logs).
+
+Events are batched with a maximum of 250 events per request.
+
+The log source and product name will be used as stream labels.
+
+The `event_message` and `timestamp` fields will be dropped from the events to avoid duplicate data.
+
+Loki must be configured to accept **structured metadata**, and it is advised to increase the default maximum number of structured metadata fields to at least 500 to accommodate large log event payloads of different products.
+
+## Pricing
+
+For a detailed breakdown of how charges are calculated, refer to [Manage Log Drain usage](/docs/guides/platform/manage-your-usage/log-drains).

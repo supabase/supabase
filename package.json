@@ -15,6 +15,7 @@
     "dev": "turbo run dev --parallel",
     "dev:reference": "turbo run dev --filter=reference --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
+    "dev:studio-local": "pnpm run --dir tests/studio-tests codegen:setup",
     "dev:docs": "turbo run dev --filter=docs --parallel",
     "dev:www": "turbo run dev --filter=www --parallel",
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
@@ -27,7 +28,8 @@
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
     "test:studio": "turbo run test --filter=studio",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
-    "test:local-studio": "pnpm --prefix tests/local-studio-tests run test",
+    "test:e2e:studio-local": "pnpm --prefix tests/studio-tests run test:local",
+    "test:e2e:studio-staging": "pnpm --prefix tests/studio-tests run test:staging",
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables",
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
@@ -58,6 +60,13 @@
     "pnpm": ">=9",
     "node": ">=20"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
   "packageManager": "pnpm@9.15.5"
 }

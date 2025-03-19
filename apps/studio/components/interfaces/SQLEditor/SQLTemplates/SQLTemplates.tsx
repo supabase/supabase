@@ -1,17 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { partition } from 'lodash'
+import { useRouter } from 'next/router'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ActionCard } from 'components/layouts/Tabs/actions-card'
+import { ActionCard } from 'components/layouts/Tabs/ActionCard'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { partition } from 'lodash'
-import { useRouter } from 'next/router'
-import { toast } from 'sonner'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { cn, SQL_ICON } from 'ui'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
@@ -81,7 +81,7 @@ const SQLTemplates = () => {
               onClick={() => {
                 handleNewQuery(x.sql, x.title)
                 sendEvent({
-                  action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED,
+                  action: 'sql_editor_template_clicked',
                   properties: { templateName: x.title },
                   groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
                 })

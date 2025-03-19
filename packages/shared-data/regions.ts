@@ -1,4 +1,4 @@
-export type CloudProvider = 'FLY' | 'AWS'
+export type CloudProvider = 'FLY' | 'AWS' | 'AWS_NEW'
 export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
 
 export const AWS_REGIONS = {
@@ -24,7 +24,7 @@ export const AWS_REGIONS = {
     displayName: 'West Europe (London)',
     location: [51.507351, -0.127758],
   },
-  WEST_EU_3: { code: 'eu-west-3', displayName: 'West EU (Paris)', location: [2.352222, 48.856613] },
+  // WEST_EU_3: { code: 'eu-west-3', displayName: 'West EU (Paris)', location: [2.352222, 48.856613] },
   CENTRAL_EU: {
     code: 'eu-central-1',
     displayName: 'Central EU (Frankfurt)',

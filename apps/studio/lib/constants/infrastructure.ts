@@ -4,7 +4,9 @@ import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 import type { components } from 'data/api'
 
 export const AWS_REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+    ? AWS_REGIONS.SOUTHEAST_ASIA
+    : AWS_REGIONS.EAST_US_2
 
 // TO DO, change default to US region for prod
 export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
@@ -39,10 +41,17 @@ export const PROVIDERS = {
     default_region: AWS_REGIONS_DEFAULT,
     regions: { ...AWS_REGIONS },
   },
+  AWS_NEW: {
+    id: 'AWS_NEW',
+    name: 'AWS (Revamped)',
+    DEFAULT_SSH_KEY: 'supabase-app-instance',
+    default_region: AWS_REGIONS_DEFAULT,
+    regions: { ...AWS_REGIONS },
+  },
 } as const
 
 export const PROJECT_STATUS: {
-  [key: string]: components['schemas']['ResourceWithServicesStatusResponse']['status']
+  [key: string]: components['schemas']['project_status']
 } = {
   INACTIVE: 'INACTIVE',
   ACTIVE_HEALTHY: 'ACTIVE_HEALTHY',

@@ -10,7 +10,7 @@ Testing is a critical part of database development, especially when working with
 
 ### Database unit testing with pgTAP
 
-[pgTAP](https://pgtap.org) is a unit testing framework for PostgreSQL that allows testing:
+[pgTAP](https://pgtap.org) is a unit testing framework for Postgres that allows testing:
 
 - Database structure: tables, columns, constraints
 - Row Level Security (RLS) policies
@@ -54,7 +54,7 @@ This example demonstrates setting up and testing RLS policies for a simple todo 
    -- install tests utilities
    -- install pgtap extension for testing
    create extension if not exists pgtap with schema extensions;
-   -- Start declare we'll have 6 test cases in our test suite
+   -- Start declare we'll have 4 test cases in our test suite
    select plan(4);
 
    -- Setup our testing data

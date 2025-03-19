@@ -5,9 +5,9 @@ import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import CustomDomainActivate from './CustomDomainActivate'
@@ -25,7 +25,8 @@ const CustomDomainConfig = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const plan = subscription?.plan?.id
 
-  const { isLoading: isSettingsLoading } = useProjectSettingsV2Query({ projectRef: ref })
+  const { data: addons, isLoading: isLoadingAddons } = useProjectAddonsQuery({ projectRef: ref })
+  const hasCustomDomainAddon = !!addons?.selected_addons.find((x) => x.type === 'custom_domain')
 
   const {
     isLoading: isCustomDomainsLoading,
@@ -46,12 +47,35 @@ const CustomDomainConfig = () => {
     }
   )
 
-  const isLoading = isSettingsLoading || isCustomDomainsLoading
-
   return (
     <section id="custom-domains">
       <FormHeader title="Custom Domains" description="Present a branded experience to your users" />
-      {isLoading ? (
+      {isLoadingAddons ? (
+        <Panel>
+          <Panel.Content className="space-y-6">
+            <CustomDomainsShimmerLoader />
+          </Panel.Content>
+        </Panel>
+      ) : !hasCustomDomainAddon ? (
+        <UpgradeToPro
+          icon={<AlertCircle size={18} strokeWidth={1.5} />}
+          primaryText={
+            customDomainsDisabledDueToQuota
+              ? 'New custom domains are temporarily disabled'
+              : 'Custom domains are a Pro Plan add-on'
+          }
+          secondaryText={
+            customDomainsDisabledDueToQuota
+              ? 'We are working with our upstream DNS provider before we are able to sign up new custom domains. Please check back in a few hours.'
+              : plan === 'free'
+                ? 'To configure a custom domain for your project, please upgrade to the Pro Plan with the custom domains add-on selected'
+                : 'To configure a custom domain for your project, please enable the add-on'
+          }
+          addon="customDomain"
+          source="customDomain"
+          disabled={customDomainsDisabledDueToQuota}
+        />
+      ) : isCustomDomainsLoading ? (
         <Panel>
           <Panel.Content className="space-y-6">
             <CustomDomainsShimmerLoader />
@@ -74,24 +98,6 @@ const CustomDomainConfig = () => {
         </Panel>
       ) : data?.status === '0_no_hostname_configured' ? (
         <CustomDomainsConfigureHostname />
-      ) : data?.status === '0_not_allowed' ? (
-        <UpgradeToPro
-          icon={<AlertCircle size={18} strokeWidth={1.5} />}
-          primaryText={
-            customDomainsDisabledDueToQuota
-              ? 'New custom domains are temporarily disabled'
-              : 'Custom domains are a Pro Plan add-on'
-          }
-          secondaryText={
-            customDomainsDisabledDueToQuota
-              ? 'We are working with our upstream DNS provider before we are able to sign up new custom domains. Please check back in a few hours.'
-              : plan === 'free'
-                ? 'To configure a custom domain for your project, please upgrade to the Pro Plan with the custom domains add-on selected'
-                : 'To configure a custom domain for your project, please enable the add-on'
-          }
-          addon="customDomain"
-          disabled={customDomainsDisabledDueToQuota}
-        />
       ) : (
         <Panel>
           {isSuccess && (

@@ -1,14 +1,15 @@
-import { useParams } from 'common'
-import { EntityTypeIcon } from 'components/tabs/entity-type-icon'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
+import { useSnapshot } from 'valtio'
+
+import { useParams } from 'common'
+import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import type { RecentItem } from 'state/recent-items'
 import { getRecentItemsStore } from 'state/recent-items'
 import { editorEntityTypes } from 'state/tabs'
-import { useSnapshot } from 'valtio'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 
 dayjs.extend(relativeTime)
@@ -22,15 +23,17 @@ export function RecentItems() {
   if (!recentItemsSnap?.items || !ref) return null
 
   // Filter items based on editor type
-  const filteredItems = recentItemsSnap.items
-    .filter((item) => editorEntityTypes[editor].includes(item.type))
-    .sort((a, b) => b.timestamp - a.timestamp)
+  const filteredItems = !editor
+    ? [...recentItemsSnap.items]
+    : recentItemsSnap.items.filter((item) => editorEntityTypes[editor].includes(item.type))
+
+  const sortedItems = filteredItems.sort((a, b) => b.timestamp - a.timestamp)
 
   return (
     <div className="space-y-4">
       <h2 className="text-sm text-foreground">Recent items</h2>
       <div className="flex flex-col gap-0">
-        {filteredItems.length === 0 ? (
+        {sortedItems.length === 0 ? (
           <motion.div
             layout
             initial={false}
@@ -47,7 +50,7 @@ export function RecentItems() {
         ) : (
           <AnimatePresence>
             <div className="grid grid-cols-1 gap-12 gap-y-0">
-              {filteredItems.map((item: RecentItem, index: number) => (
+              {sortedItems.map((item: RecentItem, index: number) => (
                 <motion.div
                   key={item.id}
                   initial={{ opacity: 0 }}

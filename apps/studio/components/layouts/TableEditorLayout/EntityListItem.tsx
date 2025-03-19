@@ -1,3 +1,10 @@
+import saveAs from 'file-saver'
+import { Clipboard, Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react'
+import Link from 'next/link'
+import Papa from 'papaparse'
+import { toast } from 'sonner'
+import { useSnapshot } from 'valtio'
+
 import { IS_PLATFORM } from 'common'
 import {
   MAX_EXPORT_ROW_COUNT,
@@ -9,7 +16,7 @@ import {
   formatTableRowsToSQL,
   getEntityLintDetails,
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import { EntityTypeIcon } from 'components/tabs/entity-type-icon'
+import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
@@ -18,14 +25,9 @@ import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import saveAs from 'file-saver'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { copyToClipboard } from 'lib/helpers'
-import { Clipboard, Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react'
-import Link from 'next/link'
-import Papa from 'papaparse'
-import { toast } from 'sonner'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, getTabsStore, makeTabPermanent } from 'state/tabs'
 import {
@@ -43,7 +45,6 @@ import {
   TooltipTrigger,
   TreeViewItemVariant,
 } from 'ui'
-import { useSnapshot } from 'valtio'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 export interface EntityListItemProps {
   id: number | string
@@ -63,7 +64,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
-  // tabs preview flag logic
+  // For tabs preview flag logic
   const { flags } = useFeaturePreviewContext()
   const isTableEditorTabsEnabled = flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
   const tabId = createTabId(entity.type, {
@@ -72,7 +73,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   })
   const tabStore = getTabsStore(projectRef)
   const isPreview = isTableEditorTabsEnabled ? tabStore.previewTabId === tabId : false
-  // end of tabs preview logic
 
   const tabs = useSnapshot(tabStore)
   const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)

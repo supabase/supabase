@@ -4,9 +4,8 @@ import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
-import { ActionCard } from 'components/layouts/Tabs/actions-card'
+import { ActionCard } from 'components/layouts/Tabs/ActionCard'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -82,7 +81,7 @@ const SQLQuickstarts = () => {
               onClick={() => {
                 handleNewQuery(x.sql, x.title)
                 sendEvent({
-                  action: TelemetryActions.SQL_EDITOR_QUICKSTART_CLICKED,
+                  action: 'sql_editor_quickstart_clicked',
                   properties: { quickstartName: x.title },
                   groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
                 })

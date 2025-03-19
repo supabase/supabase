@@ -13,23 +13,6 @@ import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderC
 import ButtonCard from '~/components/ButtonCard'
 import { Extensions } from '~/components/Extensions'
 import { JwtGenerator } from '~/components/JwtGenerator'
-import {
-  AuthErrorCodesTable,
-  AuthRateLimits,
-  CreateClientSnippet,
-  DatabaseSetup,
-  GetSessionWarning,
-  HuggingFaceDeployment,
-  KotlinProjectSetup,
-  MigrationWarnings,
-  OAuthPkceFlow,
-  ProjectSetup,
-  QuickstartDbSetup,
-  QuickstartIntro,
-  SocialProviderSettingsSupabase,
-  SocialProviderSetup,
-  PostgresInstallation,
-} from '~/components/MDX/partials'
 import { NavData } from '~/components/NavData'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
@@ -41,14 +24,13 @@ import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import * as CH from '~/features/ui/CodeHike'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import InfoTooltip from '~/features/ui/InfoTooltip'
 
 const components = {
   Accordion,
   AccordionItem,
   Admonition,
   // Admonition: (props: AdmonitionProps) => <Admonition className="[&_a]:underline" {...props} />,
-  AuthErrorCodesTable,
-  AuthRateLimits,
   AuthSmsProviderConfig,
   AppleSecretGenerator,
   AuthProviders,
@@ -58,38 +40,26 @@ const components = {
   CodeSampleDummy,
   CodeSampleWrapper,
   CostWarning,
-  CreateClientSnippet,
-  DatabaseSetup,
   Extensions,
-  GetSessionWarning,
   GlassPanel,
-  HuggingFaceDeployment,
   IconArrowDown: ArrowDown,
   IconCheck: Check,
   IconPanel,
   IconX: X,
   Image: (props: any) => <Image fill className="object-contain" {...props} />,
   JwtGenerator,
-  KotlinProjectSetup,
   Link,
-  MigrationWarnings,
   NavData,
-  OAuthPkceFlow,
   ProjectConfigVariables,
-  ProjectSetup,
-  QuickstartDbSetup,
-  QuickstartIntro,
   RealtimeLimitsEstimator,
   RegionsList,
   SharedData,
   ShowUntil,
-  SocialProviderSettingsSupabase,
-  SocialProviderSetup,
-  PostgresInstallation,
   SqlToRest,
   StepHikeCompact,
   Tabs,
   TabPanel,
+  InfoTooltip,
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
       {props.children}

@@ -5,9 +5,37 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 09 Dec 2024 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Sat, 08 Mar 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/quilia</guid>
+  <title>Quilia Empowers Personal Injury Clients with Streamlined Data Management using Supabase</title>
+  <link>https://supabase.com/customers/quilia</link>
+  <description>Migrating to Supabase resulted in a 75% reduction in development time, 50% lower costs, and enhanced security for sensitive client data.</description>
+  <pubDate>Sat, 08 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/asap-work</guid>
+  <title>Scaling Beyond No-Code: asap.work’s Journey to a Faster, Flexible Solution with Supabase</title>
+  <link>https://supabase.com/customers/asap-work</link>
+  <description></description>
+  <pubDate>Fri, 28 Feb 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/meshy</guid>
+  <title>Scaling Innovation with Supabase: Meshy’s Migration to Cost-Effective Authentication</title>
+  <link>https://supabase.com/customers/meshy</link>
+  <description>Discover how a rapidly growing Meshy migrated from an expensive authentication model with Auth0 to Supabase Auth, and significantly reduced their costs.</description>
+  <pubDate>Fri, 28 Feb 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/resend</guid>
+  <title>Resend&apos;s Journey with Supabase: Scaling Email Infrastructure with Ease</title>
+  <link>https://supabase.com/customers/resend</link>
+  <description>Scaling seamlessly to 5,000+ paying customers &amp; millions of emails sent daily with Supabase</description>
+  <pubDate>Fri, 21 Feb 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/e2b</guid>
   <title>E2B: Accelerating AI-Driven Development with Supabase</title>
   <link>https://supabase.com/customers/e2b</link>

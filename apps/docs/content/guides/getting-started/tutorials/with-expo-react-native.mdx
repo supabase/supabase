@@ -4,7 +4,7 @@ description: 'Learn how to use Supabase in your React Native App.'
 tocVideo: 'AE7dKIKMJy4'
 ---
 
-<QuickstartIntro />
+<$Partial path="quickstart_intro.mdx" />
 
 ![Supabase User Management example](/docs/img/supabase-flutter-demo.png)
 
@@ -14,7 +14,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 </Admonition>
 
-<ProjectSetup />
+<$Partial path="project_setup.mdx" />
 
 ## Building the app
 
@@ -73,7 +73,7 @@ These variables are safe to expose in your Expo app since Supabase has
 
     If you wish to encrypt the user's session information, you can use `aes-js` and store the encryption key in [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore). The [`aes-js` library](https://github.com/ricmoo/aes-js) is a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
 
-    Please make sure that:
+    Make sure that:
     - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
     - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
     - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
@@ -84,6 +84,7 @@ These variables are safe to expose in your Expo app since Supabase has
     npm install @supabase/supabase-js
     npm install @rneui/themed @react-native-async-storage/async-storage
     npm install aes-js react-native-get-random-values
+    npm install --save-dev @types/aes-js
     npx expo install expo-secure-store
     ```
 

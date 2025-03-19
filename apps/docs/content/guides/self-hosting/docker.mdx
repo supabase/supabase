@@ -1,13 +1,14 @@
 ---
-title: "Self-Hosting with Docker"
-description: "Learn how to configure and deploy Supabase with Docker."
-subtitle: "Learn how to configure and deploy Supabase with Docker."
-tocVideo: "FqiQKRKsfZE"
+title: 'Self-Hosting with Docker'
+description: 'Learn how to configure and deploy Supabase with Docker.'
+subtitle: 'Learn how to configure and deploy Supabase with Docker.'
+tocVideo: 'FqiQKRKsfZE'
 ---
 
 Docker is the easiest way to get started with self-hosted Supabase. It should only take you a few minutes to get up and running. This guide assumes you are running the command from the machine you intend to host from.
 
 ## Contents
+
 1. [Before you begin](#before-you-begin)
 2. [Installing and running Supabase](#installing-and-running-supabase)
 3. [Accessing your services](#accessing-supabase-studio)
@@ -89,8 +90,7 @@ All of the services should have a status `running (healthy)`. If you see a statu
 <Admonition type="danger">
 
 Your app is now running with default credentials.
-Please [secure your services](#securing-your-services) as soon as possible using the instructions below.
-
+[Secure your services](#securing-your-services) as soon as possible using the instructions below.
 </Admonition>
 
 ### Accessing Supabase Studio
@@ -125,7 +125,7 @@ By default, the Supabase stack runs the [Supavisor](https://supabase.github.io/s
 
 You can connect to the Postgres database using the following methods:
 
-1. For session-based connections (equivalent to direct PostgreSQL connections):
+1. For session-based connections (equivalent to direct Postgres connections):
 
 ```bash
 psql 'postgres://postgres.your-tenant-id:your-super-secret-and-long-postgres-password@localhost:5432/postgres'
@@ -142,12 +142,14 @@ The default tenant ID is `your-tenant-id`, and the default password is `your-sup
 By default, the database is not accessible from outside the local machine but the pooler is. You can [change this](#exposing-your-postgres-database) by updating the `docker-compose.yml` file.
 
 ## Updating your services
+
 For security reasons, we "pin" the versions of each service in the docker-compose file (these versions are updated ~monthly). If you want to update any services immediately, you can do so by updating the version number in the docker compose file and then running `docker compose pull`. You can find all the latest docker images in the [Supabase Docker Hub](https://hub.docker.com/u/supabase).
 
 You should update your services frequently to get the latest features and bug fixes and security patches. Note that you will need to restart the services to pick up the changes, which will result in some downtime for your services.
 
 **Example**
 You'll want to update the Studio(Dashboard) frequently to get the latest features and bug fixes. To update the Dashboard:
+
 1. Visit the [supabase/studio](https://hub.docker.com/r/supabase/studio/tags) image in the [Supabase Docker Hub](https://hub.docker.com/u/supabase)
 2. Find the latest version (tag) number. It will look something like `20241029-46e1e40`
 3. Update the `image` field in the `docker-compose.yml` file to the new version. It should look like this: `image: supabase/studio:20241028-a265374`
@@ -155,9 +157,10 @@ You'll want to update the Studio(Dashboard) frequently to get the latest feature
 
 ## Securing your services
 
-While we provided you with some example secrets for getting started, you should NEVER deploy your Supabase setup using the defaults we have provided. Please follow all of the steps in this section to ensure you have a secure setup, and then [restart all services](#restarting-all-services) to pick up the changes.
+While we provided you with some example secrets for getting started, you should NEVER deploy your Supabase setup using the defaults we have provided. Follow all of the steps in this section to ensure you have a secure setup, and then [restart all services](#restarting-all-services) to pick up the changes.
 
 ### Generate API keys
+
 We need to generate secure keys for accessing your services. We'll use the `JWT Secret` to generate `anon` and `service` API keys using the form below.
 
 1. **Obtain a Secret**: Use the 40-character secret provided, or create your own. If creating, ensure it's a strong, random string of 40 characters.
@@ -170,8 +173,8 @@ We need to generate secure keys for accessing your services. We'll use the `JWT 
 
 Run this form twice to generate new `anon` and `service` API keys. Replace the values in the `./docker/.env` file:
 
-  - `ANON_KEY` - replace with an `anon` key
-  - `SERVICE_ROLE_KEY` - replace with a `service` key
+- `ANON_KEY` - replace with an `anon` key
+- `SERVICE_ROLE_KEY` - replace with a `service` key
 
 You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 
@@ -191,20 +194,24 @@ You will need to [restart](#restarting-all-services) the services for the change
 
 The Dashboard is protected with basic authentication. The default user and password MUST be updated before using Supabase in production.
 Update the following values in the `./docker/.env` file:
- - `DASHBOARD_USERNAME`: The default username for the Dashboard
- - `DASHBOARD_PASSWORD`: The default password for the Dashboard
+
+- `DASHBOARD_USERNAME`: The default username for the Dashboard
+- `DASHBOARD_PASSWORD`: The default password for the Dashboard
 
 You can also add more credentials for multiple users in `./docker/volumes/api/kong.yml`. For example:
 
 ```yaml docker/volumes/api/kong.yml
 basicauth_credentials:
-- consumer: DASHBOARD
-  username: user_one
-  password: password_one
-- consumer: DASHBOARD
-  username: user_two
-  password: password_two
+  - consumer: DASHBOARD
+    username: user_one
+    password: password_one
+  - consumer: DASHBOARD
+    username: user_two
+    password: password_two
 ```
+
+To enable all dashboard features outside of `localhost`, update the following value in the `./docker/.env` file:
+ - `SUPABASE_PUBLIC_URL`: The URL or IP used to access the dashboard
 
 You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 
@@ -220,8 +227,9 @@ docker compose down
 docker compose up -d
 ```
 
-Be aware that this will result in downtime. Simply restarting the services does not apply configuration changes.
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 
+Be aware that this will result in downtime. Simply restarting the services does not apply configuration changes.
 ## Stopping all services
 
 You can stop Supabase by running `docker compose stop` in same directory as your `docker-compose.yml` file.
@@ -274,11 +282,11 @@ If the tool doesn't exist, we build and open source it ourselves.
 
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
 - [GoTrue](https://github.com/supabase/gotrue) is an JWT based API for managing users and issuing JWT tokens.
-- [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
-- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using WebSockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over WebSockets to authorized clients.
+- [PostgREST](http://postgrest.org/) is a web server that turns your Postgres database directly into a RESTful API
+- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to Postgres inserts, updates, and deletes using WebSockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over WebSockets to authorized clients.
 - [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
 - [`postgres-meta`](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
-- [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
+- [Postgres](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
 - [Supavisor](https://github.com/supabase/supavisor) is a scalable connection pooler for Postgres, allowing for efficient management of database connections.
 
 For the system to work cohesively, some services require additional configuration within the Postgres database. For example, the APIs and Auth system require several [default roles](/docs/guides/database/postgres/roles) and the `pgjwt` Postgres extension.
@@ -297,23 +305,22 @@ Each system has a number of configuration options which can be found in the rele
 - [Kong](https://docs.konghq.com/gateway/latest/install/docker/)
 - [Supavisor](https://supabase.github.io/supavisor/development/docs/)
 
- These configuration items are generally added to the `env` section of each service, inside the `docker-compose.yml` section. If these configuration items are sensitive, they should be stored in a [secret manager](/docs/guides/self-hosting#managing-your-secrets) or using an `.env` file and then referenced using the `${}` syntax.
-
+These configuration items are generally added to the `env` section of each service, inside the `docker-compose.yml` section. If these configuration items are sensitive, they should be stored in a [secret manager](/docs/guides/self-hosting#managing-your-secrets) or using an `.env` file and then referenced using the `${}` syntax.
 
 <CH.Code>
 
- ```yml docker-compose.yml
+```yml docker-compose.yml
 services:
   rest:
     image: postgrest/postgrest
     environment:
       PGRST_JWT_SECRET: ${JWT_SECRET}
- ```
+```
 
- ```bash .env
- ## Never check your secrets into version control
+```bash .env
+## Never check your secrets into version control
 `${JWT_SECRET}`
- ```
+```
 
 </CH.Code>
 
@@ -341,11 +348,10 @@ We recommend using [AWS SES](https://aws.amazon.com/ses/). It's extremely cheap 
 By default all files are stored locally on the server. You can configure the Storage service to use S3 by updating the following environment variables:
 
 ```yaml docker-compose.yml
-  storage:
-    environment:
-      STORAGE_BACKEND=s3
-      GLOBAL_S3_BUCKET=name-of-your-s3-bucket
-      REGION=region-of-your-s3-bucket
+storage:
+  environment: STORAGE_BACKEND=s3
+    GLOBAL_S3_BUCKET=name-of-your-s3-bucket
+    REGION=region-of-your-s3-bucket
 ```
 
 You can find all the available options in the [storage repository](https://github.com/supabase/storage-api/blob/master/.env.sample). Restart the `storage` service to pick up the changes: `docker compose restart storage --no-deps`
@@ -390,12 +396,12 @@ If you need direct access to the Postgres database without going through Supavis
 #  supavisor:
 #    ports:
 # ...
-  db:
-    ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+db:
+  ports:
+    - ${POSTGRES_PORT}:${POSTGRES_PORT}
 ```
 
-This is less-secure, so please make sure you are running a firewall in front of your server.
+This is less-secure, so make sure you are running a firewall in front of your server.
 
 #### File storage backend on macOS
 
@@ -414,7 +420,6 @@ Due to the changes in the Analytics server, you will need to run the following c
 All data in analytics will be deleted when you run the commands below.
 
 </Admonition>
-
 
 ```sh
 ### Destroy analytics to transition to postgres self hosted solution without other data loss
@@ -443,6 +448,7 @@ A minimal setup working on Ubuntu, hosted on DigitalOcean.
 </div>
 
 ### Demo using DigitalOcean
+
 1. A DigitalOcean Droplet with 1 GB memory and 25 GB solid-state drive (SSD) is sufficient to start
 2. To access the Dashboard, use the ipv4 IP address of your Droplet.
 3. If you're unable to access Dashboard, run `docker compose ps` to see if the Studio service is running and healthy.

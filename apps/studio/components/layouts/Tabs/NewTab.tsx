@@ -1,6 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { partition } from 'lodash'
+import { Table2 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -8,11 +13,6 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { partition } from 'lodash'
-import { Table2 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { toast } from 'sonner'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { getTabsStore } from 'state/tabs'
@@ -133,7 +133,7 @@ export function NewTab() {
                     onClick={() => {
                       handleNewQuery(item.sql, item.title)
                       sendEvent({
-                        action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED,
+                        action: 'sql_editor_template_clicked',
                         properties: { templateName: item.title },
                         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
                       })
@@ -160,7 +160,7 @@ export function NewTab() {
                     onClick={() => {
                       handleNewQuery(item.sql, item.title)
                       sendEvent({
-                        action: TelemetryActions.SQL_EDITOR_QUICKSTART_CLICKED,
+                        action: 'sql_editor_quickstart_clicked',
                         properties: { quickstartName: item.title },
                         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
                       })

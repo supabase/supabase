@@ -74,7 +74,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Strict-Transport-Security',
-            value: '',
+            value: process.env.VERCEL === '1' ? 'max-age=31536000; includeSubDomains; preload' : '',
           },
           {
             key: 'X-Robots-Tag',
@@ -97,7 +97,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Strict-Transport-Security',
-            value: '',
+            value: process.env.VERCEL === '1' ? 'max-age=31536000; includeSubDomains; preload' : '',
           },
           {
             key: 'X-Robots-Tag',

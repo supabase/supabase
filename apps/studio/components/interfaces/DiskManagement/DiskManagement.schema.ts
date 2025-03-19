@@ -14,6 +14,7 @@ const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
   totalSize: z
     .number()
+    .int('Value must be an integer')
     .min(8, { message: 'Allocated disk size must be at least 8 GB.' })
     .describe('Allocated disk size in GB'),
   provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),
@@ -50,7 +51,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
     if (totalSize < defaultTotalSize) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Disk size cannot be reduced in size. Must be at least ${formatNumber(defaultTotalSize)} GB.`,
+        message: `Disk size cannot be reduced in size. Reduce your database size and then head to the Infrastructure settings and go through a Postgres version upgrade to right-size your disk.`,
         path: ['totalSize'],
       })
     }
@@ -163,7 +164,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
         if (throughput > THROUGHPUT_RANGE['gp3'].max) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Throughput can not exceed ${formatNumber(maxThroughput)} MiB/s`,
+            message: `Throughput can not exceed ${formatNumber(maxThroughput)} MB/s`,
             path: ['throughput'],
           })
         }
@@ -171,14 +172,14 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
           const iopsRequiredForThroughput = calculateIopsRequiredForThroughput(throughput)
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Need at least ${formatNumber(iopsRequiredForThroughput)} IOPS to support ${formatNumber(throughput)} MiB/s.`,
+            message: `Need at least ${formatNumber(iopsRequiredForThroughput)} IOPS to support ${formatNumber(throughput)} MB/s.`,
             path: ['throughput'],
           })
         }
         if (throughput < THROUGHPUT_RANGE[DiskType.GP3].min) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Throughput must be at least ${formatNumber(THROUGHPUT_RANGE[DiskType.GP3].min)} MiB/s`,
+            message: `Throughput must be at least ${formatNumber(THROUGHPUT_RANGE[DiskType.GP3].min)} MB/s`,
             path: ['throughput'],
           })
         }

@@ -1,4 +1,8 @@
-import { useParams } from 'common/hooks'
+import { useTheme } from 'next-themes'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+
+import { useParams } from 'common'
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
@@ -9,9 +13,7 @@ import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorL
 import TableEditorMenu from 'components/layouts/TableEditorLayout/TableEditorMenu'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useTheme } from 'next-themes'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { addTab, createTabId, getTabsStore } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
@@ -67,7 +69,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   }, [selectedTable, id, projectRef, isTableEditorTabsEnabled])
 
   return (
-    <>
+    <TableEditorTableStateContextProvider key={`table-editor-table-${id}`}>
       <TableGridEditor
         isLoadingSelectedTable={isLoading}
         selectedTable={selectedTable}
@@ -84,7 +86,7 @@ const TableEditorPage: NextPageWithLayout = () => {
           }
         }}
       />
-    </>
+    </TableEditorTableStateContextProvider>
   )
 }
 

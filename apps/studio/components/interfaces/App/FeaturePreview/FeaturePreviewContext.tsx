@@ -1,22 +1,24 @@
+import { noop } from 'lodash'
+
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EMPTY_OBJ } from 'lib/void'
-import { noop } from 'lodash'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { CLSPreview } from './CLSPreview'
+import { InlineEditorPreview } from './InlineEditorPreview'
 import { SqlEditorTabsPreview } from './SqlEditorTabs'
 import { TableEditorTabsPreview } from './TableEditorTabs'
 
 export const FEATURE_PREVIEWS = [
   {
     key: LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS,
-    name: 'Table Editor tabs',
+    name: 'Table Editor Tabs',
     content: <TableEditorTabsPreview />,
     isNew: true,
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS,
-    name: 'SQL Editor tabs',
+    name: 'SQL Editor Tabs',
     content: <SqlEditorTabsPreview />,
     isNew: true,
   },
@@ -33,6 +35,13 @@ export const FEATURE_PREVIEWS = [
     content: <CLSPreview />,
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
     isNew: false,
+  },
+  {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
+    name: 'Inline SQL Editor',
+    content: <InlineEditorPreview />,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
+    isNew: true,
   },
 ]
 
@@ -89,4 +98,9 @@ export const useIsAPIDocsSidePanelEnabled = () => {
 export const useIsColumnLevelPrivilegesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
+}
+
+export const useIsInlineEditorEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]
 }

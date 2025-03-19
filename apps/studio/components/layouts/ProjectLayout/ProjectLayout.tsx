@@ -3,6 +3,7 @@ import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePrevi
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import AISettingsModal from 'components/ui/AISettingsModal'
+import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -63,8 +64,6 @@ export interface ProjectLayoutProps {
   isBlocking?: boolean
   product?: string
   productMenu?: ReactNode
-  hideHeader?: boolean
-  hideIconBar?: boolean
   selectedTable?: string
   resizableSidebar?: boolean
 }
@@ -78,8 +77,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       product = '',
       productMenu,
       children,
-      hideHeader = false,
-      hideIconBar = false,
       selectedTable,
       resizableSidebar = false,
     },
@@ -87,21 +84,26 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
   ) => {
     const router = useRouter()
     const [isClient, setIsClient] = useState(false)
-    const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
-    const { aiAssistantPanel, setAiAssistantPanel, mobileMenuOpen, setMobileMenuOpen } =
-      useAppStateSnapshot()
+    const {
+      editorPanel,
+      aiAssistantPanel,
+      setAiAssistantPanel,
+      mobileMenuOpen,
+      setMobileMenuOpen,
+      showSidebar,
+    } = useAppStateSnapshot()
     const { open } = aiAssistantPanel
 
-    // tabs preview flag logic
+    // For tabs preview flag logic - only conditionally collapse sidebar for table editor and sql editor if feature flags are on
     const editor = useEditorType()
     const { flags } = useFeaturePreviewContext()
     const tableEditorTabsEnabled =
-      editor === 'table' && !flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
-    const sqlEditorTabsEnabled = editor === 'sql' && !flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
-    const forceShowProductMenu = tableEditorTabsEnabled && !sqlEditorTabsEnabled
-    // end of tabs preview flag logic
+      editor === 'table' && flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
+    const sqlEditorTabsEnabled = editor === 'sql' && flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+    const forceShowProductMenu = !tableEditorTabsEnabled && !sqlEditorTabsEnabled
+    const sideBarIsOpen = forceShowProductMenu || showSidebar
 
     const projectName = selectedProject?.name
     const organizationName = selectedOrganization?.name
@@ -133,8 +135,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       return () => window.removeEventListener('keydown', handler)
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
-
-    const sideBarIsOpen = true // @mildtomato - var for later to use collapsible sidebar
 
     return (
       <>
@@ -195,7 +195,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               <ResizableHandle
                 withHandle
                 disabled={resizableSidebar ? false : true}
-                className="hidden md:block"
+                className="hidden md:flex"
               />
             )}
             <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col w-full">
@@ -226,7 +226,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                     )}
                   </main>
                 </ResizablePanel>
-                {isClient && aiAssistantPanel.open && (
+                {isClient && (aiAssistantPanel.open || editorPanel.open) && (
                   <>
                     <ResizableHandle withHandle />
                     <ResizablePanel
@@ -237,7 +237,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                         '2xl:min-w-[500px] 2xl:max-w-[600px]'
                       )}
                     >
-                      <AIAssistantPanel />
+                      {aiAssistantPanel.open && <AIAssistantPanel />}
+                      {editorPanel.open && <EditorPanel />}
                     </ResizablePanel>
                   </>
                 )}
