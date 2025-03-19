@@ -358,6 +358,11 @@ class TicketScene implements BaseScene {
     this._enableSecretEffects()
   }
 
+  async upgradeToPlatinum() {
+    this.state.platinum = true
+    await this._loadTextures()
+  }
+
   // In your click method
   click(_e: MouseEvent) {
     if (!this._sceneRenderer || !this._sceneRenderer.mousePositionState?.isWithinContainer) return
@@ -688,7 +693,7 @@ class TicketScene implements BaseScene {
     const textureLoader = new THREE.TextureLoader()
     const loadingPromises: Promise<void>[] = []
 
-    const textureSetKey = this.state.secret ? 'secret' : this.state.platinum ? 'platinum' : 'basic'
+    const textureSetKey = this.state.platinum ? 'platinum' : this.state.secret ? 'secret' : 'basic'
 
     if (!force) {
       if (this._internalState.loadedTextureType === textureSetKey) {
@@ -813,10 +818,10 @@ class TicketScene implements BaseScene {
       : 'monospace'
 
     // Get the appropriate color scheme based on ticket type
-    const colors = this.state.secret
-      ? this.textureImages.secret
-      : this.state.platinum
-        ? this.textureImages.platinum
+    const colors = this.state.platinum
+      ? this.textureImages.platinum
+      : this.state.secret
+        ? this.textureImages.secret
         : this.textureImages.basic
 
     const isNeon = this.state.secret || this.state.platinum

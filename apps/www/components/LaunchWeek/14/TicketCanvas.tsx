@@ -97,22 +97,26 @@ const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
   )
 
   useEffect(() => {
+    async function updateTicket() {
+      if (sceneRef.current) {
+        sceneRef.current.setVisible(state.ticketVisibility)
+        sceneRef.current.setTicketNumber(state.userTicketData.ticket_number ?? 0)
+        sceneRef.current.setUserName(state.userTicketData.name ?? '')
+
+        if (state.userTicketData.secret) await sceneRef.current.upgradeToSecret()
+        if (state.userTicketData.platinum) await sceneRef.current.upgradeToPlatinum()
+
+        sceneRef.current.reloadTextures()
+      }
+    }
+
     if (sceneRef.current) {
-      sceneRef.current.setVisible(state.ticketVisibility)
-      sceneRef.current.setTicketNumber(state.userTicketData.ticket_number ?? 0)
-      sceneRef.current.setUserName(state.userTicketData.name ?? '')
-      if (state.userTicketData.secret) sceneRef.current.upgradeToSecret()
-      sceneRef.current.reloadTextures()
+      void updateTicket()
       if (state.ticketVisibility) {
         hudRef.current?.dimmHud()
       }
     }
-  }, [
-    state.ticketVisibility,
-    state.userTicketData.name,
-    state.userTicketData.secret,
-    state.userTicketData.ticket_number,
-  ])
+  }, [state.ticketVisibility, state.userTicketData.name, state.userTicketData.platinum, state.userTicketData.secret, state.userTicketData.ticket_number])
 
   useEffect(() => {
     if (!hudRef.current || !userData) return
