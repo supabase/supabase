@@ -28,7 +28,6 @@ export default function App() {
   const [username, setUsername] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     // Generate a random username
@@ -77,11 +76,6 @@ export default function App() {
       channel.unsubscribe();
     };
   }, []);
-
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -159,7 +153,6 @@ export default function App() {
                 );
               })
             )}
-            <div ref={messagesEndRef} />
           </div>
           
           <form onSubmit={handleSendMessage} className="flex w-full gap-2">

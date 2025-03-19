@@ -351,7 +351,7 @@ export default function App() {
   };
   
   return (
-    <div className="flex flex-col h-screen bg-neutral-800 text-white antialiased">
+    <div className="flex flex-col h-screen bg-neutral-900 text-white antialiased">
       {/* Toolbar */}
       <div className="flex items-center gap-4 absolute top-4 right-4">
         <button 
@@ -398,7 +398,7 @@ export default function App() {
             onMouseMove={draw}
             onMouseUp={stopDrawing}
             onMouseLeave={stopDrawing}
-            className="w-full h-full cursor-crosshair touch-none bg-neutral-800 shrink-0"
+            className="w-full h-full cursor-crosshair touch-none bg-neutral-900 shrink-0"
           />
         </div>
       </div>

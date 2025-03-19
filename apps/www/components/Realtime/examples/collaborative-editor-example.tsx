@@ -49,7 +49,8 @@ export default function App() {
       theme: 'bubble', // Using bubble theme which has no toolbar
       formats: [], // Disable all formatting
       modules: {
-        clipboard: true
+        clipboard: true,
+        toolbar: false
       }
     });
     

@@ -182,7 +182,7 @@ function RealtimePage() {
           </div>
         </SectionContainer>
         <SectionContainer className="max-w-none lg:mx-0 md:px-0 sm:px-0 xl:px-0">
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center mb-4">
             <h2 className="h3">What you can build with Realtime</h2>
             <p className="p mx-auto text-center lg:w-1/2">
               Build any kind of Realtime application with ease, including any of these scenarios.

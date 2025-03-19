@@ -9,9 +9,12 @@ import WhiteboardExample from './examples/whiteboard-example'
 import TicTacToeExample from './examples/tic-tac-toe-example'
 import EmojiPickerExample from './examples/emoji-picker-example'
 import Platformer3DExample from './examples/platformer-3d-example'
+import FPSExample from './examples/fps-example'
 import IframeAnnotationExample from './examples/iframe-annotation-example'
 import CarRacingExample from './examples/car-racing-example'
 import LogViewerExample from './examples/log-viewer-example'
+import FormPresenceExample from './examples/form-presence-example'
+import CursorTrackingExample from './examples/cursor-tracking-example'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import {
   Users,
@@ -25,6 +28,9 @@ import {
   StickyNote,
   Car,
   FileText,
+  ClipboardList,
+  MousePointer,
+  Crosshair,
 } from 'lucide-react'
 
 export default function RealtimeShowcase() {
@@ -32,30 +38,46 @@ export default function RealtimeShowcase() {
     <UserProvider>
       <div>
         <Tabs_Shadcn_ defaultValue="presence" className="w-full">
-          <TabsList_Shadcn_ className="justify-center gap-6">
-            <TabsTrigger_Shadcn_ value="presence" className="flex flex-col items-center gap-4 py-4">
+          <TabsList_Shadcn_ className="justify-center gap-6 sticky top-16 bg-background z-20">
+            <TabsTrigger_Shadcn_ value="presence" className="flex flex-col items-center gap-3 py-4">
               <Users strokeWidth={1.5} size={20} className="text-brand" />
               Presence
             </TabsTrigger_Shadcn_>
 
-            <TabsTrigger_Shadcn_ value="chat" className="flex flex-col items-center gap-4 py-4">
+            <TabsTrigger_Shadcn_ value="chat" className="flex flex-col items-center gap-3 py-4">
               <MessageSquare strokeWidth={1.5} size={20} className="text-brand" />
               Chat
             </TabsTrigger_Shadcn_>
 
-            <TabsTrigger_Shadcn_ value="todo" className="flex flex-col items-center gap-4 py-4">
+            <TabsTrigger_Shadcn_ value="todo" className="flex flex-col items-center gap-3 py-4">
               <CheckSquare strokeWidth={1.5} size={20} className="text-brand" />
               Todo List
             </TabsTrigger_Shadcn_>
 
-            <TabsTrigger_Shadcn_ value="editor" className="flex flex-col items-center gap-4 py-4">
+            <TabsTrigger_Shadcn_ value="editor" className="flex flex-col items-center gap-3 py-4">
               <Edit strokeWidth={1.5} size={20} className="text-brand" />
               Editor
             </TabsTrigger_Shadcn_>
 
             <TabsTrigger_Shadcn_
+              value="formPresence"
+              className="flex flex-col items-center gap-3 py-4"
+            >
+              <ClipboardList strokeWidth={1.5} size={20} className="text-brand" />
+              Form
+            </TabsTrigger_Shadcn_>
+
+            <TabsTrigger_Shadcn_
+              value="cursorTracking"
+              className="flex flex-col items-center gap-3 py-4"
+            >
+              <MousePointer strokeWidth={1.5} size={20} className="text-brand" />
+              Cursors
+            </TabsTrigger_Shadcn_>
+
+            <TabsTrigger_Shadcn_
               value="whiteboard"
-              className="flex flex-col items-center gap-4 py-4"
+              className="flex flex-col items-center gap-3 py-4"
             >
               <PenTool strokeWidth={1.5} size={20} className="text-brand" />
               Whiteboard
@@ -63,20 +85,20 @@ export default function RealtimeShowcase() {
 
             <TabsTrigger_Shadcn_
               value="tictactoe"
-              className="flex flex-col items-center gap-4 py-4"
+              className="flex flex-col items-center gap-3 py-4"
             >
               <Hash strokeWidth={1.5} size={20} className="text-brand" />
               Tic Tac Toe
             </TabsTrigger_Shadcn_>
 
-            <TabsTrigger_Shadcn_ value="emoji" className="flex flex-col items-center gap-4 py-4">
+            <TabsTrigger_Shadcn_ value="emoji" className="flex flex-col items-center gap-3 py-4">
               <Smile strokeWidth={1.5} size={20} className="text-brand" />
               Reactions
             </TabsTrigger_Shadcn_>
 
             <TabsTrigger_Shadcn_
               value="platformer"
-              className="flex flex-col items-center gap-4 py-4"
+              className="flex flex-col items-center gap-3 py-4"
             >
               <Gamepad2 strokeWidth={1.5} size={20} className="text-brand" />
               3D Platformer
@@ -84,13 +106,13 @@ export default function RealtimeShowcase() {
 
             <TabsTrigger_Shadcn_
               value="annotation"
-              className="flex flex-col items-center gap-4 py-4"
+              className="flex flex-col items-center gap-3 py-4"
             >
               <StickyNote strokeWidth={1.5} size={20} className="text-brand" />
               Annotation
             </TabsTrigger_Shadcn_>
 
-            <TabsTrigger_Shadcn_ value="logs" className="flex flex-col items-center gap-4 py-4">
+            <TabsTrigger_Shadcn_ value="logs" className="flex flex-col items-center gap-3 py-4">
               <FileText strokeWidth={1.5} size={20} className="text-brand" />
               Logs
             </TabsTrigger_Shadcn_>
@@ -112,6 +134,14 @@ export default function RealtimeShowcase() {
 
             <TabsContent_Shadcn_ value="editor" className="mt-0 border-0 p-0">
               <CollaborativeEditorExample />
+            </TabsContent_Shadcn_>
+
+            <TabsContent_Shadcn_ value="formPresence" className="mt-0 border-0 p-0">
+              <FormPresenceExample />
+            </TabsContent_Shadcn_>
+
+            <TabsContent_Shadcn_ value="cursorTracking" className="mt-0 border-0 p-0">
+              <CursorTrackingExample />
             </TabsContent_Shadcn_>
 
             <TabsContent_Shadcn_ value="whiteboard" className="mt-0 border-0 p-0">

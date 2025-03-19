@@ -24,14 +24,17 @@ const CHANNEL = 'platformer-3d-example-${instanceId}';
 
 // Game constants
 const MOVE_SPEED = 5;
-const JUMP_FORCE = 7;
+const GROUND_MOVE_SPEED = 10; // Increased movement speed on ground
+const JUMP_FORCE = 8; // Strong jump force
 const PLAYER_SIZE = [1, 1, 1]; // Width, height, depth
-const GRAVITY = -9.8;
+const GRAVITY = -12; // Stronger gravity for more responsive falling
 const BROADCAST_THROTTLE = 50; // ms between broadcasts (20 updates per second)
 const INTERPOLATION_SPEED = 15; // Higher values = faster interpolation
-const PROJECTILE_SPEED = 15; // Speed of projectiles
-const PROJECTILE_SIZE = 0.2; // Size of projectiles
+const PROJECTILE_SPEED = 12; // Reduced speed for better collision detection
+const PROJECTILE_SIZE = 0.2; // Smaller projectile size
 const SHOOT_COOLDOWN = 500; // Cooldown between shots in ms
+const COLLISION_OFFSET = 0.05; // Small offset to prevent clipping
+const GROUND_CHECK_THRESHOLD = 0.3; // Threshold for ground detection
 
 // Character colors - vibrant neon colors
 const COLORS = [
@@ -349,6 +352,12 @@ export default function App() {
   
   // Handle key down events
   const handleKeyDown = (e) => {
+    // Prevent default behavior for arrow keys and WASD to disable scrolling
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyS', 'KeyA', 'KeyD'].includes(e.code)) {
+      e.preventDefault();
+    }
+    
+    // Simply update the keysPressed object
     keysPressed.current[e.code] = true;
     
     // Shoot when Enter is pressed
@@ -388,15 +397,15 @@ export default function App() {
       canShoot.current = true;
     }, SHOOT_COOLDOWN);
     
-    // Create projectile data
+    // Create projectile data with better positioning
     const projectileData = {
       id: \`\${userId.current}-\${now}\`,
       ownerId: userId.current,
       ownerName: player.username,
       position: [
-        player.position[0] + player.direction[0] * 0.7, // Offset from player
+        player.position[0] + player.direction[0] * 1.0, // Increased offset from player
         player.position[1] + 0.5, // Slightly above center
-        player.position[2] + player.direction[2] * 0.7
+        player.position[2] + player.direction[2] * 1.0
       ],
       direction: [...player.direction],
       color: player.color,
@@ -479,64 +488,6 @@ export default function App() {
     isGameOver.current = false;
   };
   
-  // Update projectiles and check for collisions
-  useEffect(() => {
-    if (projectiles.length === 0) return;
-    
-    // Move projectiles and check for collisions
-    const interval = setInterval(() => {
-      setProjectiles(prev => {
-        // Move projectiles
-        const updatedProjectiles = prev.map(projectile => {
-          // Calculate new position
-          const newPosition = [
-            projectile.position[0] + projectile.direction[0] * PROJECTILE_SPEED * 0.016, // 16ms frame time
-            projectile.position[1] - 0.05, // Add gravity effect
-            projectile.position[2] + projectile.direction[2] * PROJECTILE_SPEED * 0.016
-          ];
-          
-          return {
-            ...projectile,
-            position: newPosition
-          };
-        });
-        
-        // Check for collisions with players
-        updatedProjectiles.forEach(projectile => {
-          // Skip projectiles from dead players
-          const owner = players.find(p => p.id === projectile.ownerId);
-          if (owner && owner.isAlive === false) return;
-          
-          // Check collision with each player
-          players.forEach(player => {
-            // Skip collision with owner or dead players
-            if (player.id === projectile.ownerId || player.isAlive === false) return;
-            
-            // Calculate distance between projectile and player
-            const dx = projectile.position[0] - player.position[0];
-            const dy = projectile.position[1] - player.position[1];
-            const dz = projectile.position[2] - player.position[2];
-            const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
-            
-            // If collision detected
-            if (distance < PLAYER_SIZE[0]/2 + PROJECTILE_SIZE/2) {
-              // Handle hit
-              handlePlayerHit(player.id, projectile.ownerId, projectile.ownerName);
-            }
-          });
-        });
-        
-        // Remove old projectiles (older than 5 seconds)
-        const now = Date.now();
-        const filtered = updatedProjectiles.filter(p => now - p.createdAt < 5000);
-        
-        return filtered;
-      });
-    }, 16); // 60fps
-    
-    return () => clearInterval(interval);
-  }, [projectiles, players]);
-  
   return (
     <div className="flex flex-col h-screen bg-neutral-900 text-neutral-300 font-sans">
       {/* Toolbar */}
@@ -552,7 +503,7 @@ export default function App() {
             <span>{user.username}</span>
           </div>
         ))}
-    </div>
+      </div>
       
       {/* Main content */}
       <div className="flex-1 relative overflow-hidden">
@@ -621,17 +572,14 @@ export default function App() {
             ))}
           </Physics>
           
-          {/* Projectiles - rendered outside physics system for simplicity */}
+          {/* Projectiles - now managed by ProjectileManager */}
           {projectiles.length > 0 && (
-            <>
-              {projectiles.map((projectile) => (
-                <Projectile 
-                  key={projectile.id} 
-                  position={projectile.position} 
-                  color={projectile.color} 
-                />
-              ))}
-            </>
+            <ProjectileManager 
+              projectiles={projectiles}
+              setProjectiles={setProjectiles}
+              players={players}
+              handlePlayerHit={handlePlayerHit}
+            />
           )}
           
           {/* Interpolation manager - handles smooth transitions for remote players */}
@@ -642,7 +590,7 @@ export default function App() {
           />
           
           <OrbitControls 
-            enableZoom={true} 
+            enableZoom={false} 
             enablePan={false} 
             enableRotate={true}
             target={[0, 0, 0]}
@@ -666,22 +614,127 @@ function Projectile({ position, color }) {
   // Add ref to track mounting
   const ref = useRef();
   
-  // Make projectiles slightly smaller
   return (
     <mesh 
       position={position} 
       castShadow
       ref={ref}
     >
-      <boxGeometry args={[PROJECTILE_SIZE * 1.5, PROJECTILE_SIZE * 1.5, PROJECTILE_SIZE * 1.5]} />
+      <sphereGeometry args={[PROJECTILE_SIZE]} />
       <meshStandardMaterial 
         color="#ffffff" 
         emissive={color || "#ffffff"}
-        emissiveIntensity={1.5}
+        emissiveIntensity={2.5}
         metalness={0.9}
         roughness={0.1}
       />
     </mesh>
+  );
+}
+
+// ProjectileManager component - handles all projectile updates in one place
+function ProjectileManager({ projectiles, setProjectiles, players, handlePlayerHit }) {
+  // Store hit status for projectiles
+  const hitProjectiles = useRef(new Set());
+  
+  // Use useFrame for smooth animation that's separate from React's render cycle
+  useFrame((state, delta) => {
+    if (projectiles.length === 0) return;
+    
+    // First, let's handle movement separately from collision detection
+    setProjectiles(prev => {
+      // Skip processing if nothing to update
+      if (prev.length === 0) return prev;
+      
+      // Move projectiles
+      const updatedProjectiles = prev.map(projectile => {
+        // Skip already hit projectiles
+        if (hitProjectiles.current.has(projectile.id)) return projectile;
+        
+        // Calculate new position
+        const newPosition = [
+          projectile.position[0] + projectile.direction[0] * PROJECTILE_SPEED * delta,
+          projectile.position[1] - 0.02, // Reduced gravity effect
+          projectile.position[2] + projectile.direction[2] * PROJECTILE_SPEED * delta
+        ];
+        
+        return {
+          ...projectile,
+          position: newPosition
+        };
+      });
+      
+      // Only update if something changed
+      return updatedProjectiles;
+    });
+    
+    // Now handle collisions as a separate process
+    // This prevents complex state updates and race conditions
+    const currentProjectiles = projectiles.filter(p => !hitProjectiles.current.has(p.id));
+    const alivePlayers = players.filter(p => p.isAlive !== false);
+    
+    // Process collisions
+    currentProjectiles.forEach(projectile => {
+      // Skip already hit projectiles
+      if (hitProjectiles.current.has(projectile.id)) return;
+      
+      // Skip projectiles from dead players
+      const owner = players.find(p => p.id === projectile.ownerId);
+      if (owner && owner.isAlive === false) {
+        hitProjectiles.current.add(projectile.id);
+        return;
+      }
+      
+      // Check collision with each alive player
+      for (const player of alivePlayers) {
+        // Skip collision with projectile owner
+        if (player.id === projectile.ownerId) continue;
+        
+        // Use a simpler and more generous collision detection
+        // Increase collision radius for better hit detection
+        const collisionRadius = PLAYER_SIZE[0] * 0.6 + PROJECTILE_SIZE * 1.5;
+        
+        // Calculate distance between projectile and player
+        const dx = projectile.position[0] - player.position[0];
+        const dy = projectile.position[1] - player.position[1];
+        const dz = projectile.position[2] - player.position[2];
+        const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+        
+        // If collision detected
+        if (distance < collisionRadius) {
+          // Mark this projectile as hit
+          hitProjectiles.current.add(projectile.id);
+          // Handle hit
+          handlePlayerHit(player.id, projectile.ownerId, projectile.ownerName);
+          // Break the loop since this projectile hit someone
+          break;
+        }
+      }
+    });
+    
+    // Remove old projectiles and hit projectiles
+    setProjectiles(prev => {
+      const now = Date.now();
+      // Remove projectiles that are:
+      // 1. Older than 5 seconds
+      // 2. Have hit something
+      return prev.filter(p => 
+        now - p.createdAt < 5000 && !hitProjectiles.current.has(p.id)
+      );
+    });
+  });
+  
+  // Render all projectiles
+  return (
+    <>
+      {projectiles.map((projectile) => (
+        <Projectile 
+          key={projectile.id} 
+          position={projectile.position} 
+          color={projectile.color} 
+        />
+      ))}
+    </>
   );
 }
 
@@ -769,7 +822,11 @@ function Ground(props) {
   const [ref] = usePlane(() => ({ 
     rotation: [-Math.PI / 2, 0, 0], 
     ...props,
-    type: 'Static'
+    type: 'Static',
+    material: {
+      friction: 0.05, // Low friction for smooth movement
+      restitution: 0.0 // No bounce
+    }
   }));
   
   return (
@@ -788,10 +845,21 @@ function Ground(props) {
 
 // Platform component
 function Platform({ position, size }) {
+  // Add a tiny offset to the platform size to prevent clipping
+  const adjustedSize = [
+    size[0] + COLLISION_OFFSET,
+    size[1] + COLLISION_OFFSET,
+    size[2] + COLLISION_OFFSET
+  ];
+  
   const [ref] = useBox(() => ({ 
     position, 
-    args: size,
-    type: 'Static'
+    args: adjustedSize, // Use the adjusted size for physics
+    type: 'Static',
+    material: {
+      friction: 0.05, // Low friction for smooth movement
+      restitution: 0.0 // No bounce
+    }
   }));
   
   return (
@@ -810,14 +878,26 @@ function Platform({ position, size }) {
 
 // Player component
 function Player({ player, isLocal, keysPressed, setLocalPlayer }) {
+  // Adjust the physics body size to be slightly smaller than visual representation
+  const physicsSize = [
+    PLAYER_SIZE[0] - COLLISION_OFFSET,
+    PLAYER_SIZE[1] - COLLISION_OFFSET,
+    PLAYER_SIZE[2] - COLLISION_OFFSET
+  ];
+  
   // Use physics for local player, but not for remote players
   const [ref, api] = useBox(() => ({ 
     mass: isLocal ? 1 : 0, // No physics for remote players
     position: player.position,
-    args: PLAYER_SIZE,
+    args: physicsSize, // Smaller collision box
     allowSleep: false,
     fixedRotation: true,
-    type: isLocal ? 'Dynamic' : 'Kinematic' // Kinematic for remote players
+    type: isLocal ? 'Dynamic' : 'Kinematic', // Kinematic for remote players
+    linearDamping: 0.1, // Reduced damping
+    material: {
+      friction: 0.05, // Low friction
+      restitution: 0.1 // Low bounciness
+    }
   }));
   
   const isJumping = useRef(false);
@@ -826,25 +906,13 @@ function Player({ player, isLocal, keysPressed, setLocalPlayer }) {
   const lastBroadcastRef = useRef(Date.now());
   const lastPositionRef = useRef(player.position);
   const directionRef = useRef(player.direction || [1, 0, 0]);
+  const isOnGroundRef = useRef(false);
   
   // For remote players, directly update position from props
   useEffect(() => {
     if (!isLocal) {
-      // Only update position if it's significantly different
-      const currentPos = positionRef.current || [0, 0, 0];
-      const newPos = player.position;
-      
-      const distance = Math.sqrt(
-        Math.pow(newPos[0] - currentPos[0], 2) +
-        Math.pow(newPos[1] - currentPos[1], 2) +
-        Math.pow(newPos[2] - currentPos[2], 2)
-      );
-      
-      // Update position if it's different enough
-      if (distance > 0.01) {
-        api.position.set(...player.position);
-        positionRef.current = player.position;
-      }
+      api.position.set(...player.position);
+      positionRef.current = player.position;
     }
   }, [player.position, isLocal, api.position]);
   
@@ -864,30 +932,20 @@ function Player({ player, isLocal, keysPressed, setLocalPlayer }) {
           directionRef.current = [1, 0, 0]; // Right
         }
         
-        lastPositionRef.current = [...p];
-        
-        // Throttle broadcasts to avoid overwhelming the network
-        // Only update if enough time has passed since last broadcast
+        // Update position in state if it changed significantly
         if (now - lastBroadcastRef.current > BROADCAST_THROTTLE) {
           lastBroadcastRef.current = now;
           
-          // Use a smaller threshold to detect more subtle movements
-          const dx = Math.abs(player.position[0] - p[0]);
-          const dy = Math.abs(player.position[1] - p[1]);
-          const dz = Math.abs(player.position[2] - p[2]);
-          
-          if (dx > 0.001 || dy > 0.001 || dz > 0.001) {
-            setLocalPlayer(prev => {
-              if (!prev) return prev;
-              
-              return {
-                ...prev,
-                position: [p[0], p[1], p[2]],
-                direction: directionRef.current,
-                lastUpdated: now
-              };
-            });
-          }
+          setLocalPlayer(prev => {
+            if (!prev) return prev;
+            
+            return {
+              ...prev,
+              position: [p[0], p[1], p[2]],
+              direction: directionRef.current,
+              lastUpdated: now
+            };
+          });
         }
       }
     });
@@ -895,55 +953,61 @@ function Player({ player, isLocal, keysPressed, setLocalPlayer }) {
     return () => {
       unsubscribe();
     };
-  }, [api, isLocal, setLocalPlayer, player.position, keysPressed]);
+  }, [api, isLocal, setLocalPlayer, keysPressed]);
   
   // Handle controls for local player
   useEffect(() => {
     if (!isLocal || player.isAlive === false) return;
     
+    // Track velocity and ground state
     const velocityUnsubscribe = api.velocity.subscribe((velocity) => {
-      // Store current velocity for use in the interval
       velocityRef.current = velocity;
+      
+      // Simple ground detection
+      isOnGroundRef.current = Math.abs(velocity[1]) < GROUND_CHECK_THRESHOLD;
+      
+      // Allow jumping again when on ground
+      if (isOnGroundRef.current) {
+        isJumping.current = false;
+      }
     });
     
+    // Main game update loop
     const interval = setInterval(() => {
-      // Use the stored velocity
-      const v = velocityRef.current || [0, 0, 0];
-      let newVelocity = [...v];
+      const velocity = velocityRef.current || [0, 0, 0];
       
-      // Handle left/right movement
+      // Movement speed
+      const moveSpeed = isOnGroundRef.current ? GROUND_MOVE_SPEED : MOVE_SPEED;
+      
+      // Left/Right movement
       if (keysPressed['ArrowLeft'] || keysPressed['KeyA']) {
-        newVelocity[0] = -MOVE_SPEED;
-      } else if (keysPressed['ArrowRight'] || keysPressed['KeyD']) {
-        newVelocity[0] = MOVE_SPEED;
-      } else {
-        newVelocity[0] *= 0.8; // Apply friction
+        api.velocity.set(-moveSpeed, velocity[1], velocity[2]);
+        directionRef.current = [-1, 0, 0];
+      } 
+      else if (keysPressed['ArrowRight'] || keysPressed['KeyD']) {
+        api.velocity.set(moveSpeed, velocity[1], velocity[2]);
+        directionRef.current = [1, 0, 0];
+      } 
+      else {
+        // Apply friction
+        api.velocity.set(velocity[0] * 0.8, velocity[1], velocity[2]);
       }
       
-      // Handle jumping
-      if ((keysPressed['ArrowUp'] || keysPressed['KeyW']) && !isJumping.current) {
-        // Simple ground check - if y velocity is very small, assume we're on ground
-        if (Math.abs(v[1]) < 0.1) {
-          newVelocity[1] = JUMP_FORCE;
-          isJumping.current = true;
-          
-          // Reset jumping state after a short delay
-          setTimeout(() => {
-            isJumping.current = false;
-          }, 500);
-        }
+      // Jumping - only if on ground and not already jumping
+      if ((keysPressed['ArrowUp'] || keysPressed['KeyW']) 
+          && isOnGroundRef.current 
+          && !isJumping.current) {
+        api.velocity.set(velocity[0], JUMP_FORCE, velocity[2]);
+        isJumping.current = true;
       }
-      
-      // Apply new velocity
-      api.velocity.set(newVelocity[0], newVelocity[1], newVelocity[2]);
-    }, 10); // 100fps for smoother controls
+    }, 10);
     
     return () => {
       clearInterval(interval);
       velocityUnsubscribe();
     };
-  }, [api, isLocal, keysPressed, player.isAlive]);
-  
+  }, [api, isLocal, player.isAlive, keysPressed]);
+
   // Apply visual effects for dead players
   const playerColor = player.isAlive === false ? '#333333' : player.color;
   const playerOpacity = player.isAlive === false ? 0.3 : 1;
@@ -980,8 +1044,7 @@ function Player({ player, isLocal, keysPressed, setLocalPlayer }) {
       </Text>
     </group>
   );
-}
-`
+}`
 
   const platformer3DFiles = {
     '/App.js': appJsCode,

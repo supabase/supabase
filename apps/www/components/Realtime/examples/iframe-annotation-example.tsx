@@ -9,6 +9,7 @@ export default function IframeAnnotationExample() {
   const appJsCode = `import { useEffect, useState, useRef } from 'react';
 import './styles.css';
 import { createClient } from '@supabase/supabase-js';
+import { X } from 'lucide-react';
 
 // Initialize Supabase client
 const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_URL}';
@@ -267,16 +268,16 @@ export default function App() {
                     className="max-w-[400px] min-w-32 bg-neutral-800 rounded shadow p-3 pt-2 mb-2"
                   >
                     <div className="flex justify-between items-center mb-1">
-                      <span className="font-medium text-xs text-neutral-400">{comment.username}</span>
+                      <span className="text-xs text-neutral-400">{comment.username}</span>
                       <button 
                         onClick={() => handleDeleteComment(comment.id)}
                         className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-neutral-800 text-neutral-500 hover:text-red-400"
                         aria-label="Delete comment"
                       >
-                        ×
+                        <X strokeWidth={1.5} size={14} />
                       </button>
                     </div>
-                    <div className="text-sm text-neutral-200 break-words">{comment.text}</div>
+                    <div className="text-xs  text-neutral-200 break-words">{comment.text}</div>
                   </div>
                   <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-neutral-900/90 mx-auto"></div>
                 </div>
@@ -307,7 +308,7 @@ export default function App() {
                         onKeyDown={handleInputKeyDown}
                         placeholder="Type your comment..."
                         data-comment-input
-                        className="w-full px-2 py-1.5 bg-neutral-800 border border-neutral-700 rounded text-sm text-neutral-200 placeholder-neutral-500 mb-2"
+                        className="w-full px-2 py-1.5 bg-neutral-800 border border-neutral-700 rounded text-xs text-neutral-200 placeholder-neutral-500 mb-2"
                         autoFocus
                       />
                       <div className="flex justify-end gap-2">
@@ -328,7 +329,6 @@ export default function App() {
                       </div>
                     </form>
                   </div>
-                  <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-neutral-900/90 mx-auto"></div>
                 </div>
               )}
             </div>

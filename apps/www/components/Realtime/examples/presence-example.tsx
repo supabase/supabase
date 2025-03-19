@@ -73,7 +73,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-neutral-800 text-white antialiased">
+    <div className="flex flex-col h-screen bg-neutral-900 text-white antialiased">
       {/* Main content */}
       <div className="flex-1 overflow-hidden p-4">
         <div className="h-full max-w-3xl mx-auto flex flex-col gap-4 items-center justify-center">
