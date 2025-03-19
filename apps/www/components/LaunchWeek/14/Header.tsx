@@ -1,11 +1,12 @@
 import { ReactNode, useEffect, useState } from 'react'
 import { cn } from 'ui'
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 
 export const TicketHeader = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="grid lg:grid-cols-[min-content_1fr_min-content] grid-cols-[1fr_1fr] w-full justify-between gap-8">
+    <SectionContainerWithCn height="none" className="grid lg:grid-cols-[127px_1fr_127px] grid-cols-[1fr_1fr] w-full justify-between gap-8">
       {children}
-    </div>
+    </SectionContainerWithCn>
   )
 }
 

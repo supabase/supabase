@@ -1,9 +1,9 @@
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import { ReactNode } from 'react'
 import { cn } from 'ui'
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 
 export const TicketLayout = ({ children }: { children: ReactNode }) => {
-  return <SectionContainer className="font-mono grid gap-12">{children}</SectionContainer>
+  return <SectionContainerWithCn className="font-mono grid gap-12 max-w-none px-0">{children}</SectionContainerWithCn>
 }
 
 const TicketLayoutCanvasCorner = ({ className }: { className?: string }) => {

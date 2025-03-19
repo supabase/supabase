@@ -1,6 +1,5 @@
 import TicketCanvas from '~/components/LaunchWeek/14/TicketCanvas'
 import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketLayout, TicketLayoutCanvas } from '~/components/LaunchWeek/14/TicketLayout'
 import {
   TicketHeader,
@@ -22,6 +21,7 @@ import TicketCopy from '~/components/LaunchWeek/14/TicketCopy'
 import TicketActions from '~/components/LaunchWeek/14/TicketActions'
 import { useRegistration } from '~/components/LaunchWeek/14/hooks/use-registration'
 import useConfData from './hooks/use-conf-data'
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 
 const dates = [new Date('2025-03-31T07:00:00.000-07:00')]
 
@@ -31,10 +31,13 @@ export const LwView = () => {
   const [state] = useConfData()
   const register = useRegistration()
 
-
   return (
     <DefaultLayout className='font-["Departure_Mono"]'>
-      <SectionContainer id="ticket" className="relative !max-w-none lw-nav-anchor !pt-0">
+      <SectionContainerWithCn
+        id="ticket"
+        height="none"
+        width="smallScreenFull"
+      >
         <TicketLayout>
           <TicketHeader>
             <TicketHeaderRemainingTime targetDate={dates[0]} />
@@ -42,18 +45,14 @@ export const LwView = () => {
             <TicketHeaderDate />
           </TicketHeader>
           <TicketLayoutCanvas>
-            <TicketCanvas onUpgradeToSecret={register.upgradeTicket}/>
+            <TicketCanvas onUpgradeToSecret={register.upgradeTicket} />
             {state.claimFormState === 'visible' && (
               <TicketClaim>
                 <TicketClaimLogo />
                 <TicketClaimContent>
                   <TicketClaimMessage />
                   <TicketClaimButtons>
-                    <ActionButton
-                      variant="primary"
-                      icon="T"
-                      onClick={() => register.signIn()}
-                    >
+                    <ActionButton variant="primary" icon="T" onClick={() => register.signIn()}>
                       CLAIM YOUR TICKET
                     </ActionButton>
                     <ActionButton
@@ -77,7 +76,7 @@ export const LwView = () => {
             )}
           </TicketLayoutCanvas>
         </TicketLayout>
-      </SectionContainer>
+      </SectionContainerWithCn>
     </DefaultLayout>
   )
 }
