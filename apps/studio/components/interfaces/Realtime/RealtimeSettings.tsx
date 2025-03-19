@@ -104,7 +104,13 @@ export const RealtimeSettings = () => {
   return (
     <ScaffoldSection isFullWidth>
       <Form_Shadcn_ {...form}>
-        <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+        <form
+          id={formId}
+          onSubmit={form.handleSubmit((values) => {
+            console.log('WTF', values)
+            onSubmit(values)
+          })}
+        >
           {isError ? (
             <AlertError error={error} subject="Failed to retrieve realtime settings" />
           ) : (
@@ -387,31 +393,31 @@ export const RealtimeSettings = () => {
                   )}
                 />
               </CardContent> */}
-              <CardFooter className="justify-between">
-                <div>
+              <CardFooter className="justify-end gap-x-2">
+                {/* <div>
                   {!canUpdateConfig && (
                     <p className="text-sm text-foreground-light">
                       You need additional permissions to update realtime settings
                     </p>
                   )}
-                </div>
-                <div className="flex items-center gap-x-2">
-                  {form.formState.isDirty && (
-                    <Button type="default" onClick={() => form.reset(data as any)}>
-                      Cancel
-                    </Button>
-                  )}
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    form={formId}
-                    disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
-                    loading={isUpdatingConfig}
-                    onClick={() => console.log('onCLICK SUBMIT')}
-                  >
-                    Save changes
+                </div> */}
+                {/* <div className="flex items-center gap-x-2"> */}
+                {form.formState.isDirty && (
+                  <Button type="default" onClick={() => form.reset(data as any)}>
+                    Cancel
                   </Button>
-                </div>
+                )}
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  form={formId}
+                  disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
+                  loading={isUpdatingConfig}
+                  onClick={() => console.log('onCLICK SUBMIT')}
+                >
+                  Save changes
+                </Button>
+                {/* </div> */}
               </CardFooter>
             </Card>
           )}
