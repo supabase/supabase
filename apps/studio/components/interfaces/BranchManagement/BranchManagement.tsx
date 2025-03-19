@@ -130,7 +130,13 @@ const BranchManagement = () => {
   const onConfirmDisableBranching = () => {
     if (projectRef == undefined) return console.error('Project ref is required')
     if (!previewBranches) return console.error('No branches available')
-    disableBranching({ projectRef, branchIds: previewBranches?.map((branch) => branch.id) })
+    disableBranching({
+      projectRef,
+      branchIds: previewBranches
+        // we can't delete the default branch it'll result in a permission error
+        ?.filter((branch) => branch.is_default === false)
+        .map((branch) => branch.id),
+    })
   }
 
   if (!hasBranchEnabled) return <BranchingEmptyState />
