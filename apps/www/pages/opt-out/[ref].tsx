@@ -146,7 +146,7 @@ export default function OptOutPage() {
         )}
 
         <Form_Shadcn_ {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="gap-4 max-w-xs flex flex-col">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="gap-2 max-w-xs flex flex-col">
             <input hidden value={form.getValues('ref')} readOnly {...register('ref')} />
             <input hidden {...register('captchaToken')} />
             <FormField_Shadcn_
@@ -209,11 +209,14 @@ export default function OptOutPage() {
               )}
             />
 
-            <div className="mb-2">
+            <div>
               <HCaptcha
                 sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || ''}
                 onVerify={handleCaptchaVerify}
-                ref={captchaRef}
+                ref={(ref) => {
+                  captchaRef.current = ref
+                  ref?.execute()
+                }}
                 theme={resolvedTheme}
                 size="invisible"
               />
