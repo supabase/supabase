@@ -3,7 +3,7 @@ import { cn } from 'ui'
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 
 export const TicketLayout = ({ children }: { children: ReactNode }) => {
-  return <SectionContainerWithCn className="font-mono grid gap-12 max-w-none px-0">{children}</SectionContainerWithCn>
+  return <SectionContainerWithCn className="font-mono grid gap-12 max-w-none px-6">{children}</SectionContainerWithCn>
 }
 
 const TicketLayoutCanvasCorner = ({ className }: { className?: string }) => {

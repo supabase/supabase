@@ -186,9 +186,27 @@ class TicketScene implements BaseScene {
 
   state: TicketSceneState
 
+  resolutions = {
+    0: {
+      ticketPosition: new Vector3(0, 0, -1),
+      ticketScale: new Vector3(0.8, 0.8, 0.8),
+    },
+
+    424: {
+      ticketPosition: new Vector3(0, 0, -0.6),
+      ticketScale: new Vector3(1, 1, 1),
+    },
+
+    1024: {
+      ticketPosition: new Vector3(0, 0, -0.5),
+      ticketScale: new Vector3(1, 1, 1),
+    },
+  }
+
   private _internalState = {
     naturalRotation: new Vector3(0, 0, Math.PI),
     naturalPosition: new Vector3(0, 0, -0.5),
+    naturalScale: new Vector3(1, 1, 1),
 
     fontsLoaded: false,
     loadedTextureType: null as 'basic' | 'secret' | 'platinum' | null,
@@ -267,6 +285,20 @@ class TicketScene implements BaseScene {
     await this._loadFonts()
     await this._preloadAllTextureSets()
 
+    const resolutionDescriptor = this.getResolutionDescriptor(window.innerWidth)
+
+    this._internalState.naturalPosition.set(
+      resolutionDescriptor.ticketPosition.x,
+      resolutionDescriptor.ticketPosition.y,
+      resolutionDescriptor.ticketPosition.z
+    )
+
+    this._internalState.naturalScale.set(
+      resolutionDescriptor.ticketScale.x,
+      resolutionDescriptor.ticketScale.y,
+      resolutionDescriptor.ticketScale.z
+    )
+
     const gltf = await loadGLTFModel(this.sceneUrl)
 
     this._ticket = gltf.scene.getObjectByName('Plane') as unknown as Scene
@@ -331,7 +363,8 @@ class TicketScene implements BaseScene {
     const mainRenderPass = context.composer.passes[0]
     if (mainRenderPass instanceof RenderPass) {
       this._updateNaturalPosition()
-      this._updateTicketSize(time)
+      this._updateTicketSize()
+      this._updateTicketPosition()
       if (this._ticket) this._updateTicketToFollowMouse(this._ticket, time)
       this._updatePasses(time)
     }
@@ -340,6 +373,20 @@ class TicketScene implements BaseScene {
   cleanup(): void {}
 
   resize(_ev: UIEvent): void {
+    const resolutionDescriptor = this.getResolutionDescriptor(window.innerWidth)
+
+    this._internalState.naturalPosition.set(
+      resolutionDescriptor.ticketPosition.x,
+      resolutionDescriptor.ticketPosition.y,
+      resolutionDescriptor.ticketPosition.z
+    )
+
+    this._internalState.naturalScale.set(
+      resolutionDescriptor.ticketScale.x,
+      resolutionDescriptor.ticketScale.y,
+      resolutionDescriptor.ticketScale.z
+    )
+
     return
   }
 
@@ -584,12 +631,11 @@ class TicketScene implements BaseScene {
     }
   }
 
-  _visibleScaleVector = new Vector3(1, 1, 1)
   _invisibleScaleVector = new Vector3(0, 0, 0)
 
-  private _updateTicketSize(time?: number) {
+  private _updateTicketSize() {
     if (this.state.visible) {
-      this._ticket?.scale.lerp(this._visibleScaleVector, 0.01)
+      this._ticket?.scale.lerp(this._internalState.naturalScale, 0.01)
     } else {
       this._ticket?.scale.lerp(this._invisibleScaleVector, 0.01)
     }
@@ -600,6 +646,13 @@ class TicketScene implements BaseScene {
     // Update bounding boxes for all meshes after scaling
     this._updateMeshBoundingBoxes()
   }
+
+  private _updateTicketPosition() {
+    this._ticket?.position.lerp(
+      this._internalState.naturalPosition,
+      0.01
+    )
+  } 
 
   private _updateMeshBoundingBoxes() {
     // Update bounding boxes for all named meshes
@@ -998,6 +1051,17 @@ class TicketScene implements BaseScene {
     }
 
     await Promise.all(promises)
+  }
+
+  private getResolutionDescriptor(resolution: number) {
+    const resolutions = Object.keys(this.resolutions).map(Number)
+    const closestResolution = resolutions.reduce((prev, curr) =>
+      resolution - curr >= 0 && resolution - curr < resolution - prev ? curr : prev
+    ) as keyof typeof this.resolutions
+
+    console.log('Closest resolution:', closestResolution)
+
+    return this.resolutions[closestResolution]
   }
 }
 

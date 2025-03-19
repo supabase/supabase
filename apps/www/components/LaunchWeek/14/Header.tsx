@@ -4,7 +4,7 @@ import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 
 export const TicketHeader = ({ children }: { children: ReactNode }) => {
   return (
-    <SectionContainerWithCn height="none" className="grid lg:grid-cols-[127px_1fr_127px] grid-cols-[1fr_1fr] w-full justify-between gap-8">
+    <SectionContainerWithCn height="none" className="grid lg:grid-cols-[127px_1fr_127px] grid-cols-[1fr_1fr] w-full justify-between gap-8 px-0">
       {children}
     </SectionContainerWithCn>
   )
