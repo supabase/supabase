@@ -5782,8 +5782,10 @@ export interface components {
       inserted_at: string
       max_client_conn?: number
       pgbouncer_enabled: boolean
-      pgbouncer_status: Record<string, never>
-      pool_mode: Record<string, never>
+      /** @enum {string} */
+      pgbouncer_status: 'COMING_UP' | 'COMING_DOWN' | 'RELOADING' | 'ENABLED' | 'DISABLED'
+      /** @enum {string} */
+      pool_mode: 'transaction' | 'session' | 'statement'
       ssl_enforced: boolean
     }
     PgbouncerStatusResponse: {
@@ -6649,6 +6651,11 @@ export interface components {
     }
     SupavisorConfigResponse: {
       connection_string: string
+      /**
+       * @deprecated
+       * @description Use connection_string instead
+       */
+      connectionString: string
       /** @enum {string} */
       database_type: 'PRIMARY' | 'READ_REPLICA'
       db_host: string
@@ -7103,8 +7110,10 @@ export interface components {
       ignore_startup_parameters: string
       max_client_conn?: number
       pgbouncer_enabled: boolean
-      pgbouncer_status: Record<string, never>
-      pool_mode: Record<string, never>
+      /** @enum {string} */
+      pgbouncer_status: 'COMING_UP' | 'COMING_DOWN' | 'RELOADING' | 'ENABLED' | 'DISABLED'
+      /** @enum {string} */
+      pool_mode: 'transaction' | 'session' | 'statement'
     }
     UpdatePostgresConfigBody: {
       effective_cache_size?: string

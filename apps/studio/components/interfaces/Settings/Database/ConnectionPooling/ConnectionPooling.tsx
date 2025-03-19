@@ -264,7 +264,6 @@ export const ConnectionPooling = () => {
             }
 
             setShowConfirmation(false)
-            // @ts-expect-error [Joshen] There's some issues with API typing, returning some params as Record<string, never>
             form.reset({ type: 'PgBouncer', ...data })
           },
         }
@@ -275,10 +274,7 @@ export const ConnectionPooling = () => {
           ref: projectRef,
           pgbouncer_enabled: false,
           ignore_startup_parameters: pgbouncerConfig.ignore_startup_parameters ?? '',
-          pool_mode: pgbouncerConfig.pool_mode as unknown as
-            | 'transaction'
-            | 'session'
-            | 'statement',
+          pool_mode: pgbouncerConfig.pool_mode,
         })
       }
       updateSupavisorConfig(
@@ -314,7 +310,6 @@ export const ConnectionPooling = () => {
       if (pgbouncerConfig) {
         form.reset({
           type: 'PgBouncer',
-          // @ts-expect-error [Joshen] There's some issues with API typing, returning some params as Record<string, never>
           pool_mode: pgbouncerConfig.pool_mode,
           default_pool_size: pgbouncerConfig.default_pool_size,
           max_client_conn: pgbouncerConfig.max_client_conn,
@@ -458,7 +453,7 @@ export const ConnectionPooling = () => {
                                 form.setValue('max_client_conn', supavisorConfig.max_client_conn)
                               } else if (e === 'PgBouncer' && pgbouncerConfig) {
                                 form.setValue('type', 'PgBouncer')
-                                form.setValue('pool_mode', pgbouncerConfig.pool_mode as any)
+                                form.setValue('pool_mode', pgbouncerConfig.pool_mode)
                                 form.setValue(
                                   'default_pool_size',
                                   pgbouncerConfig.default_pool_size as any
