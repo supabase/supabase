@@ -37,7 +37,7 @@ export default function OptOutPage() {
 
   const [formMessage, setFormMessage] = useState<string | null>(null)
   const [submissionType, setSubmissionType] = useState<'success' | 'error' | null>(null)
-  const captchaRef = useRef<HCaptcha>(null)
+  const captchaRef = useRef<HCaptcha | null>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
