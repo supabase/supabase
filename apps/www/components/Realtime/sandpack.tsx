@@ -23,7 +23,7 @@ export default function SandpackWrapper({ files, dependencies = {} }: SandpackPr
   }
 
   return (
-    <div className="h-full w-full bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700/50">
+    <div className="flex-1 h-full min-h-96 w-full bg-neutral-800 rounded-lg overflow-hidden border border-neutral-700/50">
       <SandpackProvider
         template="react"
         files={completeFiles}

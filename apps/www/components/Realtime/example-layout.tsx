@@ -20,7 +20,7 @@ export default function ExampleLayout({
 }: ExampleLayoutProps) {
   return (
     <div>
-      <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-2 h-screen">
+      <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-2 lg:h-screen">
         {/* Left column: Code display */}
         <div className="h-full flex flex-col gap-2 overflow-hidden">
           <div className="p-8 border bg-surface-75 rounded-lg relative overflow-hidden">
@@ -45,7 +45,7 @@ export default function ExampleLayout({
             <h1 className="text-xl font-medium text-neutral-100 mb-4">{title}</h1>
             <p className="text-foreground-light">{description}</p>
           </div>
-          <div className="flex-1 rounded-lg border bg-surface-100 overflow-auto">
+          <div className="flex-1 rounded-lg border bg-surface-100 overflow-auto max-h-96 lg:max-h-none">
             <CodeBlock className="!bg-surface-75" lang="tsx">
               {appJsCode}
             </CodeBlock>
@@ -53,7 +53,7 @@ export default function ExampleLayout({
         </div>
 
         {/* Right column: Two Sandpack previews stacked vertically */}
-        <div className="h-full grid grid-rows-2 gap-2">
+        <div className="h-full flex flex-col gap-2">
           <SandpackWrapper files={files} dependencies={dependencies} />
           <SandpackWrapper files={files} dependencies={dependencies} />
         </div>

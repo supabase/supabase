@@ -378,7 +378,7 @@ export default function App() {
           {activeUsers.map((user, index) => (
             <div 
               key={index} 
-              className="flex items-center gap-2 w-8 h-8 rounded-full bg-neutral-900 text-neutral-200 text-sm font-medium"
+              className="flex items-center gap-2 w-8 h-8 rounded-full bg-neutral-800 text-neutral-200 text-sm font-medium"
               title={user.username}
             >
               <div className="w-full h-full rounded-full flex items-center justify-center text-xs">

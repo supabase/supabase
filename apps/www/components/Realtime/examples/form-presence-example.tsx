@@ -299,7 +299,7 @@ export default function App() {
   }
 
   return (
-    <div className="p-8 flex flex-col bg-neutral-900 text-white antialiased">
+    <div className="min-h-screen p-8 flex flex-col bg-neutral-900 text-white antialiased">
       <header className="mb-8">
         <div className="max-w-3xl mx-auto flex justify-between items-center">
           <h1 className="text-xl font-medium">Collaborative Form</h1>

@@ -38,7 +38,7 @@ export default function RealtimeShowcase() {
     <UserProvider>
       <div>
         <Tabs_Shadcn_ defaultValue="presence" className="w-full">
-          <TabsList_Shadcn_ className="justify-center gap-6 sticky top-16 bg-background z-20">
+          <TabsList_Shadcn_ className="justify-center gap-6 sticky top-16 bg-background z-20 max-w-full overflow-x-auto">
             <TabsTrigger_Shadcn_ value="presence" className="flex flex-col items-center gap-3 py-4">
               <Users strokeWidth={1.5} size={20} className="text-brand" />
               Presence
@@ -88,7 +88,7 @@ export default function RealtimeShowcase() {
               className="flex flex-col items-center gap-3 py-4"
             >
               <Hash strokeWidth={1.5} size={20} className="text-brand" />
-              Tic Tac Toe
+              XO
             </TabsTrigger_Shadcn_>
 
             <TabsTrigger_Shadcn_ value="emoji" className="flex flex-col items-center gap-3 py-4">
@@ -101,7 +101,7 @@ export default function RealtimeShowcase() {
               className="flex flex-col items-center gap-3 py-4"
             >
               <Gamepad2 strokeWidth={1.5} size={20} className="text-brand" />
-              3D Platformer
+              Platformer
             </TabsTrigger_Shadcn_>
 
             <TabsTrigger_Shadcn_
@@ -119,7 +119,7 @@ export default function RealtimeShowcase() {
           </TabsList_Shadcn_>
 
           {/* Tab Content */}
-          <div className="flex-1 h-full overflow-hidden p-16 border-b">
+          <div className="flex-1 h-full overflow-hidden pt-8 px-8 lg:p-16 border-b">
             <TabsContent_Shadcn_ value="presence" className="mt-0 border-0 p-0">
               <PresenceExample />
             </TabsContent_Shadcn_>
