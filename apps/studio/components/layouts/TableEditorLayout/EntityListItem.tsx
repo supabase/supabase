@@ -65,10 +65,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
 
   // For tabs preview flag logic
   const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
-  const tabId = createTabId(entity.type, {
-    schema: selectedSchema,
-    name: entity.name,
-  })
+  const tabId = createTabId(entity.type, { id: entity.id })
   const tabStore = getTabsStore(projectRef)
   const isPreview = isTableEditorTabsEnabled ? tabStore.previewTabId === tabId : false
 
@@ -235,10 +232,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       )}
       onDoubleClick={(e) => {
         e.preventDefault()
-        const tabId = createTabId(entity.type, {
-          schema: selectedSchema,
-          name: entity.name,
-        })
+        const tabId = createTabId(entity.type, { id: entity.id })
         makeTabPermanent(projectRef, tabId)
       }}
     >

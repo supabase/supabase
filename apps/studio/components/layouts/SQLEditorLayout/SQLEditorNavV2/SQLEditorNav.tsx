@@ -7,6 +7,7 @@ import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { EmptyPrivateQueriesPanel } from 'components/layouts/SQLEditorLayout/PrivateSqlSnippetEmpty'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
+import { sqlEditorTabsCleanup } from 'components/layouts/Tabs/Tabs.utils'
 import { useContentCountQuery } from 'data/content/content-count-query'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { getContentById } from 'data/content/content-id-query'
@@ -28,7 +29,7 @@ import {
   useSnippetFolders,
   useSqlEditorV2StateSnapshot,
 } from 'state/sql-editor-v2'
-import { createTabId, getTabsStore, makeTabPermanent } from 'state/tabs'
+import { createTabId, getTabsStore, makeTabPermanent, removeTabs } from 'state/tabs'
 import { SqlSnippets } from 'types'
 import { Separator, TreeView } from 'ui'
 import {
@@ -58,7 +59,9 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const { profile } = useProfile()
   const project = useSelectedProject()
   const snapV2 = useSqlEditorV2StateSnapshot()
+
   const tabStore = getTabsStore(projectRef)
+  const tabs = useSnapshot(tabStore)
   const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const [sectionVisibility, setSectionVisibility] = useLocalStorage<SectionState>(
@@ -284,6 +287,14 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   })
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
+    onSuccess: (data) => {
+      if (isSQLEditorTabsEnabled) {
+        // Update Tabs state - currently unknown how to differentiate between sql and non-sql content
+        // so we're just deleting all tabs for with matching IDs
+        const tabIds = data.map((id) => createTabId('sql', { id }))
+        removeTabs(projectRef, tabIds)
+      }
+    },
     onError: (error, data) => {
       if (error.message.includes('Contents not found')) {
         postDeleteCleanup(data.ids)
@@ -492,21 +503,19 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     setSelectedSnippets([])
   }, [id])
 
-  const tabsStore = getTabsStore(projectRef)
-  const tabs = useSnapshot(tabsStore)
-
   useEffect(() => {
     if (projectRef && privateSnippetsPages) {
       privateSnippetsPages.pages.forEach((page) => {
         page.contents?.forEach((snippet: Snippet) => {
-          snapV2.addSnippet({
-            projectRef,
-            snippet,
-          })
+          snapV2.addSnippet({ projectRef, snippet })
         })
-
         page.folders?.forEach((folder: SnippetFolder) => snapV2.addFolder({ projectRef, folder }))
       })
+
+      if (isSQLEditorTabsEnabled) {
+        const snippets = privateSnippetsPages.pages.flatMap((x) => x.contents)
+        sqlEditorTabsCleanup({ ref: projectRef, snippets: snippets as any })
+      }
     }
   }, [projectRef, privateSnippetsPages?.pages])
 
@@ -515,13 +524,15 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
     favoriteSqlSnippetsData.pages.forEach((page) => {
       page.contents?.forEach((snippet) => {
-        snapV2.addSnippet({
-          projectRef,
-          snippet,
-        })
+        snapV2.addSnippet({ projectRef, snippet })
       })
     })
-  }, [projectRef, privateSnippetsPages?.pages])
+
+    if (isSQLEditorTabsEnabled) {
+      const snippets = favoriteSqlSnippetsData.pages.flatMap((x) => x.contents)
+      sqlEditorTabsCleanup({ ref: projectRef, snippets: snippets as any })
+    }
+  }, [projectRef, favoriteSqlSnippetsData?.pages])
 
   useEffect(() => {
     if (projectRef === undefined || !isSharedSqlSnippetsSuccess) return
@@ -534,7 +545,12 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         })
       })
     })
-  }, [projectRef, privateSnippetsPages?.pages])
+
+    if (isSQLEditorTabsEnabled) {
+      const snippets = sharedSqlSnippetsData.pages.flatMap((x) => x.contents)
+      sqlEditorTabsCleanup({ ref: projectRef, snippets: snippets as any })
+    }
+  }, [projectRef, sharedSqlSnippetsData?.pages])
 
   return (
     <>
@@ -581,9 +597,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     isPreview={isPreview}
                     onDoubleClick={(e) => {
                       e.preventDefault()
-                      const tabId = createTabId('sql', {
-                        id: element?.metadata?.id as unknown as Snippet['id'],
-                      })
                       makeTabPermanent(projectRef, tabId)
                     }}
                     element={element}
@@ -666,9 +679,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     isPreview={isPreview}
                     onDoubleClick={(e) => {
                       e.preventDefault()
-                      const tabId = createTabId('sql', {
-                        id: element?.metadata?.id as unknown as Snippet['id'],
-                      })
                       makeTabPermanent(projectRef, tabId)
                     }}
                     element={element}
@@ -824,9 +834,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     }}
                     onDoubleClick={(e) => {
                       e.preventDefault()
-                      const tabId = createTabId('sql', {
-                        id: element?.metadata?.id as unknown as Snippet['id'],
-                      })
                       makeTabPermanent(projectRef, tabId)
                     }}
                   />

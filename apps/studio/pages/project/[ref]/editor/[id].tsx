@@ -40,29 +40,22 @@ const TableEditorPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     // tabs preview flag logic
-    if (isTableEditorTabsEnabled) {
-      // end of tabs preview flag logic
-      if (selectedTable && projectRef) {
-        const tabId = createTabId(selectedTable.entity_type, {
-          schema: selectedTable.schema,
-          name: selectedTable.name,
+    if (isTableEditorTabsEnabled && selectedTable && projectRef) {
+      const tabId = createTabId(selectedTable.entity_type, { id: selectedTable.id })
+      if (!store.tabsMap[tabId]) {
+        addTab(projectRef, {
+          id: tabId,
+          type: selectedTable.entity_type,
+          label: selectedTable.name,
+          metadata: {
+            schema: selectedTable.schema,
+            name: selectedTable.name,
+            tableId: id,
+          },
         })
-
-        if (!store.tabsMap[tabId]) {
-          addTab(projectRef, {
-            id: tabId,
-            type: selectedTable.entity_type,
-            label: selectedTable.name,
-            metadata: {
-              schema: selectedTable.schema,
-              name: selectedTable.name,
-              tableId: id,
-            },
-          })
-        } else {
-          // If tab already exists, just make it active
-          store.activeTab = tabId
-        }
+      } else {
+        // If tab already exists, just make it active
+        store.activeTab = tabId
       }
     }
   }, [selectedTable, id, projectRef, isTableEditorTabsEnabled])

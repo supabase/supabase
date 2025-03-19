@@ -156,9 +156,14 @@ export const removeTabs = (ref: string | undefined, ids: string[]) => {
   if (!ref) return
   if (!ids.length) return
 
-  ids.forEach((id) => {
-    removeTab(ref, id)
-  })
+  ids.forEach((id) => removeTab(ref, id))
+}
+
+export const renameTab = (ref: string, id: string, name: string) => {
+  const store = getTabsStore(ref)
+  if (!!store.tabsMap[id]) {
+    store.tabsMap[id].label = name
+  }
 }
 
 // Function to reorder tabs in the store
@@ -325,32 +330,13 @@ export const handleTabDragEnd = (
 }
 
 type CreateTabIdParams = {
-  r: {
-    schema: string
-    name: string
-  }
-  v: {
-    schema: string
-    name: string
-  }
-  m: {
-    schema: string
-    name: string
-  }
-  f: {
-    schema: string
-    name: string
-  }
-  p: {
-    schema: string
-    name: string
-  }
-  sql: {
-    id: string
-  }
-  schema: {
-    schema: string
-  }
+  r: { id: number }
+  v: { id: number }
+  m: { id: number }
+  f: { id: number }
+  p: { id: number }
+  sql: { id: string }
+  schema: { schema: string }
   view: never
   function: never
   new: never
@@ -360,15 +346,15 @@ type CreateTabIdParams = {
 export function createTabId<T extends TabType>(type: T, params: CreateTabIdParams[T]): string {
   switch (type) {
     case 'r':
-      return `r-${(params as CreateTabIdParams['r']).schema}-${(params as CreateTabIdParams['r']).name}`
+      return `r-${(params as CreateTabIdParams['r']).id}`
     case 'v':
-      return `v-${(params as CreateTabIdParams['v']).schema}-${(params as CreateTabIdParams['v']).name}`
+      return `v-${(params as CreateTabIdParams['v']).id}`
     case 'm':
-      return `m-${(params as CreateTabIdParams['m']).schema}-${(params as CreateTabIdParams['m']).name}`
+      return `m-${(params as CreateTabIdParams['m']).id}`
     case 'f':
-      return `f-${(params as CreateTabIdParams['f']).schema}-${(params as CreateTabIdParams['f']).name}`
+      return `f-${(params as CreateTabIdParams['f']).id}`
     case 'p':
-      return `p-${(params as CreateTabIdParams['p']).schema}-${(params as CreateTabIdParams['p']).name}`
+      return `p-${(params as CreateTabIdParams['p']).id}`
     case 'sql':
       return `sql-${(params as CreateTabIdParams['sql']).id}`
     case 'schema':
