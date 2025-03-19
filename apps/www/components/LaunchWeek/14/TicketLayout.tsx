@@ -17,7 +17,7 @@ const TicketLayoutCanvasCorner = ({ className }: { className?: string }) => {
 
 export const TicketLayoutCanvas = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="relative w-full aspect-[1.5841584158] border border-neutral-600">
+    <div className="relative w-full h-[397px] lg:h-auto lg:aspect-[1.5841584158] border border-neutral-600">
       <TicketLayoutCanvasCorner className="top-[-1px] left-[-1px] -rotate-90"></TicketLayoutCanvasCorner>
       <TicketLayoutCanvasCorner className="top-[-1px] right-[-1px]"></TicketLayoutCanvasCorner>
       <TicketLayoutCanvasCorner className="bottom-[-1px] left-[-1px] rotate-180"></TicketLayoutCanvasCorner>

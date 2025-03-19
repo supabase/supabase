@@ -545,7 +545,12 @@ class HUDScene implements BaseScene {
   }
 
   private repositionHudElements(): void {
-    if (!this.hudGroup) return
+    if (!this.hudGroup || !this.hudMesh) return
+
+    // Update the plane geometry with new dimensions
+    this.hudMesh.geometry.dispose(); // Dispose of the old geometry
+    this.hudPlane = new THREE.PlaneGeometry(this.width, this.height);
+    this.hudMesh.geometry = this.hudPlane;
   }
 
   private getSize(num: number, axis: 'y' | 'x') {
