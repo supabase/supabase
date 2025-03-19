@@ -1,0 +1,32 @@
+---
+title: Radio Group Stacked
+description: A set of checkable buttons—known as radio buttons—where no more than one of the buttons can be checked at a time.
+component: true
+links:
+  doc: https://www.radix-ui.com/docs/primitives/components/radio-group
+  api: https://www.radix-ui.com/docs/primitives/components/radio-group#api-reference
+source:
+  radix: true
+---
+
+<ComponentPreview name="radio-group-stacked-demo" peekCode wide />
+
+## Usage
+
+```tsx
+import { RadioGroupStacked, RadioGroupStackedItem } from 'ui'
+```
+
+```tsx
+<RadioGroupStacked defaultValue="comfortable">
+  <RadioGroupStackedItem value="default" id="r1" label="Default" />
+  <RadioGroupStackedItem value="comfortable" id="r2" label="Comfortable" />
+  <RadioGroupStackedItem value="compact" id="r3" label="Compact" />
+</RadioGroupStacked>
+```
+
+## Examples
+
+### Form
+
+<ComponentPreview name="radio-group-stacked-form" />
