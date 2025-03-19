@@ -34,7 +34,7 @@ export const LwView = () => {
 
   return (
     <DefaultLayout className='font-["Departure_Mono"]'>
-      <SectionContainer id="ticket" className="relative !max-w-none lw-nav-anchor">
+      <SectionContainer id="ticket" className="relative !max-w-none lw-nav-anchor !pt-0">
         <TicketLayout>
           <TicketHeader>
             <TicketHeaderRemainingTime targetDate={dates[0]} />
