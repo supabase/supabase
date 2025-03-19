@@ -122,7 +122,7 @@ export const RealtimeSettings = () => {
                       <FormSectionContent loading={isLoading} className="!gap-y-2">
                         <FormItemLayout
                           layout="flex"
-                          label="Allow public channels"
+                          label="Allow public access"
                           description="If disabled, only private channels will be allowed"
                         >
                           <FormControl_Shadcn_>
