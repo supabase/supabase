@@ -121,7 +121,7 @@ export const RealtimeSettings = () => {
                         <FormItemLayout
                           layout="flex"
                           label="Allow public channels"
-                          description="If this is disabled, only private channels will be allowed"
+                          description="If disabled, only private channels will be allowed"
                         >
                           <FormControl_Shadcn_>
                             <Switch
