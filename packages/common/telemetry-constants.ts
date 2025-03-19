@@ -1049,7 +1049,7 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
- * User clicked the deploy button for an Edge Function. This can happen in the Functions Editor page or through the functions ai assistant side panel.
+ * User clicked the deploy button for an Edge Function.
  *
  * @group Events
  * @source studio
@@ -1058,6 +1058,11 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 export interface EdgeFunctionDeployButtonClickedEvent {
   action: 'edge_function_deploy_button_clicked'
   properties: {
+    /**
+     * Click on Deploy can either happen:
+     *   1. in the functions editor page
+     *   2. in the chat button in the functions editor
+     */
     origin: 'functions_editor' | 'functions_ai_assistant'
   }
   groups: {
@@ -1067,8 +1072,7 @@ export interface EdgeFunctionDeployButtonClickedEvent {
 }
 
 /**
- * User clicked the AI Assistant button for creating an Edge Function.
- * This can happen through clicking AI Assistant on the main block when there are no functions or in the secondary action section of the page or chat button in the functions editor.
+ * User clicked the AI Assistant button to create an Edge Function.
  *
  * @group Events
  * @source studio
@@ -1076,10 +1080,13 @@ export interface EdgeFunctionDeployButtonClickedEvent {
  */
 export interface EdgeFunctionAiAssistantButtonClickedEvent {
   action: 'edge_function_ai_assistant_button_clicked'
-  /**
-   *
-   */
   properties: {
+    /**
+     * Click on AI Assistant can either happen:
+     *   1. on the main block when there are no functions
+     *   2. in the secondary action section of the page
+     *   3. on the chat button in the functions editor
+     */
     origin: 'no_functions_block' | 'secondary_action' | 'functions_editor_chat'
   }
   groups: {
@@ -1090,7 +1097,6 @@ export interface EdgeFunctionAiAssistantButtonClickedEvent {
 
 /**
  * User clicked the button to go to the functions editor page to create an edge function.
- * This can happen through clicking Via Editor on the main block when there are no functions or in the secondary action section of the page.
  *
  * @group Events
  * @source studio
@@ -1099,6 +1105,11 @@ export interface EdgeFunctionAiAssistantButtonClickedEvent {
 export interface EdgeFunctionViaEditorButtonClickedEvent {
   action: 'edge_function_via_editor_button_clicked'
   properties: {
+    /**
+     * Click on Via Editor can either happen:
+     *   1. on the main block when there are no functions
+     *   2. in the secondary action section of the page
+     */
     origin: 'no_functions_block' | 'secondary_action'
   }
   groups: {
@@ -1118,6 +1129,11 @@ export interface EdgeFunctionTemplateClickedEvent {
   action: 'edge_function_template_clicked'
   properties: {
     templateName: string
+    /**
+     * Where the edge function template was clicked from:
+     *  1. functions page
+     *  2. editor page
+     */
     origin: 'functions_page' | 'editor_page'
   }
   groups: {
