@@ -5,7 +5,7 @@ import { DateTimeFormats } from './Charts.constants'
 import { numberFormatter } from './Charts.utils'
 import { MultiAttribute } from './ComposedChartHandler'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { cn } from 'ui'
 
 interface CustomIconProps {
@@ -156,6 +156,10 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
     onLabelHover?.(null)
   }
 
+  // useEffect(() => {
+  //   return () => handleMouseLeave()
+  // }, [])
+
   const getIcon = (name: string, color: string) => {
     switch (name === maxValueAttribute?.attribute) {
       case true:
@@ -171,14 +175,17 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
     const isHovered = hoveredLabel === entry.name
 
     const Label = () => (
-      <span
-        className={cn(
-          'text-nowrap text-foreground-lighter pr-2',
-          hoveredLabel && !isHovered && 'opacity-50'
-        )}
-      >
-        {attribute?.label || entry.name}
-      </span>
+      <div className="flex items-center gap-1">
+        {getIcon(entry.name, entry.color)}
+        <span
+          className={cn(
+            'text-nowrap text-foreground-lighter pr-2',
+            hoveredLabel && !isHovered && 'opacity-50'
+          )}
+        >
+          {attribute?.label || entry.name}
+        </span>
+      </div>
     )
 
     if (!showMaxValue && isMax) return null
@@ -188,23 +195,20 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
         key={entry.name}
         className="inline-flex md:flex-col gap-1 md:gap-0 w-fit text-foreground"
         onMouseEnter={() => handleMouseEnter(entry.name)}
-        onMouseLeave={handleMouseLeave}
+        onMouseOutCapture={handleMouseLeave}
       >
-        <div className="flex items-center gap-1">
-          {getIcon(entry.name, entry.color)}
-          {!!attribute?.tooltip ? (
-            <Tooltip>
-              <TooltipTrigger>
-                <Label />
-              </TooltipTrigger>
-              <TooltipContent side="bottom" align="center" className="max-w-[250px]">
-                {attribute.tooltip}
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            <Label />
-          )}
-        </div>
+        {!!attribute?.tooltip ? (
+          <Tooltip>
+            <TooltipTrigger>
+              <Label />
+            </TooltipTrigger>
+            <TooltipContent side="bottom" align="center" className="max-w-[250px]">
+              {attribute.tooltip}
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          <Label />
+        )}
       </p>
     )
   }

@@ -271,7 +271,7 @@ export default function ComposedChart({
                     hoveredLabel && hoveredLabel !== attribute.name
                       ? 0.075
                       : hoveredLabel === attribute.name
-                        ? 0.4
+                        ? 0.3
                         : 0.25
                   }
                   name={
