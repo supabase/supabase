@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useState, useMemo } from 'react'
+import React, { PropsWithChildren, useState, useMemo, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 
 import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
@@ -57,6 +57,43 @@ interface ComposedChartHandlerProps {
   showMaxValue?: boolean
   updateDateRange: UpdateDateRange
   valuePrecision?: number
+  isVisible?: boolean
+}
+
+/**
+ * Wrapper component that handles intersection observer logic for lazy loading
+ */
+const LazyChartWrapper = ({ children }: PropsWithChildren) => {
+  const [isVisible, setIsVisible] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.disconnect()
+        }
+      },
+      {
+        rootMargin: '150px 0px', // Start loading before the component enters viewport
+        threshold: 0,
+      }
+    )
+
+    const currentRef = ref.current
+    if (currentRef) {
+      observer.observe(currentRef)
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef)
+      }
+    }
+  }, [])
+
+  return <div ref={ref}>{React.cloneElement(children as React.ReactElement, { isVisible })}</div>
 }
 
 /**
@@ -89,6 +126,7 @@ const ComposedChartHandler = ({
   showTotal,
   updateDateRange,
   valuePrecision,
+  isVisible = true,
 }: PropsWithChildren<ComposedChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
@@ -111,7 +149,7 @@ const ComposedChartHandler = ({
           interval: interval as AnalyticsInterval,
           databaseIdentifier,
         },
-        { enabled: data === undefined }
+        { enabled: data === undefined && isVisible }
       )
     } else {
       return useInfraMonitoringQuery(
@@ -123,7 +161,7 @@ const ComposedChartHandler = ({
           interval: interval as AnalyticsInterval,
           databaseIdentifier,
         },
-        { enabled: data === undefined }
+        { enabled: data === undefined && isVisible }
       )
     }
   })
@@ -165,7 +203,6 @@ const ComposedChartHandler = ({
   const loading = isLoading || attributeQueries.some((query) => query.isLoading)
 
   // Calculate highlighted value based on the first attribute's data
-  // TODO: need to update this to show total aggregate over multiple attributes in a stacked chart
   const _highlightedValue = useMemo(() => {
     if (highlightedValue !== undefined) return highlightedValue
 
@@ -259,4 +296,10 @@ const ComposedChartHandler = ({
   )
 }
 
-export default ComposedChartHandler
+export default function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
+  return (
+    <LazyChartWrapper>
+      <ComposedChartHandler {...props} />
+    </LazyChartWrapper>
+  )
+}

@@ -1,9 +1,10 @@
+import { useEffect, useState } from 'react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ArrowRight, BookOpen, ExternalLink, RefreshCw } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -31,7 +32,7 @@ import type { NextPageWithLayout } from 'types'
 import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import ComposedChartHandler, { MultiAttribute } from 'components/ui/Charts/ComposedChartHandler'
+import { MultiAttribute } from 'components/ui/Charts/ComposedChartHandler'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 
 import { analyticsKeys } from 'data/analytics/keys'
@@ -41,6 +42,8 @@ import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { getReportAttributes } from 'data/reports/database-charts'
+
+const ComposedChartHandler = dynamic(() => import('components/ui/Charts/ComposedChartHandler'))
 
 export type UpdateDateRange = (from: string, to: string) => void
 
