@@ -28,7 +28,6 @@ export async function getTables(
   }: TablesVariables,
   signal?: AbortSignal
 ) {
-  console.log('RAN TABLES REQUEST')
   if (!projectRef) {
     throw new Error('projectRef is required')
   }
