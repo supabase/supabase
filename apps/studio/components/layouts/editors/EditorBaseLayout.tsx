@@ -2,8 +2,10 @@ import { usePathname } from 'next/navigation'
 import { ComponentProps, ReactNode } from 'react'
 
 import { useParams } from 'common'
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import {
+  useIsSQLEditorTabsEnabled,
+  useIsTableEditorTabsEnabled,
+} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { cn } from 'ui'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 import { Tabs } from '../Tabs'
@@ -21,11 +23,12 @@ export const EditorBaseLayout = ({ children, title, product, ...props }: Explore
   const { ref } = useParams()
   const pathname = usePathname()
   const editor = useEditorType()
-  const { flags } = useFeaturePreviewContext()
 
-  const tableEditorTabsEnabled =
-    editor === 'table' && flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
-  const sqlEditorTabsEnabled = editor === 'sql' && flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
+  const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
+
+  const tableEditorTabsEnabled = editor === 'table' && isTableEditorTabsEnabled
+  const sqlEditorTabsEnabled = editor === 'sql' && isSQLEditorTabsEnabled
   const hideTabs = pathname === `/project/${ref}/editor` || pathname === `/project/${ref}/sql`
 
   return (

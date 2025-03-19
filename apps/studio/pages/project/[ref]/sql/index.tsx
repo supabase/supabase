@@ -1,11 +1,10 @@
 import { useParams } from 'common'
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsSQLEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { NewTab } from 'components/layouts/Tabs/NewTab'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { getTabsStore } from 'state/tabs'
@@ -27,8 +26,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   }
 
   // redirect to /new if not using tabs
-  const { flags } = useFeaturePreviewContext()
-  const isSqlEditorTabsEnabled = flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+  const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   useEffect(() => {
     if (isSqlEditorTabsEnabled !== undefined && !isSqlEditorTabsEnabled) {

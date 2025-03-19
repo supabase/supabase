@@ -1,5 +1,8 @@
 import { useParams } from 'common'
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsSQLEditorTabsEnabled,
+  useIsTableEditorTabsEnabled,
+} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import AISettingsModal from 'components/ui/AISettingsModal'
@@ -10,7 +13,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
+import { PROJECT_STATUS } from 'lib/constants'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
@@ -96,12 +99,13 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     } = useAppStateSnapshot()
     const { open } = aiAssistantPanel
 
+    const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
+    const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
+
     // For tabs preview flag logic - only conditionally collapse sidebar for table editor and sql editor if feature flags are on
     const editor = useEditorType()
-    const { flags } = useFeaturePreviewContext()
-    const tableEditorTabsEnabled =
-      editor === 'table' && flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
-    const sqlEditorTabsEnabled = editor === 'sql' && flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+    const tableEditorTabsEnabled = editor === 'table' && isTableEditorTabsEnabled
+    const sqlEditorTabsEnabled = editor === 'sql' && isSQLEditorTabsEnabled
     const forceShowProductMenu = !tableEditorTabsEnabled && !sqlEditorTabsEnabled
     const sideBarIsOpen = forceShowProductMenu || showSidebar
 

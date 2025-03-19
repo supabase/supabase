@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { useParams } from 'common'
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -12,7 +12,6 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import TableEditorMenu from 'components/layouts/TableEditorLayout/TableEditorMenu'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { addTab, createTabId, getTabsStore } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
@@ -37,8 +36,8 @@ const TableEditorPage: NextPageWithLayout = () => {
    * - selectedTable changes (when a new table is loaded)
    * - id changes (when URL parameter changes)
    */
-  const { flags } = useFeaturePreviewContext()
-  const isTableEditorTabsEnabled = flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
+  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
+
   useEffect(() => {
     // tabs preview flag logic
     if (isTableEditorTabsEnabled) {

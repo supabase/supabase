@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useIsSQLEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
@@ -52,11 +53,14 @@ const DEFAULT_SECTION_STATE: SectionState = { shared: false, favorite: false, pr
 
 export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const router = useRouter()
+  const { ref: projectRef, id } = useParams()
+
   const { profile } = useProfile()
   const project = useSelectedProject()
-  const { ref: projectRef, id } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabStore = getTabsStore(projectRef)
+  const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
+
   const [sectionVisibility, setSectionVisibility] = useLocalStorage<SectionState>(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_SECTION_STATE(projectRef ?? ''),
     DEFAULT_SECTION_STATE
@@ -556,14 +560,17 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
               data={projectSnippetsTreeState}
               aria-label="project-level-snippets"
               nodeRenderer={({ element, ...props }) => {
-                const isOpened = Object.values(tabs.tabsMap).some(
-                  (tab) => tab.metadata?.sqlId === element.metadata?.id
-                )
+                const isOpened =
+                  isSQLEditorTabsEnabled &&
+                  Object.values(tabs.tabsMap).some(
+                    (tab) => tab.metadata?.sqlId === element.metadata?.id
+                  )
                 const tabId = createTabId('sql', {
                   id: element?.metadata?.id as unknown as Snippet['id'],
                 })
-                const isPreview = tabStore.previewTabId === tabId
+                const isPreview = isSQLEditorTabsEnabled && tabStore.previewTabId === tabId
                 const isActive = !isPreview && element.metadata?.id === id
+
                 return (
                   <SQLEditorTreeViewItem
                     {...props}
@@ -639,13 +646,15 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
               data={favoritesTreeState}
               aria-label="favorite-snippets"
               nodeRenderer={({ element, ...props }) => {
-                const isOpened = Object.values(tabs.tabsMap).some(
-                  (tab) => tab.metadata?.sqlId === element.metadata?.id
-                )
+                const isOpened =
+                  isSQLEditorTabsEnabled &&
+                  Object.values(tabs.tabsMap).some(
+                    (tab) => tab.metadata?.sqlId === element.metadata?.id
+                  )
                 const tabId = createTabId('sql', {
                   id: element?.metadata?.id as unknown as Snippet['id'],
                 })
-                const isPreview = tabStore.previewTabId === tabId
+                const isPreview = isSQLEditorTabsEnabled && tabStore.previewTabId === tabId
                 const isActive = !isPreview && element.metadata?.id === id
                 return (
                   <SQLEditorTreeViewItem
@@ -728,13 +737,15 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
               }}
               expandedIds={expandedFolderIds}
               nodeRenderer={({ element, ...props }) => {
-                const isOpened = Object.values(tabs.tabsMap).some(
-                  (tab) => tab.metadata?.sqlId === element.metadata?.id
-                )
+                const isOpened =
+                  isSQLEditorTabsEnabled &&
+                  Object.values(tabs.tabsMap).some(
+                    (tab) => tab.metadata?.sqlId === element.metadata?.id
+                  )
                 const tabId = createTabId('sql', {
                   id: element?.metadata?.id as unknown as Snippet['id'],
                 })
-                const isPreview = tabStore.previewTabId === tabId
+                const isPreview = isSQLEditorTabsEnabled && tabStore.previewTabId === tabId
                 const isActive = !isPreview && element.metadata?.id === id
 
                 return (

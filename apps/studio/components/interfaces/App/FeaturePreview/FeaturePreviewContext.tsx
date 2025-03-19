@@ -104,3 +104,13 @@ export const useIsInlineEditorEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]
 }
+
+export const useIsTableEditorTabsEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
+}
+
+export const useIsSQLEditorTabsEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+}

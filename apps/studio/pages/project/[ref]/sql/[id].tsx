@@ -2,14 +2,13 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { useParams } from 'common/hooks/useParams'
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsSQLEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { useContentIdQuery } from 'data/content/content-id-query'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { addTab, createTabId } from 'state/tabs'
@@ -56,8 +55,7 @@ const SqlEditor: NextPageWithLayout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, allSnippets, content])
 
-  const { flags } = useFeaturePreviewContext()
-  const isSqlEditorTabsEnabled = flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+  const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   // Watch for route changes
   useEffect(() => {

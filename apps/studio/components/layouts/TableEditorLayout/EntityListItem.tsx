@@ -11,7 +11,7 @@ import {
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
@@ -26,7 +26,6 @@ import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { copyToClipboard } from 'lib/helpers'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, getTabsStore, makeTabPermanent } from 'state/tabs'
@@ -65,8 +64,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const { selectedSchema } = useQuerySchemaState()
 
   // For tabs preview flag logic
-  const { flags } = useFeaturePreviewContext()
-  const isTableEditorTabsEnabled = flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
+  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const tabId = createTabId(entity.type, {
     schema: selectedSchema,
     name: entity.name,

@@ -1,13 +1,13 @@
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useParams } from 'next/navigation'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+
+import { useIsSQLEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import SQLQuickstarts from 'components/interfaces/SQLEditor/SQLTemplates/SQLQuickstarts'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useParams } from 'next/navigation'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 import { addTab, createTabId } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
@@ -15,10 +15,8 @@ const SqlQuickstarts: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams<{ ref: string }>()
 
-  const { flags } = useFeaturePreviewContext()
-  const isSqlEditorTabsEnabled = flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+  const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
-  // Watch for route changes
   useEffect(() => {
     if (isSqlEditorTabsEnabled) {
       if (!router.isReady) return
