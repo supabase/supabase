@@ -24,6 +24,7 @@ jobs:
         with:
           sparse-checkout: |
             packages/pg-meta
+            packages/tsconfig
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
