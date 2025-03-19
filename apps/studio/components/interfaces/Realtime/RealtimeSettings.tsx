@@ -70,10 +70,12 @@ export const RealtimeSettings = () => {
       .min(1)
       .max(maxConn?.maxConnections ?? 100),
     max_concurrent_users: z.coerce.number().min(1).max(50000),
-    max_events_per_second: z.coerce.number().min(1).max(50000),
-    max_bytes_per_second: z.coerce.number().min(1).max(10000000),
-    max_channels_per_client: z.coerce.number().min(1).max(10000),
-    max_joins_per_second: z.coerce.number().min(1).max(5000),
+
+    // [Joshen] These fields are temporarily hidden from the UI
+    // max_events_per_second: z.coerce.number().min(1).max(50000),
+    // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
+    // max_channels_per_client: z.coerce.number().min(1).max(10000),
+    // max_joins_per_second: z.coerce.number().min(1).max(5000),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -85,7 +87,6 @@ export const RealtimeSettings = () => {
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (data) => {
-    console.log('FUNCTION ONSUBMIT')
     if (!projectRef) return console.error('Project ref is required')
     updateRealtimeConfig({
       ref: projectRef,
@@ -104,13 +105,7 @@ export const RealtimeSettings = () => {
   return (
     <ScaffoldSection isFullWidth>
       <Form_Shadcn_ {...form}>
-        <form
-          id={formId}
-          onSubmit={form.handleSubmit((values) => {
-            console.log('WTF', values)
-            onSubmit(values)
-          })}
-        >
+        <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
           {isError ? (
             <AlertError error={error} subject="Failed to retrieve realtime settings" />
           ) : (
@@ -393,31 +388,30 @@ export const RealtimeSettings = () => {
                   )}
                 />
               </CardContent> */}
-              <CardFooter className="justify-end gap-x-2">
-                {/* <div>
+              <CardFooter className="justify-between">
+                <div>
                   {!canUpdateConfig && (
                     <p className="text-sm text-foreground-light">
                       You need additional permissions to update realtime settings
                     </p>
                   )}
-                </div> */}
-                {/* <div className="flex items-center gap-x-2"> */}
-                {form.formState.isDirty && (
-                  <Button type="default" onClick={() => form.reset(data as any)}>
-                    Cancel
+                </div>
+                <div className="flex items-center gap-x-2">
+                  {form.formState.isDirty && (
+                    <Button type="default" onClick={() => form.reset(data as any)}>
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    form={formId}
+                    disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
+                    loading={isUpdatingConfig}
+                  >
+                    Save changes
                   </Button>
-                )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  form={formId}
-                  disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
-                  loading={isUpdatingConfig}
-                  onClick={() => console.log('onCLICK SUBMIT')}
-                >
-                  Save changes
-                </Button>
-                {/* </div> */}
+                </div>
               </CardFooter>
             </Card>
           )}
