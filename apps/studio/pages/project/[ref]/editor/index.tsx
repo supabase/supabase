@@ -40,7 +40,6 @@ const TableEditorPage: NextPageWithLayout = () => {
   return (
     <>
       {isTableEditorTabsEnabled ? <NewTab /> : <EmptyState />}
-
       <SidePanelEditor onTableCreated={onTableCreated} />
     </>
   )
