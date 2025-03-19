@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { Edit, Unlink } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -9,7 +10,6 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
 import { useUnlinkIdentityMutation } from 'data/profile/profile-unlink-identity-mutation'
-import dayjs from 'dayjs'
 import { BASE_PATH } from 'lib/constants'
 import {
   Badge,
@@ -178,7 +178,7 @@ export const AccountIdentities = () => {
         visible={!!selectedProviderUnlink}
         title={`Unlink ${getProviderName(selectedProviderUnlink ?? '')} identity`}
         onCancel={() => setSelectedProviderUnlink(undefined)}
-        onConfirm={() => onConfirmUnlinkIdentity()}
+        onConfirm={onConfirmUnlinkIdentity}
         confirmLabel="Unlink identity"
         confirmLabelLoading="Unlinking identity"
         alert={{
