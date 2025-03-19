@@ -38,7 +38,7 @@ const TicketCanvas = ({ className }: TicketCanvasProps) => {
       const initPromise = sceneRenderer.init(async () => {
         dispatch({ type: 'TICKET_LOADING_START' })
         const scene = new TicketScene({
-          defaultVisible: false ?? initialSceneDataRef.current.visible,
+          defaultVisible: initialSceneDataRef.current.visible,
           defaultSecret: initialSceneDataRef.current.secret,
           defaultPlatinum: initialSceneDataRef.current.platinum,
           user: initialSceneDataRef.current.user,
@@ -99,6 +99,9 @@ const TicketCanvas = ({ className }: TicketCanvasProps) => {
       sceneRef.current.setTicketNumber(state.userTicketData.ticket_number ?? 0)
       sceneRef.current.setUserName(state.userTicketData.name ?? '')
       sceneRef.current.reloadTextures()
+      if(state.ticketVisibility) {
+        hudRef.current?.dimmHud()
+      }
     }
   }, [state.ticketVisibility, state.userTicketData.name, state.userTicketData.ticket_number])
 

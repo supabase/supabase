@@ -9,6 +9,8 @@ interface HudSceneState {
   fuelLevel: number
   shieldIntegrity: number
   oxygenLevel: number
+  vignetteRaduis: number
+  vignetteSmoothness: number
 }
 
 interface HudSceneOptions {
@@ -77,15 +79,15 @@ class HUDScene implements BaseScene {
       coords: [
         {
           y: 611,
-          x: 190,
+          x: 190 + 25,
         },
         {
           y: 611,
-          x: 380,
+          x: 380 + 25,
         },
         {
           y: 611,
-          x: 570,
+          x: 570 + 25,
         },
       ],
     },
@@ -101,7 +103,7 @@ class HUDScene implements BaseScene {
       valueColor: '#fff',
       coords: {
         y: 611,
-        x: 760,
+        x: 760 + 25,
       },
     },
   }
@@ -118,6 +120,8 @@ class HUDScene implements BaseScene {
       shieldIntegrity: 0,
       oxygenLevel: 0,
       peopleOnlineActive: options.online ?? false,
+      vignetteRaduis: 1,
+      vignetteSmoothness: 0,
     }
 
     this.canvasWidth = this.referenceCanvasWidth * this.qualityMultiplier
@@ -175,6 +179,9 @@ class HUDScene implements BaseScene {
       depthWrite: false, // Helps with transparency issues
     })
 
+    this.shader.uniforms.vignetteRadius.value = this.state.vignetteRaduis
+    this.shader.uniforms.vignetteSmoothness.value = this.state.vignetteSmoothness
+
     // Create HUD mesh
     this.hudPlane = new THREE.PlaneGeometry(this.width, this.height)
     this.hudMesh = new THREE.Mesh(this.hudPlane, this.hudMaterial)
@@ -222,7 +229,12 @@ class HUDScene implements BaseScene {
     // Update shader uniforms
     if (this.shader.uniforms && time !== undefined) {
       // Update time uniform for animation
-      this.shader.uniforms.u_time.value = time
+      this.shader.uniforms.time.value = time
+      this.shader.uniforms.resolution.value = [this.canvasWidth, this.canvasHeight]
+      this.shader.uniforms.vignetteRadius.value = this.shader.uniforms.vignetteRadius.value + 
+        (this.state.vignetteRaduis - this.shader.uniforms.vignetteRadius.value) * 0.1
+      this.shader.uniforms.vignetteSmoothness.value = this.shader.uniforms.vignetteSmoothness.value + 
+        (this.state.vignetteSmoothness - this.shader.uniforms.vignetteSmoothness.value) * 0.1
     }
   }
 
@@ -285,6 +297,16 @@ class HUDScene implements BaseScene {
     this.state.peopleOnlineActive = active
     this.draw()
     if (this.hudTexture) this.hudTexture.needsUpdate = true
+  }
+
+  dimmHud() {
+    this.state.vignetteRaduis = 0.2
+    this.state.vignetteSmoothness = 0.5
+  }
+
+  undimmHud() {
+    this.state.vignetteRaduis = 1
+    this.state.vignetteSmoothness = 0
   }
 
   resize(ev: UIEvent): void {
