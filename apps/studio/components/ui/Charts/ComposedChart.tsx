@@ -82,6 +82,7 @@ export default function ComposedChart({
   const [_activePayload, setActivePayload] = useState<any>(null)
   const [_showMaxValue, setShowMaxValue] = useState(showMaxValue)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
+  const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
 
   const { Container } = useChartSize(size)
 
@@ -248,7 +249,9 @@ export default function ComposedChart({
                   dataKey={attribute.name}
                   stackId="1"
                   fill={attribute.color}
+                  fillOpacity={hoveredLabel && hoveredLabel !== attribute.name ? 0.25 : 1}
                   radius={0.75}
+                  opacity={hoveredLabel && hoveredLabel !== attribute.name ? 0.5 : 1}
                   name={
                     attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
                   }
@@ -261,10 +264,16 @@ export default function ComposedChart({
                   dataKey={attribute.name}
                   stackId="1"
                   fill={attribute.color}
-                  strokeOpacity={1}
+                  strokeOpacity={hoveredLabel && hoveredLabel !== attribute.name ? 0.4 : 1}
                   stroke={attribute.color}
                   radius={0.75}
-                  fillOpacity={0.25}
+                  fillOpacity={
+                    hoveredLabel && hoveredLabel !== attribute.name
+                      ? 0.075
+                      : hoveredLabel === attribute.name
+                        ? 0.4
+                        : 0.25
+                  }
                   name={
                     attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
                   }
@@ -314,6 +323,7 @@ export default function ComposedChart({
           payload={[maxAttributeData, ...chartData]}
           attributes={attributes}
           showMaxValue={_showMaxValue}
+          onLabelHover={setHoveredLabel}
         />
       )}
     </div>

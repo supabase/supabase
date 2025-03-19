@@ -5,7 +5,8 @@ import { DateTimeFormats } from './Charts.constants'
 import { numberFormatter } from './Charts.utils'
 import { MultiAttribute } from './ComposedChartHandler'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import ReactMarkdown from 'react-markdown'
+import { useState } from 'react'
+import { cn } from 'ui'
 
 interface CustomIconProps {
   color: string
@@ -40,16 +41,6 @@ export const formatBytes = (bytes: number, precision: number = 1) => {
   const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return `${(bytes / Math.pow(k, i)).toFixed(precision)} ${sizes[i]}`
-}
-
-const formatLargeNumber = (num: number, precision: number = 0) => {
-  if (num >= 1000000) {
-    return `${(num / 1000000).toFixed(precision)}M`
-  } else if (num >= 1000) {
-    return `${(num / 1000).toFixed(precision)}K`
-  } else {
-    return num.toString()
-  }
 }
 
 const isMax = (attributes?: MultiAttribute[]) => attributes?.find((a) => a.isMaxValue)
@@ -147,11 +138,23 @@ interface CustomLabelProps {
   payload?: any[]
   attributes?: MultiAttribute[]
   showMaxValue?: boolean
+  onLabelHover?: (label: string | null) => void
 }
 
-const CustomLabel = ({ payload, attributes, showMaxValue }: CustomLabelProps) => {
+const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: CustomLabelProps) => {
   const items = payload ?? []
   const maxValueAttribute = isMax(attributes)
+  const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
+
+  const handleMouseEnter = (label: string) => {
+    setHoveredLabel(label)
+    onLabelHover?.(label)
+  }
+
+  const handleMouseLeave = () => {
+    setHoveredLabel(null)
+    onLabelHover?.(null)
+  }
 
   const getIcon = (name: string, color: string) => {
     switch (name === maxValueAttribute?.attribute) {
@@ -165,19 +168,28 @@ const CustomLabel = ({ payload, attributes, showMaxValue }: CustomLabelProps) =>
   const LabelItem = ({ entry }: { entry: any }) => {
     const attribute = attributes?.find((a) => a.attribute === entry.name)
     const isMax = entry.name === maxValueAttribute?.attribute
+    const isHovered = hoveredLabel === entry.name
 
     const Label = () => (
-      <span className="text-nowrap text-foreground-lighter pr-2">
+      <span
+        className={cn(
+          'text-nowrap text-foreground-lighter pr-2',
+          hoveredLabel && !isHovered && 'opacity-50'
+        )}
+      >
         {attribute?.label || entry.name}
       </span>
     )
 
     if (!showMaxValue && isMax) return null
 
-    const TContent = attribute?.tooltip
-
     return (
-      <p key={entry.name} className="inline-flex md:flex-col gap-1 md:gap-0 w-fit text-foreground">
+      <p
+        key={entry.name}
+        className="inline-flex md:flex-col gap-1 md:gap-0 w-fit text-foreground"
+        onMouseEnter={() => handleMouseEnter(entry.name)}
+        onMouseLeave={handleMouseLeave}
+      >
         <div className="flex items-center gap-1">
           {getIcon(entry.name, entry.color)}
           {!!attribute?.tooltip ? (
