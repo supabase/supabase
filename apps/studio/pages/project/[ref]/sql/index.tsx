@@ -34,11 +34,7 @@ const TableEditorPage: NextPageWithLayout = () => {
     }
   }, [isSqlEditorTabsEnabled])
 
-  return (
-    <>
-      <NewTab />
-    </>
-  )
+  return <NewTab />
 }
 
 TableEditorPage.getLayout = (page) => (

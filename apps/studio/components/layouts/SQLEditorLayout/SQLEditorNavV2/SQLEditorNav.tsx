@@ -549,7 +549,9 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
           title={`Shared ${numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
         />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
-          {numProjectSnippets === 0 ? (
+          {isLoadingSharedSqlSnippets ? (
+            <SQLEditorLoadingSnippets />
+          ) : numProjectSnippets === 0 ? (
             <InnerSideBarEmptyPanel
               className="mx-2"
               title="No shared queries"

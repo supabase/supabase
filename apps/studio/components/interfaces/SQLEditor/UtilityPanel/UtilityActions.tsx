@@ -176,12 +176,17 @@ const UtilityActions = ({
 
       <div className="flex items-center justify-between gap-x-2">
         <div className="flex items-center">
-          <DatabaseSelector
-            selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
-            variant="connected-on-right"
-            onSelectId={onSelectDatabase}
+          {IS_PLATFORM && (
+            <DatabaseSelector
+              selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
+              variant="connected-on-right"
+              onSelectId={onSelectDatabase}
+            />
+          )}
+          <RoleImpersonationPopover
+            serviceRoleLabel="postgres"
+            variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
           />
-          <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
           <SqlRunButton
             isDisabled={isDisabled || isExecuting}
             isExecuting={isExecuting}
