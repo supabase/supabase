@@ -1,4 +1,4 @@
 declare module '*?resource' {
-  const url: `${string}`
+  const url: string
   export default url
 }
