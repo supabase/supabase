@@ -85,6 +85,7 @@ export const RealtimeSettings = () => {
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (data) => {
+    console.log('FUNCTION ONSUBMIT')
     if (!projectRef) return console.error('Project ref is required')
     updateRealtimeConfig({
       ref: projectRef,
@@ -403,8 +404,10 @@ export const RealtimeSettings = () => {
                   <Button
                     type="primary"
                     htmlType="submit"
+                    form={formId}
                     disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
                     loading={isUpdatingConfig}
+                    onClick={() => console.log('onCLICK SUBMIT')}
                   >
                     Save changes
                   </Button>
