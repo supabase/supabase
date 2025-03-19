@@ -188,13 +188,18 @@ class TicketScene implements BaseScene {
 
   resolutions = {
     0: {
-      ticketPosition: new Vector3(0, 0, -1),
-      ticketScale: new Vector3(0.8, 0.8, 0.8),
+      ticketPosition: new Vector3(0, 0, -1.6),
+      ticketScale: new Vector3(0.55, 0.55, 0.55),
     },
 
-    424: {
-      ticketPosition: new Vector3(0, 0, -0.6),
-      ticketScale: new Vector3(1, 1, 1),
+    480: {
+      ticketPosition: new Vector3(0, 0, -1.5),
+      ticketScale: new Vector3(0.65, 0.65, 0.65),
+    },
+
+    640: {
+      ticketPosition: new Vector3(0, 0, -1.2),
+      ticketScale: new Vector3(0.85, 0.85, 0.85),
     },
 
     1024: {

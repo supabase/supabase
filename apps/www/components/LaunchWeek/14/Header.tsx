@@ -4,7 +4,10 @@ import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 
 export const TicketHeader = ({ children }: { children: ReactNode }) => {
   return (
-    <SectionContainerWithCn height="none" className="grid lg:grid-cols-[127px_1fr_127px] grid-cols-[1fr_1fr] w-full justify-between gap-8 px-0">
+    <SectionContainerWithCn
+      height="none"
+      className="grid lg:grid-cols-[127px_1fr_127px] grid-cols-[1fr_1fr] w-full justify-between gap-6 md:gap-8 px-0"
+    >
       {children}
     </SectionContainerWithCn>
   )
@@ -23,16 +26,16 @@ const SingleTick = ({ className }: { className?: string }) => {
 
 export const TicketHeaderClaim = () => {
   return (
-    <div className="inline-flex justify-center items-center gap-8 w-full order-1 col-span-2 lg:col-auto lg:order-2">
-      <div className="flex gap-4 flex-wrap w-full h-2.5 overflow-hidden justify-end flex-shrink flex-1">
+    <div className="inline-flex justify-start items-center gap-8 w-full order-1 col-span-2 lg:col-auto lg:order-2">
+      <div className="hidden gap-4 flex-wrap w-full h-2.5 overflow-hidden justify-end flex-shrink flex-1 md:flex">
         {Array.from({ length: 7 }).map((_, i) => (
           <SingleTick key={i} />
         ))}
       </div>
-      <div className="text-center justify-center text-neutral-500 text-sm font-normal uppercase [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)] lg:text-nowrap flex-grow text-balance">
+      <div className="text-start md:text-center justify-center text-neutral-500 text-sm font-normal uppercase [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)] lg:text-nowrap flex-grow max-w-[220px] md:max-w-none">
         Launch Week is coming. Stay tuned!
       </div>
-      <div className="flex gap-4 flex-wrap w-full h-2.5 overflow-hidden flex-shrink flex-1">
+      <div className="hidden gap-4 flex-wrap w-full h-2.5 overflow-hidden flex-shrink flex-1 md:flex">
         {Array.from({ length: 7 }).map((_, i) => (
           <SingleTick key={i} />
         ))}

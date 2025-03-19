@@ -3,7 +3,7 @@ import { cn } from 'ui'
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 
 export const TicketLayout = ({ children }: { children: ReactNode }) => {
-  return <SectionContainerWithCn className="font-mono grid gap-12 max-w-none px-6">{children}</SectionContainerWithCn>
+  return <SectionContainerWithCn height="narrow" className="font-mono grid gap-6 md:gap-12 max-w-none px-6">{children}</SectionContainerWithCn>
 }
 
 const TicketLayoutCanvasCorner = ({ className }: { className?: string }) => {
@@ -17,7 +17,7 @@ const TicketLayoutCanvasCorner = ({ className }: { className?: string }) => {
 
 export const TicketLayoutCanvas = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="relative w-full h-[397px] lg:h-auto lg:aspect-[1.5841584158] border border-neutral-600">
+    <div className="relative w-full h-[650px] lg:h-auto lg:aspect-[1.5841584158] border border-neutral-600">
       <TicketLayoutCanvasCorner className="top-[-1px] left-[-1px] -rotate-90"></TicketLayoutCanvasCorner>
       <TicketLayoutCanvasCorner className="top-[-1px] right-[-1px]"></TicketLayoutCanvasCorner>
       <TicketLayoutCanvasCorner className="bottom-[-1px] left-[-1px] rotate-180"></TicketLayoutCanvasCorner>

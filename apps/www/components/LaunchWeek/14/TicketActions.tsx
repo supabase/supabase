@@ -74,7 +74,7 @@ export default function TicketActions() {
   }
 
   return (
-    <div className="flex flex-row flex-wrap justify-start w-full gap-2 pointer-events-auto">
+    <div className="flex flex-col xs:flex-row flex-wrap justify-start w-full gap-2 pointer-events-auto">
       <Button
         onClick={() => handleShare('twitter')}
         type={userData.shared_on_twitter ? 'secondary' : 'default'}

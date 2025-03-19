@@ -12,7 +12,7 @@ const sectionContainerVariants = cva(
       },
       height: {
         normal: 'py-16 md:py-24 lg:py-24',
-        narrow: 'py-8 md:py-12 lg:py-16',
+        narrow: 'py-6 md:py-12 lg:py-16',
         none: ''
       },
     },
