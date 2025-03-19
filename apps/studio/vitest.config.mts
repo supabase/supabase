@@ -10,7 +10,7 @@ import { defineConfig } from 'vitest/config'
 const dirname = fileURLToPath(new URL('.', import.meta.url))
 
 // Register custom loaders to emulate webpack's behavior
-const nodeArgs = [`--import=./tests/loaders/register.mjs`]
+const nodeArgs = ['--import=./tests/loaders/register.mjs']
 
 export default defineConfig({
   plugins: [
