@@ -43,15 +43,6 @@ export function SiteFooter() {
             className="font-medium underline underline-offset-4 hover:text-foreground-lighter"
           >
             shadcn/ui
-          </a>{' '}
-          and{' '}
-          <a
-            href={siteConfig.links.credits.geist}
-            target="_blank"
-            rel="noreferrer"
-            className="font-medium underline underline-offset-4 hover:text-foreground-lighter"
-          >
-            Geist
           </a>
           .
         </p>

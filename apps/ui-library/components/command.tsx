@@ -1,4 +1,4 @@
-import { CommandCopyButton } from "./command-copy-button"
+import { CommandCopyButton } from './command-copy-button'
 
 interface CommandCopyProps {
   name: string
@@ -6,11 +6,11 @@ interface CommandCopyProps {
 
 export function Command({ name }: CommandCopyProps) {
   const command = `npx shadcn@latest add ${
-    process.env.VERCEL_TARGET_ENV === "production"
+    process.env.VERCEL_TARGET_ENV === 'production'
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : process.env.VERCEL_TARGET_ENV === "preview"
-      ? `https://${process.env.VERCEL_PROJECT_PREVIEW_URL}`
-      : "http://localhost:3000"
+      : process.env.VERCEL_TARGET_ENV === 'preview'
+        ? `https://${process.env.VERCEL_PROJECT_PREVIEW_URL}`
+        : 'http://localhost:3000'
   }/r/${name}.json`
 
   return (
