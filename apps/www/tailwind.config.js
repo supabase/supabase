@@ -62,6 +62,9 @@ module.exports = config({
         1200: '1200ms',
         1500: '1500ms',
       },
+      screens: {
+        'custom-pointer-coarse': { 'raw': '(pointer:coarse)' },
+      }
     },
   },
 })

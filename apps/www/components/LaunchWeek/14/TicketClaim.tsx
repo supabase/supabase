@@ -4,7 +4,7 @@ import logo from './assets/logo.png'
 
 export const TicketClaim = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="grid w-full gap-16 absolute z-10 top-[10%] left-0 h-full justify-center justify-items-center p-10 content-start">
+    <div className="grid w-full gap-8 sm:gap-16 absolute z-10 top-[3%] sm:top-[10%] left-0 h-full justify-center justify-items-center p-10 content-start">
       {children}
     </div>
   )
@@ -14,7 +14,7 @@ export const TicketClaimLogo = () => {
   return (
     <div className="grid content-center">
       <Image src={logo} alt="LW logo" className="size-12" width="48" height="48" />
-      <div>LW 14</div>
+      <div className='hidden md:block'>LW 14</div>
     </div>
   )
 }
@@ -25,25 +25,23 @@ export const TicketClaimContent = ({ children }: { children?: ReactNode }) => {
 
 export const TicketClaimMessage = () => {
   return (
-    <div className="grid justify-center">
+    <div className="grid justify-center gap-3">
       <div className="inline-flex flex-col justify-center items-center gap-1 font-mono">
         <div className="self-stretch text-center justify-center text-emerald-400 text-xl leading-7 [text-shadow:_0px_0px_12px_rgb(255_255_255_/_0.35)]">
           LAUNCH WEEK 14
         </div>
         <div className="text-center justify-center text-white text-xl leading-7 [text-shadow:_0px_0px_4px_rgb(44_244_148_/_0.25)]">
-          2 — 5 DECEMBER / 7AM PT
+          MAR 31 — APR 4<span className='hidden md:inline'> / 7AM PT</span>
         </div>
       </div>
-      <div className="opacity-70 text-center justify-center text-white text-base font-mono leading-normal [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)]">
+      <div className="opacity-70 text-center justify-center text-white md:text-base font-mono leading-normal [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)] text-sm text-balance max-w-[310px] md:max-w-[400px]">
         Join us for a week of new features
-        <br />
         and level up your development!
       </div>
-      <div className="flex"></div>
     </div>
   )
 }
 
 export const TicketClaimButtons = ({ children }: { children?: ReactNode }) => {
-  return <div className="inline-flex justify-start items-center gap-2.5">{children}</div>
+  return <div className="inline-flex justify-center items-center gap-2.5 flex-wrap">{children}</div>
 }
