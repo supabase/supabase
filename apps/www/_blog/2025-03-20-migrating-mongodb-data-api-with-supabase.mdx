@@ -1,6 +1,6 @@
 ---
 title: 'Migrating from the MongoDB Data API to Supabase'
-description: "A guide to migrating from the MongoDB Data API to Supabase."
+description: 'A guide to migrating from the MongoDB Data API to Supabase.'
 author: prashant
 image: mongodb-data-api/mongodb-data-api-og.png
 thumb: mongodb-data-api/mongodb-data-api-og.png
@@ -29,7 +29,7 @@ Supabase is an open-source MongoDB alternative and offers:
 - Built-in REST API via open-source PostgREST, directly analogous to MongoDB's Data API.
 - Real-time capabilities, authentication, file storage, and serverless functions—all tightly integrated.
 
-Most notably, Supabase [automatically generates a RESTful API](https://supabase.com/docs/guides/api#rest-api-overview) from your database schema, powered by PostgREST, itself a stable open-source project with a strong community. This feature  accelerates development by eliminating boilerplate code for basic CRUD operations. Supabase provides a near drop-in replacement for MongoDB’s Data API. The Supabase Data API also supports GraphQL and a host of mobile and web application frameworks.
+Most notably, Supabase [automatically generates a RESTful API](https://supabase.com/docs/guides/api#rest-api-overview) from your database schema, powered by PostgREST, itself a stable open-source project with a strong community. This feature accelerates development by eliminating boilerplate code for basic CRUD operations. Supabase provides a near drop-in replacement for MongoDB’s Data API. The Supabase Data API also supports GraphQL and a host of mobile and web application frameworks.
 
 In the end, you can focus on migrating your data, expose your data using Supabase’s Data API, and seamlessly integrate with your client applications.
 
@@ -59,9 +59,9 @@ mongoexport --uri="mongodb+srv://<username>:<password>@cluster.mongodb.net/<dbna
 Create a table in Supabase with a JSONB column to store raw Mongo documents:
 
 ```sql
-CREATE TABLE mongo_users_raw (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  data JSONB NOT NULL
+create table mongo_users_raw (
+  id uuid primary key default gen_random_uuid(),
+  data jsonb not null
 );
 ```
 
@@ -81,14 +81,14 @@ Once your data is imported as JSONB, leverage PostgreSQL’s powerful JSON funct
 ```sql
 -- Example to normalize user data
 INSERT INTO users (name, email)
-SELECT 
-  data->>'name' as name, 
+SELECT
+  data->>'name' as name,
   data->>'email' as email
 FROM mongo_users_raw;
 
 -- Example to normalize orders into a separate table
 INSERT INTO orders (user_id, product, quantity)
-SELECT 
+SELECT
   u.id,
   orders->>'product',
   (orders.value->>'quantity')::INTEGER
@@ -106,18 +106,17 @@ For example, if you have a users table, querying user information using Supabase
 ```jsx
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-	'https://<your-project>.supabase.co', 
-	'<your-api-key>'
-)
+const supabase = createClient('https://<your-project>.supabase.co', '<your-api-key>')
 
 // Fetch user named John along with their orders
 const { data, error } = await supabase
   .from('users')
-  .select(`
+  .select(
+    `
     id, name,
     orders (product, quantity)
-  `)
+  `
+  )
   .eq('name', 'John')
 
 if (error) {
