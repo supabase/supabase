@@ -1,5 +1,4 @@
 import { Mdx } from '@/components/mdx-components'
-import { DocsPager } from '@/components/pager'
 import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
 import { siteConfig } from '@/config/site'
@@ -101,7 +100,6 @@ export default async function DocPage({ params }: DocPageProps) {
         <div className="pb-12">
           <Mdx code={doc.body.code} />
         </div>
-        <DocsPager doc={doc} />
       </div>
       {doc.toc && (
         <div className="hidden text-sm xl:block">
