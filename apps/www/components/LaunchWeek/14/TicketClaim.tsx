@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { ReactNode } from 'react'
 import logo from './assets/logo.png'
+import useConfData from './hooks/use-conf-data'
 
 export const TicketClaim = ({ children }: { children: ReactNode }) => {
   return (
@@ -24,6 +25,7 @@ export const TicketClaimContent = ({ children }: { children?: ReactNode }) => {
 }
 
 export const TicketClaimMessage = () => {
+  const [state] = useConfData()
   return (
     <div className="grid justify-center gap-3">
       <div className="inline-flex flex-col justify-center items-center gap-1 font-mono">
@@ -35,7 +37,7 @@ export const TicketClaimMessage = () => {
         </div>
       </div>
       <div className="opacity-70 text-center justify-center text-white md:text-base font-mono leading-normal [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)] text-sm text-balance max-w-[310px] md:max-w-[400px]">
-        Join us for a week of new features
+        Join {state.referal ?? "us"} for a week of new features
         and level up your development!
       </div>
     </div>

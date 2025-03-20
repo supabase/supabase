@@ -36,7 +36,7 @@ const Lw14Page = () => {
         }}
       />
 
-      <Lw14ConfDataProvider initState={{ userTicketData: defaultUserData}}>
+      <Lw14ConfDataProvider initState={{ userTicketData: defaultUserData }}>
         <LwView />
       </Lw14ConfDataProvider>
     </>

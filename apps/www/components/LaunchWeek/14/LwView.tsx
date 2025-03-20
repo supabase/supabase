@@ -16,9 +16,9 @@ import {
 } from '~/components/LaunchWeek/14/TicketClaim'
 import { ActionButton } from '~/components/LaunchWeek/14/ActionButton'
 import { usePartymode } from '~/components/LaunchWeek/14/hooks/use-partymode'
-import { TicketShare } from '~/components/LaunchWeek/14/TicketShare'
+import { TicketShareLayout } from '~/components/LaunchWeek/14/TicketShare'
 import TicketCopy from '~/components/LaunchWeek/14/TicketCopy'
-import TicketActions from '~/components/LaunchWeek/14/TicketActions'
+import TicketShare from '~/components/LaunchWeek/14/TicketActions'
 import { useRegistration } from '~/components/LaunchWeek/14/hooks/use-registration'
 import useConfData from './hooks/use-conf-data'
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
@@ -66,10 +66,10 @@ export const LwView = () => {
             )}
             {state.ticketVisibility && (
               <>
-                <TicketShare>
+                <TicketShareLayout>
                   <TicketCopy />
-                  <TicketActions />
-                </TicketShare>
+                  <TicketShare />
+                </TicketShareLayout>
 
                 <div className="absolute bottom-4 md:bottom-auto md:top-4 left-0 right-0 flex justify-center">
                   <ActionButton

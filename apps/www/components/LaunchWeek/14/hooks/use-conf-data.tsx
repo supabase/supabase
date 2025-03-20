@@ -1,5 +1,6 @@
 import { Session, SupabaseClient } from '@supabase/supabase-js'
-import { createContext, Dispatch, useContext, useReducer } from 'react'
+import { useRouter } from 'next/router'
+import { createContext, Dispatch, useContext, useMemo, useReducer } from 'react'
 
 /**
  * This is copy of shared use-conf-data.ts. For laynch week 14 we need different ticket states.
@@ -59,6 +60,7 @@ interface LwState {
   ticketVisibility: boolean
   claimFormState: 'initial' | 'visible' | 'hidden'
   partyModeState: 'unloaded' | 'on' | 'off'
+  referal?: string
 }
 
 export const lwReducer = (state: LwState, action: LwAction): LwState => {
@@ -138,7 +140,9 @@ export const Lw14ConfDataProvider = ({
   children: React.ReactNode
   initState?: Partial<LwState>
 }) => {
-  const state = useReducer(lwReducer, {
+  const { query } = useRouter()
+
+  const [state, dispatch] = useReducer(lwReducer, {
     userTicketData: {},
     ticketState: 'loading',
     session: null,
@@ -151,7 +155,14 @@ export const Lw14ConfDataProvider = ({
     ...initState,
   })
 
-  return <Lw14ConfDataContext.Provider value={state}>{children}</Lw14ConfDataContext.Provider>
+  const finalState = useMemo(() => {
+    return [{ ...state, referal: query.referal?.toString() }, dispatch] as [
+      LwState,
+      Dispatch<LwAction>,
+    ]
+  }, [query.referal, state])
+
+  return <Lw14ConfDataContext.Provider value={finalState}>{children}</Lw14ConfDataContext.Provider>
 }
 
 export default function useLw14ConfData() {
