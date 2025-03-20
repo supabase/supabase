@@ -127,6 +127,10 @@
       "env": [
         "NEXT_PUBLIC_BASE_PATH",
         "NEXT_PUBLIC_APP_URL",
+        "VERCEL_TARGET_ENV",
+        "VERCEL_PROJECT_PRODUCTION_URL",
+        "NODE_ENV",
+        "HIDE_TAILWIND_INDICATOR",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",

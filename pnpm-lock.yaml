@@ -1004,9 +1004,6 @@ importers:
 
   apps/ui-library:
     dependencies:
-      '@hookform/resolvers':
-        specifier: ^3.1.1
-        version: 3.3.1(react-hook-form@7.47.0(react@18.2.0))
       '@radix-ui/react-label':
         specifier: ^2.0.2
         version: 2.0.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1019,9 +1016,6 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.0.7
         version: 1.0.7(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      '@types/lodash':
-        specifier: ^4.17.16
-        version: 4.17.16
       class-variance-authority:
         specifier: ^0.6.0
         version: 0.6.1
@@ -1037,15 +1031,9 @@ importers:
       jotai:
         specifier: ^2.8.0
         version: 2.8.1(@types/react@18.3.3)(react@18.2.0)
-      lodash.template:
-        specifier: 4.5.0
-        version: 4.5.0
       lucide-react:
         specifier: '*'
         version: 0.436.0(react@18.2.0)
-      markdown-wasm:
-        specifier: ^1.2.0
-        version: 1.2.0
       next:
         specifier: 'catalog:'
         version: 14.2.21(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
@@ -1064,18 +1052,12 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
-      react-hook-form:
-        specifier: ^7.45.0
-        version: 7.47.0(react@18.2.0)
       react-inlinesvg:
         specifier: ^4.0.4
         version: 4.0.4(react@18.2.0)
       react-wrap-balancer:
         specifier: ^1.1.0
         version: 1.1.0(react@18.2.0)
-      recharts:
-        specifier: ^2.12.7
-        version: 2.12.7(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       rehype-autolink-headings:
         specifier: ^7.1.0
         version: 7.1.0
@@ -1097,9 +1079,6 @@ importers:
       sonner:
         specifier: ^1.5.0
         version: 1.5.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      ts-morph:
-        specifier: ^22.0.0
-        version: 22.0.0
       ui:
         specifier: workspace:*
         version: link:../../packages/ui
@@ -1125,9 +1104,9 @@ importers:
       '@tanstack/react-start':
         specifier: ^1.114.25
         version: 1.114.25(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.25(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@types/node@22.13.10)(db0@0.3.1(@electric-sql/pglite@0.2.15))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.2.1(@types/node@22.13.10)(jiti@2.4.2)(sass@1.72.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.1))(yaml@2.4.5)
-      '@types/lodash.template':
-        specifier: 4.5.0
-        version: 4.5.0
+      '@types/lodash':
+        specifier: ^4.17.16
+        version: 4.17.16
       '@types/react':
         specifier: ^18.2.65
         version: 18.3.3
