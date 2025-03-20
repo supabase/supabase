@@ -1,8 +1,10 @@
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Layout from 'components/Layouts/Default'
 import { NextSeo } from 'next-seo'
+import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
@@ -24,31 +26,39 @@ import { z } from 'zod'
 const formSchema = z.object({
   ref: z.string(),
   reason: z.string().optional(),
+  captchaToken: z.string().min(1, 'Please complete the captcha verification'),
 })
 
 export default function OptOutPage() {
   const router = useRouter()
+  const { resolvedTheme } = useTheme()
   const ref = router.query.ref as string
   const email = router.query.email as string | undefined
 
   const [formMessage, setFormMessage] = useState<string | null>(null)
   const [submissionType, setSubmissionType] = useState<'success' | 'error' | null>(null)
+  const captchaRef = useRef<HCaptcha | null>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       ref: ref,
       reason: undefined,
+      captchaToken: '',
     },
   })
 
-  const { register } = form
+  const { register, setValue } = form
 
   // Ensure ref is a string
   const refString = typeof ref !== 'string'
   const refPattern = /^[a-zA-Z]{20}$/
   const refIsInvalid = !refString && !refPattern.test(ref)
   const SelectItemContainerClasses = 'flex flex-col text-sm items-start'
+
+  const handleCaptchaVerify = (token: string) => {
+    setValue('captchaToken', token)
+  }
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
@@ -60,7 +70,11 @@ export default function OptOutPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ reason: data.reason, email: email }),
+        body: JSON.stringify({
+          reason: data.reason,
+          email: email,
+          captchaToken: data.captchaToken,
+        }),
       })
       const message = await response.text()
 
@@ -68,17 +82,35 @@ export default function OptOutPage() {
         setFormMessage('Error: Invalid project reference.')
         setSubmissionType('error')
       } else if (response.ok) {
-        setFormMessage(message)
+        try {
+          const parsedMessage = JSON.parse(message)
+          if (!parsedMessage.message) {
+            throw new Error()
+          }
+
+          setFormMessage(parsedMessage.message)
+        } catch {
+          setFormMessage(message)
+        }
+
         setSubmissionType('success')
       } else {
         console.error('Form submission failed:', message)
         setFormMessage('Error: Form submission failed.')
         setSubmissionType('error')
       }
+
+      // Reset captcha after submission
+      captchaRef.current?.resetCaptcha()
+      setValue('captchaToken', '')
     } catch (error) {
       console.error('Error submitting form:', error)
       setFormMessage('Error: An unexpected error occurred.')
       setSubmissionType('error')
+
+      // Reset captcha after error
+      captchaRef.current?.resetCaptcha()
+      setValue('captchaToken', '')
     }
   }
 
@@ -94,7 +126,7 @@ export default function OptOutPage() {
   }
 
   useEffect(() => {
-    form.reset({ ref: ref, reason: '' })
+    form.reset({ ref: ref, reason: '', captchaToken: '' })
   }, [ref])
 
   return (
@@ -114,8 +146,9 @@ export default function OptOutPage() {
         )}
 
         <Form_Shadcn_ {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="gap-4 max-w-xs flex flex-col">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="gap-2 max-w-xs flex flex-col">
             <input hidden value={form.getValues('ref')} readOnly {...register('ref')} />
+            <input hidden {...register('captchaToken')} />
             <FormField_Shadcn_
               name="reason"
               control={form.control}
@@ -175,6 +208,25 @@ export default function OptOutPage() {
                 </FormItemLayout>
               )}
             />
+
+            <div>
+              <HCaptcha
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || ''}
+                onVerify={handleCaptchaVerify}
+                ref={(ref) => {
+                  captchaRef.current = ref
+                  ref?.execute()
+                }}
+                theme={resolvedTheme}
+                size="invisible"
+              />
+              {form.formState.errors.captchaToken && (
+                <p className="text-sm text-destructive mt-1">
+                  {form.formState.errors.captchaToken.message}
+                </p>
+              )}
+            </div>
+
             <Button htmlType="submit" size="small" disabled={submissionType === 'success'}>
               Report spam
             </Button>

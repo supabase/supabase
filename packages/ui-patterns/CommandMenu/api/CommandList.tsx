@@ -4,7 +4,7 @@ import { forwardRef, useRef } from 'react'
 
 import { CommandList_Shadcn_, cn } from 'ui'
 
-import { CommandItem, type ICommand } from '../internal/Command'
+import { CommandItem } from '../internal/Command'
 import { CommandEmpty } from '../internal/CommandEmpty'
 import { CommandGroup } from '../internal/CommandGroup'
 import { useCommands } from './hooks/commandsHooks'
@@ -40,15 +40,11 @@ const CommandList = forwardRef<
           <CommandGroup key={section.id} heading={section.name} forceMount={section.forceMount}>
             {section.commands
               .filter((command) => !command.defaultHidden || query)
-              .map((_command) => {
-                const command = _command as ICommand // strip the readonly applied from the proxy
-
-                return (
-                  <CommandItem key={command.id} command={command}>
-                    <TextHighlighter>{command.name}</TextHighlighter>
-                  </CommandItem>
-                )
-              })}
+              .map((command) => (
+                <CommandItem key={command.id} command={command}>
+                  <TextHighlighter>{command.name}</TextHighlighter>
+                </CommandItem>
+              ))}
           </CommandGroup>
         )
       })}
