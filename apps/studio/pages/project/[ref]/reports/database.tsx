@@ -33,6 +33,7 @@ import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -78,10 +79,8 @@ const DatabaseUsage = () => {
     },
   })
 
-  const { data: pgBouncerConfig } = usePgbouncerConfigQuery({
-    projectRef: ref ?? 'default',
-  })
-  const isPgBouncerEnabled = pgBouncerConfig?.pgbouncer_enabled
+  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
   const REPORT_ATTRIBUTES = [
     { id: 'ram_usage', label: 'Memory usage', hide: false },
@@ -95,13 +94,13 @@ const DatabaseUsage = () => {
     },
     {
       id: 'supavisor_connections_active',
-      label: 'Client to Supavisor connections',
+      label: 'Client to Shared Pooler connections',
       hide: false,
     },
     {
       id: 'pgbouncer_pools_client_active_connections',
-      label: 'Client to dedicated pooler connections',
-      hide: !isPgBouncerEnabled,
+      label: 'Client to Dedicated Pooler connections',
+      hide: isFreePlan,
     },
   ] as const
 
