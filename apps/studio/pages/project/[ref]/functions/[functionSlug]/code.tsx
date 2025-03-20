@@ -16,6 +16,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
 import { useFlag } from 'hooks/ui/useFlag'
+import LogoLoader from '@ui/components/LogoLoader'
 
 const CodePage = () => {
   const router = useRouter()
@@ -23,7 +24,6 @@ const CodePage = () => {
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
-  const { setAiAssistantPanel } = useAppStateSnapshot()
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
 
   // TODO (Saxon): Remove this once the flag is fully launched
@@ -34,7 +34,10 @@ const CodePage = () => {
   }, [edgeFunctionCreate, ref, router])
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
-  const { data: functionFiles } = useEdgeFunctionBodyQuery({ projectRef: ref, slug: functionSlug })
+  const { data: functionFiles, isLoading: isLoadingFiles } = useEdgeFunctionBodyQuery({
+    projectRef: ref,
+    slug: functionSlug,
+  })
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
   >([])
@@ -43,7 +46,7 @@ const CodePage = () => {
     // Set files from API response when available
     if (functionFiles) {
       setFiles(
-        functionFiles.map((file, index) => ({
+        functionFiles.map((file: { name: string; content: string }, index: number) => ({
           id: index + 1,
           name: file.name,
           content: file.content,
@@ -84,22 +87,28 @@ const CodePage = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <FileExplorerAndEditor
-        files={files}
-        onFilesChange={setFiles}
-        aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
-        aiMetadata={{
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          includeSchemaMetadata,
-        }}
-      />
+      {isLoadingFiles ? (
+        <div className="flex flex-col items-center justify-center h-full bg-surface-200">
+          <LogoLoader />
+        </div>
+      ) : (
+        <FileExplorerAndEditor
+          files={files}
+          onFilesChange={setFiles}
+          aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
+          aiMetadata={{
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            includeSchemaMetadata,
+          }}
+        />
+      )}
 
       <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
         <Button
           loading={isDeploying}
           size="medium"
-          disabled={files.length === 0}
+          disabled={files.length === 0 || isLoadingFiles}
           onClick={onUpdate}
           iconRight={
             isDeploying ? (
