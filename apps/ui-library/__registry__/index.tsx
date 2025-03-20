@@ -88,8 +88,8 @@ export const Index: Record<string, any> = {
       subcategory: 'undefined',
       chunks: [],
     },
-    'dropzone-remix': {
-      name: 'dropzone-remix',
+    'dropzone-react-router': {
+      name: 'dropzone-react-router',
       type: 'registry:component',
       registryDependencies: ['button', 'tooltip', 'progress'],
       component: React.lazy(
@@ -99,8 +99,8 @@ export const Index: Record<string, any> = {
       files: [
         'registry/default/blocks/dropzone/components/dropzone.tsx',
         'registry/default/blocks/dropzone/hooks/use-supabase-upload.ts',
-        'registry/default/clients/remix/lib/supabase.client.ts',
-        'registry/default/clients/remix/lib/supabase.server.ts',
+        'registry/default/clients/react-router/lib/supabase.client.ts',
+        'registry/default/clients/react-router/lib/supabase.server.ts',
       ],
       category: 'undefined',
       subcategory: 'undefined',
@@ -162,8 +162,8 @@ export const Index: Record<string, any> = {
       subcategory: 'undefined',
       chunks: [],
     },
-    'realtime-cursor-remix': {
-      name: 'realtime-cursor-remix',
+    'realtime-cursor-react-router': {
+      name: 'realtime-cursor-react-router',
       type: 'registry:component',
       registryDependencies: [],
       component: React.lazy(
@@ -174,8 +174,8 @@ export const Index: Record<string, any> = {
         'registry/default/blocks/realtime-cursor/components/cursor.tsx',
         'registry/default/blocks/realtime-cursor/components/realtime-cursors.tsx',
         'registry/default/blocks/realtime-cursor/hooks/use-realtime-cursors.ts',
-        'registry/default/clients/remix/lib/supabase.client.ts',
-        'registry/default/clients/remix/lib/supabase.server.ts',
+        'registry/default/clients/react-router/lib/supabase.client.ts',
+        'registry/default/clients/react-router/lib/supabase.server.ts',
       ],
       category: 'undefined',
       subcategory: 'undefined',
@@ -230,17 +230,17 @@ export const Index: Record<string, any> = {
       subcategory: 'undefined',
       chunks: [],
     },
-    'supabase-client-remix': {
-      name: 'supabase-client-remix',
+    'supabase-client-react-router': {
+      name: 'supabase-client-react-router',
       type: 'registry:lib',
       registryDependencies: [],
       component: React.lazy(
-        () => import('@/registry/default/clients/remix/lib/supabase.client.ts')
+        () => import('@/registry/default/clients/react-router/lib/supabase.client.ts')
       ),
       source: '',
       files: [
-        'registry/default/clients/remix/lib/supabase.client.ts',
-        'registry/default/clients/remix/lib/supabase.server.ts',
+        'registry/default/clients/react-router/lib/supabase.client.ts',
+        'registry/default/clients/react-router/lib/supabase.server.ts',
       ],
       category: 'undefined',
       subcategory: 'undefined',

@@ -160,7 +160,7 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
-      "name": "dropzone-remix",
+      "name": "dropzone-react-router",
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
@@ -176,11 +176,11 @@
           "type": "registry:hook"
         },
         {
-          "path": "registry/default/clients/remix/lib/supabase.client.ts",
+          "path": "registry/default/clients/react-router/lib/supabase.client.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/default/clients/remix/lib/supabase.server.ts",
+          "path": "registry/default/clients/react-router/lib/supabase.server.ts",
           "type": "registry:lib"
         }
       ]
@@ -276,7 +276,7 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
-      "name": "realtime-cursor-remix",
+      "name": "realtime-cursor-react-router",
       "type": "registry:component",
       "title": "Realtime Cursor",
       "description": "Component which renders realtime cursors from other users in a room.",
@@ -296,11 +296,11 @@
           "type": "registry:hook"
         },
         {
-          "path": "registry/default/clients/remix/lib/supabase.client.ts",
+          "path": "registry/default/clients/react-router/lib/supabase.client.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/default/clients/remix/lib/supabase.server.ts",
+          "path": "registry/default/clients/react-router/lib/supabase.server.ts",
           "type": "registry:lib"
         }
       ]
@@ -376,19 +376,19 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
-      "name": "supabase-client-remix",
+      "name": "supabase-client-react-router",
       "type": "registry:lib",
-      "title": "Supabase Client for Remix",
+      "title": "Supabase Client for React Router",
       "description": "",
       "registryDependencies": [],
       "dependencies": ["@supabase/ssr@latest"],
       "files": [
         {
-          "path": "registry/default/clients/remix/lib/supabase.client.ts",
+          "path": "registry/default/clients/react-router/lib/supabase.client.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/default/clients/remix/lib/supabase.server.ts",
+          "path": "registry/default/clients/react-router/lib/supabase.server.ts",
           "type": "registry:lib"
         }
       ]
