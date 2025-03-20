@@ -19,7 +19,8 @@
     "config": "workspace:*",
     "js-tiktoken": "^1.0.10",
     "jsonrepair": "^3.5.0",
-    "openai": "^4.26.1"
+    "openai": "^4.26.1",
+    "zod": "3.23.8"
   },
   "devDependencies": {
     "@ai-sdk/openai": "^0.0.72",

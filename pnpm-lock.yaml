@@ -1440,7 +1440,7 @@ importers:
         version: 2.49.1
       ai:
         specifier: ^3.4.33
-        version: 3.4.33(openai@4.71.1(encoding@0.1.13)(zod@3.24.2))(react@18.2.0)(sswr@2.1.0(svelte@4.2.19))(svelte@4.2.19)(vue@3.5.13(typescript@5.5.2))(zod@3.24.2)
+        version: 3.4.33(openai@4.71.1(encoding@0.1.13)(zod@3.23.8))(react@18.2.0)(sswr@2.1.0(svelte@4.2.19))(svelte@4.2.19)(vue@3.5.13(typescript@5.5.2))(zod@3.23.8)
       common-tags:
         specifier: ^1.8.2
         version: 1.8.2
@@ -1455,11 +1455,14 @@ importers:
         version: 3.5.0
       openai:
         specifier: ^4.26.1
-        version: 4.71.1(encoding@0.1.13)(zod@3.24.2)
+        version: 4.71.1(encoding@0.1.13)(zod@3.23.8)
+      zod:
+        specifier: 3.23.8
+        version: 3.23.8
     devDependencies:
       '@ai-sdk/openai':
         specifier: ^0.0.72
-        version: 0.0.72(zod@3.24.2)
+        version: 0.0.72(zod@3.23.8)
       '@types/common-tags':
         specifier: ^1.8.4
         version: 1.8.4
@@ -15417,12 +15420,6 @@ snapshots:
       '@ai-sdk/provider-utils': 1.0.22(zod@3.23.8)
       zod: 3.23.8
 
-  '@ai-sdk/openai@0.0.72(zod@3.24.2)':
-    dependencies:
-      '@ai-sdk/provider': 0.0.26
-      '@ai-sdk/provider-utils': 1.0.22(zod@3.24.2)
-      zod: 3.24.2
-
   '@ai-sdk/provider-utils@1.0.22(zod@3.23.8)':
     dependencies:
       '@ai-sdk/provider': 0.0.26
@@ -15431,15 +15428,6 @@ snapshots:
       secure-json-parse: 2.7.0
     optionalDependencies:
       zod: 3.23.8
-
-  '@ai-sdk/provider-utils@1.0.22(zod@3.24.2)':
-    dependencies:
-      '@ai-sdk/provider': 0.0.26
-      eventsource-parser: 1.1.2
-      nanoid: 3.3.8
-      secure-json-parse: 2.7.0
-    optionalDependencies:
-      zod: 3.24.2
 
   '@ai-sdk/provider@0.0.26':
     dependencies:
@@ -15455,16 +15443,6 @@ snapshots:
       react: 18.2.0
       zod: 3.23.8
 
-  '@ai-sdk/react@0.0.70(react@18.2.0)(zod@3.24.2)':
-    dependencies:
-      '@ai-sdk/provider-utils': 1.0.22(zod@3.24.2)
-      '@ai-sdk/ui-utils': 0.0.50(zod@3.24.2)
-      swr: 2.2.5(react@18.2.0)
-      throttleit: 2.1.0
-    optionalDependencies:
-      react: 18.2.0
-      zod: 3.24.2
-
   '@ai-sdk/solid@0.0.54(zod@3.23.8)':
     dependencies:
       '@ai-sdk/provider-utils': 1.0.22(zod@3.23.8)
@@ -15472,27 +15450,10 @@ snapshots:
     transitivePeerDependencies:
       - zod
 
-  '@ai-sdk/solid@0.0.54(zod@3.24.2)':
-    dependencies:
-      '@ai-sdk/provider-utils': 1.0.22(zod@3.24.2)
-      '@ai-sdk/ui-utils': 0.0.50(zod@3.24.2)
-    transitivePeerDependencies:
-      - zod
-
   '@ai-sdk/svelte@0.0.57(svelte@4.2.19)(zod@3.23.8)':
     dependencies:
       '@ai-sdk/provider-utils': 1.0.22(zod@3.23.8)
       '@ai-sdk/ui-utils': 0.0.50(zod@3.23.8)
-      sswr: 2.1.0(svelte@4.2.19)
-    optionalDependencies:
-      svelte: 4.2.19
-    transitivePeerDependencies:
-      - zod
-
-  '@ai-sdk/svelte@0.0.57(svelte@4.2.19)(zod@3.24.2)':
-    dependencies:
-      '@ai-sdk/provider-utils': 1.0.22(zod@3.24.2)
-      '@ai-sdk/ui-utils': 0.0.50(zod@3.24.2)
       sswr: 2.1.0(svelte@4.2.19)
     optionalDependencies:
       svelte: 4.2.19
@@ -15509,30 +15470,10 @@ snapshots:
     optionalDependencies:
       zod: 3.23.8
 
-  '@ai-sdk/ui-utils@0.0.50(zod@3.24.2)':
-    dependencies:
-      '@ai-sdk/provider': 0.0.26
-      '@ai-sdk/provider-utils': 1.0.22(zod@3.24.2)
-      json-schema: 0.4.0
-      secure-json-parse: 2.7.0
-      zod-to-json-schema: 3.23.5(zod@3.24.2)
-    optionalDependencies:
-      zod: 3.24.2
-
   '@ai-sdk/vue@0.0.59(vue@3.5.13(typescript@5.5.2))(zod@3.23.8)':
     dependencies:
       '@ai-sdk/provider-utils': 1.0.22(zod@3.23.8)
       '@ai-sdk/ui-utils': 0.0.50(zod@3.23.8)
-      swrv: 1.0.4(vue@3.5.13(typescript@5.5.2))
-    optionalDependencies:
-      vue: 3.5.13(typescript@5.5.2)
-    transitivePeerDependencies:
-      - zod
-
-  '@ai-sdk/vue@0.0.59(vue@3.5.13(typescript@5.5.2))(zod@3.24.2)':
-    dependencies:
-      '@ai-sdk/provider-utils': 1.0.22(zod@3.24.2)
-      '@ai-sdk/ui-utils': 0.0.50(zod@3.24.2)
       swrv: 1.0.4(vue@3.5.13(typescript@5.5.2))
     optionalDependencies:
       vue: 3.5.13(typescript@5.5.2)
@@ -16500,7 +16441,7 @@ snapshots:
       ts-pattern: 5.1.1
       unified: 11.0.5
       yaml: 2.4.5
-      zod: 3.24.2
+      zod: 3.23.8
     transitivePeerDependencies:
       - '@effect-ts/otel-node'
       - esbuild
@@ -22004,7 +21945,7 @@ snapshots:
       sirv: 3.0.0
       tinyglobby: 0.2.10
       tinyrainbow: 2.0.0
-      vitest: 3.0.4(@types/node@20.12.11)(@vitest/ui@3.0.4)(jiti@2.4.2)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.7.3(@types/node@20.12.11)(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
+      vitest: 3.0.4(@types/node@20.12.11)(@vitest/ui@3.0.4)(jiti@2.4.2)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
 
   '@vitest/utils@3.0.4':
     dependencies:
@@ -22256,31 +22197,6 @@ snapshots:
       sswr: 2.1.0(svelte@4.2.19)
       svelte: 4.2.19
       zod: 3.23.8
-    transitivePeerDependencies:
-      - solid-js
-      - vue
-
-  ai@3.4.33(openai@4.71.1(encoding@0.1.13)(zod@3.24.2))(react@18.2.0)(sswr@2.1.0(svelte@4.2.19))(svelte@4.2.19)(vue@3.5.13(typescript@5.5.2))(zod@3.24.2):
-    dependencies:
-      '@ai-sdk/provider': 0.0.26
-      '@ai-sdk/provider-utils': 1.0.22(zod@3.24.2)
-      '@ai-sdk/react': 0.0.70(react@18.2.0)(zod@3.24.2)
-      '@ai-sdk/solid': 0.0.54(zod@3.24.2)
-      '@ai-sdk/svelte': 0.0.57(svelte@4.2.19)(zod@3.24.2)
-      '@ai-sdk/ui-utils': 0.0.50(zod@3.24.2)
-      '@ai-sdk/vue': 0.0.59(vue@3.5.13(typescript@5.5.2))(zod@3.24.2)
-      '@opentelemetry/api': 1.9.0
-      eventsource-parser: 1.1.2
-      json-schema: 0.4.0
-      jsondiffpatch: 0.6.0
-      secure-json-parse: 2.7.0
-      zod-to-json-schema: 3.23.5(zod@3.24.2)
-    optionalDependencies:
-      openai: 4.71.1(encoding@0.1.13)(zod@3.24.2)
-      react: 18.2.0
-      sswr: 2.1.0(svelte@4.2.19)
-      svelte: 4.2.19
-      zod: 3.24.2
     transitivePeerDependencies:
       - solid-js
       - vue
@@ -28695,20 +28611,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  openai@4.71.1(encoding@0.1.13)(zod@3.24.2):
-    dependencies:
-      '@types/node': 18.18.13
-      '@types/node-fetch': 2.6.6
-      abort-controller: 3.0.0
-      agentkeepalive: 4.5.0
-      form-data-encoder: 1.7.2
-      formdata-node: 4.4.1
-      node-fetch: 2.7.0(encoding@0.1.13)
-    optionalDependencies:
-      zod: 3.24.2
-    transitivePeerDependencies:
-      - encoding
-
   openapi-fetch@0.12.4:
     dependencies:
       openapi-typescript-helpers: 0.0.14
@@ -32157,7 +32059,7 @@ snapshots:
       unenv: 1.10.0
       unstorage: 1.15.0(db0@0.3.1(@electric-sql/pglite@0.2.15))(ioredis@5.6.0(supports-color@8.1.1))
       vite: 6.2.1(@types/node@22.13.10)(jiti@2.4.2)(sass@1.72.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
-      zod: 3.24.2
+      zod: 3.23.8
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -32773,10 +32675,6 @@ snapshots:
   zod-to-json-schema@3.23.5(zod@3.23.8):
     dependencies:
       zod: 3.23.8
-
-  zod-to-json-schema@3.23.5(zod@3.24.2):
-    dependencies:
-      zod: 3.24.2
 
   zod@3.23.8: {}
 
