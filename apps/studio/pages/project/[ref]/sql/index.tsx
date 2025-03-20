@@ -18,20 +18,20 @@ const TableEditorPage: NextPageWithLayout = () => {
   const appSnap = useAppStateSnapshot()
   const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
-  // Handle redirect to last opened table tab, or last table tab
-  const lastOpenedTab = appSnap.dashboardHistory.sql
-  const lastTabId = store.openTabs.find((id) => store.tabsMap[id]?.type === 'sql')
-  if (lastOpenedTab !== undefined) {
-    router.push(`/project/${projectRef}/sql/${appSnap.dashboardHistory.sql}`)
-  } else if (lastTabId) {
-    const lastTab = store.tabsMap[lastTabId]
-    if (lastTab) router.push(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
-  }
-
   useEffect(() => {
-    // redirect to /new if not using tabs
-    if (isSqlEditorTabsEnabled !== undefined && !isSqlEditorTabsEnabled) {
+    if (!isSqlEditorTabsEnabled) {
+      // Redirect to /new if not using tabs
       router.push(`/project/${projectRef}/sql/new`)
+    } else {
+      // Handle redirect to last opened snippet tab, or last snippet tab
+      const lastOpenedTab = appSnap.dashboardHistory.sql
+      const lastTabId = store.openTabs.find((id) => store.tabsMap[id]?.type === 'sql')
+      if (lastOpenedTab !== undefined) {
+        router.push(`/project/${projectRef}/sql/${appSnap.dashboardHistory.sql}`)
+      } else if (lastTabId) {
+        const lastTab = store.tabsMap[lastTabId]
+        if (lastTab) router.push(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
+      }
     }
   }, [isSqlEditorTabsEnabled])
 
