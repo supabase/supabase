@@ -202,7 +202,7 @@ const DatabaseUsage = () => {
 
     switch (true) {
       case conditions['15s']:
-        return '15s'
+        return '1m'
       case conditions['1m']:
         return '1m'
       case conditions['10m']:
@@ -214,10 +214,10 @@ const DatabaseUsage = () => {
     }
   }
 
-  const handleCustomDateFormat =
-    handleIntervalGranularity(dateRange?.period_start?.date, dateRange?.period_end?.date) === '15s'
-      ? DateTimeFormats.FULL_SECONDS
-      : undefined
+  // const handleCustomDateFormat =
+  //   handleIntervalGranularity(dateRange?.period_start?.date, dateRange?.period_end?.date) === '15s'
+  //     ? DateTimeFormats.FULL_SECONDS
+  //     : undefined
 
   const updateDateRange: UpdateDateRange = (from: string, to: string) => {
     setDateRange({

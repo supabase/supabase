@@ -15395,7 +15395,7 @@ export interface operations {
           | 'pgbouncer_pools_client_active_connections'
         databaseIdentifier?: string
         endDate: string
-        interval?: '15s' | '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
+        interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
         startDate: string
       }
       header?: never
