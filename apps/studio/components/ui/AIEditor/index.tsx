@@ -132,7 +132,7 @@ const AIEditor = ({
       })
 
     // Add edge runtime types to the TS language service
-    fetch('https://jsr.io/@supabase/functions-js/2.4.4/src/edge-runtime.d.ts')
+    fetch('/deno/edge-runtime.d.ts')
       .then((response) => response.text())
       .then((code) => {
         monaco.languages.typescript.typescriptDefaults.addExtraLib(code)

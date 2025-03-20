@@ -55,7 +55,6 @@ const SUPABASE_ASSETS_URL =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
     ? 'https://frontend-assets.supabase.green'
     : 'https://frontend-assets.supabase.com'
-const JSR_URL = 'https://jsr.io'
 
 // used by vercel live preview
 const PUSHER_URL = 'https://*.pusher.com'
@@ -524,10 +523,6 @@ const nextConfig = {
       {
         source: '/favicon/:slug*',
         headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
-      },
-      {
-        source: '/(.*).ts',
-        headers: [{ key: 'content-type', value: 'text/typescript' }],
       },
     ]
   },

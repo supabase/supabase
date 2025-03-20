@@ -5,37 +5,62 @@
  * Deno Releases: https://github.com/denoland/deno/releases
  */
 
-import fs from 'fs'
+import fs from 'fs/promises'
 import path from 'path'
 
 const DENO_VERSION = 'v1.45.0'
+const SUPABASE_FUNCTIONS_JS_VERSION = '2.4.4'
+
 const DENO_TYPES_URL = `https://github.com/denoland/deno/releases/download/${DENO_VERSION}/lib.deno.d.ts`
+const SUPABASE_FUNCTIONS_JS_TYPES_URL = `https://jsr.io/@supabase/functions-js/${SUPABASE_FUNCTIONS_JS_VERSION}/src/edge-runtime.d.ts`
 
 const OUTPUT_FILE = path.join(path.dirname(__dirname), 'public', 'deno', 'lib.deno.d.ts')
-
+const SUPABASE_FUNCTIONS_JS_OUTPUT_FILE = path.join(
+  path.dirname(__dirname),
+  'public',
+  'deno',
+  'edge-runtime.d.ts'
+)
 const OUTPUT_VERSION_FILE = path.join(path.dirname(__dirname), 'public', 'deno', 'deno-version.txt')
-
-const CURRENT_VERSION = fs.readFileSync(OUTPUT_VERSION_FILE, 'utf8')
-
-if (CURRENT_VERSION === DENO_VERSION) {
-  console.log(`Deno types already exist for version ${DENO_VERSION}, skipping download`)
-  process.exit(0)
-}
+const SUPABASE_FUNCTIONS_JS_OUTPUT_VERSION_FILE = path.join(
+  path.dirname(__dirname),
+  'public',
+  'deno',
+  'supabase-functions-js-version.txt'
+)
 
 async function downloadTypes() {
-  const response = await fetch(DENO_TYPES_URL)
-  const data = await response.text()
+  console.log('Downloading Deno types')
 
-  fs.writeFileSync(OUTPUT_FILE, data)
+  try {
+    const response = await fetch(DENO_TYPES_URL)
+    const data = await response.text()
 
-  fs.writeFileSync(OUTPUT_VERSION_FILE, DENO_VERSION)
-}
+    await fs.writeFile(OUTPUT_FILE, data)
+    await fs.writeFile(OUTPUT_VERSION_FILE, DENO_VERSION)
 
-downloadTypes()
-  .then(() => {
     console.log('Deno types downloaded successfully')
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error('Error downloading Deno types', error)
     process.exit(1)
-  })
+  }
+}
+
+async function downloadSupabaseFunctionsJsTypes() {
+  console.log('Downloading Supabase Functions JS types')
+
+  try {
+    const response = await fetch(SUPABASE_FUNCTIONS_JS_TYPES_URL)
+    const data = await response.text()
+
+    await fs.writeFile(SUPABASE_FUNCTIONS_JS_OUTPUT_FILE, data)
+    await fs.writeFile(SUPABASE_FUNCTIONS_JS_OUTPUT_VERSION_FILE, SUPABASE_FUNCTIONS_JS_VERSION)
+
+    console.log('Supabase Functions JS types downloaded successfully')
+  } catch (error) {
+    console.error('Error downloading Supabase Functions JS types', error)
+    process.exit(1)
+  }
+}
+
+Promise.all([downloadTypes(), downloadSupabaseFunctionsJsTypes()])
