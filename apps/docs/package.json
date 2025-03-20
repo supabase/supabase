@@ -33,6 +33,8 @@
   },
   "dependencies": {
     "@code-hike/mdx": "^0.9.0",
+    "@codesandbox/sandpack-react": "2.20.0",
+    "@codesandbox/sandpack-themes": "^2.0.21",
     "@har-sdk/openapi-sampler": "^2.2.0",
     "@mdx-js/loader": "^2.1.5",
     "@mdx-js/react": "^2.3.0",
