@@ -65,7 +65,7 @@ const nextConfig = {
       ],
       '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
     },
-    serverComponentsExternalPackages: ['libpg-query'],
+    serverComponentsExternalPackages: ['libpg-query', 'twoslash'],
   },
   async headers() {
     return [
