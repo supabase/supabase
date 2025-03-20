@@ -114,6 +114,10 @@ const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
       void updateTicket()
       if (state.ticketVisibility) {
         hudRef.current?.dimmHud()
+        hudRef.current?.setLayout("ticket")
+      } else {
+        hudRef.current?.undimmHud()
+        hudRef.current?.setLayout("default")
       }
     }
   }, [state.ticketVisibility, state.userTicketData.name, state.userTicketData.platinum, state.userTicketData.secret, state.userTicketData.ticket_number])

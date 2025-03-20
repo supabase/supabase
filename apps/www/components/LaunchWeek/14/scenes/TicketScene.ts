@@ -197,10 +197,15 @@ class TicketScene implements BaseScene {
       ticketScale: new Vector3(0.65, 0.65, 0.65),
     },
 
-    640: {
-      ticketPosition: new Vector3(0, 0, -1.2),
-      ticketScale: new Vector3(0.85, 0.85, 0.85),
+    768: {
+      ticketPosition: new Vector3(0, 0, -0.5),
+      ticketScale: new Vector3(0.65, 0.65, 0.65),
     },
+
+    // 784: {
+    //   ticketPosition: new Vector3(0, 0, -0.5),
+    //   ticketScale: new Vector3(0.85, 0.85, 0.85),
+    // },
 
     1024: {
       ticketPosition: new Vector3(0, 0, -0.5),

@@ -33,11 +33,7 @@ export const LwView = () => {
 
   return (
     <DefaultLayout className='font-["Departure_Mono"]'>
-      <SectionContainerWithCn
-        id="ticket"
-        height="none"
-        width="smallScreenFull"
-      >
+      <SectionContainerWithCn id="ticket" height="none" width="smallScreenFull">
         <TicketLayout>
           <TicketHeader>
             <TicketHeaderRemainingTime targetDate={dates[0]} />
@@ -56,23 +52,37 @@ export const LwView = () => {
                       CLAIM YOUR TICKET
                     </ActionButton>
                     <ActionButton
-                      variant={partymode.state.on ? 'primary' : 'secondary'}
+                      variant={partymode.state === 'on' ? 'primary' : 'secondary'}
                       icon="P"
                       onClick={() => {
                         partymode.toggle()
                       }}
                     >
-                      Party mode: {partymode.state.on ? 'ON' : 'OFF'}
+                      Party mode: {partymode.state === 'on' ? 'ON' : 'OFF'}
                     </ActionButton>
                   </TicketClaimButtons>
                 </TicketClaimContent>
               </TicketClaim>
             )}
             {state.ticketVisibility && (
-              <TicketShare>
-                <TicketCopy />
-                <TicketActions />
-              </TicketShare>
+              <>
+                <TicketShare>
+                  <TicketCopy />
+                  <TicketActions />
+                </TicketShare>
+
+                <div className="absolute bottom-4 md:bottom-auto md:top-4 left-0 right-0 flex justify-center">
+                  <ActionButton
+                    variant={partymode.state === 'on' ? 'primary' : 'secondary'}
+                    icon="P"
+                    onClick={() => {
+                      partymode.toggle()
+                    }}
+                  >
+                    Party mode: {partymode.state === 'on' ? 'ON' : 'OFF'}
+                  </ActionButton>
+                </div>
+              </>
             )}
           </TicketLayoutCanvas>
         </TicketLayout>

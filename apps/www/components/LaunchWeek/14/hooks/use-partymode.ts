@@ -1,14 +1,16 @@
-import { useState } from "react"
+import useLw14ConfData from "./use-conf-data"
 
 export const usePartymode = () => {
-  const [on, setOn] = useState(false)
+  const [state, dispatch] = useLw14ConfData()
 
   return {
-    state: {
-      on
-    },
+    state: state.partyModeState,
     toggle: () => {
-      setOn(!on)
+      if(state.partyModeState === 'on') {
+        dispatch({ type: 'PARTYMODE_DISABLE' })
+      } else {
+        dispatch({ type: 'PARTYMODE_ENABLE' })
+      }
     }
   }
 }

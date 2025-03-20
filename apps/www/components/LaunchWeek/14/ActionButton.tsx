@@ -37,7 +37,7 @@ const iconVariants = cva(
 )
 
 const textVariants = cva(
-  'justify-center text-white text-xs leading-[20px] font-normal min-w-[108.25px] custom-pointer-coarse:pl-2 text-nowrap',
+  'justify-center text-white text-xs leading-[20px] font-normal min-w-[108.25px] [@media(pointer:coarse)]:pl-2 text-nowrap',
   {
     variants: {
       variant: {
@@ -55,9 +55,16 @@ export interface ActionButtonProps extends VariantProps<typeof actionButtonVaria
   icon: string
   children: ReactNode
   onClick?: () => void
+  className?: string
 }
 
-export const ActionButton = ({ variant, icon, children, onClick }: ActionButtonProps) => {
+export const ActionButton = ({
+  variant,
+  icon,
+  children,
+  className,
+  onClick,
+}: ActionButtonProps) => {
   const buttonRef = useRef<HTMLDivElement>(null)
 
   const handleKeyPress = (e: KeyboardEvent) => {
@@ -67,11 +74,14 @@ export const ActionButton = ({ variant, icon, children, onClick }: ActionButtonP
   }
 
   const isCommandMenuOpen = useCommandMenuOpen()
-  useKey(icon.toLowerCase(), () => !isCommandMenuOpen && onClick?.(), {}, [isCommandMenuOpen])
+  useKey(icon.toLowerCase(), () => !isCommandMenuOpen && onClick?.(), { event: 'keydown' }, [
+    isCommandMenuOpen,
+    onClick
+  ])
 
   return (
     <div
-      className={actionButtonVariants({ variant })}
+      className={cn(actionButtonVariants({ variant }), className)}
       onClick={onClick}
       onKeyDown={handleKeyPress}
       tabIndex={0}
@@ -79,7 +89,7 @@ export const ActionButton = ({ variant, icon, children, onClick }: ActionButtonP
       aria-label={typeof children === 'string' ? children : undefined}
       ref={buttonRef}
     >
-      <div className={cn(iconVariants({ variant }), 'custom-pointer-coarse:hidden')}>
+      <div className={cn(iconVariants({ variant }), '[@media(pointer:coarse)]:hidden')}>
         <div className="text-center justify-center text-neutral-50 text-xs font-normal leading-none [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)]">
           {icon}
         </div>

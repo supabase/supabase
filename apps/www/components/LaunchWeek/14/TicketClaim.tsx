@@ -4,7 +4,7 @@ import logo from './assets/logo.png'
 
 export const TicketClaim = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="grid w-full gap-8 sm:gap-16 absolute z-10 top-[3%] sm:top-[10%] left-0 h-full justify-center justify-items-center p-10 content-start">
+    <div className="grid w-full gap-8 sm:gap-16 absolute z-10 top-[3%] sm:top-[5%] 2xl:top-[15%] left-0 h-full justify-center justify-items-center p-10 content-start">
       {children}
     </div>
   )

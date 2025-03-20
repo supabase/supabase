@@ -11,6 +11,7 @@ interface HudSceneState {
   oxygenLevel: number
   vignetteRaduis: number
   vignetteSmoothness: number
+  layout: 'default' | 'ticket'
 }
 
 interface HudSceneOptions {
@@ -85,18 +86,18 @@ class HUDScene implements BaseScene {
   resolutions = {
     0: {
       numberControl: {
-        coords: { y: 611, x: 0, alignment: 'center' as const },
+        coords: { y: 611 - 20, x: 0, alignment: 'center' as const },
       },
       bars: {
         coords: [
-          { y: 611 - 50 * 3, x: 0, alignment: 'center' as const },
+          { y: 611 - 170, x: 0, alignment: 'center' as const },
           {
-            y: 611 - 50 * 2,
+            y: 611 - 120,
             x: 0,
             alignment: 'center' as const,
           },
           {
-            y: 611 - 50 * 1,
+            y: 611 - 70,
             x: 0,
             alignment: 'center' as const,
           },
@@ -106,7 +107,49 @@ class HUDScene implements BaseScene {
         visible: false as const,
       },
     },
-    784: {
+    768: {
+      numberControl: {
+        coords: {
+          y: 611,
+          x: 760 + 25,
+          alignment: 'left' as const,
+        },
+      },
+      bars: {
+        coords: [
+          {
+            y: 611,
+            x: 190 + 25,
+            alignment: 'left' as const,
+          },
+          {
+            y: 611,
+            x: 380 + 25,
+            alignment: 'left' as const,
+          },
+          {
+            y: 611,
+            x: 570 + 25,
+            alignment: 'left' as const,
+          },
+        ],
+      },
+      axis: {
+        visible: true as const,
+        leftCoords: {
+          x: 92 + 75,
+          y: 206,
+          alignment: 'left' as const,
+        },
+        rightCoords: {
+          x: 960 - 75,
+          y: 206,
+          alignment: 'left' as const,
+        },
+      },
+    },
+
+    1024: {
       numberControl: {
         coords: {
           y: 611,
@@ -141,7 +184,7 @@ class HUDScene implements BaseScene {
           alignment: 'left' as const,
         },
         rightCoords: {
-          x: 985,
+          x: 960,
           y: 206,
           alignment: 'left' as const,
         },
@@ -149,8 +192,101 @@ class HUDScene implements BaseScene {
     },
   }
 
+  resolutionsTicketLayout = {
+    0: {
+      numberControl: {
+        coords: { y: 611 - 20, x: 0, alignment: 'center' as const },
+      },
+      bars: {
+        coords: [
+          { y: 611 - 170, x: 0, alignment: 'center' as const },
+          {
+            y: 611 - 120,
+            x: 0,
+            alignment: 'center' as const,
+          },
+          {
+            y: 611 - 70,
+            x: 0,
+            alignment: 'center' as const,
+          },
+        ],
+      },
+      axis: {
+        visible: false as const,
+      },
+    },
+    768: {
+      numberControl: {
+        coords: {
+          x: 960 - 150,
+          y: 206 + 170,
+          alignment: 'left' as const,
+        },
+      },
+      bars: {
+        coords: [
+          {
+            x: 92 + 120,
+            y: 206 + 100,
+            alignment: 'left' as const,
+          },
+          {
+            x: 92 + 120,
+            y: 206 + 170,
+            alignment: 'left' as const,
+          },
+          {
+            x: 960 - 150,
+            y: 206 + 100,
+            alignment: 'left' as const,
+          },
+        ],
+      },
+      axis: {
+        visible: false as const,
+      },
+    },
+
+    1024: {
+      numberControl: {
+        coords: {
+          x: 940,
+          y: 206 + 70,
+          alignment: 'left' as const,
+        },
+      },
+      bars: {
+        coords: [
+          {
+            x: 92,
+            y: 206,
+            alignment: 'left' as const,
+          },
+          {
+            x: 92,
+            y: 206 + 70,
+            alignment: 'left' as const,
+          },
+          {
+            x: 940,
+            y: 206,
+            alignment: 'left' as const,
+          },
+        ],
+      },
+      axis: {
+        visible: false as const,
+      },
+    },
+  }
+
   activeResolutionKey: keyof typeof this.resolutions = 0
-  scaledCoords: typeof this.resolutions
+
+  layouts: {
+    default: HUDScene['resolutions']
+    ticket: HUDScene['resolutionsTicketLayout']
+  }
 
   private scaledStyles: typeof this.referenceStyles
   private canvasWidth: number
@@ -166,6 +302,7 @@ class HUDScene implements BaseScene {
       peopleOnlineActive: options.online ?? false,
       vignetteRaduis: 1,
       vignetteSmoothness: 0,
+      layout: 'default',
     }
 
     this.canvasWidth = this.referenceCanvasWidth * this.qualityMultiplier
@@ -175,14 +312,25 @@ class HUDScene implements BaseScene {
       return typeof value === 'number' ? value * this.qualityMultiplier : value
     })
 
-    this.scaledCoords = Object.fromEntries(
-      Object.entries(this.resolutions).map(([key, resolutions]) => [
-        key,
-        JSON.parse(JSON.stringify(resolutions), (key, value) => {
-          return typeof value === 'number' ? value * this.qualityMultiplier : value
-        }),
-      ])
-    ) as typeof this.resolutions
+    this.layouts = {
+      default: Object.fromEntries(
+        Object.entries(this.resolutions).map(([key, resolutions]) => [
+          key,
+          JSON.parse(JSON.stringify(resolutions), (key, value) => {
+            return typeof value === 'number' ? value * this.qualityMultiplier : value
+          }),
+        ])
+      ) as typeof this.resolutions,
+
+      ticket: Object.fromEntries(
+        Object.entries(this.resolutionsTicketLayout).map(([key, resolutions]) => [
+          key,
+          JSON.parse(JSON.stringify(resolutions), (key, value) => {
+            return typeof value === 'number' ? value * this.qualityMultiplier : value
+          }),
+        ])
+      ) as typeof this.resolutionsTicketLayout,
+    }
   }
 
   getId(): string {
@@ -361,6 +509,16 @@ class HUDScene implements BaseScene {
     if (this.hudTexture) this.hudTexture.needsUpdate = true
   }
 
+  setLayout(value: "default" | "ticket"): void {
+    if(value === this.state.layout) {
+      return
+    }
+
+    this.state.layout = value
+    this.draw()
+    if (this.hudTexture) this.hudTexture.needsUpdate = true
+  }
+
   dimmHud() {
     this.state.vignetteRaduis = 0.2
     this.state.vignetteSmoothness = 0.5
@@ -417,7 +575,8 @@ class HUDScene implements BaseScene {
     const canvas = this.hudCanvas
 
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    const sizes = this.scaledCoords[this.activeResolutionKey]
+    const layout = this.layouts[this.state.layout]
+    const sizes = layout[this.activeResolutionKey]
 
     if (sizes.axis.visible) {
       this.drawLeftAlignedAxis(ctx, sizes.axis.leftCoords, {

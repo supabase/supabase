@@ -45,6 +45,8 @@ type LwAction =
   | { type: 'TICKET_LOADING_START' }
   | { type: 'TICKET_LOADING_SUCCESS' }
   | { type: 'TICKET_LOADING_ERROR'; payload?: Error }
+  | { type: 'PARTYMODE_ENABLE' }
+  | { type: 'PARTYMODE_DISABLE' }
 
 // Define state interface
 interface LwState {
@@ -56,6 +58,7 @@ interface LwState {
   ticketLoadingState: 'unloaded' | 'loading' | 'error' | 'loaded'
   ticketVisibility: boolean
   claimFormState: 'initial' | 'visible' | 'hidden'
+  partyModeState: 'unloaded' | 'on' | 'off'
 }
 
 export const lwReducer = (state: LwState, action: LwAction): LwState => {
@@ -108,6 +111,18 @@ export const lwReducer = (state: LwState, action: LwAction): LwState => {
         ticketVisibility: false,
         claimFormState: 'visible',
       }
+    case 'PARTYMODE_ENABLE': {
+      return {
+        ...state,
+        partyModeState: 'on',
+      }
+    }
+    case 'PARTYMODE_DISABLE': {
+      return {
+        ...state,
+        partyModeState: 'off',
+      }
+    }
     default:
       action satisfies never
       return state
@@ -132,6 +147,7 @@ export const Lw14ConfDataProvider = ({
     userTicketDataState: 'unloaded',
     userTicketDataError: null,
     claimFormState: 'initial',
+    partyModeState: 'unloaded',
     ...initState,
   })
 

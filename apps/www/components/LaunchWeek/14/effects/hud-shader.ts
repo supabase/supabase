@@ -101,8 +101,6 @@ void main() {
     
     vec4 color = texture2D(tDiffuse, vUv);
 
-
-    color = vec4(color.rgb * v, color.a);
     color = mix(color, black, 1.0-v);
     
     //get the luminance of the image
