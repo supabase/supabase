@@ -1,12 +1,12 @@
-// 'use server'
+'use server'
 
-// import { generateRegistryTree } from '@/lib/process-registry'
-// import path from 'path'
-// import { BlockItemCode } from './block-item-code'
+import { generateRegistryTree } from '@/lib/process-registry'
+import path from 'path'
+import { BlockItemCode } from './block-item-code'
 
-// export async function RegistryBlock({ itemName }: { itemName: string }) {
-//   const registryPath = path.join(process.cwd(), 'public', 'r', `${itemName}.json`)
-//   const tree = generateRegistryTree(itemName, registryPath)
+export async function RegistryBlock({ itemName }: { itemName: string }) {
+  const registryPath = path.join(process.cwd(), 'public', 'r', `${itemName}.json`)
+  const tree = generateRegistryTree(itemName, registryPath)
 
-//   return <BlockItemCode files={tree} />
-// }
+  return <BlockItemCode files={tree} />
+}

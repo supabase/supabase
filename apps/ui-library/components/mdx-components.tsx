@@ -1,5 +1,3 @@
-'use client'
-
 import { useMDXComponent } from 'next-contentlayer2/hooks'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,12 +10,12 @@ import { ComponentExample } from '@/components/component-example'
 import { ComponentPreview } from '@/components/component-preview'
 import { ComponentSource } from '@/components/component-source'
 import { CopyButton } from '@/components/copy-button'
-import { useConfig } from '@/hooks/use-config'
 import { cn } from 'ui'
 // import { FrameworkDocs } from '@/components/framework-docs'
 import { CodeFragment } from '@/components/code-fragment'
 import { Colors } from '@/components/colors'
 import { Icons } from '@/components/icons'
+import { RegistryBlock } from '@/components/registry-block'
 import { ThemeSettings } from '@/components/theme-settings'
 import { Style } from '@/registry/styles'
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock'
@@ -44,6 +42,7 @@ import { StyleWrapper } from './style-wrapper'
 
 const components = {
   DynamicCodeBlock,
+  RegistryBlock,
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -281,9 +280,8 @@ interface MdxProps {
 }
 
 export function Mdx({ code }: MdxProps) {
-  const [config] = useConfig()
   const Component = useMDXComponent(code, {
-    style: config.style,
+    style: 'default',
   })
 
   return (
