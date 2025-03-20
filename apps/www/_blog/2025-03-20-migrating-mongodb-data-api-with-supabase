@@ -1,7 +1,7 @@
 ---
 title: 'Migrating from the MongoDB Data API to Supabase'
 description: "A guide to migrating from the MongoDB Data API to Supabase."
-author: prashant_sridharan
+author: prashant
 image: mongodb-data-api/mongodb-data-api-og.png
 thumb: mongodb-data-api/mongodb-data-api-og.png
 categories:
