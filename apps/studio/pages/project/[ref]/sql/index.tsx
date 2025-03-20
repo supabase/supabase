@@ -7,28 +7,29 @@ import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { NewTab } from 'components/layouts/Tabs/NewTab'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import { useAppStateSnapshot } from 'state/app-state'
 import { getTabsStore } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const store = getTabsStore(projectRef)
-  const router = useRouter()
-
-  // handle Tabs preview logic
-  // handle redirect to last table tab
-  const lastTabId = store.openTabs.find((id) => store.tabsMap[id]?.type === 'sql')
-  if (lastTabId) {
-    const lastTab = store.tabsMap[lastTabId]
-    if (lastTab) {
-      router.push(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
-    }
-  }
-
-  // redirect to /new if not using tabs
+  const appSnap = useAppStateSnapshot()
   const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
+  // Handle redirect to last opened table tab, or last table tab
+  const lastOpenedTab = appSnap.dashboardHistory.sql
+  const lastTabId = store.openTabs.find((id) => store.tabsMap[id]?.type === 'sql')
+  if (lastOpenedTab !== undefined) {
+    router.push(`/project/${projectRef}/sql/${appSnap.dashboardHistory.sql}`)
+  } else if (lastTabId) {
+    const lastTab = store.tabsMap[lastTabId]
+    if (lastTab) router.push(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
+  }
+
   useEffect(() => {
+    // redirect to /new if not using tabs
     if (isSqlEditorTabsEnabled !== undefined && !isSqlEditorTabsEnabled) {
       router.push(`/project/${projectRef}/sql/new`)
     }

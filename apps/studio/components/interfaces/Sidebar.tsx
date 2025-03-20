@@ -43,7 +43,10 @@ import {
   useSidebar,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
-import { useIsAPIDocsSidePanelEnabled } from './App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsAPIDocsSidePanelEnabled,
+  useIsSQLEditorTabsEnabled,
+} from './App/FeaturePreview/FeaturePreviewContext'
 import { ThemeDropdown } from './ThemeDropdown'
 import { UserDropdown } from './UserDropdown'
 
@@ -266,7 +269,7 @@ function ProjectLinks() {
   const { securityLints, errorLints } = useLints()
 
   const showWarehouse = useFlag('warehouse')
-  const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewSqlEditorTabs')
+  const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -283,7 +286,7 @@ function ProjectLinks() {
   ])
 
   const toolRoutes = generateToolRoutes(ref, project, {
-    sqlEditorTabs: isFeaturePreviewTabsSqlEditorFlag,
+    sqlEditorTabs: isSqlEditorTabsEnabled,
   })
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
