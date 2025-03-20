@@ -55,13 +55,12 @@ const SUPABASE_ASSETS_URL =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
     ? 'https://frontend-assets.supabase.green'
     : 'https://frontend-assets.supabase.com'
-const JSR_URL = 'https://jsr.io'
 
 // used by vercel live preview
 const PUSHER_URL = 'https://*.pusher.com'
 const PUSHER_URL_WS = 'wss://*.pusher.com'
 
-const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_LOCAL_PROJECTS_URL_WS} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL} ${SUPABASE_ASSETS_URL} ${JSR_URL}`
+const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_LOCAL_PROJECTS_URL_WS} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL} ${SUPABASE_ASSETS_URL}`
 const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL} ${SUPABASE_ASSETS_URL}`
 const FRAME_SRC_URLS = `${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL}`
 const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL} ${GITHUB_USER_AVATAR_URL} ${GOOGLE_USER_AVATAR_URL} ${SUPABASE_ASSETS_URL}`
@@ -124,11 +123,6 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     webpackBuildWorker: true,
-    urlImports: [
-      // Used to import the Deno types passed on Monaco's typescript language service
-      'https://github.com/denoland/deno',
-      SUPABASE_ASSETS_URL,
-    ],
   },
   async rewrites() {
     return [
@@ -530,10 +524,6 @@ const nextConfig = {
         source: '/favicon/:slug*',
         headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
       },
-      {
-        source: '/(.*).ts',
-        headers: [{ key: 'content-type', value: 'text/typescript' }],
-      },
     ]
   },
   images: {
@@ -585,25 +575,6 @@ const nextConfig = {
           delete rule.issuer.and
         }
       })
-
-    // Find the parent `oneOf` rule that contains next-swc-loader
-    const tsRules = config.module.rules.find(
-      (rule) =>
-        'oneOf' in rule &&
-        rule.oneOf.some(
-          (r) =>
-            Array.isArray(r.use) &&
-            r.use.some((u) => 'loader' in u && u.loader === 'next-swc-loader')
-        )
-    )
-
-    // Add custom loader that treats `?resource` imports as an asset/resource without further processing
-    // This allows us to import `.ts` files as assets without further processing through the SWC loader
-    // Used to load raw Deno `.d.ts` types as source assets passed to Monaco's typescript language service
-    tsRules.oneOf.unshift({
-      resourceQuery: /resource/,
-      type: 'asset/resource',
-    })
 
     // .md files to be loaded as raw text
     config.module.rules.push({

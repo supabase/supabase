@@ -9,9 +9,6 @@ import { defineConfig } from 'vitest/config'
 // `setupFiles` live next to the test file itself. This forces them to always resolve correctly.
 const dirname = fileURLToPath(new URL('.', import.meta.url))
 
-// Register custom loaders to emulate webpack's behavior
-const nodeArgs = ['--import=./tests/loaders/register.mjs']
-
 export default defineConfig({
   plugins: [
     react(),
@@ -29,12 +26,6 @@ export default defineConfig({
     environment: 'jsdom', // TODO(kamil): This should be set per test via header in .tsx files only
     include: [resolve(dirname, './**/*.test.{ts,tsx}')],
     restoreMocks: true,
-    poolOptions: {
-      threads: { execArgv: nodeArgs },
-      forks: { execArgv: nodeArgs },
-      vmThreads: { execArgv: nodeArgs },
-      vmForks: { execArgv: nodeArgs },
-    },
     setupFiles: [
       resolve(dirname, './tests/vitestSetup.ts'),
       resolve(dirname, './tests/setup/polyfills.js'),
