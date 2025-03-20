@@ -16,3 +16,7 @@ export interface NavItemWithChildren extends NavItem {
 export interface MainNavItem extends NavItem {}
 
 export interface SidebarNavItem extends NavItemWithChildren {}
+
+export interface SidebarNavGroup extends NavItem {
+  items: (SidebarNavItem & { commandItemLabel: string })[]
+}
