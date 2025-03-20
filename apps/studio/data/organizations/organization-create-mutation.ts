@@ -12,6 +12,7 @@ export type OrganizationCreateVariables = {
   size?: string
   tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
   payment_method?: string
+  cadence: 'monthly' | 'yearly'
 }
 
 export async function createOrganization({
@@ -20,6 +21,7 @@ export async function createOrganization({
   size,
   tier,
   payment_method,
+  cadence,
 }: OrganizationCreateVariables) {
   const { data, error } = await post('/platform/organizations', {
     body: {
@@ -29,6 +31,7 @@ export async function createOrganization({
       size,
       tier,
       payment_method,
+      cadence,
     },
   })
 

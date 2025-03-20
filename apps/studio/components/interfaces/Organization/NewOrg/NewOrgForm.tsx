@@ -18,7 +18,18 @@ import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { parseAsBoolean, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs'
-import { Button, Input, Listbox, Toggle } from 'ui'
+import {
+  Button,
+  Input,
+  Listbox,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Toggle,
+} from 'ui'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -61,12 +72,14 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     spend_cap: parseAsBoolean.withDefault(true),
     returnTo: parseAsString.withDefault(''),
     auth_id: parseAsString.withDefault(''),
+    cadence: parseAsString.withDefault('monthly'),
   })
   const {
     name: orgName,
     kind: orgKind,
     spend_cap: isSpendCapEnabled,
     plan: dbPricingTierKey,
+    cadence,
     size: orgSize,
     returnTo,
     auth_id,
@@ -117,6 +130,10 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     setState({ ...state, kind: value })
   }
 
+  function onCadenceChange(value: any) {
+    setState({ ...state, cadence: value })
+  }
+
   function onOrgSizeChange(value: any) {
     setState({ ...state, size: value })
   }
@@ -139,6 +156,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         | 'tier_enterprise',
       ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
       payment_method: paymentMethodId,
+      cadence: cadence as 'monthly' | 'yearly',
     })
   }
 
@@ -324,6 +342,20 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               )
             })}
           </Listbox>
+        </Panel.Content>
+
+        <Panel.Content>
+          <Select_Shadcn_ value={cadence} onValueChange={onCadenceChange}>
+            <SelectTrigger_Shadcn_ className="w-[180px]">
+              <SelectValue_Shadcn_ placeholder="Select cadence" />
+            </SelectTrigger_Shadcn_>
+            <SelectContent_Shadcn_>
+              <SelectGroup_Shadcn_>
+                <SelectItem_Shadcn_ value="monthly">Monthly</SelectItem_Shadcn_>
+                <SelectItem_Shadcn_ value="yearly">Yearly</SelectItem_Shadcn_>
+              </SelectGroup_Shadcn_>
+            </SelectContent_Shadcn_>
+          </Select_Shadcn_>
         </Panel.Content>
 
         {dbPricingTierKey === 'PRO' && (
