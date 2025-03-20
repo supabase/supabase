@@ -1,31 +1,5 @@
+import { Filter, Sort } from '@supabase/pg-meta/src/query'
 import { CalculatedColumn, RenderHeaderCellProps } from 'react-data-grid'
-
-export interface Sort {
-  table: string
-  column: string
-  ascending?: boolean
-  nullsFirst?: boolean
-}
-
-export type FilterOperator =
-  | '='
-  | '<>'
-  | '>'
-  | '<'
-  | '>='
-  | '<='
-  | '~~'
-  | '~~*'
-  | '!~~'
-  | '!~~*'
-  | 'in'
-  | 'is'
-
-export interface Filter {
-  column: string
-  operator: FilterOperator
-  value: any
-}
 
 export interface SavedState {
   filters: Filter[]
