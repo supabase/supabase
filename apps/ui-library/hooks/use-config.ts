@@ -1,14 +1,13 @@
 import { Style } from '@/registry/styles'
-import { Theme } from '@/registry/themes'
+// import { Theme } from '@/registry/themes'
 import { useAtom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 import { ComponentProps } from 'react'
 import { SonnerToaster } from 'ui'
-// import { BackendProvider } from '@/registry/backend-provider'
 
 type Config = {
   style: Style['name']
-  theme: Theme['name']
+  // theme: Theme['name']
   radius: number
   sonnerPosition: ComponentProps<typeof SonnerToaster>['position']
   sonnerExpand: boolean
@@ -17,11 +16,10 @@ type Config = {
 
 const configAtom = atomWithStorage<Config>('config', {
   style: 'default',
-  theme: 'zinc',
+  // theme: 'zinc',
   radius: 0.5,
   sonnerPosition: 'bottom-right',
   sonnerExpand: false,
-  // backendProvider: 'nextjs-auth',
 })
 
 export function useConfig() {

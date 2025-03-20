@@ -1,11 +1,11 @@
 import { withContentlayer } from 'next-contentlayer2'
 
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/design-system'
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/ui'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['ui', 'common', 'shared-data', 'icons', 'tsconfig'],
-  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/design-system',
+  basePath: BASE_PATH,
   images: {
     remotePatterns: [
       {
@@ -35,6 +35,10 @@ const nextConfig = {
           ]
         : []),
     ]
+  },
+  eslint: {
+    // We are already running linting via GH action, this will skip linting during production build on Vercel
+    ignoreDuringBuilds: true,
   },
 }
 
