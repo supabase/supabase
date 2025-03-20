@@ -127,6 +127,7 @@ const nextConfig = {
     urlImports: [
       // Used to import the Deno types passed on Monaco's typescript language service
       'https://github.com/denoland/deno',
+      SUPABASE_ASSETS_URL,
     ],
   },
   async rewrites() {
