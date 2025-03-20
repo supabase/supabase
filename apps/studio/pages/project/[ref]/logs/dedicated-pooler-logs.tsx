@@ -4,7 +4,6 @@ import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import { Loading } from 'components/ui/Loading'
-import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
@@ -14,10 +13,6 @@ export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
-  const { data: pgBouncerConfig, isLoading: pgBouncerLoading } = usePgbouncerConfigQuery({
-    projectRef: ref ?? 'default',
-  })
-
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
   useEffect(() => {
@@ -28,7 +23,7 @@ export const LogPage: NextPageWithLayout = () => {
   }, [isFreePlan, isOrgPlanLoading, ref, router])
 
   // Prevent showing logs while checking plan or loading config
-  if (isOrgPlanLoading || pgBouncerLoading || isFreePlan) {
+  if (isOrgPlanLoading || isFreePlan) {
     return <Loading />
   }
 

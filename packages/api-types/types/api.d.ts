@@ -32,6 +32,26 @@ export interface paths {
     patch: operations['v1-update-a-branch-config']
     trace?: never
   }
+  '/v1/branches/{branch_id}/merge': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Merges a database branch
+     * @description Merges the specified database branch
+     */
+    post: operations['v1-merge-a-branch']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/branches/{branch_id}/push': {
     parameters: {
       query?: never
@@ -2463,12 +2483,6 @@ export interface components {
       wal_sender_timeout?: string
       work_mem?: string
     }
-    UpdatePostgrestConfigBody: {
-      db_extra_search_path?: string
-      db_pool?: number
-      db_schema?: string
-      max_rows?: number
-    }
     UpdateProviderBody: {
       attribute_mapping?: components['schemas']['AttributeMapping']
       domains?: string[]
@@ -2758,6 +2772,12 @@ export interface components {
       name?: string
       verify_jwt?: boolean
     }
+    V1UpdatePostgrestConfigBody: {
+      db_extra_search_path?: string
+      db_pool?: number
+      db_schema?: string
+      max_rows?: number
+    }
     ValidationError: {
       message: string
     }
@@ -2862,6 +2882,34 @@ export interface operations {
         }
       }
       /** @description Failed to update database branch */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-merge-a-branch': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        branch_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BranchUpdateResponse']
+        }
+      }
+      /** @description Failed to merge database branch */
       500: {
         headers: {
           [name: string]: unknown
@@ -5362,7 +5410,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdatePostgrestConfigBody']
+        'application/json': components['schemas']['V1UpdatePostgrestConfigBody']
       }
     }
     responses: {

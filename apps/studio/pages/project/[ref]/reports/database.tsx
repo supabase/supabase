@@ -98,7 +98,7 @@ const DatabaseUsage = () => {
       hide: false,
     },
     {
-      id: 'pgbouncer_pools_client_active_connections',
+      id: 'client_connections_pgbouncer',
       label: 'Client to Dedicated Pooler connections',
       hide: isFreePlan,
     },
