@@ -10,12 +10,11 @@ export type PgbouncerConfigurationUpdateVariables = {
   ref: string
 } & Pick<
   components['schemas']['UpdatePgbouncerConfigBody'],
-  'default_pool_size' | 'pool_mode' | 'max_client_conn'
+  'default_pool_size' | 'max_client_conn'
 >
 
 export async function updatePgbouncerConfiguration({
   ref,
-  pool_mode,
   default_pool_size,
   max_client_conn,
 }: PgbouncerConfigurationUpdateVariables) {
@@ -25,9 +24,7 @@ export async function updatePgbouncerConfiguration({
     params: { path: { ref } },
     body: {
       default_pool_size,
-      pool_mode,
       max_client_conn,
-      pgbouncer_enabled: true,
       ignore_startup_parameters: '',
     },
   })
