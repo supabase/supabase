@@ -1,3 +1,7 @@
+import { useRouter } from 'next/router'
+
+import { useParams } from 'common'
+import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
@@ -6,7 +10,19 @@ import { NewTab } from 'components/layouts/Tabs/NewTab'
 import type { NextPageWithLayout } from 'types'
 
 const EditorNewPage: NextPageWithLayout = () => {
-  return <NewTab />
+  const router = useRouter()
+  const { ref: projectRef } = useParams()
+
+  const onTableCreated = (table: { id: number }) => {
+    router.push(`/project/${projectRef}/editor/${table.id}`)
+  }
+
+  return (
+    <>
+      <NewTab />
+      <SidePanelEditor onTableCreated={onTableCreated} />
+    </>
+  )
 }
 
 EditorNewPage.getLayout = (page) => (
