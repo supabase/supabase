@@ -18,8 +18,8 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw14`
 
 // Load custom font
-const FONT_URL = `${STORAGE_URL}/assets/font/CircularStd-Book.otf`
-const MONO_FONT_URL = `${STORAGE_URL}/assets/font/SourceCodePro-Regular.ttf`
+const FONT_URL = `${STORAGE_URL}/assets/font/Nippo-Regular.otf`
+const MONO_FONT_URL = `${STORAGE_URL}/assets/font/DepartureMono-Regular.otf`
 const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 
@@ -45,14 +45,14 @@ export async function GET(req: Request, res: Response) {
       await supabaseAdminClient
         .from(LW_TABLE)
         .update({ shared_on_twitter: 'now' })
-        .eq('launch_week', 'lw13')
+        .eq('launch_week', 'lw14')
         .eq('username', username)
         .is('shared_on_twitter', null)
     } else if (userAgent?.toLocaleLowerCase().includes('linkedin')) {
       await supabaseAdminClient
         .from(LW_TABLE)
         .update({ shared_on_linkedin: 'now' })
-        .eq('launch_week', 'lw13')
+        .eq('launch_week', 'lw14')
         .eq('username', username)
         .is('shared_on_linkedin', null)
     }
@@ -61,9 +61,9 @@ export async function GET(req: Request, res: Response) {
     const { data: user, error } = await supabaseAdminClient
       .from(LW_MATERIALIZED_VIEW)
       .select(
-        'id, name, metadata, shared_on_twitter, shared_on_linkedin, platinum, secret, role, company, location'
+        'id, name, metadata, shared_on_twitter, shared_on_linkedin, platinum, secret, role, company, location, ticket_number'
       )
-      .eq('launch_week', 'lw13')
+      .eq('launch_week', 'lw14')
       .eq('username', username)
       .maybeSingle()
 
@@ -77,13 +77,15 @@ export async function GET(req: Request, res: Response) {
       metadata,
       shared_on_twitter: sharedOnTwitter,
       shared_on_linkedin: sharedOnLinkedIn,
+      ticket_number,
     } = user
 
     const isDark = metadata.theme !== 'light'
 
     const platinum = isPlatinum ?? (!!sharedOnTwitter && !!sharedOnLinkedIn) ?? false
-    if (assumePlatinum && !platinum)
-      return await fetch(`${STORAGE_URL}/assets/platinum_no_meme.jpg`)
+    if (assumePlatinum && !platinum) return await fetch(`${STORAGE_URL}/images/og-14-platinum.png`)
+
+    const seatCode = (466561 + (ticket_number || 0)).toString(36).toUpperCase()
 
     // Generate image and upload to storage.
     const ticketType = secret ? 'secret' : platinum ? 'platinum' : 'regular'
@@ -92,29 +94,65 @@ export async function GET(req: Request, res: Response) {
       TICKET_FOREGROUND: themes(isDark)[ticketType].TICKET_FOREGROUND,
     })
 
+    const TICKET_THEME = {
+      regular: {
+        color: 'rgb(239, 239, 239)',
+        background: 'transparent',
+      },
+      secret: {
+        color: 'rgba(44, 244, 148)',
+        background: 'rgba(44, 244, 148, 0.4)',
+      },
+      platinum: {
+        color: 'rgba(255, 199, 58)',
+        background: 'rgba(255, 199, 58, 0.4)',
+      },
+    }
+
     const fontData = await font
     const monoFontData = await mono_font
+
     const OG_WIDTH = 1200
     const OG_HEIGHT = 628
-    const USERNAME_LEFT = 400
-    const USERNAME_BOTTOM = 100
-    const USERNAME_WIDTH = 400
-    const DISPLAY_NAME = name || username
+    const USERNAME_BOTTOM = 435
 
-    const BACKGROUND = (isDark?: boolean) => ({
+    // NOTE: defaulted to true on 14th launch-week as we only have dark theme
+    const BACKGROUND = (isDark: boolean = true) => ({
       regular: {
         LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v4`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg-regular-${isDark ? 'dark' : 'light'}.png?v4`,
+        BACKGROUND_IMG: `${STORAGE_URL}/assets/og-14-regular.png`,
       },
       platinum: {
         LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v4`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg-platinum.png?v4`,
+        BACKGROUND_IMG: `${STORAGE_URL}/assets/og-14-platinum.png`,
       },
       secret: {
         LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v4`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg-secret.png?v4`,
+        BACKGROUND_IMG: `${STORAGE_URL}/assets/og-14-secret.png`,
       },
     })
+
+    const usernameToLines = (username: string): string[] => {
+      // NOTE: replace spaces with non-breaking spaces
+      username = username.replace(' ', '\u00A0')
+
+      const line1 = username.slice(0, 11)
+      const line2 = username.slice(11, 22)
+      let line3 = username.slice(22)
+
+      // NOTE: If third line is too long, trim to 8 characters and add '...'
+      if (line3.length > 11) {
+        line3 = line3.slice(0, 8) + '...'
+      }
+
+      // NOTE: Only include non-empty lines
+      return [line1, line2, line3].filter((line) => line.length > 0)
+    }
+
+    const computeBackgroundWidth = (letters: number) => {
+      return 100 + (letters * 40 + (letters - 1) * 12)
+    }
+    const lines = usernameToLines(username)
 
     const generatedTicketImage = new ImageResponse(
       (
@@ -124,16 +162,15 @@ export async function GET(req: Request, res: Response) {
               width: '1200px',
               height: '628px',
               position: 'relative',
-              fontFamily: '"Circular"',
+              fontFamily: '"Nippo-Regular"',
               overflow: 'hidden',
               color: STYLING_CONFIG(isDark).TICKET_FOREGROUND,
               display: 'flex',
               flexDirection: 'column',
-              padding: '60px',
               justifyContent: 'space-between',
             }}
           >
-            {/* Background  */}
+            {/* Background */}
             <img
               width="1204"
               height="634"
@@ -145,42 +182,56 @@ export async function GET(req: Request, res: Response) {
                 right: '-2px',
                 zIndex: '0',
                 backgroundSize: 'cover',
+                backgroundColor: STYLING_CONFIG(true).TICKET_FOREGROUND,
               }}
               src={BACKGROUND(isDark)[ticketType].BACKGROUND_IMG}
             />
-
-            {/* Name & username */}
+            {/* Seat number */}
             <div
               style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                flexDirection: 'column',
+                transform: 'rotate(-90deg)',
+                fontFamily: '"Nippo-Regular"',
+                fontSize: '82px',
                 position: 'absolute',
-                bottom: USERNAME_BOTTOM,
-                left: USERNAME_LEFT,
-                width: USERNAME_WIDTH,
-                height: 'auto',
-                overflow: 'hidden',
-                textOverflow: 'clip',
-                textAlign: 'left',
-                letterSpacing: '-0.5px',
-                marginBottom: '10px',
+                color: TICKET_THEME[ticketType].color,
+                top: 70,
+                right: 135,
               }}
             >
-              <p
+              {seatCode}
+            </div>
+
+            {/* Render each username line */}
+            {lines.map((line, index) => (
+              <div
+                key={index}
                 style={{
-                  margin: '0',
-                  padding: '0',
-                  fontSize: '54',
-                  lineHeight: '105%',
                   display: 'flex',
-                  marginBottom: '10px',
+                  position: 'absolute',
+                  bottom: USERNAME_BOTTOM - index * 80,
+                  paddingLeft: '93px',
+                  paddingRight: 0,
+                  left: 27,
+                  height: '61px',
+                  width: `${computeBackgroundWidth(line.length)}px`,
+                  backgroundColor: TICKET_THEME[ticketType].background,
                 }}
               >
-                {DISPLAY_NAME}
-              </p>
-            </div>
+                <p
+                  style={{
+                    fontFamily: '"DepartureMono-Regular"',
+                    margin: '0',
+                    color: TICKET_THEME[ticketType].color,
+                    padding: '0',
+                    fontSize: '82px',
+                    lineHeight: '56px',
+                    display: 'flex',
+                  }}
+                >
+                  {line}
+                </p>
+              </div>
+            ))}
           </div>
         </>
       ),
@@ -189,12 +240,12 @@ export async function GET(req: Request, res: Response) {
         height: OG_HEIGHT,
         fonts: [
           {
-            name: 'Circular',
+            name: 'Nippo-Regular',
             data: fontData,
             style: 'normal',
           },
           {
-            name: 'SourceCodePro',
+            name: 'DepartureMono-Regular',
             data: monoFontData,
             style: 'normal',
           },
