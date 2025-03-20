@@ -198,13 +198,10 @@ export function Tabs() {
 
   const hasNewTab = router.asPath.includes('/new')
 
-  // Separate new tab from regular tabs
-  const regularTabs = !editor
-    ? []
-    : openTabs.filter((tab) => {
-        // Filter by editor type - only show SQL tabs for SQL editor and table tabs for table editor
-        return entityTypes[editor]?.includes(tab.type)
-      })
+  // Filter by editor type - only show SQL tabs for SQL editor and table tabs for table editor
+  const editorTabs = !!editor
+    ? openTabs.filter((tab) => entityTypes[editor]?.includes(tab.type))
+    : []
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -235,12 +232,11 @@ export function Tabs() {
       >
         <CollapseButton hideTabs={false} />
         <TabsList_Shadcn_ className="bg-surface-200 dark:bg-alternative rounded-b-none gap-0 h-10 flex items-center w-full z-[1] border-none overflow-clip overflow-x-auto ">
-          {/* Draggable regular tabs */}
           <SortableContext
-            items={regularTabs.map((tab) => tab.id)}
+            items={editorTabs.map((tab) => tab.id)}
             strategy={horizontalListSortingStrategy}
           >
-            {regularTabs.map((tab, index) => (
+            {editorTabs.map((tab, index) => (
               <SortableTab
                 key={tab.id}
                 tab={tab}

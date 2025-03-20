@@ -35,6 +35,7 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
     const isTimeout =
       result?.error?.message?.includes('canceling statement due to statement timeout') ||
       result?.error?.message?.includes('upstream request timeout')
+    const isNetWorkError = result?.error?.message?.includes('EHOSTUNREACH')
 
     if (isExecuting) {
       return (
@@ -93,7 +94,7 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                 ) : (
                   <p className="font-mono text-sm tracking-tight">Error: {result.error?.message}</p>
                 )}
-                {!isTimeout && result.autoLimit && (
+                {!isTimeout && !isNetWorkError && result.autoLimit && (
                   <p className="text-sm text-foreground-light">
                     Note: A limit of {result.autoLimit} was applied to your query. If this was the
                     cause of a syntax error, try selecting "No limit" instead and re-run the query.
@@ -169,4 +170,5 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
   }
 )
 
+UtilityTabResults.displayName = 'UtilityTabResults'
 export default UtilityTabResults

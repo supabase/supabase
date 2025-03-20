@@ -50,12 +50,14 @@ export const tableEditorTabsCleanUp = ({
     )
   }
 
-  const tabsToRemove = [
-    ...tabsFilteredToSchemas.filter((entityId) => !entitiesById.includes(entityId)),
+  const tableEditorTabsToBeCleaned = [
+    ...tabsFilteredToSchemas.filter(
+      (id) => !id.startsWith('sql') && !id.startsWith('schema') && !entitiesById.includes(id)
+    ),
   ]
 
   // perform tabs cleanup
-  removeTabs(ref, tabsToRemove)
+  removeTabs(ref, tableEditorTabsToBeCleaned)
 }
 
 export const sqlEditorTabsCleanup = ({
@@ -80,8 +82,10 @@ export const sqlEditorTabsCleanup = ({
 
   // Remove any snippet tabs that might no longer be existing (removed outside of the dashboard session)
   const tabsStore = getTabsStore(ref)
-  const tabIds = tabsStore.openTabs.filter((id: string) => !currentContentIds.includes(id))
-  removeTabs(ref, tabIds)
+  const snippetTabsToBeCleaned = tabsStore.openTabs.filter(
+    (id: string) => id.startsWith('sql') && !currentContentIds.includes(id)
+  )
+  removeTabs(ref, snippetTabsToBeCleaned)
 
   // Remove any recent items that might no longer be existing (removed outside of the dashboard session)
   const recentItems = getRecentItemsByType(ref, 'sql')

@@ -276,6 +276,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     [projectSnippetsTreeState]
   )
 
+  const allSnippetsInView = [
+    ...(privateSnippetsPages?.pages.flatMap((x) => x.contents) ?? []),
+    ...(sharedSqlSnippetsData?.pages.flatMap((x) => x.contents) ?? []),
+  ]
+
   // ==========================
   // Snippet mutations from  RQ
   // ==========================
@@ -511,11 +516,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         })
         page.folders?.forEach((folder: SnippetFolder) => snapV2.addFolder({ projectRef, folder }))
       })
-
-      if (isSQLEditorTabsEnabled) {
-        const snippets = privateSnippetsPages.pages.flatMap((x) => x.contents)
-        sqlEditorTabsCleanup({ ref: projectRef, snippets: snippets as any })
-      }
     }
   }, [projectRef, privateSnippetsPages?.pages])
 
@@ -527,11 +527,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         snapV2.addSnippet({ projectRef, snippet })
       })
     })
-
-    if (isSQLEditorTabsEnabled) {
-      const snippets = favoriteSqlSnippetsData.pages.flatMap((x) => x.contents)
-      sqlEditorTabsCleanup({ ref: projectRef, snippets: snippets as any })
-    }
   }, [projectRef, favoriteSqlSnippetsData?.pages])
 
   useEffect(() => {
@@ -539,18 +534,17 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
     sharedSqlSnippetsData.pages.forEach((page) => {
       page.contents?.forEach((snippet) => {
-        snapV2.addSnippet({
-          projectRef,
-          snippet,
-        })
+        snapV2.addSnippet({ projectRef, snippet })
       })
     })
-
-    if (isSQLEditorTabsEnabled) {
-      const snippets = sharedSqlSnippetsData.pages.flatMap((x) => x.contents)
-      sqlEditorTabsCleanup({ ref: projectRef, snippets: snippets as any })
-    }
   }, [projectRef, sharedSqlSnippetsData?.pages])
+
+  useEffect(() => {
+    if (projectRef && isSuccess && isSharedSqlSnippetsSuccess && isSQLEditorTabsEnabled) {
+      sqlEditorTabsCleanup({ ref: projectRef, snippets: allSnippetsInView as any })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess, isSharedSqlSnippetsSuccess, allSnippetsInView])
 
   return (
     <>
