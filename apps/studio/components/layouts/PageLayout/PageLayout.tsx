@@ -30,6 +30,7 @@ interface PageLayoutProps {
   className?: string
   size?: 'default' | 'full' | 'large' | 'small'
   isCompact?: boolean
+  pageMeta?: ReactNode
 }
 
 /**
@@ -67,6 +68,7 @@ export const PageLayout = ({
   className,
   size = 'default',
   isCompact = false,
+  pageMeta,
 }: PageLayoutProps) => {
   const router = useRouter()
 
@@ -93,6 +95,7 @@ export const PageLayout = ({
             primaryActions={primaryActions}
             secondaryActions={secondaryActions}
             isCompact={isCompact}
+            pageMeta={pageMeta}
           />
         )}
 
