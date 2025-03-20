@@ -33,8 +33,8 @@ export const aiEditorsRules: SidebarNavGroup = {
   title: 'AI Editors Rules',
   items: [
     {
-      title: 'Introduction',
-      href: '/docs/ai-editors-rules/introduction',
+      title: 'Prompts',
+      href: '/docs/ai-editors-rules/prompts',
       items: [],
       commandItemLabel: 'AI Editors Rules',
     },

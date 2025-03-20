@@ -26,12 +26,14 @@ import * as React from "react"
 export const Index: Record<string, any> = {
   "default": {
     ${registry.items.map((item) => {
+      const componentFile = item.files.find((file) => file.path.endsWith('.tsx'))
+
       return `
     "${item.name}": {
       name: "${item.name}",
       type: "${item.type}",
       registryDependencies: [${item.registryDependencies.map((dep) => `"${dep}"`).join(',')}],
-      component: React.lazy(() => import("@/${item.files[0].path}")),
+      ${componentFile ? `component: React.lazy(() => import("@/${componentFile.path}")),` : ''}
       source: "",
       files: [${item.files?.map((file) => `"${file.path}"`).join(',')}],
       category: "undefined",

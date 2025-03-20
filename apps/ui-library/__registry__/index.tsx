@@ -204,9 +204,7 @@ export const Index: Record<string, any> = {
       name: 'supabase-client-nextjs',
       type: 'registry:lib',
       registryDependencies: [],
-      component: React.lazy(
-        () => import('@/registry/default/clients/nextjs/lib/supabase/client.ts')
-      ),
+
       source: '',
       files: [
         'registry/default/clients/nextjs/lib/supabase/client.ts',
@@ -221,9 +219,7 @@ export const Index: Record<string, any> = {
       name: 'supabase-client-react',
       type: 'registry:lib',
       registryDependencies: [],
-      component: React.lazy(
-        () => import('@/registry/default/clients/react/lib/supabase/client.ts')
-      ),
+
       source: '',
       files: ['registry/default/clients/react/lib/supabase/client.ts'],
       category: 'undefined',
@@ -234,9 +230,7 @@ export const Index: Record<string, any> = {
       name: 'supabase-client-react-router',
       type: 'registry:lib',
       registryDependencies: [],
-      component: React.lazy(
-        () => import('@/registry/default/clients/react-router/lib/supabase.client.ts')
-      ),
+
       source: '',
       files: [
         'registry/default/clients/react-router/lib/supabase.client.ts',
@@ -250,13 +244,28 @@ export const Index: Record<string, any> = {
       name: 'supabase-client-tanstack',
       type: 'registry:lib',
       registryDependencies: [],
-      component: React.lazy(
-        () => import('@/registry/default/clients/tanstack/lib/supabase/client.ts')
-      ),
+
       source: '',
       files: [
         'registry/default/clients/tanstack/lib/supabase/client.ts',
         'registry/default/clients/tanstack/lib/supabase/server.ts',
+      ],
+      category: 'undefined',
+      subcategory: 'undefined',
+      chunks: [],
+    },
+    'ai-editor-rules': {
+      name: 'ai-editor-rules',
+      type: 'registry:file',
+      registryDependencies: [],
+
+      source: '',
+      files: [
+        'registry/default/ai-editor-rules/create-db-functions.md',
+        'registry/default/ai-editor-rules/create-migration.md',
+        'registry/default/ai-editor-rules/create-rls-policies.md',
+        'registry/default/ai-editor-rules/postgres-sql-style-guide.md',
+        'registry/default/ai-editor-rules/writing-supabase-edge-functions.md',
       ],
       category: 'undefined',
       subcategory: 'undefined',
