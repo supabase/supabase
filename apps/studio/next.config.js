@@ -124,11 +124,6 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     webpackBuildWorker: true,
-    urlImports: [
-      // Used to import the Deno types passed on Monaco's typescript language service
-      'https://github.com/denoland/deno',
-      SUPABASE_ASSETS_URL,
-    ],
   },
   async rewrites() {
     return [
@@ -585,25 +580,6 @@ const nextConfig = {
           delete rule.issuer.and
         }
       })
-
-    // Find the parent `oneOf` rule that contains next-swc-loader
-    const tsRules = config.module.rules.find(
-      (rule) =>
-        'oneOf' in rule &&
-        rule.oneOf.some(
-          (r) =>
-            Array.isArray(r.use) &&
-            r.use.some((u) => 'loader' in u && u.loader === 'next-swc-loader')
-        )
-    )
-
-    // Add custom loader that treats `?resource` imports as an asset/resource without further processing
-    // This allows us to import `.ts` files as assets without further processing through the SWC loader
-    // Used to load raw Deno `.d.ts` types as source assets passed to Monaco's typescript language service
-    tsRules.oneOf.unshift({
-      resourceQuery: /resource/,
-      type: 'asset/resource',
-    })
 
     // .md files to be loaded as raw text
     config.module.rules.push({

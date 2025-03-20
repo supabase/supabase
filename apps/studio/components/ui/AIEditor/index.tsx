@@ -10,9 +10,6 @@ import { constructHeaders } from 'data/fetchers'
 import { detectOS } from 'lib/helpers'
 import ResizableAIWidget from './ResizableAIWidget'
 
-// Special asset/resource import that fetches deno types at build time
-import denoTypesUrl from 'https://github.com/denoland/deno/releases/latest/download/lib.deno.d.ts?resource'
-
 interface AIEditorProps {
   id?: string
   language?: string
@@ -128,8 +125,7 @@ const AIEditor = ({
       }
     }
 
-    // Add deno types to the TS language service
-    fetch(denoTypesUrl)
+    fetch('/deno/lib.deno.d.ts')
       .then((response) => response.text())
       .then((code) => {
         monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
