@@ -71,7 +71,7 @@ Prisma is unable to allocate connections to pending queries fast enough to meet 
 
 ### Possible causes: [#possible-causes-timed-out-fetching-a-new-connection]
 
-- **Overwhelmed server**: The server hosting Prisma is under heavy load, limiting its ability to manage connections. By default, Prisma will create the default `2 * num_cpus / 2` worth of connections. A common cause for server strain is increasing the `connection_limit` significantly past the default.
+- **Overwhelmed server**: The server hosting Prisma is under heavy load, limiting its ability to manage connections. By default, Prisma will create the default `num_cpus * 2 + 1` worth of connections. A common cause for server strain is increasing the `connection_limit` significantly past the default.
 - **Insufficient pool size**: The Supavisor pooler does not have enough connections available to quickly satisfy Prisma's requests.
 - **Slow queries**: Prisma's queries are taking too long to execute, preventing it from releasing connections for reuse.
 

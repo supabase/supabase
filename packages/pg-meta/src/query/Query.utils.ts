@@ -50,7 +50,7 @@ export function deleteQuery(
     query +=
       enumArrayColumns === undefined || enumArrayColumns.length === 0
         ? ` returning *`
-        : ` returning *, ${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`
+        : ` returning *, ${enumArrayColumns.map((x) => `${ident(x)}::text[]`).join(',')}`
   }
   return query + ';'
 }
@@ -89,7 +89,7 @@ export function insertQuery(
     query +=
       enumArrayColumns === undefined || enumArrayColumns.length === 0
         ? ` returning *`
-        : ` returning *, ${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`
+        : ` returning *, ${enumArrayColumns.map((x) => `${ident(x)}::text[]`).join(',')}`
   }
   return query + ';'
 }

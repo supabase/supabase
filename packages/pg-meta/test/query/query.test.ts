@@ -253,7 +253,7 @@ describe('Query.utils', () => {
         returning: true,
         enumArrayColumns: ['tags'],
       })
-      expect(result).toBe('delete from public.users where id = 1 returning *, "tags"::text[];')
+      expect(result).toBe('delete from public.users where id = 1 returning *, tags::text[];')
     })
   })
 
@@ -285,7 +285,7 @@ describe('Query.utils', () => {
         enumArrayColumns: ['tags'],
       })
       expect(result).toMatchInlineSnapshot(
-        `"insert into public.users (id,name) select id,name from jsonb_populate_recordset(null::public.users, '[{"id":1,"name":"John"}]') returning *, "tags"::text[];"`
+        `"insert into public.users (id,name) select id,name from jsonb_populate_recordset(null::public.users, '[{"id":1,"name":"John"}]') returning *, tags::text[];"`
       )
     })
   })
@@ -362,7 +362,7 @@ describe('Query.utils', () => {
         enumArrayColumns: ['tags'],
       })
       expect(result).toMatchInlineSnapshot(
-        `"update public.users set (name) = (select name from json_populate_record(null::public.users, '{"name":"John"}')) where id = 1 returning *, "tags"::text[];"`
+        `"update public.users set (name) = (select name from json_populate_record(null::public.users, '{"name":"John"}')) where id = 1 returning *, tags::text[];"`
       )
     })
   })
