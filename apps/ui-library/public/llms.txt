@@ -1,0 +1,29 @@
+# Supabase Design System
+Last updated: 2025-03-19T20:34:00.110Z
+
+## Overview
+The Design System used in Supabase Studio.
+
+## Docs
+- [Password-based Auth (Nextjs)](https://supabase-design-system.vercel.app/design-system/docs/blocks/password-based-auth-nextjs)
+    - Password-based Auth block for Nextjs app
+- [Password-based Auth (React)](https://supabase-design-system.vercel.app/design-system/docs/blocks/password-based-auth-react)
+    - Password-based Auth block for React
+- [Nextjs](https://supabase-design-system.vercel.app/design-system/docs/clients/nextjs)
+    - Supabase client for Nextjs
+- [React](https://supabase-design-system.vercel.app/design-system/docs/clients/react)
+    - Supabase client for React
+- [Remix](https://supabase-design-system.vercel.app/design-system/docs/clients/remix)
+    - Supabase client for Remix
+- [Tanstack Start](https://supabase-design-system.vercel.app/design-system/docs/clients/tanstack)
+    - Supabase client for Tanstack Start
+- [Dropzone (File Upload)](https://supabase-design-system.vercel.app/design-system/docs/components/dropzone)
+    - Displays a control for easier uploading of files directly to Supabase Storage
+- [Realtime Cursor](https://supabase-design-system.vercel.app/design-system/docs/components/realtime-cursor)
+    - Real-time cursor sharing for collaborative applications
+- [FAQ](https://supabase-design-system.vercel.app/design-system/docs/faq)
+    - Frequently asked questions
+- [Introduction](https://supabase-design-system.vercel.app/design-system/docs/getting-started/introduction)
+    - Components
+- [Quick Start](https://supabase-design-system.vercel.app/design-system/docs/index)
+    - Components
