@@ -114,7 +114,6 @@ export const ConnectionPooling = () => {
       {
         ref: projectRef,
         default_pool_size: default_pool_size === null ? undefined : default_pool_size,
-        pool_mode: 'transaction',
       },
       {
         onSuccess: (data) => {

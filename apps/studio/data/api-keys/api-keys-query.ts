@@ -2,7 +2,6 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 
-import { components } from 'api-types'
 import { apiKeysKeys } from './keys'
 
 type LegacyKeys = {
@@ -13,7 +12,7 @@ type LegacyKeys = {
   inserted_at?: string | null
   name: string
   prefix?: string | null
-  secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
+  secret_jwt_template?: { role: string } | null
   type: 'legacy' | null
   updated_at?: string | null
 }
@@ -26,7 +25,7 @@ type SecretKeys = {
   inserted_at: string
   name: string
   prefix: string
-  secret_jwt_template: components['schemas']['ApiKeySecretJWTTemplate']
+  secret_jwt_template: { role: string }
   type: 'secret'
   updated_at?: string
 }
@@ -39,7 +38,7 @@ type PublishableKeys = {
   inserted_at: string
   name: string
   prefix?: string
-  secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
+  secret_jwt_template?: { role: string } | null
   type: 'publishable'
   updated_at?: string
 }

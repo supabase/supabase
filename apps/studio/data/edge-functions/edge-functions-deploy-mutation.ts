@@ -8,7 +8,7 @@ import { edgeFunctionsKeys } from './keys'
 
 export type EdgeFunctionsDeployVariables = {
   projectRef: string
-  metadata: components['schemas']['FunctionDeployMetadata']
+  metadata: components['schemas']['FunctionDeployBody']['metadata']
   files: { name: string; content: string }[]
 }
 
@@ -30,7 +30,7 @@ export async function deployEdgeFunction({
 
       formData.append('metadata', JSON.stringify(body.metadata))
 
-      body.file.forEach((f: any) => {
+      body?.file?.forEach((f: any) => {
         const file = f as { name: string; content: string }
         const blob = new Blob([file.content], { type: 'text/plain' })
         formData.append('file', blob, file.name)
