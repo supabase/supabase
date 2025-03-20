@@ -145,9 +145,9 @@ export const ConnectionPooling = () => {
             <div className="flex items-center gap-x-2">
               <p>Connection pooling configuration</p>
               {disablePoolModeSelection ? (
-                <Badge>Dedicated Pooler</Badge>
-              ) : (
                 <Badge>Shared Pooler</Badge>
+              ) : (
+                <Badge>Dedicated Pooler</Badge>
               )}
             </div>
             <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler" />
