@@ -7,7 +7,7 @@ development. Built with [Playwright](https://playwright.dev/docs/intro).
 
 Before running the tests, make sure you've done the following:
 
-- If you haven't install playwright on your machine, run `pnpm exec playwright install`
+- If you haven't installed playwright on your machine, run `pnpm exec playwright install`
 - Run `pnpm install` in the root folder of this repo
 - `docker` or `orbstack` is currently running
 - `supabase` CLI is already [installed](https://github.com/supabase/cli?tab=readme-ov-file#install-the-cli)
