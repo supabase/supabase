@@ -1,47 +1,21 @@
 'use client'
 
-import { proxy, useSnapshot } from 'valtio'
-
 /**
  * The MDXProvider is necessary so that MDX partials will have access
  * to components.
  */
 
 import { MDXProvider } from '@mdx-js/react'
-import { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react'
+import { useEffect, useState, type PropsWithChildren } from 'react'
+import { AnchorProvider } from 'ui-patterns'
 import { components } from '~/features/docs/MdxBase.shared'
-import { type AnchorProviderProps, AnchorProvider } from 'ui-patterns'
+import { TocAnchorsContext, useSubscribeTocRerender } from './GuidesMdx.state'
 
 interface TOCHeader {
   id?: string
   text: string
   link: string
   level: number
-}
-
-const TocAnchorsContext = createContext<AnchorProviderProps | undefined>(undefined)
-
-const useTocAnchors = () => {
-  const context = useContext(TocAnchorsContext)
-  if (!context) {
-    throw new Error('useTocAnchors must be used within an TocAnchorsContext')
-  }
-  return context
-}
-
-const useTocRerenderTrigger = () => {
-  const { toggleRenderFlag } = useSnapshot(tocRenderSwitch)
-  return toggleRenderFlag
-}
-
-const tocRenderSwitch = proxy({
-  renderFlag: 0,
-  toggleRenderFlag: () => void (tocRenderSwitch.renderFlag = (tocRenderSwitch.renderFlag + 1) % 2),
-})
-
-const useSubscribeTocRerender = () => {
-  const { renderFlag } = useSnapshot(tocRenderSwitch)
-  return void renderFlag // Prevent it from being detected as unused code
 }
 
 const TocAnchorsProvider = ({ children }: PropsWithChildren) => {
@@ -101,4 +75,4 @@ const MDXProviderGuides = ({ children }: PropsWithChildren) => {
   return <MDXProvider components={components}>{children}</MDXProvider>
 }
 
-export { MDXProviderGuides, TocAnchorsProvider, useTocAnchors, useTocRerenderTrigger }
+export { MDXProviderGuides, TocAnchorsProvider }
