@@ -1,9 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
+import { handleError, constructHeaders } from 'data/fetchers'
+import { IS_PLATFORM, API_URL } from 'lib/constants'
 import { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
-import { constructHeaders } from 'data/fetchers'
 
 export type EdgeFunctionBodyVariables = {
   projectRef?: string
@@ -15,6 +14,10 @@ export type EdgeFunctionFile = {
   content: string
 }
 
+export type EdgeFunctionBodyResponse = {
+  files: EdgeFunctionFile[]
+}
+
 export async function getEdgeFunctionBody(
   { projectRef, slug }: EdgeFunctionBodyVariables,
   signal?: AbortSignal
@@ -22,45 +25,45 @@ export async function getEdgeFunctionBody(
   if (!projectRef) throw new Error('projectRef is required')
   if (!slug) throw new Error('slug is required')
 
+  // First, fetch the eszip data
   const headers = await constructHeaders()
-  headers.set('Accept', 'multipart/form-data')
+  headers.set('Accept', 'application/octet-stream')
 
-  // TODO: Uncomment when endpoint is ready
-  // const response = await fetch(`/v1/projects/${projectRef}/functions/${slug}/body`, {
-  //   headers,
-  //   signal,
-  // })
-  //
-  // if (!response.ok) {
-  //   const error = await response.json()
-  //   handleError(error)
-  // }
-  // const formData = await response.formData()
+  const baseUrl = API_URL?.replace('/platform', '')
+  const url = `${baseUrl}/v1/projects/{ref}/functions/{function_slug}/body`
+    .replace('{ref}', projectRef)
+    .replace('{function_slug}', slug)
+  const response = await fetch(url, {
+    method: 'GET',
+    headers,
+    signal,
+    credentials: 'include',
+    referrerPolicy: 'no-referrer-when-downgrade',
+  })
 
-  // Mock response
-  const mockFormData = new FormData()
-  const mockContent = `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-
-Deno.serve(async (req) => {
-  const { name } = await req.json()
-  const data = {
-    message: \`Hello \${name}!\`,
+  if (!response.ok) {
+    const error = await response.json()
+    handleError(error)
   }
 
-  return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } })
-})`
-  const mockFile = new File([mockContent], 'index.ts', { type: 'text/typescript' })
-  mockFormData.append('index.ts', mockFile)
+  const eszip = await response.arrayBuffer()
+  console.log('eszip received, size:', eszip.byteLength)
 
-  const files: EdgeFunctionFile[] = []
-  for (const [name, content] of mockFormData.entries()) {
-    if (content instanceof File) {
-      const text = await content.text()
-      files.push({ name, content: text })
-    }
+  // Send to server for processing
+  const parseResponse = await fetch('/api/edge-functions/parse-body', {
+    method: 'POST',
+    body: eszip,
+    headers: {
+      'Content-Type': 'application/octet-stream',
+    },
+  })
+
+  if (!parseResponse.ok) {
+    const error = await parseResponse.json()
+    handleError(error)
   }
 
+  const { files } = await parseResponse.json()
   return files
 }
 

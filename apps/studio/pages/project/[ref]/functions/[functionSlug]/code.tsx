@@ -13,7 +13,7 @@ import { useRouter } from 'next/router'
 import { useParams } from 'common'
 import { useAppStateSnapshot } from 'state/app-state'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import FunctionsLayout from 'components/layouts/FunctionsLayout/FunctionsLayout'
+import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
 import { useFlag } from 'hooks/ui/useFlag'
 
@@ -121,7 +121,7 @@ const CodePage = () => {
 CodePage.getLayout = (page: React.ReactNode) => {
   return (
     <DefaultLayout>
-      <FunctionsLayout>{page}</FunctionsLayout>
+      <EdgeFunctionDetailsLayout>{page}</EdgeFunctionDetailsLayout>
     </DefaultLayout>
   )
 }
