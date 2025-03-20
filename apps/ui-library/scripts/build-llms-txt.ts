@@ -1,4 +1,3 @@
-import { registry } from '@/registry/registry'
 import fs from 'fs'
 import path from 'path'
 
