@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "supabase-client-remix",
+  "type": "registry:lib",
+  "title": "Supabase Client for Remix",
+  "description": "",
+  "registryDependencies": [],
+  "dependencies": ["@supabase/ssr@latest"],
+  "files": [
+    {
+      "path": "registry/default/clients/remix/lib/supabase.client.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/remix/lib/supabase.server.ts",
+      "type": "registry:lib"
+    }
+  ]
+}
