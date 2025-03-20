@@ -1,4 +1,4 @@
-import { Session, SupabaseClient } from '@supabase/supabase-js'
+import { RealtimeChannel, Session, SupabaseClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
 import { createContext, Dispatch, useContext, useMemo, useReducer } from 'react'
 
@@ -46,7 +46,7 @@ type LwAction =
   | { type: 'TICKET_LOADING_START' }
   | { type: 'TICKET_LOADING_SUCCESS' }
   | { type: 'TICKET_LOADING_ERROR'; payload?: Error }
-  | { type: 'PARTYMODE_ENABLE' }
+  | { type: 'PARTYMODE_ENABLE', payload: RealtimeChannel }
   | { type: 'PARTYMODE_DISABLE' }
 
 // Define state interface
@@ -59,7 +59,7 @@ interface LwState {
   ticketLoadingState: 'unloaded' | 'loading' | 'error' | 'loaded'
   ticketVisibility: boolean
   claimFormState: 'initial' | 'visible' | 'hidden'
-  partyModeState: 'unloaded' | 'on' | 'off'
+  realtimeGaugesChannel: RealtimeChannel | null
   referal?: string
 }
 
@@ -116,13 +116,13 @@ export const lwReducer = (state: LwState, action: LwAction): LwState => {
     case 'PARTYMODE_ENABLE': {
       return {
         ...state,
-        partyModeState: 'on',
+        realtimeGaugesChannel: action.payload,
       }
     }
     case 'PARTYMODE_DISABLE': {
       return {
         ...state,
-        partyModeState: 'off',
+        realtimeGaugesChannel: null,
       }
     }
     default:
@@ -152,6 +152,7 @@ export const Lw14ConfDataProvider = ({
     userTicketDataError: null,
     claimFormState: 'initial',
     partyModeState: 'unloaded',
+    realtimeGaugesChannel: null,
     ...initState,
   })
 

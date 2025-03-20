@@ -26,7 +26,7 @@ import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 const dates = [new Date('2025-03-31T07:00:00.000-07:00')]
 
 export const LwView = () => {
-  const partymode = usePartymode()
+  const partymode = usePartymode("on")
 
   const [state] = useConfData()
   const register = useRegistration()
@@ -52,13 +52,13 @@ export const LwView = () => {
                       CLAIM YOUR TICKET
                     </ActionButton>
                     <ActionButton
-                      variant={partymode.state === 'on' ? 'primary' : 'secondary'}
+                      variant={partymode.state === 'joined' ? 'primary' : 'secondary'}
                       icon="P"
                       onClick={() => {
                         partymode.toggle()
                       }}
                     >
-                      Party mode: {partymode.state === 'on' ? 'ON' : 'OFF'}
+                      Party mode: {partymode.state === 'joined' ? 'ON' : 'OFF'}
                     </ActionButton>
                   </TicketClaimButtons>
                 </TicketClaimContent>
@@ -73,13 +73,13 @@ export const LwView = () => {
 
                 <div className="absolute bottom-4 md:bottom-auto md:top-4 left-0 right-0 flex justify-center">
                   <ActionButton
-                    variant={partymode.state === 'on' ? 'primary' : 'secondary'}
+                    variant={partymode.state === 'joined' ? 'primary' : 'secondary'}
                     icon="P"
                     onClick={() => {
                       partymode.toggle()
                     }}
                   >
-                    Party mode: {partymode.state === 'on' ? 'ON' : 'OFF'}
+                    Party mode: {partymode.state === 'joined' ? 'ON' : 'OFF'}
                   </ActionButton>
                 </div>
               </>
