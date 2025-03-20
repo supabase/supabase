@@ -3,9 +3,9 @@
 import { usePathname } from 'next/navigation'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns/Toc'
 import { Feedback } from '~/components/Feedback'
-import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns'
-import { useTocAnchors } from '../features/docs/GuidesMdx.client'
+import { useTocAnchors } from '../features/docs/GuidesMdx.state'
 
 interface TOCHeader {
   id?: string

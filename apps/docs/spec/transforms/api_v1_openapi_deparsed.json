@@ -5738,6 +5738,9 @@
                       "connectionString": {
                         "type": "string"
                       },
+                      "connection_string": {
+                        "type": "string"
+                      },
                       "pool_mode": {
                         "enum": ["transaction", "session"],
                         "type": "string"
@@ -5754,6 +5757,7 @@
                       "db_host",
                       "db_name",
                       "connectionString",
+                      "connection_string",
                       "pool_mode"
                     ]
                   }
@@ -5804,8 +5808,7 @@
                   "pool_mode": {
                     "enum": ["transaction", "session"],
                     "type": "string",
-                    "deprecated": true,
-                    "description": "This field is deprecated and is ignored in this request"
+                    "description": "Dedicated pooler mode for the project"
                   }
                 }
               }
@@ -5825,7 +5828,6 @@
                       "nullable": true
                     },
                     "pool_mode": {
-                      "enum": ["transaction", "session"],
                       "type": "string"
                     }
                   },
@@ -12660,9 +12662,6 @@
           },
           "updated_at": {
             "type": "string"
-          },
-          "updated_at": {
-            "type": "string"
           }
         },
         "required": ["name", "value"]
@@ -13553,6 +13552,9 @@
           "connectionString": {
             "type": "string"
           },
+          "connection_string": {
+            "type": "string"
+          },
           "pool_mode": {
             "enum": ["transaction", "session"],
             "type": "string"
@@ -13569,6 +13571,7 @@
           "db_host",
           "db_name",
           "connectionString",
+          "connection_string",
           "pool_mode"
         ]
       },
@@ -13584,8 +13587,7 @@
           "pool_mode": {
             "enum": ["transaction", "session"],
             "type": "string",
-            "deprecated": true,
-            "description": "This field is deprecated and is ignored in this request"
+            "description": "Dedicated pooler mode for the project"
           }
         }
       },
@@ -13597,7 +13599,6 @@
             "nullable": true
           },
           "pool_mode": {
-            "enum": ["transaction", "session"],
             "type": "string"
           }
         },

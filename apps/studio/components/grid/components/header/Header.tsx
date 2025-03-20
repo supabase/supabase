@@ -7,7 +7,7 @@ import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useDispatch, useTrackedState } from 'components/grid/store/Store'
+import { useTrackedState } from 'components/grid/store/Store'
 import type { Filter, Sort, SupaTable } from 'components/grid/types'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -23,6 +23,7 @@ import {
   useSubscribeToImpersonatedRole,
 } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   cn,
@@ -31,6 +32,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Separator,
+  SonnerProgress,
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
@@ -71,8 +73,7 @@ const Header = ({
   headerActions,
   customHeader,
 }: HeaderProps) => {
-  const state = useTrackedState()
-  const { selectedRows } = state
+  const snap = useTableEditorTableStateSnapshot()
 
   return (
     <div>
@@ -81,7 +82,7 @@ const Header = ({
           <>{customHeader}</>
         ) : (
           <>
-            {selectedRows.size > 0 ? (
+            {snap.selectedRows.size > 0 ? (
               <RowHeader table={table} sorts={sorts} filters={filters} />
             ) : (
               <DefaultHeader
@@ -255,10 +256,10 @@ type RowHeaderProps = {
 }
 const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const state = useTrackedState()
-  const dispatch = useDispatch()
 
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const isImpersonatingRole = roleImpersonationState.role !== undefined
@@ -272,7 +273,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     sorts,
     filters,
     page: snap.page,
-    limit: snap.rowsPerPage,
+    limit: tableEditorSnap.rowsPerPage,
     impersonatedRole: roleImpersonationState.role,
   })
 
@@ -288,27 +289,24 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     { keepPreviousData: true }
   )
 
+  const allRows = data?.rows ?? []
+  const totalRows = countData?.count ?? 0
+  const { editable } = state
+
   const onSelectAllRows = () => {
-    dispatch({
-      type: 'SELECT_ALL_ROWS',
-      payload: { selectedRows: new Set(allRows.map((row) => row.idx)) },
-    })
+    snap.setSelectedRows(new Set(allRows.map((row) => row.idx)), true)
   }
 
   const onRowsDelete = () => {
-    const numRows = allRowsSelected ? totalRows : selectedRows.size
-    const rowIdxs = Array.from(selectedRows) as number[]
+    const numRows = snap.allRowsSelected ? totalRows : snap.selectedRows.size
+    const rowIdxs = Array.from(snap.selectedRows) as number[]
     const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
 
-    snap.onDeleteRows(rows, {
-      allRowsSelected,
+    tableEditorSnap.onDeleteRows(rows, {
+      allRowsSelected: snap.allRowsSelected,
       numRows,
       callback: () => {
-        dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs } })
-        dispatch({
-          type: 'SELECTED_ROWS_CHANGE',
-          payload: { selectedRows: new Set() },
-        })
+        snap.setSelectedRows(new Set())
       },
     })
   }
@@ -316,7 +314,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   async function onRowsExportCSV() {
     setIsExporting(true)
 
-    if (allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
+    if (snap.allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
       toast.error(
         <div className="prose text-sm text-foreground">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>
       )
@@ -328,7 +326,16 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       return setIsExporting(false)
     }
 
-    const rows = allRowsSelected
+    const toastId = snap.allRowsSelected
+      ? toast(<SonnerProgress progress={0} message={`Exporting all rows from ${table.name}`} />, {
+          closeButton: false,
+          duration: Infinity,
+        })
+      : toast.loading(
+          `Exporting ${snap.selectedRows.size} row${snap.selectedRows.size > 1 ? 's' : ''} from ${table.name}`
+        )
+
+    const rows = snap.allRowsSelected
       ? await fetchAllTableRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
@@ -336,8 +343,29 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           filters,
           sorts,
           impersonatedRole: roleImpersonationState.role,
+          progressCallback: (value: number) => {
+            const progress = Math.min((value / totalRows) * 100, 100)
+            toast(
+              <SonnerProgress
+                progress={progress}
+                message={`Exporting all rows from ${table.name}`}
+              />,
+              {
+                id: toastId,
+                closeButton: false,
+                duration: Infinity,
+              }
+            )
+          },
         })
-      : allRows.filter((x) => selectedRows.has(x.idx))
+      : allRows.filter((x) => snap.selectedRows.has(x.idx))
+
+    if (rows.length === 0) {
+      toast.dismiss(toastId)
+      toast.error('Export failed, please try exporting again')
+      setIsExporting(false)
+      return
+    }
 
     const formattedRows = rows.map((row) => {
       const formattedRow = row
@@ -352,6 +380,11 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       columns: state.table!.columns.map((column) => column.name),
     })
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    toast.success(`Downloaded ${rows.length} rows to CSV`, {
+      id: toastId,
+      closeButton: true,
+      duration: 4000,
+    })
     saveAs(csvData, `${state.table!.name}_rows.csv`)
     setIsExporting(false)
   }
@@ -359,7 +392,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   async function onRowsExportSQL() {
     setIsExporting(true)
 
-    if (allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
+    if (snap.allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
       toast.error(
         <div className="prose text-sm text-foreground">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>
       )
@@ -371,7 +404,21 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       return setIsExporting(false)
     }
 
-    const rows = allRowsSelected
+    if (snap.allRowsSelected && totalRows === 0) {
+      toast.error('Export failed, please try exporting again')
+      return setIsExporting(false)
+    }
+
+    const toastId = snap.allRowsSelected
+      ? toast(<SonnerProgress progress={0} message={`Exporting all rows from ${table.name}`} />, {
+          closeButton: false,
+          duration: Infinity,
+        })
+      : toast.loading(
+          `Exporting ${snap.selectedRows.size} row${snap.selectedRows.size > 1 ? 's' : ''} from ${table.name}`
+        )
+
+    const rows = snap.allRowsSelected
       ? await fetchAllTableRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
@@ -379,27 +426,45 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           filters,
           sorts,
           impersonatedRole: roleImpersonationState.role,
+          progressCallback: (value: number) => {
+            const progress = Math.min((value / totalRows) * 100, 100)
+            toast(
+              <SonnerProgress
+                progress={progress}
+                message={`Exporting all rows from ${table.name}`}
+              />,
+              {
+                id: toastId,
+                closeButton: false,
+                duration: Infinity,
+              }
+            )
+          },
         })
-      : allRows.filter((x) => selectedRows.has(x.idx))
+      : allRows.filter((x) => snap.selectedRows.has(x.idx))
+
+    if (rows.length === 0) {
+      toast.error('Export failed, please exporting try again')
+      setIsExporting(false)
+      return
+    }
 
     const sqlStatements = formatTableRowsToSQL(table, rows)
     const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
+    toast.success(`Downloading ${rows.length} rows to SQL`, {
+      id: toastId,
+      closeButton: true,
+      duration: 4000,
+    })
     saveAs(sqlData, `${state.table!.name}_rows.sql`)
     setIsExporting(false)
   }
   function deselectRows() {
-    dispatch({
-      type: 'SELECTED_ROWS_CHANGE',
-      payload: { selectedRows: new Set() },
-    })
+    snap.setSelectedRows(new Set())
   }
 
-  const allRows = data?.rows ?? []
-  const totalRows = countData?.count ?? 0
-  const { selectedRows, editable, allRowsSelected } = state
-
   useSubscribeToImpersonatedRole(() => {
-    if (allRowsSelected || selectedRows.size > 0) {
+    if (snap.allRowsSelected || snap.selectedRows.size > 0) {
       deselectRows()
     }
   })
@@ -412,22 +477,22 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           size="tiny"
           icon={<Trash />}
           onClick={onRowsDelete}
-          disabled={allRowsSelected && isImpersonatingRole}
+          disabled={snap.allRowsSelected && isImpersonatingRole}
           tooltip={{
             content: {
               side: 'bottom',
               text:
-                allRowsSelected && isImpersonatingRole
+                snap.allRowsSelected && isImpersonatingRole
                   ? 'Table truncation is not supported when impersonating a role'
                   : undefined,
             },
           }}
         >
-          {allRowsSelected
+          {snap.allRowsSelected
             ? `Delete all rows in table`
-            : selectedRows.size > 1
-              ? `Delete ${selectedRows.size} rows`
-              : `Delete ${selectedRows.size} row`}
+            : snap.selectedRows.size > 1
+              ? `Delete ${snap.selectedRows.size} rows`
+              : `Delete ${snap.selectedRows.size} row`}
         </ButtonTooltip>
       )}
       <DropdownMenu>
@@ -450,7 +515,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {!allRowsSelected && totalRows > allRows.length && (
+      {!snap.allRowsSelected && totalRows > allRows.length && (
         <>
           <div className="h-6 ml-0.5">
             <Separator orientation="vertical" />
