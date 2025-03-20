@@ -6,16 +6,11 @@ import useConfData from './hooks/use-conf-data'
 export default function TicketCopy() {
   const [state] = useConfData()
   const userData = state.userTicketData
-  const { username, platinum, secret } = userData
+  const { username } = userData
   const [copied, setCopied] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const hasSecretTicket = secret
-  const displayUrl = `.../launch-week/tickets/${username}?lw=14${
-    hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
-  }`
-  const url = `${LW14_URL}/tickets/${username}?lw=14${
-    hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
-  }`
+  const displayUrl = `.../launch-week?referal=${username}`
+  const link = `${LW14_URL}?referal=${username}`
 
   return (
     <button
@@ -23,7 +18,7 @@ export default function TicketCopy() {
       name="Copy"
       ref={buttonRef}
       onClick={() => {
-        navigator.clipboard.writeText(url).then(() => {
+        navigator.clipboard.writeText(link).then(() => {
           setCopied(true)
           setTimeout(() => {
             setCopied(false)

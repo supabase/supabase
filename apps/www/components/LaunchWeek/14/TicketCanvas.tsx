@@ -26,7 +26,7 @@ const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
     platinum: state.userTicketData.platinum,
     user: {
       id: state.userTicketData.id,
-      name: state.userTicketData.name,
+      name: state.userTicketData.name ?? state.userTicketData.username,
       ticketNumber: state.userTicketData.ticket_number,
     },
   })
