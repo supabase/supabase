@@ -89,6 +89,8 @@
         "NEXT_PUBLIC_VERCEL_ENV",
         "NEXT_PUBLIC_VERCEL_BRANCH_URL",
         "NEXT_PUBLIC_API_URL",
+        "NEXT_PUBLIC_HCAPTCHA_SITE_KEY",
+        "HCAPTCHA_SECRET_KEY",
         "NODE_ENV",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
