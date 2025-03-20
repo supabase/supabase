@@ -1,6 +1,5 @@
-import { format, ident, literal } from '@supabase/pg-meta/src/pg-format'
-import type { Dictionary } from 'types'
-import type { Filter, QueryPagination, QueryTable, Sort } from '../types'
+import { ident, literal, format } from '../pg-format'
+import type { Filter, QueryPagination, QueryTable, Sort, Dictionary } from './types'
 
 export function countQuery(
   table: QueryTable,
@@ -51,7 +50,7 @@ export function deleteQuery(
     query +=
       enumArrayColumns === undefined || enumArrayColumns.length === 0
         ? ` returning *`
-        : ` returning *, ${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`
+        : ` returning *, ${enumArrayColumns.map((x) => `${ident(x)}::text[]`).join(',')}`
   }
   return query + ';'
 }
@@ -90,7 +89,7 @@ export function insertQuery(
     query +=
       enumArrayColumns === undefined || enumArrayColumns.length === 0
         ? ` returning *`
-        : ` returning *, ${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`
+        : ` returning *, ${enumArrayColumns.map((x) => `${ident(x)}::text[]`).join(',')}`
   }
   return query + ';'
 }
@@ -151,7 +150,7 @@ export function updateQuery(
     query +=
       enumArrayColumns === undefined || enumArrayColumns.length === 0
         ? ` returning *`
-        : ` returning *, ${enumArrayColumns.map((x) => `"${x}"::text[]`).join(',')}`
+        : ` returning *, ${enumArrayColumns.map((x) => `${ident(x)}::text[]`).join(',')}`
   }
 
   return query + ';'
@@ -218,10 +217,10 @@ function filterLiteral(value: any) {
 //============================================================
 
 function applySorts(query: string, sorts: Sort[]) {
-  if (sorts.length === 0) return query
-  query += ` order by ${sorts
+  const validSorts = sorts.filter((sort) => sort.column)
+  if (validSorts.length === 0) return query
+  query += ` order by ${validSorts
     .map((x) => {
-      if (!x.column) return null
       const order = x.ascending ? 'asc' : 'desc'
       const nullOrder = x.nullsFirst ? 'nulls first' : 'nulls last'
       return `${ident(x.table)}.${ident(x.column)} ${order} ${nullOrder}`

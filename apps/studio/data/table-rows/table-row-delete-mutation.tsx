@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { Query } from 'components/grid/query/Query'
+import { Query } from '@supabase/pg-meta/src/query'
 import type { SupaRow } from 'components/grid/types'
 import { Markdown } from 'components/interfaces/Markdown'
 import { DocsButton } from 'components/ui/DocsButton'
