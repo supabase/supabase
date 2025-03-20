@@ -2,9 +2,8 @@
 
 import { useLayoutEffect, useRef } from 'react'
 import { useSnapshot } from 'valtio'
-
 import { useCommandContext } from '../../internal/Context'
-import { type DialogSize, type ITouchHandlers } from '../../internal/state/viewState'
+import { type DialogSize, type ITouchHandlers } from '../../internal/state/viewState.types'
 
 const useCommandMenuInitiated = () => {
   const { viewState } = useCommandContext()
