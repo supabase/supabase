@@ -140,4 +140,3 @@ export const COMMAND_ITEMS = [
     }))
   ),
 ]
-console.log(COMMAND_ITEMS)

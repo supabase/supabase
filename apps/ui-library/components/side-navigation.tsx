@@ -56,7 +56,9 @@ function SideNavigation() {
             <SelectContent_Shadcn_>
               <SelectGroup_Shadcn_>
                 {options.map((f) => (
-                  <SelectItem_Shadcn_ value={f.value}>{f.label}</SelectItem_Shadcn_>
+                  <SelectItem_Shadcn_ key={f.value} value={f.value}>
+                    {f.label}
+                  </SelectItem_Shadcn_>
                 ))}
               </SelectGroup_Shadcn_>
             </SelectContent_Shadcn_>
