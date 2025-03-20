@@ -11,12 +11,32 @@ const TWOSLASHABLE_LANGS = ['js', 'ts', 'jsx', 'tsx', 'javascript', 'typescript'
 export async function CodeBlock({
   className,
   lang: explicitLang,
+  lineNumbers = true,
   contents,
   children,
-}: PropsWithChildren<{ className?: string; lang?: string; contents?: string }>) {
-  const code = (contents || extractCode(children)).trim()
+}: PropsWithChildren<{
+  className?: string
+  lang?: string
+  lineNumbers: boolean
+  contents?: string
+}>) {
+  let code = (contents || extractCode(children)).trim()
   const lang = tryToBundledLanguage(explicitLang) || extractLang(children)
-  const { tokens } = await codeToTokens(cutCode(code), {
+
+  let twoslashed = null as null | Map<number, Map<number, Array<NodeHover>>>
+  if (TWOSLASHABLE_LANGS.includes(lang)) {
+    try {
+      const { code: editedCode, nodes } = twoslasher(code)
+      const hoverNodes: Array<NodeHover> = nodes.filter((node) => node.type === 'hover')
+      twoslashed = annotationsByLine(hoverNodes)
+      code = editedCode
+    } catch (_err) {
+      // Silently ignore, if imports aren't defined type compilation fails
+      console.error(_err)
+    }
+  }
+
+  const { tokens } = await codeToTokens(code, {
     lang,
     themes: {
       light: 'vitesse-light',
@@ -24,34 +44,33 @@ export async function CodeBlock({
     },
   })
 
-  let twoslashed = null as null | Map<number, Map<number, Array<NodeHover>>>
-  if (TWOSLASHABLE_LANGS.includes(lang)) {
-    try {
-      const { nodes } = twoslasher(code)
-      const hoverNodes: Array<NodeHover> = nodes.filter((node) => node.type === 'hover')
-      twoslashed = annotationsByLine(hoverNodes)
-    } catch {
-      // Silently ignore, if imports aren't defined type compilation fails
-    }
-  }
-
   return (
     <div
       className={cn(
         'not-prose',
         'w-full overflow-x-auto',
         'border border-default rounded-lg',
-        'p-6',
         'bg-200',
         'text-sm',
         className
       )}
     >
       <pre>
-        <code>
-          {tokens.map((line, idx) => (
-            <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
-          ))}
+        <code className={lineNumbers ? 'flex' : ''}>
+          {lineNumbers && (
+            <div className="flex-shrink-0 select-none text-right text-muted bg-control py-6 px-2">
+              {tokens.map((_, idx) => (
+                <div key={idx} className="w-full">
+                  {idx + 1}
+                </div>
+              ))}
+            </div>
+          )}
+          <div className={cn('p-6', lineNumbers ? 'flex-grow' : '')}>
+            {tokens.map((line, idx) => (
+              <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
+            ))}
+          </div>
         </code>
       </pre>
     </div>
@@ -73,7 +92,7 @@ function CodeLine({
   })
 
   return (
-    <span className="block">
+    <span className="block h-5">
       {tokens.map((token) =>
         twoslash?.has(token.offset) ? (
           <AnnotatedSpan
@@ -89,16 +108,6 @@ function CodeLine({
       )}
     </span>
   )
-}
-
-function cutCode(str: string): string {
-  // Remove all text before a line with "---cut---" marker
-  const cutIndex = str.indexOf('// ---cut---')
-  if (cutIndex === -1) return str
-  // Find the end of the cut line (including newline after it)
-  const lineEndIndex = str.indexOf('\n', cutIndex)
-  if (lineEndIndex === -1) return '' // If no newline after cut marker, return empty string
-  return str.slice(lineEndIndex + 1) // Skip the newline character too
 }
 
 function extractCode(children: React.ReactNode): string {
