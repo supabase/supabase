@@ -1,29 +1,6 @@
 import { proxy } from 'valtio'
-import { type ICommand } from '../Command'
-import { type ICommandSection, section$new } from '../CommandSection'
-
-type OrderSectionInstruction = (sections: ICommandSection[], idx: number) => ICommandSection[]
-type OrderCommandsInstruction = (
-  commands: ICommand[],
-  commandsToInsert: ICommand[]
-) => Array<ICommand>
-type CommandOptions = {
-  deps?: any[]
-  enabled?: boolean
-  forceMountSection?: boolean
-  sectionMeta?: any
-  orderSection?: OrderSectionInstruction
-  orderCommands?: OrderCommandsInstruction
-}
-
-type ICommandsState = {
-  commandSections: ICommandSection[]
-  registerSection: (
-    sectionName: string,
-    commands: ICommand[],
-    options?: CommandOptions
-  ) => () => void
-}
+import { type ICommandSection, type ICommandsState, type CommandOptions } from '../types'
+import { section$new } from '../CommandSection'
 
 const initCommandsState = () => {
   const state: ICommandsState = proxy({
@@ -82,4 +59,4 @@ const orderSectionFirst = (sections: ICommandSection[], idx: number) => [
 ]
 
 export { initCommandsState, orderSectionFirst }
-export type { ICommandsState, CommandOptions }
+export type { CommandOptions }

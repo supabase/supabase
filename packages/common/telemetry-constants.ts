@@ -1049,6 +1049,115 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
+ * User clicked the deploy button for an Edge Function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/new
+ */
+export interface EdgeFunctionDeployButtonClickedEvent {
+  action: 'edge_function_deploy_button_clicked'
+  properties: {
+    /**
+     * Click on Deploy can either happen:
+     *   1. in the functions editor page
+     *   2. in the chat button in the functions editor
+     */
+    origin: 'functions_editor' | 'functions_ai_assistant'
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User clicked the AI Assistant button to create an Edge Function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions
+ */
+export interface EdgeFunctionAiAssistantButtonClickedEvent {
+  action: 'edge_function_ai_assistant_button_clicked'
+  properties: {
+    /**
+     * Click on AI Assistant can either happen:
+     *   1. on the main block when there are no functions
+     *   2. in the secondary action section of the page
+     *   3. on the chat button in the functions editor
+     */
+    origin: 'no_functions_block' | 'secondary_action' | 'functions_editor_chat'
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User clicked the button to go to the functions editor page to create an edge function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions
+ */
+export interface EdgeFunctionViaEditorButtonClickedEvent {
+  action: 'edge_function_via_editor_button_clicked'
+  properties: {
+    /**
+     * Click on Via Editor can either happen:
+     *   1. on the main block when there are no functions
+     *   2. in the secondary action section of the page
+     */
+    origin: 'no_functions_block' | 'secondary_action'
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User clicked on an Edge Function template.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions
+ */
+export interface EdgeFunctionTemplateClickedEvent {
+  action: 'edge_function_template_clicked'
+  properties: {
+    templateName: string
+    /**
+     * Where the edge function template was clicked from:
+     *  1. functions page
+     *  2. editor page
+     */
+    origin: 'functions_page' | 'editor_page'
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User clicked the button to create an edge function via CLI.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions
+ */
+export interface EdgeFunctionViaCliButtonClickedEvent {
+  action: 'edge_function_via_cli_button_clicked'
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1113,3 +1222,8 @@ export type TelemetryEvent =
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
+  | EdgeFunctionDeployButtonClickedEvent
+  | EdgeFunctionAiAssistantButtonClickedEvent
+  | EdgeFunctionViaEditorButtonClickedEvent
+  | EdgeFunctionTemplateClickedEvent
+  | EdgeFunctionViaCliButtonClickedEvent
